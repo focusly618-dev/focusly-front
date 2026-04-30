@@ -1,0 +1,5 @@
+echo "Checking types..."
+yarn tsc --noEmit
+
+echo "Running lint-staged..."
+yarn lint-staged
