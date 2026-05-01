@@ -132,7 +132,7 @@ export const Workspace = ({
     watch,
   ]);
 
-  const handleSelectWorkspace = (workspace: WorkspaceTypes) => {
+  const handleSelectWorkspace = (workspace: WorkspaceTypes):void => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('workspaceId', workspace.id);
     setSearchParams(newParams);
@@ -152,7 +152,7 @@ export const Workspace = ({
     onEditorChange(true);
   };
 
-  const handleCreateNew = () => {
+  const handleCreateNew = (): void => {
     reset({
       title: 'Untitled Strategic Plan',
       content: '[]',
