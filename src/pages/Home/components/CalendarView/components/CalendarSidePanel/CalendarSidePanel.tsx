@@ -38,7 +38,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
 // Mock Components
 const QuickInsights = () => (
   <Box>
-    <SectionTitle>Quick Insightssssssssss</SectionTitle>
+    <SectionTitle>Quick Insights</SectionTitle>
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <Card elevation={0}>
         <Box
