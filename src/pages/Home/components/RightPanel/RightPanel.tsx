@@ -26,7 +26,7 @@ const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
       >
         {isOpen && (
           <Typography variant="h6" fontWeight="bold">
-            Quick Insightsssssssss
+            Quick Insights
           </Typography>
         )}
         <IconButton
