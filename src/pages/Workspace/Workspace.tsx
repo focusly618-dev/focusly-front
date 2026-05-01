@@ -36,7 +36,7 @@ export const Workspace = ({
     selectedSubtaskIndex,
   } = useWorkspace();
 
-  const [runOnboarding, setRunOnboarding] = useState(() => {
+  const [runOnboarding, setRunOnboarding] = useState(():boolean => {
     return localStorage.getItem('onboarding_workspace_completed') !== 'true';
   });
 
@@ -70,7 +70,7 @@ export const Workspace = ({
     },
   ];
 
-  const handleFinishOnboarding = () => {
+  const handleFinishOnboarding = ():void=> {
     setRunOnboarding(false);
     localStorage.setItem('onboarding_workspace_completed', 'true');
   };
