@@ -42,6 +42,7 @@ export const WorkspaceEditor = ({
   getCustomSlashMenuItems,
   getWorkspaceMentionMenuItems,
   activeFocusTaskId,
+  onUnlinkTask,
 }: WorkspaceEditorProps) => {
   const currentTitle = watch('title');
   const currentContent = watch('content');
@@ -184,6 +185,7 @@ export const WorkspaceEditor = ({
           onOpenTaskDetails={onOpenTaskDetails}
           onStartFocus={onStartFocus}
           activeFocusTaskId={activeFocusTaskId}
+          onUnlinkTask={onUnlinkTask}
         />
       </EditorContainer>
       <OnboardingWrapper

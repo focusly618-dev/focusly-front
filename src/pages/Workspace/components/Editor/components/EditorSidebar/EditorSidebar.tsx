@@ -20,6 +20,7 @@ import {
   Visibility as VisibilityIcon,
   EventNote as PlannedIcon,
   Description as DescriptionIcon,
+  LinkOff as LinkOffIcon,
 } from '@mui/icons-material';
 import {
   getPriorityFromLevel,
@@ -50,6 +51,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     onOpenTaskDetails,
     onStartFocus,
     activeFocusTaskId,
+    onUnlinkTask,
   } = props;
 
   const {
@@ -106,6 +108,63 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           <MetadataSection id="joyride-editor-metadata">
             {selectTask ? (
               <>
+                <Box sx={{ mb: 3 }}>
+                  {selectedSubtaskIndex !== null && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'info.main',
+                        fontWeight: 700,
+                        display: 'block',
+                        mb: 0.5,
+                        textTransform: 'uppercase',
+                        letterSpacing: 1,
+                      }}
+                    >
+                      Subtask of: {selectTask.title}
+                    </Typography>
+                  )}
+                  <Box
+                    display="flex"
+                    alignItems="flex-start"
+                    justifyContent="space-between"
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 800,
+                        color: 'text.primary',
+                        lineHeight: 1.2,
+                        fontSize: '1.25rem',
+                        letterSpacing: '-0.02em',
+                        flex: 1,
+                      }}
+                    >
+                      {selectedSubtaskIndex !== null &&
+                      selectTask.subtasks?.[selectedSubtaskIndex]
+                        ? selectTask.subtasks[selectedSubtaskIndex].title
+                        : selectTask.title}
+                    </Typography>
+                    {onUnlinkTask && (
+                      <IconButton
+                        size="small"
+                        onClick={onUnlinkTask}
+                        sx={{
+                          color: 'text.secondary',
+                          ml: 0.5,
+                          '&:hover': {
+                            color: 'error.main',
+                            bgcolor: 'error.main',
+                            backgroundColor: 'rgba(244,67,54,0.08)',
+                          },
+                        }}
+                        title="Unlink task"
+                      >
+                        <LinkOffIcon sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    )}
+                  </Box>
+                </Box>
                 <Box
                   display="flex"
                   justifyContent="space-between"

@@ -151,11 +151,11 @@ export const SearchPalette = ({
                       onClick={() => {
                         if (isSelected) {
                           handleSelectTask(null, null);
-                          setValue('taskId', undefined);
+                          setValue('taskId', null);
                         } else {
                           handleSelectTask(task, null);
                           setValue('taskId', task.id);
-                          setValue('title', task.title);
+                          setSearchTerm('');
                           setShowPalette(false);
                         }
                       }}
@@ -198,11 +198,11 @@ export const SearchPalette = ({
                             e.stopPropagation();
                             if (isSubtaskSelected) {
                               handleSelectTask(null, null);
-                              setValue('taskId', undefined);
+                              setValue('taskId', null);
                             } else {
                               handleSelectTask(task, index);
                               setValue('taskId', task.id);
-                              setValue('title', subtask.title);
+                              setSearchTerm('');
                               setShowPalette(false);
                             }
                           }}

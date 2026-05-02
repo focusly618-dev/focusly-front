@@ -91,6 +91,7 @@ export const TaskDetailModal = ({
     handleTimerChange,
     hasMeetLink,
     createURLWorkSpace,
+    handleRemoveWorkspace,
   } = useTaskDetailModal({
     onSave,
     onClose,
@@ -207,6 +208,7 @@ export const TaskDetailModal = ({
           <TaskWorkspaces
             workspaces={initialTask?.workspaces}
             onNavigate={createURLWorkSpace}
+            onRemove={handleRemoveWorkspace}
           />
 
           <TaskDescription
