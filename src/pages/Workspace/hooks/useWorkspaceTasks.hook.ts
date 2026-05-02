@@ -1,36 +1,68 @@
 import { useState, useMemo } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_TOTAL_WORKSPACES } from '../workspaces.graphql';
-import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import {
+  GET_TASKS_TITLES,
+  UPDATE_TASK,
+} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import type { TaskSearchItems } from '../types/workspace.types';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
 interface UseWorkspaceTasksProps {
   userId?: string;
   onTaskSelect?: (taskId: string | undefined) => void;
 }
 
-export const useWorkspaceTasks = ({ userId, onTaskSelect }: UseWorkspaceTasksProps) => {
+export const useWorkspaceTasks = ({
+  userId,
+  onTaskSelect,
+}: UseWorkspaceTasksProps) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [selectedSubtaskIndex, setSelectedSubtaskIndex] = useState<number | null>(null);
+  const [selectedSubtaskIndex, setSelectedSubtaskIndex] = useState<
+    number | null
+  >(null);
 
-  const { data: tasksData, loading: isLoading } = useQuery(GET_TASKS_TITLES, {
-    skip: !userId,
-    variables: { userId },
-    fetchPolicy: 'cache-and-network',
-  });
+  const { data: rawTasksData, loading: isLoading } = useQuery(
+    GET_TASKS_TITLES,
+    {
+      skip: !userId,
+      variables: { userId },
+      fetchPolicy: 'cache-and-network',
+    },
+  );
 
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
 
+  const tasksData = useMemo(() => {
+    if (!rawTasksData?.tasks) return undefined;
+    return {
+      tasks: rawTasksData.tasks.map(
+        (t: TaskResponse) => mapResponseToTask(t) as unknown as TaskSearchItems,
+      ),
+    };
+  }, [rawTasksData]);
+
   const selectTask = useMemo(() => {
     if (!tasksData?.tasks || !selectedTaskId) return null;
-    return tasksData.tasks.find((t: TaskSearchItems) => t.id === selectedTaskId) || null;
+    return (
+      tasksData.tasks.find((t: TaskSearchItems) => t.id === selectedTaskId) ||
+      null
+    );
   }, [tasksData, selectedTaskId]);
 
-  const handleSelectTask = (selectedTask: TaskSearchItems | null, subtaskIndex?: number | null) => {
+  const handleSelectTask = (
+    selectedTask: TaskSearchItems | null,
+    subtaskIndex?: number | null,
+  ) => {
     if (selectedTask?.id !== selectedTaskId) {
-      setSelectedSubtaskIndex(typeof subtaskIndex === 'number' ? subtaskIndex : null);
+      setSelectedSubtaskIndex(
+        typeof subtaskIndex === 'number' ? subtaskIndex : null,
+      );
     } else {
-      setSelectedSubtaskIndex(typeof subtaskIndex === 'number' ? subtaskIndex : null);
+      setSelectedSubtaskIndex(
+        typeof subtaskIndex === 'number' ? subtaskIndex : null,
+      );
     }
 
     setSelectedTaskId(selectedTask?.id || null);
@@ -40,7 +72,10 @@ export const useWorkspaceTasks = ({ userId, onTaskSelect }: UseWorkspaceTasksPro
     }
   };
 
-  const handleUpdateTask = async (taskId: string, updates: Partial<TaskSearchItems>) => {
+  const handleUpdateTask = async (
+    taskId: string,
+    updates: Partial<TaskSearchItems>,
+  ) => {
     try {
       await updateTaskMutation({
         variables: {

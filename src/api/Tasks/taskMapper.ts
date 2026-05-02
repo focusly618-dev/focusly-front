@@ -107,5 +107,16 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
       ) || [],
     estimated_start_date: safeISO(t.estimated_start_date),
     estimated_end_date: safeISO(t.estimated_end_date),
+    workspaces: t.workspace
+      ? [
+          {
+            id: t.workspace.id,
+            title: t.workspace.title,
+            content: t.workspace.content || '',
+            updatedAt: t.workspace.updatedAt || '',
+            folder: t.workspace.folder,
+          },
+        ]
+      : [],
   };
 };

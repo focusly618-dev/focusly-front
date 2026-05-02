@@ -53,6 +53,15 @@ export const CREATE_WORKSPACE = gql`
       taskId
       folderId
       saveStatus
+      task {
+        id
+        title
+        status
+        estimate_timer
+        real_timer
+        duration
+        priority_level
+      }
     }
   }
 `;
@@ -66,6 +75,15 @@ export const UPDATE_WORKSPACE = gql`
       updatedAt
       taskId
       folderId
+      task {
+        id
+        title
+        status
+        estimate_timer
+        real_timer
+        duration
+        priority_level
+      }
     }
   }
 `;
@@ -116,7 +134,7 @@ export const GET_WORKSPACE_BY_ID = gql`
         google_event_id
       }
     }
-}
+  }
 `;
 
 export const GET_FOLDERS = gql`

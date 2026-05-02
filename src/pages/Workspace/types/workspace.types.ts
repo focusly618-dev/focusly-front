@@ -33,7 +33,7 @@ export interface WorkspaceFormData {
   id?: string;
   title: string;
   content: string;
-  taskId?: string;
+  taskId?: string | null;
   folderId?: string;
   folder?: FolderTypes;
   saveStatus: boolean;
@@ -71,6 +71,7 @@ export interface WorkspaceEditorProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getWorkspaceMentionMenuItems: (editor: any) => any[];
   activeFocusTaskId?: string | null;
+  onUnlinkTask?: () => void;
 }
 
 export interface WorkspaceProps {
@@ -109,4 +110,12 @@ export interface TaskSearchItems {
   }[];
   links?: { title: string; url: string }[];
   google_event_id?: string;
+  workspaces?: {
+    id: string;
+    title: string;
+    folder?: {
+      name: string;
+      color?: string;
+    } | null;
+  }[];
 }

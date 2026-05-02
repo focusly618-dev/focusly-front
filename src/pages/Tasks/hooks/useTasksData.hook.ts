@@ -1,9 +1,14 @@
 import { useMemo, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_TASKS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
-import type { TaskResponse, TaskFilterInput, TaskSortInput } from '@/api/Tasks/apiTaskTypes';
+import type {
+  TaskResponse,
+  TaskFilterInput,
+  TaskSortInput,
+} from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import { setTasks } from '@/redux/tasks/task.slice';
+import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
 interface UseTasksDataProps {
   userId?: string;
@@ -28,12 +33,10 @@ export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
 
   useEffect(() => {
     if (data?.tasks) {
-      const validTasks = data.tasks.map((t: TaskResponse) => ({
-        ...t,
-        deadline: t.deadline || new Date().toISOString(),
-      }));
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      dispatch(setTasks(validTasks as any));
+      const mappedTasks = data.tasks.map((t: TaskResponse) =>
+        mapResponseToTask(t),
+      );
+      dispatch(setTasks(mappedTasks));
     }
   }, [data, dispatch]);
 

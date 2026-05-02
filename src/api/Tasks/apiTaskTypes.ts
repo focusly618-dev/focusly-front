@@ -82,6 +82,17 @@ export interface TaskResponse {
   estimated_end_date?: string;
   task_type?: string;
   source?: string;
+  workspace?: {
+    id: string;
+    title: string;
+    content?: string;
+    updatedAt?: string;
+    folder?: {
+      id: string;
+      name: string;
+      color?: string;
+    } | null;
+  };
 }
 
 export interface updateTask {

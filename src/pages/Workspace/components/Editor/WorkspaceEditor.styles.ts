@@ -10,16 +10,19 @@ export const EditorContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   height: '100%',
+  overflow: 'hidden',
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
 }));
 
 export const MainEditorArea = styled(Box)(({ theme }) => ({
   flex: 1,
+  minWidth: 0,
   display: 'flex',
   flexDirection: 'column',
   borderRight: `1px solid ${theme.palette.divider}`,
   overflowY: 'auto',
+  overflowX: 'auto',
 }));
 
 export const EditorHeader = styled(Box)(({ theme }) => ({
@@ -78,13 +81,15 @@ export const RightSidebar = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'isOpen',
 })<RightSidebarProps>(({ theme, isOpen }) => ({
   width: isOpen ? '320px' : '60px',
+  flexShrink: 0,
   transition: 'width 0.3s ease',
   display: 'flex',
   flexDirection: 'column',
   backgroundColor: theme.palette.background.paper, // Slightly distinct bg
   padding: '24px',
   borderLeft: `1px solid ${theme.palette.divider}`,
-  overflow: 'hidden',
+  overflowY: 'auto',
+  overflowX: 'hidden',
   position: 'relative',
   whiteSpace: 'nowrap', // Prevent text wrapping during transition
   height: '100%',
@@ -267,7 +272,8 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
   flex: 1,
   '& .bn-editor': {
     backgroundColor: 'transparent',
-    padding: '0 16px', // Align with title
+    padding: '0 16px 100px 16px', // Extra padding at bottom
+    minHeight: 'calc(100vh - 250px)', // Ensures editor stretches down so empty space is clickable
   },
   '& .bn-block-content': {
     color: theme.palette.text.secondary,
@@ -353,6 +359,73 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
       boxShadow: `0 0 12px ${theme.palette.info.main}66`,
       transform: 'translateY(-1px)',
     },
+  },
+  // Table Styles
+  '& table': {
+    width: '100%',
+    borderCollapse: 'separate',
+    borderSpacing: 0,
+    margin: '24px 0',
+    backgroundColor: 'transparent',
+    borderRadius: '10px',
+    border:
+      theme.palette.mode === 'dark'
+        ? `1px solid rgb(255 255 255)`
+        : `1px solid ${theme.palette.divider}`,
+  },
+  '& th': {
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.8)' : '#f8fafc',
+    color: theme.palette.text.primary,
+    fontWeight: 700,
+    fontSize: '13px',
+    letterSpacing: '0.5px',
+    padding: '16px',
+    textAlign: 'left',
+    borderBottom: `2px solid ${theme.palette.divider}`,
+    borderRight: `1px solid ${theme.palette.divider}`,
+    textTransform: 'uppercase',
+    '&:last-child': {
+      borderRight: 'none',
+    },
+  },
+  '& td': {
+    padding: '16px',
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    borderRight: `1px solid ${theme.palette.divider}`,
+    color: theme.palette.text.secondary,
+    fontSize: '14px',
+    lineHeight: 1.6,
+    transition: 'all 0.2s ease',
+    '&:last-child': {
+      borderRight: 'none',
+    },
+  },
+  '& tr:last-child td': {
+    borderBottom: 'none',
+  },
+  '& tr': {
+    transition: 'background-color 0.2s ease',
+    '&:hover td': {
+      backgroundColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.03)'
+          : 'rgba(0, 0, 0, 0.02)',
+      color: theme.palette.text.primary,
+    },
+  },
+  // Target the BlockNote specific wrapper if it exists to override its styles
+  '& .bn-table-wrapper': {
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    borderRadius: '12px',
+    padding: '8px', // Padding around the table
+    marginBottom: '16px',
+    border: `1px solid ${theme.palette.divider}`,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(0, 0, 0, 0.2)'
+        : 'rgba(0, 0, 0, 0.02)',
   },
 }));
 // Search Input Styles

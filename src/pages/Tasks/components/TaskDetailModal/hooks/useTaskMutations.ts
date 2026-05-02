@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import {
   GET_WORKSPACES,
-  REMOVE_WORKSPACE,
+  UPDATE_WORKSPACE,
 } from '@/pages/Workspace/workspaces.graphql';
 import {
   CREATE_TASK,
@@ -54,7 +54,6 @@ export const useTaskMutations = ({
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
   const [addSubtaskMutation] = useMutation(ADD_SUBTASK);
-  const [removeWorkspaceMutation] = useMutation(REMOVE_WORKSPACE);
 
   const generateMeetLinkNow = async (
     googleEventId?: string,
@@ -520,14 +519,28 @@ export const useTaskMutations = ({
     }
   };
 
+  const [updateWorkspaceMutation] = useMutation(UPDATE_WORKSPACE);
+
   const handleRemoveWorkspace = async (workspaceId: string) => {
     try {
-      await removeWorkspaceMutation({
-        variables: { id: workspaceId },
+      await updateWorkspaceMutation({
+        variables: {
+          updateWorkspaceInput: {
+            id: workspaceId,
+            taskId: null,
+          },
+        },
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user?.id } }],
+      });
+      sileo.success({
+        title: 'Workspace unlinked',
+        fill: 'var(--sileo-update-bg)',
       });
     } catch (error) {
       console.error(error);
+      sileo.error({
+        title: 'Error unlinking workspace',
+      });
     }
   };
 

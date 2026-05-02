@@ -12,4 +12,5 @@ export interface EditorSidebarProps {
   onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   onStartFocus?: (task: TaskSearchItems, subtaskIndex: number | null) => void;
   activeFocusTaskId?: string | null;
+  onUnlinkTask?: () => void;
 }

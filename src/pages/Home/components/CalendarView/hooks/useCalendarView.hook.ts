@@ -55,7 +55,7 @@ export const useCalendarView = () => {
   const [currentView, setCurrentView] = useState<View>(() => {
     const v = searchParams.get('v');
     const validViews: View[] = [Views.MONTH, Views.WEEK, Views.DAY];
-    return validViews.includes(v as View) ? (v as View) : Views.MONTH;
+    return validViews.includes(v as View) ? (v as View) : Views.DAY;
   });
 
   const [currentDate, setCurrentDate] = useState(() => {
@@ -206,8 +206,9 @@ export const useCalendarView = () => {
     // 2. Map Google Calendar Events (Virtual) with robust Deduplication
     const calendarEvents = reduxEvents
       .filter((ge) => {
-        const normGoogleId = normalizeGoogleId(ge.id);
-        const baseGoogleId = getBaseGoogleId(ge.id);
+        const targetId = ge.google_event_id || ge.id;
+        const normGoogleId = normalizeGoogleId(targetId);
+        const baseGoogleId = getBaseGoogleId(targetId);
 
         // Hide if there's any match in our synced IDs set
         const isAlreadySaved =

@@ -39,13 +39,19 @@ export const TaskActions = ({
                 title: 'Confirm',
                 onClick: () => {
                   sileo.promise(handleDelete(), {
-                    loading: { title: 'Deleting...', fill: 'var(--sileo-update-bg)', },
+                    loading: {
+                      title: 'Deleting...',
+                      fill: 'var(--sileo-update-bg)',
+                    },
                     success: {
                       title: 'Task deleted successfully!',
                       duration: 4000,
                       fill: 'var(--sileo-delete-bg)',
-                      },
-                    error: { title: 'Error deleting task', fill: 'var(--sileo-error-bg)', },
+                    },
+                    error: {
+                      title: 'Error deleting task',
+                      fill: 'var(--sileo-error-bg)',
+                    },
                   });
                   onClose();
                 },
@@ -61,18 +67,14 @@ export const TaskActions = ({
         </Button>
       </Box>
       <Button
-        onClick={
-          initialTask && initialTask.task_type !== 'GoogleTask'
-            ? handleUpdate
-            : handleSave
-        }
+        onClick={initialTask ? handleUpdate : handleSave}
         variant="contained"
         sx={saveButtonSx}
       >
         {loadingSave ? (
           <CircularProgress size={24} color="inherit" />
-        ) : initialTask && (initialTask?.task_type === 'PlatformTask' || initialTask?.task_type === 'GoogleTask') ? (
-          'Save Changes'
+        ) : initialTask ? (
+          'Edit Task'
         ) : (
           'Create Task'
         )}

@@ -36,7 +36,7 @@ export const Workspace = ({
     selectedSubtaskIndex,
   } = useWorkspace();
 
-  const [runOnboarding, setRunOnboarding] = useState(():boolean => {
+  const [runOnboarding, setRunOnboarding] = useState((): boolean => {
     return localStorage.getItem('onboarding_workspace_completed') !== 'true';
   });
 
@@ -70,7 +70,7 @@ export const Workspace = ({
     },
   ];
 
-  const handleFinishOnboarding = ():void=> {
+  const handleFinishOnboarding = (): void => {
     setRunOnboarding(false);
     localStorage.setItem('onboarding_workspace_completed', 'true');
   };
@@ -100,7 +100,7 @@ export const Workspace = ({
             setValue('id', workspace.id);
             setValue('title', workspace.title);
             setValue('content', workspace.content);
-            setValue('taskId', workspace.taskId);
+            setValue('taskId', workspace.taskId || null);
             setValue('folderId', workspace.folderId);
             setValue('folder', workspace.folder);
             setValue('saveStatus', true);
@@ -132,7 +132,7 @@ export const Workspace = ({
     watch,
   ]);
 
-  const handleSelectWorkspace = (workspace: WorkspaceTypes):void => {
+  const handleSelectWorkspace = (workspace: WorkspaceTypes): void => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('workspaceId', workspace.id);
     setSearchParams(newParams);
@@ -140,7 +140,7 @@ export const Workspace = ({
     setValue('id', workspace.id);
     setValue('title', workspace.title);
     setValue('content', workspace.content);
-    setValue('taskId', workspace.taskId);
+    setValue('taskId', workspace.taskId || null);
     setValue('folderId', workspace.folderId);
     setValue('folder', workspace.folder);
     setValue('saveStatus', true);
@@ -207,6 +207,11 @@ export const Workspace = ({
     }));
   };
 
+  const handleUnlinkTask = (): void => {
+    handleSelectTask(null);
+    setValue('taskId', null);
+  };
+
   if (isEditorOpen) {
     return (
       <>
@@ -238,6 +243,7 @@ export const Workspace = ({
             getCustomSlashMenuItems={getCustomSlashMenuItems}
             getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
             activeFocusTaskId={activeFocusTaskId}
+            onUnlinkTask={handleUnlinkTask}
           />
         </div>
         <OnboardingWrapper

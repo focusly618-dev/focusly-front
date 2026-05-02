@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Typography, Button, alpha, useTheme } from '@mui/material';
-import { 
+import {
   Description as WorkspaceIcon,
-  ChevronRight as ChevronRightIcon 
+  ChevronRight as ChevronRightIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 
 interface TaskWorkspacesProps {
   workspaces?: {
@@ -15,9 +17,14 @@ interface TaskWorkspacesProps {
     } | null;
   }[];
   onNavigate: (id: string) => void;
+  onRemove?: (id: string) => void;
 }
 
-export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({ workspaces, onNavigate }) => {
+export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({
+  workspaces,
+  onNavigate,
+  onRemove,
+}) => {
   const theme = useTheme();
 
   if (!workspaces || workspaces.length === 0) return null;
@@ -26,7 +33,10 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({ workspaces, onNa
     <Box sx={{ px: 4, mb: 4 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
         <WorkspaceIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, letterSpacing: 1 }}>
+        <Typography
+          variant="caption"
+          sx={{ color: 'text.secondary', fontWeight: 600, letterSpacing: 1 }}
+        >
           LINKED {workspaces.length > 1 ? 'WORKSPACES' : 'WORKSPACE'}
         </Typography>
       </Box>
@@ -43,16 +53,25 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({ workspaces, onNa
               alignItems: 'center',
               p: 1.5,
               borderRadius: '12px',
-              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              bgcolor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.03)'
+                  : 'rgba(0,0,0,0.02)',
               border: '1px solid',
-              borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+              borderColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.05)'
+                  : 'rgba(0,0,0,0.05)',
               color: theme.palette.text.primary,
               textTransform: 'none',
               transition: 'all 0.2s',
               '&:hover': {
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.05)'
+                    : 'rgba(0,0,0,0.04)',
                 borderColor: 'divider',
-              }
+              },
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -61,7 +80,9 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({ workspaces, onNa
                   width: 32,
                   height: 32,
                   borderRadius: '8px',
-                  bgcolor: ws.folder?.color ? alpha(ws.folder.color, 0.2) : alpha(theme.palette.primary.main, 0.2),
+                  bgcolor: ws.folder?.color
+                    ? alpha(ws.folder.color, 0.2)
+                    : alpha(theme.palette.primary.main, 0.2),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -75,13 +96,43 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({ workspaces, onNa
                   {ws.title}
                 </Typography>
                 {ws.folder && (
-                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', display: 'block' }}
+                  >
                     {ws.folder.name}
                   </Typography>
                 )}
               </Box>
             </Box>
-            <ChevronRightIcon sx={{ color: 'text.secondary', opacity: 0.5, fontSize: 18 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              {onRemove && (
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemove(ws.id);
+                  }}
+                  sx={{
+                    opacity: 0,
+                    transition: 'opacity 0.2s',
+                    color: 'error.main',
+                    '.MuiButton-root:hover &': {
+                      opacity: 0.7,
+                    },
+                    '&:hover': {
+                      opacity: '1 !important',
+                      bgcolor: alpha(theme.palette.error.main, 0.1),
+                    },
+                  }}
+                >
+                  <CloseIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              )}
+              <ChevronRightIcon
+                sx={{ color: 'text.secondary', opacity: 0.5, fontSize: 18 }}
+              />
+            </Box>
           </Button>
         ))}
       </Box>
