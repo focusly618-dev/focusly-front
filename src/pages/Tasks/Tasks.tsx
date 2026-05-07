@@ -4,6 +4,7 @@ import { TasksContainer, MainContent } from './Tasks.styles';
 import { TasksHeader } from './components/TasksHeader/TasksHeader';
 import { TasksControlsBar } from './components/TasksControlsBar/TasksControlsBar';
 import { TasksContentView } from './components/TasksContentView/TasksContentView';
+import { TaskPriorityCards } from './components/TaskPriorityCards/TaskPriorityCards';
 import { SubtaskModal } from './components/SubtaskModal/SubtaskModal';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import type { Step } from 'react-joyride';
@@ -43,7 +44,17 @@ export const Tasks = () => {
     handleOpenSubtaskModal,
     handleSaveSubtask,
     handleSubtaskToggle,
+    setPriorityFilter,
   } = useTasks();
+
+  const activePriority =
+    activeFilterState?.priorities?.length === 1
+      ? activeFilterState.priorities[0] === 'High'
+        ? 3
+        : activeFilterState.priorities[0] === 'Medium'
+          ? 2
+          : 1
+      : undefined;
 
   const onboardingSteps: Step[] = [
     {
@@ -134,7 +145,10 @@ export const Tasks = () => {
           handleSortClose={handleSortClose}
           handleApplySort={handleApplySort}
         />
-
+        <TaskPriorityCards
+          activePriority={activePriority}
+          onPriorityChange={setPriorityFilter}
+        />
         <TasksContentView
           viewMode={viewMode}
           isLoading={isLoading}

@@ -1,5 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
-import type { TaskResponse, TaskFilterInput, TaskSortInput } from '@/api/Tasks/apiTaskTypes';
+import type {
+  TaskResponse,
+  TaskFilterInput,
+  TaskSortInput,
+} from '@/api/Tasks/apiTaskTypes';
 import type { FilterState } from '../components/FilterPopover/FilterPopover';
 import type { SortState } from '../components/SortPopover/SortPopover';
 
@@ -7,9 +11,15 @@ export type DateRangeFilter = 'today' | 'last7' | 'last30' | 'all';
 
 export const useTasksFilters = (tasks: TaskResponse[]) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilters, setActiveFilters] = useState<TaskFilterInput | undefined>(undefined);
-  const [activeFilterState, setActiveFilterState] = useState<FilterState | undefined>(undefined);
-  const [activeSort, setActiveSort] = useState<TaskSortInput | undefined>(undefined);
+  const [activeFilters, setActiveFilters] = useState<
+    TaskFilterInput | undefined
+  >(undefined);
+  const [activeFilterState, setActiveFilterState] = useState<
+    FilterState | undefined
+  >(undefined);
+  const [activeSort, setActiveSort] = useState<TaskSortInput | undefined>(
+    undefined,
+  );
   const [isCompletedFilterActive, setIsCompletedFilterActive] = useState(false);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(() => {
     const saved = localStorage.getItem('tasksDateRange');
@@ -62,11 +72,15 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
       result = result.filter(
         (task) =>
           task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          task.notes_encrypted?.toLowerCase().includes(searchTerm.toLowerCase())
+          task.notes_encrypted
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()),
       );
     }
     if (isCompletedFilterActive) {
-      result = result.filter((task) => ['Done', 'Pending', 'Backlog'].includes(task.status));
+      result = result.filter((task) =>
+        ['Done', 'Pending', 'Backlog'].includes(task.status),
+      );
       // Note: The original logic had multiple sequential filters that seemed to conflict.
       // Replaced with a more logical interpretation if needed, or keeping it as requested if strictly following.
       // Let's stick closer to the original but fix the evident bug (overwriting filter).
@@ -86,7 +100,9 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
       if (task.status === 'Done') return;
 
       const dateToUse = task.deadline;
-      const taskDateStr = dateToUse ? new Date(dateToUse).toLocaleDateString('en-CA') : '';
+      const taskDateStr = dateToUse
+        ? new Date(dateToUse).toLocaleDateString('en-CA')
+        : '';
       const isHighPriority = (task.priority_level ?? 0) >= 3;
       const isOverdue = taskDateStr && taskDateStr < todayStr;
 
@@ -99,7 +115,11 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
       }
     });
 
-    return { highPriorityTasks: high, todayTasks: today, upcomingTasks: upcoming };
+    return {
+      highPriorityTasks: high,
+      todayTasks: today,
+      upcomingTasks: upcoming,
+    };
   }, [filteredTasks]);
 
   const handleApplySort = (sort: SortState) => {
@@ -118,7 +138,8 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
       Completed: 'Done',
     };
 
-    const mappedStatus = filters.statuses.length > 0 ? statusMap[filters.statuses[0]] : undefined;
+    const mappedStatus =
+      filters.statuses.length > 0 ? statusMap[filters.statuses[0]] : undefined;
 
     const priorityMap: Record<string, number> = {
       High: 3,
@@ -126,9 +147,12 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
       Low: 1,
     };
     const mappedPriority =
-      filters.priorities.length > 0 ? priorityMap[filters.priorities[0]] : undefined;
+      filters.priorities.length > 0
+        ? priorityMap[filters.priorities[0]]
+        : undefined;
 
-    const mappedCategory = filters.categories.length > 0 ? filters.categories[0] : undefined;
+    const mappedCategory =
+      filters.categories.length > 0 ? filters.categories[0] : undefined;
 
     const newFilterInput: TaskFilterInput = {
       status: mappedStatus as TaskFilterInput['status'],
@@ -142,6 +166,22 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
     } else {
       setActiveFilters(newFilterInput);
       setActiveFilterState(filters);
+    }
+  };
+
+  const setPriorityFilter = (priority: number | undefined) => {
+    if (priority === undefined) {
+      setActiveFilters(undefined);
+      setActiveFilterState(undefined);
+    } else {
+      setActiveFilters({ priorityLevel: priority });
+      setActiveFilterState({
+        priorities: [
+          priority === 3 ? 'High' : priority === 2 ? 'Medium' : 'Low',
+        ],
+        categories: [],
+        statuses: [],
+      });
     }
   };
 
@@ -161,5 +201,6 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
     upcomingTasks,
     handleApplySort,
     handleApplyFilters,
+    setPriorityFilter,
   };
 };
