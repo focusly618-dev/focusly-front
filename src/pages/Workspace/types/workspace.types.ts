@@ -23,6 +23,8 @@ export interface WorkspaceTypes {
   folderId?: string;
   folder?: FolderTypes;
   title: string;
+  emoji?: string;
+  background_color?: string;
   saveStatus: boolean;
   content: string;
   createdAt: string;
@@ -32,6 +34,8 @@ export interface WorkspaceTypes {
 export interface WorkspaceFormData {
   id?: string;
   title: string;
+  emoji?: string;
+  background_color?: string;
   content: string;
   taskId?: string | null;
   folderId?: string;

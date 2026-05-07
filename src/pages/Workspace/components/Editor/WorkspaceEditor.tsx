@@ -45,6 +45,8 @@ export const WorkspaceEditor = ({
   onUnlinkTask,
 }: WorkspaceEditorProps) => {
   const currentTitle = watch('title');
+  const currentEmoji = watch('emoji');
+  const currentBackgroundColor = watch('background_color');
   const currentContent = watch('content');
   const currentFolder = watch('folder');
 
@@ -167,6 +169,10 @@ export const WorkspaceEditor = ({
             currentFolder={currentFolder}
             currentTitle={currentTitle}
             setTitle={(t) => setValue('title', t)}
+            currentEmoji={currentEmoji}
+            setEmoji={(e) => setValue('emoji', e)}
+            currentBackgroundColor={currentBackgroundColor}
+            setBackgroundColor={(c) => setValue('background_color', c)}
             editor={editor}
             onContentChange={() => {
               setValue('content', JSON.stringify(editor.document));

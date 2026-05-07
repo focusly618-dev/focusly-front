@@ -20,7 +20,7 @@ import {
 import { sileo } from 'sileo';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
-import { setTasks, removeTask } from '@/redux/tasks/task.slice';
+import { setTasks, removeTask, updateTask } from '@/redux/tasks/task.slice';
 import { removeEvent, setEvents } from '@/redux/calendar/calendar.slice';
 import {
   fetchGoogleEvents,
@@ -112,7 +112,7 @@ export const useCalendarView = () => {
       end = endOfWeek(currentDate);
     } else {
       start = startOfDay(currentDate);
-      end = endOfDay(currentDate);
+      end = addDays(endOfDay(currentDate), 2); // Extend to 2 days later for more margin
     }
 
     return {
@@ -481,6 +481,24 @@ export const useCalendarView = () => {
     const startDate = typeof start === 'string' ? new Date(start) : start;
     const endDate = typeof end === 'string' ? new Date(end) : end;
 
+    // Actualizar estado local inmediatamente para evitar el "snap back"
+    const task = tasks.find((t) => t.id === event.id);
+    if (task) {
+      const updatedTask: Task = {
+        ...task,
+        deadline: endDate.toISOString(),
+        estimated_start_date: startDate.toISOString(),
+        estimated_end_date: endDate.toISOString(),
+      };
+      dispatch(updateTask(updatedTask));
+    }
+
+    console.log('Event drop:', {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      dateRange,
+    });
+
     try {
       await updateTaskMutation({
         variables: {
@@ -513,6 +531,8 @@ export const useCalendarView = () => {
     }
   };
 
+  const MIN_TASK_DURATION_MINUTES = 15;
+
   const handleEventResize = async ({
     event,
     start,
@@ -521,7 +541,34 @@ export const useCalendarView = () => {
     if (event.type !== 'task') return;
 
     const startDate = typeof start === 'string' ? new Date(start) : start;
-    const endDate = typeof end === 'string' ? new Date(end) : end;
+    let endDate = typeof end === 'string' ? new Date(end) : end;
+
+    // Validar duración mínima de 15 minutos
+    const durationMinutes =
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60);
+    if (durationMinutes < MIN_TASK_DURATION_MINUTES) {
+      // Ajustar la hora de fin para que tenga al menos 15 minutos
+      endDate = new Date(
+        startDate.getTime() + MIN_TASK_DURATION_MINUTES * 60 * 1000,
+      );
+      sileo.warning({
+        title: 'Minimum duration is 15 minutes',
+        description: 'Task duration has been adjusted automatically',
+        duration: 3000,
+      });
+    }
+
+    // Actualizar estado local inmediatamente para evitar el "snap back"
+    const task = tasks.find((t) => t.id === event.id);
+    if (task) {
+      const updatedTask: Task = {
+        ...task,
+        deadline: endDate.toISOString(),
+        estimated_start_date: startDate.toISOString(),
+        estimated_end_date: endDate.toISOString(),
+      };
+      dispatch(updateTask(updatedTask));
+    }
 
     try {
       await updateTaskMutation({

@@ -1,7 +1,6 @@
 import { Box, styled } from '@mui/material';
 import Sidebar from './components/Sidebar/Sidebar';
 import CalendarView from './components/CalendarView';
-import RightPanel from './components/RightPanel';
 import { Tasks } from '../Tasks/Tasks';
 import { TaskBar } from './components/Sidebar/types/Sidebar.types';
 import { Insights } from '../Insights/Insights';
@@ -28,7 +27,7 @@ const MainContent = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   height: '100vh',
-  overflow: 'hidden',
+  overflow: 'auto',
 });
 
 export const Home = () => {
@@ -40,7 +39,6 @@ export const Home = () => {
     isWorkspaceSidebarOpen,
     setIsWorkspaceSidebarOpen,
     isRightPanelOpen,
-    setIsRightPanelOpen,
     isFocusModeOpen,
     setIsFocusModeOpen,
     isFocusModeActive,
@@ -83,14 +81,7 @@ export const Home = () => {
           {activeTab === TaskBar.Insights && <Insights />}
           {activeTab === TaskBar.Settings && <Settings />}
         </MainContent>
-        {activeTab !== TaskBar.Workspace && (
-          <Box id="joyride-right-panel">
-            <RightPanel
-              isOpen={isRightPanelOpen}
-              onToggle={() => setIsRightPanelOpen(!isRightPanelOpen)}
-            />
-          </Box>
-        )}
+
         <Box id="joyride-chat-ai">
           <ChatAI
             rightOffset={

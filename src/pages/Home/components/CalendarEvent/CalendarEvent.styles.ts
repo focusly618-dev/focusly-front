@@ -1,4 +1,4 @@
-import { Box, styled, darken, lighten } from '@mui/material';
+import { Box, styled, lighten } from '@mui/material';
 import type { Task } from '@/redux/tasks/task.types';
 
 // Priority-based color palette (6 colors)
@@ -10,15 +10,17 @@ export const PRIORITY_COLORS: Record<number, { main: string }> = {
 };
 
 const GOOGLE_EVENT_COLOR = { main: '#06B6D4' }; // Teal for Google events
-const DEFAULT_COLOR = { main: '#A855F7' };       // Purple fallback
+const DEFAULT_COLOR = { main: '#A855F7' }; // Purple fallback
 
-export const getEventColor = (
-  event: { id?: string; type?: string; resource?: unknown },
-) => {
+export const getEventColor = (event: {
+  id?: string;
+  type?: string;
+  resource?: unknown;
+}) => {
   if (event.type === 'event') return GOOGLE_EVENT_COLOR;
 
   const task = event.resource as Task | undefined;
-  
+
   // 1. Check for custom color tag in notes
   if (task?.notes_encrypted) {
     const colorMatch = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
@@ -36,76 +38,90 @@ export const getEventColor = (
 };
 
 export const EventContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'isMeeting' && prop !== 'overlapIndex',
-})<{ variant: { main: string }; isMeeting?: boolean; overlapIndex?: number }>(
-  ({ theme, variant, isMeeting, overlapIndex = 0 }) => {
-    const isDark = theme.palette.mode === 'dark';
-    const MEETING_COLOR = '#3B82F6'; // Medium priority blue
+  shouldForwardProp: (prop) =>
+    prop !== 'variant' && prop !== 'isMeeting' && prop !== 'overlapIndex',
+})<{ variant: { main: string }; isMeeting?: boolean; overlapIndex?: number }>(({
+  theme,
+  variant,
+  isMeeting,
+  overlapIndex = 0,
+}) => {
+  const isDark = theme.palette.mode === 'dark';
+  const MEETING_COLOR = '#3B82F6'; // Medium priority blue
 
-    // Dynamic rotation if overlap detected
-    const hueRotation = overlapIndex > 0 ? (overlapIndex * 40) % 360 : 0;
-    const brightnessIdx = overlapIndex > 0 ? 1 - (overlapIndex * 0.1) : 1;
+  // Dynamic rotation if overlap detected
+  const hueRotation = overlapIndex > 0 ? (overlapIndex * 40) % 360 : 0;
+  const brightnessIdx = overlapIndex > 0 ? 1 - overlapIndex * 0.1 : 1;
 
-    if (isMeeting) {
-      return {
-        backgroundColor: isDark ? 'rgba(30, 41, 59, 1)' : '#ffffff',
-        color: isDark ? '#ffffff' : '#000000',
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '2px 8px',
-        position: 'relative',
-        borderRadius: '6px',
-        overflow: 'hidden',
-        cursor: 'pointer',
-        boxShadow: isDark ? '0 0 12px rgba(59, 130, 246, 0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
-        filter: overlapIndex > 0 ? `hue-rotate(${hueRotation}deg) brightness(${brightnessIdx})` : 'none',
-        zIndex: overlapIndex + 1,
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 1.5, // Lifted slightly from bottom to avoid clipping
-          border: `2px dashed ${MEETING_COLOR}`,
-          borderRadius: 'inherit',
-          pointerEvents: 'none',
-        },
-        '&:hover': {
-          backgroundColor: isDark ? 'rgba(59, 130, 246, 0.3)' : '#f0f9ff', // Opaque light blue 
-          zIndex: 50, // Jump to top
-          '&::before': {
-            borderColor: lighten(MEETING_COLOR, 0.2),
-          },
-        },
-      };
-    }
-
+  if (isMeeting) {
     return {
-      backgroundColor: isDark ? darken(variant.main, 0.35) : lighten(variant.main, 0.3),
-      color: '#ffffff',
+      backgroundColor: isDark ? 'rgba(30, 41, 59, 1)' : '#ffffff',
+      color: isDark ? '#ffffff' : '#000000',
       height: '100%',
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      padding: '1px 6px',
-      borderLeft: `3px solid ${variant.main}`,
-      borderRadius: '4px',
+      padding: '2px 8px',
+      position: 'relative',
+      borderRadius: '6px',
       overflow: 'hidden',
       cursor: 'pointer',
+      boxShadow: isDark
+        ? '0 0 12px rgba(59, 130, 246, 0.3)'
+        : '0 2px 8px rgba(0,0,0,0.1)',
+      filter:
+        overlapIndex > 0
+          ? `hue-rotate(${hueRotation}deg) brightness(${brightnessIdx})`
+          : 'none',
       zIndex: overlapIndex + 1,
-      boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-      filter: overlapIndex > 0 ? `hue-rotate(${hueRotation}deg) brightness(${brightnessIdx})` : 'none',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 1.5, // Lifted slightly from bottom to avoid clipping
+        border: `2px dashed ${MEETING_COLOR}`,
+        borderRadius: 'inherit',
+        pointerEvents: 'none',
+      },
       '&:hover': {
-        backgroundColor: isDark ? darken(variant.main, 0.2) : lighten(variant.main, 0.1),
-        zIndex: 50,
+        backgroundColor: isDark ? 'rgba(59, 130, 246, 0.3)' : '#f0f9ff', // Opaque light blue
+        zIndex: 50, // Jump to top
+        '&::before': {
+          borderColor: lighten(MEETING_COLOR, 0.2),
+        },
       },
     };
   }
-);
+
+  return {
+    backgroundColor: isDark ? 'rgba(30, 41, 59, 0.6)' : '#ffffff',
+    color: isDark ? '#e0e2e9' : '#0f172a',
+    height: '100%',
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: '4px 8px',
+    border: `1px solid ${variant.main}40`,
+    borderLeft: `3px solid ${variant.main}`,
+    borderRadius: '3px',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    zIndex: overlapIndex + 1,
+    boxShadow: isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)',
+    filter:
+      overlapIndex > 0
+        ? `hue-rotate(${hueRotation}deg) brightness(${brightnessIdx})`
+        : 'none',
+    '&:hover': {
+      backgroundColor: isDark ? 'rgba(30, 41, 59, 0.8)' : '#f8fafc',
+      borderColor: variant.main,
+      zIndex: 50,
+    },
+  };
+});
 
 export const priorityCircleSx = (color: string, isSelected: boolean) => ({
   width: 18,
@@ -127,7 +143,8 @@ export const contextMenuSx = {
     borderRadius: '12px',
     minWidth: '180px',
     padding: '4px 0',
-    boxShadow: '0px 10px 25px -5px rgba(0,0,0,0.2), 0px 8px 10px -6px rgba(0,0,0,0.1)',
+    boxShadow:
+      '0px 10px 25px -5px rgba(0,0,0,0.2), 0px 8px 10px -6px rgba(0,0,0,0.1)',
     border: '1px solid',
     borderColor: 'divider',
     backgroundColor: 'background.paper',

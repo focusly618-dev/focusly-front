@@ -5,6 +5,8 @@ export const GET_WORKSPACES = gql`
     workspaces(search: $search) {
       id
       title
+      emoji
+      background_color
       content
       updatedAt
       createdAt
@@ -48,6 +50,8 @@ export const CREATE_WORKSPACE = gql`
     createWorkspace(createWorkspaceInput: $createWorkspaceInput) {
       id
       title
+      emoji
+      background_color
       content
       updatedAt
       taskId
@@ -71,6 +75,8 @@ export const UPDATE_WORKSPACE = gql`
     updateWorkspace(updateWorkspaceInput: $updateWorkspaceInput) {
       id
       title
+      emoji
+      background_color
       content
       updatedAt
       taskId
@@ -105,6 +111,8 @@ export const GET_WORKSPACE_BY_ID = gql`
     workspace(id: $id) {
       id
       title
+      emoji
+      background_color
       content
       taskId
       task {

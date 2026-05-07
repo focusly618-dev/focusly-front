@@ -33,6 +33,8 @@ export const useWorkspaceForm = () => {
               updateWorkspaceInput: {
                 id: data.id,
                 title: data.title,
+                emoji: data.emoji,
+                background_color: data.background_color,
                 content: data.content,
                 taskId: data.taskId ?? null,
                 saveStatus: data.saveStatus ?? true,
@@ -51,6 +53,8 @@ export const useWorkspaceForm = () => {
             variables: {
               createWorkspaceInput: {
                 title: data.title,
+                emoji: data.emoji,
+                background_color: data.background_color,
                 content: data.content,
                 taskId: data.taskId,
                 saveStatus: data.saveStatus ?? true,
@@ -85,6 +89,8 @@ export const useWorkspaceForm = () => {
   const lastSavedValues = useRef(
     JSON.stringify({
       title: values.title,
+      emoji: values.emoji,
+      background_color: values.background_color,
       content: values.content,
       taskId: values.taskId ?? null,
     }),
@@ -93,6 +99,8 @@ export const useWorkspaceForm = () => {
   useEffect(() => {
     const currentValues = JSON.stringify({
       title: values.title,
+      emoji: values.emoji,
+      background_color: values.background_color,
       content: values.content,
       taskId: values.taskId ?? null,
     });

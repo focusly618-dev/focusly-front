@@ -37,6 +37,10 @@ export const EditorHeader = styled(Box)(({ theme }) => ({
 export const EditorContent = styled(Box)({
   padding: '40px 60px',
   flex: 1,
+  minHeight: 0,
+  overflowY: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
 });
 
 export const DraftingBadge = styled(Box)(({ theme }) => ({
@@ -273,7 +277,7 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
   '& .bn-editor': {
     backgroundColor: 'transparent',
     padding: '0 16px 100px 16px', // Extra padding at bottom
-    minHeight: 'calc(100vh - 250px)', // Ensures editor stretches down so empty space is clickable
+    minHeight: '300px', // Ensures editor has clickable space without forcing parent overflow
   },
   '& .bn-block-content': {
     color: theme.palette.text.secondary,

@@ -29,7 +29,14 @@ import {
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
 } from '@mui/icons-material';
-import { SidebarContainer, Logo, AddTaskButton, NavItem, EnergyCard } from './Sidebar.styles';
+import {
+  SidebarContainer,
+  Logo,
+  AddTaskButton,
+  NavItem,
+  EnergyCard,
+} from './Sidebar.styles';
+import { NextTaskCard } from './components/NextTaskCard/NextTaskCard';
 import { TaskBar, type SidebarProps } from './types/Sidebar.types';
 import { useAppSelector } from '@/redux/hooks';
 import { useSearchParams } from 'react-router-dom';
@@ -44,31 +51,56 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Notifications state
-  const [notifAnchor, setNotifAnchor] = useState<HTMLButtonElement | null>(null);
-  const [notifications, setNotifications] = useState<{ id: string; title: string; time: string; read: boolean }[]>([]);
+  const [notifAnchor, setNotifAnchor] = useState<HTMLButtonElement | null>(
+    null,
+  );
+  const [notifications, setNotifications] = useState<
+    { id: string; title: string; time: string; read: boolean }[]
+  >([]);
   const unreadCount = notifications.filter((n) => !n.read).length;
   const notifOpen = Boolean(notifAnchor);
 
-  const handleNotifOpen = (e: React.MouseEvent<HTMLButtonElement>) => setNotifAnchor(e.currentTarget);
+  const handleNotifOpen = (e: React.MouseEvent<HTMLButtonElement>) =>
+    setNotifAnchor(e.currentTarget);
   const handleNotifClose = () => setNotifAnchor(null);
-  const markAsRead = (id: string) => setNotifications((p) => p.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  const markAllRead = () => setNotifications((p) => p.map((n) => ({ ...n, read: true })));
-  const deleteNotif = (id: string) => setNotifications((p) => p.filter((n) => n.id !== id));
+  const markAsRead = (id: string) =>
+    setNotifications((p) =>
+      p.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
+  const markAllRead = () =>
+    setNotifications((p) => p.map((n) => ({ ...n, read: true })));
+  const deleteNotif = (id: string) =>
+    setNotifications((p) => p.filter((n) => n.id !== id));
 
   const taskId = searchParams.get('taskId');
-  const activeURLTask = useMemo(() => tasks.find((t) => t.id === taskId), [tasks, taskId]);
+  const activeURLTask = useMemo(
+    () => tasks.find((t) => t.id === taskId),
+    [tasks, taskId],
+  );
 
   return (
     <SidebarContainer>
       <Box paddingLeft={3} paddingRight={3}>
-        <Logo id="joyride-logo" as="div" sx={{ justifyContent: 'space-between' }}>
+        <Logo
+          id="joyride-logo"
+          as="div"
+          sx={{ justifyContent: 'space-between' }}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FocuslyLogo size={30} />
             Focusly
           </Box>
-          <IconButton size="small" onClick={handleNotifOpen} sx={{ color: 'text.secondary' }}>
-            <Badge badgeContent={unreadCount} color="primary"
-              sx={{ '& .MuiBadge-badge': { fontSize: 9, height: 16, minWidth: 16 } }}
+          <IconButton
+            size="small"
+            onClick={handleNotifOpen}
+            sx={{ color: 'text.secondary' }}
+          >
+            <Badge
+              badgeContent={unreadCount}
+              color="primary"
+              sx={{
+                '& .MuiBadge-badge': { fontSize: 9, height: 16, minWidth: 16 },
+              }}
             >
               <NotificationsNoneIcon sx={{ fontSize: 20 }} />
             </Badge>
@@ -100,10 +132,29 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           },
         }}
       >
-        <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="subtitle1" fontWeight={700}>Notifications</Typography>
+        <Box
+          sx={{
+            p: 2.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight={700}>
+            Notifications
+          </Typography>
           {unreadCount > 0 && (
-            <Box sx={{ bgcolor: alpha(theme.palette.primary.main, 0.15), color: theme.palette.primary.main, fontWeight: 700, fontSize: '0.65rem', px: 1.2, py: 0.3, borderRadius: '6px' }}>
+            <Box
+              sx={{
+                bgcolor: alpha(theme.palette.primary.main, 0.15),
+                color: theme.palette.primary.main,
+                fontWeight: 700,
+                fontSize: '0.65rem',
+                px: 1.2,
+                py: 0.3,
+                borderRadius: '6px',
+              }}
+            >
               {unreadCount} NEW
             </Box>
           )}
@@ -111,27 +162,94 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
         <Divider />
         <Box sx={{ overflowY: 'auto', maxHeight: 280 }}>
           {notifications.length === 0 ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 5, px: 3, gap: 1.5 }}>
-              <InboxIcon sx={{ fontSize: 44, color: alpha(theme.palette.text.primary, 0.15) }} />
-              <Typography variant="body2" fontWeight={600} color="text.secondary">No notifications yet</Typography>
-              <Typography variant="caption" color="text.disabled" textAlign="center">
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                py: 5,
+                px: 3,
+                gap: 1.5,
+              }}
+            >
+              <InboxIcon
+                sx={{
+                  fontSize: 44,
+                  color: alpha(theme.palette.text.primary, 0.15),
+                }}
+              />
+              <Typography
+                variant="body2"
+                fontWeight={600}
+                color="text.secondary"
+              >
+                No notifications yet
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                textAlign="center"
+              >
                 Notifications about tasks and focus sessions will appear here.
               </Typography>
             </Box>
           ) : (
             notifications.map((n) => (
-              <Box key={n.id} sx={{ px: 2.5, py: 1.5, display: 'flex', alignItems: 'flex-start', gap: 1.5, transition: 'background 0.2s', '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) }, borderLeft: n.read ? 'none' : `3px solid ${theme.palette.primary.main}` }}>
+              <Box
+                key={n.id}
+                sx={{
+                  px: 2.5,
+                  py: 1.5,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1.5,
+                  transition: 'background 0.2s',
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  },
+                  borderLeft: n.read
+                    ? 'none'
+                    : `3px solid ${theme.palette.primary.main}`,
+                }}
+              >
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography variant="body2" fontWeight={n.read ? 400 : 600} noWrap>{n.title}</Typography>
-                  <Typography variant="caption" color="text.disabled">{n.time}</Typography>
+                  <Typography
+                    variant="body2"
+                    fontWeight={n.read ? 400 : 600}
+                    noWrap
+                  >
+                    {n.title}
+                  </Typography>
+                  <Typography variant="caption" color="text.disabled">
+                    {n.time}
+                  </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 0.3, flexShrink: 0 }}>
                   {!n.read && (
-                    <IconButton size="small" onClick={() => markAsRead(n.id)} sx={{ color: theme.palette.primary.main, '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) } }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => markAsRead(n.id)}
+                      sx={{
+                        color: theme.palette.primary.main,
+                        '&:hover': {
+                          bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        },
+                      }}
+                    >
                       <CheckNotifIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   )}
-                  <IconButton size="small" onClick={() => deleteNotif(n.id)} sx={{ color: alpha(theme.palette.text.primary, 0.3), '&:hover': { bgcolor: alpha('#ef4444', 0.1), color: '#ef4444' } }}>
+                  <IconButton
+                    size="small"
+                    onClick={() => deleteNotif(n.id)}
+                    sx={{
+                      color: alpha(theme.palette.text.primary, 0.3),
+                      '&:hover': {
+                        bgcolor: alpha('#ef4444', 0.1),
+                        color: '#ef4444',
+                      },
+                    }}
+                  >
                     <DeleteNotifIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Box>
@@ -143,7 +261,17 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           <>
             <Divider />
             <Box sx={{ p: 1.5, display: 'flex', justifyContent: 'center' }}>
-              <Button size="small" startIcon={<DoneAllIcon />} onClick={markAllRead} disabled={unreadCount === 0} sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}>
+              <Button
+                size="small"
+                startIcon={<DoneAllIcon />}
+                onClick={markAllRead}
+                disabled={unreadCount === 0}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                }}
+              >
                 Mark all read
               </Button>
             </Box>
@@ -167,9 +295,13 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
             }}
           />
         }
+        sx={{ py: 1, fontSize: '13px' }}
       >
         {activeURLTask ? activeURLTask.title : 'Add New Task'}
       </AddTaskButton>
+
+      <NextTaskCard tasks={tasks} />
+
       <List sx={{ padding: '16px' }}>
         <ListItem disablePadding>
           <NavItem
@@ -180,7 +312,10 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
             <ListItemIcon>
               <DashboardIcon />
             </ListItemIcon>
-            <ListItemText primary="Daily Plan" primaryTypographyProps={{ fontWeight: 600 }} />
+            <ListItemText
+              primary="Daily Plan"
+              primaryTypographyProps={{ fontWeight: 600 }}
+            />
           </NavItem>
         </ListItem>
         <ListItem disablePadding>
@@ -192,7 +327,10 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
             <ListItemIcon>
               <TasksIcon />
             </ListItemIcon>
-            <ListItemText primary="Tasks" primaryTypographyProps={{ fontWeight: 500 }} />
+            <ListItemText
+              primary="Tasks"
+              primaryTypographyProps={{ fontWeight: 500 }}
+            />
           </NavItem>
         </ListItem>
         <ListItem disablePadding>
@@ -210,7 +348,9 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor:
-                    activeTab === TaskBar.Workspace ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                    activeTab === TaskBar.Workspace
+                      ? 'rgba(59, 130, 246, 0.1)'
+                      : 'transparent',
                   borderRadius: 1,
                 }}
               >
@@ -233,7 +373,10 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
                 </svg>
               </Box>
             </ListItemIcon>
-            <ListItemText primary="Workspace" primaryTypographyProps={{ fontWeight: 500 }} />
+            <ListItemText
+              primary="Workspace"
+              primaryTypographyProps={{ fontWeight: 500 }}
+            />
           </NavItem>
         </ListItem>
         <ListItem disablePadding>
@@ -245,7 +388,10 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
             <ListItemIcon>
               <InsightsIcon />
             </ListItemIcon>
-            <ListItemText primary="Insights" primaryTypographyProps={{ fontWeight: 500 }} />
+            <ListItemText
+              primary="Insights"
+              primaryTypographyProps={{ fontWeight: 500 }}
+            />
           </NavItem>
         </ListItem>
         <ListItem disablePadding>
@@ -257,7 +403,10 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
-            <ListItemText primary="Settings" primaryTypographyProps={{ fontWeight: 500 }} />
+            <ListItemText
+              primary="Settings"
+              primaryTypographyProps={{ fontWeight: 500 }}
+            />
           </NavItem>
         </ListItem>
       </List>
@@ -265,10 +414,20 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
       <Box flexGrow={1} />
 
       <EnergyCard id="joyride-energy">
-        <Typography color="primary.main" fontWeight="700" fontSize="0.85rem" mb={1}>
+        <Typography
+          color="primary.main"
+          fontWeight="700"
+          fontSize="0.85rem"
+          mb={1}
+        >
           Afternoon Slump Predicted
         </Typography>
-        <Typography variant="caption" color="text.secondary" display="block" mb={2}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          display="block"
+          mb={2}
+        >
           Your energy usually dips around 2 PM. Schedule light tasks.
         </Typography>
         <Button
@@ -305,7 +464,9 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           transition: 'all 0.2s',
           '&:hover': {
             bgcolor:
-              colorMode.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+              colorMode.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.05)'
+                : 'rgba(0, 0, 0, 0.05)',
           },
         }}
       >
@@ -318,7 +479,6 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           {colorMode.mode === 'dark' ? 'Light Mode' : 'Dark Mode'}
         </Typography>
       </Box>
-
     </SidebarContainer>
   );
 };
