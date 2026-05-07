@@ -174,5 +174,6 @@ export const useTasks = () => {
     handleOpenSubtaskModal,
     handleSaveSubtask,
     handleSubtaskToggle,
+    setPriorityFilter: filterLogic.setPriorityFilter,
   };
 };

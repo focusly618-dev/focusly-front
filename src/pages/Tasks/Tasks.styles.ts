@@ -162,7 +162,6 @@ export const SectionTitle = styled(Typography, {
   },
 }));
 
-
 export const AddTaskInput = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   padding: '12px 16px',
@@ -198,24 +197,24 @@ export const ViewToggleGroup = styled(Box)(({ theme }) => ({
   height: 'fit-content',
 }));
 
-export const ViewToggleButton = styled(Box)<{ active?: boolean }>(({ theme, active }) => ({
-  padding: '6px 10px',
-  cursor: 'pointer',
-  backgroundColor: active
-    ? theme.palette.action.selected
-    : 'transparent',
-  color: active ? theme.palette.text.primary : theme.palette.text.secondary,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  transition: 'all 0.2s',
-  '&:hover': {
-    backgroundColor: active
-      ? theme.palette.action.selected
-      : theme.palette.action.hover,
-    color: theme.palette.text.primary,
-  },
-}));
+export const ViewToggleButton = styled(Box)<{ active?: boolean }>(
+  ({ theme, active }) => ({
+    padding: '6px 10px',
+    cursor: 'pointer',
+    backgroundColor: active ? theme.palette.action.selected : 'transparent',
+    color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.2s',
+    '&:hover': {
+      backgroundColor: active
+        ? theme.palette.action.selected
+        : theme.palette.action.hover,
+      color: theme.palette.text.primary,
+    },
+  }),
+);
 
 export const GridTaskContainer = styled(Box)({
   display: 'grid',
@@ -225,3 +224,42 @@ export const GridTaskContainer = styled(Box)({
   paddingBottom: '32px',
 });
 
+export const PriorityCardsContainer = styled(Box)({
+  display: 'flex',
+  gap: '12px',
+  marginBottom: '24px',
+  flexWrap: 'wrap',
+  justifyContent: 'flex-start',
+});
+
+export const PriorityCard = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'active' && prop !== 'priorityColor',
+})<{ active?: boolean; priorityColor: string }>(
+  ({ theme, active, priorityColor }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    padding: '6px 16px',
+    borderRadius: '24px',
+    backgroundColor: active
+      ? `${priorityColor}15`
+      : theme.palette.background.paper,
+    border: '1px solid',
+    borderColor: active ? priorityColor : theme.palette.divider,
+    cursor: 'pointer',
+    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+    gap: '8px',
+    position: 'relative',
+    boxShadow: active ? `0 2px 8px ${priorityColor}33` : 'none',
+    minWidth: 'fit-content',
+
+    '&:hover': {
+      borderColor: priorityColor,
+      backgroundColor: `${priorityColor}10`,
+      transform: 'translateY(-1px)',
+    },
+
+    '& .MuiTypography-root': {
+      transition: 'color 0.2s',
+    },
+  }),
+);
