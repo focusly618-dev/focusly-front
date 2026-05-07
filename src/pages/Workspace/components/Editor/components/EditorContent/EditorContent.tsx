@@ -1,7 +1,18 @@
 import { Box, Typography, useTheme } from '@mui/material';
 import { Folder as FolderIcon } from '@mui/icons-material';
 import { BlockNoteView } from '@blocknote/mantine';
-import { SuggestionMenuController } from '@blocknote/react';
+import {
+  FormattingToolbar,
+  FormattingToolbarController,
+  getFormattingToolbarItems,
+  SuggestionMenuController,
+} from '@blocknote/react';
+import { filterSuggestionItems } from '@blocknote/core/extensions';
+import {
+  AIMenuController,
+  AIToolbarButton,
+  getAISlashMenuItems,
+} from '@blocknote/xl-ai';
 import {
   EditorContent as StyledEditorContent,
   FolderBadge,
@@ -60,18 +71,38 @@ export const EditorContent = ({
         <BlockNoteView
           editor={editor}
           theme={isThemeDark ? 'dark' : 'light'}
+          formattingToolbar={false}
           slashMenu={false}
           onChange={onContentChange}
         >
-          {/* Slash Menu (/) */}
+          {/* AI Command menu (appears when AI is invoked) */}
+          <AIMenuController />
+
+          {/* Formatting Toolbar with AI button */}
+          <FormattingToolbarController
+            formattingToolbar={() => (
+              <FormattingToolbar>
+                {...getFormattingToolbarItems()}
+                <AIToolbarButton />
+              </FormattingToolbar>
+            )}
+          />
+
+          {/* Slash Menu (/) with AI option */}
           <SuggestionMenuController
             triggerCharacter={'/'}
             getItems={async (query) =>
-              getCustomSlashMenuItems(editor).filter((item) =>
-                item.title.toLowerCase().includes(query.toLowerCase()),
+              filterSuggestionItems(
+                [
+                  ...getCustomSlashMenuItems(editor),
+                  ...getAISlashMenuItems(editor),
+                ],
+                query,
               )
             }
           />
+
+          {/* Mention Menu (@) */}
           <SuggestionMenuController
             triggerCharacter={'@'}
             getItems={async (query) =>

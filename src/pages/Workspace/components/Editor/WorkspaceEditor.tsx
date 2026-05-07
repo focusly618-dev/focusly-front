@@ -5,8 +5,14 @@ import {
   type PartialBlock,
 } from '@blocknote/core';
 import { useCreateBlockNote } from '@blocknote/react';
+import { en } from '@blocknote/core/locales';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
+
+import { AIExtension } from '@blocknote/xl-ai';
+import { en as aiEn } from '@blocknote/xl-ai/locales';
+import '@blocknote/xl-ai/style.css';
+import { DefaultChatTransport } from 'ai';
 
 import type {
   TaskSearchItems,
@@ -19,6 +25,14 @@ import { EditorHeader } from './components/EditorHeader/EditorHeader';
 import { EditorContent } from './components/EditorContent/EditorContent';
 import { EditorSidebar } from './components/EditorSidebar/EditorSidebar';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
+
+import {
+  IS_VERCEL_API,
+  VERCEL_API_URL,
+  LOCAL_API_URL,
+} from '@/config/vercel.config';
+
+const AI_BASE_URL = IS_VERCEL_API ? VERCEL_API_URL : LOCAL_API_URL;
 
 const schema = BlockNoteSchema.create({
   blockSpecs: {
@@ -135,6 +149,17 @@ export const WorkspaceEditor = ({
 
   const editor = useCreateBlockNote({
     schema,
+    dictionary: {
+      ...en,
+      ai: aiEn,
+    },
+    extensions: [
+      AIExtension({
+        transport: new DefaultChatTransport({
+          api: `${AI_BASE_URL}/ai/chat`,
+        }),
+      }),
+    ],
     initialContent: initialContent || [
       {
         type: 'paragraph',

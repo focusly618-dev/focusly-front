@@ -69,7 +69,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
   const handleCreateTaskAtSlot = (priority?: number) => {
     if (slotContextMenu) {
       const start = slotContextMenu.date;
-      const end = new Date(start.getTime() + 30 * 60000); // Default 30 mins
+      const end = new Date(start.getTime() + 30 * 60000);
 
       const params: {
         action: string;

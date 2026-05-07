@@ -180,6 +180,7 @@ export const useTaskDetailModal = ({
 
   // Inject real resetForm into mutations (assuming useTaskMutations doesn't store it in a way that breaks this)
   const mutationsWithReset = { ...mutations, resetForm };
+  const [isGeneratingMeet, setIsGeneratingMeet] = useState(false);
 
   const handleSaveWrapper = async (shouldClose = true) => {
     if (!validateForm()) return;
@@ -234,8 +235,6 @@ export const useTaskDetailModal = ({
       setSearchParams(newParams);
     }
   };
-
-  const [isGeneratingMeet, setIsGeneratingMeet] = useState(false);
 
   const handleGenerateMeet = async () => {
     setIsGeneratingMeet(true);
