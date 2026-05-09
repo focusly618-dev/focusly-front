@@ -101,10 +101,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           flexDirection: 'column',
           height: '100%',
           position: 'relative',
-          overflow: 'hidden',
+          overflow: 'auto',
         }}
       >
         <DnDCalendar
+          key={`${currentDate.toISOString()}-${currentView}-${events.length}`}
           localizer={localizer}
           events={events}
           startAccessor="start"
@@ -112,6 +113,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           view={currentView}
           onView={handleOnChangeView}
           date={currentDate}
+          defaultDate={currentDate}
           onNavigate={(newDate) => handleOnNavigate(newDate as Date)}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
@@ -149,8 +151,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               />
             ),
           }}
-          step={5}
-          timeslots={12}
+          step={15}
+          timeslots={2}
+          min={new Date(0, 0, 0, 0, 0, 0)}
+          scrollToTime={new Date(0, 0, 0, 8, 0, 0)}
           onShowMore={handleShowMore}
           popup={false}
           messages={{

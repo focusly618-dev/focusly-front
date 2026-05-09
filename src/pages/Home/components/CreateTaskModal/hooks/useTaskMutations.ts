@@ -13,11 +13,24 @@ import {
   GET_WORKSPACES,
 } from '@/pages/Workspace/workspaces.graphql';
 import { sileo } from 'sileo';
-import { createGoogleEvent, updateGoogleEvent, deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
+import {
+  createGoogleEvent,
+  updateGoogleEvent,
+  deleteGoogleEvent,
+} from '@/api/GoogleCalendar/googleCalendarApi';
 import { removeTask } from '@/redux/tasks/task.slice';
-import { deduplicateLinks, parseDuration, parseRealTime, getPriorityLevel } from '../CreateTaskModal.utils';
+import {
+  deduplicateLinks,
+  parseDuration,
+  parseRealTime,
+  getPriorityLevel,
+} from '../CreateTaskModal.utils';
 import type { PriorityType } from '../CreateTaskModal.utils';
-import type { TaskData, TaskInput, UseTaskMutationsProps } from '../types/CreateTaskModal.types';
+import type {
+  TaskData,
+  TaskInput,
+  UseTaskMutationsProps,
+} from '../types/CreateTaskModal.types';
 
 export const useTaskMutations = ({
   onSave,
@@ -40,7 +53,7 @@ export const useTaskMutations = ({
 
   const generateMeetLinkNow = async (
     googleEventId?: string,
-    state?: Partial<TaskData & { color: string }>
+    state?: Partial<TaskData & { color: string }>,
   ) => {
     try {
       if (googleEventId) {
@@ -58,10 +71,14 @@ export const useTaskMutations = ({
         const tempEvent = await createGoogleEvent({
           summary: state?.title || 'Focusly Meeting',
           description: state?.description || '',
-          start: { dateTime: state?.deadline?.toISOString() || new Date().toISOString() },
+          start: {
+            dateTime:
+              state?.deadline?.toISOString() || new Date().toISOString(),
+          },
           end: {
             dateTime: new Date(
-              (state?.deadline?.getTime() || Date.now()) + (parseDuration(state?.duration || '30m') || 30) * 60000
+              (state?.deadline?.getTime() || Date.now()) +
+                (parseDuration(state?.duration || '30m') || 30) * 60000,
             ).toISOString(),
           },
           conferenceData: {
@@ -72,7 +89,7 @@ export const useTaskMutations = ({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
         });
-        
+
         const meetLink = tempEvent.hangoutLink || null;
         if (tempEvent.id) {
           try {
@@ -82,7 +99,7 @@ export const useTaskMutations = ({
             console.warn('Failed to delete dummy meet event immediately', e);
           }
         }
-        
+
         return meetLink;
       }
     } catch (error) {
@@ -91,7 +108,9 @@ export const useTaskMutations = ({
     }
   };
 
-  const handleSave = async (state: TaskData & { color: string; shouldGenerateMeet?: boolean }) => {
+  const handleSave = async (
+    state: TaskData & { color: string; shouldGenerateMeet?: boolean },
+  ) => {
     if (!user) return;
     setLoadingSave(true);
 
@@ -101,16 +120,30 @@ export const useTaskMutations = ({
       meetLink = generated || null;
     }
 
-    const estimateTimer = parseDuration(state.duration);
+    let estimateTimer = parseDuration(state.duration);
     const realTimer = parseRealTime(state.realTime || '');
     const priorityLevel = getPriorityLevel(state.priority as PriorityType);
+
+    // Validar duración mínima de 15 minutos
+    const MIN_DURATION_MINUTES = 15;
+    if (estimateTimer < MIN_DURATION_MINUTES) {
+      estimateTimer = MIN_DURATION_MINUTES;
+      sileo.warning({
+        title: 'Minimum duration is 15 minutes',
+        description: 'Duration has been adjusted automatically',
+        duration: 3000,
+      });
+    }
 
     const cleanDesc = (state.description || '')
       .replace(/\[COLOR:(.*?)\]/g, '')
       .replace(/\[START_DATE:(.*?)\]/g, '')
       .trim();
 
-    const links = deduplicateLinks(state.links || []).map((l) => ({ title: l.title, url: l.url }));
+    const links = deduplicateLinks(state.links || []).map((l) => ({
+      title: l.title,
+      url: l.url,
+    }));
     if (meetLink) {
       links.push({ title: 'Google Meet', url: meetLink });
     }
@@ -121,7 +154,9 @@ export const useTaskMutations = ({
       estimate_timer: estimateTimer,
       real_timer: realTimer,
       tags: state.tags,
-      deadline: state.deadline ? state.deadline.toISOString() : new Date().toISOString(),
+      deadline: state.deadline
+        ? state.deadline.toISOString()
+        : new Date().toISOString(),
       priority_level: priorityLevel,
       category: state.category,
       links,
@@ -134,10 +169,15 @@ export const useTaskMutations = ({
             taskId: parentTask.id,
             subtask: { ...commonInput, status: state.status || 'Backlog' },
           },
-          refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
+          refetchQueries: [
+            { query: GET_TASKS, variables: { userId: user.id } },
+          ],
         });
         if (data?.addSubtask) {
-          sileo.success({ title: 'Subtask added', fill: 'var(--sileo-success-bg)', });
+          sileo.success({
+            title: 'Subtask added',
+            fill: 'var(--sileo-success-bg)',
+          });
           onSave(data.addSubtask);
           resetForm();
         }
@@ -152,7 +192,8 @@ export const useTaskMutations = ({
       ...commonInput,
       user_id: user.id || '',
       status: state.status || 'Backlog',
-      google_event_id: (initialTask as { google_event_id?: string })?.google_event_id,
+      google_event_id: (initialTask as { google_event_id?: string })
+        ?.google_event_id,
       subtasks: state.subtasks?.map((st) => ({
         title: st.title,
         completed: st.completed,
@@ -166,7 +207,10 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.createTask) {
-        sileo.success({ title: 'Task created', fill: 'var(--sileo-success-bg)', });
+        sileo.success({
+          title: 'Task created',
+          fill: 'var(--sileo-success-bg)',
+        });
         onSave(data.createTask);
         resetForm();
         onClose();
@@ -177,25 +221,44 @@ export const useTaskMutations = ({
     setLoadingSave(false);
   };
 
-  const handleUpdate = async (state: TaskData & { color: string; shouldGenerateMeet?: boolean }, shouldClose = true) => {
+  const MIN_DURATION_MINUTES = 15;
+
+  const handleUpdate = async (
+    state: TaskData & { color: string; shouldGenerateMeet?: boolean },
+    shouldClose = true,
+  ) => {
     if (!user || !initialTask?.id) return;
     setLoadingSave(true);
-    const estimateTimer = state.duration
+    let estimateTimer = state.duration
       ? parseDuration(state.duration)
       : initialTask.estimate_timer || 0;
+
+    // Validar duración mínima de 15 minutos
+    if (estimateTimer < MIN_DURATION_MINUTES) {
+      estimateTimer = MIN_DURATION_MINUTES;
+      sileo.warning({
+        title: 'Minimum duration is 15 minutes',
+        description: 'Duration has been adjusted automatically',
+        duration: 3000,
+      });
+    }
 
     const priorityLevel = state.priority
       ? getPriorityLevel(state.priority as PriorityType)
       : initialTask.priority_level || 2;
 
-    const realTimer = state.realTime !== undefined && state.realTime !== null
-      ? parseRealTime(state.realTime)
-      : initialTask.real_timer || 0;
+    const realTimer =
+      state.realTime !== undefined && state.realTime !== null
+        ? parseRealTime(state.realTime)
+        : initialTask.real_timer || 0;
 
     if (parentTask && typeof subtaskIndex === 'number') {
       const updatedSubtasks = [...(parentTask.subtasks || [])].map((st, i) => {
         if (i !== subtaskIndex) return st;
-        const subtaskColor = state.color || (initialTask as { color?: string | undefined }).color || '#3b82f6';
+        const subtaskColor =
+          state.color ||
+          (initialTask as { color?: string | undefined }).color ||
+          '#3b82f6';
         return {
           title: state.title || initialTask.title,
           timer: estimateTimer,
@@ -217,11 +280,18 @@ export const useTaskMutations = ({
 
       try {
         const { data } = await updateTaskMutation({
-          variables: { updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks } },
-          refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
+          variables: {
+            updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks },
+          },
+          refetchQueries: [
+            { query: GET_TASKS, variables: { userId: user.id } },
+          ],
         });
         if (data?.updateTask) {
-          sileo.success({ title: 'Subtask updated', fill: 'var(--sileo-update-bg)', });
+          sileo.success({
+            title: 'Subtask updated',
+            fill: 'var(--sileo-update-bg)',
+          });
           onSave(data.updateTask);
           resetForm();
           if (shouldClose) onClose();
@@ -233,8 +303,14 @@ export const useTaskMutations = ({
       return;
     }
 
-    const taskColor = state.color || (initialTask as { color?: string | undefined }).color || '#3b82f6';
-    const taskCategory = state.category || (initialTask as { category?: string | undefined }).category || 'General';
+    const taskColor =
+      state.color ||
+      (initialTask as { color?: string | undefined }).color ||
+      '#3b82f6';
+    const taskCategory =
+      state.category ||
+      (initialTask as { category?: string | undefined }).category ||
+      'General';
 
     const cleanDesc = (state.description || '')
       .replace(/\[COLOR:(.*?)\]/g, '')
@@ -265,7 +341,8 @@ export const useTaskMutations = ({
           return rest;
         }) ||
         (initialTask.subtasks || []).map((st) => {
-          if (typeof st === 'string') return { title: st, completed: false, timer: 0 };
+          if (typeof st === 'string')
+            return { title: st, completed: false, timer: 0 };
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { __typename, ...rest } = st as {
             title: string;
@@ -276,12 +353,15 @@ export const useTaskMutations = ({
           return rest;
         }),
       tags: state.tags || initialTask.tags,
-      links: deduplicateLinks(state.links || initialTask.links || []).map((l) => ({
-        title: l.title,
-        url: l.url,
-      })),
+      links: deduplicateLinks(state.links || initialTask.links || []).map(
+        (l) => ({
+          title: l.title,
+          url: l.url,
+        }),
+      ),
       google_event_id:
-        (state as { google_event_id?: string }).google_event_id || initialTask.google_event_id,
+        (state as { google_event_id?: string }).google_event_id ||
+        initialTask.google_event_id,
     };
 
     try {
@@ -290,7 +370,10 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.updateTask) {
-        sileo.success({ title: 'Task updated', fill: 'var(--sileo-update-bg)', });
+        sileo.success({
+          title: 'Task updated',
+          fill: 'var(--sileo-update-bg)',
+        });
         onSave(data.updateTask);
         if (shouldClose) onClose();
       }
@@ -324,7 +407,6 @@ export const useTaskMutations = ({
       console.error(e);
     }
   };
-
 
   const handleRemoveWorkspace = async (workspaceId: string) => {
     try {

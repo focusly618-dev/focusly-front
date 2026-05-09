@@ -75,6 +75,7 @@ interface TaskPropertiesProps {
     setAnchor: (el: HTMLDivElement | null) => void,
     target: HTMLDivElement,
   ) => void;
+  validateMinDuration?: (value: string) => string;
   durationSuggestions: string[];
   setDurationSuggestions: (s: string[]) => void;
   durationAnchor: HTMLDivElement | null;
@@ -108,6 +109,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
     realTime,
     setRealTime,
     handleTimerChange,
+    validateMinDuration,
     durationSuggestions,
     setDurationSuggestions,
     durationAnchor,
@@ -471,8 +473,16 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                     e.currentTarget.parentElement as HTMLDivElement,
                   )
                 }
-                onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
-                placeholder="2h 00m"
+                onBlur={() => {
+                  setTimeout(() => setDurationAnchor(null), 200);
+                  if (validateMinDuration) {
+                    const validated = validateMinDuration(duration);
+                    if (validated !== duration) {
+                      setDuration(validated);
+                    }
+                  }
+                }}
+                placeholder="15m"
                 InputProps={{
                   disableUnderline: true,
                   sx: {

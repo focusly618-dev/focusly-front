@@ -12,6 +12,8 @@ export const BASE_EMPTY_TASK: Partial<Task> = {
 
 export const DEFAULT_WORKSPACE_DATA = {
   title: 'Untitled Strategic Plan',
+  emoji: '',
+  background_color: '',
   content: '[]',
   saveStatus: true,
 };

@@ -99,6 +99,8 @@ export const Workspace = ({
           if (workspace) {
             setValue('id', workspace.id);
             setValue('title', workspace.title);
+            setValue('emoji', workspace.emoji || '');
+            setValue('background_color', workspace.background_color || '');
             setValue('content', workspace.content);
             setValue('taskId', workspace.taskId || null);
             setValue('folderId', workspace.folderId);
@@ -139,6 +141,8 @@ export const Workspace = ({
 
     setValue('id', workspace.id);
     setValue('title', workspace.title);
+    setValue('emoji', workspace.emoji || '');
+    setValue('background_color', workspace.background_color || '');
     setValue('content', workspace.content);
     setValue('taskId', workspace.taskId || null);
     setValue('folderId', workspace.folderId);
