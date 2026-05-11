@@ -59,14 +59,17 @@ export const SubtaskModal = ({
               status: subtask.status || (subtask.completed ? 'Done' : 'Todo'),
               estimate_timer: subtask.estimate_timer || subtask.timer,
               real_timer: subtask.timer,
-              priority_level: activeParentTask!.priority_level,
-              category: activeParentTask!.category,
-              deadline: activeParentTask!.deadline,
-              notes_encrypted: '',
+              priority_level:
+                subtask.priority_level ?? activeParentTask!.priority_level,
+              category: subtask.category ?? activeParentTask!.category,
+              deadline: subtask.deadline ?? activeParentTask!.deadline,
+              notes_encrypted: subtask.notes_encrypted ?? '',
+              color: subtask.color, // Use subtask's own color only
               subtasks: [],
               tags: [],
               links: subtask.links || [],
               user_id: activeParentTask!.user_id,
+              task_type: 'PlatformTask',
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             } as unknown as Task)

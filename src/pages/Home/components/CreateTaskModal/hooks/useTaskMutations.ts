@@ -53,7 +53,7 @@ export const useTaskMutations = ({
 
   const generateMeetLinkNow = async (
     googleEventId?: string,
-    state?: TaskData & { color: string },
+    state?: Partial<TaskData & { color: string }>,
   ) => {
     try {
       if (googleEventId) {
@@ -148,6 +148,7 @@ export const useTaskMutations = ({
         : new Date().toISOString(),
       priority_level: priorityLevel,
       category: state.category,
+      color: state.color,
       links,
     };
 
@@ -251,6 +252,7 @@ export const useTaskMutations = ({
               ? state.deadline.toISOString()
               : state.deadline || initialTask.deadline,
           category: state.category,
+          color: subtaskColor,
           links: state.links?.map((l) => ({ title: l.title, url: l.url })),
         };
       });
@@ -299,6 +301,7 @@ export const useTaskMutations = ({
       notes_encrypted: `${cleanDesc} [COLOR:${taskColor}]`,
       status: state.status || initialTask.status,
       category: taskCategory,
+      color: taskColor,
       estimate_timer: estimateTimer,
       real_timer: realTimer,
       deadline:

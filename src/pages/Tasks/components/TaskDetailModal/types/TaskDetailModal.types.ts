@@ -55,9 +55,15 @@ export interface TaskInput {
   deadline: string;
   priority_level: number;
   category: string;
+  color?: string;
   links: { title: string; url: string }[];
   status?: string;
-  subtasks?: { title: string; completed: boolean; timer: number; notes_encrypted?: string }[];
+  subtasks?: {
+    title: string;
+    completed: boolean;
+    timer: number;
+    notes_encrypted?: string;
+  }[];
   google_event_id?: string;
   user_id?: string;
   collaborators?: { name: string; email: string; avatar?: string }[];

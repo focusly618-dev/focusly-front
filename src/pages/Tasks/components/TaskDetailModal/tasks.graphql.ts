@@ -1,7 +1,11 @@
 import { gql } from '@apollo/client';
 
 export const GET_TASKS = gql`
-  query GetTasks($userId: String!, $filters: TaskFilterInput, $sort: TaskSortInput) {
+  query GetTasks(
+    $userId: String!
+    $filters: TaskFilterInput
+    $sort: TaskSortInput
+  ) {
     tasks: getTasksByUser(userId: $userId, filters: $filters, sort: $sort) {
       id
       title
@@ -13,6 +17,7 @@ export const GET_TASKS = gql`
       priority_level
       user_id
       category
+      color
       subtasks {
         title
         completed
@@ -73,6 +78,7 @@ export const GET_TASKS_TITLES = gql`
       real_timer
       priority_level
       category
+      color
       notes_encrypted
       links {
         title
@@ -107,6 +113,7 @@ export const GET_TASKS_TITLES = gql`
         status
         deadline
         category
+        color
         links {
           title
           url
@@ -124,6 +131,7 @@ export const UPDATE_TASK = gql`
       notes_encrypted
       status
       category
+      color
       subtasks {
         title
         completed
@@ -134,6 +142,7 @@ export const UPDATE_TASK = gql`
         status
         deadline
         category
+        color
         links {
           title
           url
@@ -163,7 +172,7 @@ export const UPDATE_TASK = gql`
       }
       priority_level
     }
-}
+  }
 `;
 
 export const CREATE_TASK = gql`
@@ -174,6 +183,7 @@ export const CREATE_TASK = gql`
       notes_encrypted
       status
       category
+      color
       subtasks {
         title
         completed
@@ -184,6 +194,7 @@ export const CREATE_TASK = gql`
         status
         deadline
         category
+        color
         links {
           title
           url
@@ -213,7 +224,7 @@ export const CREATE_TASK = gql`
       }
       priority_level
     }
-}
+  }
 `;
 
 export const ADD_SUBTASK = gql`
@@ -231,6 +242,7 @@ export const ADD_SUBTASK = gql`
         status
         deadline
         category
+        color
         links {
           title
           url

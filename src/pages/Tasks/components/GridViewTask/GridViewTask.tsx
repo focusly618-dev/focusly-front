@@ -23,17 +23,27 @@ interface GridViewTaskProps {
 }
 
 export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
-    const taskColor = (() => {
-      if (task.notes_encrypted) {
-        const match = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
-        if (match && match[1]) return match[1];
-      }
-      return task.priority_level === 3 ? '#EF4444' : task.priority_level === 2 ? '#F59E0B' : '#22C55E';
-    })();
+  const taskColor = (() => {
+    // Use color field directly if available
+    if (task.color) return task.color;
+    // Fallback: extract from notes_encrypted (legacy data)
+    if (task.notes_encrypted) {
+      const match = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
+      if (match && match[1]) return match[1];
+    }
+    return task.priority_level === 3
+      ? '#EF4444'
+      : task.priority_level === 2
+        ? '#F59E0B'
+        : '#22C55E';
+  })();
 
-    const subtaskCount = task.subtasks?.length || 0;
-    const completedSubtasks = task.subtasks?.filter(s => s.completed || s.status === 'Done')?.length || 0;
-    const progress = subtaskCount > 0 ? (completedSubtasks / subtaskCount) * 100 : 0;
+  const subtaskCount = task.subtasks?.length || 0;
+  const completedSubtasks =
+    task.subtasks?.filter((s) => s.completed || s.status === 'Done')?.length ||
+    0;
+  const progress =
+    subtaskCount > 0 ? (completedSubtasks / subtaskCount) * 100 : 0;
 
   return (
     <GridTaskCard onClick={() => onTaskClick(task)}>
@@ -53,7 +63,10 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
         </Tag>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {task.links && task.links.length > 0 && (
-            <LinkIcon sx={{ fontSize: 16, color: taskColor }} titleAccess={`${task.links.length} links`} />
+            <LinkIcon
+              sx={{ fontSize: 16, color: taskColor }}
+              titleAccess={`${task.links.length} links`}
+            />
           )}
           <IconButton size="small" sx={{ color: 'text.secondary', p: 0 }}>
             <MoreHorizIcon />
@@ -86,7 +99,8 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
             overflow: 'hidden',
           }}
         >
-          {task.notes_encrypted?.replace(/\[COLOR:(.*?)\]/g, '').trim() || 'No description provided.'}
+          {task.notes_encrypted?.replace(/\[COLOR:(.*?)\]/g, '').trim() ||
+            'No description provided.'}
         </Typography>
       </Box>
 
@@ -99,8 +113,15 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
                 color: taskColor,
               }}
             />
-            <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: 600 }}>
-              {task.priority_level === 3 ? 'High' : task.priority_level === 2 ? 'Medium' : 'Low'}
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.primary', fontWeight: 600 }}
+            >
+              {task.priority_level === 3
+                ? 'High'
+                : task.priority_level === 2
+                  ? 'Medium'
+                  : 'Low'}
             </Typography>
           </Box>
         )}
@@ -120,10 +141,16 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
       <GridCardFooter>
         <ProgressBarContainer>
           <ProgressLabel>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '11px' }}>
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', fontSize: '11px' }}
+            >
               Subtasks: {completedSubtasks}/{subtaskCount}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '11px' }}>
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', fontSize: '11px' }}
+            >
               {Math.round(progress)}%
             </Typography>
           </ProgressLabel>

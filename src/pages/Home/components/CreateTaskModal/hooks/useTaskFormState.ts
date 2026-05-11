@@ -9,8 +9,10 @@ import type { PriorityType } from '../CreateTaskModal.utils';
 import { addMinutes, format } from 'date-fns';
 import type { UseTaskFormStateProps } from '../types/CreateTaskModal.types';
 
-
-export const useTaskFormState = ({ initialTask, initialStart }: UseTaskFormStateProps) => {
+export const useTaskFormState = ({
+  initialTask,
+  initialStart,
+}: UseTaskFormStateProps) => {
   const getInitialState = useCallback(() => {
     const defaults = {
       title: '',
@@ -37,16 +39,22 @@ export const useTaskFormState = ({ initialTask, initialStart }: UseTaskFormState
       real_timer,
     } = initialTask;
 
-    let color = '#1e293b';
-    const colorMatch = notes_encrypted.match(/\[COLOR:(.*?)\]/);
-    if (colorMatch && colorMatch[1]) {
-      color = colorMatch[1];
+    // Use color field directly if available, otherwise fall back to parsing from notes_encrypted
+    let color = (initialTask as { color?: string }).color || '#1e293b';
+    if (!color) {
+      const colorMatch = notes_encrypted.match(/\[COLOR:(.*?)\]/);
+      if (colorMatch && colorMatch[1]) {
+        color = colorMatch[1];
+      }
     }
 
     const cleanDesc = notes_encrypted
       .replace(/\[START_DATE:(.*?)\]/g, '')
       .replace(/\[COLOR:(.*?)\]/g, '')
-      .replace(/https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g, '')
+      .replace(
+        /https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g,
+        '',
+      )
       .trim();
 
     return {
@@ -69,13 +77,15 @@ export const useTaskFormState = ({ initialTask, initialStart }: UseTaskFormState
   const [priority, setPriority] = useState<PriorityType>(initialState.priority);
   const [status, setStatus] = useState<Task['status']>(initialState.status);
   const [category, setCategory] = useState(initialState.category);
-  const [currentDate, setCurrentDate] = useState<Date | null>(initialState.currentDate);
+  const [currentDate, setCurrentDate] = useState<Date | null>(
+    initialState.currentDate,
+  );
   const [duration, setDuration] = useState(initialState.duration);
   const [realTime, setRealTime] = useState(initialState.realTime);
   const [color, setColor] = useState(initialState.color);
-  const [errors, setErrors] = useState<{ title?: string; duration?: string }>({});
-
-
+  const [errors, setErrors] = useState<{ title?: string; duration?: string }>(
+    {},
+  );
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -105,16 +115,26 @@ export const useTaskFormState = ({ initialTask, initialStart }: UseTaskFormState
   }, [currentDate, duration]);
 
   return {
-    title, setTitle,
-    description, setDescription,
-    priority, setPriority,
-    status, setStatus,
-    category, setCategory,
-    currentDate, setCurrentDate,
-    duration, setDuration,
-    realTime, setRealTime,
-    color, setColor,
-    errors, setErrors,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    priority,
+    setPriority,
+    status,
+    setStatus,
+    category,
+    setCategory,
+    currentDate,
+    setCurrentDate,
+    duration,
+    setDuration,
+    realTime,
+    setRealTime,
+    color,
+    setColor,
+    errors,
+    setErrors,
     handleTitleChange,
     validateForm,
     initialState,

@@ -29,6 +29,7 @@ export interface TaskResponse {
   duration?: string;
   priority_level: number;
   category: string;
+  color?: string;
   deadline: string;
   status:
     | 'Todo'
@@ -64,6 +65,7 @@ export interface TaskResponse {
       | 'Archived';
     deadline?: string;
     category?: string;
+    color?: string;
     created_at?: string;
     id?: string;
     links?: { title: string; url: string }[];

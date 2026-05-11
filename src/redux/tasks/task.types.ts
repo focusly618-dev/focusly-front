@@ -27,6 +27,7 @@ export interface Task {
   deadline: string;
   status: TaskStatus;
   category: string;
+  color?: string;
   /** For Golden Hour Analysis (FR-16) */
   completed_at?: string | null;
   created_at: string;
@@ -47,6 +48,7 @@ export interface Task {
         status?: TaskStatus;
         deadline?: string;
         category?: string;
+        color?: string;
         id?: string;
         created_at?: string;
         links?: { title: string; url: string }[];
