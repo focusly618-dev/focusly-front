@@ -113,12 +113,11 @@ export const EventContainer = styled(Box, {
     backgroundColor: bgColor,
     color: textColor,
     height: '100%',
-    width: '100%',
+    width: `calc(100% - ${overlapIndex * 32}px)`,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     padding: '4px 6px',
-    borderLeft: `3px solid ${variant.main}`,
     borderRadius: '4px',
     overflow: 'hidden',
     cursor: 'pointer',
@@ -133,8 +132,6 @@ export const EventContainer = styled(Box, {
 
     // ── Staircase Stacking (32px offset for title visibility) ──
     transform: `translateX(${overlapIndex * 32}px)`,
-    width: `calc(100% - ${overlapIndex * 32}px)`,
-    zIndex: overlapIndex + 1,
 
     '&:hover': {
       backgroundColor: bgHover,
