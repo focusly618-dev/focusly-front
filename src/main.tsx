@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AppThemeProvider } from '@/context/ThemeContext';
 import './index.css';
+import './styles/notifications.css';
 import App from './App.tsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Provider } from 'react-redux';
@@ -29,5 +30,5 @@ createRoot(document.getElementById('root')!).render(
         </Provider>
       </ApolloProvider>
     </GoogleOAuthProvider>
-  </AppThemeProvider>
+  </AppThemeProvider>,
 );

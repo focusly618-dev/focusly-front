@@ -1,8 +1,6 @@
-import { Box, Typography, IconButton, LinearProgress } from '@mui/material';
+import { Box, Typography, LinearProgress } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
-  Flag as FlagIcon,
-  MoreHoriz as MoreHorizIcon,
   Link as LinkIcon,
 } from '@mui/icons-material';
 
@@ -13,6 +11,9 @@ import {
   ProgressBarContainer,
   ProgressLabel,
   Tag,
+  StatusDot,
+  MetaBadge,
+  PriorityBar,
 } from './GridViewTask.styles';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
@@ -22,21 +23,29 @@ interface GridViewTaskProps {
   onTaskClick: (task: TaskResponse) => void;
 }
 
+// Professional color scheme matching ListViewTask
+const getStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    Done: '#22c55e',
+    Todo: '#3b82f6',
+    Planning: '#8b5cf6',
+    Pending: '#f59e0b',
+    OnHold: '#ef4444',
+    Review: '#06b6d4',
+    Backlog: '#6b7280',
+  };
+  return colors[status] || '#6b7280';
+};
+
+const getPriorityColor = (level: number) => {
+  if (level >= 3) return '#ef4444';
+  if (level === 2) return '#f59e0b';
+  return '#22c55e';
+};
+
 export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
-  const taskColor = (() => {
-    // Use color field directly if available
-    if (task.color) return task.color;
-    // Fallback: extract from notes_encrypted (legacy data)
-    if (task.notes_encrypted) {
-      const match = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
-      if (match && match[1]) return match[1];
-    }
-    return task.priority_level === 3
-      ? '#EF4444'
-      : task.priority_level === 2
-        ? '#F59E0B'
-        : '#22C55E';
-  })();
+  const statusColor = getStatusColor(task.status);
+  const priorityColor = getPriorityColor(task.priority_level);
 
   const subtaskCount = task.subtasks?.length || 0;
   const completedSubtasks =
@@ -48,37 +57,33 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
   return (
     <GridTaskCard onClick={() => onTaskClick(task)}>
       <GridCardHeader>
-        <Tag
-          tagColor={getTagColors(task.category || 'General').bgcolor}
-          textColor={getTagColors(task.category || 'General').color}
-          sx={{
-            border: '1px solid',
-            borderColor: getTagColors(task.category || 'General').borderColor,
-            px: 1,
-            py: 0.25,
-            borderRadius: '6px',
-          }}
-        >
-          {task.category || 'General'}
-        </Tag>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {task.links && task.links.length > 0 && (
-            <LinkIcon
-              sx={{ fontSize: 16, color: taskColor }}
-              titleAccess={`${task.links.length} links`}
-            />
-          )}
-          <IconButton size="small" sx={{ color: 'text.secondary', p: 0 }}>
-            <MoreHorizIcon />
-          </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <StatusDot color={statusColor} />
+          <Tag
+            tagColor={getTagColors(task.category || 'General').bgcolor}
+            textColor={getTagColors(task.category || 'General').color}
+          >
+            {task.category || 'General'}
+          </Tag>
         </Box>
+        {task.links && task.links.length > 0 && (
+          <MetaBadge sx={{ color: '#3b82f6' }}>
+            <LinkIcon sx={{ fontSize: 14 }} />
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '11px', fontWeight: 500 }}
+            >
+              {task.links.length}
+            </Typography>
+          </MetaBadge>
+        )}
       </GridCardHeader>
 
-      <Box>
+      <Box sx={{ flex: 1 }}>
         <Typography
           variant="h6"
           sx={{
-            fontSize: '16px',
+            fontSize: '15px',
             fontWeight: 600,
             color: 'text.primary',
             lineHeight: 1.4,
@@ -91,7 +96,7 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
           variant="body2"
           sx={{
             color: 'text.secondary',
-            fontSize: '13px',
+            fontSize: '12px',
             lineHeight: 1.5,
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -104,37 +109,40 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
         </Typography>
       </Box>
 
-      <Box sx={{ mt: 1, display: 'flex', gap: 2 }}>
+      {/* Metadata row */}
+      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
         {task.priority_level > 0 && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <FlagIcon
-              sx={{
-                fontSize: 14,
-                color: taskColor,
-              }}
-            />
+          <MetaBadge>
+            <PriorityBar color={priorityColor} />
             <Typography
               variant="caption"
-              sx={{ color: 'text.primary', fontWeight: 600 }}
+              sx={{
+                fontSize: '11px',
+                fontWeight: 500,
+                color: 'text.secondary',
+              }}
             >
-              {task.priority_level === 3
+              {task.priority_level >= 3
                 ? 'High'
                 : task.priority_level === 2
-                  ? 'Medium'
+                  ? 'Med'
                   : 'Low'}
             </Typography>
-          </Box>
+          </MetaBadge>
         )}
         {task.deadline && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <CalendarTodayIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <MetaBadge>
+            <CalendarTodayIcon sx={{ fontSize: 12, color: 'text.secondary' }} />
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '11px', color: 'text.secondary' }}
+            >
               {new Date(task.deadline).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
               })}
             </Typography>
-          </Box>
+          </MetaBadge>
         )}
       </Box>
 
@@ -145,24 +153,28 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
               variant="caption"
               sx={{ color: 'text.secondary', fontSize: '11px' }}
             >
-              Subtasks: {completedSubtasks}/{subtaskCount}
+              {completedSubtasks}/{subtaskCount} subtasks
             </Typography>
             <Typography
               variant="caption"
-              sx={{ color: 'text.secondary', fontSize: '11px' }}
+              sx={{
+                color: 'text.secondary',
+                fontSize: '11px',
+                fontWeight: 500,
+              }}
             >
               {Math.round(progress)}%
             </Typography>
           </ProgressLabel>
           <LinearProgress
             variant="determinate"
-            value={Math.max(progress, 5)} // Min 5% to show bar
+            value={Math.max(progress, 3)}
             sx={{
-              height: 4,
+              height: 3,
               borderRadius: 2,
               bgcolor: 'action.hover',
               '& .MuiLinearProgress-bar': {
-                bgcolor: taskColor,
+                bgcolor: statusColor,
                 borderRadius: 2,
               },
             }}

@@ -20,7 +20,7 @@ import {
 import { sileo } from 'sileo';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
-import { setTasks, removeTask } from '@/redux/tasks/task.slice';
+import { setTasks, removeTask, updateTask } from '@/redux/tasks/task.slice';
 import { removeEvent, setEvents } from '@/redux/calendar/calendar.slice';
 import {
   fetchGoogleEvents,
@@ -295,7 +295,15 @@ export const useCalendarView = () => {
     const sortedEvents = allEvents.sort((a, b) => {
       const aStart = a.start?.getTime() || 0;
       const bStart = b.start?.getTime() || 0;
-      return aStart - bStart;
+
+      if (aStart !== bStart) {
+        return aStart - bStart;
+      }
+
+      // If same start time, longer events go first (at the bottom of the stack)
+      const aDuration = (a.end?.getTime() || 0) - aStart;
+      const bDuration = (b.end?.getTime() || 0) - bStart;
+      return bDuration - aDuration;
     });
 
     const result: ICalendarEvent[] = [];
@@ -395,8 +403,12 @@ export const useCalendarView = () => {
   };
 
   const handleDeleteTask = async (taskId: string) => {
+    // 1. Optimistic Delete in Redux
+    dispatch(removeTask({ id: taskId }));
+    dispatch(removeEvent({ id: taskId })); // Also remove from virtual state
+
     try {
-      // 1. Identify if it's a persistent Platform Task or a virtual Google Event
+      // Identify if it's a persistent Platform Task or a virtual Google Event
       const persistentTask = tasks.find((t) => t.id === taskId);
       const virtualEvent = reduxEvents.find((e) => e.id === taskId);
 
@@ -404,34 +416,31 @@ export const useCalendarView = () => {
       const isPureGoogleEvent = !!virtualEvent && !persistentTask;
 
       if (isPlatformTask) {
-        // Point 2: Platform Task — Delete from BOTH Google and Platform
-        // Even though backend handles this, calling Google API from frontend provides immediate feedback
         if (persistentTask.google_event_id) {
           try {
             await deleteGoogleEvent(persistentTask.google_event_id);
-            // Also remove from virtual state to prevent "ghost" duplicates
             dispatch(removeEvent({ id: persistentTask.google_event_id }));
           } catch (err) {
-            console.warn(
-              'Failed to delete Google event, proceeding with platform delete',
-              err,
-            );
+            console.warn('Failed to delete Google event', err);
           }
         }
 
         await deleteTaskMutation({
           variables: { id: taskId },
           refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user?.id } },
+            {
+              query: GET_TASKS,
+              variables: {
+                userId: user?.id,
+                filters: { startDate: dateRange.start, endDate: dateRange.end },
+              },
+            },
             { query: GET_WORKSPACES, variables: { search: '' } },
           ],
         });
-        dispatch(removeTask({ id: taskId }));
       } else if (isPureGoogleEvent || taskId.startsWith('_')) {
-        // Point 1: Pure Google Event (never saved to platform) — Delete only in Google
         const eventId = virtualEvent?.id || taskId;
         await deleteGoogleEvent(eventId);
-        dispatch(removeEvent({ id: taskId }));
       }
 
       handleModalClose();
@@ -443,6 +452,8 @@ export const useCalendarView = () => {
       });
     } catch (err) {
       console.error('Error deleting task:', err);
+      // We don't easily revert delete without refetching,
+      // but refetch will happen anyway on focus or next range change.
       sileo.error({
         title: 'Error deleting task',
         fill: 'var(--sileo-error-bg)',
@@ -481,6 +492,19 @@ export const useCalendarView = () => {
     const startDate = typeof start === 'string' ? new Date(start) : start;
     const endDate = typeof end === 'string' ? new Date(end) : end;
 
+    // 1. Optimistic Update in Redux
+    const originalTask = tasks.find((t) => t.id === event.id);
+    if (originalTask) {
+      dispatch(
+        updateTask({
+          ...originalTask,
+          estimated_start_date: startDate.toISOString(),
+          estimated_end_date: endDate.toISOString(),
+          deadline: endDate.toISOString(),
+        }),
+      );
+    }
+
     try {
       await updateTaskMutation({
         variables: {
@@ -491,6 +515,7 @@ export const useCalendarView = () => {
             estimated_end_date: endDate.toISOString(),
           },
         },
+        // We still refetch to ensure server sync, but optimistic update removes the "jump"
         refetchQueries: [
           {
             query: GET_TASKS,
@@ -509,6 +534,10 @@ export const useCalendarView = () => {
       });
     } catch (err) {
       console.error('Error dropping event:', err);
+      // Revert if error
+      if (originalTask) {
+        dispatch(updateTask(originalTask));
+      }
       sileo.error({ title: 'Error rescheduling task' });
     }
   };
@@ -522,6 +551,19 @@ export const useCalendarView = () => {
 
     const startDate = typeof start === 'string' ? new Date(start) : start;
     const endDate = typeof end === 'string' ? new Date(end) : end;
+
+    // 1. Optimistic Update in Redux
+    const originalTask = tasks.find((t) => t.id === event.id);
+    if (originalTask) {
+      dispatch(
+        updateTask({
+          ...originalTask,
+          estimated_start_date: startDate.toISOString(),
+          estimated_end_date: endDate.toISOString(),
+          deadline: endDate.toISOString(),
+        }),
+      );
+    }
 
     try {
       await updateTaskMutation({
@@ -545,6 +587,10 @@ export const useCalendarView = () => {
       });
     } catch (err) {
       console.error('Error resizing event:', err);
+      // Revert if error
+      if (originalTask) {
+        dispatch(updateTask(originalTask));
+      }
     }
   };
 

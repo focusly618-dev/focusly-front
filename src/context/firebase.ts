@@ -6,6 +6,7 @@ import { getAuth } from 'firebase/auth';
 import Swal from 'sweetalert2';
 import 'animate.css';
 import { store } from '@/redux/store';
+import { soundPlayer } from '@/utils/notificationSounds';
 
 interface FirebaseConfig {
   apiKey: string;
@@ -72,6 +73,9 @@ export const listenForegroundMessages = () => {
 
     console.log('Mensaje recibido en Focusly:', payload);
 
+    // Play notification sound for upcoming task alerts
+    soundPlayer.playTaskUpcoming();
+
     // Data-only messages: title/body are in payload.data
     const data = payload.data as Record<string, string>;
     const taskTitle = data?.taskTitle || data?.title || 'Upcoming Task! 🚀';
@@ -99,57 +103,44 @@ export const listenForegroundMessages = () => {
       });
     }
 
-    // 2. Premium in-app toast (only when tab is visible)
+    // 2. Premium in-app toast (only when tab is visible) - Motion/Notion style
     if (document.visibilityState === 'visible') {
       void Swal.fire({
         html: `
-          <div style="text-align: left; font-family: 'Inter', sans-serif;">
-            <div style="font-size: 11px; color: #82aaff; font-weight: 800; letter-spacing: 1.2px; margin-bottom: 8px; text-transform: uppercase;">NEXT TASK</div>
-            <div style="font-size: 20px; color: white; font-weight: 700; margin-bottom: 8px; line-height: 1.2;">${taskTitle}</div>
-            <div style="display: flex; align-items: center; color: #94a3b8; font-size: 14px; margin-bottom: 20px;">
-              <span style="margin-right: 8px; font-size: 16px;">🕒</span> ${timeFormatted}
+          <div style="display: flex; align-items: center; gap: 16px; font-family: inherit;">
+            <div class="motion-notification-icon-wrapper">⏰</div>
+            <div style="flex: 1; min-width: 0; text-align: left;">
+              <div class="motion-notification-title">${taskTitle}</div>
+              <div class="motion-notification-body">Starts at ${timeFormatted}</div>
             </div>
           </div>
         `,
         toast: true,
-        position: 'top',
-        timer: 8000,
-        timerProgressBar: true,
-        showConfirmButton: true,
-        showDenyButton: true,
-        confirmButtonText: 'Check',
-        denyButtonText: 'Dismiss',
-        confirmButtonColor: '#3b82f6',
-        denyButtonColor: '#334155',
-        background: '#111827',
-        color: '#ffffff',
+        position: 'top-end',
+        timer: 5000,
+        timerProgressBar: false,
+        showConfirmButton: false,
+        showCloseButton: false,
+        showDenyButton: false,
+        background: 'transparent',
+        padding: '0',
+        customClass: {
+          popup: 'motion-notification',
+        },
         showClass: {
-          popup: 'animate__animated animate__fadeInDown animate__faster',
+          popup: 'motion-slide-in',
         },
         hideClass: {
-          popup: 'animate__animated animate__fadeOutUp animate__faster',
+          popup: 'motion-slide-out',
         },
         didOpen: (toast) => {
-          toast.style.borderRadius = '16px';
-          toast.style.padding = '20px';
-          toast.style.width = '380px';
-          toast.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-
-          const confirmBtn = toast.querySelector(
-            '.swal2-confirm',
-          ) as HTMLElement;
-          const denyBtn = toast.querySelector('.swal2-deny') as HTMLElement;
-          if (confirmBtn) {
-            confirmBtn.style.borderRadius = '12px';
-            confirmBtn.style.fontWeight = '600';
-            confirmBtn.style.flex = '1';
-          }
-          if (denyBtn) {
-            denyBtn.style.borderRadius = '12px';
-            denyBtn.style.fontWeight = '600';
-            denyBtn.style.flex = '0.5';
-          }
+          toast.addEventListener('mouseenter', Swal.stopTimer);
+          toast.addEventListener('mouseleave', Swal.resumeTimer);
         },
+      }).then((result) => {
+        if (result.isDismissed || result.isDenied) {
+          Swal.close();
+        }
       });
     }
   });

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/redux/store';
 import { updateUser } from '@/redux/auth/auth.slice';
+import { useNotificationSounds } from '@/hooks/useNotificationSounds';
+import { soundPlayer, type SoundType } from '@/utils/notificationSounds';
 import {
   Box,
   Switch,
@@ -16,8 +18,9 @@ import {
   PlayArrow as PlayArrowIcon,
   Coffee as CoffeeIcon,
   Check as CheckIcon,
-  WarningAmber as WarningAmberIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
+  VolumeUp as VolumeUpIcon,
+  NotificationsActive as NotificationsActiveIcon,
 } from '@mui/icons-material';
 import {
   SectionCard,
@@ -34,11 +37,19 @@ import {
   SoundSelector,
 } from '../Settings.styles';
 
+type AlertType = 'sessionStart' | 'breakReminder' | 'sessionEnd';
+
 export const NotificationSettings = () => {
   const theme = useTheme();
   const themeSwitchStyles = switchStyles(theme);
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { playSound } = useNotificationSounds(0.5);
+
+  // Preferred notification sound from localStorage
+  const [preferredSound, setPreferredSound] = useState<SoundType>(
+    soundPlayer.getPreferredSound(),
+  );
 
   // La preferencia guardada en el perfil del usuario (o true por defecto)
   const savedPreference = user?.pushEnabled !== false;
@@ -48,6 +59,20 @@ export const NotificationSettings = () => {
   );
   const [permissionStatus, setPermissionStatus] =
     useState<NotificationPermission>(Notification.permission);
+
+  // Mutually exclusive alert selection - only one can be active
+  const [selectedAlert, setSelectedAlert] = useState<AlertType>('sessionStart');
+
+  const handleAlertToggle = (alertType: AlertType) => {
+    setSelectedAlert(alertType);
+  };
+
+  const handlePreferredSoundChange = (type: SoundType) => {
+    setPreferredSound(type);
+    soundPlayer.setPreferredSound(type);
+    // Play a preview
+    playSound(type);
+  };
 
   const handlePushToggle = async () => {
     if (permissionStatus === 'denied') {
@@ -132,6 +157,89 @@ export const NotificationSettings = () => {
         </SettingItem>
       </SectionCard>
 
+      {/* Notification Sound Selection */}
+      <SectionCard>
+        <SectionHeader>
+          <SectionTitle>
+            <Box
+              className="icon-wrapper"
+              sx={{ color: theme.palette.warning.main }}
+            >
+              <NotificationsActiveIcon />
+            </Box>
+            <Typography>Notification Sound</Typography>
+          </SectionTitle>
+        </SectionHeader>
+
+        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+          Select the sound that will play when a task is about to start. This
+          choice is saved locally on your device.
+        </Typography>
+
+        <AlertGrid sx={{ mb: 2 }}>
+          {(
+            [
+              'taskUpcoming',
+              'sessionStart',
+              'breakReminder',
+              'sessionEnd',
+            ] as SoundType[]
+          ).map((type) => {
+            const labels: Record<SoundType, string> = {
+              taskUpcoming: 'Classic Chime',
+              sessionStart: 'Digital Tone',
+              breakReminder: 'Soft Bell',
+              sessionEnd: 'Success Arpeggio',
+            };
+
+            const icons: Record<SoundType, React.ElementType> = {
+              taskUpcoming: NotificationsActiveIcon,
+              sessionStart: PlayArrowIcon,
+              breakReminder: CoffeeIcon,
+              sessionEnd: CheckIcon,
+            };
+
+            const Icon = icons[type];
+            const isActive = preferredSound === type;
+
+            return (
+              <AlertCard
+                key={type}
+                active={isActive}
+                onClick={() => handlePreferredSoundChange(type)}
+                sx={{ cursor: 'pointer' }}
+              >
+                <AlertIconBox
+                  active={isActive}
+                  type={
+                    type === 'taskUpcoming'
+                      ? 'sessionStart'
+                      : (type as
+                          | 'sessionStart'
+                          | 'breakReminder'
+                          | 'sessionEnd')
+                  }
+                >
+                  <Icon />
+                </AlertIconBox>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                    {labels[type]}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
+                  >
+                    {isActive ? 'Current Selection' : 'Click to select'}
+                  </Typography>
+                </Box>
+                {isActive && <Badge sx={{ alignSelf: 'center' }}>Active</Badge>}
+              </AlertCard>
+            );
+          })}
+        </AlertGrid>
+      </SectionCard>
+
       {/* Session & Break Alerts */}
       <SectionCard>
         <SectionHeader>
@@ -147,8 +255,11 @@ export const NotificationSettings = () => {
         </SectionHeader>
 
         <AlertGrid>
-          <AlertCard active>
-            <AlertIconBox active>
+          <AlertCard active={selectedAlert === 'sessionStart'}>
+            <AlertIconBox
+              active={selectedAlert === 'sessionStart'}
+              type="sessionStart"
+            >
               <PlayArrowIcon />
             </AlertIconBox>
             <Box sx={{ flex: 1 }}>
@@ -178,17 +289,26 @@ export const NotificationSettings = () => {
                     begins.
                   </Typography>
                 </Box>
-                <Switch defaultChecked size="small" sx={themeSwitchStyles} />
+                <Switch
+                  checked={selectedAlert === 'sessionStart'}
+                  onChange={() => handleAlertToggle('sessionStart')}
+                  size="small"
+                  sx={themeSwitchStyles}
+                />
               </Box>
-              <SoundSelector>
-                <Typography>System Sound 1</Typography>
+              <SoundSelector onClick={() => playSound('sessionStart')}>
+                <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                <Typography>Preview Sound</Typography>
                 <KeyboardArrowDownIcon />
               </SoundSelector>
             </Box>
           </AlertCard>
 
-          <AlertCard active>
-            <AlertIconBox active>
+          <AlertCard active={selectedAlert === 'breakReminder'}>
+            <AlertIconBox
+              active={selectedAlert === 'breakReminder'}
+              type="breakReminder"
+            >
               <CoffeeIcon />
             </AlertIconBox>
             <Box sx={{ flex: 1 }}>
@@ -218,17 +338,26 @@ export const NotificationSettings = () => {
                     ends.
                   </Typography>
                 </Box>
-                <Switch defaultChecked size="small" sx={themeSwitchStyles} />
+                <Switch
+                  checked={selectedAlert === 'breakReminder'}
+                  onChange={() => handleAlertToggle('breakReminder')}
+                  size="small"
+                  sx={themeSwitchStyles}
+                />
               </Box>
-              <SoundSelector>
-                <Typography>Gentle Bell</Typography>
+              <SoundSelector onClick={() => playSound('breakReminder')}>
+                <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                <Typography>Preview Sound</Typography>
                 <KeyboardArrowDownIcon />
               </SoundSelector>
             </Box>
           </AlertCard>
 
-          <AlertCard active>
-            <AlertIconBox active>
+          <AlertCard active={selectedAlert === 'sessionEnd'}>
+            <AlertIconBox
+              active={selectedAlert === 'sessionEnd'}
+              type="sessionEnd"
+            >
               <CheckIcon />
             </AlertIconBox>
             <Box sx={{ flex: 1 }}>
@@ -257,49 +386,16 @@ export const NotificationSettings = () => {
                     Notification when your focus timer hits zero.
                   </Typography>
                 </Box>
-                <Switch defaultChecked size="small" sx={themeSwitchStyles} />
+                <Switch
+                  checked={selectedAlert === 'sessionEnd'}
+                  onChange={() => handleAlertToggle('sessionEnd')}
+                  size="small"
+                  sx={themeSwitchStyles}
+                />
               </Box>
-              <SoundSelector>
-                <Typography>Success Chime</Typography>
-                <KeyboardArrowDownIcon />
-              </SoundSelector>
-            </Box>
-          </AlertCard>
-
-          <AlertCard>
-            <AlertIconBox>
-              <WarningAmberIcon />
-            </AlertIconBox>
-            <Box sx={{ flex: 1 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                }}
-              >
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 700, color: theme.palette.text.primary }}
-                  >
-                    Overtime Alert
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      display: 'block',
-                      mt: 0.5,
-                    }}
-                  >
-                    Warn when you've been working too long without a break.
-                  </Typography>
-                </Box>
-                <Switch size="small" sx={themeSwitchStyles} />
-              </Box>
-              <SoundSelector>
-                <Typography>Default</Typography>
+              <SoundSelector onClick={() => playSound('sessionEnd')}>
+                <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                <Typography>Preview Sound</Typography>
                 <KeyboardArrowDownIcon />
               </SoundSelector>
             </Box>

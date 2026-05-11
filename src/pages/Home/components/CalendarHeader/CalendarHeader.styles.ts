@@ -5,29 +5,31 @@ export const HeaderContainer = styled(Box)({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '8px 0',
-  height: '70px',
+  padding: '4px 0',
+  height: '52px', // Matches the new header height in CalendarView.styles.ts
 });
 
 export const DayName = styled(Typography)(({ theme }) => ({
-  fontSize: '11px',
+  fontSize: '10px',
   fontWeight: 600,
   color: theme.palette.text.secondary,
   textTransform: 'uppercase',
-  marginBottom: '4px',
+  letterSpacing: '0.05em',
+  marginBottom: '2px',
 }));
 
 export const DayNumber = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'active',
 })<{ active?: boolean }>(({ theme, active }) => ({
-  fontSize: '16px',
-  fontWeight: 700,
+  fontSize: '14px',
+  fontWeight: 600,
   color: active ? '#ffffff' : theme.palette.text.primary,
   backgroundColor: active ? theme.palette.primary.main : 'transparent',
-  width: '32px',
-  height: '32px',
+  width: '28px',
+  height: '28px',
   borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  transition: 'all 0.2s ease',
 }));
