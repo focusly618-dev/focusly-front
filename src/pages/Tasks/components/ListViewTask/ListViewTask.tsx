@@ -134,6 +134,9 @@ export const ListViewTask = ({
     setActiveSubtaskIdx(null);
   };
   const taskColor = (() => {
+    // Use color field directly if available
+    if (task.color) return task.color;
+    // Fallback: extract from notes_encrypted (legacy data)
     if (task.notes_encrypted) {
       const match = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
       if (match && match[1]) return match[1];

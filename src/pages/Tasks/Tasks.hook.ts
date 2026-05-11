@@ -11,6 +11,7 @@ import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
 export const useTasks = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const tasks = useAppSelector((state) => state.task.tasks);
   const [, setSearchParams] = useSearchParams();
 
   // ── View & UI local state ──────────────────────────────────────────
@@ -89,7 +90,9 @@ export const useTasks = () => {
   };
 
   const handleOpenSubtaskModal = (task: TaskResponse, index?: number): void => {
-    setActiveParentTask(task);
+    // Get the task from Redux store to ensure we have the latest data with updated subtask colors
+    const updatedTask = tasks.find((t) => t.id === task.id) || task;
+    setActiveParentTask(updatedTask as TaskResponse);
     setActiveSubtaskIndex(typeof index === 'number' ? index : null);
     setIsSubtaskModalOpen(true);
   };

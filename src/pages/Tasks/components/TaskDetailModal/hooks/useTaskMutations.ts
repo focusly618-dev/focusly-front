@@ -149,6 +149,7 @@ export const useTaskMutations = ({
         : new Date().toISOString(),
       priority_level: priorityLevel,
       category: state.category,
+      color: state.color,
       links,
       collaborators: state.collaborators,
     };
@@ -167,6 +168,7 @@ export const useTaskMutations = ({
             ? state.deadline.toISOString()
             : new Date().toISOString(),
           category: state.category,
+          color: state.color,
           links,
         };
 
@@ -277,6 +279,7 @@ export const useTaskMutations = ({
               ? state.deadline.toISOString()
               : state.deadline || initialTask.deadline,
           category: state.category,
+          color: subtaskColor,
           links: state.links?.map((l) => ({ title: l.title, url: l.url })),
         };
       });
@@ -292,12 +295,17 @@ export const useTaskMutations = ({
         });
         if (data?.updateTask) {
           dispatch(upsertTaskRedux(mapResponseToTask(data.updateTask)));
+          sileo.success({
+            title: 'Subtask updated',
+            fill: 'var(--sileo-update-bg)',
+          });
           onSave(data.updateTask);
           resetForm();
           if (shouldClose) onClose();
         }
       } catch (e) {
         console.error(e);
+        sileo.error({ title: 'Failed to update subtask' });
       }
       setLoadingSave(false);
       return;
@@ -340,6 +348,11 @@ export const useTaskMutations = ({
         key: 'category',
         val: state.category,
         initial: initialTask.category,
+      },
+      color: {
+        key: 'color',
+        val: taskColor,
+        initial: (initialTask as { color?: string }).color,
       },
       estimate: {
         key: 'estimate_timer',
