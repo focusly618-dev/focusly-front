@@ -37,7 +37,6 @@ export const useHome = () => {
   // Workspace & UI State
   const [isWorkspaceEditorOpen, setIsWorkspaceEditorOpen] = useState(false);
   const [isWorkspaceSidebarOpen, setIsWorkspaceSidebarOpen] = useState(true);
-  const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
 
   // Focus Mode State
   const [isFocusModeOpen, setIsFocusModeOpen] = useState(() => {
@@ -337,8 +336,6 @@ export const useHome = () => {
     setIsWorkspaceEditorOpen,
     isWorkspaceSidebarOpen,
     setIsWorkspaceSidebarOpen,
-    isRightPanelOpen,
-    setIsRightPanelOpen,
     isFocusModeOpen,
     setIsFocusModeOpen,
     isFocusModeActive,

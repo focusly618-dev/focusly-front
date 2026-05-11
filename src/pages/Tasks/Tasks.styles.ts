@@ -34,13 +34,13 @@ export const AnimatedContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const TasksContainer = styled(Box)(({ theme }) => ({
-  padding: '24px',
+  padding: '16px 24px',
   backgroundColor: theme.palette.background.default,
-  height: '100vh', // Fixed height
-  overflow: 'hidden', // Prevent body scroll
+  height: '100vh',
+  overflow: 'hidden',
   color: theme.palette.text.primary,
   display: 'flex',
-  gap: '24px',
+  gap: '20px',
 }));
 
 export const MainContent = styled(Box)({
@@ -141,13 +141,13 @@ export const CompletedButton = styled(Button)(({ theme }) => ({
 export const SectionTitle = styled(Typography, {
   shouldForwardProp: (prop) => prop !== 'colorIndicator',
 })<{ colorIndicator?: string }>(({ theme, colorIndicator }) => ({
-  fontSize: '14px',
-  fontWeight: 600,
+  fontSize: '12px',
+  fontWeight: 700,
   color: theme.palette.text.secondary,
-  marginBottom: '16px',
-  marginTop: '32px',
+  marginBottom: '8px',
+  marginTop: '20px',
   textTransform: 'uppercase',
-  letterSpacing: '0.5px',
+  letterSpacing: '1px',
   display: 'flex',
   alignItems: 'center',
   gap: '8px',

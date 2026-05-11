@@ -1,4 +1,4 @@
-import { styled, Box, Typography, Card } from '@mui/material';
+import { styled, Box, Typography, Card, alpha, lighten } from '@mui/material';
 
 export const LibraryContainer = styled(Box)(({ theme }) => ({
   flex: 1,
@@ -161,58 +161,69 @@ export const FolderList = styled(Box)(({ theme }) => ({
 
 export const FolderCapsule = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'active' && prop !== 'color',
-})<{ active?: boolean; color?: string }>(({ theme, active, color }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: '10px 20px 10px 10px',
-  borderRadius: '40px',
-  backgroundColor: active
-    ? theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.08)'
-      : 'rgba(19, 127, 236, 0.1)'
-    : theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.03)'
-      : 'rgba(0, 0, 0, 0.02)',
-  border: `1px solid ${active ? color || (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : theme.palette.primary.main) : 'transparent'}`,
-  cursor: 'pointer',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  minWidth: '180px',
-  flexShrink: 0,
-  position: 'relative',
-  '&:hover .folder-options-btn': {
-    opacity: 1,
-    transform: 'scale(1)',
-  },
-  '&:hover': {
+})<{ active?: boolean; color?: string }>(({ theme, active, color }) => {
+  const isDark = theme.palette.mode === 'dark';
+  const baseColor = color || theme.palette.primary.main;
+  const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
+
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '10px 20px 10px 10px',
+    borderRadius: '40px',
     backgroundColor: active
-      ? theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.12)'
-        : 'rgba(19, 127, 236, 0.15)'
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.07)'
-        : 'rgba(0, 0, 0, 0.05)',
-    transform: 'translateY(-2px)',
-    boxShadow:
-      theme.palette.mode === 'dark'
-        ? '0 8px 20px rgba(0,0,0,0.4)'
+      ? isDark
+        ? alpha(visibleColor, 0.12)
+        : alpha(baseColor, 0.1)
+      : isDark
+        ? 'rgba(255, 255, 255, 0.03)'
+        : 'rgba(0, 0, 0, 0.02)',
+    border: `1px solid ${active ? visibleColor : 'transparent'}`,
+    cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    minWidth: '180px',
+    flexShrink: 0,
+    position: 'relative',
+    '&:hover .folder-options-btn': {
+      opacity: 1,
+      transform: 'scale(1)',
+    },
+    '&:hover': {
+      backgroundColor: active
+        ? isDark
+          ? alpha(visibleColor, 0.18)
+          : alpha(baseColor, 0.15)
+        : isDark
+          ? 'rgba(255, 255, 255, 0.07)'
+          : 'rgba(0, 0, 0, 0.05)',
+      transform: 'translateY(-2px)',
+      boxShadow: isDark
+        ? `0 8px 24px ${alpha(visibleColor, 0.2)}`
         : '0 8px 20px rgba(0,0,0,0.1)',
-  },
-}));
+    },
+  };
+});
 
 export const FolderIconCircle = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'color',
-})<{ color?: string }>(({ color }) => ({
-  width: '44px',
-  height: '44px',
-  borderRadius: '50%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: color ? `${color}1A` : 'rgba(24, 118, 209, 0.15)',
-  color: color || '#1976d2',
-  marginRight: '12px',
-  boxShadow: `0 4px 12px ${color ? color + '22' : 'rgba(0,0,0,0.1)'}`,
-}));
+})<{ color?: string }>(({ theme, color }) => {
+  const isDark = theme.palette.mode === 'dark';
+  const baseColor = color || theme.palette.primary.main;
+  const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
+
+  return {
+    width: '44px',
+    height: '44px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: alpha(visibleColor, isDark ? 0.2 : 0.1),
+    color: visibleColor,
+    marginRight: '12px',
+    boxShadow: `0 4px 12px ${alpha(visibleColor, isDark ? 0.3 : 0.15)}`,
+  };
+});
 
 export const AddFolderCapsule = styled(Box)(({ theme }) => ({
   display: 'flex',

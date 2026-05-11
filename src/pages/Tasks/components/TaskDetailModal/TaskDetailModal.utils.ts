@@ -24,25 +24,25 @@ export const parseRealTime = (time: string): number => {
 };
 
 export const TASK_COLORS = [
-    '#f44336',
-    '#e91e63',
-    '#9c27b0',
-    '#673ab7',
-    '#3f51b5',
-    '#2196f3',
-    '#03a9f4',
-    '#00bcd4',
-    '#009688',
-    '#4caf50',
-    '#8bc34a',
-    '#cddc39',
-    '#ffeb3b',
-    '#ffc107',
-    '#ff9800',
-    '#ff5722',
-    '#795548',
-    '#607d8b',
-  ];
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#3f51b5',
+  '#2196f3',
+  '#03a9f4',
+  '#00bcd4',
+  '#009688',
+  '#4caf50',
+  '#8bc34a',
+  '#cddc39',
+  '#ffeb3b',
+  '#ffc107',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#607d8b',
+];
 
 export type PriorityType = 'High' | 'Med' | 'Low' | 'No priority';
 
@@ -60,11 +60,15 @@ export const getPriorityLevel = (priority: PriorityType): number => {
   return 0;
 };
 
-export const getTagColors = (tagName: string = 'General') => {
+export const getTagColors = (
+  tagName: string | null | undefined = 'General',
+) => {
+  // Handle null/undefined
+  const safeTagName = tagName ?? 'General';
   // Simple hash for consistency
   let hash = 0;
-  for (let i = 0; i < tagName.length; i++) {
-    hash = tagName.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < safeTagName.length; i++) {
+    hash = safeTagName.charCodeAt(i) + ((hash << 5) - hash);
   }
 
   // Predefined premium HSL base colors
@@ -90,7 +94,8 @@ export const getTagColors = (tagName: string = 'General') => {
     borderColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.4)`,
   };
 };
-export const normalizeUrl = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+export const normalizeUrl = (url: string) =>
+  url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
 export const deduplicateLinks = (links: { title: string; url: string }[]) => {
   const seen = new Set();
@@ -105,7 +110,7 @@ export const deduplicateLinks = (links: { title: string; url: string }[]) => {
 export const getTimerSuggestions = (val: string) => {
   const clean = val.trim();
   if (!clean || clean.length > 8) return [];
-  
+
   const suggestions: string[] = [];
   if (/^\d+$/.test(clean)) {
     suggestions.push(`${clean}h`, `${clean}m`);
@@ -122,4 +127,3 @@ export const getTimerSuggestions = (val: string) => {
   }
   return suggestions;
 };
-

@@ -1,7 +1,6 @@
 import { Box, styled } from '@mui/material';
 import Sidebar from './components/Sidebar/Sidebar';
 import CalendarView from './components/CalendarView';
-import RightPanel from './components/RightPanel';
 import { Tasks } from '../Tasks/Tasks';
 import { TaskBar } from './components/Sidebar/types/Sidebar.types';
 import { Insights } from '../Insights/Insights';
@@ -39,8 +38,6 @@ export const Home = () => {
     setIsWorkspaceEditorOpen,
     isWorkspaceSidebarOpen,
     setIsWorkspaceSidebarOpen,
-    isRightPanelOpen,
-    setIsRightPanelOpen,
     isFocusModeOpen,
     setIsFocusModeOpen,
     isFocusModeActive,
@@ -66,7 +63,9 @@ export const Home = () => {
         <Sidebar activeTab={activeTab} changeStatusTab={changeStatusTab} />
         <MainContent id="joyride-main-content">
           {activeTab === TaskBar.DailyPlan && (
-            <CalendarView onStartFocus={() => handleStartFocus(null)} />
+            <CalendarView
+              onStartFocus={(task: Task) => handleStartFocus(task)}
+            />
           )}
           {activeTab === TaskBar.Tasks && <Tasks />}
           {activeTab === TaskBar.Workspace && (
@@ -83,14 +82,6 @@ export const Home = () => {
           {activeTab === TaskBar.Insights && <Insights />}
           {activeTab === TaskBar.Settings && <Settings />}
         </MainContent>
-        {activeTab !== TaskBar.Workspace && (
-          <Box id="joyride-right-panel">
-            <RightPanel
-              isOpen={isRightPanelOpen}
-              onToggle={() => setIsRightPanelOpen(!isRightPanelOpen)}
-            />
-          </Box>
-        )}
         <Box id="joyride-chat-ai">
           <ChatAI
             rightOffset={
@@ -100,9 +91,7 @@ export const Home = () => {
                   : 92
                 : activeTab === TaskBar.Workspace
                   ? 32
-                  : isRightPanelOpen
-                    ? 352
-                    : 92
+                  : 92
             }
           />
         </Box>

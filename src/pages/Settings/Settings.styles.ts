@@ -46,12 +46,16 @@ export const TabItem = styled(Box, {
   fontWeight: 600,
   transition: 'all 0.2s ease',
   color: active ? theme.palette.text.primary : theme.palette.text.secondary,
-  backgroundColor: active ? alpha(theme.palette.primary.main, 0.15) : 'transparent',
+  backgroundColor: active
+    ? alpha(theme.palette.primary.main, 0.15)
+    : 'transparent',
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(1.5),
   '&:hover': {
-    backgroundColor: active ? alpha(theme.palette.primary.main, 0.2) : theme.palette.action.hover,
+    backgroundColor: active
+      ? alpha(theme.palette.primary.main, 0.2)
+      : theme.palette.action.hover,
     color: theme.palette.text.primary,
   },
 }));
@@ -141,7 +145,8 @@ export const AlertGrid = styled(Box)(({ theme }) => ({
 export const AlertCard = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'active',
 })<{ active?: boolean }>(({ theme, active }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? alpha('#fff', 0.02) : alpha('#000', 0.02),
+  backgroundColor:
+    theme.palette.mode === 'dark' ? alpha('#fff', 0.02) : alpha('#000', 0.02),
   borderRadius: '16px',
   padding: theme.spacing(3),
   border: `1px solid ${active ? alpha(theme.palette.primary.main, 0.3) : theme.palette.divider}`,
@@ -149,24 +154,53 @@ export const AlertCard = styled(Box, {
   display: 'flex',
   gap: theme.spacing(2.5),
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? alpha('#fff', 0.05) : alpha('#000', 0.04),
-    borderColor: active ? alpha(theme.palette.primary.main, 0.5) : alpha(theme.palette.text.secondary, 0.3),
+    backgroundColor:
+      theme.palette.mode === 'dark' ? alpha('#fff', 0.05) : alpha('#000', 0.04),
+    borderColor: active
+      ? alpha(theme.palette.primary.main, 0.5)
+      : alpha(theme.palette.text.secondary, 0.3),
   },
 }));
 
 export const AlertIconBox = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'active',
-})<{ active?: boolean }>(({ theme, active }) => ({
-  width: '48px',
-  height: '48px',
-  borderRadius: '12px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: active ? alpha(theme.palette.primary.main, 0.1) : theme.palette.action.hover,
-  color: active ? theme.palette.primary.main : theme.palette.text.secondary,
-  flexShrink: 0,
-}));
+  shouldForwardProp: (prop) => prop !== 'active' && prop !== 'type',
+})<{
+  active?: boolean;
+  type?: 'sessionStart' | 'breakReminder' | 'sessionEnd';
+}>(({ theme, active, type }) => {
+  const getColor = () => {
+    if (!active) return theme.palette.text.secondary;
+    switch (type) {
+      case 'sessionStart':
+        return theme.palette.primary.main;
+      case 'breakReminder':
+        return theme.palette.mode === 'dark' ? '#ffa726' : '#ed6c02';
+      case 'sessionEnd':
+        return theme.palette.mode === 'dark' ? '#66bb6a' : '#2e7d32';
+      default:
+        return theme.palette.primary.main;
+    }
+  };
+
+  const color = getColor();
+
+  return {
+    width: '48px',
+    height: '48px',
+    borderRadius: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: alpha(color, 0.1),
+    color: color,
+    flexShrink: 0,
+    transition: 'all 0.2s ease',
+    border: `1px solid ${alpha(color, 0.1)}`,
+    '& svg': {
+      fontSize: '24px',
+    },
+  };
+});
 
 export const SoundSelector = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(1.5),

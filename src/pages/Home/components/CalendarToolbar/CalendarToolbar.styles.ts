@@ -32,51 +32,67 @@ export const SubDate = styled(Typography)(({ theme }) => ({
 }));
 
 export const ViewToggle = styled(ButtonGroup)(({ theme }) => ({
-  backgroundColor: theme.palette.background.default,
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,0.03)'
+      : 'rgba(0,0,0,0.03)',
   borderRadius: '8px',
-  padding: '4px',
+  padding: '3px',
   display: 'flex',
-  gap: '8px',
+  gap: '4px',
   border: `1px solid ${theme.palette.divider}`,
+  boxShadow: 'none',
   '& .MuiButton-root': {
-    border: 'none',
+    border: 'none !important',
     color: theme.palette.text.secondary,
     textTransform: 'none',
-    fontWeight: 500,
-    fontSize: '14px',
-    padding: '6px 16px',
+    fontWeight: 600,
+    fontSize: '12px',
+    padding: '4px 12px',
+    minWidth: 'auto',
     borderRadius: '6px !important',
-    backgroundColor: theme.palette.background.default,
+    transition: 'all 0.2s ease',
+    backgroundColor: 'transparent',
     '&:hover': {
       backgroundColor:
-        theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+        theme.palette.mode === 'dark'
+          ? 'rgba(255,255,255,0.05)'
+          : 'rgba(0,0,0,0.05)',
+      color: theme.palette.text.primary,
     },
     '&.active': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#334155' : theme.palette.grey[200],
-      color: theme.palette.text.primary,
+      backgroundColor:
+        theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#ffffff',
+      color: theme.palette.primary.main,
+      boxShadow:
+        theme.palette.mode === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.1)',
     },
   },
 }));
 
 export const NavigationButtons = styled(Box)({
   display: 'flex',
-  gap: '8px',
+  gap: '6px',
   alignItems: 'center',
 });
 
 export const NavButton = styled(Box)(({ theme }) => ({
-  width: '32px',
-  height: '32px',
+  width: '28px',
+  height: '28px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '8px',
+  borderRadius: '6px',
   border: `1px solid ${theme.palette.divider}`,
   color: theme.palette.text.secondary,
   cursor: 'pointer',
   transition: 'all 0.2s',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#334155' : theme.palette.grey[200],
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.05)'
+        : 'rgba(0,0,0,0.05)',
     color: theme.palette.text.primary,
+    borderColor: theme.palette.text.secondary,
   },
 }));

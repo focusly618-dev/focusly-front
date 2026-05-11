@@ -116,8 +116,16 @@ export const useTaskMutations = ({
     if (!user) return;
     setLoadingSave(true);
 
+    // Check if there's already a Google Meet link in the state
+    const hasExistingMeetLink = state.links?.some(
+      (l) =>
+        l.url.includes('meet.google.com') ||
+        l.title.toLowerCase().includes('meet'),
+    );
+
     let meetLink: string | null = null;
-    if (state.shouldGenerateMeet) {
+    // Only generate new meet link if shouldGenerateMeet is true AND no meet link exists
+    if (state.shouldGenerateMeet && !hasExistingMeetLink) {
       const generated = await generateMeetLinkNow(undefined, state);
       meetLink = generated || null;
     }
@@ -134,6 +142,7 @@ export const useTaskMutations = ({
     const links = deduplicateLinks(state.links || []).map(
       (l: { title: string; url: string }) => ({ title: l.title, url: l.url }),
     );
+    // Only add meet link if we generated a new one (not if it already exists)
     if (meetLink) {
       links.push({ title: 'Google Meet', url: meetLink });
     }

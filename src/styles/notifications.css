@@ -1,0 +1,98 @@
+/* Professional Notification Animations - Notion/Motion Style */
+
+@keyframes motionSlideIn {
+  from {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes motionSlideOut {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+.motion-slide-in {
+  animation: motionSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.motion-slide-out {
+  animation: motionSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+
+/* Premium Notification Styles */
+.motion-notification {
+  border-radius: 14px !important;
+  padding: 16px 20px !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2), 0 4px 12px -2px rgba(0, 0, 0, 0.1) !important;
+  min-width: 340px !important;
+  max-width: 420px !important;
+}
+
+/* Base text styles for the notification */
+.motion-notification-title {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #ffffff !important; /* Always white as requested */
+  margin-bottom: 3px !important;
+  letter-spacing: -0.01em !important;
+}
+
+.motion-notification-body {
+  font-size: 13px !important;
+  color: rgba(255, 255, 255, 0.7) !important; /* Soft white/gray as requested */
+  line-height: 1.4 !important;
+  font-weight: 400 !important;
+}
+
+.motion-notification-icon-wrapper {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 20px !important;
+  flex-shrink: 0 !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Light Mode: "Tono blanco y gris" but with white text (Darker Gray background to support it) */
+@media (prefers-color-scheme: light) {
+  .motion-notification {
+    background: rgba(45, 47, 54, 0.9) !important; /* Sleek Dark Gray/Navy */
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  .motion-notification-icon-wrapper {
+    background: rgba(255, 255, 255, 0.12) !important; /* Aesthetic white/gray icon bg */
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+/* Dark Mode: Deep black/gray */
+@media (prefers-color-scheme: dark) {
+  .motion-notification {
+    background: rgba(20, 21, 24, 0.95) !important; /* Deep Dark */
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  
+  .motion-notification-icon-wrapper {
+    background: rgba(255, 255, 255, 0.06) !important; /* Even softer for dark mode */
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
+  }
+}

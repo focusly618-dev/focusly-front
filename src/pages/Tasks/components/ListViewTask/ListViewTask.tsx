@@ -1,28 +1,20 @@
 import { useState } from 'react';
-import {
-  Box,
-  Typography,
-  IconButton,
-  Collapse,
-  Menu,
-  MenuItem,
-} from '@mui/material';
+import { Box, Typography, Collapse, Menu, MenuItem } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
-  Flag as FlagIcon,
-  CheckCircle as CheckCircleIcon,
   SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
-  RadioButtonUnchecked as RadioButtonUncheckedIcon,
-  History as HistoryIcon,
   AccessTime as AccessTimeIcon,
-  Category as CategoryIcon,
-  Add as AddIcon,
   Link as LinkIcon,
-  Visibility as VisibilityIcon,
-  EventNote as PlannedIcon,
 } from '@mui/icons-material';
 
-import { TaskCard, CardLeft } from './ListViewTask.styles';
+import {
+  TaskCard,
+  CardLeft,
+  TaskMetaItem,
+  StatusBadge,
+  CategoryChip,
+  PriorityIndicator,
+} from './ListViewTask.styles';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import {
   differenceInHours,
@@ -31,7 +23,7 @@ import {
   differenceInMonths,
   differenceInYears,
 } from 'date-fns';
-import { formatDuration } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+// import { formatDuration } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 
 const formatTimeSinceCompletion = (dateString: string | undefined) => {
   if (!dateString) return '';
@@ -64,37 +56,42 @@ interface ListViewTaskProps {
   updateTask?: (taskId: string, updates: TaskResponse) => Promise<void>;
 }
 
-const getSubtaskStatusIcon = (
-  status: string | undefined,
-  completed: boolean,
-) => {
-  if (status === 'Done' || completed)
-    return <CheckCircleIcon sx={{ fontSize: 16, color: '#3fb950' }} />;
-  if (status === 'Pending')
-    return <AccessTimeIcon sx={{ fontSize: 16, color: '#d29922' }} />;
-  if (status === 'Backlog')
-    return <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />;
-  if (status === 'Planning')
-    return <PlannedIcon sx={{ fontSize: 16, color: '#58a6ff' }} />;
-  if (status === 'OnHold')
-    return <RadioButtonUncheckedIcon sx={{ fontSize: 16, color: '#ff7b72' }} />;
-  if (status === 'Review')
-    return <VisibilityIcon sx={{ fontSize: 16, color: '#a78bfa' }} />;
-  if (status === 'Todo')
-    return <RadioButtonUncheckedIcon sx={{ fontSize: 16, color: '#58a6ff' }} />;
-  return (
-    <RadioButtonUncheckedIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-  );
-};
-
 const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
-  Todo: <RadioButtonUncheckedIcon sx={{ fontSize: 16, color: '#58a6ff' }} />,
-  Planning: <PlannedIcon sx={{ fontSize: 16, color: '#58a6ff' }} />,
-  Pending: <AccessTimeIcon sx={{ fontSize: 16, color: '#d29922' }} />,
-  OnHold: <RadioButtonUncheckedIcon sx={{ fontSize: 16, color: '#ff7b72' }} />,
-  Review: <VisibilityIcon sx={{ fontSize: 16, color: '#a78bfa' }} />,
-  Done: <CheckCircleIcon sx={{ fontSize: 16, color: '#3fb950' }} />,
-  Backlog: <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />,
+  Todo: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#3b82f6' }}
+    />
+  ),
+  Planning: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#8b5cf6' }}
+    />
+  ),
+  Pending: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#f59e0b' }}
+    />
+  ),
+  OnHold: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ef4444' }}
+    />
+  ),
+  Review: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#06b6d4' }}
+    />
+  ),
+  Done: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#22c55e' }}
+    />
+  ),
+  Backlog: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#6b7280' }}
+    />
+  ),
 };
 
 export const ListViewTask = ({
@@ -106,176 +103,198 @@ export const ListViewTask = ({
   updateTask,
 }: ListViewTaskProps) => {
   const [statusAnchor, setStatusAnchor] = useState<null | HTMLElement>(null);
-  const [activeSubtaskIdx, setActiveSubtaskIdx] = useState<number | null>(null);
+  const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
+    null,
+  );
+  const [dateAnchor, setDateAnchor] = useState<null | HTMLElement>(null);
 
-  const handleStatusIconClick = (
-    e: React.MouseEvent<HTMLElement>,
-    index: number,
-  ) => {
-    e.stopPropagation();
-    setActiveSubtaskIdx(index);
-    setStatusAnchor(e.currentTarget);
-  };
-
-  const handleStatusSelect = (status: string) => {
-    setStatusAnchor(null);
-    if (activeSubtaskIdx === null || !updateTask) return;
-    const newSubtasks = [...(task.subtasks || [])].map((st) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { __typename, ...clean } = st as Record<string, unknown>;
-      return clean;
-    });
-    newSubtasks[activeSubtaskIdx] = {
-      ...newSubtasks[activeSubtaskIdx],
-      status: status as TaskResponse['subtasks'][number]['status'],
-      completed: status === 'Done',
-    };
-    updateTask(task.id, { ...task, subtasks: newSubtasks } as TaskResponse);
-    setActiveSubtaskIdx(null);
-  };
-  const taskColor = (() => {
-    // Use color field directly if available
-    if (task.color) return task.color;
-    // Fallback: extract from notes_encrypted (legacy data)
-    if (task.notes_encrypted) {
-      const match = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
-      if (match && match[1]) return match[1];
+  const handlePrioritySelect = async (level: number) => {
+    setPriorityAnchor(null);
+    if (updateTask && task.priority_level !== level) {
+      await updateTask(task.id, { ...task, priority_level: level });
     }
-    return task.priority_level === 3
-      ? '#58a6ff'
-      : task.priority_level === 2
-        ? '#d29922'
-        : '#ff7b72';
-  })();
+  };
+
+  const handleDateSelect = async (daysToAdd: number) => {
+    setDateAnchor(null);
+    if (updateTask) {
+      const newDate = new Date();
+      newDate.setDate(newDate.getDate() + daysToAdd);
+      await updateTask(task.id, { ...task, deadline: newDate.toISOString() });
+    }
+  };
+
+  const handleStatusSelect = async (status: string) => {
+    setStatusAnchor(null);
+    if (updateTask && task.status !== status) {
+      await updateTask(task.id, {
+        ...task,
+        status: status as TaskResponse['status'],
+      });
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      Done: '#22c55e',
+      Todo: '#3b82f6',
+      Planning: '#8b5cf6',
+      Pending: '#f59e0b',
+      OnHold: '#ef4444',
+      Review: '#06b6d4',
+      Backlog: '#6b7280',
+    };
+    return colors[status] || '#6b7280';
+  };
+
+  const getPriorityColor = (level: number) => {
+    if (level >= 3) return '#ef4444';
+    if (level === 2) return '#f59e0b';
+    return '#22c55e';
+  };
+
+  const statusColor = getStatusColor(task.status);
+  const priorityColor = getPriorityColor(task.priority_level);
 
   return (
     <>
       <TaskCard
         onClick={() => onTaskClick(task)}
         sx={{
-          borderLeft: '5px solid',
-          borderLeftColor: taskColor,
           cursor: 'pointer',
-          transition: 'transform 0.2s',
-          '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-          },
+          borderLeft: `3px solid ${statusColor}`,
         }}
       >
-        <CardLeft>
-          <IconButton
-            size="small"
+        <CardLeft sx={{ alignItems: 'center', gap: '12px' }}>
+          <StatusBadge
+            statusColor={statusColor}
             onClick={(e) => {
               e.stopPropagation();
+              setStatusAnchor(e.currentTarget);
             }}
-            sx={{ p: 0, mr: 1 }}
+            sx={{
+              cursor: 'pointer',
+              '&:hover': { transform: 'scale(1.2)' },
+              transition: 'transform 0.2s',
+            }}
+          />
+
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              minWidth: 0,
+            }}
           >
-            {task.status === 'Done' && (
-              <CheckCircleIcon sx={{ fontSize: 24, color: '#3fb950' }} />
-            )}
-            {task.status === 'Todo' && (
-              <RadioButtonUncheckedIcon
-                sx={{ fontSize: 24, color: '#58a6ff' }}
-              />
-            )}
-            {task.status === 'Pending' && (
-              <AccessTimeIcon sx={{ fontSize: 24, color: '#d29922' }} />
-            )}
-            {task.status === 'Backlog' && (
-              <HistoryIcon sx={{ fontSize: 24, color: 'text.secondary' }} />
-            )}
-          </IconButton>
-          <Box>
-            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 0.5 }}>
+            {/* Title & Category */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                minWidth: 0,
+                flexShrink: 1,
+              }}
+            >
               <Typography
                 variant="body1"
-                sx={{ fontWeight: 500, color: 'text.primary' }}
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  color: 'text.primary',
+                  lineHeight: 1,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
               >
                 {task.title}
               </Typography>
+              {task.category && (
+                <CategoryChip sx={{ flexShrink: 0 }}>
+                  {task.category}
+                </CategoryChip>
+              )}
             </Box>
 
+            {/* Metadata Section - Single Row */}
             <Box
-              sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: 0.5 }}
+              sx={{
+                display: 'flex',
+                gap: 2,
+                alignItems: 'center',
+                color: 'text.secondary',
+                flexShrink: 0,
+              }}
             >
-              {task.priority_level > 0 && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <FlagIcon
-                    sx={{
-                      fontSize: 14,
-                      color:
-                        task.priority_level === 3
-                          ? '#58a6ff'
-                          : task.priority_level === 2
-                            ? '#d29922'
-                            : '#ff7b72',
-                    }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color:
-                        task.priority_level >= 3
-                          ? '#ff7b72'
-                          : task.priority_level === 2
-                            ? '#d29922'
-                            : '#58a6ff',
-                    }}
-                  >
-                    {task.priority_level >= 3
-                      ? 'High Priority'
+              <TaskMetaItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPriorityAnchor(e.currentTarget);
+                }}
+                sx={{
+                  cursor: 'pointer',
+                  px: 0.5,
+                  py: 0.25,
+                  borderRadius: '4px',
+                  '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
+                }}
+              >
+                <PriorityIndicator priorityColor={priorityColor} />
+                <Typography
+                  variant="caption"
+                  sx={{ fontSize: '11px', fontWeight: 600 }}
+                >
+                  {task.priority_level >= 4
+                    ? 'Urgent'
+                    : task.priority_level === 3
+                      ? 'High'
                       : task.priority_level === 2
-                        ? 'Medium Priority'
-                        : 'Low Priority'}
-                  </Typography>
-                </Box>
-              )}
+                        ? 'Med'
+                        : 'Low'}
+                </Typography>
+              </TaskMetaItem>
+
               {(task.deadline || task.status === 'Done') && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  {task.status === 'Done' ? (
-                    <CheckCircleIcon sx={{ fontSize: 14, color: '#3fb950' }} />
-                  ) : (
-                    <CalendarTodayIcon
-                      sx={{ fontSize: 14, color: 'text.secondary' }}
-                    />
-                  )}
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'text.secondary' }}
-                  >
+                <TaskMetaItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDateAnchor(e.currentTarget);
+                  }}
+                  sx={{
+                    cursor: 'pointer',
+                    px: 0.5,
+                    py: 0.25,
+                    borderRadius: '4px',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'text.primary',
+                    },
+                  }}
+                >
+                  <CalendarTodayIcon sx={{ fontSize: 13, opacity: 0.7 }} />
+                  <Typography variant="caption" sx={{ fontSize: '11px' }}>
                     {task.status === 'Done'
                       ? formatTimeSinceCompletion(task.updated_at)
-                      : new Date(task.deadline!).toLocaleDateString()}
+                      : new Date(task.deadline!).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
                   </Typography>
-                </Box>
+                </TaskMetaItem>
               )}
+
               {task.estimate_minutes > 0 && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <AccessTimeIcon
-                    sx={{ fontSize: 14, color: 'text.secondary' }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'text.secondary' }}
-                  >
+                <TaskMetaItem>
+                  <AccessTimeIcon sx={{ fontSize: 13, opacity: 0.7 }} />
+                  <Typography variant="caption" sx={{ fontSize: '11px' }}>
                     {task.estimate_minutes}m
                   </Typography>
-                </Box>
+                </TaskMetaItem>
               )}
-              {task.category && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <CategoryIcon
-                    sx={{ fontSize: 14, color: 'text.secondary' }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    {task.category}
-                  </Typography>
-                </Box>
-              )}
+
               <Box
                 onClick={(e) => {
                   e.stopPropagation();
@@ -286,238 +305,170 @@ export const ListViewTask = ({
                   alignItems: 'center',
                   gap: 0.5,
                   cursor: 'pointer',
-                  bgcolor: 'action.hover',
-                  padding: 0.5,
-                  borderRadius: 1,
-                  '&:hover': {
-                    opacity: 0.8,
-                  },
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  bgcolor: task.subtasks?.length
+                    ? 'action.hover'
+                    : 'transparent',
+                  '&:hover': { bgcolor: 'action.selected' },
                 }}
               >
                 <SubdirectoryArrowRightIcon
                   sx={{
-                    fontSize: 14,
-                    color:
-                      task.subtasks && task.subtasks.length > 0
-                        ? 'text.secondary'
-                        : 'text.disabled',
+                    fontSize: 13,
+                    opacity: 0.7,
                     transform: expandedTaskIds.has(task.id)
                       ? 'rotate(90deg)'
                       : 'none',
                     transition: 'transform 0.2s',
                   }}
                 />
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                <Typography
+                  variant="caption"
+                  sx={{ fontSize: '11px', fontWeight: 600 }}
+                >
                   {task.subtasks?.length || 0}
                 </Typography>
               </Box>
+
               {task.links && task.links.length > 0 && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    padding: 0.5,
-                    borderRadius: 1,
-                    bgcolor: 'action.hover',
-                  }}
-                >
-                  <LinkIcon sx={{ fontSize: 14, color: '#3b82f6' }} />
+                <TaskMetaItem sx={{ color: 'primary.main' }}>
+                  <LinkIcon sx={{ fontSize: 13 }} />
                   <Typography
                     variant="caption"
-                    sx={{ color: 'text.secondary' }}
+                    sx={{ fontSize: '11px', fontWeight: 600 }}
                   >
                     {task.links.length}
                   </Typography>
-                </Box>
+                </TaskMetaItem>
               )}
             </Box>
-            <Collapse
-              in={expandedTaskIds.has(task.id)}
-              timeout="auto"
-              unmountOnExit
-            >
-              <Box
-                sx={{
-                  mt: 1,
-                  ml: 0.5,
-                }}
-              >
-                {task.subtasks &&
-                  task.subtasks.length > 0 &&
-                  task.subtasks.map((subtask, index) => {
-                    if (typeof subtask === 'string') return null;
-                    const isLast = index === task.subtasks!.length - 1;
-                    return (
-                      <Box
-                        key={index}
-                        sx={{
-                          display: 'flex',
-                          position: 'relative',
-                          alignItems: 'center',
-                          gap: 1.5,
-                          pl: 3,
-                          pr: 2,
-                          py: 0.5,
-                          width: '100%',
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            left: 0,
-                            top: 0,
-                            bottom: isLast ? '50%' : 0,
-                            width: '1px',
-                            bgcolor: 'divider',
-                          }}
-                        />
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            left: 0,
-                            top: '50%',
-                            width: '16px',
-                            height: '1px',
-                            bgcolor: 'divider',
-                          }}
-                        />
-
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleStatusIconClick(e, index)}
-                          sx={{ p: 0, minWidth: 0 }}
-                        >
-                          {getSubtaskStatusIcon(
-                            subtask.status,
-                            subtask.completed,
-                          )}
-                        </IconButton>
-                        <Typography
-                          variant="body2"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenSubtaskModal(task, index);
-                          }}
-                          sx={{
-                            color: subtask.completed
-                              ? 'text.secondary'
-                              : 'text.primary',
-                            flexGrow: 1,
-                            textDecoration: subtask.completed
-                              ? 'line-through'
-                              : 'none',
-                            cursor: 'pointer',
-                            '&:hover': {
-                              textDecoration: subtask.completed
-                                ? 'line-through'
-                                : 'underline',
-                            },
-                          }}
-                        >
-                          {subtask.title}
-                        </Typography>
-
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            gap: 1,
-                            alignItems: 'center',
-                            ml: 'auto',
-                          }}
-                        >
-                          {subtask.priority_level !== undefined &&
-                            subtask.priority_level > 0 && (
-                              <FlagIcon
-                                sx={{
-                                  fontSize: 14,
-                                  color:
-                                    subtask.priority_level === 3
-                                      ? '#58a6ff'
-                                      : subtask.priority_level === 2
-                                        ? '#d29922'
-                                        : '#ff7b72',
-                                }}
-                              />
-                            )}
-                          {subtask.category && (
-                            <CategoryIcon
-                              sx={{ fontSize: 14, color: 'text.secondary' }}
-                            />
-                          )}
-
-                          {subtask.timer > 0 && (
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: 'text.primary',
-                                fontSize: '11px',
-                                backgroundColor: 'action.hover',
-                                borderRadius: '4px',
-                                padding: '1px 4px',
-                              }}
-                            >
-                              {formatDuration(subtask.timer)}
-                            </Typography>
-                          )}
-                        </Box>
-                      </Box>
-                    );
-                  })}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1.5,
-                    pl: 3,
-                    pr: 2,
-                    py: 0.5,
-                    cursor: 'pointer',
-                    '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.05)',
-                      borderRadius: 1,
-                    },
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOpenSubtaskModal(task);
-                  }}
-                >
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 0,
-                      bottom: '50%',
-                      width: '1px',
-                      bgcolor: 'divider',
-                      visibility: 'hidden',
-                    }}
-                  />
-                  <AddIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Add new subtask
-                  </Typography>
-                </Box>
-              </Box>
-            </Collapse>
           </Box>
         </CardLeft>
       </TaskCard>
 
+      <Collapse in={expandedTaskIds.has(task.id)} timeout="auto" unmountOnExit>
+        <Box
+          sx={{ ml: 6, mb: 2, borderLeft: '1px solid', borderColor: 'divider' }}
+        >
+          {task.subtasks?.map((subtask, index) => {
+            if (typeof subtask === 'string') return null;
+            return (
+              <Box
+                key={index}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  py: 0.5,
+                  px: 2,
+                  borderRadius: '8px',
+                  '&:hover': { bgcolor: 'action.hover' },
+                }}
+              >
+                <StatusBadge
+                  statusColor={getStatusColor(subtask.status || 'Todo')}
+                />
+                <Typography
+                  variant="body2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenSubtaskModal(task, index);
+                  }}
+                  sx={{
+                    color: subtask.completed
+                      ? 'text.secondary'
+                      : 'text.primary',
+                    flexGrow: 1,
+                    fontSize: '13px',
+                    textDecoration: subtask.completed ? 'line-through' : 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {subtask.title}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Box>
+      </Collapse>
+
+      {/* Priority Quick Select */}
+      <Menu
+        anchorEl={priorityAnchor}
+        open={Boolean(priorityAnchor)}
+        onClose={() => setPriorityAnchor(null)}
+        PaperProps={{
+          sx: {
+            borderRadius: '10px',
+            minWidth: '140px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+          },
+        }}
+      >
+        {[
+          { level: 4, label: 'Urgent', color: '#ef4444' },
+          { level: 3, label: 'High', color: '#f59e0b' },
+          { level: 2, label: 'Medium', color: '#3b82f6' },
+          { level: 1, label: 'Low', color: '#22c55e' },
+        ].map((p) => (
+          <MenuItem
+            key={p.level}
+            onClick={() => handlePrioritySelect(p.level)}
+            sx={{ gap: 1.5, py: 1 }}
+          >
+            <Box
+              sx={{
+                width: 12,
+                height: 12,
+                borderRadius: '2px',
+                bgcolor: p.color,
+              }}
+            />
+            <Typography variant="body2" fontWeight={600}>
+              {p.label}
+            </Typography>
+          </MenuItem>
+        ))}
+      </Menu>
+
+      {/* Date Quick Select */}
+      <Menu
+        anchorEl={dateAnchor}
+        open={Boolean(dateAnchor)}
+        onClose={() => setDateAnchor(null)}
+        PaperProps={{
+          sx: {
+            borderRadius: '10px',
+            minWidth: '160px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+          },
+        }}
+      >
+        <MenuItem onClick={() => handleDateSelect(0)} sx={{ py: 1 }}>
+          Today
+        </MenuItem>
+        <MenuItem onClick={() => handleDateSelect(1)} sx={{ py: 1 }}>
+          Tomorrow
+        </MenuItem>
+        <MenuItem onClick={() => handleDateSelect(3)} sx={{ py: 1 }}>
+          In 3 days
+        </MenuItem>
+        <MenuItem onClick={() => handleDateSelect(7)} sx={{ py: 1 }}>
+          Next week
+        </MenuItem>
+      </Menu>
+
+      {/* Status Quick Select */}
       <Menu
         anchorEl={statusAnchor}
         open={Boolean(statusAnchor)}
         onClose={() => setStatusAnchor(null)}
-        onClick={(e) => e.stopPropagation()}
         PaperProps={{
           sx: {
             borderRadius: '12px',
             minWidth: '180px',
-            mt: 1,
             boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-            border: '1px solid',
-            borderColor: 'divider',
           },
         }}
       >
@@ -533,12 +484,10 @@ export const ListViewTask = ({
           <MenuItem
             key={s}
             onClick={() => handleStatusSelect(s)}
-            sx={{ gap: 1.5, py: 1.2, borderRadius: '8px', mx: 1, my: 0.5 }}
+            sx={{ gap: 1.5 }}
           >
             {STATUS_MENU_ICON[s]}
-            <Typography variant="body2" fontWeight={600}>
-              {s === 'OnHold' ? 'On Hold' : s}
-            </Typography>
+            <Typography variant="body2">{s}</Typography>
           </MenuItem>
         ))}
       </Menu>

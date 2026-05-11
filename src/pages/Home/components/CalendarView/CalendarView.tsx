@@ -37,6 +37,7 @@ import {
 // Types
 import type { ICalendarEvent } from '../CalendarEvent/CalendarEvent';
 import type { ToolbarProps } from 'react-big-calendar';
+import type { Task } from '@/redux/tasks/task.types';
 
 // Setup the localizer
 const localizer = momentLocalizer(moment);
@@ -44,7 +45,7 @@ const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop<ICalendarEvent, object>(Calendar);
 
 interface CalendarViewProps {
-  onStartFocus?: () => void;
+  onStartFocus: (task: Task) => void;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
@@ -121,6 +122,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           selectable
           showAllEvents={false}
           doShowMoreDrillDown={false}
+          dayLayoutAlgorithm="overlap"
           components={{
             toolbar: (props: ToolbarProps<ICalendarEvent>) => (
               <CalendarToolbar
@@ -174,14 +176,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           <Typography
             variant="overline"
             sx={{
-              fontWeight: 700,
+              fontWeight: 600,
               color: 'text.secondary',
               display: 'block',
-              mb: 1,
-              lineHeight: 1,
+              mb: 0.5,
+              lineHeight: 1.2,
+              letterSpacing: '0.05em',
+              fontSize: '10px',
             }}
           >
-            Quick Create
+            Quick Create Task
           </Typography>
           <Stack
             direction="row"

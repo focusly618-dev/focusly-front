@@ -36,19 +36,40 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
       divider: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0',
     },
     typography: {
-      fontFamily: '"Outfit", "sans-serif"',
+      fontFamily:
+        '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+      fontSize: 14,
       h1: {
-        fontWeight: 900,
+        fontWeight: 700,
+        fontSize: '1.875rem',
+        letterSpacing: '-0.02em',
       },
       h2: {
-        fontWeight: 800,
+        fontWeight: 700,
+        fontSize: '1.5rem',
+        letterSpacing: '-0.015em',
       },
       h3: {
         fontWeight: 700,
+        fontSize: '1.25rem',
+        letterSpacing: '-0.01em',
+      },
+      body1: {
+        fontSize: '0.875rem',
+        lineHeight: 1.5,
+      },
+      body2: {
+        fontSize: '0.8125rem',
+        lineHeight: 1.5,
+      },
+      caption: {
+        fontSize: '0.75rem',
+        lineHeight: 1.4,
       },
       button: {
         textTransform: 'none',
-        fontWeight: 700,
+        fontWeight: 600,
+        fontSize: '0.875rem',
       },
     },
     shape: {

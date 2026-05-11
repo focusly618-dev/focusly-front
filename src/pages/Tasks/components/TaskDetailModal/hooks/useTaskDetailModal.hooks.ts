@@ -248,7 +248,11 @@ export const useTaskDetailModal = ({
       });
       if (meetUrl) {
         handleAddLink('Google Meet', meetUrl);
-        setShouldGenerateMeet(true);
+        // Only set shouldGenerateMeet if this is an existing task (has real ID)
+        // For new tasks/subtasks, the link is already added to state and will be saved
+        if (initialTask?.id && !initialTask.id.startsWith('temp-')) {
+          setShouldGenerateMeet(true);
+        }
         sileo.success({
           title: 'Google Meet link generated!',
           description: 'Link added to resources.',
