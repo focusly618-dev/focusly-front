@@ -17,7 +17,7 @@ import {
   endOfDay,
   format,
 } from 'date-fns';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
 import { setTasks, removeTask, updateTask } from '@/redux/tasks/task.slice';
@@ -98,6 +98,7 @@ export const useCalendarView = () => {
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
 
   const user = useSelector((state: RootState) => state.auth.user);
+  const toast = useToast();
 
   const dateRange = useMemo(() => {
     let start: Date;
@@ -445,20 +446,12 @@ export const useCalendarView = () => {
 
       handleModalClose();
 
-      sileo.success({
-        title: 'Task deleted successfully!',
-        fill: 'var(--sileo-delete-bg)',
-        duration: 4000,
-      });
+      toast.success('Task deleted successfully!');
     } catch (err) {
       console.error('Error deleting task:', err);
       // We don't easily revert delete without refetching,
       // but refetch will happen anyway on focus or next range change.
-      sileo.error({
-        title: 'Error deleting task',
-        fill: 'var(--sileo-error-bg)',
-        duration: 4000,
-      });
+      toast.error('Error deleting task');
     }
   };
 
@@ -527,18 +520,14 @@ export const useCalendarView = () => {
         ],
       });
 
-      sileo.success({
-        title: 'Task rescheduled!',
-        description: `New time: ${format(startDate, 'hh:mm a')}`,
-        duration: 3000,
-      });
+      toast.success('Task rescheduled!', `New time: ${format(startDate, 'hh:mm a')}`);
     } catch (err) {
       console.error('Error dropping event:', err);
       // Revert if error
       if (originalTask) {
         dispatch(updateTask(originalTask));
       }
-      sileo.error({ title: 'Error rescheduling task' });
+      toast.error('Error rescheduling task');
     }
   };
 

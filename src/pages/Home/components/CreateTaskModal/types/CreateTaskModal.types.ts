@@ -15,6 +15,7 @@ export interface TaskData {
   status?: Task['status'];
   realTime?: string;
   shouldGenerateMeet?: boolean;
+  use_ai?: boolean;
 }
 
 export interface CreateTaskModalProps {
@@ -65,6 +66,7 @@ export interface TaskInput {
   }[];
   google_event_id?: string;
   user_id?: string;
+  use_ai?: boolean;
 }
 
 export interface UseTaskCollectionsProps {

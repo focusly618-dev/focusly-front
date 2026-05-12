@@ -9,9 +9,10 @@ import {
 } from '../workspaces.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 
 export const useWorkspaceForm = () => {
+  const toast = useToast();
   const [createWorkspace] = useMutation(CREATE_WORKSPACE, {
     refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
   });
@@ -64,11 +65,12 @@ export const useWorkspaceForm = () => {
         }
       };
 
-      await sileo.promise(savePromise(), {
-        loading: { title: 'Saving...', fill: 'var(--sileo-update-bg)' },
-        success: { title: 'Saved!', fill: 'var(--sileo-success-bg)' },
-        error: { title: 'Error saving', fill: 'var(--sileo-error-bg)' },
-      });
+      try {
+        await savePromise();
+        toast.success('Saved!');
+      } catch (error) {
+        toast.error('Error saving');
+      }
     },
     [createWorkspace, updateWorkspace, setValue],
   );

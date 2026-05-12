@@ -12,7 +12,7 @@ import {
   REMOVE_WORKSPACE,
   GET_WORKSPACES,
 } from '@/pages/Workspace/workspaces.graphql';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 import {
   createGoogleEvent,
   updateGoogleEvent,
@@ -43,6 +43,7 @@ export const useTaskMutations = ({
 }: UseTaskMutationsProps) => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const [loadingSave, setLoadingSave] = useState(false);
 
   const [createTaskMutation] = useMutation(CREATE_TASK);
@@ -164,10 +165,7 @@ export const useTaskMutations = ({
           ],
         });
         if (data?.addSubtask) {
-          sileo.success({
-            title: 'Subtask added',
-            fill: 'var(--sileo-success-bg)',
-          });
+          toast.success('Subtask added');
           onSave(data.addSubtask);
           resetForm();
         }
@@ -184,6 +182,7 @@ export const useTaskMutations = ({
       status: state.status || 'Backlog',
       google_event_id: (initialTask as { google_event_id?: string })
         ?.google_event_id,
+      use_ai: state.use_ai,
       subtasks: state.subtasks?.map((st) => ({
         title: st.title,
         completed: st.completed,
@@ -197,10 +196,7 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.createTask) {
-        sileo.success({
-          title: 'Task created',
-          fill: 'var(--sileo-success-bg)',
-        });
+        toast.success('Task created');
         onSave(data.createTask);
         resetForm();
         onClose();
@@ -267,10 +263,7 @@ export const useTaskMutations = ({
           ],
         });
         if (data?.updateTask) {
-          sileo.success({
-            title: 'Subtask updated',
-            fill: 'var(--sileo-update-bg)',
-          });
+          toast.success('Subtask updated');
           onSave(data.updateTask);
           resetForm();
           if (shouldClose) onClose();
@@ -342,6 +335,7 @@ export const useTaskMutations = ({
       google_event_id:
         (state as { google_event_id?: string }).google_event_id ||
         initialTask.google_event_id,
+      use_ai: state.use_ai,
     };
 
     try {
@@ -350,10 +344,7 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.updateTask) {
-        sileo.success({
-          title: 'Task updated',
-          fill: 'var(--sileo-update-bg)',
-        });
+        toast.success('Task updated');
         onSave(data.updateTask);
         if (shouldClose) onClose();
       }

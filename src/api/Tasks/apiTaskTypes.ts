@@ -84,6 +84,7 @@ export interface TaskResponse {
   estimated_end_date?: string;
   task_type?: string;
   source?: string;
+  use_ai?: boolean;
   workspace?: {
     id: string;
     title: string;

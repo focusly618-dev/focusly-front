@@ -11,11 +11,9 @@ import {
 import {
   PersonOutline as PersonOutlineIcon,
   AccessTime as AccessTimeIcon,
-  PrecisionManufacturing as PrecisionManufacturingIcon,
   NotificationsNone as NotificationsNoneIcon
 } from '@mui/icons-material';
 import { NotificationSettings } from './components/NotificationSettings';
-import { FocusEngineSettings } from './components/FocusEngineSettings';
 import { ScheduleSettings } from './components/ScheduleSettings';
 import { ProfileSettings } from './components/ProfileSettings';
 import { SettingsTab } from './Settings.types';
@@ -58,7 +56,6 @@ export const Settings = () => {
   const tabs = [
     { id: SettingsTab.Profile, label: 'General Profile', icon: <PersonOutlineIcon fontSize="small" /> },
     { id: SettingsTab.Schedule, label: 'Schedule & Energy', icon: <AccessTimeIcon fontSize="small" /> },
-    { id: SettingsTab.Focus, label: 'Focus Engine', icon: <PrecisionManufacturingIcon fontSize="small" /> },
     { id: SettingsTab.Notifications, label: 'Notifications', icon: <NotificationsNoneIcon fontSize="small" /> },
   ];
 
@@ -87,7 +84,6 @@ export const Settings = () => {
       <Box sx={{ mt: 2 }}>
         {activeTab === SettingsTab.Profile && <ProfileSettings />}
         {activeTab === SettingsTab.Notifications && <NotificationSettings />}
-        {activeTab === SettingsTab.Focus && <FocusEngineSettings />}
         {activeTab === SettingsTab.Schedule && <ScheduleSettings />}
         {activeTab !== SettingsTab.Profile && 
          activeTab !== SettingsTab.Notifications && 

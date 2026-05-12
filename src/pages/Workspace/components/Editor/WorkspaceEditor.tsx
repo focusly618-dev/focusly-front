@@ -173,6 +173,7 @@ export const WorkspaceEditor = ({
             }}
             getCustomSlashMenuItems={getCustomSlashMenuItems}
             getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
+            onOpenTaskDetails={onOpenTaskDetails}
           />
         </MainEditorArea>
 

@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Box, Typography, Collapse, Menu, MenuItem } from '@mui/material';
+import { Box, Typography, Collapse, Menu, MenuItem, Switch } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
   SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
   AccessTime as AccessTimeIcon,
   Link as LinkIcon,
 } from '@mui/icons-material';
+import { GeminiIcon } from '@/components/ui/GeminiIcon';
+import { GeminiAIToggle } from '@/components/ui/GeminiSwitch';
 
 import {
   TaskCard,
@@ -344,6 +346,29 @@ export const ListViewTask = ({
               )}
             </Box>
           </Box>
+
+          <TaskMetaItem
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            sx={{
+              gap: 0,
+              ml: 'auto',
+              mr: 1,
+              '&:hover': { bgcolor: 'transparent' }
+            }}
+          >
+            <GeminiAIToggle
+              checked={task.use_ai || false}
+              onChange={async (e) => {
+                if (updateTask) {
+                  await updateTask(task.id, { ...task, use_ai: e.target.checked });
+                }
+              }}
+            />
+          </TaskMetaItem>
         </CardLeft>
       </TaskCard>
 

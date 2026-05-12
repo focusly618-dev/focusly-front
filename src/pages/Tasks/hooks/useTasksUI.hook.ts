@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 
 export const useTasksUI = () => {
+  const toast = useToast();
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLElement | null>(null);
@@ -39,14 +40,8 @@ export const useTasksUI = () => {
     subMessage: string,
     type: 'success' | 'update' | 'delete' | 'warning' | 'error' = 'success'
   ) => {
-    const method = type === 'warning' ? 'warning' : type === 'error' ? 'error' : 'success';
-
-    sileo[method]({
-      title: message,
-      description: subMessage,
-      fill: `var(--sileo-${type}-bg)`,
-      duration: 4000,
-    });
+    const toastType = type === 'update' || type === 'delete' ? 'success' : type;
+    toast.showToast({ title: message, description: subMessage, type: toastType });
   };
 
   return {

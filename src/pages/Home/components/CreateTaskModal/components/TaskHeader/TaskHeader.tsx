@@ -1,4 +1,4 @@
-import { Box, Typography, IconButton } from '@mui/material';
+import { Box, Typography, IconButton, Switch } from '@mui/material';
 import {
   Close as CloseIcon,
   OpenInFull as OpenInFullIcon,
@@ -7,6 +7,8 @@ import {
   SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
   ArrowForwardIos,
 } from '@mui/icons-material';
+import { GeminiIcon } from '@/components/ui/GeminiIcon';
+import { GeminiAIToggle } from '@/components/ui/GeminiSwitch';
 import { headerIconSx } from '../../CreateTaskModal.styles';
 import { TASK_COLORS } from '../../CreateTaskModal.utils';
 
@@ -18,6 +20,8 @@ interface TaskHeaderProps {
   onClose: () => void;
   parentTask?: { id: string; title: string; subtasks?: unknown[] };
   title: string;
+  useAI: boolean;
+  setUseAI: (v: boolean) => void;
 }
 
 export const TaskHeader = ({
@@ -28,6 +32,8 @@ export const TaskHeader = ({
   onClose,
   parentTask,
   title,
+  useAI,
+  setUseAI,
 }: TaskHeaderProps) => {
   const hasColor = TASK_COLORS.includes(color);
 
@@ -92,6 +98,26 @@ export const TaskHeader = ({
         )}
       </Box>
       <Box display="flex" alignItems="center" gap={2}>
+        <Box display="flex" alignItems="center" gap={1} sx={{ 
+          bgcolor: hasColor ? 'rgba(255,255,255,0.15)' : 'rgba(155, 114, 203, 0.08)',
+          px: 1.5,
+          py: 0.5,
+          borderRadius: '20px',
+          border: '1px solid',
+          borderColor: hasColor ? 'rgba(255,255,255,0.3)' : 'rgba(155, 114, 203, 0.2)',
+        }}>
+          <Typography variant="caption" sx={{ 
+            fontWeight: 600, 
+            fontSize: '11px',
+            color: hasColor ? '#fff' : '#9B72CB',
+          }}>
+            Schedule with AI
+          </Typography>
+          <GeminiAIToggle
+            checked={useAI}
+            onChange={(e) => setUseAI(e.target.checked)}
+          />
+        </Box>
         <IconButton size="small" onClick={onClose} sx={iconSx}>
           <CloseIcon sx={{ fontSize: 20 }} />
         </IconButton>

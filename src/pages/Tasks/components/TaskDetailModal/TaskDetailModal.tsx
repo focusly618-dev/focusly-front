@@ -66,6 +66,8 @@ export const TaskDetailModal = ({
     handleDelete,
     realTime,
     setRealTime,
+    useAI,
+    setUseAI,
     timeSlotDisplay,
     errors,
     duration,
@@ -138,6 +140,8 @@ export const TaskDetailModal = ({
           parentTask={parentTask ? (parentTask as unknown as Task) : undefined}
           title={title}
           onClose={onClose}
+          useAI={useAI}
+          setUseAI={setUseAI}
         />
 
         <DialogContent sx={dialogContentSx}>
@@ -178,6 +182,8 @@ export const TaskDetailModal = ({
             setDuration={setDuration}
             realTime={realTime}
             setRealTime={setRealTime}
+            useAI={useAI}
+            setUseAI={setUseAI}
             isPureGoogleTask={isPureGoogleTask}
             timeSlotDisplay={timeSlotDisplay}
             handleTimerChange={handleTimerChange}

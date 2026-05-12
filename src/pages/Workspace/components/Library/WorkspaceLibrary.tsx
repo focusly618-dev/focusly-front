@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { motion, AnimatePresence } from 'motion/react';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useConfirm } from '@/components/ui/Confirm/ConfirmContext';
 import {
   LibraryContainer,
   LibraryHeader,
@@ -85,6 +86,8 @@ export const WorkspaceLibrary = ({
   onSelect,
 }: WorkspaceLibraryProps) => {
   const theme = useTheme();
+  const toast = useToast();
+  const { confirm } = useConfirm();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
@@ -164,14 +167,10 @@ export const WorkspaceLibrary = ({
           },
         },
       });
-      sileo.success({
-        title: 'Workspace moved',
-        description: folderId
-          ? 'Workspace moved to folder'
-          : 'Workspace moved to All Notes',
-        fill: 'var(--sileo-success-bg)',
-        duration: 3000,
-      });
+      toast.success(
+        'Workspace moved',
+        folderId ? 'Workspace moved to folder' : 'Workspace moved to All Notes'
+      );
     } catch (err) {
       console.error('Error moving workspace:', err);
     }
@@ -221,12 +220,7 @@ export const WorkspaceLibrary = ({
 
       setIsFolderModalOpen(false);
 
-      sileo.success({
-        title: 'Folder created',
-        description: `Folder "${name}" has been created.`,
-        fill: 'var(--sileo-success-bg)',
-        duration: 4000,
-      });
+      toast.success('Folder created', `Folder "${name}" has been created.`);
     } catch (err) {
       console.error('Error creating folder:', err);
     }
@@ -244,12 +238,7 @@ export const WorkspaceLibrary = ({
         },
       });
 
-      sileo.success({
-        title: 'Workspace updated',
-        description: 'Changes saved successfully',
-        fill: 'var(--sileo-update-bg)',
-        duration: 3000,
-      });
+      toast.success('Workspace updated', 'Changes saved successfully');
     } catch (err) {
       console.error('Error updating folder:', err);
     }
@@ -257,6 +246,16 @@ export const WorkspaceLibrary = ({
 
   const handleDeleteFolder = async () => {
     if (!selectedFolderToManage) return;
+    
+    const ok = await confirm({
+      title: 'Delete Folder',
+      description: 'Are you sure you want to delete this folder? All workspaces will be moved to All Notes.',
+      confirmText: 'Delete',
+      severity: 'warning'
+    });
+
+    if (!ok) return;
+
     try {
       await deleteFolder({
         variables: { id: selectedFolderToManage.id },
@@ -266,13 +265,10 @@ export const WorkspaceLibrary = ({
         setSelectedFolderId(null);
       }
 
-      sileo.success({
-        title: 'Folder deleted',
-        description:
-          'Folder has been removed. All workspaces were moved to All Notes.',
-        fill: 'var(--sileo-delete-bg)',
-        duration: 4000,
-      });
+      toast.success(
+        'Folder deleted',
+        'Folder has been removed. All workspaces were moved to All Notes.'
+      );
     } catch (err) {
       console.error('Error deleting folder:', err);
     }
@@ -832,13 +828,7 @@ export const WorkspaceLibrary = ({
                                     },
                                   },
                                 });
-                                sileo.success({
-                                  title: 'Task unlinked',
-                                  description:
-                                    'The task association has been removed.',
-                                  fill: 'var(--sileo-update-bg)',
-                                  duration: 3000,
-                                });
+                                toast.success('Task unlinked', 'The task association has been removed.');
                               } catch (err) {
                                 console.error('Error unlinking task:', err);
                               }

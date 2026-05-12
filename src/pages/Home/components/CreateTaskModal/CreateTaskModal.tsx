@@ -41,6 +41,7 @@ export const CreateTaskModal = ({
     isAddingTag, setIsAddingTag,
     handleSave, handleAddTag, handleUpdate, handleDelete,
     realTime, setRealTime,
+    useAI, setUseAI,
     timeSlotDisplay, errors,
     duration, setDuration,
     color, setColor,
@@ -108,6 +109,8 @@ export const CreateTaskModal = ({
           onClose={onClose}
           parentTask={parentTask}
           title={title}
+          useAI={useAI}
+          setUseAI={setUseAI}
         />
 
         <DialogContent sx={dialogContentSx}>
@@ -145,6 +148,8 @@ export const CreateTaskModal = ({
             setDuration={setDuration}
             realTime={realTime}
             setRealTime={setRealTime}
+            useAI={useAI}
+            setUseAI={setUseAI}
             handleTimerChange={handleTimerChange}
             durationSuggestions={durationSuggestions}
             setDurationSuggestions={setDurationSuggestions}

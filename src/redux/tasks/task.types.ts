@@ -77,6 +77,7 @@ export interface Task {
   google_event_id?: string;
   source?: 'google' | 'platform';
   sync_status?: 'synced' | 'pending' | 'error';
+  use_ai?: boolean;
 }
 
 export interface TaskState {

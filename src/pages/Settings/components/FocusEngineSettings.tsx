@@ -1,35 +1,19 @@
-import { Box, Switch, alpha, Typography, useTheme, Slider, type Theme } from '@mui/material';
+import { Box,Typography, useTheme, Slider } from '@mui/material';
 import {
   PrecisionManufacturing as PrecisionManufacturingIcon,
-  Block as BlockIcon,
-  OpenInNew as OpenInNewIcon,
   CalendarMonth as CalendarMonthIcon
 } from '@mui/icons-material';
 import {
   SectionCard,
   SectionHeader,
   SectionTitle,
-  SettingItem,
-  SettingInfo,
-  SettingLabel,
-  SettingSublabel,
   Badge,
 } from '../Settings.styles';
 
 export const FocusEngineSettings = () => {
   const theme = useTheme();
   
-  const themeSwitchStyles = (theme: Theme) => ({
-    '& .MuiSwitch-switchBase.Mui-checked': {
-      color: theme.palette.primary.main,
-      '&:hover': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.08),
-      },
-    },
-    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-      backgroundColor: theme.palette.primary.main,
-    },
-  });
+
 
   const sliderStyles = {
     color: theme.palette.primary.main,
@@ -131,50 +115,6 @@ export const FocusEngineSettings = () => {
         </Box>
       </SectionCard>
 
-      {/* Distraction Blocking */}
-      <SectionCard>
-        <SectionHeader>
-          <SectionTitle>
-            <Box className="icon-wrapper" sx={{ color: '#ef4444' }}>
-              <BlockIcon />
-            </Box>
-            <Typography>Distraction Blocking</Typography>
-          </SectionTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-             <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#22c55e' }} />
-             <Typography variant="caption" sx={{ fontWeight: 700, color: theme.palette.text.secondary }}>Active</Typography>
-          </Box>
-        </SectionHeader>
-
-        <SettingItem>
-          <SettingInfo>
-            <SettingLabel>Block Social Media</SettingLabel>
-            <SettingSublabel>Prevents access to Twitter, Facebook, Instagram during focus sessions.</SettingSublabel>
-          </SettingInfo>
-          <Switch defaultChecked sx={themeSwitchStyles(theme)} />
-        </SettingItem>
-
-        <SettingItem>
-          <SettingInfo>
-            <SettingLabel>Block News & Entertainment</SettingLabel>
-            <SettingSublabel>Restricts access to major news outlets and streaming services. </SettingSublabel>
-          </SettingInfo>
-          <Switch defaultChecked sx={themeSwitchStyles(theme)} />
-        </SettingItem>
-
-        <SettingItem>
-          <SettingInfo>
-            <SettingLabel>Strict Mode</SettingLabel>
-            <SettingSublabel>Cannot cancel a focus session once started. Use with caution.</SettingSublabel>
-          </SettingInfo>
-          <Switch sx={themeSwitchStyles(theme)} />
-        </SettingItem>
-
-        <Box sx={{ mt: 3, display: 'flex', alignItems: 'center', gap: 1, color: theme.palette.primary.main, cursor: 'pointer', '&:hover': { opacity: 0.8 } }}>
-          <Typography sx={{ fontSize: '0.9rem', fontWeight: 700 }}>Manage Blocklist</Typography>
-          <OpenInNewIcon sx={{ fontSize: 16 }} />
-        </Box>
-      </SectionCard>
 
       {/* Calendar Sync */}
       <SectionCard>

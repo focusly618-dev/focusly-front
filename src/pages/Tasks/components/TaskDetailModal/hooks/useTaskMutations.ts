@@ -12,7 +12,7 @@ import {
   ADD_SUBTASK,
   GET_TASKS,
 } from '../tasks.graphql';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 import {
   createGoogleEvent,
   updateGoogleEvent,
@@ -48,6 +48,7 @@ export const useTaskMutations = ({
 }: UseTaskMutationsProps) => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const [loadingSave, setLoadingSave] = useState(false);
 
   const [createTaskMutation] = useMutation(CREATE_TASK);
@@ -192,10 +193,7 @@ export const useTaskMutations = ({
         });
         if (data?.addSubtask) {
           dispatch(upsertTaskRedux(mapResponseToTask(data.addSubtask)));
-          sileo.success({
-            title: 'Subtask added',
-            fill: 'var(--sileo-success-bg)',
-          });
+          toast.success('Subtask added');
           onSave(data.addSubtask);
           resetForm();
         }
@@ -225,10 +223,7 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.createTask) {
-        sileo.success({
-          title: 'Task created',
-          fill: 'var(--sileo-success-bg)',
-        });
+        toast.success('Task created');
         onSave(data.createTask);
         resetForm();
         onClose();
@@ -304,17 +299,14 @@ export const useTaskMutations = ({
         });
         if (data?.updateTask) {
           dispatch(upsertTaskRedux(mapResponseToTask(data.updateTask)));
-          sileo.success({
-            title: 'Subtask updated',
-            fill: 'var(--sileo-update-bg)',
-          });
+          toast.success('Subtask updated');
           onSave(data.updateTask);
           resetForm();
           if (shouldClose) onClose();
         }
       } catch (e) {
         console.error(e);
-        sileo.error({ title: 'Failed to update subtask' });
+        toast.error('Failed to update subtask');
       }
       setLoadingSave(false);
       return;
@@ -456,10 +448,7 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.updateTask) {
-        sileo.success({
-          title: 'Task updated',
-          fill: 'var(--sileo-update-bg)',
-        });
+        toast.success('Task updated');
         onSave(data.updateTask);
         if (shouldClose) onClose();
       }
@@ -495,10 +484,7 @@ export const useTaskMutations = ({
           ],
         });
         if (data?.updateTask) {
-          sileo.success({
-            title: 'Subtask deleted',
-            fill: 'var(--sileo-delete-bg)',
-          });
+          toast.success('Subtask deleted');
           onSave(data.updateTask);
           onClose();
         }
@@ -554,15 +540,10 @@ export const useTaskMutations = ({
         },
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user?.id } }],
       });
-      sileo.success({
-        title: 'Workspace unlinked',
-        fill: 'var(--sileo-update-bg)',
-      });
+      toast.success('Workspace unlinked');
     } catch (error) {
       console.error(error);
-      sileo.error({
-        title: 'Error unlinking workspace',
-      });
+      toast.error('Error unlinking workspace');
     }
   };
 

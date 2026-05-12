@@ -1,8 +1,10 @@
-import { Box, Typography, LinearProgress } from '@mui/material';
+import { Box, Typography, LinearProgress, Switch } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
   Link as LinkIcon,
 } from '@mui/icons-material';
+import { GeminiIcon } from '@/components/ui/GeminiIcon';
+import { GeminiAIToggle } from '@/components/ui/GeminiSwitch';
 
 import {
   GridTaskCard,
@@ -21,6 +23,7 @@ import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDeta
 interface GridViewTaskProps {
   task: TaskResponse;
   onTaskClick: (task: TaskResponse) => void;
+  updateTask?: (taskId: string, updates: any) => Promise<void>;
 }
 
 // Professional color scheme matching ListViewTask
@@ -43,7 +46,7 @@ const getPriorityColor = (level: number) => {
   return '#22c55e';
 };
 
-export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
+export const GridViewTask = ({ task, onTaskClick, updateTask }: GridViewTaskProps) => {
   const statusColor = getStatusColor(task.status);
   const priorityColor = getPriorityColor(task.priority_level);
 
@@ -144,6 +147,23 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
             </Typography>
           </MetaBadge>
         )}
+        <MetaBadge
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          sx={{ gap: 0, ml: 'auto', '&:hover': { bgcolor: 'transparent' } }}
+        >
+          <GeminiAIToggle
+            checked={task.use_ai || false}
+            onChange={async (e) => {
+              if (updateTask) {
+                await updateTask(task.id, { ...task, use_ai: e.target.checked });
+              }
+            }}
+          />
+        </MetaBadge>
       </Box>
 
       <GridCardFooter>

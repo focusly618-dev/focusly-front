@@ -5,17 +5,11 @@ import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../CreateTaskModal.utils';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 
-export const useCreateTaskModal = ({
-  onSave,
-  onClose,
-  onDelete,
-  initialStart,
-  initialTask,
-  parentTask,
   subtaskIndex,
 }: UseCreateTaskModalProps) => {
+  const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {
@@ -241,23 +235,12 @@ export const useCreateTaskModal = ({
       if (meetUrl) {
         handleAddLink('Google Meet', meetUrl);
         setShouldGenerateMeet(true);
-        sileo.success({
-          title: 'Google Meet link generated!',
-          description: 'Link added to resources.',
-          fill: 'var(--sileo-success-bg)',
-        });
+        toast.success('Google Meet link generated!', 'Link added to resources.');
       } else {
-        sileo.error({
-          title: 'Could not generate Meet link',
-          description: 'Make sure you are signed in with Google.',
-          fill: 'var(--sileo-error-bg)',
-        });
+        toast.error('Could not generate Meet link', 'Make sure you are signed in with Google.');
       }
     } catch {
-      sileo.error({
-        title: 'Error generating Meet link',
-        fill: 'var(--sileo-error-bg)',
-      });
+      toast.error('Error generating Meet link');
     } finally {
       setIsGeneratingMeet(false);
     }

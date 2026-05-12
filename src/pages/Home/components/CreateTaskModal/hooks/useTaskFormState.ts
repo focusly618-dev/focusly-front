@@ -83,6 +83,7 @@ export const useTaskFormState = ({
   const [duration, setDuration] = useState(initialState.duration);
   const [realTime, setRealTime] = useState(initialState.realTime);
   const [color, setColor] = useState(initialState.color);
+  const [useAI, setUseAI] = useState(initialTask?.use_ai || false);
   const [errors, setErrors] = useState<{ title?: string; duration?: string }>(
     {},
   );
@@ -133,6 +134,8 @@ export const useTaskFormState = ({
     setRealTime,
     color,
     setColor,
+    useAI,
+    setUseAI,
     errors,
     setErrors,
     handleTitleChange,

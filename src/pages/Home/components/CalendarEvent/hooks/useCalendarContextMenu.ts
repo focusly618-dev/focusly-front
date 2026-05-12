@@ -9,7 +9,7 @@ import {
 } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 import type { Task } from '@/redux/tasks/task.types';
 
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
@@ -19,6 +19,7 @@ import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 export const useCalendarContextMenu = () => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  const toast = useToast();
 
   const [createTask] = useMutation(CREATE_TASK);
   const [updateTask] = useMutation(UPDATE_TASK);
@@ -29,7 +30,7 @@ export const useCalendarContextMenu = () => {
     
     // Check if it's a Google event mirrored task - we probably shouldn't duplicate these directly via Focusly API or they lose sync
     if (task.task_type === 'GoogleTask') {
-        sileo.error({ title: 'Cannot duplicate Google events via context menu' });
+        toast.error('Cannot duplicate Google events via context menu');
         return;
     }
 
@@ -67,15 +68,11 @@ export const useCalendarContextMenu = () => {
       if (data?.createTask) {
         const newTask = mapResponseToTask(data.createTask);
         dispatch(upsertTask(newTask));
-        sileo.success({ 
-          title: 'Task duplicated', 
-          fill: 'var(--sileo-success-bg)',
-          duration: 3000 
-        });
+        toast.success('Task duplicated');
       }
     } catch (error) {
       console.error('Failed to duplicate task:', error);
-      sileo.error({ title: 'Failed to duplicate task', fill: 'var(--sileo-error-bg)', });
+      toast.error('Failed to duplicate task');
     }
   };
 
@@ -95,15 +92,11 @@ export const useCalendarContextMenu = () => {
       if (data?.updateTask) {
         const updatedTask = mapResponseToTask(data.updateTask);
         dispatch(upsertTask(updatedTask));
-        sileo.success({ 
-          title: `Priority updated to ${priorityLevel}`, 
-          fill: 'var(--sileo-update-bg)',
-          duration: 3000 
-        });
+        toast.success(`Priority updated to ${priorityLevel}`);
       }
     } catch (error) {
       console.error('Failed to update priority:', error);
-      sileo.error({ title: 'Failed to update priority', fill: 'var(--sileo-error-bg)', });
+      toast.error('Failed to update priority');
     }
   };
 
@@ -119,14 +112,10 @@ export const useCalendarContextMenu = () => {
         ],
       });
       dispatch(removeTask({ id: taskId }));
-      sileo.success({ 
-        title: 'Task deleted', 
-        fill: 'var(--sileo-delete-bg)',
-        duration: 3000 
-      });
+      toast.success('Task deleted');
     } catch (error) {
       console.error('Failed to delete task:', error);
-      sileo.error({ title: 'Failed to delete task', fill: 'var(--sileo-error-bg)', });
+      toast.error('Failed to delete task');
     }
   };
 
@@ -134,14 +123,10 @@ export const useCalendarContextMenu = () => {
     try {
       await deleteGoogleEvent(eventId);
       dispatch(removeEvent({ id: eventId }));
-      sileo.success({ 
-        title: 'Event deleted', 
-        fill: 'var(--sileo-delete-bg)',
-        duration: 3000 
-      });
+      toast.success('Event deleted');
     } catch (error) {
       console.error('Failed to delete Google event:', error);
-      sileo.error({ title: 'Failed to delete event', fill: 'var(--sileo-error-bg)', });
+      toast.error('Failed to delete event');
     }
   };
 

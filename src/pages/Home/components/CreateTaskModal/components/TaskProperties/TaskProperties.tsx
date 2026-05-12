@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Box,
   Typography,
@@ -8,6 +7,7 @@ import {
   MenuItem,
   List,
   ListItemText,
+  Switch,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -428,8 +428,6 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             />
           )}
         </Box>
-      </Box>
-
       {/* Time Tracking */}
       <Box sx={{ ...propertyRowSx, alignItems: 'center' }}>
         <Box sx={propertyLabelSx}>

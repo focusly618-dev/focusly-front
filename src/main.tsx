@@ -14,21 +14,25 @@ import { store } from '@/redux/store.ts';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@/api/apollo';
 
-import { Toaster } from 'sileo';
+import { ToastProvider } from '@/components/ui/Toast/ToastContext';
+import { ConfirmProvider } from '@/components/ui/Confirm/ConfirmContext';
 import { BrowserRouter } from 'react-router-dom';
 
 createRoot(document.getElementById('root')!).render(
   <AppThemeProvider>
     <CssBaseline />
-    <Toaster position="top-center" theme="light" options={{ duration: 4000 }} />
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <ApolloProvider client={client}>
-        <Provider store={store}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </Provider>
-      </ApolloProvider>
-    </GoogleOAuthProvider>
+    <ToastProvider>
+      <ConfirmProvider>
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+          <ApolloProvider client={client}>
+            <Provider store={store}>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </Provider>
+          </ApolloProvider>
+        </GoogleOAuthProvider>
+      </ConfirmProvider>
+    </ToastProvider>
   </AppThemeProvider>,
 );

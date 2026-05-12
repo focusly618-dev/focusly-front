@@ -6,7 +6,8 @@ import {
   saveButtonSx,
   deleteContainerSx,
 } from './TaskActions.styles';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useConfirm } from '@/components/ui/Confirm/ConfirmContext';
 import type { Task } from '@/redux/tasks/task.types';
 
 interface TaskActionsProps {
@@ -26,37 +27,29 @@ export const TaskActions = ({
   handleSave,
   loadingSave,
 }: TaskActionsProps) => {
+  const toast = useToast();
+  const { confirm } = useConfirm();
   return (
     <DialogActions sx={dialogActionsSx}>
       <Box sx={deleteContainerSx(!!initialTask)}>
         <Button
-          onClick={() => {
-            sileo.warning({
+          onClick={async () => {
+            const ok = await confirm({
               title: 'Delete Task',
-              description: 'Are you sure you want to delete this task?',
-              fill: 'var(--sileo-warning-bg)',
-              button: {
-                title: 'Confirm',
-                onClick: () => {
-                  sileo.promise(handleDelete(), {
-                    loading: {
-                      title: 'Deleting...',
-                      fill: 'var(--sileo-update-bg)',
-                    },
-                    success: {
-                      title: 'Task deleted successfully!',
-                      duration: 4000,
-                      fill: 'var(--sileo-delete-bg)',
-                    },
-                    error: {
-                      title: 'Error deleting task',
-                      fill: 'var(--sileo-error-bg)',
-                    },
-                  });
-                  onClose();
-                },
-              },
+              description: 'Are you sure you want to delete this task? This action cannot be undone.',
+              confirmText: 'Delete',
+              severity: 'error'
             });
+
+            if (ok) {
+              try {
+                await handleDelete();
+                toast.success('Task deleted successfully!');
+                onClose();
+              } catch (error) {
+                toast.error('Error deleting task');
+              }
+            }
           }}
           variant="contained"
           disableElevation

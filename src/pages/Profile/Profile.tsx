@@ -175,11 +175,7 @@ const Profile: React.FC = () => {
                   fontSize: '2rem',
                 }}
               >
-                <img
-                  alt="avatar"
-                  src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
+                {getInitials(user?.name)}
               </Avatar>
               <Box>
                 <Typography variant="subtitle1" fontWeight="bold">

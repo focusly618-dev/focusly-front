@@ -73,10 +73,15 @@ export const ProfileSettings = () => {
               height: 100, 
               borderRadius: '50%',
               bgcolor: alpha(theme.palette.primary.main, 0.1),
-              border: `4px solid ${alpha(theme.palette.primary.main, 0.2)}`
+              border: `4px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+              color: theme.palette.primary.main,
+              fontWeight: 700,
+              fontSize: '2rem'
             }} 
             src={user?.picture || ""}   
-          />
+          >
+            {user?.name?.charAt(0).toUpperCase() || 'U'}
+          </Avatar>
           <Box>
             <Typography sx={{ fontWeight: 700, mb: 0.5 }}>Your Avatar</Typography>
             <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block', mb: 2 }}>

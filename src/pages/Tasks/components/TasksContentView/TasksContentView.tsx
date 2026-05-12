@@ -108,6 +108,7 @@ export const TasksContentView = ({
               key={task.id}
               task={task}
               onTaskClick={handleTaskClick}
+              updateTask={updateTask}
             />
           ))}
         </GridTaskContainer>

@@ -1,20 +1,22 @@
 import { client } from '@/api/apollo';
 import { REMOVE_WORKSPACE, GET_WORKSPACES } from '../workspaces.graphql';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useConfirm } from '@/components/ui/Confirm/ConfirmContext';
 
 export const useWorkspaceActions = () => {
-  const handleOpen = (id: string): void => {
-    sileo.warning({
-      title: 'Remove Workspace',
-      description: 'Are you sure you want to remove this workspace?',
-      fill: 'var(--sileo-warning-bg)',
-      button: {
-        title: 'Confirm',
-        onClick: () => {
-          deleteWorkspace(id);
-        },
-      },
+  const toast = useToast();
+  const { confirm } = useConfirm();
+  const handleOpen = async (id: string) => {
+    const ok = await confirm({
+      title: 'Delete Workspace',
+      description: 'Are you sure you want to remove this workspace? This action cannot be undone.',
+      confirmText: 'Delete',
+      severity: 'error'
     });
+
+    if (ok) {
+      deleteWorkspace(id);
+    }
   };
 
   const deleteWorkspace = async (id: string) => {
@@ -38,16 +40,10 @@ export const useWorkspaceActions = () => {
           });
         },
       });
-      sileo.success({ 
-        title: 'Workspace deleted', 
-        fill: 'var(--sileo-delete-bg)', 
-        });
+      toast.success('Workspace deleted');
     } catch (error) {
       console.error('Error deleting workspace:', error);
-      sileo.error({ 
-        title: 'Error deleting workspace', 
-        fill: 'var(--sileo-error-bg)', 
-        });
+      toast.error('Error deleting workspace');
     }
   };
 

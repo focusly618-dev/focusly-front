@@ -23,6 +23,20 @@ export const MainEditorArea = styled(Box)(({ theme }) => ({
   borderRight: `1px solid ${theme.palette.divider}`,
   overflowY: 'auto',
   overflowX: 'auto',
+  '&::-webkit-scrollbar': {
+    width: '8px',
+    height: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+    borderRadius: '10px',
+    '&:hover': {
+      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+    },
+  },
 }));
 
 export const EditorHeader = styled(Box)(({ theme }) => ({
@@ -93,6 +107,19 @@ export const RightSidebar = styled(Box, {
   position: 'relative',
   whiteSpace: 'nowrap', // Prevent text wrapping during transition
   height: '100%',
+  '&::-webkit-scrollbar': {
+    width: '6px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+    borderRadius: '10px',
+    '&:hover': {
+      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+    },
+  },
 }));
 
 export const SidebarHeader = styled(Box)({

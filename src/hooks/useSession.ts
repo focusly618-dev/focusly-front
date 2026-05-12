@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout as logoutThunk, clearAuth, setSessionExpiredNotice } from '@/redux/auth/auth.slice';
 import { useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sileo } from 'sileo';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 import { auth as firebaseAuth } from '@/context/firebase';
 import { onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
 
@@ -16,6 +16,7 @@ import { onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
 export const useSession = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const toast = useToast();
   const auth = useAppSelector((state) => state.auth);
   const wasLoggedIn = useRef(false);
 
@@ -23,12 +24,10 @@ export const useSession = () => {
     try {
       if (isExternal) {
         dispatch(clearAuth());
-        sileo.info({
-          title: 'Sesión Finalizada',
-          description: 'Tu sesión se ha cerrado en otra pestaña. Inicia Sesión de nuevo para continuar.',
-          fill: 'var(--sileo-update-bg)',
-          duration: 5000,
-        });
+        toast.info(
+          'Sesión Finalizada',
+          'Tu sesión se ha cerrado en otra pestaña. Inicia Sesión de nuevo para continuar.'
+        );
       } else {
         // Call logout thunk (handles API + state clearing)
         await dispatch(logoutThunk());
