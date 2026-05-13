@@ -31,24 +31,46 @@ export const CreateTaskModal = ({
   subtaskIndex,
 }: CreateTaskModalProps) => {
   const {
-    title, setTitle,
-    description, setDescription,
-    priority, setPriority,
-    category, setCategory,
-    status, setStatus,
-    tags, setTags,
-    newTag, setNewTag,
-    isAddingTag, setIsAddingTag,
-    handleSave, handleAddTag, handleUpdate, handleDelete,
-    realTime, setRealTime,
-    timeSlotDisplay, errors,
-    duration, setDuration,
-    color, setColor,
-    currentDate, loadingSave, setCurrentDate,
-    links, handleAddLink, handleRemoveLink,
-    newLinkTitle, setNewLinkTitle,
-    newLinkUrl, setNewLinkUrl,
-    isAddingLink, setIsAddingLink,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    priority,
+    setPriority,
+    category,
+    setCategory,
+    status,
+    setStatus,
+    tags,
+    setTags,
+    newTag,
+    setNewTag,
+    isAddingTag,
+    setIsAddingTag,
+    handleSave,
+    handleAddTag,
+    handleUpdate,
+    handleDelete,
+    realTime,
+    setRealTime,
+    timeSlotDisplay,
+    errors,
+    duration,
+    setDuration,
+    color,
+    setColor,
+    currentDate,
+    loadingSave,
+    setCurrentDate,
+    links,
+    handleAddLink,
+    handleRemoveLink,
+    newLinkTitle,
+    setNewLinkTitle,
+    newLinkUrl,
+    setNewLinkUrl,
+    isAddingLink,
+    setIsAddingLink,
     isGeneratingMeet,
     handleGenerateMeet,
     handleTimerChange,
@@ -65,15 +87,23 @@ export const CreateTaskModal = ({
 
   // Popover anchors
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
-  const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(null);
-  const [categoryAnchor, setCategoryAnchor] = useState<HTMLElement | null>(null);
+  const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(
+    null,
+  );
+  const [categoryAnchor, setCategoryAnchor] = useState<HTMLElement | null>(
+    null,
+  );
   const [colorAnchor, setColorAnchor] = useState<HTMLElement | null>(null);
 
   // Timer Suggestions State
   const [durationSuggestions, setDurationSuggestions] = useState<string[]>([]);
   const [realTimeSuggestions, setRealTimeSuggestions] = useState<string[]>([]);
-  const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(null);
-  const [realTimeAnchor, setRealTimeAnchor] = useState<HTMLDivElement | null>(null);
+  const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const [realTimeAnchor, setRealTimeAnchor] = useState<HTMLDivElement | null>(
+    null,
+  );
 
   // UI State
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -108,6 +138,8 @@ export const CreateTaskModal = ({
           onClose={onClose}
           parentTask={parentTask}
           title={title}
+          initialTask={initialTask}
+          handleDelete={handleDelete}
         />
 
         <DialogContent sx={dialogContentSx}>

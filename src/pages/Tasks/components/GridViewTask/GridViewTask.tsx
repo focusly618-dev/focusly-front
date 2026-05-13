@@ -2,6 +2,7 @@ import { Box, Typography, LinearProgress } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
   Link as LinkIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 
 import {
@@ -21,6 +22,7 @@ import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDeta
 interface GridViewTaskProps {
   task: TaskResponse;
   onTaskClick: (task: TaskResponse) => void;
+  isAIScheduleEnabled?: boolean;
 }
 
 // Professional color scheme matching ListViewTask
@@ -43,7 +45,11 @@ const getPriorityColor = (level: number) => {
   return '#22c55e';
 };
 
-export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
+export const GridViewTask = ({
+  task,
+  onTaskClick,
+  isAIScheduleEnabled,
+}: GridViewTaskProps) => {
   const statusColor = getStatusColor(task.status);
   const priorityColor = getPriorityColor(task.priority_level);
 
@@ -76,6 +82,25 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
               {task.links.length}
             </Typography>
           </MetaBadge>
+        )}
+        {isAIScheduleEnabled && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              color: '#7c3aed',
+              background: 'rgba(124, 58, 237, 0.1)',
+              padding: '2px 6px',
+              borderRadius: '6px',
+              border: '1px solid rgba(124, 58, 237, 0.2)',
+            }}
+          >
+            <AutoAwesomeIcon sx={{ fontSize: 12 }} />
+            <Typography sx={{ fontSize: '10px', fontWeight: 700 }}>
+              AI
+            </Typography>
+          </Box>
         )}
       </GridCardHeader>
 

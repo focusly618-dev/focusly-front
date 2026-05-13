@@ -1,6 +1,13 @@
 import { Typography, Box, LinearProgress } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTasks } from './Tasks.hook';
-import { TasksContainer, MainContent } from './Tasks.styles';
+import {
+  TasksContainer,
+  MainContent,
+  AISwitchContainer,
+  StyledAISwitch,
+} from './Tasks.styles';
 import { TasksHeader } from './components/TasksHeader/TasksHeader';
 import { TasksControlsBar } from './components/TasksControlsBar/TasksControlsBar';
 import { TasksContentView } from './components/TasksContentView/TasksContentView';
@@ -8,8 +15,19 @@ import { TaskPriorityCards } from './components/TaskPriorityCards/TaskPriorityCa
 import { SubtaskModal } from './components/SubtaskModal/SubtaskModal';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import type { Step } from 'react-joyride';
+import type { Task } from '@/redux/tasks/task.types';
 
-export const Tasks = () => {
+interface TasksProps {
+  isAIScheduleEnabled: boolean;
+  setIsAIScheduleEnabled: (enabled: boolean) => void;
+  onStartFocus?: (task: Task) => void;
+}
+
+export const Tasks = ({
+  isAIScheduleEnabled: isAIScheduleEnabledProp,
+  setIsAIScheduleEnabled: setIsAIScheduleEnabledProp,
+  onStartFocus,
+}: TasksProps) => {
   const {
     tasks,
     filteredTasks,
@@ -46,6 +64,9 @@ export const Tasks = () => {
     handleSubtaskToggle,
     setPriorityFilter,
   } = useTasks();
+
+  const isAIScheduleEnabled = isAIScheduleEnabledProp;
+  const setIsAIScheduleEnabled = setIsAIScheduleEnabledProp;
 
   const activePriority =
     activeFilterState?.priorities?.length === 1
@@ -96,87 +117,115 @@ export const Tasks = () => {
   ];
 
   return (
-    <TasksContainer sx={{ position: 'relative' }}>
-      {isLoading && (
-        <LinearProgress
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <TasksContainer sx={{ position: 'relative' }}>
+        {isLoading && (
+          <LinearProgress
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '3px',
+              zIndex: 1000,
+              bgcolor: 'transparent',
+              '& .MuiLinearProgress-bar': {
+                bgcolor: 'primary.main',
+              },
+            }}
+          />
+        )}
+
+        <MainContent
           sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '3px',
-            zIndex: 1000,
-            bgcolor: 'transparent',
-            '& .MuiLinearProgress-bar': {
-              bgcolor: 'primary.main',
-            },
+            borderRadius: '16px',
           }}
-        />
-      )}
+        >
+          <TasksHeader
+            filteredTasks={filteredTasks}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+          >
+            <AISwitchContainer sx={{ height: 'fit-content' }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 600,
+                  color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
+                  transition: 'color 0.3s ease',
+                }}
+              >
+                Schedule with AI
+              </Typography>
+              <StyledAISwitch
+                checked={isAIScheduleEnabled}
+                onChange={(e) => setIsAIScheduleEnabled(e.target.checked)}
+              />
+            </AISwitchContainer>
+          </TasksHeader>
 
-      <MainContent>
-        <TasksHeader
-          filteredTasks={filteredTasks}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
-
-        <TasksControlsBar
-          viewMode={viewMode}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filterAnchorEl={filterAnchorEl}
-          sortAnchorEl={sortAnchorEl}
-          isCompletedFilterActive={isCompletedFilterActive}
-          activeSort={activeSort ?? null}
-          activeFilterState={
-            activeFilterState ?? {
-              priorities: [],
-              categories: [],
-              statuses: [],
+          <TasksControlsBar
+            viewMode={viewMode}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filterAnchorEl={filterAnchorEl}
+            sortAnchorEl={sortAnchorEl}
+            isCompletedFilterActive={isCompletedFilterActive}
+            activeSort={activeSort ?? null}
+            activeFilterState={
+              activeFilterState ?? {
+                priorities: [],
+                categories: [],
+                statuses: [],
+              }
             }
-          }
-          tags={tags}
-          handleFilterClick={handleFilterClick}
-          handleFilterClose={handleFilterClose}
-          handleApplyFilters={handleApplyFilters}
-          handleSortClose={handleSortClose}
-          handleApplySort={handleApplySort}
-        />
-        <TaskPriorityCards
-          activePriority={activePriority}
-          onPriorityChange={setPriorityFilter}
-        />
-        <TasksContentView
-          viewMode={viewMode}
-          isLoading={isLoading}
-          tasks={tasks}
-          filteredTasks={filteredTasks}
-          expandedTaskIds={expandedTaskIds}
-          toggleTaskExpansion={toggleTaskExpansion}
-          handleSubtaskToggle={handleSubtaskToggle}
-          handleOpenSubtaskModal={handleOpenSubtaskModal}
-          handleTaskClick={handleTaskClick}
-          updateTask={updateTask}
-          setSearchTerm={setSearchTerm}
-        />
-      </MainContent>
+            tags={tags}
+            handleFilterClick={handleFilterClick}
+            handleFilterClose={handleFilterClose}
+            handleApplyFilters={handleApplyFilters}
+            handleSortClose={handleSortClose}
+            handleApplySort={handleApplySort}
+          />
+          <TaskPriorityCards
+            activePriority={activePriority}
+            onPriorityChange={setPriorityFilter}
+          />
+          <TasksContentView
+            viewMode={viewMode}
+            isLoading={isLoading}
+            tasks={tasks}
+            filteredTasks={filteredTasks}
+            expandedTaskIds={expandedTaskIds}
+            toggleTaskExpansion={toggleTaskExpansion}
+            handleSubtaskToggle={handleSubtaskToggle}
+            handleOpenSubtaskModal={handleOpenSubtaskModal}
+            handleTaskClick={handleTaskClick}
+            updateTask={updateTask}
+            setSearchTerm={setSearchTerm}
+            isAIScheduleEnabled={isAIScheduleEnabled}
+            setIsAIScheduleEnabled={setIsAIScheduleEnabled}
+            onStartFocus={onStartFocus}
+          />
+        </MainContent>
 
-      <SubtaskModal
-        isOpen={isSubtaskModalOpen}
-        onClose={() => setIsSubtaskModalOpen(false)}
-        onSave={handleSaveSubtask}
-        activeParentTask={activeParentTask}
-        activeSubtaskIndex={activeSubtaskIndex}
-      />
+        <SubtaskModal
+          isOpen={isSubtaskModalOpen}
+          onClose={() => setIsSubtaskModalOpen(false)}
+          onSave={handleSaveSubtask}
+          activeParentTask={activeParentTask}
+          activeSubtaskIndex={activeSubtaskIndex}
+          isAIScheduleEnabled={isAIScheduleEnabled}
+          setIsAIScheduleEnabled={setIsAIScheduleEnabled}
+        />
 
-      <OnboardingWrapper
-        steps={onboardingSteps}
-        run={runOnboarding}
-        onFinish={handleFinishOnboarding}
-      />
-    </TasksContainer>
+        <OnboardingWrapper
+          steps={onboardingSteps}
+          run={runOnboarding}
+          onFinish={handleFinishOnboarding}
+        />
+      </TasksContainer>
+    </LocalizationProvider>
   );
 };

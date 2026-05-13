@@ -30,6 +30,7 @@ export const useTasks = () => {
   );
 
   // ── Composed hooks ─────────────────────────────────────────────────
+
   const ui = useTasksUI();
   const filterLogic = useTasksFilters([]);
 
@@ -153,6 +154,7 @@ export const useTasks = () => {
     toastSubMessage: ui.toastSubMessage,
 
     // Mutations
+
     updateTask: mutations.updateTask,
     handleAddSubtask: mutations.handleAddSubtask,
 
