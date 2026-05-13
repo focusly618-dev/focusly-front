@@ -55,6 +55,8 @@ export const Home = () => {
     deleteTask,
     initialStart,
     initialEnd,
+    isAIScheduleEnabled,
+    setIsAIScheduleEnabled,
   } = useHome();
 
   return (
@@ -67,7 +69,14 @@ export const Home = () => {
               onStartFocus={(task: Task) => handleStartFocus(task)}
             />
           )}
-          {activeTab === TaskBar.Tasks && <Tasks />}
+          {activeTab === TaskBar.Tasks && (
+            <Tasks
+              isAIScheduleEnabled={isAIScheduleEnabled}
+              setIsAIScheduleEnabled={setIsAIScheduleEnabled}
+              onStartFocus={handleStartFocus}
+            />
+          )}
+
           {activeTab === TaskBar.Workspace && (
             <Workspace
               isEditorOpen={isWorkspaceEditorOpen}
@@ -124,6 +133,8 @@ export const Home = () => {
           initialStart={initialStart}
           initialEnd={initialEnd}
           handleDelete={deleteTask}
+          isAIScheduleEnabled={isAIScheduleEnabled}
+          setIsAIScheduleEnabled={setIsAIScheduleEnabled}
         />
       )}
 

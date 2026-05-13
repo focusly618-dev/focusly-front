@@ -1,10 +1,21 @@
 import { useState } from 'react';
-import { Box, Typography, Collapse, Menu, MenuItem } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Collapse,
+  Menu,
+  MenuItem,
+  IconButton,
+  Tooltip,
+  alpha,
+} from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
   SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
   AccessTime as AccessTimeIcon,
   Link as LinkIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  PlayArrow as PlayIcon,
 } from '@mui/icons-material';
 
 import {
@@ -23,6 +34,7 @@ import {
   differenceInMonths,
   differenceInYears,
 } from 'date-fns';
+import type { Task } from '@/redux/tasks/task.types';
 // import { formatDuration } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 
 const formatTimeSinceCompletion = (dateString: string | undefined) => {
@@ -54,6 +66,8 @@ interface ListViewTaskProps {
   handleOpenSubtaskModal: (task: TaskResponse, index?: number) => void;
   onTaskClick: (task: TaskResponse) => void;
   updateTask?: (taskId: string, updates: TaskResponse) => Promise<void>;
+  isAIScheduleEnabled?: boolean;
+  onStartFocus?: (task: Task) => void;
 }
 
 const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
@@ -101,6 +115,8 @@ export const ListViewTask = ({
   handleOpenSubtaskModal,
   onTaskClick,
   updateTask,
+  isAIScheduleEnabled,
+  onStartFocus,
 }: ListViewTaskProps) => {
   const [statusAnchor, setStatusAnchor] = useState<null | HTMLElement>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
@@ -163,6 +179,7 @@ export const ListViewTask = ({
         sx={{
           cursor: 'pointer',
           borderLeft: `3px solid ${statusColor}`,
+          background: 'background.paper',
         }}
       >
         <CardLeft sx={{ alignItems: 'center', gap: '12px' }}>
@@ -345,6 +362,58 @@ export const ListViewTask = ({
             </Box>
           </Box>
         </CardLeft>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {onStartFocus && (
+            <Tooltip title="Start Focus Mode">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onStartFocus(task as unknown as Task);
+                }}
+                sx={{
+                  color: 'primary.main',
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+                  '&:hover': {
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.2),
+                    transform: 'scale(1.1)',
+                  },
+                  transition: 'all 0.2s',
+                  width: 32,
+                  height: 32,
+                }}
+              >
+                <PlayIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
+          )}
+          {isAIScheduleEnabled && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                color: '#7c3aed',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                background: 'rgba(124, 58, 237, 0.1)',
+                border: '1px solid rgba(124, 58, 237, 0.2)',
+                boxShadow: '0 0 10px rgba(124, 58, 237, 0.2)',
+              }}
+            >
+              <AutoAwesomeIcon sx={{ fontSize: 14 }} />
+              <Typography
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  letterSpacing: '0.05em',
+                }}
+              >
+                AI
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </TaskCard>
 
       <Collapse in={expandedTaskIds.has(task.id)} timeout="auto" unmountOnExit>
