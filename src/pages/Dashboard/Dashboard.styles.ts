@@ -381,7 +381,7 @@ export const ProfileImage = styled(Box)<{ src?: string }>(({ theme, src }) => ({
   height: '100%',
   borderRadius: '50%',
   backgroundColor: alpha(theme.palette.text.primary, 0.05),
-  backgroundImage: src ? `url(${src})` : 'none',
+  backgroundImage: src ? `url("${src}")` : 'none',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   border: `2px border ${alpha(theme.palette.text.primary, 0.1)}`,
