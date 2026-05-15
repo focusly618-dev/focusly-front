@@ -855,15 +855,21 @@ export const WorkspaceLibrary = ({
                           sx={{
                             fontSize: 16,
                             color: isBackgroundActive
-                              ? '#fff'
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
                               : workspace.folder?.color || 'text.secondary',
-                            opacity: 0.8,
+                            opacity: isBackgroundActive ? 0.9 : 0.8,
                           }}
                         />
                         <Typography
                           variant="caption"
                           sx={{
-                            color: isBackgroundActive ? '#fff' : 'text.secondary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.secondary',
                             fontWeight: 500,
                             opacity: 0.8,
                           }}
@@ -879,7 +885,11 @@ export const WorkspaceLibrary = ({
                             handleOpen(workspace.id);
                           }}
                           sx={{
-                            color: isBackgroundActive ? '#fff' : 'text.secondary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.secondary',
                             '&:hover': {
                               color: 'white',
                               backgroundColor: '#ff0090ff',
@@ -892,7 +902,11 @@ export const WorkspaceLibrary = ({
                           size="small"
                           onClick={(e) => handleMenuOpen(e, workspace)}
                           sx={{
-                            color: isBackgroundActive ? '#fff' : 'text.secondary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.secondary',
                             '&:hover': {
                               backgroundColor: 'action.hover',
                             },
@@ -907,7 +921,11 @@ export const WorkspaceLibrary = ({
                             e.stopPropagation();
                           }}
                           sx={{
-                            color: isBackgroundActive ? '#fff' : 'text.secondary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.secondary',
                             '&:hover': {
                               color: 'white',
                               backgroundColor: '#18f3ffff',
@@ -945,7 +963,11 @@ export const WorkspaceLibrary = ({
                         {createElement(iconMap[workspace.emoji], {
                           sx: {
                             fontSize: 22,
-                            color: isBackgroundActive ? '#fff' : 'text.primary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.primary',
                           },
                         })}
                       </Box>
@@ -955,7 +977,11 @@ export const WorkspaceLibrary = ({
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: isBackgroundActive ? '#fff' : 'text.primary',
+                        color: isBackgroundActive
+                          ? theme.palette.mode === 'dark'
+                            ? '#fff'
+                            : '#000'
+                          : 'text.primary',
                         fontSize: '16px',
                         mb: 1,
                         lineHeight: 1.3,
@@ -1014,7 +1040,11 @@ export const WorkspaceLibrary = ({
                         >
                           <Box
                             sx={{
-                              color: isBackgroundActive ? '#fff' : 'primary.main',
+                              color: isBackgroundActive
+                                ? theme.palette.mode === 'dark'
+                                  ? '#fff'
+                                  : '#000'
+                                : 'primary.main',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -1063,7 +1093,11 @@ export const WorkspaceLibrary = ({
                             </TaskPillLabel>
                             <TaskPillTitle
                               sx={{
-                                color: isBackgroundActive ? '#fff' : 'text.primary',
+                                color: isBackgroundActive
+                                  ? theme.palette.mode === 'dark'
+                                    ? '#fff'
+                                    : '#000'
+                                  : 'text.primary',
                               }}
                             >
                               {workspace.task.title}
@@ -1178,43 +1212,43 @@ export const WorkspaceLibrary = ({
 
             <Typography
               variant="caption"
-          sx={{
-            px: 2,
-            py: 1,
-            display: 'block',
-            fontWeight: 800,
-            color: 'primary.main',
-            letterSpacing: '0.5px',
-          }}
-        >
-          MOVE TO FOLDER
-        </Typography>
-        <MenuItem
-          onClick={() => handleMoveToFolder(null)}
-          sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
-        >
-          <FolderSpecialIcon sx={{ fontSize: 18, mr: 1.5, opacity: 0.7 }} />
-          All Notes (Default)
-        </MenuItem>
-        <Divider sx={{ my: 0.5, opacity: 0.1 }} />
-        {[...folders]
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((folder) => (
+              sx={{
+                px: 2,
+                py: 1,
+                display: 'block',
+                fontWeight: 800,
+                color: 'primary.main',
+                letterSpacing: '0.5px',
+              }}
+            >
+              MOVE TO FOLDER
+            </Typography>
             <MenuItem
-              key={folder.id}
-              onClick={() => handleMoveToFolder(folder.id)}
+              onClick={() => handleMoveToFolder(null)}
               sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
             >
-              <FolderIcon
-                sx={{
-                  fontSize: 18,
-                  mr: 1.5,
-                  color: folder.color || 'primary.main',
-                }}
-              />
-              {folder.name}
+              <FolderSpecialIcon sx={{ fontSize: 18, mr: 1.5, opacity: 0.7 }} />
+              All Notes (Default)
             </MenuItem>
-          ))}
+            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
+            {[...folders]
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((folder) => (
+                <MenuItem
+                  key={folder.id}
+                  onClick={() => handleMoveToFolder(folder.id)}
+                  sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
+                >
+                  <FolderIcon
+                    sx={{
+                      fontSize: 18,
+                      mr: 1.5,
+                      color: folder.color || 'primary.main',
+                    }}
+                  />
+                  {folder.name}
+                </MenuItem>
+              ))}
           </>
         )}
       </Menu>

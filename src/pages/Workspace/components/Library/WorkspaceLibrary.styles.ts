@@ -387,9 +387,14 @@ export const WorkspaceCard = styled(Card, {
   height: '220px',
   cursor: 'pointer',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  border: `1px solid ${
-    gradient ? 'rgba(255, 255, 255, 0.12)' : theme.palette.divider
+  border: `1.5px solid ${
+    gradient
+      ? theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.2)'
+        : 'rgba(0, 0, 0, 0.1)'
+      : theme.palette.divider
   }`,
+  backgroundClip: 'padding-box',
   position: 'relative',
   overflow: 'hidden',
   boxShadow: gradient ? '0 4px 20px rgba(0, 0, 0, 0.2)' : 'none',

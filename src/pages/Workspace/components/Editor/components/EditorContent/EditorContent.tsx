@@ -272,18 +272,11 @@ export const EditorContent = ({
   const [selectedText, setSelectedText] = useState('');
   const [colorAnchor, setColorAnchor] = useState<null | HTMLElement>(null);
   const [iconAnchor, setIconAnchor] = useState<null | HTMLElement>(null);
-  const [headerColor, setHeaderColor] = useState<HeaderColor>('none');
-  const [headerIcon, setHeaderIcon] = useState<string>('');
+  const headerColor: HeaderColor = (persistedBg as HeaderColor | undefined) ?? 'none';
+  const headerIcon: string = persistedEmoji ?? '';
 
-  // Sync persisted values into local state when workspace loads/changes
-  useEffect(() => {
-    const bg = (persistedBg as HeaderColor | undefined) ?? 'none';
-    setHeaderColor(colorPalette.some((c) => c.color === bg) ? bg : 'none');
-  }, [persistedBg]);
-
-  useEffect(() => {
-    setHeaderIcon(persistedEmoji ?? '');
-  }, [persistedEmoji]);
+  // Use derived values directly - no need for useEffect sync
+  // (persistedBg and persistedEmoji from watch() are already reactive)
 
   const iconMap: Record<string, React.ElementType> = {
     Article: ArticleIcon,
@@ -329,13 +322,11 @@ export const EditorContent = ({
   };
 
   const handleColorSelect = (color: HeaderColor) => {
-    setHeaderColor(color);
     setValue?.('background_color', color === 'none' ? undefined : color);
     setColorAnchor(null);
   };
 
   const handleIconSelect = (iconName: string) => {
-    setHeaderIcon(iconName);
     setValue?.('emoji', iconName || undefined);
     setIconAnchor(null);
   };
