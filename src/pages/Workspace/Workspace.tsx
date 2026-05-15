@@ -103,6 +103,9 @@ export const Workspace = ({
             setValue('taskId', workspace.taskId || null);
             setValue('folderId', workspace.folderId);
             setValue('folder', workspace.folder);
+            setValue('emoji', workspace.emoji);
+            setValue('background_color', workspace.background_color);
+            setValue('card_show_background', workspace.card_show_background);
             setValue('saveStatus', true);
             if (workspace.task) {
               handleSelectTask(workspace.task);
@@ -143,6 +146,9 @@ export const Workspace = ({
     setValue('taskId', workspace.taskId || null);
     setValue('folderId', workspace.folderId);
     setValue('folder', workspace.folder);
+    setValue('emoji', workspace.emoji);
+    setValue('background_color', workspace.background_color);
+    setValue('card_show_background', workspace.card_show_background);
     setValue('saveStatus', true);
     if (workspace.task) {
       handleSelectTask(workspace.task);
@@ -158,6 +164,9 @@ export const Workspace = ({
       content: '[]',
       id: undefined,
       taskId: undefined,
+      emoji: undefined,
+      background_color: undefined,
+      card_show_background: false,
       saveStatus: true,
     });
     handleSelectTask(null);

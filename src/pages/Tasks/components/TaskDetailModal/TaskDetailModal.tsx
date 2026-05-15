@@ -22,6 +22,8 @@ import { TaskResources } from './components/TaskResources/TaskResources';
 import { TaskDescription } from './components/TaskDescription/TaskDescription';
 import { TaskActions } from './components/TaskActions/TaskActions';
 import { TaskWorkspaces } from './components/TaskWorkspaces/TaskWorkspaces';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import 'react-perfect-scrollbar/dist/css/styles.css';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -134,92 +136,141 @@ export const TaskDetailModal = ({
           backdrop: { sx: modalBackdropSx },
         }}
       >
-        <TaskHeader
-          color={color}
-          isFullScreen={isFullScreen}
-          setIsFullScreen={setIsFullScreen}
-          parentTask={parentTask ? (parentTask as unknown as Task) : undefined}
-          title={title}
-          onClose={onClose}
-          initialTask={initialTask}
-          handleDelete={handleDelete}
-        />
 
-        <DialogContent sx={dialogContentSx}>
-          <Box sx={{ px: 1, mb: 1 }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Give your task a clear name..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              sx={titleInputPropsSx}
-              error={!!errors.title}
-              helperText={errors.title}
+
+        <DialogContent
+          sx={{
+            ...dialogContentSx,
+            overflow: 'hidden !important',
+            p: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            '&::-webkit-scrollbar': {
+              display: 'none !important',
+            },
+            '& .ps__rail-y': {
+              backgroundColor: 'transparent !important',
+              border: 'none !important',
+              opacity: 1,
+              width: '10px !important',
+              zIndex: 1000,
+            },
+            '& .ps__thumb-y': {
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.2) !important'
+                  : 'rgba(0, 0, 0, 0.15) !important',
+              borderRadius: '10px !important',
+              width: '6px !important',
+              right: '2px !important',
+              transition: 'background-color 0.2s, width 0.2s !important',
+            },
+            '& .ps__rail-y:hover .ps__thumb-y, & .ps__rail-y.ps--clicking .ps__thumb-y':
+              {
+                backgroundColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.3) !important'
+                    : 'rgba(0, 0, 0, 0.25) !important',
+                width: '8px !important',
+              },
+          }}
+        >
+          <PerfectScrollbar
+            style={{
+              maxHeight: 'calc(90vh - 100px)',
+              padding: '0px',
+            }}
+            options={{ wheelPropagation: false, suppressScrollX: true }}
+          >
+            <TaskHeader
+              color={color}
+              isFullScreen={isFullScreen}
+              setIsFullScreen={setIsFullScreen}
+              parentTask={
+                parentTask ? (parentTask as unknown as Task) : undefined
+              }
+              title={title}
+              onClose={onClose}
+              initialTask={initialTask}
+              handleDelete={handleDelete}
             />
-          </Box>
+            <Box sx={{ p: 3, pt: 1.5 }}>
+              <Box sx={{ px: 1, mb: 1 }}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Give your task a clear name..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  sx={titleInputPropsSx}
+                  error={!!errors.title}
+                  helperText={errors.title}
+                />
+              </Box>
 
-          <TaskProperties
-            status={status}
-            setStatus={setStatus}
-            priority={priority}
-            setPriority={setPriority}
-            category={category}
-            setCategory={setCategory}
-            color={color}
-            setColor={setColor}
-            colorAnchor={colorAnchor}
-            setColorAnchor={setColorAnchor}
-            currentDate={currentDate}
-            setCurrentDate={setCurrentDate}
-            tags={tags}
-            setTags={setTags}
-            newTag={newTag}
-            setNewTag={setNewTag}
-            isAddingTag={isAddingTag}
-            setIsAddingTag={setIsAddingTag}
-            handleAddTag={handleAddTag}
-            duration={duration}
-            setDuration={setDuration}
-            realTime={realTime}
-            setRealTime={setRealTime}
-            isPureGoogleTask={isPureGoogleTask}
-            timeSlotDisplay={timeSlotDisplay}
-            handleTimerChange={handleTimerChange}
-          />
+              <TaskProperties
+                status={status}
+                setStatus={setStatus}
+                priority={priority}
+                setPriority={setPriority}
+                category={category}
+                setCategory={setCategory}
+                color={color}
+                setColor={setColor}
+                colorAnchor={colorAnchor}
+                setColorAnchor={setColorAnchor}
+                currentDate={currentDate}
+                setCurrentDate={setCurrentDate}
+                tags={tags}
+                setTags={setTags}
+                newTag={newTag}
+                setNewTag={setNewTag}
+                isAddingTag={isAddingTag}
+                setIsAddingTag={setIsAddingTag}
+                handleAddTag={handleAddTag}
+                duration={duration}
+                setDuration={setDuration}
+                realTime={realTime}
+                setRealTime={setRealTime}
+                isPureGoogleTask={isPureGoogleTask}
+                timeSlotDisplay={timeSlotDisplay}
+                handleTimerChange={handleTimerChange}
+              />
 
-          <TaskResources
-            links={links}
-            isLinksExpanded={isLinksExpanded}
-            setIsLinksExpanded={setIsLinksExpanded}
-            isGeneratingMeet={isGeneratingMeet}
-            handleGenerateMeet={handleGenerateMeet}
-            hasMeetLink={hasMeetLink}
-            setIsAddingLink={setIsAddingLink}
-            isAddingLink={isAddingLink}
-            newLinkTitle={newLinkTitle}
-            setNewLinkTitle={setNewLinkTitle}
-            newLinkUrl={newLinkUrl}
-            setNewLinkUrl={setNewLinkUrl}
-            handleAddLink={handleAddLink}
-            handleRemoveLink={handleRemoveLink}
-          />
+              <TaskResources
+                links={links}
+                isLinksExpanded={isLinksExpanded}
+                setIsLinksExpanded={setIsLinksExpanded}
+                isGeneratingMeet={isGeneratingMeet}
+                handleGenerateMeet={handleGenerateMeet}
+                hasMeetLink={hasMeetLink}
+                setIsAddingLink={setIsAddingLink}
+                isAddingLink={isAddingLink}
+                newLinkTitle={newLinkTitle}
+                setNewLinkTitle={setNewLinkTitle}
+                newLinkUrl={newLinkUrl}
+                setNewLinkUrl={setNewLinkUrl}
+                handleAddLink={handleAddLink}
+                handleRemoveLink={handleRemoveLink}
+              />
 
-          <Collaborators
-            collaborators={collaborators}
-            handleAddCollaborator={handleAddCollaborator}
-          />
+              <Collaborators
+                collaborators={collaborators}
+                handleAddCollaborator={handleAddCollaborator}
+              />
 
-          <TaskWorkspaces
-            workspaces={initialTask?.workspaces}
-            onNavigate={createURLWorkSpace}
-            onRemove={handleRemoveWorkspace}
-          />
+              <TaskWorkspaces
+                workspaces={initialTask?.workspaces}
+                onNavigate={createURLWorkSpace}
+                onRemove={handleRemoveWorkspace}
+              />
 
-          <TaskDescription
-            description={description}
-            setDescription={setDescription}
-          />
+              <TaskDescription
+                description={description}
+                setDescription={setDescription}
+              />
+            </Box>
+          </PerfectScrollbar>
         </DialogContent>
 
         <TaskActions

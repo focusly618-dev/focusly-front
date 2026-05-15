@@ -32,7 +32,12 @@ export const useLoginAuth = ({ onAuthSuccess, onAuthError }: UseLoginAuthProps =
         url: `${window.location.origin}/login`,
         handleCodeInApp: true,
       };
-
+      console.log('Sending magic link to:', email);
+      console.log('Action code settings:', actionCodeSettings);
+      console.log('Auth instance:', auth);
+      console.log('Full URL:', window.location.href);
+      console.log('Origin:', window.location.origin);
+      console.log('FullName', fullName);
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
 
       // Guardamos el email localmente para completar el sign-in al volver.

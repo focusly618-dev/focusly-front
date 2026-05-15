@@ -21,7 +21,7 @@ import { ProfileSettings } from './components/ProfileSettings';
 import { SettingsTab } from './Settings.types';
 
 export const Settings = () => {
-  const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.Notifications);
+  const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.Profile);
 
   const getHeaderContent = () => {
     switch (activeTab) {
@@ -61,6 +61,7 @@ export const Settings = () => {
     { id: SettingsTab.Focus, label: 'Focus Engine', icon: <PrecisionManufacturingIcon fontSize="small" /> },
     { id: SettingsTab.Notifications, label: 'Notifications', icon: <NotificationsNoneIcon fontSize="small" /> },
   ];
+  console.log(activeTab)
 
   return (
     <SettingsContainer>

@@ -36,6 +36,9 @@ export const useWorkspaceForm = () => {
                 content: data.content,
                 taskId: data.taskId ?? null,
                 saveStatus: data.saveStatus ?? true,
+                emoji: data.emoji ?? undefined,
+                background_color: data.background_color ?? undefined,
+                card_show_background: data.card_show_background ?? undefined,
               },
             },
           });
@@ -87,6 +90,9 @@ export const useWorkspaceForm = () => {
       title: values.title,
       content: values.content,
       taskId: values.taskId ?? null,
+      emoji: values.emoji ?? null,
+      background_color: values.background_color ?? null,
+      card_show_background: values.card_show_background ?? false,
     }),
   );
 
@@ -95,6 +101,9 @@ export const useWorkspaceForm = () => {
       title: values.title,
       content: values.content,
       taskId: values.taskId ?? null,
+      emoji: values.emoji ?? null,
+      background_color: values.background_color ?? null,
+      card_show_background: values.card_show_background ?? false,
     });
 
     // If we switched workspaces, reset the baseline and don't save yet

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createElement, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { motion, AnimatePresence } from 'motion/react';
 import { sileo } from 'sileo';
@@ -33,6 +33,7 @@ import {
   LinearProgress,
   IconButton,
   useTheme,
+  Tooltip,
 } from '@mui/material';
 import { EmptyState } from '@/utils/EmptyState';
 import {
@@ -51,6 +52,37 @@ import {
   FilterList as FilterListIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
+  Palette as PaletteIcon,
+  Image as CoverIcon,
+  ArticleOutlined as ArticleIcon,
+  StarBorder as StarIcon,
+  BookmarkBorder as BookmarkIcon,
+  WorkOutlined as WorkIcon,
+  HomeOutlined as HomeIcon,
+  SchoolOutlined as SchoolIcon,
+  FlightOutlined as FlightIcon,
+  MusicNote as MusicNoteIcon,
+  CameraAlt as CameraAltIcon,
+  LightbulbOutlined as LightbulbIcon,
+  CalendarToday as CalendarTodayIcon,
+  AccessTime as AccessTimeIcon,
+  AttachMoney as AttachMoneyIcon,
+  LocationOn as LocationOnIcon,
+  FitnessCenter as FitnessCenterIcon,
+  Restaurant as RestaurantIcon,
+  Movie as MovieIcon,
+  Code as CodeIcon,
+  Psychology as PsychologyIcon,
+  RocketLaunch as RocketIcon,
+  FavoriteBorder as FavoriteIcon,
+  LocalFireDepartment as FireIcon,
+  Spa as EcoIcon,
+  Brush as BrushIcon,
+  Gamepad as GamingIcon,
+  DeveloperMode as TerminalIcon,
+  AccountTree as HubIcon,
+  Stars as MagicIcon,
+  LocalOffer as TagIcon,
 } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
@@ -125,6 +157,7 @@ export const WorkspaceLibrary = ({
     useState<FolderTypes | null>(null);
   const [isUpdateFolderModalOpen, setIsUpdateFolderModalOpen] = useState(false);
   const [isAllFoldersModalOpen, setIsAllFoldersModalOpen] = useState(false);
+  const [showPaletteInMenu, setShowPaletteInMenu] = useState(false);
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -133,11 +166,37 @@ export const WorkspaceLibrary = ({
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedWorkspace(workspace);
+    setShowPaletteInMenu(false); // Reset when opening new menu
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedWorkspace(null);
+    setShowPaletteInMenu(false);
+  };
+
+  const handleSetBackground = async (color: string) => {
+    if (!selectedWorkspace) return;
+    try {
+      await updateWorkspace({
+        variables: {
+          updateWorkspaceInput: {
+            id: selectedWorkspace.id,
+            background_color: color,
+            card_show_background: true,
+          },
+        },
+      });
+      sileo.success({
+        title: 'Background updated',
+        description: `Workspace background updated successfully.`,
+        fill: 'var(--sileo-update-bg)',
+        duration: 3000,
+      });
+    } catch (err) {
+      console.error('Error setting background:', err);
+    }
+    handleMenuClose();
   };
 
   const handleFolderMenuOpen = (
@@ -176,6 +235,95 @@ export const WorkspaceLibrary = ({
       console.error('Error moving workspace:', err);
     }
     handleMenuClose();
+  };
+
+  const handleToggleCardBackground = async () => {
+    if (!selectedWorkspace) return;
+    const newValue = !selectedWorkspace.card_show_background;
+    try {
+      await updateWorkspace({
+        variables: {
+          updateWorkspaceInput: {
+            id: selectedWorkspace.id,
+            card_show_background: newValue,
+          },
+        },
+      });
+      sileo.success({
+        title: newValue ? 'Background enabled' : 'Background disabled',
+        description: newValue
+          ? 'Card now shows the workspace gradient'
+          : 'Card background reset to default',
+        fill: 'var(--sileo-update-bg)',
+        duration: 3000,
+      });
+    } catch (err) {
+      console.error('Error toggling card background:', err);
+    }
+    handleMenuClose();
+  };
+
+  const colorPaletteMap: Record<string, string> = {
+    aurora: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    sunset: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    ocean: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    forest: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+    midnight: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+    rose: 'linear-gradient(135deg, #fc5c7d 0%, #6a3093 100%)',
+    golden: 'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)',
+    cosmic: 'linear-gradient(135deg, #1a1a2e 0%, #7b2ff7 50%, #f107a3 100%)',
+    ember: 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)',
+    dusk: 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
+    arctic: 'linear-gradient(135deg, #304352 0%, #d7d2cc 100%)',
+    spring: 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)',
+    candy: 'linear-gradient(135deg, #ff6fd8 0%, #3813c2 100%)',
+    neon: 'linear-gradient(135deg, #21D4FD 0%, #B721FF 100%)',
+    borealis: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    royal: 'linear-gradient(135deg, #141e30 0%, #243b55 100%)',
+    grape: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)',
+    kyoto: 'linear-gradient(135deg, #c21500 0%, #ffc500 100%)',
+    aqua: 'linear-gradient(135deg, #50C9C3 0%, #96DEDA 100%)',
+    mauve: 'linear-gradient(135deg, #42275a 0%, #734b6d 100%)',
+    shore: 'linear-gradient(135deg, #70e1f5 0%, #ffd194 100%)',
+    peach: 'linear-gradient(135deg, #FF9A8B 0%, #FF6A88 100%)',
+    indigo: 'linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%)',
+    nebula: 'linear-gradient(135deg, #7028e4 0%, #e5b2ca 100%)',
+    mint: 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)',
+    blood: 'linear-gradient(135deg, #f85032 0%, #e73827 100%)',
+    silver: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)',
+    obsidian: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
+  };
+
+  const iconMap: Record<string, React.ElementType> = {
+    Article: ArticleIcon,
+    Star: StarIcon,
+    Bookmark: BookmarkIcon,
+    Work: WorkIcon,
+    Home: HomeIcon,
+    School: SchoolIcon,
+    Flight: FlightIcon,
+    Music: MusicNoteIcon,
+    Camera: CameraAltIcon,
+    Lightbulb: LightbulbIcon,
+    Calendar: CalendarTodayIcon,
+    Clock: AccessTimeIcon,
+    Money: AttachMoneyIcon,
+    Location: LocationOnIcon,
+    Fitness: FitnessCenterIcon,
+    Restaurant: RestaurantIcon,
+    Movie: MovieIcon,
+    Code: CodeIcon,
+    Psychology: PsychologyIcon,
+    Rocket: RocketIcon,
+    Favorite: FavoriteIcon,
+    Fire: FireIcon,
+    Eco: EcoIcon,
+    Brush: BrushIcon,
+    Gaming: GamingIcon,
+    Terminal: TerminalIcon,
+    Hub: HubIcon,
+    Magic: MagicIcon,
+    Tag: TagIcon,
   };
 
   if (foldersError) {
@@ -673,10 +821,20 @@ export const WorkspaceLibrary = ({
                   // ignore JSON error
                 }
 
+                const gradient = workspace.background_color
+                  ? colorPaletteMap[workspace.background_color]
+                  : undefined;
+
+                const isBackgroundActive =
+                  workspace.card_show_background &&
+                  workspace.background_color &&
+                  workspace.background_color !== 'none';
+
                 return (
                   <WorkspaceCard
                     key={workspace.id}
                     onClick={() => onSelect(workspace)}
+                    gradient={isBackgroundActive ? gradient : undefined}
                   >
                     <Box
                       sx={{
@@ -696,14 +854,22 @@ export const WorkspaceLibrary = ({
                         <FolderIcon
                           sx={{
                             fontSize: 16,
-                            color: workspace.folder?.color || 'text.secondary',
-                            opacity: 0.8,
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : workspace.folder?.color || 'text.secondary',
+                            opacity: isBackgroundActive ? 0.9 : 0.8,
                           }}
                         />
                         <Typography
                           variant="caption"
                           sx={{
-                            color: 'text.secondary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.secondary',
                             fontWeight: 500,
                             opacity: 0.8,
                           }}
@@ -719,7 +885,11 @@ export const WorkspaceLibrary = ({
                             handleOpen(workspace.id);
                           }}
                           sx={{
-                            color: 'text.secondary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.secondary',
                             '&:hover': {
                               color: 'white',
                               backgroundColor: '#ff0090ff',
@@ -732,7 +902,11 @@ export const WorkspaceLibrary = ({
                           size="small"
                           onClick={(e) => handleMenuOpen(e, workspace)}
                           sx={{
-                            color: 'text.secondary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.secondary',
                             '&:hover': {
                               backgroundColor: 'action.hover',
                             },
@@ -747,7 +921,11 @@ export const WorkspaceLibrary = ({
                             e.stopPropagation();
                           }}
                           sx={{
-                            color: 'text.secondary',
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.secondary',
                             '&:hover': {
                               color: 'white',
                               backgroundColor: '#18f3ffff',
@@ -759,11 +937,51 @@ export const WorkspaceLibrary = ({
                       </Box>
                     </Box>
 
+                    {workspace.emoji && iconMap[workspace.emoji] && (
+                      <Box
+                        sx={{
+                          mb: 1,
+                          mt: 1.5,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: 36,
+                          height: 36,
+                          borderRadius: '10px',
+                          bgcolor: isBackgroundActive
+                            ? 'rgba(255,255,255,0.15)'
+                            : 'action.hover',
+                          backdropFilter: isBackgroundActive
+                            ? 'blur(4px)'
+                            : 'none',
+                          border: '1px solid',
+                          borderColor: isBackgroundActive
+                            ? 'rgba(255,255,255,0.2)'
+                            : 'divider',
+                        }}
+                      >
+                        {createElement(iconMap[workspace.emoji], {
+                          sx: {
+                            fontSize: 22,
+                            color: isBackgroundActive
+                              ? theme.palette.mode === 'dark'
+                                ? '#fff'
+                                : '#000'
+                              : 'text.primary',
+                          },
+                        })}
+                      </Box>
+                    )}
+
                     <Typography
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: 'text.primary',
+                        color: isBackgroundActive
+                          ? theme.palette.mode === 'dark'
+                            ? '#fff'
+                            : '#000'
+                          : 'text.primary',
                         fontSize: '16px',
                         mb: 1,
                         lineHeight: 1.3,
@@ -779,7 +997,9 @@ export const WorkspaceLibrary = ({
                     <Typography
                       variant="body2"
                       sx={{
-                        color: 'text.secondary',
+                        color: isBackgroundActive
+                          ? 'rgba(255,255,255,0.8)'
+                          : 'text.secondary',
                         fontSize: '13px',
                         lineHeight: 1.5,
                         mb: 'auto',
@@ -796,9 +1016,13 @@ export const WorkspaceLibrary = ({
                     <Box mt="auto" width="100%">
                       <Typography
                         variant="caption"
-                        color="text.secondary"
-                        display="block"
-                        mb={workspace.task ? 1.5 : 0}
+                        sx={{
+                          color: isBackgroundActive
+                            ? 'rgba(255,255,255,0.6)'
+                            : 'text.secondary',
+                          display: 'block',
+                          mb: workspace.task ? 1.5 : 0,
+                        }}
                       >
                         {formatDistanceToNow(new Date(workspace.updatedAt), {
                           addSuffix: true,
@@ -806,10 +1030,21 @@ export const WorkspaceLibrary = ({
                       </Typography>
 
                       {workspace.task && (
-                        <TaskPill>
+                        <TaskPill
+                          sx={{
+                            ...(isBackgroundActive && {
+                              bgcolor: 'rgba(255,255,255,0.15)',
+                              borderColor: 'rgba(255,255,255,0.2)',
+                            }),
+                          }}
+                        >
                           <Box
                             sx={{
-                              color: 'primary.main',
+                              color: isBackgroundActive
+                                ? theme.palette.mode === 'dark'
+                                  ? '#fff'
+                                  : '#000'
+                                : 'primary.main',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -847,8 +1082,24 @@ export const WorkspaceLibrary = ({
                             <CheckBoxIcon sx={{ fontSize: 20 }} />
                           </Box>
                           <Box display="flex" flexDirection="column">
-                            <TaskPillLabel>ASSIGNED TASK</TaskPillLabel>
-                            <TaskPillTitle>
+                            <TaskPillLabel
+                              sx={{
+                                color: isBackgroundActive
+                                  ? 'rgba(255,255,255,0.7)'
+                                  : 'primary.main',
+                              }}
+                            >
+                              ASSIGNED TASK
+                            </TaskPillLabel>
+                            <TaskPillTitle
+                              sx={{
+                                color: isBackgroundActive
+                                  ? theme.palette.mode === 'dark'
+                                    ? '#fff'
+                                    : '#000'
+                                  : 'text.primary',
+                              }}
+                            >
                               {workspace.task.title}
                             </TaskPillTitle>
                           </Box>
@@ -874,51 +1125,132 @@ export const WorkspaceLibrary = ({
             borderRadius: '12px',
             mt: 1,
             boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-            minWidth: 180,
+            minWidth: showPaletteInMenu ? 240 : 180,
             bgcolor: 'background.paper',
             backgroundImage: 'none',
+            p: showPaletteInMenu ? 1.5 : 0,
           },
         }}
       >
-        <Typography
-          variant="caption"
-          sx={{
-            px: 2,
-            py: 1,
-            display: 'block',
-            fontWeight: 800,
-            color: 'primary.main',
-            letterSpacing: '0.5px',
-          }}
-        >
-          MOVE TO FOLDER
-        </Typography>
-        <MenuItem
-          onClick={() => handleMoveToFolder(null)}
-          sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
-        >
-          <FolderSpecialIcon sx={{ fontSize: 18, mr: 1.5, opacity: 0.7 }} />
-          All Notes (Default)
-        </MenuItem>
-        <Divider sx={{ my: 0.5, opacity: 0.1 }} />
-        {[...folders]
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((folder) => (
+        {showPaletteInMenu ? (
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                px: 1,
+                mb: 1.5,
+                display: 'block',
+                fontWeight: 800,
+                color: 'primary.main',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Select Background
+            </Typography>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 1fr)',
+                gap: 1,
+              }}
+            >
+              {Object.entries(colorPaletteMap).map(([name, gradient]) => (
+                <Tooltip key={name} title={name} arrow>
+                  <Box
+                    onClick={() => handleSetBackground(name)}
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      background: gradient,
+                      cursor: 'pointer',
+                      border:
+                        selectedWorkspace?.background_color === name
+                          ? '2px solid #fff'
+                          : '1px solid rgba(255,255,255,0.1)',
+                      boxShadow:
+                        selectedWorkspace?.background_color === name
+                          ? '0 0 0 2px var(--mui-palette-primary-main)'
+                          : 'none',
+                      transition: 'transform 0.2s',
+                      '&:hover': {
+                        transform: 'scale(1.1)',
+                      },
+                    }}
+                  />
+                </Tooltip>
+              ))}
+            </Box>
+          </Box>
+        ) : (
+          <>
+            {selectedWorkspace?.background_color &&
+              selectedWorkspace.background_color !== 'none' && (
+                <MenuItem
+                  onClick={handleToggleCardBackground}
+                  sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
+                >
+                  <PaletteIcon sx={{ fontSize: 18, mr: 1.5, opacity: 0.7 }} />
+                  {selectedWorkspace?.card_show_background
+                    ? 'Disable card background'
+                    : 'Enable card background'}
+                </MenuItem>
+              )}
+
             <MenuItem
-              key={folder.id}
-              onClick={() => handleMoveToFolder(folder.id)}
+              onClick={() => setShowPaletteInMenu(true)}
               sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
             >
-              <FolderIcon
-                sx={{
-                  fontSize: 18,
-                  mr: 1.5,
-                  color: folder.color || 'primary.main',
-                }}
-              />
-              {folder.name}
+              <CoverIcon sx={{ fontSize: 18, mr: 1.5, opacity: 0.7 }} />
+              {selectedWorkspace?.background_color
+                ? 'Change background'
+                : 'Select background'}
             </MenuItem>
-          ))}
+
+            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
+
+            <Typography
+              variant="caption"
+              sx={{
+                px: 2,
+                py: 1,
+                display: 'block',
+                fontWeight: 800,
+                color: 'primary.main',
+                letterSpacing: '0.5px',
+              }}
+            >
+              MOVE TO FOLDER
+            </Typography>
+            <MenuItem
+              onClick={() => handleMoveToFolder(null)}
+              sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
+            >
+              <FolderSpecialIcon sx={{ fontSize: 18, mr: 1.5, opacity: 0.7 }} />
+              All Notes (Default)
+            </MenuItem>
+            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
+            {[...folders]
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((folder) => (
+                <MenuItem
+                  key={folder.id}
+                  onClick={() => handleMoveToFolder(folder.id)}
+                  sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
+                >
+                  <FolderIcon
+                    sx={{
+                      fontSize: 18,
+                      mr: 1.5,
+                      color: folder.color || 'primary.main',
+                    }}
+                  />
+                  {folder.name}
+                </MenuItem>
+              ))}
+          </>
+        )}
       </Menu>
 
       <CreateFolderModal

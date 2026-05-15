@@ -25,6 +25,9 @@ export interface WorkspaceTypes {
   title: string;
   saveStatus: boolean;
   content: string;
+  emoji?: string;
+  background_color?: string;
+  card_show_background?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -37,6 +40,9 @@ export interface WorkspaceFormData {
   folderId?: string;
   folder?: FolderTypes;
   saveStatus: boolean;
+  emoji?: string;
+  background_color?: string;
+  card_show_background?: boolean;
 }
 
 export interface WorkspaceEditorProps {

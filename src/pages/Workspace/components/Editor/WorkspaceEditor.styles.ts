@@ -23,6 +23,30 @@ export const MainEditorArea = styled(Box)(({ theme }) => ({
   borderRight: `1px solid ${theme.palette.divider}`,
   overflowY: 'auto',
   overflowX: 'auto',
+  // Custom scrollbar
+  '&::-webkit-scrollbar': {
+    width: '8px',
+    height: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.15)'
+        : 'rgba(0, 0, 0, 0.12)',
+    borderRadius: '10px',
+    border: '2px solid transparent',
+    backgroundClip: 'padding-box',
+    '&:hover': {
+      backgroundColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.25)'
+          : 'rgba(0, 0, 0, 0.2)',
+    },
+  },
+  colorScheme: theme.palette.mode,
 }));
 
 export const EditorHeader = styled(Box)(({ theme }) => ({
@@ -93,6 +117,27 @@ export const RightSidebar = styled(Box, {
   position: 'relative',
   whiteSpace: 'nowrap', // Prevent text wrapping during transition
   height: '100%',
+  // Custom scrollbar
+  '&::-webkit-scrollbar': {
+    width: '6px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.12)'
+        : 'rgba(0, 0, 0, 0.08)',
+    borderRadius: '10px',
+    '&:hover': {
+      backgroundColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.2)'
+          : 'rgba(0, 0, 0, 0.15)',
+    },
+  },
+  colorScheme: theme.palette.mode,
 }));
 
 export const SidebarHeader = styled(Box)({

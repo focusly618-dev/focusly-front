@@ -109,7 +109,6 @@ export const NotificationSettings = () => {
             </Box>
             <Typography>Delivery Channels</Typography>
           </SectionTitle>
-          <Badge>RFU-09</Badge>
         </SectionHeader>
 
         <SettingItem>
@@ -126,8 +125,8 @@ export const NotificationSettings = () => {
           <SettingInfo>
             <SettingLabel>Email Summaries</SettingLabel>
             <SettingSublabel>
-              Get daily and weekly productivity reports sent to
-              user@example.com.
+              Get daily and weekly productivity reports sent to{' '}
+              <strong>{user?.email}</strong>
             </SettingSublabel>
           </SettingInfo>
           <Switch defaultChecked sx={themeSwitchStyles} />
