@@ -15,21 +15,21 @@ import {
 interface FocusFooterProps {
   isActive: boolean;
   setIsActive: (active: boolean) => void;
-  setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
+  setTargetSeconds: React.Dispatch<React.SetStateAction<number>>;
   handleCompleteTask: () => void;
 }
 
 export const FocusFooter: React.FC<FocusFooterProps> = ({
   isActive,
   setIsActive,
-  setTimeLeft,
+  setTargetSeconds,
   handleCompleteTask,
 }) => {
   return (
     <FooterContainer sx={{ mt: 8 }}>
       <AddTimeButton
         startIcon={<HistoryIcon />}
-        onClick={() => setTimeLeft((prev) => prev + 5 * 60)}
+        onClick={() => setTargetSeconds((prev) => prev + 5 * 60)}
       >
         +5m
       </AddTimeButton>
@@ -42,10 +42,7 @@ export const FocusFooter: React.FC<FocusFooterProps> = ({
         )}
       </PlayPauseButton>
 
-      <CompleteButton
-        startIcon={<CheckIcon />}
-        onClick={handleCompleteTask}
-      >
+      <CompleteButton startIcon={<CheckIcon />} onClick={handleCompleteTask}>
         Complete Task
       </CompleteButton>
     </FooterContainer>

@@ -16,4 +16,5 @@ export interface TasksContentViewProps {
   isAIScheduleEnabled?: boolean;
   setIsAIScheduleEnabled?: (enabled: boolean) => void;
   onStartFocus?: (task: Task) => void;
+  activeFocusTaskId?: string | null;
 }

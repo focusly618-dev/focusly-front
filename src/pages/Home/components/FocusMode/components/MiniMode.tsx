@@ -20,11 +20,12 @@ interface MiniModeProps {
   position: { x: number; y: number } | null;
   handleMouseDown: (e: React.MouseEvent) => void;
   formatTime: (seconds: number) => string;
-  timeLeft: number;
+  secondsPassed: number;
   isActive: boolean;
   setIsActive: (active: boolean) => void;
   activeItem: { title?: string } | null;
   progress: number;
+  isOvertime: boolean;
   handleCloseRequest: () => void;
   setViewMode: (mode: 'full' | 'mini') => void;
 }
@@ -33,15 +34,23 @@ export const MiniMode: React.FC<MiniModeProps> = ({
   position,
   handleMouseDown,
   formatTime,
-  timeLeft,
+  secondsPassed,
   isActive,
   setIsActive,
   activeItem,
   progress,
+  isOvertime,
   handleCloseRequest,
   setViewMode,
 }) => {
   const theme = useTheme();
+
+  const progressColor = isOvertime
+    ? theme.palette.error.main
+    : theme.palette.primary.main;
+  const textColor = isOvertime
+    ? theme.palette.error.main
+    : theme.palette.text.primary;
 
   return (
     <MiniModeContainer
@@ -54,43 +63,68 @@ export const MiniMode: React.FC<MiniModeProps> = ({
         top: 0,
       }}
     >
-      <RippleDot />
+      <RippleDot sx={{ bgcolor: progressColor }} />
       <Box
         sx={{
           borderRadius: '14px',
           padding: '2px',
-          background: `conic-gradient(${theme.palette.primary.main} ${progress}%, transparent ${progress}%)`,
+          background: `conic-gradient(${progressColor} ${Math.min(progress, 100)}%, transparent ${Math.min(progress, 100)}%)`,
           display: 'flex',
         }}
       >
         <MiniTimerBox sx={{ border: 'none', width: '96px', m: 0 }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
-            {formatTime(timeLeft)}
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              lineHeight: 1,
+              color: textColor,
+            }}
+          >
+            {formatTime(secondsPassed)}
           </Typography>
           <Typography
             variant="caption"
-            sx={{ color: theme.palette.text.secondary, fontSize: '10px' }}
+            sx={{
+              color: isOvertime
+                ? theme.palette.error.main
+                : theme.palette.text.secondary,
+              fontSize: '10px',
+              fontWeight: 700,
+            }}
           >
-            LEFT
+            {isOvertime ? 'OVER' : 'ELAPSED'}
           </Typography>
         </MiniTimerBox>
       </Box>
       <MiniInfoBox>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+        <Typography
+          variant="subtitle2"
+          sx={{ fontWeight: 600, mb: 0.5, color: textColor }}
+        >
           {activeItem?.title || 'Focus Session'}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Typography
             variant="caption"
-            sx={{ color: theme.palette.text.secondary }}
+            sx={{
+              color: isOvertime
+                ? theme.palette.error.main
+                : theme.palette.text.secondary,
+              fontWeight: 600,
+            }}
           >
-            {Math.round(progress)}% Complete
+            {isOvertime ? 'Time exceeded' : 'Focusing...'}
           </Typography>
         </Box>
       </MiniInfoBox>
       <MiniControlsBox>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <MiniPlayButton size="small" onClick={() => setIsActive(!isActive)}>
+          <MiniPlayButton
+            size="small"
+            onClick={() => setIsActive(!isActive)}
+            sx={{ color: progressColor }}
+          >
             {isActive ? (
               <PauseIcon fontSize="small" />
             ) : (

@@ -67,6 +67,7 @@ export const Home = () => {
           {activeTab === TaskBar.DailyPlan && (
             <CalendarView
               onStartFocus={(task: Task) => handleStartFocus(task)}
+              activeFocusTaskId={isFocusModeActive ? activeFocusTask?.id : null}
             />
           )}
           {activeTab === TaskBar.Tasks && (
@@ -74,6 +75,7 @@ export const Home = () => {
               isAIScheduleEnabled={isAIScheduleEnabled}
               setIsAIScheduleEnabled={setIsAIScheduleEnabled}
               onStartFocus={handleStartFocus}
+              activeFocusTaskId={isFocusModeActive ? activeFocusTask?.id : null}
             />
           )}
 

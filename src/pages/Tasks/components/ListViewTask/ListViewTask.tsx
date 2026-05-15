@@ -68,6 +68,7 @@ interface ListViewTaskProps {
   updateTask?: (taskId: string, updates: TaskResponse) => Promise<void>;
   isAIScheduleEnabled?: boolean;
   onStartFocus?: (task: Task) => void;
+  activeFocusTaskId?: string | null;
 }
 
 const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
@@ -117,7 +118,10 @@ export const ListViewTask = ({
   updateTask,
   isAIScheduleEnabled,
   onStartFocus,
+  activeFocusTaskId,
 }: ListViewTaskProps) => {
+  const isThisTaskFocusing = activeFocusTaskId === task.id;
+  const isOtherTaskFocusing = !!activeFocusTaskId && !isThisTaskFocusing;
   const [statusAnchor, setStatusAnchor] = useState<null | HTMLElement>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
     null,
@@ -364,27 +368,57 @@ export const ListViewTask = ({
         </CardLeft>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {onStartFocus && (
-            <Tooltip title="Start Focus Mode">
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onStartFocus(task as unknown as Task);
-                }}
-                sx={{
-                  color: 'primary.main',
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
-                  '&:hover': {
-                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.2),
-                    transform: 'scale(1.1)',
-                  },
-                  transition: 'all 0.2s',
-                  width: 32,
-                  height: 32,
-                }}
-              >
-                <PlayIcon sx={{ fontSize: 20 }} />
-              </IconButton>
+            <Tooltip
+              title={
+                isThisTaskFocusing
+                  ? 'Focus Active'
+                  : isOtherTaskFocusing
+                    ? 'Another Focus Session Active'
+                    : 'Start Focus Mode'
+              }
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {isThisTaskFocusing && (
+                  <Typography
+                    sx={{
+                      color: 'primary.main',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      mr: 1,
+                    }}
+                  >
+                    IN PROGRESS
+                  </Typography>
+                )}
+                <IconButton
+                  size="small"
+                  disabled={isOtherTaskFocusing}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onStartFocus(task as unknown as Task);
+                  }}
+                  sx={{
+                    color: isThisTaskFocusing ? 'white' : 'primary.main',
+                    bgcolor: (theme) =>
+                      isThisTaskFocusing
+                        ? theme.palette.primary.main
+                        : alpha(theme.palette.primary.main, 0.1),
+                    '&:hover': {
+                      bgcolor: (theme) =>
+                        isThisTaskFocusing
+                          ? theme.palette.primary.dark
+                          : alpha(theme.palette.primary.main, 0.2),
+                      transform: isOtherTaskFocusing ? 'none' : 'scale(1.1)',
+                    },
+                    opacity: isOtherTaskFocusing ? 0.5 : 1,
+                    transition: 'all 0.2s',
+                    width: 32,
+                    height: 32,
+                  }}
+                >
+                  <PlayIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+              </Box>
             </Tooltip>
           )}
           {isAIScheduleEnabled && (

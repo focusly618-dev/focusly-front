@@ -9,24 +9,30 @@ import {
 } from '../FocusMode.styles';
 
 interface FocusTimerDisplayProps {
-  timeLeft: number;
+  secondsPassed: number;
+  targetSeconds: number;
   formatTime: (seconds: number) => string;
   progress: number;
+  isOvertime: boolean;
 }
 
 export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
-  timeLeft,
+  secondsPassed,
+  targetSeconds,
   formatTime,
   progress,
+  isOvertime,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+
+  const progressColor = isOvertime ? theme.palette.error.main : '#3b82f6';
 
   return (
     <>
       <TimerContainer>
         {(() => {
-          const timeParts = formatTime(timeLeft).split(':');
+          const timeParts = formatTime(targetSeconds || 0).split(':');
           const hasHours = timeParts.length === 3;
 
           return (
@@ -41,6 +47,7 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
                         fontSize: '5rem',
                         lineHeight: 1,
                         fontFamily: 'Inter, sans-serif',
+                        color: theme.palette.text.primary,
                       }}
                     >
                       {timeParts[0]}
@@ -51,7 +58,10 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
               )}
               <TimerCard
                 label="MINUTES"
-                sx={{ width: hasHours ? 180 : 220, height: hasHours ? 200 : 240 }}
+                sx={{
+                  width: hasHours ? 180 : 220,
+                  height: hasHours ? 200 : 240,
+                }}
               >
                 <Typography
                   variant="h2"
@@ -60,6 +70,7 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
                     fontSize: hasHours ? '5rem' : '6rem',
                     lineHeight: 1,
                     fontFamily: 'Inter, sans-serif',
+                    color: theme.palette.text.primary,
                   }}
                 >
                   {hasHours ? timeParts[1] : timeParts[0]}
@@ -68,7 +79,10 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
               <TimerSeparator>:</TimerSeparator>
               <TimerCard
                 label="SECONDS"
-                sx={{ width: hasHours ? 180 : 220, height: hasHours ? 200 : 240 }}
+                sx={{
+                  width: hasHours ? 180 : 220,
+                  height: hasHours ? 200 : 240,
+                }}
               >
                 <Typography
                   variant="h2"
@@ -77,6 +91,7 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
                     fontSize: hasHours ? '5rem' : '6rem',
                     lineHeight: 1,
                     fontFamily: 'Inter, sans-serif',
+                    color: theme.palette.text.primary,
                   }}
                 >
                   {hasHours ? timeParts[2] : timeParts[1]}
@@ -91,22 +106,35 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
         <ProgressLabels>
           <Typography
             variant="caption"
-            sx={{ color: theme.palette.text.secondary, fontWeight: 600 }}
+            sx={{
+              color: isOvertime
+                ? theme.palette.error.main
+                : theme.palette.text.secondary,
+              fontWeight: 600,
+            }}
           >
-            Session Progress
+            {isOvertime ? 'OVERTIME' : 'Session Progress'}
           </Typography>
           <Typography
             variant="caption"
-            sx={{ color: theme.palette.text.secondary, fontWeight: 600 }}
+            sx={{
+              color: isOvertime
+                ? theme.palette.error.main
+                : theme.palette.text.secondary,
+              fontWeight: 700,
+              fontSize: '0.85rem',
+            }}
           >
-            {Math.round(progress)}%
+            {formatTime(secondsPassed)}
           </Typography>
         </ProgressLabels>
         <Box
           sx={{
             height: 6,
             width: '100%',
-            bgcolor: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(226, 232, 240, 0.5)',
+            bgcolor: isDark
+              ? 'rgba(30, 41, 59, 0.5)'
+              : 'rgba(226, 232, 240, 0.5)',
             borderRadius: 3,
             overflow: 'hidden',
           }}
@@ -114,10 +142,10 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
           <Box
             sx={{
               height: '100%',
-              width: `${progress}%`,
-              bgcolor: '#3b82f6',
+              width: `${Math.min(progress, 100)}%`,
+              bgcolor: progressColor,
               transition: 'width 1s linear',
-              boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)',
+              boxShadow: `0 0 10px ${progressColor}80`,
             }}
           />
         </Box>

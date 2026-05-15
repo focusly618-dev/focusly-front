@@ -81,16 +81,30 @@ export const useFocusMode = ({
     },
   });
 
+  // Update browser tab title with elapsed time only when timer is running
+  useEffect(() => {
+    if (isActive) {
+      const formatted = timer.formatTime(timer.secondsPassed);
+      document.title = `${formatted} – Focus Mode`;
+    } else {
+      document.title = 'Focusly';
+    }
+
+    // Cleanup title when component unmounts
+    return () => {
+      document.title = 'Focusly';
+    };
+  }, [timer.secondsPassed, timer.formatTime, isActive, timer]);
+
   useEffect(() => {
     if (open) {
       ui.setViewMode('full');
       ui.setIsSessionCompleted(false);
-      const totalSeconds = initialMinutes * 60;
-      timer.setTimeLeft(totalSeconds);
-      localStorage.setItem('focus_mode_time_left', totalSeconds.toString());
+      timer.setSecondsPassed(0);
+      localStorage.setItem('focus_mode_seconds_passed', '0');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, initialMinutes]);
+  }, [open]);
 
   useEffect(() => {
     onActiveChange?.(isActive);
@@ -108,7 +122,7 @@ export const useFocusMode = ({
     localStorage.removeItem('focus_mode_open');
     localStorage.removeItem('focus_mode_task');
     localStorage.removeItem('focus_mode_subtask_index');
-    localStorage.removeItem('focus_mode_time_left');
+    localStorage.removeItem('focus_mode_seconds_passed');
     localStorage.removeItem('focus_mode_is_active');
     localStorage.removeItem('focus_mode_view');
 
@@ -117,8 +131,7 @@ export const useFocusMode = ({
 
   const handleCompleteTask = async () => {
     if (!tasks.activeTask) return;
-    const timeSpentSeconds = initialMinutes * 60 - timer.timeLeft;
-    const timeSpentMinutes = Math.max(1, Math.round(timeSpentSeconds / 60));
+    const timeSpentMinutes = Math.max(1, Math.round(timer.secondsPassed / 60));
 
     await actions.handleCompleteTask(
       tasks.activeTask,
@@ -199,10 +212,13 @@ export const useFocusMode = ({
 
     // Timer State & Actions
     timer: {
-      timeLeft: timer.timeLeft,
-      setTimeLeft: timer.setTimeLeft,
+      secondsPassed: timer.secondsPassed,
+      setSecondsPassed: timer.setSecondsPassed,
       progress: timer.progress,
       formatTime: timer.formatTime,
+      isOvertime: timer.isOvertime,
+      targetSeconds: timer.targetSeconds,
+      setTargetSeconds: timer.setTargetSeconds,
       isActive,
       setIsActive,
     },

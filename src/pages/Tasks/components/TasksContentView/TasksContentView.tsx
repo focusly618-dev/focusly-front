@@ -55,6 +55,7 @@ export const TasksContentView = ({
   setSearchTerm,
   isAIScheduleEnabled,
   onStartFocus,
+  activeFocusTaskId,
 }: TasksContentViewProps) => {
   // Loading skeletons
   if (isLoading && filteredTasks.length === 0) {
@@ -111,6 +112,7 @@ export const TasksContentView = ({
               task={task}
               onTaskClick={handleTaskClick}
               isAIScheduleEnabled={isAIScheduleEnabled}
+              activeFocusTaskId={activeFocusTaskId}
             />
           ))}
         </GridTaskContainer>
@@ -155,6 +157,7 @@ export const TasksContentView = ({
                       updateTask={updateTask}
                       isAIScheduleEnabled={isAIScheduleEnabled}
                       onStartFocus={onStartFocus}
+                      activeFocusTaskId={activeFocusTaskId}
                     />
                   ))}
                 </Box>

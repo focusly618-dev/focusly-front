@@ -21,12 +21,14 @@ interface TasksProps {
   isAIScheduleEnabled: boolean;
   setIsAIScheduleEnabled: (enabled: boolean) => void;
   onStartFocus?: (task: Task) => void;
+  activeFocusTaskId?: string | null;
 }
 
 export const Tasks = ({
   isAIScheduleEnabled: isAIScheduleEnabledProp,
   setIsAIScheduleEnabled: setIsAIScheduleEnabledProp,
   onStartFocus,
+  activeFocusTaskId,
 }: TasksProps) => {
   const {
     tasks,
@@ -207,6 +209,7 @@ export const Tasks = ({
             isAIScheduleEnabled={isAIScheduleEnabled}
             setIsAIScheduleEnabled={setIsAIScheduleEnabled}
             onStartFocus={onStartFocus}
+            activeFocusTaskId={activeFocusTaskId}
           />
         </MainContent>
 

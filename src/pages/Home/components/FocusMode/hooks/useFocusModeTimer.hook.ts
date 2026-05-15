@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo } from 'react';
 interface UseFocusModeTimerProps {
   initialMinutes: number;
   isActive: boolean;
-  setIsActive: (active: boolean) => void;
   onComplete: () => void;
   onTick?: (secondsPassed: number) => void;
 }
@@ -11,24 +10,33 @@ interface UseFocusModeTimerProps {
 export const useFocusModeTimer = ({
   initialMinutes,
   isActive,
-  setIsActive,
   onComplete,
   onTick,
 }: UseFocusModeTimerProps) => {
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const saved = localStorage.getItem('focus_mode_time_left');
-    return saved ? parseInt(saved, 10) : initialMinutes * 60;
+  const [secondsPassed, setSecondsPassed] = useState(() => {
+    const saved = localStorage.getItem('focus_mode_seconds_passed');
+    return saved ? parseInt(saved, 10) : 0;
   });
 
+  const [targetSeconds, setTargetSeconds] = useState(initialMinutes * 60);
+
   useEffect(() => {
-    localStorage.setItem('focus_mode_time_left', timeLeft.toString());
-  }, [timeLeft]);
+    setTargetSeconds(initialMinutes * 60);
+  }, [initialMinutes]);
+
+  useEffect(() => {
+    localStorage.setItem('focus_mode_seconds_passed', secondsPassed.toString());
+  }, [secondsPassed]);
 
   const progress = useMemo(() => {
-    const totalSeconds = initialMinutes * 60;
-    if (totalSeconds === 0) return 0;
-    return Math.min(((totalSeconds - timeLeft) / totalSeconds) * 100, 100);
-  }, [timeLeft, initialMinutes]);
+    if (targetSeconds === 0) return 0;
+    return (secondsPassed / targetSeconds) * 100;
+  }, [secondsPassed, targetSeconds]);
+
+  const isOvertime = useMemo(
+    () => secondsPassed > targetSeconds,
+    [secondsPassed, targetSeconds],
+  );
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -44,27 +52,27 @@ export const useFocusModeTimer = ({
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
 
-    if (isActive && timeLeft > 0) {
+    if (isActive) {
       interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            setIsActive(false);
-            onComplete();
-            return 0;
-          }
+        setSecondsPassed((prev) => {
+          const next = prev + 1;
+
           onTick?.(1);
-          return prev - 1;
+          return next;
         });
       }, 1000);
     }
 
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, onComplete, onTick, setIsActive]);
+  }, [isActive, targetSeconds, onComplete, onTick]);
 
   return {
-    timeLeft,
-    setTimeLeft,
+    secondsPassed,
+    setSecondsPassed,
     progress,
     formatTime,
+    isOvertime,
+    targetSeconds,
+    setTargetSeconds,
   };
 };

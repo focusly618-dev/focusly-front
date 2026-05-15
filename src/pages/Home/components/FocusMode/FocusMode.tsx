@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Dialog, Slide, useTheme } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 
@@ -60,8 +60,16 @@ export const FocusMode: React.FC<FocusModeProps> = ({
     confirmExit,
   } = ui;
 
-  const { timeLeft, setTimeLeft, progress, formatTime, isActive, setIsActive } =
-    timer;
+  const {
+    secondsPassed,
+    targetSeconds,
+    setTargetSeconds,
+    progress,
+    formatTime,
+    isActive,
+    setIsActive,
+    isOvertime,
+  } = timer;
 
   const {
     activeItem,
@@ -72,21 +80,6 @@ export const FocusMode: React.FC<FocusModeProps> = ({
   } = tasks;
 
   const theme = useTheme();
-
-  // Update browser tab title with remaining time only when timer is running
-  useEffect(() => {
-    if (isActive) {
-      const formatted = formatTime(timeLeft);
-      document.title = `${formatted} – Focus Mode`;
-    } else {
-      document.title = 'Focusly';
-    }
-
-    // Cleanup title when component unmounts
-    return () => {
-      document.title = 'Focusly';
-    };
-  }, [timeLeft, formatTime, isActive]);
 
   return (
     <>
@@ -122,15 +115,17 @@ export const FocusMode: React.FC<FocusModeProps> = ({
                   />
 
                   <FocusTimerDisplay
-                    timeLeft={timeLeft}
+                    secondsPassed={secondsPassed}
+                    targetSeconds={targetSeconds}
                     formatTime={formatTime}
                     progress={progress}
+                    isOvertime={isOvertime}
                   />
 
                   <FocusFooter
                     isActive={isActive}
                     setIsActive={setIsActive}
-                    setTimeLeft={setTimeLeft}
+                    setTargetSeconds={setTargetSeconds}
                     handleCompleteTask={handleCompleteTask}
                   />
                 </>
@@ -151,11 +146,12 @@ export const FocusMode: React.FC<FocusModeProps> = ({
           position={position}
           handleMouseDown={handleMouseDown}
           formatTime={formatTime}
-          timeLeft={timeLeft}
+          secondsPassed={secondsPassed}
           isActive={isActive}
           setIsActive={setIsActive}
           activeItem={activeItem}
           progress={progress}
+          isOvertime={isOvertime}
           handleCloseRequest={handleCloseRequest}
           setViewMode={setViewMode}
         />
