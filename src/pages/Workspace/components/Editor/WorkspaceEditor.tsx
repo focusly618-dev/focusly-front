@@ -173,6 +173,8 @@ export const WorkspaceEditor = ({
             }}
             getCustomSlashMenuItems={getCustomSlashMenuItems}
             getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
+            setValue={setValue}
+            watch={watch}
           />
         </MainEditorArea>
 

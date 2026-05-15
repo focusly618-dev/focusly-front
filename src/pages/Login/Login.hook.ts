@@ -44,8 +44,6 @@ export const useLogin = () => {
     onSignIn,
     linkSent,
     setLinkSent,
-
-    // Form State & Actions
     isRegistering: form.isRegistering,
     toggleRegister: form.toggleRegister,
     email: form.email,

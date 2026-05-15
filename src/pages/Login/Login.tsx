@@ -132,7 +132,7 @@ export const Login: React.FC = () => {
               ) : isRegistering ? (
                 'Send Sign Up Link'
               ) : (
-                'Send Magic Link'
+                'Login With Email'
               )}
             </SignInButton>
           </Box>

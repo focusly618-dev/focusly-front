@@ -6,6 +6,9 @@ export const GET_WORKSPACES = gql`
       id
       title
       content
+      emoji
+      background_color
+      card_show_background
       updatedAt
       createdAt
       task {
@@ -72,6 +75,9 @@ export const UPDATE_WORKSPACE = gql`
       id
       title
       content
+      emoji
+      background_color
+      card_show_background
       updatedAt
       taskId
       folderId
@@ -106,6 +112,9 @@ export const GET_WORKSPACE_BY_ID = gql`
       id
       title
       content
+      emoji
+      background_color
+      card_show_background
       taskId
       task {
         id

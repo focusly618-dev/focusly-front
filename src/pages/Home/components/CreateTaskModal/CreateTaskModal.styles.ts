@@ -129,7 +129,32 @@ export const headerIconSx = {
   },
 };
 
-export const dialogContentSx = { p: 3, paddingTop: '12px !important' };
+export const dialogContentSx = {
+  p: 3,
+  paddingTop: '12px !important',
+  '&::-webkit-scrollbar': {
+    width: '6px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 1)'
+        : 'rgba(255, 255, 255, 1)',
+    borderRadius: '10px',
+    border: '1px solid transparent',
+    backgroundClip: 'padding-box',
+    '&:hover': {
+      backgroundColor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.25)'
+          : 'rgba(0, 0, 0, 0.15)',
+    },
+  },
+  colorScheme: (theme: Theme) => theme.palette.mode,
+};
 
 export const propertyListSx = {
   mt: 2,

@@ -19,6 +19,8 @@ import { TaskLinksResources } from './components/TaskLinksResources/TaskLinksRes
 import { TaskDescription } from './components/TaskDescription/TaskDescription';
 import { TaskFooterActions } from './components/TaskFooterActions/TaskFooterActions';
 import { TaskPopovers } from './components/TaskPopovers/TaskPopovers';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import 'react-perfect-scrollbar/dist/css/styles.css';
 
 export const CreateTaskModal = ({
   open,
@@ -130,83 +132,130 @@ export const CreateTaskModal = ({
           backdrop: { sx: modalBackdropSx },
         }}
       >
-        <TaskHeader
-          color={color}
-          isFullScreen={isFullScreen}
-          setIsFullScreen={setIsFullScreen}
-          setColorAnchor={setColorAnchor}
-          onClose={onClose}
-          parentTask={parentTask}
-          title={title}
-          initialTask={initialTask}
-          handleDelete={handleDelete}
-        />
 
-        <DialogContent sx={dialogContentSx}>
-          <Box sx={{ px: 1, mb: 1 }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Give your task a clear name..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              sx={titleInputPropsSx}
-              error={!!errors.title}
-              helperText={errors.title}
+
+        <DialogContent
+          sx={{
+            ...dialogContentSx,
+            overflow: 'hidden !important',
+            p: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            '&::-webkit-scrollbar': {
+              display: 'none !important',
+            },
+            '& .ps__rail-y': {
+              backgroundColor: 'transparent !important',
+              border: 'none !important',
+              opacity: 1,
+              width: '10px !important',
+              zIndex: 1000,
+            },
+            '& .ps__thumb-y': {
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.2) !important'
+                  : 'rgba(0, 0, 0, 0.15) !important',
+              borderRadius: '10px !important',
+              width: '6px !important',
+              right: '2px !important',
+              transition: 'background-color 0.2s, width 0.2s !important',
+            },
+            '& .ps__rail-y:hover .ps__thumb-y, & .ps__rail-y.ps--clicking .ps__thumb-y':
+              {
+                backgroundColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.3) !important'
+                    : 'rgba(0, 0, 0, 0.25) !important',
+                width: '8px !important',
+              },
+          }}
+        >
+          <PerfectScrollbar
+            style={{
+              maxHeight: 'calc(90vh - 100px)', // Adjusted height to accommodate header
+              padding: '0px', // Removed padding to let header handle its own spacing
+            }}
+            options={{ wheelPropagation: false, suppressScrollX: true }}
+          >
+            <TaskHeader
+              color={color}
+              isFullScreen={isFullScreen}
+              setIsFullScreen={setIsFullScreen}
+              setColorAnchor={setColorAnchor}
+              onClose={onClose}
+              parentTask={parentTask}
+              title={title}
+              initialTask={initialTask}
+              handleDelete={handleDelete}
             />
-          </Box>
+            <Box sx={{ p: 3, pt: 1.5 }}>
+            <Box sx={{ px: 1, mb: 1 }}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Give your task a clear name..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                sx={titleInputPropsSx}
+                error={!!errors.title}
+                helperText={errors.title}
+              />
+            </Box>
 
-          <TaskProperties
-            status={status}
-            setStatusAnchor={setStatusAnchor}
-            priority={priority}
-            setPriorityAnchor={setPriorityAnchor}
-            category={category}
-            setCategoryAnchor={setCategoryAnchor}
-            currentDate={currentDate}
-            setCurrentDate={setCurrentDate}
-            timeSlotDisplay={timeSlotDisplay}
-            tags={tags}
-            setTags={setTags}
-            newTag={newTag}
-            setNewTag={setNewTag}
-            isAddingTag={isAddingTag}
-            setIsAddingTag={setIsAddingTag}
-            handleAddTag={handleAddTag}
-            duration={duration}
-            setDuration={setDuration}
-            realTime={realTime}
-            setRealTime={setRealTime}
-            handleTimerChange={handleTimerChange}
-            durationSuggestions={durationSuggestions}
-            setDurationSuggestions={setDurationSuggestions}
-            durationAnchor={durationAnchor}
-            setDurationAnchor={setDurationAnchor}
-            realTimeSuggestions={realTimeSuggestions}
-            setRealTimeSuggestions={setRealTimeSuggestions}
-            realTimeAnchor={realTimeAnchor}
-            setRealTimeAnchor={setRealTimeAnchor}
-          />
+            <TaskProperties
+              status={status}
+              setStatusAnchor={setStatusAnchor}
+              priority={priority}
+              setPriorityAnchor={setPriorityAnchor}
+              category={category}
+              setCategoryAnchor={setCategoryAnchor}
+              currentDate={currentDate}
+              setCurrentDate={setCurrentDate}
+              timeSlotDisplay={timeSlotDisplay}
+              tags={tags}
+              setTags={setTags}
+              newTag={newTag}
+              setNewTag={setNewTag}
+              isAddingTag={isAddingTag}
+              setIsAddingTag={setIsAddingTag}
+              handleAddTag={handleAddTag}
+              duration={duration}
+              setDuration={setDuration}
+              realTime={realTime}
+              setRealTime={setRealTime}
+              handleTimerChange={handleTimerChange}
+              durationSuggestions={durationSuggestions}
+              setDurationSuggestions={setDurationSuggestions}
+              durationAnchor={durationAnchor}
+              setDurationAnchor={setDurationAnchor}
+              realTimeSuggestions={realTimeSuggestions}
+              setRealTimeSuggestions={setRealTimeSuggestions}
+              realTimeAnchor={realTimeAnchor}
+              setRealTimeAnchor={setRealTimeAnchor}
+            />
 
-          <TaskLinksResources
-            links={links}
-            handleAddLink={handleAddLink}
-            handleRemoveLink={handleRemoveLink}
-            newLinkTitle={newLinkTitle}
-            setNewLinkTitle={setNewLinkTitle}
-            newLinkUrl={newLinkUrl}
-            setNewLinkUrl={setNewLinkUrl}
-            isAddingLink={isAddingLink}
-            setIsAddingLink={setIsAddingLink}
-            hasMeetLink={hasMeetLink}
-            isGeneratingMeet={isGeneratingMeet}
-            handleGenerateMeet={handleGenerateMeet}
-          />
+            <TaskLinksResources
+              links={links}
+              handleAddLink={handleAddLink}
+              handleRemoveLink={handleRemoveLink}
+              newLinkTitle={newLinkTitle}
+              setNewLinkTitle={setNewLinkTitle}
+              newLinkUrl={newLinkUrl}
+              setNewLinkUrl={setNewLinkUrl}
+              isAddingLink={isAddingLink}
+              setIsAddingLink={setIsAddingLink}
+              hasMeetLink={hasMeetLink}
+              isGeneratingMeet={isGeneratingMeet}
+              handleGenerateMeet={handleGenerateMeet}
+            />
 
-          <TaskDescription
-            description={description}
-            setDescription={setDescription}
-          />
+            <TaskDescription
+              description={description}
+              setDescription={setDescription}
+            />
+            </Box>
+          </PerfectScrollbar>
         </DialogContent>
 
         <TaskFooterActions
