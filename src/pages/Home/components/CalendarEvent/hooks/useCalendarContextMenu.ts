@@ -9,7 +9,7 @@ import {
 } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 import type { Task } from '@/redux/tasks/task.types';
 
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';

@@ -49,8 +49,13 @@ export const useTasksMutations = ({
       ) || [],
   });
 
-  const updateTask = async (id: string, task: TaskResponse) => {
+  const updateTask = async (id: string, updates: Partial<TaskResponse>) => {
     try {
+      const existingTask = tasks.find((t) => t.id === id);
+      if (!existingTask) return;
+
+      const mergedTask = { ...existingTask, ...updates };
+
       const {
         title,
         notes_encrypted,
@@ -65,7 +70,7 @@ export const useTasksMutations = ({
         estimated_start_date,
         estimated_end_date,
         real_timer,
-      } = task;
+      } = mergedTask;
 
       const { data } = await updateTaskMutation({
         variables: {
@@ -74,7 +79,7 @@ export const useTasksMutations = ({
             title,
             notes_encrypted,
             status,
-            estimate_timer: estimate_minutes,
+            estimate_timer: mergedTask.estimate_timer || estimate_minutes,
             real_timer,
             duration: null,
             priority_level,

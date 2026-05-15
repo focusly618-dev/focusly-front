@@ -1,14 +1,14 @@
-import { Box, SvgIcon } from '@mui/material';
+import { SvgIcon } from '@mui/material';
 import type { SvgIconProps } from '@mui/material';
 
 export const GeminiIcon = (props: SvgIconProps) => {
   return (
     <SvgIcon {...props} viewBox="0 0 24 24">
       <defs>
-        <linearGradient id="gemini-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#4E85EB" />
-          <stop offset="50%" stopColor="#9B72CB" />
-          <stop offset="100%" stopColor="#D96570" />
+        <linearGradient id="gemini-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1e88e5" />
+          <stop offset="50%" stopColor="#9c27b0" />
+          <stop offset="100%" stopColor="#e91e63" />
         </linearGradient>
       </defs>
       <path
@@ -18,5 +18,3 @@ export const GeminiIcon = (props: SvgIconProps) => {
     </SvgIcon>
   );
 };
-
-export default GeminiIcon;

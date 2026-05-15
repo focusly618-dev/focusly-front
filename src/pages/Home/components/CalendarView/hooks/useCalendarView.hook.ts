@@ -17,7 +17,7 @@ import {
   endOfDay,
   format,
 } from 'date-fns';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
 import { setTasks, removeTask, updateTask } from '@/redux/tasks/task.slice';

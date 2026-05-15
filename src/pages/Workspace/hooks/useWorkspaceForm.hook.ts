@@ -9,7 +9,7 @@ import {
 } from '../workspaces.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 
 export const useWorkspaceForm = () => {
   const toast = useToast();
@@ -72,7 +72,7 @@ export const useWorkspaceForm = () => {
         toast.error('Error saving');
       }
     },
-    [createWorkspace, updateWorkspace, setValue],
+    [createWorkspace, updateWorkspace, setValue, toast],
   );
 
   const debouncedSave = useMemo(

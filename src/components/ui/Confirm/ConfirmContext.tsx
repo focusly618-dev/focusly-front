@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback } from 'react';
 import { 
   Dialog, 
   DialogTitle, 
@@ -23,7 +23,7 @@ interface ConfirmContextType {
   confirm: (options: ConfirmOptions) => Promise<boolean>;
 }
 
-const ConfirmContext = createContext<ConfirmContextType | undefined>(undefined);
+export const ConfirmContext = createContext<ConfirmContextType | undefined>(undefined);
 
 export const ConfirmProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -134,12 +134,4 @@ export const ConfirmProvider: React.FC<{ children: React.ReactNode }> = ({ child
       </Dialog>
     </ConfirmContext.Provider>
   );
-};
-
-export const useConfirm = () => {
-  const context = useContext(ConfirmContext);
-  if (!context) {
-    throw new Error('useConfirm must be used within a ConfirmProvider');
-  }
-  return context;
 };

@@ -6,8 +6,8 @@ import {
   saveButtonSx,
   deleteContainerSx,
 } from './TaskActions.styles';
-import { useToast } from '@/components/ui/Toast/ToastContext';
-import { useConfirm } from '@/components/ui/Confirm/ConfirmContext';
+import { useToast } from '@/components/ui/Toast/useToast';
+import { useConfirm } from '@/components/ui/Confirm/useConfirm';
 import type { Task } from '@/redux/tasks/task.types';
 
 interface TaskActionsProps {

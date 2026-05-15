@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout as logoutThunk, clearAuth, setSessionExpiredNotice } from '@/redux/auth/auth.slice';
 import { useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 import { auth as firebaseAuth } from '@/context/firebase';
 import { onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
 
@@ -39,7 +39,7 @@ export const useSession = () => {
       dispatch(clearAuth());
       navigate('/login');
     }
-  }, [dispatch, navigate]);
+  }, [dispatch, navigate, toast]);
 
   // Cross-tab logout detection via localStorage
   useEffect(() => {
@@ -58,38 +58,33 @@ export const useSession = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [logout]);
 
-  // Real-time Firebase auth state detection
   useEffect(() => {
-    const unsubAuth = onAuthStateChanged(firebaseAuth, (user) => {
-      if (!user && wasLoggedIn.current) {
-        // Firebase user became null while we were logged in → session expired
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
+      if (user) {
+        wasLoggedIn.current = true;
+      } else if (wasLoggedIn.current && auth.user) {
+        // Firebase session ended, but we still think we are logged in
         dispatch(setSessionExpiredNotice(true));
-        dispatch(clearAuth());
-        navigate('/login');
+        logout(false);
       }
-      wasLoggedIn.current = !!user;
     });
 
-    const unsubToken = onIdTokenChanged(firebaseAuth, (user) => {
-      if (!user && wasLoggedIn.current) {
-        // Token was revoked or expired and couldn't be refreshed
-        dispatch(setSessionExpiredNotice(true));
-        dispatch(clearAuth());
-        navigate('/login');
+    const unsubscribeToken = onIdTokenChanged(firebaseAuth, async (user) => {
+      if (user) {
+        await user.getIdToken();
+        // Update local storage or state if needed, but Firebase handles refreshing
       }
     });
 
     return () => {
-      unsubAuth();
-      unsubToken();
+      unsubscribe();
+      unsubscribeToken();
     };
-  }, [dispatch, navigate]);
+  }, [auth.user, dispatch, logout]);
 
   return {
-    isLogged: auth.isLogged,
+    isLogged: !!auth.user,
     user: auth.user,
-    authProvider: auth.authProvider,
-    status: auth.isLogged ? 'authenticated' : 'unauthenticated',
     logout: () => logout(false),
   };
 };

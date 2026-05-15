@@ -1,39 +1,61 @@
-import { Box, Button, CircularProgress, DialogActions } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { useToast } from '@/components/ui/Toast/ToastContext';
-import { useConfirm } from '@/components/ui/Confirm/ConfirmContext';
-import { dialogActionsSx, cancelButtonSx, saveButtonSx, deleteButtonSx } from '../../CreateTaskModal.styles';
+import {
+  deleteButtonSx,
+  cancelButtonSx,
+  saveButtonSx,
+} from '../../CreateTaskModal.styles';
+import { useToast } from '@/components/ui/Toast/useToast';
+import { useConfirm } from '@/components/ui/Confirm/useConfirm';
 import type { Task } from '@/redux/tasks/task.types';
 
+const footerActionsSx = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: 1.5,
+  px: 3,
+  py: 2,
+  borderTop: '1px solid',
+  borderColor: 'divider',
+  bgcolor: 'background.paper',
+};
+
+const deleteContainerSx = (show: boolean) => ({
+  display: show ? 'flex' : 'none',
+  flex: 1,
+});
+
 interface TaskFooterActionsProps {
-  initialTask?: Task | null;
-  onClose: () => void;
-  handleSave: () => void;
-  handleUpdate: () => void;
+  initialTask: Task | null | undefined;
   handleDelete: () => Promise<void>;
+  onClose: () => void;
+  handleUpdate: () => void;
+  handleSave: () => void;
   loadingSave: boolean;
 }
 
 export const TaskFooterActions = ({
   initialTask,
-  onClose,
-  handleSave,
-  handleUpdate,
   handleDelete,
+  onClose,
+  handleUpdate,
+  handleSave,
   loadingSave,
 }: TaskFooterActionsProps) => {
   const toast = useToast();
   const { confirm } = useConfirm();
+
   return (
-    <DialogActions sx={dialogActionsSx}>
-      <Box display={initialTask ? 'flex' : 'none'} sx={{ flex: 1 }} justifyContent="flex-start">
+    <Box sx={footerActionsSx}>
+      <Box sx={deleteContainerSx(!!initialTask)}>
         <Button
           onClick={async () => {
             const ok = await confirm({
               title: 'Delete Task',
               description: 'Are you sure you want to delete this task? This action cannot be undone.',
               confirmText: 'Delete',
-              severity: 'error'
+              severity: 'error',
             });
 
             if (ok) {
@@ -41,7 +63,7 @@ export const TaskFooterActions = ({
                 await handleDelete();
                 toast.success('Task deleted successfully!');
                 onClose();
-              } catch (error) {
+              } catch {
                 toast.error('Error deleting task');
               }
             }
@@ -58,22 +80,18 @@ export const TaskFooterActions = ({
         Cancel
       </Button>
       <Button
-        onClick={
-          initialTask && initialTask.user_id !== 'google-user'
-            ? handleUpdate
-            : handleSave
-        }
+        onClick={initialTask ? handleUpdate : handleSave}
         variant="contained"
         sx={saveButtonSx}
       >
         {loadingSave ? (
-          <CircularProgress size={24} color="inherit" />
-        ) : initialTask && initialTask.user_id !== 'google-user' ? (
-          'Save Changes'
+          'Saving...'
+        ) : initialTask ? (
+          'Edit Task'
         ) : (
           'Create Task'
         )}
       </Button>
-    </DialogActions>
+    </Box>
   );
 };

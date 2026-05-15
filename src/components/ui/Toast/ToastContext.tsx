@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Box, Typography, IconButton, Paper, styled } from '@mui/material';
 import { 
@@ -26,7 +26,7 @@ interface ToastContextType {
   warning: (title: string, description?: string) => void;
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+export const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 const ToastContainer = styled(Box)({
   position: 'fixed',
@@ -142,12 +142,4 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       </ToastContainer>
     </ToastContext.Provider>
   );
-};
-
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
 };

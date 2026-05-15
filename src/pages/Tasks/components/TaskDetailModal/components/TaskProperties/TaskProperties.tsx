@@ -10,7 +10,6 @@ import {
   MenuItem,
   List,
   ListItemText,
-  Switch,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,

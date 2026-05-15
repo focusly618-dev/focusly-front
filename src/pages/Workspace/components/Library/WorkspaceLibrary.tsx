@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { motion, AnimatePresence } from 'motion/react';
-import { useToast } from '@/components/ui/Toast/ToastContext';
-import { useConfirm } from '@/components/ui/Confirm/ConfirmContext';
+import { useToast } from '@/components/ui/Toast/useToast';
+import { useConfirm } from '@/components/ui/Confirm/useConfirm';
 import {
   LibraryContainer,
   LibraryHeader,

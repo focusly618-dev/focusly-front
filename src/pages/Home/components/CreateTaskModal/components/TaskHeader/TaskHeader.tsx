@@ -1,4 +1,4 @@
-import { Box, Typography, IconButton, Switch } from '@mui/material';
+import { Box, Typography, IconButton } from '@mui/material';
 import {
   Close as CloseIcon,
   OpenInFull as OpenInFullIcon,
@@ -7,7 +7,6 @@ import {
   SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
   ArrowForwardIos,
 } from '@mui/icons-material';
-import { GeminiIcon } from '@/components/ui/GeminiIcon';
 import { GeminiAIToggle } from '@/components/ui/GeminiSwitch';
 import { headerIconSx } from '../../CreateTaskModal.styles';
 import { TASK_COLORS } from '../../CreateTaskModal.utils';

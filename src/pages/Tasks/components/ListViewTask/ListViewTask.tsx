@@ -1,384 +1,244 @@
 import { useState } from 'react';
-import { Box, Typography, Collapse, Menu, MenuItem, Switch } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Collapse,
+  Menu,
+  MenuItem,
+  IconButton,
+} from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
   SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
   AccessTime as AccessTimeIcon,
   Link as LinkIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
-import { GeminiIcon } from '@/components/ui/GeminiIcon';
 import { GeminiAIToggle } from '@/components/ui/GeminiSwitch';
 
 import {
   TaskCard,
   CardLeft,
   TaskMetaItem,
-  StatusBadge,
   CategoryChip,
   PriorityIndicator,
 } from './ListViewTask.styles';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import {
-  differenceInHours,
-  differenceInDays,
-  differenceInWeeks,
-  differenceInMonths,
-  differenceInYears,
-} from 'date-fns';
-// import { formatDuration } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-
-const formatTimeSinceCompletion = (dateString: string | undefined) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const now = new Date();
-
-  const hours = differenceInHours(now, date);
-  if (hours < 24) return `${hours}h ago`;
-
-  const days = differenceInDays(now, date);
-  if (days < 7) return `${days}d ago`;
-
-  const weeks = differenceInWeeks(now, date);
-  if (weeks < 4) return `${weeks}w ago`;
-
-  const months = differenceInMonths(now, date);
-  if (months < 12) return `${months}mo ago`;
-
-  const years = differenceInYears(now, date);
-  return `${years}y ago`;
-};
 
 interface ListViewTaskProps {
   task: TaskResponse;
-  expandedTaskIds: Set<string>;
-  toggleTaskExpansion: (taskId: string) => void;
-  handleSubtaskToggle: (task: TaskResponse, index: number) => void;
-  handleOpenSubtaskModal: (task: TaskResponse, index?: number) => void;
-  onTaskClick: (task: TaskResponse) => void;
-  updateTask?: (taskId: string, updates: TaskResponse) => Promise<void>;
+  updateTask: (taskId: string, updates: Partial<TaskResponse>) => Promise<void>;
+  onClick?: () => void;
+  onTaskClick?: (task: TaskResponse) => void;
+  expandedTaskIds?: Set<string>;
+  toggleTaskExpansion?: (taskId: string) => void;
+  handleSubtaskToggle?: (task: TaskResponse, index: number) => void;
+  handleOpenSubtaskModal?: (task: TaskResponse, index?: number) => void;
 }
 
-const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
-  Todo: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#3b82f6' }}
-    />
-  ),
-  Planning: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#8b5cf6' }}
-    />
-  ),
-  Pending: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#f59e0b' }}
-    />
-  ),
-  OnHold: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ef4444' }}
-    />
-  ),
-  Review: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#06b6d4' }}
-    />
-  ),
-  Done: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#22c55e' }}
-    />
-  ),
-  Backlog: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#6b7280' }}
-    />
-  ),
+type TaskStatusType = TaskResponse['status'];
+
+const PRIORITY_COLORS: Record<number, string> = {
+  1: '#3b82f6',
+  2: '#f59e0b',
+  3: '#ef4444',
+  4: '#ef4444',
+};
+
+const STATUS_COLORS: Record<TaskStatusType, string> = {
+  Backlog: '#94a3b8',
+  Todo: '#3b82f6',
+  Planning: '#818cf8',
+  Pending: '#f59e0b',
+  OnHold: '#6b7280',
+  Review: '#8b5cf6',
+  Done: '#22c55e',
+  Scheduled: '#06b6d4',
+  Archived: '#64748b',
 };
 
 export const ListViewTask = ({
   task,
-  expandedTaskIds,
-  toggleTaskExpansion,
-  handleOpenSubtaskModal,
-  onTaskClick,
   updateTask,
+  onClick,
+  onTaskClick,
+  expandedTaskIds: externalExpanded,
+  toggleTaskExpansion,
+  handleSubtaskToggle,
+  handleOpenSubtaskModal,
 }: ListViewTaskProps) => {
-  const [statusAnchor, setStatusAnchor] = useState<null | HTMLElement>(null);
-  const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
-    null,
-  );
-  const [dateAnchor, setDateAnchor] = useState<null | HTMLElement>(null);
+  const [localExpanded, setLocalExpanded] = useState<Set<string>>(new Set());
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [dateMenuAnchor, setDateMenuAnchor] = useState<null | HTMLElement>(null);
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(null);
 
-  const handlePrioritySelect = async (level: number) => {
-    setPriorityAnchor(null);
-    if (updateTask && task.priority_level !== level) {
-      await updateTask(task.id, { ...task, priority_level: level });
-    }
+  const expandedTaskIds = externalExpanded ?? localExpanded;
+
+  const handleClick = () => {
+    if (onClick) onClick();
+    else if (onTaskClick) onTaskClick(task);
   };
 
-  const handleDateSelect = async (daysToAdd: number) => {
-    setDateAnchor(null);
-    if (updateTask) {
-      const newDate = new Date();
-      newDate.setDate(newDate.getDate() + daysToAdd);
-      await updateTask(task.id, { ...task, deadline: newDate.toISOString() });
-    }
-  };
-
-  const handleStatusSelect = async (status: string) => {
-    setStatusAnchor(null);
-    if (updateTask && task.status !== status) {
-      await updateTask(task.id, {
-        ...task,
-        status: status as TaskResponse['status'],
+  const handleExpandToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (toggleTaskExpansion) {
+      toggleTaskExpansion(task.id);
+    } else {
+      setLocalExpanded((prev) => {
+        const next = new Set(prev);
+        if (next.has(task.id)) next.delete(task.id);
+        else next.add(task.id);
+        return next;
       });
     }
   };
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      Done: '#22c55e',
-      Todo: '#3b82f6',
-      Planning: '#8b5cf6',
-      Pending: '#f59e0b',
-      OnHold: '#ef4444',
-      Review: '#06b6d4',
-      Backlog: '#6b7280',
-    };
-    return colors[status] || '#6b7280';
+  const handleMoreClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
   };
 
-  const getPriorityColor = (level: number) => {
-    if (level >= 3) return '#ef4444';
-    if (level === 2) return '#f59e0b';
-    return '#22c55e';
+  const handleClose = () => setAnchorEl(null);
+
+  const handleStatusChange = async (newStatus: TaskStatusType) => {
+    await updateTask(task.id, { status: newStatus });
+    setStatusMenuAnchor(null);
   };
 
-  const statusColor = getStatusColor(task.status);
-  const priorityColor = getPriorityColor(task.priority_level);
+  const handleDateSelect = async (days: number) => {
+    const newDate = new Date();
+    newDate.setDate(newDate.getDate() + days);
+    await updateTask(task.id, { deadline: newDate.toISOString() });
+    setDateMenuAnchor(null);
+  };
+
+  const priorityColor = PRIORITY_COLORS[task.priority_level] || '#94a3b8';
+  const priorityLabel =
+    task.priority_level >= 3 ? 'High' : task.priority_level === 1 ? 'Low' : 'Medium';
 
   return (
-    <>
+    <Box sx={{ mb: 1.5 }}>
       <TaskCard
-        onClick={() => onTaskClick(task)}
+        onClick={handleClick}
         sx={{
-          cursor: 'pointer',
-          borderLeft: `3px solid ${statusColor}`,
+          opacity: task.status === 'Done' ? 0.7 : 1,
+          borderLeft: `4px solid ${STATUS_COLORS[task.status] || '#cbd5e1'}`,
         }}
       >
-        <CardLeft sx={{ alignItems: 'center', gap: '12px' }}>
-          <StatusBadge
-            statusColor={statusColor}
-            onClick={(e) => {
-              e.stopPropagation();
-              setStatusAnchor(e.currentTarget);
-            }}
-            sx={{
-              cursor: 'pointer',
-              '&:hover': { transform: 'scale(1.2)' },
-              transition: 'transform 0.2s',
-            }}
-          />
-
-          <Box
-            sx={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              minWidth: 0,
-            }}
-          >
-            {/* Title & Category */}
+        <CardLeft>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+            {/* Status circle */}
             <Box
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleStatusChange(task.status === 'Done' ? 'Todo' : 'Done');
+              }}
               sx={{
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                border: `2px solid ${STATUS_COLORS[task.status] || '#cbd5e1'}`,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1,
-                minWidth: 0,
-                flexShrink: 1,
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                '&:hover': { transform: 'scale(1.1)' },
+                bgcolor: task.status === 'Done' ? STATUS_COLORS[task.status] : 'transparent',
               }}
             >
-              <Typography
-                variant="body1"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '14px',
-                  color: 'text.primary',
-                  lineHeight: 1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {task.title}
-              </Typography>
-              {task.category && (
-                <CategoryChip sx={{ flexShrink: 0 }}>
-                  {task.category}
-                </CategoryChip>
+              {task.status === 'Done' && (
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'white' }} />
               )}
             </Box>
 
-            {/* Metadata Section - Single Row */}
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                color: 'text.secondary',
-                flexShrink: 0,
-              }}
-            >
-              <TaskMetaItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPriorityAnchor(e.currentTarget);
-                }}
-                sx={{
-                  cursor: 'pointer',
-                  px: 0.5,
-                  py: 0.25,
-                  borderRadius: '4px',
-                  '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
-                }}
-              >
-                <PriorityIndicator priorityColor={priorityColor} />
+            {/* Task info */}
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Typography
-                  variant="caption"
-                  sx={{ fontSize: '11px', fontWeight: 600 }}
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 700,
+                    textDecoration: task.status === 'Done' ? 'line-through' : 'none',
+                    color: task.status === 'Done' ? 'text.secondary' : 'text.primary',
+                  }}
                 >
-                  {task.priority_level >= 4
-                    ? 'Urgent'
-                    : task.priority_level === 3
-                      ? 'High'
-                      : task.priority_level === 2
-                        ? 'Med'
-                        : 'Low'}
+                  {task.title}
                 </Typography>
-              </TaskMetaItem>
-
-              {(task.deadline || task.status === 'Done') && (
-                <TaskMetaItem
-                  onClick={(e) => {
+                <GeminiAIToggle
+                  checked={task.use_ai || false}
+                  onChange={(e) => {
                     e.stopPropagation();
-                    setDateAnchor(e.currentTarget);
-                  }}
-                  sx={{
-                    cursor: 'pointer',
-                    px: 0.5,
-                    py: 0.25,
-                    borderRadius: '4px',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      color: 'text.primary',
-                    },
-                  }}
-                >
-                  <CalendarTodayIcon sx={{ fontSize: 13, opacity: 0.7 }} />
-                  <Typography variant="caption" sx={{ fontSize: '11px' }}>
-                    {task.status === 'Done'
-                      ? formatTimeSinceCompletion(task.updated_at)
-                      : new Date(task.deadline!).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                  </Typography>
-                </TaskMetaItem>
-              )}
-
-              {task.estimate_minutes > 0 && (
-                <TaskMetaItem>
-                  <AccessTimeIcon sx={{ fontSize: 13, opacity: 0.7 }} />
-                  <Typography variant="caption" sx={{ fontSize: '11px' }}>
-                    {task.estimate_minutes}m
-                  </Typography>
-                </TaskMetaItem>
-              )}
-
-              <Box
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleTaskExpansion(task.id);
-                }}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  cursor: 'pointer',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  bgcolor: task.subtasks?.length
-                    ? 'action.hover'
-                    : 'transparent',
-                  '&:hover': { bgcolor: 'action.selected' },
-                }}
-              >
-                <SubdirectoryArrowRightIcon
-                  sx={{
-                    fontSize: 13,
-                    opacity: 0.7,
-                    transform: expandedTaskIds.has(task.id)
-                      ? 'rotate(90deg)'
-                      : 'none',
-                    transition: 'transform 0.2s',
+                    updateTask(task.id, { use_ai: e.target.checked });
                   }}
                 />
-                <Typography
-                  variant="caption"
-                  sx={{ fontSize: '11px', fontWeight: 600 }}
-                >
-                  {task.subtasks?.length || 0}
-                </Typography>
               </Box>
 
-              {task.links && task.links.length > 0 && (
-                <TaskMetaItem sx={{ color: 'primary.main' }}>
-                  <LinkIcon sx={{ fontSize: 13 }} />
-                  <Typography
-                    variant="caption"
-                    sx={{ fontSize: '11px', fontWeight: 600 }}
-                  >
-                    {task.links.length}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 0.5 }}>
+                <CategoryChip>{task.category || 'General'}</CategoryChip>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <PriorityIndicator priorityColor={priorityColor} />
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: priorityColor }}>
+                    {priorityLabel}
                   </Typography>
-                </TaskMetaItem>
-              )}
+                </Box>
+              </Box>
             </Box>
           </Box>
 
-          <TaskMetaItem
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            sx={{
-              gap: 0,
-              ml: 'auto',
-              mr: 1,
-              '&:hover': { bgcolor: 'transparent' }
-            }}
-          >
-            <GeminiAIToggle
-              checked={task.use_ai || false}
-              onChange={async (e) => {
-                if (updateTask) {
-                  await updateTask(task.id, { ...task, use_ai: e.target.checked });
-                }
-              }}
-            />
-          </TaskMetaItem>
+          {/* Meta items */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <TaskMetaItem>
+              <CalendarTodayIcon sx={{ fontSize: 14 }} />
+              <Typography variant="caption">
+                {task.deadline
+                  ? new Date(task.deadline).toLocaleDateString()
+                  : 'No date'}
+              </Typography>
+            </TaskMetaItem>
+
+            {task.estimate_timer > 0 && (
+              <TaskMetaItem>
+                <AccessTimeIcon sx={{ fontSize: 14 }} />
+                <Typography variant="caption">
+                  {Math.round(task.estimate_timer / 60)}h
+                </Typography>
+              </TaskMetaItem>
+            )}
+
+            {task.links && task.links.length > 0 && (
+              <TaskMetaItem>
+                <LinkIcon sx={{ fontSize: 14 }} />
+                <Typography variant="caption">{task.links.length}</Typography>
+              </TaskMetaItem>
+            )}
+
+            {task.subtasks && task.subtasks.length > 0 && (
+              <TaskMetaItem
+                onClick={handleExpandToggle}
+                sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+              >
+                <SubdirectoryArrowRightIcon sx={{ fontSize: 14 }} />
+                <Typography variant="caption">{task.subtasks.length}</Typography>
+              </TaskMetaItem>
+            )}
+
+            <IconButton
+              size="small"
+              onClick={handleMoreClick}
+              sx={{ color: 'text.secondary' }}
+            >
+              <MoreVertIcon fontSize="small" />
+            </IconButton>
+          </Box>
         </CardLeft>
       </TaskCard>
 
-      <Collapse in={expandedTaskIds.has(task.id)} timeout="auto" unmountOnExit>
-        <Box
-          sx={{ ml: 6, mb: 2, borderLeft: '1px solid', borderColor: 'divider' }}
-        >
-          {task.subtasks?.map((subtask, index) => {
-            if (typeof subtask === 'string') return null;
-            return (
+      {/* Subtasks */}
+      {task.subtasks && task.subtasks.length > 0 && (
+        <Collapse in={expandedTaskIds.has(task.id)} timeout="auto" unmountOnExit>
+          <Box sx={{ pl: 4, mt: 0.5 }}>
+            {task.subtasks.map((subtask, index) => (
               <Box
                 key={index}
                 sx={{
@@ -386,136 +246,75 @@ export const ListViewTask = ({
                   alignItems: 'center',
                   gap: 1.5,
                   py: 0.5,
-                  px: 2,
-                  borderRadius: '8px',
-                  '&:hover': { bgcolor: 'action.hover' },
+                  cursor: handleSubtaskToggle ? 'pointer' : 'default',
+                }}
+                onClick={() => {
+                  if (handleSubtaskToggle) handleSubtaskToggle(task, index);
+                  else if (handleOpenSubtaskModal) handleOpenSubtaskModal(task, index);
                 }}
               >
-                <StatusBadge
-                  statusColor={getStatusColor(subtask.status || 'Todo')}
-                />
+                <SubdirectoryArrowRightIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
                 <Typography
                   variant="body2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOpenSubtaskModal(task, index);
-                  }}
                   sx={{
-                    color: subtask.completed
-                      ? 'text.secondary'
-                      : 'text.primary',
-                    flexGrow: 1,
-                    fontSize: '13px',
+                    color: subtask.completed ? 'text.disabled' : 'text.primary',
                     textDecoration: subtask.completed ? 'line-through' : 'none',
-                    cursor: 'pointer',
                   }}
                 >
                   {subtask.title}
                 </Typography>
               </Box>
-            );
-          })}
-        </Box>
-      </Collapse>
+            ))}
+          </Box>
+        </Collapse>
+      )}
 
-      {/* Priority Quick Select */}
+      {/* Context menu */}
       <Menu
-        anchorEl={priorityAnchor}
-        open={Boolean(priorityAnchor)}
-        onClose={() => setPriorityAnchor(null)}
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
         PaperProps={{
-          sx: {
-            borderRadius: '10px',
-            minWidth: '140px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-          },
+          sx: { borderRadius: '12px', minWidth: 160, boxShadow: '0 8px 32px rgba(0,0,0,0.1)' },
         }}
       >
-        {[
-          { level: 4, label: 'Urgent', color: '#ef4444' },
-          { level: 3, label: 'High', color: '#f59e0b' },
-          { level: 2, label: 'Medium', color: '#3b82f6' },
-          { level: 1, label: 'Low', color: '#22c55e' },
-        ].map((p) => (
-          <MenuItem
-            key={p.level}
-            onClick={() => handlePrioritySelect(p.level)}
-            sx={{ gap: 1.5, py: 1 }}
-          >
-            <Box
-              sx={{
-                width: 12,
-                height: 12,
-                borderRadius: '2px',
-                bgcolor: p.color,
-              }}
-            />
-            <Typography variant="body2" fontWeight={600}>
-              {p.label}
-            </Typography>
+        <MenuItem onClick={(e) => { e.stopPropagation(); setStatusMenuAnchor(e.currentTarget); handleClose(); }}>
+          Change Status
+        </MenuItem>
+        <MenuItem onClick={(e) => { e.stopPropagation(); setDateMenuAnchor(e.currentTarget); handleClose(); }}>
+          Change Date
+        </MenuItem>
+        {task.subtasks && task.subtasks.length > 0 && (
+          <MenuItem onClick={handleExpandToggle}>
+            {expandedTaskIds.has(task.id) ? 'Hide' : 'Show'} Subtasks
           </MenuItem>
-        ))}
+        )}
       </Menu>
 
-      {/* Date Quick Select */}
+      {/* Status submenu */}
       <Menu
-        anchorEl={dateAnchor}
-        open={Boolean(dateAnchor)}
-        onClose={() => setDateAnchor(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '10px',
-            minWidth: '160px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-          },
-        }}
+        anchorEl={statusMenuAnchor}
+        open={Boolean(statusMenuAnchor)}
+        onClose={() => setStatusMenuAnchor(null)}
       >
-        <MenuItem onClick={() => handleDateSelect(0)} sx={{ py: 1 }}>
-          Today
-        </MenuItem>
-        <MenuItem onClick={() => handleDateSelect(1)} sx={{ py: 1 }}>
-          Tomorrow
-        </MenuItem>
-        <MenuItem onClick={() => handleDateSelect(3)} sx={{ py: 1 }}>
-          In 3 days
-        </MenuItem>
-        <MenuItem onClick={() => handleDateSelect(7)} sx={{ py: 1 }}>
-          Next week
-        </MenuItem>
-      </Menu>
-
-      {/* Status Quick Select */}
-      <Menu
-        anchorEl={statusAnchor}
-        open={Boolean(statusAnchor)}
-        onClose={() => setStatusAnchor(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '12px',
-            minWidth: '180px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-          },
-        }}
-      >
-        {[
-          'Todo',
-          'Planning',
-          'Pending',
-          'OnHold',
-          'Review',
-          'Done',
-          'Backlog',
-        ].map((s) => (
-          <MenuItem
-            key={s}
-            onClick={() => handleStatusSelect(s)}
-            sx={{ gap: 1.5 }}
-          >
-            {STATUS_MENU_ICON[s]}
+        {(Object.keys(STATUS_COLORS) as TaskStatusType[]).map((s) => (
+          <MenuItem key={s} onClick={() => handleStatusChange(s)}>
             <Typography variant="body2">{s}</Typography>
           </MenuItem>
         ))}
       </Menu>
-    </>
+
+      {/* Date submenu */}
+      <Menu
+        anchorEl={dateMenuAnchor}
+        open={Boolean(dateMenuAnchor)}
+        onClose={() => setDateMenuAnchor(null)}
+      >
+        <MenuItem onClick={() => handleDateSelect(0)}>Today</MenuItem>
+        <MenuItem onClick={() => handleDateSelect(1)}>Tomorrow</MenuItem>
+        <MenuItem onClick={() => handleDateSelect(3)}>In 3 days</MenuItem>
+        <MenuItem onClick={() => handleDateSelect(7)}>In a week</MenuItem>
+      </Menu>
+    </Box>
   );
 };

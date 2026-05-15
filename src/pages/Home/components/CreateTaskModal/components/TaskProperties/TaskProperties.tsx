@@ -7,7 +7,6 @@ import {
   MenuItem,
   List,
   ListItemText,
-  Switch,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -46,6 +45,7 @@ import {
   getPriorityIconColor,
 } from '../TaskIcons';
 import type { TaskStatus } from '@/redux/tasks/task.types';
+import { useState } from 'react';
 
 interface TaskPropertiesProps {
   status: TaskStatus;
@@ -428,6 +428,8 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             />
           )}
         </Box>
+      </Box>
+
       {/* Time Tracking */}
       <Box sx={{ ...propertyRowSx, alignItems: 'center' }}>
         <Box sx={propertyLabelSx}>

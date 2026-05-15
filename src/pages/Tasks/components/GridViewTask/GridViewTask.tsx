@@ -1,9 +1,8 @@
-import { Box, Typography, LinearProgress, Switch } from '@mui/material';
+import { Box, Typography, LinearProgress } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
   Link as LinkIcon,
 } from '@mui/icons-material';
-import { GeminiIcon } from '@/components/ui/GeminiIcon';
 import { GeminiAIToggle } from '@/components/ui/GeminiSwitch';
 
 import {
@@ -23,7 +22,7 @@ import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDeta
 interface GridViewTaskProps {
   task: TaskResponse;
   onTaskClick: (task: TaskResponse) => void;
-  updateTask?: (taskId: string, updates: any) => Promise<void>;
+  updateTask?: (taskId: string, updates: Partial<TaskResponse>) => Promise<void>;
 }
 
 // Professional color scheme matching ListViewTask

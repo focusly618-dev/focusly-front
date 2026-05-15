@@ -12,7 +12,7 @@ import {
   ADD_SUBTASK,
   GET_TASKS,
 } from '../tasks.graphql';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 import {
   createGoogleEvent,
   updateGoogleEvent,

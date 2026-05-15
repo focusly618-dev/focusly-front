@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 
 export const useTasksUI = () => {
   const toast = useToast();

@@ -10,6 +10,6 @@ export interface TasksContentViewProps {
   handleSubtaskToggle: (task: TaskResponse, index: number) => void;
   handleOpenSubtaskModal: (task: TaskResponse, index?: number) => void;
   handleTaskClick: (task: TaskResponse) => void;
-  updateTask: (taskId: string, updates: TaskResponse) => Promise<void>;
+  updateTask: (taskId: string, updates: Partial<TaskResponse>) => Promise<void>;
   setSearchTerm: (term: string) => void;
 }

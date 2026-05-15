@@ -3,14 +3,19 @@ import type { UseCreateTaskModalProps } from '../types/CreateTaskModal.types';
 import { useTaskFormState } from './useTaskFormState';
 import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
-import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../CreateTaskModal.utils';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 
+export const useCreateTaskModal = ({
+  initialTask,
+  parentTask,
+  onSave,
+  onClose,
+  onDelete,
+  initialStart,
   subtaskIndex,
 }: UseCreateTaskModalProps) => {
   const toast = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const {
     title,
@@ -31,8 +36,9 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
     setRealTime,
     color,
     setColor,
+    useAI,
+    setUseAI,
     errors,
-    setErrors,
     handleTitleChange,
     validateForm,
     initialState,
@@ -97,6 +103,7 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
             subtasks,
             links: updatedLinks,
             color,
+            use_ai: useAI,
           },
           false,
         );
@@ -118,6 +125,7 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
             subtasks,
             links: updatedLinks,
             color,
+            use_ai: useAI,
           },
           false,
         );
@@ -135,6 +143,7 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
     setColor(initialState.color);
     setRealTime(initialState.realTime);
     setStatus(initialState.status);
+    setUseAI(initialTask?.use_ai || false);
 
     setTags(initialCollections.tags);
     setSubtasks(initialCollections.subtasks);
@@ -147,6 +156,7 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
   }, [
     initialState,
     initialCollections,
+    initialTask,
     setTitle,
     setDescription,
     setPriority,
@@ -164,12 +174,20 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
     setNewTag,
     setIsAddingTag,
     setIsAddingLink,
+    setUseAI,
   ]);
 
-  // Inject real resetForm into mutations (assuming useTaskMutations doesn't store it in a way that breaks this)
-  const mutationsWithReset = { ...mutations, resetForm };
+  const mutationsWithReset = useTaskMutations({
+    onSave,
+    onClose,
+    onDelete,
+    initialTask,
+    parentTask,
+    subtaskIndex,
+    resetForm,
+  });
 
-  const handleSaveWrapper = async () => {
+  const handleSaveWrapper = async (shouldClose = true) => {
     if (!validateForm()) return;
     await mutationsWithReset.handleSave({
       title,
@@ -185,36 +203,32 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
       links,
       color,
       shouldGenerateMeet,
+      use_ai: useAI,
     });
+    if (shouldClose) onClose();
   };
 
-  const handleUpdateWrapper = async () => {
+  const handleUpdateWrapper = async (shouldClose = true) => {
     if (!validateForm()) return;
-    await mutationsWithReset.handleUpdate({
-      title,
-      description,
-      priority,
-      status,
-      category,
-      deadline: currentDate,
-      duration,
-      realTime,
-      tags,
-      subtasks,
-      links,
-      color,
-      shouldGenerateMeet,
-    });
-  };
-
-  const createURLWorkSpace = (workspaceId: string): void => {
-    if (workspaceId) {
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set('tab', 'Workspace');
-      newParams.set('workspaceId', workspaceId);
-      newParams.delete('taskId');
-      setSearchParams(newParams);
-    }
+    await mutationsWithReset.handleUpdate(
+      {
+        title,
+        description,
+        priority,
+        status,
+        category,
+        deadline: currentDate,
+        duration,
+        realTime,
+        tags,
+        subtasks,
+        links,
+        color,
+        shouldGenerateMeet,
+        use_ai: useAI,
+      },
+      shouldClose,
+    );
   };
 
   const [isGeneratingMeet, setIsGeneratingMeet] = useState(false);
@@ -225,16 +239,14 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
       const meetUrl = await mutationsWithReset.generateMeetLinkNow(undefined, {
         title,
         description,
-        deadline: currentDate ?? null,
+        deadline: currentDate ?? undefined,
         duration,
-        priority,
-        category,
-        tags,
-        color,
       });
       if (meetUrl) {
         handleAddLink('Google Meet', meetUrl);
-        setShouldGenerateMeet(true);
+        if (initialTask?.id && !initialTask.id.startsWith('temp-')) {
+          setShouldGenerateMeet(true);
+        }
         toast.success('Google Meet link generated!', 'Link added to resources.');
       } else {
         toast.error('Could not generate Meet link', 'Make sure you are signed in with Google.');
@@ -246,25 +258,32 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
     }
   };
 
-  const handleTimerChange = (
-    value: string,
-    setter: (v: string) => void,
-    setSuggestions: (s: string[]) => void,
-    setAnchor: (el: HTMLDivElement | null) => void,
-    target: HTMLDivElement,
-  ) => {
-    setter(value);
-    const suggestions = getTimerSuggestions(value);
-    setSuggestions(suggestions);
-    setAnchor(suggestions.length > 0 ? target : null);
-  };
+  const handleTimerChange = useCallback(
+    (
+      value: string,
+      setter: (v: string) => void,
+      setSuggestions: (s: string[]) => void,
+      setAnchor: (el: HTMLDivElement | null) => void,
+      target: HTMLDivElement,
+    ) => {
+      setter(value);
+      const suggestions = getTimerSuggestions(value);
+      setSuggestions(suggestions);
+      if (suggestions.length > 0) {
+        setAnchor(target);
+      } else {
+        setAnchor(null);
+      }
+    },
+    [],
+  );
 
   const hasMeetLink =
     shouldGenerateMeet ||
     links.some(
       (l) =>
         l.url.includes('meet.google.com') ||
-        l.title.includes('Google Meet') ||
+        l.title.toLowerCase().includes('google meet') ||
         l.url.includes('hangouts'),
     );
 
@@ -287,11 +306,9 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
     setRealTime,
     color,
     setColor,
+    useAI,
+    setUseAI,
     errors,
-    setErrors,
-    handleTitleChange,
-    validateForm,
-    timeSlotDisplay,
     tags,
     setTags,
     subtasks,
@@ -318,16 +335,18 @@ import { useToast } from '@/components/ui/Toast/ToastContext';
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,
-    ...mutationsWithReset,
     handleSave: handleSaveWrapper,
     handleUpdate: handleUpdateWrapper,
-    resetForm,
-    createURLWorkSpace,
-    shouldGenerateMeet,
-    setShouldGenerateMeet,
+    handleDelete: mutationsWithReset.handleDelete,
+    validateForm,
+    handleTitleChange,
+    timeSlotDisplay,
     isGeneratingMeet,
     handleGenerateMeet,
-    handleTimerChange,
     hasMeetLink,
+    setShouldGenerateMeet,
+    shouldGenerateMeet,
+    loadingSave: mutationsWithReset.loadingSave,
+    handleTimerChange,
   };
 };

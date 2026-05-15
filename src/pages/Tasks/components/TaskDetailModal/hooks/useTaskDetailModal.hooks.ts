@@ -3,9 +3,8 @@ import type { UseTaskDetailModalProps } from '../types/TaskDetailModal.types';
 import { useTaskFormState } from './useTaskFormState';
 import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
-import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../TaskDetailModal.utils';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 
 export const useTaskDetailModal = ({
   onSave,
@@ -17,7 +16,6 @@ export const useTaskDetailModal = ({
   subtaskIndex,
 }: UseTaskDetailModalProps) => {
   const toast = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const {
     title,
@@ -38,8 +36,9 @@ export const useTaskDetailModal = ({
     setRealTime,
     color,
     setColor,
+    useAI,
+    setUseAI,
     errors,
-    setErrors,
     handleTitleChange,
     validateForm,
     initialState,
@@ -108,6 +107,8 @@ export const useTaskDetailModal = ({
             subtasks,
             links: updatedLinks,
             color,
+            collaborators,
+            use_ai: useAI,
           },
           false,
         );
@@ -129,6 +130,8 @@ export const useTaskDetailModal = ({
             subtasks,
             links: updatedLinks,
             color,
+            collaborators,
+            use_ai: useAI,
           },
           false,
         );
@@ -146,6 +149,7 @@ export const useTaskDetailModal = ({
     setColor(initialState.color);
     setRealTime(initialState.realTime);
     setStatus(initialState.status);
+    setUseAI(initialTask?.use_ai || false);
 
     setTags(initialCollections.tags);
     setSubtasks(initialCollections.subtasks);
@@ -159,6 +163,7 @@ export const useTaskDetailModal = ({
   }, [
     initialState,
     initialCollections,
+    initialTask,
     setTitle,
     setDescription,
     setPriority,
@@ -177,10 +182,18 @@ export const useTaskDetailModal = ({
     setNewTag,
     setIsAddingTag,
     setIsAddingLink,
+    setUseAI,
   ]);
 
-  // Inject real resetForm into mutations (assuming useTaskMutations doesn't store it in a way that breaks this)
-  const mutationsWithReset = { ...mutations, resetForm };
+  const mutationsWithReset = useTaskMutations({
+    onSave,
+    onClose,
+    onDelete,
+    initialTask,
+    parentTask,
+    subtaskIndex,
+    resetForm,
+  });
 
   const handleSaveWrapper = async (shouldClose = true) => {
     if (!validateForm()) return;
@@ -196,9 +209,10 @@ export const useTaskDetailModal = ({
       tags,
       subtasks,
       links,
-      collaborators,
       color,
+      collaborators,
       shouldGenerateMeet,
+      use_ai: useAI,
     });
     if (shouldClose) onClose();
   };
@@ -218,22 +232,13 @@ export const useTaskDetailModal = ({
         tags,
         subtasks,
         links,
-        collaborators,
         color,
+        collaborators,
         shouldGenerateMeet,
+        use_ai: useAI,
       },
       shouldClose,
     );
-  };
-
-  const createURLWorkSpace = (workspaceId: string): void => {
-    if (workspaceId) {
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set('tab', 'Workspace');
-      newParams.set('workspaceId', workspaceId);
-      newParams.delete('taskId');
-      setSearchParams(newParams);
-    }
   };
 
   const [isGeneratingMeet, setIsGeneratingMeet] = useState(false);
@@ -263,18 +268,25 @@ export const useTaskDetailModal = ({
     }
   };
 
-  const handleTimerChange = (
-    value: string,
-    setter: (v: string) => void,
-    setSuggestions: (s: string[]) => void,
-    setAnchor: (el: HTMLDivElement | null) => void,
-    target: HTMLDivElement,
-  ) => {
-    setter(value);
-    const suggestions = getTimerSuggestions(value);
-    setSuggestions(suggestions);
-    setAnchor(suggestions.length > 0 ? target : null);
-  };
+  const handleTimerChange = useCallback(
+    (
+      value: string,
+      setter: (v: string) => void,
+      setSuggestions: (s: string[]) => void,
+      setAnchor: (el: HTMLDivElement | null) => void,
+      target: HTMLDivElement,
+    ) => {
+      setter(value);
+      const suggestions = getTimerSuggestions(value);
+      setSuggestions(suggestions);
+      if (suggestions.length > 0) {
+        setAnchor(target);
+      } else {
+        setAnchor(null);
+      }
+    },
+    [],
+  );
 
   const hasMeetLink =
     shouldGenerateMeet ||
@@ -284,6 +296,10 @@ export const useTaskDetailModal = ({
         l.title.toLowerCase().includes('google meet') ||
         l.url.includes('hangouts'),
     );
+
+  const createURLWorkSpace = useCallback((workspaceId: string) => {
+    window.open(`/workspace/${workspaceId}`, '_blank');
+  }, []);
 
   return {
     title,
@@ -304,11 +320,9 @@ export const useTaskDetailModal = ({
     setRealTime,
     color,
     setColor,
+    useAI,
+    setUseAI,
     errors,
-    setErrors,
-    handleTitleChange,
-    validateForm,
-    timeSlotDisplay,
     tags,
     setTags,
     subtasks,
@@ -336,18 +350,23 @@ export const useTaskDetailModal = ({
     handleRemoveLink,
     handleUpdateLink,
     collaborators,
+    setCollaborators,
     handleAddCollaborator,
     handleRemoveCollaborator,
-    ...mutationsWithReset,
     handleSave: handleSaveWrapper,
     handleUpdate: handleUpdateWrapper,
-    resetForm,
-    createURLWorkSpace,
-    shouldGenerateMeet,
-    setShouldGenerateMeet,
+    handleDelete: mutationsWithReset.handleDelete,
+    validateForm,
+    handleTitleChange,
+    timeSlotDisplay,
     isGeneratingMeet,
     handleGenerateMeet,
-    handleTimerChange,
     hasMeetLink,
+    setShouldGenerateMeet,
+    shouldGenerateMeet,
+    loadingSave: mutationsWithReset.loadingSave,
+    handleTimerChange,
+    createURLWorkSpace,
+    handleRemoveWorkspace: mutationsWithReset.handleRemoveWorkspace,
   };
 };

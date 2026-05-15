@@ -12,7 +12,7 @@ import {
   REMOVE_WORKSPACE,
   GET_WORKSPACES,
 } from '@/pages/Workspace/workspaces.graphql';
-import { useToast } from '@/components/ui/Toast/ToastContext';
+import { useToast } from '@/components/ui/Toast/useToast';
 import {
   createGoogleEvent,
   updateGoogleEvent,

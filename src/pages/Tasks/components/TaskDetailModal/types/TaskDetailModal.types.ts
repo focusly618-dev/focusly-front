@@ -16,6 +16,7 @@ export interface TaskData {
   realTime?: string;
   shouldGenerateMeet?: boolean;
   collaborators?: { name: string; email: string; avatar?: string }[];
+  use_ai?: boolean;
 }
 
 export interface TaskDetailModalProps {

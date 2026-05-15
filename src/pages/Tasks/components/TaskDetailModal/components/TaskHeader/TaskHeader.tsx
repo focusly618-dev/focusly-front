@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, Switch } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import {
   Close as CloseIcon,
   OpenInFull as OpenInFullIcon,
@@ -6,7 +6,6 @@ import {
   SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
   ArrowForwardIos,
 } from '@mui/icons-material';
-import { GeminiIcon } from '@/components/ui/GeminiIcon';
 import { GeminiAIToggle } from '@/components/ui/GeminiSwitch';
 import { TASK_COLORS } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { Task } from '@/redux/tasks/task.types';

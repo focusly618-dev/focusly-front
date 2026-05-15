@@ -1,7 +1,7 @@
 import { client } from '@/api/apollo';
 import { REMOVE_WORKSPACE, GET_WORKSPACES } from '../workspaces.graphql';
-import { useToast } from '@/components/ui/Toast/ToastContext';
-import { useConfirm } from '@/components/ui/Confirm/ConfirmContext';
+import { useToast } from '@/components/ui/Toast/useToast';
+import { useConfirm } from '@/components/ui/Confirm/useConfirm';
 
 export const useWorkspaceActions = () => {
   const toast = useToast();
