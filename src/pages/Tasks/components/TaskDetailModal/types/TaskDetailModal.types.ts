@@ -34,6 +34,8 @@ export interface TaskDetailModalProps {
     subtasks?: { title: string; completed: boolean; timer: number }[];
   };
   subtaskIndex?: number;
+  isAIScheduleEnabled?: boolean;
+  setIsAIScheduleEnabled?: (enabled: boolean) => void;
 }
 
 export interface UseTaskDetailModalProps {
@@ -45,6 +47,8 @@ export interface UseTaskDetailModalProps {
   initialTask?: Task | null;
   parentTask?: Task;
   subtaskIndex?: number;
+  isAIScheduleEnabled?: boolean;
+  setIsAIScheduleEnabled?: (enabled: boolean) => void;
 }
 
 export interface TaskInput {

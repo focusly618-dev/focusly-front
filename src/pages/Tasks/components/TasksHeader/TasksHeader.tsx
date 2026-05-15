@@ -20,6 +20,7 @@ interface TasksHeaderProps {
   setDateRange: (range: DateRangeFilter) => void;
   viewMode: 'list' | 'grid' | 'board' | 'workload';
   setViewMode: (mode: 'list' | 'grid' | 'board' | 'workload') => void;
+  children?: React.ReactNode;
 }
 
 export const TasksHeader = ({
@@ -28,6 +29,7 @@ export const TasksHeader = ({
   setDateRange,
   viewMode,
   setViewMode,
+  children,
 }: TasksHeaderProps) => {
   return (
     <Header>
@@ -38,6 +40,7 @@ export const TasksHeader = ({
         <Title>My Tasks</Title>
       </Box>
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        {children}
         <Box
           sx={{
             bgcolor: 'background.paper',

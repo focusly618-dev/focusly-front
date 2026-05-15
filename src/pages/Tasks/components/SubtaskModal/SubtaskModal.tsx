@@ -8,6 +8,8 @@ interface SubtaskModalProps {
   onSave: () => Promise<void>;
   activeParentTask: TaskResponse | null;
   activeSubtaskIndex: number | null;
+  isAIScheduleEnabled?: boolean;
+  setIsAIScheduleEnabled?: (enabled: boolean) => void;
 }
 
 export const SubtaskModal = ({
@@ -16,6 +18,8 @@ export const SubtaskModal = ({
   onSave,
   activeParentTask,
   activeSubtaskIndex,
+  isAIScheduleEnabled,
+  setIsAIScheduleEnabled,
 }: SubtaskModalProps) => {
   if (!isOpen) return null;
 
@@ -39,6 +43,8 @@ export const SubtaskModal = ({
       onSave={onSave}
       initialStart={null}
       initialEnd={null}
+      isAIScheduleEnabled={isAIScheduleEnabled}
+      setIsAIScheduleEnabled={setIsAIScheduleEnabled}
       parentTask={
         activeParentTask
           ? {

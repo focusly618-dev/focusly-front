@@ -232,6 +232,58 @@ export const ListViewTask = ({
             </IconButton>
           </Box>
         </CardLeft>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {onStartFocus && (
+            <Tooltip title="Start Focus Mode">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onStartFocus(task as unknown as Task);
+                }}
+                sx={{
+                  color: 'primary.main',
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+                  '&:hover': {
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.2),
+                    transform: 'scale(1.1)',
+                  },
+                  transition: 'all 0.2s',
+                  width: 32,
+                  height: 32,
+                }}
+              >
+                <PlayIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
+          )}
+          {isAIScheduleEnabled && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                color: '#7c3aed',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                background: 'rgba(124, 58, 237, 0.1)',
+                border: '1px solid rgba(124, 58, 237, 0.2)',
+                boxShadow: '0 0 10px rgba(124, 58, 237, 0.2)',
+              }}
+            >
+              <AutoAwesomeIcon sx={{ fontSize: 14 }} />
+              <Typography
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  letterSpacing: '0.05em',
+                }}
+              >
+                AI
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </TaskCard>
 
       {/* Subtasks */}

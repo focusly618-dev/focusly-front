@@ -43,6 +43,9 @@ export const useHome = () => {
     return localStorage.getItem('focus_mode_open') === 'true';
   });
   const [isFocusModeActive, setIsFocusModeActive] = useState(false);
+  const [isAIScheduleEnabled, setIsAIScheduleEnabled] = useState(() => {
+    return localStorage.getItem('ai_schedule_enabled') === 'true';
+  });
   const [activeFocusTask, setActiveFocusTask] = useState<Task | null>(() => {
     const saved = localStorage.getItem('focus_mode_task');
     return saved ? JSON.parse(saved) : null;
@@ -69,7 +72,13 @@ export const useHome = () => {
     } else {
       localStorage.removeItem('focus_mode_subtask_index');
     }
-  }, [isFocusModeOpen, activeFocusTask, activeFocusSubtaskIndex]);
+    localStorage.setItem('ai_schedule_enabled', String(isAIScheduleEnabled));
+  }, [
+    isFocusModeOpen,
+    activeFocusTask,
+    activeFocusSubtaskIndex,
+    isAIScheduleEnabled,
+  ]);
 
   // Task Details Management via URL
   const taskIdParam = searchParams.get('taskId');
@@ -354,5 +363,7 @@ export const useHome = () => {
     initialStart,
     initialEnd,
     isCreatingNewTask,
+    isAIScheduleEnabled,
+    setIsAIScheduleEnabled,
   };
 };

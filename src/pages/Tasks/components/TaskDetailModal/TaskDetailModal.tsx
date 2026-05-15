@@ -21,7 +21,6 @@ import { TaskHeader } from './components/TaskHeader/TaskHeader';
 import { TaskResources } from './components/TaskResources/TaskResources';
 import { TaskDescription } from './components/TaskDescription/TaskDescription';
 import { TaskActions } from './components/TaskActions/TaskActions';
-
 import { TaskWorkspaces } from './components/TaskWorkspaces/TaskWorkspaces';
 
 const Transition = React.forwardRef(function Transition(
@@ -42,6 +41,8 @@ export const TaskDetailModal = ({
   handleDelete: onDelete,
   parentTask,
   subtaskIndex,
+  isAIScheduleEnabled,
+  setIsAIScheduleEnabled,
 }: TaskDetailModalProps) => {
   const {
     title,
@@ -102,6 +103,8 @@ export const TaskDetailModal = ({
     onDelete,
     parentTask: parentTask ? (parentTask as unknown as Task) : undefined,
     subtaskIndex,
+    isAIScheduleEnabled,
+    setIsAIScheduleEnabled,
   });
 
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -228,6 +231,8 @@ export const TaskDetailModal = ({
           handleUpdate={handleUpdate}
           handleSave={handleSave}
           loadingSave={loadingSave}
+          isAIScheduleEnabled={isAIScheduleEnabled}
+          setIsAIScheduleEnabled={setIsAIScheduleEnabled}
         />
       </Dialog>
     </LocalizationProvider>

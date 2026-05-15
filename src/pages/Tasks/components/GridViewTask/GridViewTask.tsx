@@ -2,6 +2,7 @@ import { Box, Typography, LinearProgress } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
   Link as LinkIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 import { GeminiAIToggle } from '@/components/ui/GeminiSwitch';
 
@@ -78,6 +79,25 @@ export const GridViewTask = ({ task, onTaskClick, updateTask }: GridViewTaskProp
               {task.links.length}
             </Typography>
           </MetaBadge>
+        )}
+        {isAIScheduleEnabled && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              color: '#7c3aed',
+              background: 'rgba(124, 58, 237, 0.1)',
+              padding: '2px 6px',
+              borderRadius: '6px',
+              border: '1px solid rgba(124, 58, 237, 0.2)',
+            }}
+          >
+            <AutoAwesomeIcon sx={{ fontSize: 12 }} />
+            <Typography sx={{ fontSize: '10px', fontWeight: 700 }}>
+              AI
+            </Typography>
+          </Box>
         )}
       </GridCardHeader>
 

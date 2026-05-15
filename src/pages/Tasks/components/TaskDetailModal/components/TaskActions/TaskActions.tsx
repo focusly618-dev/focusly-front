@@ -1,5 +1,3 @@
-import { Box, Button, CircularProgress, DialogActions } from '@mui/material';
-import { Delete as DeleteIcon } from '@mui/icons-material';
 import {
   dialogActionsSx,
   deleteButtonSx,
@@ -21,11 +19,11 @@ interface TaskActionsProps {
 
 export const TaskActions = ({
   initialTask,
-  handleDelete,
-  onClose,
   handleUpdate,
   handleSave,
   loadingSave,
+  isAIScheduleEnabled,
+  setIsAIScheduleEnabled,
 }: TaskActionsProps) => {
   const toast = useToast();
   const { confirm } = useConfirm();

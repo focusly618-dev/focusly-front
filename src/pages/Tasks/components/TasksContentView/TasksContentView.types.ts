@@ -1,4 +1,5 @@
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import type { Task } from '@/redux/tasks/task.types';
 
 export interface TasksContentViewProps {
   viewMode: 'list' | 'grid' | 'board' | 'workload';
@@ -12,4 +13,7 @@ export interface TasksContentViewProps {
   handleTaskClick: (task: TaskResponse) => void;
   updateTask: (taskId: string, updates: Partial<TaskResponse>) => Promise<void>;
   setSearchTerm: (term: string) => void;
+  isAIScheduleEnabled?: boolean;
+  setIsAIScheduleEnabled?: (enabled: boolean) => void;
+  onStartFocus?: (task: Task) => void;
 }

@@ -102,11 +102,18 @@ export const TasksSkeletons = ({ viewMode }: TasksSkeletonsProps) => {
 
   // Default: list view skeleton
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {[1, 2, 3, 4, 5].map((i) => (
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      {[1, 2, 3, 4, 5, 6].map((i) => (
         <TaskCard
           key={i}
-          sx={{ cursor: 'default', borderLeft: '5px solid #30363d' }}
+          sx={{
+            cursor: 'default',
+            borderLeft: '3px solid',
+            borderColor: (theme) => theme.palette.divider,
+            minHeight: '40px',
+            display: 'flex',
+            alignItems: 'center',
+          }}
         >
           <Box
             sx={{
@@ -118,42 +125,37 @@ export const TasksSkeletons = ({ viewMode }: TasksSkeletonsProps) => {
           >
             <Skeleton
               variant="circular"
-              width={24}
-              height={24}
+              width={8}
+              height={8}
               animation="wave"
+              sx={{ ml: 0.5 }}
             />
-            <Box sx={{ flex: 1 }}>
-              <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+            <Box
+              sx={{ display: 'flex', flex: 1, alignItems: 'center', gap: 2 }}
+            >
+              <Skeleton
+                variant="text"
+                width="30%"
+                height={20}
+                animation="wave"
+              />
+              <Skeleton
+                variant="rectangular"
+                width="50px"
+                height={18}
+                sx={{ borderRadius: '6px' }}
+                animation="wave"
+              />
+              <Box sx={{ display: 'flex', gap: 2, ml: 'auto' }}>
                 <Skeleton
                   variant="text"
-                  width="40%"
-                  height={24}
-                  animation="wave"
-                />
-                <Skeleton
-                  variant="rectangular"
                   width="60px"
-                  height={20}
-                  sx={{ borderRadius: '10px' }}
-                  animation="wave"
-                />
-              </Box>
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <Skeleton
-                  variant="text"
-                  width="20%"
                   height={16}
                   animation="wave"
                 />
                 <Skeleton
                   variant="text"
-                  width="25%"
-                  height={16}
-                  animation="wave"
-                />
-                <Skeleton
-                  variant="text"
-                  width="15%"
+                  width="80px"
                   height={16}
                   animation="wave"
                 />

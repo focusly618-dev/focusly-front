@@ -38,15 +38,22 @@ export const StatCard = styled(Paper)(({ theme }) => ({
   '&:hover': {
     transform: 'translateY(-2px)',
     boxShadow:
-      theme.palette.mode === 'dark' ? '0 4px 20px rgba(0,0,0,0.4)' : '0 4px 20px rgba(0,0,0,0.1)',
+      theme.palette.mode === 'dark'
+        ? '0 4px 20px rgba(0,0,0,0.4)'
+        : '0 4px 20px rgba(0,0,0,0.1)',
   },
 }));
 
-export const IconWrapper = styled(Box)<{ color?: string }>(({ theme, color }) => {
+export const IconWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'color',
+})<{ color?: string }>(({ theme, color }) => {
   const getColor = (c: string) => {
     if (c.includes('.')) {
       const parts = c.split('.');
-      let current: Record<string, unknown> = theme.palette as unknown as Record<string, unknown>;
+      let current: Record<string, unknown> = theme.palette as unknown as Record<
+        string,
+        unknown
+      >;
       for (const part of parts) {
         const next = current[part];
         if (next && typeof next === 'object') {
@@ -70,7 +77,9 @@ export const IconWrapper = styled(Box)<{ color?: string }>(({ theme, color }) =>
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: resolvedColor ? alpha(resolvedColor, 0.1) : theme.palette.action.hover,
+    backgroundColor: resolvedColor
+      ? alpha(resolvedColor, 0.1)
+      : theme.palette.action.hover,
     color: resolvedColor || theme.palette.text.primary,
   };
 });
@@ -108,28 +117,38 @@ export const BottomRow = styled(Box)({
   },
 });
 
-export const FilterButton = styled('button')<{ active?: boolean }>(({ theme, active }) => ({
+export const FilterButton = styled('button', {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
   padding: '8px 16px',
   borderRadius: '20px',
   border: 'none',
   backgroundColor: active ? theme.palette.primary.main : 'transparent',
-  color: active ? theme.palette.primary.contrastText : theme.palette.text.secondary,
+  color: active
+    ? theme.palette.primary.contrastText
+    : theme.palette.text.secondary,
   cursor: 'pointer',
   fontWeight: 600,
   fontSize: '14px',
   transition: 'all 0.2s',
   '&:hover': {
-    backgroundColor: active ? theme.palette.primary.dark : theme.palette.action.hover,
+    backgroundColor: active
+      ? theme.palette.primary.dark
+      : theme.palette.action.hover,
     color: theme.palette.text.primary,
   },
 }));
 
-export const ActionButton = styled('button')<{ primary?: boolean }>(({ theme, primary }) => ({
+export const ActionButton = styled('button', {
+  shouldForwardProp: (prop) => prop !== 'primary',
+})<{ primary?: boolean }>(({ theme, primary }) => ({
   padding: '10px 20px',
   borderRadius: '8px',
   border: primary ? 'none' : `1px solid ${theme.palette.divider}`,
   backgroundColor: primary ? theme.palette.primary.main : 'transparent',
-  color: primary ? theme.palette.primary.contrastText : theme.palette.text.primary,
+  color: primary
+    ? theme.palette.primary.contrastText
+    : theme.palette.text.primary,
   cursor: 'pointer',
   fontWeight: 600,
   fontSize: '14px',
@@ -138,7 +157,9 @@ export const ActionButton = styled('button')<{ primary?: boolean }>(({ theme, pr
   gap: '8px',
   transition: 'all 0.2s',
   '&:hover': {
-    backgroundColor: primary ? theme.palette.primary.dark : theme.palette.action.hover,
+    backgroundColor: primary
+      ? theme.palette.primary.dark
+      : theme.palette.action.hover,
   },
 }));
 
@@ -149,7 +170,9 @@ export const HeatmapGrid = styled(Box)({
   marginTop: '16px',
 });
 
-export const HeatmapCell = styled(Box)<{ intensity: number }>(({ theme, intensity }) => ({
+export const HeatmapCell = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'intensity',
+})<{ intensity: number }>(({ theme, intensity }) => ({
   aspectRatio: '1',
   borderRadius: '4px',
   backgroundColor: theme.palette.primary.main,
