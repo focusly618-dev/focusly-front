@@ -23,8 +23,8 @@ export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
     skip: !userId,
     variables: {
       userId,
-      filters,
-      sort,
+      filters: filters || null,
+      sort: sort || null,
     },
     fetchPolicy: 'cache-and-network',
   });

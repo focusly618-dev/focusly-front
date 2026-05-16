@@ -141,28 +141,28 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
                 );
               case 'Backlog':
                 return (
-                  <HistoryIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                  <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                 );
               case 'Planning':
                 return (
                   <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />
                 );
-              case 'OnHold':
+              case 'Scheduled':
+                return <PlannedIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />;
+              case 'On Hold':
                 return (
-                  <RadioButtonUncheckedIcon
-                    sx={{ fontSize: 16, color: 'error.main' }}
-                  />
+                  <PauseCircleIcon sx={{ fontSize: 16, color: 'error.main' }} />
                 );
               case 'Review':
                 return (
-                  <VisibilityIcon
-                    sx={{ fontSize: 16, color: 'secondary.main' }}
-                  />
+                  <VisibilityIcon sx={{ fontSize: 16, color: '#06b6d4' }} />
                 );
+              case 'Archived':
+                return <HistoryIcon sx={{ fontSize: 16, color: '#4b5563' }} />;
               default:
                 return (
                   <RadioButtonUncheckedIcon
-                    sx={{ fontSize: 16, color: 'info.main' }}
+                    sx={{ fontSize: 16, color: 'text.secondary' }}
                   />
                 );
             }
@@ -193,11 +193,15 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             transition: 'all 0.2s',
           }}
         >
-          <FlashOnIcon sx={{ fontSize: 16, color: '#f59e0b' }} />
+          {getPriorityFromLevel(Number(activeItem?.priority_level)) !==
+            'No priority' && (
+            <FlashOnIcon sx={{ fontSize: 16, color: '#f59e0b' }} />
+          )}
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {activeItem?.priority_level
-              ? getPriorityFromLevel(Number(activeItem.priority_level))
-              : 'Med'}
+            {getPriorityFromLevel(Number(activeItem?.priority_level)) ===
+            'No priority'
+              ? ''
+              : getPriorityFromLevel(Number(activeItem?.priority_level))}
           </Typography>
         </Box>
 
@@ -234,7 +238,7 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             label: 'Todo',
             icon: (
               <RadioButtonUncheckedIcon
-                sx={{ fontSize: 18, color: 'info.main' }}
+                sx={{ fontSize: 18, color: 'text.secondary' }}
               />
             ),
           },
@@ -243,29 +247,29 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             icon: <PlannedIcon sx={{ fontSize: 18, color: 'info.main' }} />,
           },
           {
+            label: 'Scheduled',
+            icon: <PlannedIcon sx={{ fontSize: 18, color: '#8b5cf6' }} />,
+          },
+          {
             label: 'Pending',
             icon: (
               <PauseCircleIcon sx={{ fontSize: 18, color: 'warning.main' }} />
             ),
           },
           {
-            label: 'OnHold',
+            label: 'On Hold',
             icon: (
-              <RadioButtonUncheckedIcon
-                sx={{ fontSize: 18, color: 'error.main' }}
-              />
+              <PauseCircleIcon sx={{ fontSize: 18, color: 'error.main' }} />
             ),
           },
           {
             label: 'Review',
-            icon: (
-              <VisibilityIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
-            ),
+            icon: <VisibilityIcon sx={{ fontSize: 18, color: '#06b6d4' }} />,
           },
           {
             label: 'Backlog',
             icon: (
-              <HistoryIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
+              <HistoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
             ),
           },
           {
@@ -273,6 +277,10 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             icon: (
               <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
             ),
+          },
+          {
+            label: 'Archived',
+            icon: <HistoryIcon sx={{ fontSize: 18, color: '#4b5563' }} />,
           },
         ].map((option) => (
           <MenuItem
@@ -307,7 +315,7 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
           { level: 1, label: 'Low', color: theme.palette.success.main },
           { level: 2, label: 'Med', color: theme.palette.warning.main },
           { level: 3, label: 'High', color: theme.palette.error.main },
-          { level: 4, label: 'Critical', color: theme.palette.error.dark },
+          { level: 0, label: '', color: theme.palette.text.secondary },
         ].map((p) => (
           <MenuItem
             key={p.level}
@@ -317,7 +325,9 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             }}
             sx={{ gap: 1.5, py: 1 }}
           >
-            <FlashOnIcon sx={{ fontSize: 18, color: p.color }} />
+            {p.label !== '' && (
+              <FlashOnIcon sx={{ fontSize: 18, color: p.color }} />
+            )}
             <Typography variant="body2">{p.label}</Typography>
           </MenuItem>
         ))}

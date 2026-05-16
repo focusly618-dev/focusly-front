@@ -57,15 +57,61 @@ export const useTasks = () => {
   );
 
   // ── Derived data ───────────────────────────────────────────────────
-  const filteredTasks = useMemo(() => {
-    let result = data.tasks;
-    if (filterLogic.searchTerm) {
-      result = result.filter((t) =>
-        t.title.toLowerCase().includes(filterLogic.searchTerm.toLowerCase()),
-      );
-    }
-    return result;
-  }, [data.tasks, filterLogic.searchTerm]);
+  const filteredTasks = useMemo(
+    () => filterLogic.applyLocalFilters(data.tasks),
+    [data.tasks, filterLogic],
+  );
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      all: data.tasks.length,
+      Todo: 0,
+      Planning: 0,
+      Scheduled: 0,
+      Done: 0,
+    };
+    data.tasks.forEach((t) => {
+      const status = t.status || 'Todo';
+      if (counts[status] !== undefined) {
+        counts[status]++;
+      }
+    });
+    return counts;
+  }, [data.tasks]);
+
+  const { highPriorityTasks, todayTasks, upcomingTasks } = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('en-CA');
+
+    const high: TaskResponse[] = [];
+    const today: TaskResponse[] = [];
+    const upcoming: TaskResponse[] = [];
+
+    filteredTasks.forEach((task) => {
+      if (task.status === 'Done') return;
+
+      const dateToUse = task.deadline;
+      const taskDateStr = dateToUse
+        ? new Date(dateToUse).toLocaleDateString('en-CA')
+        : '';
+      const isHighPriority = (task.priority_level ?? 0) >= 3;
+      const isOverdue = taskDateStr && taskDateStr < todayStr;
+
+      if (isHighPriority || isOverdue) {
+        high.push(task);
+      } else if (taskDateStr === todayStr) {
+        today.push(task);
+      } else {
+        upcoming.push(task);
+      }
+    });
+
+    return {
+      highPriorityTasks: high,
+      todayTasks: today,
+      upcomingTasks: upcoming,
+    };
+  }, [filteredTasks]);
 
   // ── Handlers ───────────────────────────────────────────────────────
   const handleTaskClick = (task: TaskResponse): void => {
@@ -128,9 +174,9 @@ export const useTasks = () => {
     // Filters & search
     searchTerm: filterLogic.searchTerm,
     setSearchTerm: filterLogic.setSearchTerm,
-    highPriorityTasks: filterLogic.highPriorityTasks,
-    todayTasks: filterLogic.todayTasks,
-    upcomingTasks: filterLogic.upcomingTasks,
+    highPriorityTasks,
+    todayTasks,
+    upcomingTasks,
     isCompletedFilterActive: filterLogic.isCompletedFilterActive,
     dateRange: filterLogic.dateRange,
     setDateRange: filterLogic.setDateRange,
@@ -180,5 +226,7 @@ export const useTasks = () => {
     handleSaveSubtask,
     handleSubtaskToggle,
     setPriorityFilter: filterLogic.setPriorityFilter,
+    setStatusFilter: filterLogic.setStatusFilter,
+    statusCounts,
   };
 };

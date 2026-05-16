@@ -157,7 +157,10 @@ export const CommandPaletteContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: '8px',
-  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? '0 10px 25px rgba(0,0,0,0.5)'
+      : '0 10px 25px rgba(0,0,0,0.1)',
   zIndex: 10,
   overflow: 'hidden',
   width: '100%',
@@ -168,7 +171,10 @@ export const CommandPaletteContainer = styled(Box)(({ theme }) => ({
 export const CollapsedSearchContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  backgroundColor: theme.palette.action.hover,
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? theme.palette.background.paper
+      : theme.palette.background.default,
   borderRadius: '8px',
   padding: '12px 16px',
   cursor: 'text',
@@ -284,23 +290,27 @@ export const CustomTabsContainer = styled(Box)(({ theme }) => ({
   gap: '4px',
 }));
 
-export const CustomTabButton = styled(Box)<{ active?: boolean }>(({ theme, active }) => ({
-  flex: 1,
-  padding: '6px 0',
-  textAlign: 'center',
-  fontSize: '10px',
-  fontWeight: 700,
-  letterSpacing: '0.5px',
-  color: active ? theme.palette.info.main : theme.palette.text.secondary,
-  backgroundColor: active ? theme.palette.action.selected : 'transparent',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  '&:hover': {
-    backgroundColor: active ? theme.palette.action.selected : theme.palette.action.hover,
-    color: active ? theme.palette.info.main : theme.palette.text.primary,
-  },
-}));
+export const CustomTabButton = styled(Box)<{ active?: boolean }>(
+  ({ theme, active }) => ({
+    flex: 1,
+    padding: '6px 0',
+    textAlign: 'center',
+    fontSize: '10px',
+    fontWeight: 700,
+    letterSpacing: '0.5px',
+    color: active ? theme.palette.info.main : theme.palette.text.secondary,
+    backgroundColor: active ? theme.palette.action.selected : 'transparent',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    '&:hover': {
+      backgroundColor: active
+        ? theme.palette.action.selected
+        : theme.palette.action.hover,
+      color: active ? theme.palette.info.main : theme.palette.text.primary,
+    },
+  }),
+);
 
 export const ResultTitle = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -317,16 +327,20 @@ export const ResultCount = styled(Box)(({ theme }) => ({
   letterSpacing: '0.5px',
 }));
 
-export const TaskItemContainer = styled(Box)<{ active?: boolean }>(({ theme, active }) => ({
-  padding: '10px 16px',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  borderLeft: active ? `2px solid ${theme.palette.info.main}` : '2px solid transparent',
-  backgroundColor: active ? theme.palette.action.selected : 'transparent',
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
+export const TaskItemContainer = styled(Box)<{ active?: boolean }>(
+  ({ theme, active }) => ({
+    padding: '10px 16px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    borderLeft: active
+      ? `2px solid ${theme.palette.info.main}`
+      : '2px solid transparent',
+    backgroundColor: active ? theme.palette.action.selected : 'transparent',
+    '&:hover': {
+      backgroundColor: theme.palette.action.hover,
+    },
+  }),
+);
 
 export const SubTaskItemContainer = styled(Box)(({ theme }) => ({
   padding: '8px 16px 8px 48px', // Indented
@@ -350,7 +364,7 @@ export const StyledBadge = styled(Box)<{ color: string; bgColor: string }>(
     textTransform: 'uppercase',
     display: 'inline-block',
     marginRight: '8px',
-  })
+  }),
 );
 
 export const StyledCategory = styled(Box)(({ theme }) => ({
@@ -392,16 +406,18 @@ export const RadioCircle = styled(Box)<{ selected?: boolean; color: string }>(
       backgroundColor: color,
       display: selected ? 'block' : 'none',
     },
-  })
+  }),
 );
 
-export const CheckSquare = styled(Box)<{ selected?: boolean }>(({ theme, selected }) => ({
-  width: '16px',
-  height: '16px',
-  borderRadius: '4px',
-  border: `1px solid ${selected ? theme.palette.info.main : theme.palette.divider}`,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: selected ? theme.palette.info.main : 'transparent',
-}));
+export const CheckSquare = styled(Box)<{ selected?: boolean }>(
+  ({ theme, selected }) => ({
+    width: '16px',
+    height: '16px',
+    borderRadius: '4px',
+    border: `1px solid ${selected ? theme.palette.info.main : theme.palette.divider}`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: selected ? theme.palette.info.main : 'transparent',
+  }),
+);

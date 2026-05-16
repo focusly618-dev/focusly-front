@@ -26,16 +26,20 @@ export const getStatusIcon = (status: string | null, fontSize = 16) => {
       return <TodoIcon sx={{ ...sx, color: 'text.secondary' }} />;
     case 'Planning':
       return <PlannedIcon sx={{ ...sx, color: 'info.main' }} />;
+    case 'Scheduled':
+      return <PlannedIcon sx={{ ...sx, color: '#8b5cf6' }} />;
     case 'Pending':
       return <AccessTimeIcon sx={{ ...sx, color: 'warning.main' }} />;
-    case 'OnHold':
+    case 'On Hold':
       return <OnHoldIcon sx={{ ...sx, color: 'error.main' }} />;
     case 'Review':
-      return <VisibilityIcon sx={{ ...sx, color: 'secondary.main' }} />;
+      return <VisibilityIcon sx={{ ...sx, color: '#06b6d4' }} />;
     case 'Done':
       return <CheckCircleOutlineIcon sx={{ ...sx, color: 'success.main' }} />;
     case 'Backlog':
       return <HistoryIcon sx={{ ...sx, color: 'text.secondary' }} />;
+    case 'Archived':
+      return <HistoryIcon sx={{ ...sx, color: '#4b5563' }} />;
     default:
       return <TodoIcon sx={{ ...sx, color: 'text.secondary' }} />;
   }

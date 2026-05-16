@@ -48,15 +48,15 @@ export type PriorityType = 'High' | 'Med' | 'Low' | 'No priority';
 
 export const getPriorityFromLevel = (level: number): PriorityType => {
   if (level >= 3) return 'High';
-  if (level === 1) return 'Low';
   if (level === 2) return 'Med';
+  if (level === 1) return 'Low';
   return 'No priority';
 };
 
 export const getPriorityLevel = (priority: PriorityType): number => {
-  if (priority === 'High') return 4;
-  if (priority === 'Low') return 1;
+  if (priority === 'High') return 3;
   if (priority === 'Med') return 2;
+  if (priority === 'Low') return 1;
   return 0;
 };
 

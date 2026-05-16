@@ -33,10 +33,12 @@ export const useEditorSidebar = (props: EditorSidebarProps) => {
   const getStatusColor = (status: string) => {
     if (status === 'Done') return theme.palette.success.main;
     if (status === 'Pending') return theme.palette.warning.main;
-    if (status === 'Backlog') return theme.palette.secondary.main;
+    if (status === 'Backlog') return theme.palette.text.secondary;
     if (status === 'Planning') return theme.palette.info.main;
-    if (status === 'OnHold') return theme.palette.error.main;
-    if (status === 'Review') return theme.palette.secondary.main;
+    if (status === 'On Hold') return theme.palette.error.main;
+    if (status === 'Review') return '#06b6d4';
+    if (status === 'Scheduled') return '#8b5cf6';
+    if (status === 'Archived') return '#4b5563';
     return theme.palette.info.main;
   };
 

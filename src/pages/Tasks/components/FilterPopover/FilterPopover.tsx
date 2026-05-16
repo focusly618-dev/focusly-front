@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Typography } from '@mui/material';
-import { 
-  Flag as FlagIcon, 
-  CircleOutlined as CircleOutlinedIcon, 
-  CheckCircleOutline as CheckCircleOutlineIcon, 
-  History as HistoryIcon 
+import {
+  Flag as FlagIcon,
+  CircleOutlined as CircleOutlinedIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 
 import {
@@ -50,9 +50,15 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
   tags,
   activeFilterState,
 }) => {
-  const [selectedPriorities, setSelectedPriorities] = useState<string[]>(activeFilterState?.priorities || []);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(activeFilterState?.categories || []);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(activeFilterState?.statuses || []);
+  const [selectedPriorities, setSelectedPriorities] = useState<string[]>(
+    activeFilterState?.priorities || [],
+  );
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    activeFilterState?.categories || [],
+  );
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(
+    activeFilterState?.statuses || [],
+  );
 
   const [prevOpen, setPrevOpen] = useState(open);
 
@@ -68,7 +74,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
   const toggleSelection = (
     item: string,
     current: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     if (current.includes(item)) {
       setter(current.filter((i) => i !== item));
@@ -101,7 +107,11 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
       {/* BY PRIORITY */}
       <Section>
         <SectionTitle>By Priority</SectionTitle>
-        <ItemRow onClick={() => toggleSelection('High', selectedPriorities, setSelectedPriorities)}>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('High', selectedPriorities, setSelectedPriorities)
+          }
+        >
           <ItemLabel>
             <FlagIcon sx={{ color: 'error.main', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
@@ -111,7 +121,9 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <RadioCircle selected={selectedPriorities.includes('High')} />
         </ItemRow>
         <ItemRow
-          onClick={() => toggleSelection('Medium', selectedPriorities, setSelectedPriorities)}
+          onClick={() =>
+            toggleSelection('Medium', selectedPriorities, setSelectedPriorities)
+          }
         >
           <ItemLabel>
             <FlagIcon sx={{ color: 'warning.main', fontSize: 16 }} />
@@ -121,7 +133,11 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           </ItemLabel>
           <RadioCircle selected={selectedPriorities.includes('Medium')} />
         </ItemRow>
-        <ItemRow onClick={() => toggleSelection('Low', selectedPriorities, setSelectedPriorities)}>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('Low', selectedPriorities, setSelectedPriorities)
+          }
+        >
           <ItemLabel>
             <FlagIcon sx={{ color: 'primary.main', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
@@ -138,7 +154,9 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
             <CategoryItem
               key={tag}
               selected={selectedCategories.includes(tag)}
-              onClick={() => toggleSelection(tag, selectedCategories, setSelectedCategories)}
+              onClick={() =>
+                toggleSelection(tag, selectedCategories, setSelectedCategories)
+              }
             >
               <Dot color={getTagColors(tag).color} />
               <Typography variant="body2" sx={{ fontSize: '13px' }}>
@@ -152,43 +170,122 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
       {/* BY STATUS */}
       <Section>
         <SectionTitle>By Status</SectionTitle>
-        <ItemRow onClick={() => toggleSelection('ToDo', selectedStatuses, setSelectedStatuses)}>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('Todo', selectedStatuses, setSelectedStatuses)
+          }
+        >
           <ItemLabel>
-            <CircleOutlinedIcon sx={{ color: '#c9d1d9', fontSize: 16 }} />
+            <CircleOutlinedIcon sx={{ color: '#94a3b8', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
               To Do
             </Typography>
           </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('ToDo')} />
+          <RadioCircle selected={selectedStatuses.includes('Todo')} />
         </ItemRow>
         <ItemRow
-          onClick={() => toggleSelection('Completed', selectedStatuses, setSelectedStatuses)}
+          onClick={() =>
+            toggleSelection('Planning', selectedStatuses, setSelectedStatuses)
+          }
         >
           <ItemLabel>
-            <CheckCircleOutlineIcon sx={{ color: 'success.main', fontSize: 16 }} />
+            <AccessTimeIcon sx={{ color: '#3b82f6', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Completed
+              Planning
             </Typography>
           </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Completed')} />
+          <RadioCircle selected={selectedStatuses.includes('Planning')} />
         </ItemRow>
-        <ItemRow onClick={() => toggleSelection('Pending', selectedStatuses, setSelectedStatuses)}>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('Scheduled', selectedStatuses, setSelectedStatuses)
+          }
+        >
           <ItemLabel>
-            <AccessTimeIcon sx={{ color: 'warning.main', fontSize: 16 }} />
+            <AccessTimeIcon sx={{ color: '#8b5cf6', fontSize: 16 }} />
+            <Typography variant="body2" sx={{ fontSize: '13px' }}>
+              Scheduled
+            </Typography>
+          </ItemLabel>
+          <RadioCircle selected={selectedStatuses.includes('Scheduled')} />
+        </ItemRow>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('Review', selectedStatuses, setSelectedStatuses)
+          }
+        >
+          <ItemLabel>
+            <HistoryIcon sx={{ color: '#06b6d4', fontSize: 16 }} />
+            <Typography variant="body2" sx={{ fontSize: '13px' }}>
+              Review
+            </Typography>
+          </ItemLabel>
+          <RadioCircle selected={selectedStatuses.includes('Review')} />
+        </ItemRow>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('Pending', selectedStatuses, setSelectedStatuses)
+          }
+        >
+          <ItemLabel>
+            <HistoryIcon sx={{ color: '#f59e0b', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
               Pending
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Pending')} />
         </ItemRow>
-        <ItemRow onClick={() => toggleSelection('Backlog', selectedStatuses, setSelectedStatuses)}>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('On Hold', selectedStatuses, setSelectedStatuses)
+          }
+        >
           <ItemLabel>
-            <HistoryIcon sx={{ color: '#c9d1d9', fontSize: 16 }} />
+            <HistoryIcon sx={{ color: '#ef4444', fontSize: 16 }} />
+            <Typography variant="body2" sx={{ fontSize: '13px' }}>
+              On Hold
+            </Typography>
+          </ItemLabel>
+          <RadioCircle selected={selectedStatuses.includes('On Hold')} />
+        </ItemRow>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('Done', selectedStatuses, setSelectedStatuses)
+          }
+        >
+          <ItemLabel>
+            <CheckCircleOutlineIcon sx={{ color: '#10b981', fontSize: 16 }} />
+            <Typography variant="body2" sx={{ fontSize: '13px' }}>
+              Done
+            </Typography>
+          </ItemLabel>
+          <RadioCircle selected={selectedStatuses.includes('Done')} />
+        </ItemRow>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('Backlog', selectedStatuses, setSelectedStatuses)
+          }
+        >
+          <ItemLabel>
+            <HistoryIcon sx={{ color: '#64748b', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
               Backlog
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Backlog')} />
+        </ItemRow>
+        <ItemRow
+          onClick={() =>
+            toggleSelection('Archived', selectedStatuses, setSelectedStatuses)
+          }
+        >
+          <ItemLabel>
+            <HistoryIcon sx={{ color: '#4b5563', fontSize: 16 }} />
+            <Typography variant="body2" sx={{ fontSize: '13px' }}>
+              Archived
+            </Typography>
+          </ItemLabel>
+          <RadioCircle selected={selectedStatuses.includes('Archived')} />
         </ItemRow>
       </Section>
 

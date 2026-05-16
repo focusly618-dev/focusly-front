@@ -7,10 +7,10 @@ import {
   Dialog,
   DialogContent,
 } from '@mui/material';
-import { 
-  Close as CloseIcon, 
-  Search as SearchIcon, 
-  Folder as FolderIcon 
+import {
+  Close as CloseIcon,
+  Search as SearchIcon,
+  Folder as FolderIcon,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button, TextField } from '@/components/ui';
@@ -24,12 +24,18 @@ interface AllFoldersModalProps {
   selectedId: string | null;
 }
 
-export const AllFoldersModal = ({ open, onClose, folders, onSelect, selectedId }: AllFoldersModalProps) => {
+export const AllFoldersModal = ({
+  open,
+  onClose,
+  folders,
+  onSelect,
+  selectedId,
+}: AllFoldersModalProps) => {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredFolders = folders.filter(f =>
-    f.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredFolders = folders.filter((f) =>
+    f.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -43,21 +49,34 @@ export const AllFoldersModal = ({ open, onClose, folders, onSelect, selectedId }
           borderRadius: '24px',
           bgcolor: theme.palette.background.paper,
           backgroundImage: 'none',
-          boxShadow: theme.palette.mode === 'dark' 
-            ? '0 25px 50px -12px rgba(0, 0, 0, 0.7)' 
-            : '0 25px 50px -12px rgba(0, 0, 0, 0.1)',
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+              : '0 25px 50px -12px rgba(0, 0, 0, 0.1)',
           overflow: 'hidden',
           border: `1px solid ${theme.palette.divider}`,
         },
       }}
     >
       <DialogContent sx={{ p: 4 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="flex-start"
+          mb={1}
+        >
           <Box>
-            <Typography variant="h5" fontWeight={800} sx={{ color: 'text.primary', mb: 0.5 }}>
+            <Typography
+              variant="h5"
+              fontWeight={800}
+              sx={{ color: 'text.primary', mb: 0.5 }}
+            >
               All Folders
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.7 }}>
+            <Typography
+              variant="body2"
+              sx={{ color: 'text.secondary', opacity: 0.7 }}
+            >
               Browse and select folders for your library view.
             </Typography>
           </Box>
@@ -73,14 +92,21 @@ export const AllFoldersModal = ({ open, onClose, folders, onSelect, selectedId }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             slotProps={{
-               input: {
-                    startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1, fontSize: 20 }} />,
-               }
+              input: {
+                startAdornment: (
+                  <SearchIcon
+                    sx={{ color: 'text.secondary', mr: 1, fontSize: 20 }}
+                  />
+                ),
+              },
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: '16px',
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.02)',
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(0,0,0,0.2)'
+                    : 'rgba(0,0,0,0.02)',
               },
             }}
           />
@@ -117,14 +143,23 @@ export const AllFoldersModal = ({ open, onClose, folders, onSelect, selectedId }
                   alignItems: 'center',
                   p: 2.5,
                   borderRadius: '16px',
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.01)',
+                  bgcolor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.015)'
+                      : 'rgba(0,0,0,0.01)',
                   border: `2px solid ${selectedId === folder.id ? '#00f5ff' : 'transparent'}`,
                   cursor: 'pointer',
                   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   position: 'relative',
                   '&:hover': {
-                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                    boxShadow: selectedId === folder.id ? '0 0 20px rgba(0, 245, 255, 0.2)' : 'none',
+                    bgcolor:
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(0,0,0,0.03)',
+                    boxShadow:
+                      selectedId === folder.id
+                        ? '0 0 20px rgba(0, 245, 255, 0.2)'
+                        : 'none',
                     borderLeft: `10px solid ${folder.color || theme.palette.primary.main}`,
                     pl: '17px', // Compensate for the 3px border
                   },
@@ -142,13 +177,28 @@ export const AllFoldersModal = ({ open, onClose, folders, onSelect, selectedId }
                     mr: 2,
                   }}
                 >
-                  <FolderIcon sx={{ color: folder.color || theme.palette.primary.main, fontSize: 24 }} />
+                  <FolderIcon
+                    sx={{
+                      color: folder.color || theme.palette.primary.main,
+                      fontSize: 24,
+                    }}
+                  />
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="subtitle1" fontWeight={700} noWrap>
-                    {folder.name}
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    noWrap
+                    sx={{ maxWidth: '100%' }}
+                  >
+                    {folder.name.length > 40
+                      ? `${folder.name.substring(0, 40)}...`
+                      : folder.name}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', opacity: 0.7 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', opacity: 0.7 }}
+                  >
                     {folder.workspaceCount || 0} Items
                   </Typography>
                 </Box>
@@ -157,14 +207,21 @@ export const AllFoldersModal = ({ open, onClose, folders, onSelect, selectedId }
                     px: 1.5,
                     py: 0.5,
                     borderRadius: '12px',
-                    bgcolor: selectedId === folder.id ? 'rgba(0, 245, 255, 0.1)' : 'transparent',
+                    bgcolor:
+                      selectedId === folder.id
+                        ? 'rgba(0, 245, 255, 0.1)'
+                        : 'transparent',
                     border: `1px solid ${selectedId === folder.id ? '#00f5ff' : 'transparent'}`,
                   }}
                 >
                   <Typography
                     variant="caption"
                     fontWeight={800}
-                    sx={{ color: selectedId === folder.id ? '#00f5ff' : 'text.secondary', fontSize: '10px' }}
+                    sx={{
+                      color:
+                        selectedId === folder.id ? '#00f5ff' : 'text.secondary',
+                      fontSize: '10px',
+                    }}
                   >
                     {selectedId === folder.id ? 'VISIBLE' : 'SELECT'}
                   </Typography>
@@ -174,8 +231,12 @@ export const AllFoldersModal = ({ open, onClose, folders, onSelect, selectedId }
           </AnimatePresence>
         </Box>
 
-        <Box display="flex" justifyContent="space-between" alignItems="center" mt={4}>
-
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mt={4}
+        >
           <Box gap={2} display="flex">
             <Button
               variant="text"

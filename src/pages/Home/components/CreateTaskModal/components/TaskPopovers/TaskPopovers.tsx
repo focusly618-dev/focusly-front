@@ -71,7 +71,7 @@ export const TaskPopovers = ({
             sx={{ borderRadius: '8px', py: 1 }}
           >
             <Box display="flex" alignItems="center" gap={1.5}>
-              {getStatusIcon(s === 'On Hold' ? 'OnHold' : s, 18)}
+              {getStatusIcon(s, 18)}
               <Typography variant="body2" fontWeight={500}>
                 {s}
               </Typography>
@@ -114,7 +114,7 @@ export const TaskPopovers = ({
                 }}
               />
               <Typography variant="body2" fontWeight={500}>
-                {p}
+                {p === 'No priority' ? '' : p}
               </Typography>
             </Box>
           </MenuItem>

@@ -89,149 +89,150 @@ type HeaderColor =
   | 'obsidian'
   | 'none';
 
-const colorPalette: { color: HeaderColor; gradient: string; label: string }[] = [
-  { color: 'none', gradient: 'none', label: 'None' },
-  {
-    color: 'aurora',
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    label: 'Aurora',
-  },
-  {
-    color: 'sunset',
-    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    label: 'Sunset',
-  },
-  {
-    color: 'ocean',
-    gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    label: 'Ocean',
-  },
-  {
-    color: 'forest',
-    gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-    label: 'Forest',
-  },
-  {
-    color: 'midnight',
-    gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-    label: 'Midnight',
-  },
-  {
-    color: 'rose',
-    gradient: 'linear-gradient(135deg, #fc5c7d 0%, #6a3093 100%)',
-    label: 'Rose',
-  },
-  {
-    color: 'golden',
-    gradient: 'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)',
-    label: 'Golden',
-  },
-  {
-    color: 'cosmic',
-    gradient: 'linear-gradient(135deg, #1a1a2e 0%, #7b2ff7 50%, #f107a3 100%)',
-    label: 'Cosmic',
-  },
-  {
-    color: 'ember',
-    gradient: 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)',
-    label: 'Ember',
-  },
-  {
-    color: 'dusk',
-    gradient: 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
-    label: 'Dusk',
-  },
-  {
-    color: 'arctic',
-    gradient: 'linear-gradient(135deg, #304352 0%, #d7d2cc 100%)',
-    label: 'Arctic',
-  },
-  {
-    color: 'spring',
-    gradient: 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)',
-    label: 'Spring',
-  },
-  {
-    color: 'candy',
-    gradient: 'linear-gradient(135deg, #ff6fd8 0%, #3813c2 100%)',
-    label: 'Candy',
-  },
-  {
-    color: 'neon',
-    gradient: 'linear-gradient(135deg, #21D4FD 0%, #B721FF 100%)',
-    label: 'Neon',
-  },
-  {
-    color: 'borealis',
-    gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    label: 'Borealis',
-  },
-  {
-    color: 'royal',
-    gradient: 'linear-gradient(135deg, #141e30 0%, #243b55 100%)',
-    label: 'Royal',
-  },
-  {
-    color: 'grape',
-    gradient: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)',
-    label: 'Grape',
-  },
-  {
-    color: 'kyoto',
-    gradient: 'linear-gradient(135deg, #c21500 0%, #ffc500 100%)',
-    label: 'Kyoto',
-  },
-  {
-    color: 'aqua',
-    gradient: 'linear-gradient(135deg, #50C9C3 0%, #96DEDA 100%)',
-    label: 'Aqua',
-  },
-  {
-    color: 'mauve',
-    gradient: 'linear-gradient(135deg, #42275a 0%, #734b6d 100%)',
-    label: 'Mauve',
-  },
-  {
-    color: 'shore',
-    gradient: 'linear-gradient(135deg, #70e1f5 0%, #ffd194 100%)',
-    label: 'Shore',
-  },
-  {
-    color: 'peach',
-    gradient: 'linear-gradient(135deg, #FF9A8B 0%, #FF6A88 100%)',
-    label: 'Peach',
-  },
-  {
-    color: 'indigo',
-    gradient: 'linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%)',
-    label: 'Indigo',
-  },
-  {
-    color: 'nebula',
-    gradient: 'linear-gradient(135deg, #7028e4 0%, #e5b2ca 100%)',
-    label: 'Nebula',
-  },
-  {
-    color: 'mint',
-    gradient: 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)',
-    label: 'Mint',
-  },
-  {
-    color: 'blood',
-    gradient: 'linear-gradient(135deg, #f85032 0%, #e73827 100%)',
-    label: 'Blood',
-  },
-  {
-    color: 'silver',
-    gradient: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)',
-    label: 'Silver',
-  },
-  {
-    color: 'obsidian',
-    gradient: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
-    label: 'Obsidian',
-  },
-];
+const colorPalette: { color: HeaderColor; gradient: string; label: string }[] =
+  [
+    { color: 'none', gradient: 'none', label: 'None' },
+    {
+      color: 'aurora',
+      gradient: 'linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%)',
+      label: 'Aurora',
+    },
+    {
+      color: 'sunset',
+      gradient: 'linear-gradient(135deg, #fbcfe8 0%, #fda4af 100%)',
+      label: 'Sunset',
+    },
+    {
+      color: 'ocean',
+      gradient: 'linear-gradient(135deg, #7dd3fc 0%, #67e8f9 100%)',
+      label: 'Ocean',
+    },
+    {
+      color: 'forest',
+      gradient: 'linear-gradient(135deg, #99f6e4 0%, #86efac 100%)',
+      label: 'Forest',
+    },
+    {
+      color: 'midnight',
+      gradient: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+      label: 'Midnight',
+    },
+    {
+      color: 'rose',
+      gradient: 'linear-gradient(135deg, #fecdd3 0%, #f9a8d4 100%)',
+      label: 'Rose',
+    },
+    {
+      color: 'golden',
+      gradient: 'linear-gradient(135deg, #fef08a 0%, #fde047 100%)',
+      label: 'Golden',
+    },
+    {
+      color: 'cosmic',
+      gradient: 'linear-gradient(135deg, #c4b5fd 0%, #a5b4fc 100%)',
+      label: 'Cosmic',
+    },
+    {
+      color: 'ember',
+      gradient: 'linear-gradient(135deg, #fca5a5 0%, #f87171 100%)',
+      label: 'Ember',
+    },
+    {
+      color: 'dusk',
+      gradient: 'linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%)',
+      label: 'Dusk',
+    },
+    {
+      color: 'arctic',
+      gradient: 'linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%)',
+      label: 'Arctic',
+    },
+    {
+      color: 'spring',
+      gradient: 'linear-gradient(135deg, #bef264 0%, #d9f99d 100%)',
+      label: 'Spring',
+    },
+    {
+      color: 'candy',
+      gradient: 'linear-gradient(135deg, #f5d0fe 0%, #e9d5ff 100%)',
+      label: 'Candy',
+    },
+    {
+      color: 'neon',
+      gradient: 'linear-gradient(135deg, #67e8f9 0%, #c084fc 100%)',
+      label: 'Neon',
+    },
+    {
+      color: 'borealis',
+      gradient: 'linear-gradient(135deg, #86efac 0%, #5eead4 100%)',
+      label: 'Borealis',
+    },
+    {
+      color: 'royal',
+      gradient: 'linear-gradient(135deg, #475569 0%, #64748b 100%)',
+      label: 'Royal',
+    },
+    {
+      color: 'grape',
+      gradient: 'linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%)',
+      label: 'Grape',
+    },
+    {
+      color: 'kyoto',
+      gradient: 'linear-gradient(135deg, #fecaca 0%, #fef08a 100%)',
+      label: 'Kyoto',
+    },
+    {
+      color: 'aqua',
+      gradient: 'linear-gradient(135deg, #99f6e4 0%, #a5f3fc 100%)',
+      label: 'Aqua',
+    },
+    {
+      color: 'mauve',
+      gradient: 'linear-gradient(135deg, #d8b4fe 0%, #c084fc 100%)',
+      label: 'Mauve',
+    },
+    {
+      color: 'shore',
+      gradient: 'linear-gradient(135deg, #bae6fd 0%, #fef3c7 100%)',
+      label: 'Shore',
+    },
+    {
+      color: 'peach',
+      gradient: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%)',
+      label: 'Peach',
+    },
+    {
+      color: 'indigo',
+      gradient: 'linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%)',
+      label: 'Indigo',
+    },
+    {
+      color: 'nebula',
+      gradient: 'linear-gradient(135deg, #e9d5ff 0%, #fbcfe8 100%)',
+      label: 'Nebula',
+    },
+    {
+      color: 'mint',
+      gradient: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)',
+      label: 'Mint',
+    },
+    {
+      color: 'blood',
+      gradient: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+      label: 'Blood',
+    },
+    {
+      color: 'silver',
+      gradient: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      label: 'Silver',
+    },
+    {
+      color: 'obsidian',
+      gradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      label: 'Obsidian',
+    },
+  ];
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
@@ -272,7 +273,8 @@ export const EditorContent = ({
   const [selectedText, setSelectedText] = useState('');
   const [colorAnchor, setColorAnchor] = useState<null | HTMLElement>(null);
   const [iconAnchor, setIconAnchor] = useState<null | HTMLElement>(null);
-  const headerColor: HeaderColor = (persistedBg as HeaderColor | undefined) ?? 'none';
+  const headerColor: HeaderColor =
+    (persistedBg as HeaderColor | undefined) ?? 'none';
   const headerIcon: string = persistedEmoji ?? '';
 
   // Use derived values directly - no need for useEffect sync
@@ -310,7 +312,8 @@ export const EditorContent = ({
     Tag: TagIcon,
   };
 
-  const currentBgGradient = colorPalette.find((c) => c.color === headerColor)?.gradient || 'none';
+  const currentBgGradient =
+    colorPalette.find((c) => c.color === headerColor)?.gradient || 'none';
   const hasCover = headerColor !== 'none';
 
   const handleColorClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -374,23 +377,45 @@ export const EditorContent = ({
     transition: 'all 0.2s',
     ...(onCover
       ? {
-          color: 'rgba(255,255,255,0.9)',
-          borderColor: 'rgba(255,255,255,0.25)',
-          bgcolor: 'rgba(0,0,0,0.25)',
-          backdropFilter: 'blur(10px)',
-          '&:hover': { bgcolor: 'rgba(0,0,0,0.4)', borderColor: 'rgba(255,255,255,0.5)' },
+          color:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.9)'
+              : 'rgba(0,0,0,0.75)',
+          borderColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.2)'
+              : 'rgba(0,0,0,0.08)',
+          bgcolor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.1)'
+              : 'rgba(255,255,255,0.4)',
+          backdropFilter: 'blur(12px)',
+          '&:hover': {
+            bgcolor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.15)'
+                : 'rgba(255,255,255,0.6)',
+            borderColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.4)'
+                : 'rgba(0,0,0,0.15)',
+            transform: 'translateY(-1px)',
+          },
         }
       : {
           color: 'text.disabled',
           borderColor: 'divider',
           bgcolor: 'transparent',
-          '&:hover': { color: 'text.secondary', borderColor: 'text.secondary' },
+          '&:hover': {
+            color: 'text.secondary',
+            borderColor: 'text.secondary',
+            bgcolor: 'action.hover',
+          },
         }),
   });
 
   return (
     <StyledEditorContent>
-
       {/* ── COVER BANNER (with icon + action buttons overlaid at bottom) ── */}
       {hasCover ? (
         <Box
@@ -408,6 +433,19 @@ export const EditorContent = ({
               height: '180px',
               background: currentBgGradient,
               transition: 'background 0.5s ease',
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(0, 0, 0, 0.1)'
+                    : 'rgba(255, 255, 255, 0.05)',
+              },
             }}
           />
 
@@ -468,13 +506,19 @@ export const EditorContent = ({
             >
               <Box onClick={handleIconClick} sx={ghostBtnSx(true)}>
                 <EmojiPickerIcon sx={{ fontSize: 14 }} />
-                <Typography variant="caption" sx={{ color: 'inherit', fontWeight: 600 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'inherit', fontWeight: 600 }}
+                >
                   {headerIcon ? 'Change icon' : 'Add icon'}
                 </Typography>
               </Box>
               <Box onClick={handleColorClick} sx={ghostBtnSx(true)}>
                 <CoverIcon sx={{ fontSize: 14 }} />
-                <Typography variant="caption" sx={{ color: 'inherit', fontWeight: 600 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'inherit', fontWeight: 600 }}
+                >
                   Change cover
                 </Typography>
               </Box>
@@ -494,13 +538,19 @@ export const EditorContent = ({
         >
           <Box onClick={handleIconClick} sx={ghostBtnSx(false)}>
             <EmojiPickerIcon sx={{ fontSize: 14 }} />
-            <Typography variant="caption" sx={{ color: 'inherit', fontWeight: 600 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: 'inherit', fontWeight: 600 }}
+            >
               {headerIcon ? 'Change icon' : 'Add icon'}
             </Typography>
           </Box>
           <Box onClick={handleColorClick} sx={ghostBtnSx(false)}>
             <CoverIcon sx={{ fontSize: 14 }} />
-            <Typography variant="caption" sx={{ color: 'inherit', fontWeight: 600 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: 'inherit', fontWeight: 600 }}
+            >
               Add cover
             </Typography>
           </Box>
@@ -547,7 +597,11 @@ export const EditorContent = ({
       {currentFolder && (
         <FolderBadge bgColor={currentFolder.color}>
           <FolderIcon sx={{ fontSize: 12 }} />
-          <Typography variant="caption" fontWeight={700} sx={{ textTransform: 'uppercase' }}>
+          <Typography
+            variant="caption"
+            fontWeight={700}
+            sx={{ textTransform: 'uppercase' }}
+          >
             {currentFolder.name}
           </Typography>
         </FolderBadge>
@@ -647,11 +701,25 @@ export const EditorContent = ({
       >
         <Typography
           variant="caption"
-          sx={{ px: 0.5, pb: 1, display: 'block', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' }}
+          sx={{
+            px: 0.5,
+            pb: 1,
+            display: 'block',
+            color: 'text.disabled',
+            fontWeight: 700,
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase',
+          }}
         >
           Cover style
         </Typography>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0.75 }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(7, 1fr)',
+            gap: 0.75,
+          }}
+        >
           {colorPalette.map((c) => (
             <Tooltip key={c.color} title={c.label} placement="top">
               <Box
@@ -660,14 +728,24 @@ export const EditorContent = ({
                   width: 30,
                   height: 30,
                   borderRadius: '8px',
-                  background: c.gradient === 'none' ? (isThemeDark ? '#1e1e1e' : '#f0f0f0') : c.gradient,
+                  background:
+                    c.gradient === 'none'
+                      ? isThemeDark
+                        ? '#1e1e1e'
+                        : '#f0f0f0'
+                      : c.gradient,
                   cursor: 'pointer',
-                  outline: headerColor === c.color ? '2.5px solid' : '1px solid',
-                  outlineColor: headerColor === c.color ? 'primary.main' : 'divider',
+                  outline:
+                    headerColor === c.color ? '2.5px solid' : '1px solid',
+                  outlineColor:
+                    headerColor === c.color ? 'primary.main' : 'divider',
                   outlineOffset: headerColor === c.color ? '2px' : '0px',
                   transition: 'all 0.18s',
                   position: 'relative',
-                  '&:hover': { transform: 'scale(1.15)', outlineColor: 'primary.main' },
+                  '&:hover': {
+                    transform: 'scale(1.15)',
+                    outlineColor: 'primary.main',
+                  },
                 }}
               />
             </Tooltip>
@@ -695,7 +773,15 @@ export const EditorContent = ({
       >
         <Typography
           variant="caption"
-          sx={{ px: 0.5, pb: 1, display: 'block', color: 'text.disabled', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' }}
+          sx={{
+            px: 0.5,
+            pb: 1,
+            display: 'block',
+            color: 'text.disabled',
+            fontWeight: 700,
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase',
+          }}
         >
           Choose icon
         </Typography>
@@ -718,10 +804,15 @@ export const EditorContent = ({
                   height: 34,
                   borderRadius: '9px',
                   cursor: 'pointer',
-                  bgcolor: headerIcon === iconName ? 'primary.main' : 'transparent',
-                  color: headerIcon === iconName ? 'primary.contrastText' : 'text.secondary',
+                  bgcolor:
+                    headerIcon === iconName ? 'primary.main' : 'transparent',
+                  color:
+                    headerIcon === iconName
+                      ? 'primary.contrastText'
+                      : 'text.secondary',
                   border: '1px solid',
-                  borderColor: headerIcon === iconName ? 'primary.main' : 'transparent',
+                  borderColor:
+                    headerIcon === iconName ? 'primary.main' : 'transparent',
                   transition: 'all 0.15s',
                   '&:hover': {
                     bgcolor: 'action.hover',
@@ -730,7 +821,9 @@ export const EditorContent = ({
                   },
                 }}
               >
-                {React.createElement(iconMap[iconName], { sx: { fontSize: 18 } })}
+                {React.createElement(iconMap[iconName], {
+                  sx: { fontSize: 18 },
+                })}
               </Box>
             </Tooltip>
           ))}

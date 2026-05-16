@@ -32,9 +32,11 @@ const getStatusColor = (status: string) => {
     Todo: '#3b82f6',
     Planning: '#8b5cf6',
     Pending: '#f59e0b',
-    OnHold: '#ef4444',
+    'On Hold': '#ef4444',
     Review: '#06b6d4',
     Backlog: '#6b7280',
+    Scheduled: '#8b5cf6',
+    Archived: '#4b5563',
   };
   return colors[status] || '#6b7280';
 };
