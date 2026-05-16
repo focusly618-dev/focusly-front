@@ -29,7 +29,7 @@ import {
 } from '@mui/icons-material';
 import { EmptyState } from '@/utils/EmptyState';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
-import type { WorkspaceTypes } from '../../types/workspace.types';
+import type { WorkspaceTypes, FolderTypes } from '../../types/workspace.types';
 import { CreateFolderModal } from './modals/CreateFolderModal';
 import { UpdateFolderModal } from './modals/UpdateFolderModal';
 import { AllFoldersModal } from './modals/AllFoldersModal';
@@ -269,7 +269,6 @@ export const WorkspaceLibrary = ({
                   key={workspace.id}
                   workspace={workspace}
                   onSelect={onSelect}
-                  onDelete={handleDeleteConfirm}
                   onMenuOpen={handleMenuOpen}
                   onUnlinkTask={handleUnlinkTask}
                 />
@@ -418,7 +417,7 @@ export const WorkspaceLibrary = ({
               )}
             </MenuItem>
 
-            {folders.map((folder) => {
+            {folders.map((folder: FolderTypes) => {
               const isCurrent = selectedWorkspace?.folderId === folder.id;
               return (
                 <MenuItem

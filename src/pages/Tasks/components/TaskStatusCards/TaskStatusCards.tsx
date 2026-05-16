@@ -7,7 +7,9 @@ import {
   EventAvailable as ScheduledIcon,
   CheckCircle as DoneIcon,
 } from '@mui/icons-material';
-import type { TaskStatus } from '@/api/Tasks/apiTaskTypes';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+
+type TaskStatus = TaskResponse['status'];
 
 interface TaskStatusCardsProps {
   activeStatus?: TaskStatus | 'all';

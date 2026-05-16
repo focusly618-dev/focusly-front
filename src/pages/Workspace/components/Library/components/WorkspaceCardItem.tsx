@@ -111,8 +111,8 @@ export const WorkspaceCardItem = ({
               textOverflow: 'ellipsis',
             }}
           >
-            {workspace.folder?.name?.length > 40
-              ? `${workspace.folder.name.substring(0, 40)}...`
+            {(workspace.folder?.name?.length ?? 0) > 40
+              ? `${workspace.folder?.name?.substring(0, 40)}...`
               : workspace.folder?.name || 'All Notes'}
           </Typography>
         </Box>
