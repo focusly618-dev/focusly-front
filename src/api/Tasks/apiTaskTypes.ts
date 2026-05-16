@@ -1,16 +1,17 @@
 export interface TaskFilterInput {
-  status?:
+  status?: (
     | 'Todo'
     | 'Planning'
     | 'Pending'
-    | 'OnHold'
+    | 'On Hold'
     | 'Review'
     | 'Done'
     | 'Backlog'
     | 'Scheduled'
-    | 'Archived';
-  priorityLevel?: number;
-  category?: string;
+    | 'Archived'
+  )[];
+  priorityLevel?: number[];
+  category?: string[];
 }
 
 export interface TaskSortInput {
@@ -35,7 +36,7 @@ export interface TaskResponse {
     | 'Todo'
     | 'Planning'
     | 'Pending'
-    | 'OnHold'
+    | 'On Hold'
     | 'Review'
     | 'Done'
     | 'Backlog'
@@ -57,7 +58,7 @@ export interface TaskResponse {
       | 'Todo'
       | 'Planning'
       | 'Pending'
-      | 'OnHold'
+      | 'On Hold'
       | 'Review'
       | 'Done'
       | 'Backlog'
@@ -108,7 +109,7 @@ export interface updateTask {
     | 'Todo'
     | 'Planning'
     | 'Pending'
-    | 'OnHold'
+    | 'On Hold'
     | 'Review'
     | 'Done'
     | 'Backlog'
@@ -130,7 +131,7 @@ export interface CreateTaskRequest {
     | 'Todo'
     | 'Planning'
     | 'Pending'
-    | 'OnHold'
+    | 'On Hold'
     | 'Review'
     | 'Done'
     | 'Backlog'

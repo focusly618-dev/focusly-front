@@ -86,7 +86,7 @@ const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
       sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#f59e0b' }}
     />
   ),
-  OnHold: (
+  'On Hold': (
     <Box
       sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ef4444' }}
     />
@@ -104,6 +104,16 @@ const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
   Backlog: (
     <Box
       sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#6b7280' }}
+    />
+  ),
+  Scheduled: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#8b5cf6' }}
+    />
+  ),
+  Archived: (
+    <Box
+      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#4b5563' }}
     />
   ),
 };
@@ -156,9 +166,11 @@ export const ListViewTask = ({
       Todo: '#3b82f6',
       Planning: '#8b5cf6',
       Pending: '#f59e0b',
-      OnHold: '#ef4444',
+      'On Hold': '#ef4444',
       Review: '#06b6d4',
       Backlog: '#6b7280',
+      Scheduled: '#8b5cf6',
+      Archived: '#4b5563',
     };
     return colors[status] || '#6b7280';
   };
@@ -264,13 +276,13 @@ export const ListViewTask = ({
                   variant="caption"
                   sx={{ fontSize: '11px', fontWeight: 600 }}
                 >
-                  {task.priority_level >= 4
-                    ? 'Urgent'
-                    : task.priority_level === 3
-                      ? 'High'
-                      : task.priority_level === 2
-                        ? 'Med'
-                        : 'Low'}
+                  {task.priority_level >= 3
+                    ? 'High'
+                    : task.priority_level === 2
+                      ? 'Med'
+                      : task.priority_level === 1
+                        ? 'Low'
+                        : ''}
                 </Typography>
               </TaskMetaItem>
 
@@ -476,10 +488,10 @@ export const ListViewTask = ({
         }}
       >
         {[
-          { level: 4, label: 'Urgent', color: '#ef4444' },
-          { level: 3, label: 'High', color: '#f59e0b' },
-          { level: 2, label: 'Medium', color: '#3b82f6' },
+          { level: 3, label: 'High', color: '#ef4444' },
+          { level: 2, label: 'Med', color: '#f59e0b' },
           { level: 1, label: 'Low', color: '#22c55e' },
+          { level: 0, label: '', color: 'text.secondary' },
         ].map((p) => (
           <MenuItem
             key={p.level}
@@ -544,11 +556,13 @@ export const ListViewTask = ({
         {[
           'Todo',
           'Planning',
+          'Scheduled',
           'Pending',
-          'OnHold',
+          'On Hold',
           'Review',
           'Done',
           'Backlog',
+          'Archived',
         ].map((s) => (
           <MenuItem
             key={s}

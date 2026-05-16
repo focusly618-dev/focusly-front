@@ -141,8 +141,10 @@ export const FolderList = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   flexWrap: 'nowrap',
   alignItems: 'center',
-  paddingBottom: theme.spacing(1.5),
+  padding: '20px 12px', // Sufficient space for large shadows and hover lift
+  margin: '0 -12px', // Pull back the container so it aligns with other content
   overflowX: 'auto',
+  overflowY: 'hidden', // Required when overflowX is auto
   // Simple, subtle native scrollbar styling
   '&::-webkit-scrollbar': {
     height: '4px',
@@ -170,6 +172,7 @@ export const FolderCapsule = styled(Box, {
     display: 'flex',
     alignItems: 'center',
     padding: '10px 20px 10px 10px',
+    height: '64px',
     borderRadius: '40px',
     backgroundColor: active
       ? isDark
@@ -186,8 +189,11 @@ export const FolderCapsule = styled(Box, {
     position: 'relative',
     '&:hover .folder-options-btn': {
       opacity: 1,
-      transform: 'scale(1)',
+      transform: 'scale(0.6)',
     },
+    boxShadow: isDark
+      ? '0 2px 8px rgba(0,0,0,0.2)'
+      : '0 2px 8px rgba(0,0,0,0.05)',
     '&:hover': {
       backgroundColor: active
         ? isDark
@@ -196,10 +202,10 @@ export const FolderCapsule = styled(Box, {
         : isDark
           ? 'rgba(255, 255, 255, 0.07)'
           : 'rgba(0, 0, 0, 0.05)',
-      transform: 'translateY(-2px)',
+      transform: 'translateY(-4px)',
       boxShadow: isDark
-        ? `0 8px 24px ${alpha(visibleColor, 0.2)}`
-        : '0 8px 20px rgba(0,0,0,0.1)',
+        ? `0 25px 50px -12px ${alpha(visibleColor, 0.3)}, 0 12px 20px -8px rgba(0,0,0,0.5)`
+        : `0 25px 50px -12px ${alpha(baseColor, 0.18)}, 0 12px 20px -8px rgba(0,0,0,0.08)`,
     },
   };
 });
@@ -229,31 +235,44 @@ export const AddFolderCapsule = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '16px 24px',
+  padding: '10px 20px',
+  height: '64px',
   borderRadius: '40px',
-  border: `2px dashed ${theme.palette.mode === 'dark' ? '#ffffffb8' : 'rgba(0, 0, 0, 0.3)'}`,
+  border: `2px dashed ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.15)'}`,
   cursor: 'pointer',
-  transition: 'all 0.2s',
-  opacity: 0.7,
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   gap: theme.spacing(1),
   flexShrink: 0,
+  minWidth: '160px',
   '&:hover': {
-    opacity: 1,
     borderColor: theme.palette.primary.main,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+    transform: 'translateY(-4px)',
+    boxShadow: `0 12px 24px ${alpha(theme.palette.primary.main, 0.25)}`,
+    '& .MuiTypography-root': {
+      color: theme.palette.primary.main,
+    },
+    '& .MuiSvgIcon-root': {
+      color: theme.palette.primary.main,
+      transform: 'rotate(90deg)',
+    },
   },
   '& .MuiTypography-root': {
-    fontSize: '11px',
+    fontSize: '13px',
     fontWeight: 800,
-    letterSpacing: '0.5px',
     color: theme.palette.text.secondary,
+    letterSpacing: '0.5px',
+  },
+  '& .MuiSvgIcon-root': {
+    transition: 'all 0.3s',
   },
 }));
 
 export const MoreFoldersCapsule = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '16px 16px 16px 16px',
+  padding: '10px 16px',
+  height: '64px',
   borderRadius: '40px',
   backgroundColor:
     theme.palette.mode === 'dark'
@@ -263,11 +282,12 @@ export const MoreFoldersCapsule = styled(Box)(({ theme }) => ({
   cursor: 'pointer',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   flexShrink: 0,
+  minWidth: '150px',
   '&:hover': {
     backgroundColor: theme.palette.primary.main,
     borderColor: theme.palette.primary.main,
-    transform: 'translateY(-2px)',
-    boxShadow: `0 8px 20px ${theme.palette.primary.main}44`,
+    transform: 'translateY(-4px)',
+    boxShadow: `0 12px 24px ${alpha(theme.palette.primary.main, 0.3)}`,
     '& .MuiTypography-root': {
       color: '#fff',
     },
@@ -387,12 +407,14 @@ export const WorkspaceCard = styled(Card, {
   height: '220px',
   cursor: 'pointer',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  border: `1.5px solid ${
+  border: `2px solid ${
     gradient
       ? theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.2)'
-        : 'rgba(0, 0, 0, 0.1)'
-      : theme.palette.divider
+        ? 'rgba(255, 255, 255, 0.25)'
+        : 'rgba(0, 0, 0, 0.15)'
+      : theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.1)'
+        : 'rgba(0, 0, 0, 0.08)'
   }`,
   backgroundClip: 'padding-box',
   position: 'relative',
@@ -406,8 +428,11 @@ export const WorkspaceCard = styled(Card, {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.12)',
-        backdropFilter: 'blur(6px)',
+        background:
+          theme.palette.mode === 'dark'
+            ? 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)'
+            : 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%)',
+        backdropFilter: 'blur(8px)',
         zIndex: 0,
       }
     : {},
@@ -484,7 +509,6 @@ export const HoverArrowButton = styled(Box)(({ theme }) => ({
   opacity: 0, // Hidden by default
   transform: 'translateX(-10px)',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-  className: 'arrow-button', // Class for targeting
 }));
 
 export const CreateCard = styled(Box)(({ theme }) => ({

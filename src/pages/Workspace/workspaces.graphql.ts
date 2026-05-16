@@ -81,6 +81,11 @@ export const UPDATE_WORKSPACE = gql`
       updatedAt
       taskId
       folderId
+      folder {
+        id
+        name
+        color
+      }
       task {
         id
         title

@@ -208,7 +208,10 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                         color: getPriorityColor(Number(currentPriorityLevel)),
                       }}
                     >
-                      {getPriorityFromLevel(Number(currentPriorityLevel))}
+                      {getPriorityFromLevel(Number(currentPriorityLevel)) ===
+                      'No priority'
+                        ? ''
+                        : getPriorityFromLevel(Number(currentPriorityLevel))}
                     </Typography>
                   </Box>
                 </Box>
@@ -251,18 +254,20 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                       />
                     ) : currentStatus === 'Planning' ? (
                       <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />
+                    ) : currentStatus === 'Scheduled' ? (
+                      <PlannedIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />
                     ) : currentStatus === 'Backlog' ? (
                       <HistoryIcon
-                        sx={{ fontSize: 16, color: 'secondary.main' }}
+                        sx={{ fontSize: 16, color: 'text.secondary' }}
                       />
-                    ) : currentStatus === 'OnHold' ? (
-                      <RadioButtonUncheckedIcon
+                    ) : currentStatus === 'On Hold' ? (
+                      <PauseCircleIcon
                         sx={{ fontSize: 16, color: 'error.main' }}
                       />
                     ) : currentStatus === 'Review' ? (
-                      <VisibilityIcon
-                        sx={{ fontSize: 16, color: 'secondary.main' }}
-                      />
+                      <VisibilityIcon sx={{ fontSize: 16, color: '#06b6d4' }} />
+                    ) : currentStatus === 'Archived' ? (
+                      <HistoryIcon sx={{ fontSize: 16, color: '#4b5563' }} />
                     ) : (
                       <RadioButtonUncheckedIcon
                         sx={{ fontSize: 16, color: 'info.main' }}
@@ -484,7 +489,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
               }}
             />
             <Typography variant="body2" fontWeight={600}>
-              {p}
+              {p === 'No priority' ? '' : p}
             </Typography>
           </MenuItem>
         ))}
@@ -508,11 +513,13 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
         {[
           'Todo',
           'Planning',
+          'Scheduled',
           'Pending',
-          'OnHold',
+          'On Hold',
           'Review',
           'Done',
           'Backlog',
+          'Archived',
         ].map((s) => (
           <MenuItem
             key={s}
@@ -521,22 +528,23 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           >
             {s === 'Todo' && (
               <RadioButtonUncheckedIcon
-                sx={{ fontSize: 18, color: 'info.main' }}
+                sx={{ fontSize: 18, color: 'text.secondary' }}
               />
             )}
             {s === 'Planning' && (
               <PlannedIcon sx={{ fontSize: 18, color: 'info.main' }} />
             )}
+            {s === 'Scheduled' && (
+              <PlannedIcon sx={{ fontSize: 18, color: '#8b5cf6' }} />
+            )}
             {s === 'Pending' && (
               <PauseCircleIcon sx={{ fontSize: 18, color: 'warning.main' }} />
             )}
-            {s === 'OnHold' && (
-              <RadioButtonUncheckedIcon
-                sx={{ fontSize: 18, color: 'error.main' }}
-              />
+            {s === 'On Hold' && (
+              <PauseCircleIcon sx={{ fontSize: 18, color: 'error.main' }} />
             )}
             {s === 'Review' && (
-              <VisibilityIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
+              <VisibilityIcon sx={{ fontSize: 18, color: '#06b6d4' }} />
             )}
             {s === 'Done' && (
               <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
@@ -544,8 +552,11 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
             {s === 'Backlog' && (
               <HistoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
             )}
+            {s === 'Archived' && (
+              <HistoryIcon sx={{ fontSize: 18, color: '#4b5563' }} />
+            )}
             <Typography variant="body2" fontWeight={600}>
-              {s === 'OnHold' ? 'On Hold' : s}
+              {s}
             </Typography>
           </MenuItem>
         ))}

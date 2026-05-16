@@ -2,7 +2,7 @@ export type TaskStatus =
   | 'Todo'
   | 'Planning'
   | 'Pending'
-  | 'OnHold'
+  | 'On Hold'
   | 'Review'
   | 'Done'
   | 'Backlog'

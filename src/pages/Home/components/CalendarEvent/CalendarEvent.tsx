@@ -139,6 +139,10 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       )) ||
     hasVideoLinkInTask;
 
+  const durationMinutes = (event.end.getTime() - event.start.getTime()) / 60000;
+  const isShortEvent = durationMinutes <= 20;
+  const startTime = moment(event.start).format('HH:mm');
+
   const currentPriority =
     event.type === 'task'
       ? (event.resource as Task)?.priority_level
@@ -193,9 +197,22 @@ export const CalendarEvent = (props: CalendarEventProps) => {
         )}
         <div
           className="event-info"
-          style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}
+          style={{
+            minWidth: 0,
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flexWrap: isShortEvent ? 'nowrap' : 'wrap',
+            }}
+          >
             {currentPriority && (
               <svg
                 width="10"
@@ -214,29 +231,30 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                 fontWeight: 600,
                 fontSize: '11px',
                 lineHeight: 1.2,
-                display: 'block',
+                display: 'inline',
                 color: 'inherit',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                whiteSpace: isShortEvent ? 'nowrap' : 'normal',
                 fontFamily: '"Inter", "Roboto", sans-serif',
               }}
               title={title}
             >
-              {title}
+              {title} {isShortEvent && startTime}
             </Typography>
           </Box>
-          {(event.overlapIndex || 0) < 2 && (
+          {!isShortEvent && (
             <Typography
               variant="caption"
               sx={{
                 fontSize: '9px',
                 fontWeight: 500,
                 display: 'block',
-                opacity: 0.5,
+                opacity: 0.6,
                 color: 'inherit',
                 lineHeight: 1.1,
                 fontFamily: '"Inter", "Roboto Mono", monospace',
+                mt: 0.2,
               }}
             >
               {timeRange}

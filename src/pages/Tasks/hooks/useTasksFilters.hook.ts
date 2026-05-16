@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import moment from 'moment';
 import type {
   TaskResponse,
   TaskFilterInput,
@@ -30,97 +31,64 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
     localStorage.setItem('tasksDateRange', dateRange);
   }, [dateRange]);
 
-  const filteredTasks = useMemo(() => {
-    let result = tasks;
+  const applyLocalFilters = useCallback(
+    (tasksToFilter: TaskResponse[]) => {
+      let result = tasksToFilter;
 
-    // Filter by date range
-    if (dateRange !== 'all') {
-      const now = new Date();
-      now.setHours(23, 59, 59, 999);
-      let startDateStr = '';
+      // Filter by date range
+      if (dateRange !== 'all') {
+        result = result.filter((task) => {
+          const dateToUse =
+            task.status === 'Done' || !task.deadline
+              ? task.created_at || task.updated_at
+              : task.deadline;
 
-      if (dateRange === 'today') {
-        const today = new Date();
-        startDateStr = today.toLocaleDateString('en-CA');
-      } else if (dateRange === 'last7') {
-        const past = new Date(now);
-        past.setDate(now.getDate() - 7);
-        startDateStr = past.toLocaleDateString('en-CA');
-      } else if (dateRange === 'last30') {
-        const past = new Date(now);
-        past.setDate(now.getDate() - 30);
-        startDateStr = past.toLocaleDateString('en-CA');
+          if (!dateToUse) return false;
+
+          const taskDateStr = moment(dateToUse).format('YYYY-MM-DD');
+
+          if (dateRange === 'today') {
+            return taskDateStr === moment().format('YYYY-MM-DD');
+          }
+
+          let startDateStr = '';
+          if (dateRange === 'last7') {
+            startDateStr = moment().subtract(7, 'days').format('YYYY-MM-DD');
+          } else if (dateRange === 'last30') {
+            startDateStr = moment().subtract(30, 'days').format('YYYY-MM-DD');
+          }
+
+          return taskDateStr >= startDateStr;
+        });
       }
 
-      result = result.filter((task) => {
-        const dateToUse =
-          task.status === 'Done' || !task.deadline
-            ? task.created_at || task.updated_at
-            : task.deadline;
-        if (!dateToUse) return false; // If no date, maybe keep it? Let's keep it to be safe for tasks without dates if we only want to strict filter. Actually let's assume if it has no date, it's not strictly in a specific past/future day unless requested
-        const taskDateObj = new Date(dateToUse);
-        const taskDateStr = taskDateObj.toLocaleDateString('en-CA');
-
-        if (dateRange === 'today') {
-          return taskDateStr === startDateStr;
-        }
-        return taskDateStr >= startDateStr;
-      });
-    }
-
-    if (searchTerm) {
-      result = result.filter(
-        (task) =>
-          task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          task.notes_encrypted
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase()),
-      );
-    }
-    if (isCompletedFilterActive) {
-      result = result.filter((task) =>
-        ['Done', 'Pending', 'Backlog'].includes(task.status),
-      );
-      // Note: The original logic had multiple sequential filters that seemed to conflict.
-      // Replaced with a more logical interpretation if needed, or keeping it as requested if strictly following.
-      // Let's stick closer to the original but fix the evident bug (overwriting filter).
-    }
-    return result;
-  }, [tasks, searchTerm, isCompletedFilterActive, dateRange]);
-
-  const { highPriorityTasks, todayTasks, upcomingTasks } = useMemo(() => {
-    const now = new Date();
-    const todayStr = now.toLocaleDateString('en-CA');
-
-    const high: TaskResponse[] = [];
-    const today: TaskResponse[] = [];
-    const upcoming: TaskResponse[] = [];
-
-    filteredTasks.forEach((task) => {
-      if (task.status === 'Done') return;
-
-      const dateToUse = task.deadline;
-      const taskDateStr = dateToUse
-        ? new Date(dateToUse).toLocaleDateString('en-CA')
-        : '';
-      const isHighPriority = (task.priority_level ?? 0) >= 3;
-      const isOverdue = taskDateStr && taskDateStr < todayStr;
-
-      if (isHighPriority || isOverdue) {
-        high.push(task);
-      } else if (taskDateStr === todayStr) {
-        today.push(task);
-      } else {
-        upcoming.push(task);
+      if (searchTerm) {
+        result = result.filter(
+          (task) =>
+            task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            task.notes_encrypted
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()),
+        );
       }
-    });
+      const isStatusFiltered = (activeFilterState?.statuses?.length ?? 0) > 0;
 
-    return {
-      highPriorityTasks: high,
-      todayTasks: today,
-      upcomingTasks: upcoming,
-    };
-  }, [filteredTasks]);
+      if (isCompletedFilterActive) {
+        result = result.filter((task) => task.status === 'Done');
+      } else if (!isStatusFiltered) {
+        // Only hide Done tasks by default if we are not explicitly filtering by status
+        result = result.filter((task) => task.status !== 'Done');
+      }
+
+      return result;
+    },
+    [dateRange, searchTerm, activeFilterState, isCompletedFilterActive],
+  );
+
+  const filteredTasks = useMemo(
+    () => applyLocalFilters(tasks),
+    [tasks, applyLocalFilters],
+  );
 
   const handleApplySort = (sort: SortState) => {
     const { sort: mappedSort, order: mappedOrder } = sort;
@@ -132,35 +100,29 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
   };
 
   const handleApplyFilters = (filters: FilterState) => {
-    const statusMap: Record<string, string> = {
-      ToDo: 'Todo',
-      OnHold: 'OnHold',
-      Completed: 'Done',
-    };
-
-    const mappedStatus =
-      filters.statuses.length > 0 ? statusMap[filters.statuses[0]] : undefined;
-
     const priorityMap: Record<string, number> = {
       High: 3,
       Medium: 2,
       Low: 1,
     };
-    const mappedPriority =
-      filters.priorities.length > 0
-        ? priorityMap[filters.priorities[0]]
-        : undefined;
-
-    const mappedCategory =
-      filters.categories.length > 0 ? filters.categories[0] : undefined;
 
     const newFilterInput: TaskFilterInput = {
-      status: mappedStatus as TaskFilterInput['status'],
-      priorityLevel: mappedPriority,
-      category: mappedCategory,
+      status:
+        filters.statuses.length > 0
+          ? (filters.statuses as NonNullable<TaskFilterInput['status']>)
+          : undefined,
+      priorityLevel:
+        filters.priorities.length > 0
+          ? filters.priorities.map((p) => priorityMap[p])
+          : undefined,
+      category: filters.categories.length > 0 ? filters.categories : undefined,
     };
 
-    if (!mappedStatus && mappedPriority === undefined && !mappedCategory) {
+    if (
+      filters.statuses.length === 0 &&
+      filters.priorities.length === 0 &&
+      filters.categories.length === 0
+    ) {
       setActiveFilters(undefined);
       setActiveFilterState(undefined);
     } else {
@@ -174,13 +136,32 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
       setActiveFilters(undefined);
       setActiveFilterState(undefined);
     } else {
-      setActiveFilters({ priorityLevel: priority });
+      const priorityMap: Record<number, string> = {
+        3: 'High',
+        2: 'Medium',
+        1: 'Low',
+      };
+      setActiveFilters({ priorityLevel: [priority] });
       setActiveFilterState({
-        priorities: [
-          priority === 3 ? 'High' : priority === 2 ? 'Medium' : 'Low',
-        ],
+        priorities: [priorityMap[priority]],
         categories: [],
         statuses: [],
+      });
+    }
+  };
+
+  const setStatusFilter = (status: string | 'all') => {
+    if (status === 'all') {
+      setActiveFilters(undefined);
+      setActiveFilterState(undefined);
+    } else {
+      setActiveFilters({
+        status: [status as NonNullable<TaskFilterInput['status']>[number]],
+      });
+      setActiveFilterState({
+        priorities: [],
+        categories: [],
+        statuses: [status],
       });
     }
   };
@@ -196,11 +177,10 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
     dateRange,
     setDateRange,
     filteredTasks,
-    highPriorityTasks,
-    todayTasks,
-    upcomingTasks,
     handleApplySort,
     handleApplyFilters,
     setPriorityFilter,
+    setStatusFilter,
+    applyLocalFilters,
   };
 };

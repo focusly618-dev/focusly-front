@@ -37,19 +37,22 @@ import {
 } from '@mui/icons-material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { format } from 'date-fns';
-import { 
-  propertyRowSx, 
-  propertyLabelSx, 
-  propertyValueSx, 
-  tagChipSx, 
+import {
+  propertyRowSx,
+  propertyLabelSx,
+  propertyValueSx,
+  tagChipSx,
   addTagInputSx,
   datePickerPopperSx,
   datePickerPaperSx,
   timePickerPopperSx,
   timePickerPaperSx,
-  timePickerLayoutSx
+  timePickerLayoutSx,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
-import { getTagColors, TASK_COLORS } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import {
+  getTagColors,
+  TASK_COLORS,
+} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 import {
   propertiesContainerSx,
@@ -60,7 +63,7 @@ import {
   popoverPaperSx,
   timerPopoverPaperSx,
   colorPopoverPaperSx,
-  colorGridSx
+  colorGridSx,
 } from './TaskProperties.styles';
 
 interface TaskPropertiesProps {
@@ -94,7 +97,7 @@ interface TaskPropertiesProps {
     setter: (v: string) => void,
     setSuggestions: (s: string[]) => void,
     setAnchor: (el: HTMLDivElement | null) => void,
-    target: HTMLDivElement
+    target: HTMLDivElement,
   ) => void;
 }
 
@@ -127,21 +130,32 @@ export const TaskProperties = ({
   handleTimerChange,
 }: TaskPropertiesProps) => {
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
-  const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(null);
-  const [categoryAnchor, setCategoryAnchor] = useState<HTMLElement | null>(null);
+  const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(
+    null,
+  );
+  const [categoryAnchor, setCategoryAnchor] = useState<HTMLElement | null>(
+    null,
+  );
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
 
   const [durationSuggestions, setDurationSuggestions] = useState<string[]>([]);
   const [realTimeSuggestions, setRealTimeSuggestions] = useState<string[]>([]);
-  const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(null);
-  const [realTimeAnchor, setRealTimeAnchor] = useState<HTMLDivElement | null>(null);
+  const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const [realTimeAnchor, setRealTimeAnchor] = useState<HTMLDivElement | null>(
+    null,
+  );
 
   const getStatusColor = (s: string) => {
     if (s === 'Done') return 'success.main';
-    if (s === 'OnHold') return 'error.main';
+    if (s === 'On Hold') return 'error.main';
     if (s === 'Pending') return 'warning.main';
     if (s === 'Planning') return 'info.main';
+    if (s === 'Scheduled') return '#8b5cf6';
+    if (s === 'Review') return '#06b6d4';
+    if (s === 'Archived') return '#4b5563';
     return 'text.secondary';
   };
 
@@ -171,14 +185,26 @@ export const TaskProperties = ({
               <>
                 {status === 'Todo' && <TodoIcon sx={{ fontSize: 16 }} />}
                 {status === 'Planning' && <PlannedIcon sx={{ fontSize: 16 }} />}
-                {status === 'Pending' && <AccessTimeIcon sx={{ fontSize: 16 }} />}
-                {status === 'OnHold' && <OnHoldIcon sx={{ fontSize: 16 }} />}
-                {status === 'Review' && <VisibilityIcon sx={{ fontSize: 16 }} />}
-                {status === 'Done' && <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />}
+                {status === 'Scheduled' && (
+                  <PlannedIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />
+                )}
+                {status === 'Pending' && (
+                  <AccessTimeIcon sx={{ fontSize: 16 }} />
+                )}
+                {status === 'On Hold' && <OnHoldIcon sx={{ fontSize: 16 }} />}
+                {status === 'Review' && (
+                  <VisibilityIcon sx={{ fontSize: 16, color: '#06b6d4' }} />
+                )}
+                {status === 'Done' && (
+                  <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                )}
                 {status === 'Backlog' && <HistoryIcon sx={{ fontSize: 16 }} />}
+                {status === 'Archived' && (
+                  <HistoryIcon sx={{ fontSize: 16, color: '#4b5563' }} />
+                )}
               </>
             }
-            label={status === 'OnHold' ? 'On Hold' : status}
+            label={status}
             onClick={(e) => setStatusAnchor(e.currentTarget)}
             sx={metadataChipSx(getStatusColor(status))}
           />
@@ -188,11 +214,15 @@ export const TaskProperties = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Chip
             icon={
-              <FlagIcon sx={{ fontSize: 16, color: getPriorityColor(priority) }} />
+              <FlagIcon
+                sx={{ fontSize: 16, color: getPriorityColor(priority) }}
+              />
             }
-            label={priority}
+            label={priority === 'No priority' ? '' : priority}
             onClick={(e) => setPriorityAnchor(e.currentTarget)}
-            sx={metadataChipSx('text.primary')}
+            sx={metadataChipSx(
+              priority === 'No priority' ? 'transparent' : 'text.primary',
+            )}
           />
         </Box>
 
@@ -201,17 +231,35 @@ export const TaskProperties = ({
           <Chip
             icon={
               <>
-                {category === 'General' && <CategoryIcon sx={{ fontSize: 16 }} />}
-                {category === 'Deep Work' && <AutoFixHighIcon sx={{ fontSize: 16 }} />}
+                {category === 'General' && (
+                  <CategoryIcon sx={{ fontSize: 16 }} />
+                )}
+                {category === 'Deep Work' && (
+                  <AutoFixHighIcon sx={{ fontSize: 16 }} />
+                )}
                 {category === 'Meeting' && <GroupsIcon sx={{ fontSize: 16 }} />}
-                {category === 'Admin' && <AssignmentIcon sx={{ fontSize: 16 }} />}
+                {category === 'Admin' && (
+                  <AssignmentIcon sx={{ fontSize: 16 }} />
+                )}
                 {category === 'Design' && <BrushIcon sx={{ fontSize: 16 }} />}
-                {category === 'Development' && <CodeIcon sx={{ fontSize: 16 }} />}
-                {category === 'Marketing' && <TrendingUpIcon sx={{ fontSize: 16 }} />}
-                {category === 'Planning' && <EventNoteIcon sx={{ fontSize: 16 }} />}
-                {category === 'Research' && <PsychologyIcon sx={{ fontSize: 16 }} />}
-                {category === 'Learning' && <SchoolIcon sx={{ fontSize: 16 }} />}
-                {category === 'Personal' && <PersonIcon sx={{ fontSize: 16 }} />}
+                {category === 'Development' && (
+                  <CodeIcon sx={{ fontSize: 16 }} />
+                )}
+                {category === 'Marketing' && (
+                  <TrendingUpIcon sx={{ fontSize: 16 }} />
+                )}
+                {category === 'Planning' && (
+                  <EventNoteIcon sx={{ fontSize: 16 }} />
+                )}
+                {category === 'Research' && (
+                  <PsychologyIcon sx={{ fontSize: 16 }} />
+                )}
+                {category === 'Learning' && (
+                  <SchoolIcon sx={{ fontSize: 16 }} />
+                )}
+                {category === 'Personal' && (
+                  <PersonIcon sx={{ fontSize: 16 }} />
+                )}
               </>
             }
             label={category || 'General'}
@@ -233,7 +281,10 @@ export const TaskProperties = ({
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
           <PlannedIcon sx={{ fontSize: 18 }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
             Date
           </Typography>
         </Box>
@@ -261,14 +312,14 @@ export const TaskProperties = ({
             }}
             slotProps={{
               textField: {
-                sx: { 
+                sx: {
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   width: '100%',
                   height: '100%',
                   opacity: 0,
-                  pointerEvents: 'none'
+                  pointerEvents: 'none',
                 },
               },
               popper: {
@@ -276,8 +327,8 @@ export const TaskProperties = ({
                 placement: 'bottom-start',
               },
               desktopPaper: {
-                sx: datePickerPaperSx
-              }
+                sx: datePickerPaperSx,
+              },
             }}
           />
         </Box>
@@ -287,7 +338,10 @@ export const TaskProperties = ({
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
           <AccessTimeIcon sx={{ fontSize: 18 }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
             Time
           </Typography>
         </Box>
@@ -315,14 +369,14 @@ export const TaskProperties = ({
             }}
             slotProps={{
               textField: {
-                sx: { 
+                sx: {
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   width: '100%',
                   height: '100%',
                   opacity: 0,
-                  pointerEvents: 'none'
+                  pointerEvents: 'none',
                 },
               },
               popper: {
@@ -330,11 +384,11 @@ export const TaskProperties = ({
                 placement: 'bottom-start',
               },
               desktopPaper: {
-                sx: timePickerPaperSx
+                sx: timePickerPaperSx,
               },
               layout: {
-                sx: timePickerLayoutSx
-              }
+                sx: timePickerLayoutSx,
+              },
             }}
           />
           <Typography
@@ -350,12 +404,24 @@ export const TaskProperties = ({
       {!isPureGoogleTask && (
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <DescriptionIcon sx={{ fontSize: 18, transform: 'rotate(180deg)' }} />
-            <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+            <DescriptionIcon
+              sx={{ fontSize: 18, transform: 'rotate(180deg)' }}
+            />
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '14px', fontWeight: 500 }}
+            >
               Tags
             </Typography>
           </Box>
-          <Box sx={{ ...propertyValueSx, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          <Box
+            sx={{
+              ...propertyValueSx,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+            }}
+          >
             <AnimatePresence mode="popLayout" initial={false}>
               {tags.map((tag) => {
                 const colors = getTagColors(tag);
@@ -454,7 +520,10 @@ export const TaskProperties = ({
         <Box sx={{ ...propertyRowSx, alignItems: 'center' }}>
           <Box sx={propertyLabelSx}>
             <AccessTimeIcon sx={{ fontSize: 18 }} />
-            <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '14px', fontWeight: 500 }}
+            >
               Time Tracking
             </Typography>
           </Box>
@@ -465,7 +534,12 @@ export const TaskProperties = ({
                   <TimerIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                   <Typography
                     variant="caption"
-                    sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px' }}
+                    sx={{
+                      color: 'text.secondary',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      letterSpacing: '0.5px',
+                    }}
                   >
                     ESTIMATED
                   </Typography>
@@ -473,13 +547,13 @@ export const TaskProperties = ({
                 <TextField
                   variant="standard"
                   value={duration}
-                  onChange={(e) => 
+                  onChange={(e) =>
                     handleTimerChange(
-                      e.target.value, 
-                      setDuration, 
-                      setDurationSuggestions, 
-                      setDurationAnchor, 
-                      e.currentTarget.parentElement as HTMLDivElement
+                      e.target.value,
+                      setDuration,
+                      setDurationSuggestions,
+                      setDurationAnchor,
+                      e.currentTarget.parentElement as HTMLDivElement,
                     )
                   }
                   onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
@@ -501,8 +575,20 @@ export const TaskProperties = ({
                 >
                   <List dense sx={{ py: 0 }}>
                     {durationSuggestions.map((s) => (
-                      <MenuItem key={s} onClick={() => { setDuration(s); setDurationAnchor(null); }}>
-                        <ListItemText primary={s} primaryTypographyProps={{ fontSize: '13px', fontWeight: 600 }} />
+                      <MenuItem
+                        key={s}
+                        onClick={() => {
+                          setDuration(s);
+                          setDurationAnchor(null);
+                        }}
+                      >
+                        <ListItemText
+                          primary={s}
+                          primaryTypographyProps={{
+                            fontSize: '13px',
+                            fontWeight: 600,
+                          }}
+                        />
                       </MenuItem>
                     ))}
                   </List>
@@ -515,7 +601,12 @@ export const TaskProperties = ({
                   <HistoryIcon sx={{ fontSize: 14, color: 'info.main' }} />
                   <Typography
                     variant="caption"
-                    sx={{ color: 'info.main', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px' }}
+                    sx={{
+                      color: 'info.main',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      letterSpacing: '0.5px',
+                    }}
                   >
                     REAL
                   </Typography>
@@ -523,13 +614,13 @@ export const TaskProperties = ({
                 <TextField
                   variant="standard"
                   value={realTime}
-                  onChange={(e) => 
+                  onChange={(e) =>
                     handleTimerChange(
-                      e.target.value, 
-                      setRealTime, 
-                      setRealTimeSuggestions, 
-                      setRealTimeAnchor, 
-                      e.currentTarget.parentElement as HTMLDivElement
+                      e.target.value,
+                      setRealTime,
+                      setRealTimeSuggestions,
+                      setRealTimeAnchor,
+                      e.currentTarget.parentElement as HTMLDivElement,
                     )
                   }
                   onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
@@ -551,8 +642,21 @@ export const TaskProperties = ({
                 >
                   <List dense sx={{ py: 0 }}>
                     {realTimeSuggestions.map((s) => (
-                      <MenuItem key={s} onClick={() => { setRealTime(s); setRealTimeAnchor(null); }}>
-                        <ListItemText primary={s} primaryTypographyProps={{ fontSize: '13px', fontWeight: 600, color: 'info.main' }} />
+                      <MenuItem
+                        key={s}
+                        onClick={() => {
+                          setRealTime(s);
+                          setRealTimeAnchor(null);
+                        }}
+                      >
+                        <ListItemText
+                          primary={s}
+                          primaryTypographyProps={{
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            color: 'info.main',
+                          }}
+                        />
                       </MenuItem>
                     ))}
                   </List>
@@ -572,7 +676,17 @@ export const TaskProperties = ({
         PaperProps={{ sx: popoverPaperSx }}
       >
         <Stack sx={{ p: 1, minWidth: '180px' }}>
-          {['Todo', 'Planning', 'Pending', 'OnHold', 'Review', 'Done', 'Backlog'].map((s) => (
+          {[
+            'Todo',
+            'Planning',
+            'Scheduled',
+            'Review',
+            'Pending',
+            'On Hold',
+            'Done',
+            'Backlog',
+            'Archived',
+          ].map((s) => (
             <MenuItem
               key={s}
               onClick={() => {
@@ -582,15 +696,39 @@ export const TaskProperties = ({
               sx={{ borderRadius: '8px', py: 1 }}
             >
               <Box display="flex" alignItems="center" gap={1.5}>
-                {s === 'Todo' && <TodoIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                {s === 'Planning' && <PlannedIcon sx={{ fontSize: 18, color: 'info.main' }} />}
-                {s === 'Pending' && <AccessTimeIcon sx={{ fontSize: 18, color: 'warning.main' }} />}
-                {s === 'OnHold' && <OnHoldIcon sx={{ fontSize: 18, color: 'error.main' }} />}
-                {s === 'Review' && <VisibilityIcon sx={{ fontSize: 18, color: 'secondary.main' }} />}
-                {s === 'Done' && <CheckCircleOutlineIcon sx={{ fontSize: 18, color: 'success.main' }} />}
-                {s === 'Backlog' && <HistoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                {s === 'Todo' && (
+                  <TodoIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                )}
+                {s === 'Planning' && (
+                  <PlannedIcon sx={{ fontSize: 18, color: 'info.main' }} />
+                )}
+                {s === 'Scheduled' && (
+                  <PlannedIcon sx={{ fontSize: 18, color: '#8b5cf6' }} />
+                )}
+                {s === 'Pending' && (
+                  <AccessTimeIcon
+                    sx={{ fontSize: 18, color: 'warning.main' }}
+                  />
+                )}
+                {s === 'On Hold' && (
+                  <OnHoldIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                )}
+                {s === 'Review' && (
+                  <VisibilityIcon sx={{ fontSize: 18, color: '#06b6d4' }} />
+                )}
+                {s === 'Done' && (
+                  <CheckCircleOutlineIcon
+                    sx={{ fontSize: 18, color: 'success.main' }}
+                  />
+                )}
+                {s === 'Backlog' && (
+                  <HistoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                )}
+                {s === 'Archived' && (
+                  <HistoryIcon sx={{ fontSize: 18, color: '#4b5563' }} />
+                )}
                 <Typography variant="body2" fontWeight={500}>
-                  {s === 'OnHold' ? 'On Hold' : s}
+                  {s}
                 </Typography>
               </Box>
             </MenuItem>
@@ -634,7 +772,19 @@ export const TaskProperties = ({
         PaperProps={{ sx: popoverPaperSx }}
       >
         <Stack sx={{ p: 1, minWidth: '180px' }}>
-          {['General', 'Deep Work', 'Meeting', 'Admin', 'Design', 'Development', 'Marketing', 'Planning', 'Research', 'Learning', 'Personal'].map((c) => (
+          {[
+            'General',
+            'Deep Work',
+            'Meeting',
+            'Admin',
+            'Design',
+            'Development',
+            'Marketing',
+            'Planning',
+            'Research',
+            'Learning',
+            'Personal',
+          ].map((c) => (
             <MenuItem
               key={c}
               onClick={() => {
@@ -644,17 +794,47 @@ export const TaskProperties = ({
               sx={{ borderRadius: '8px', py: 1 }}
             >
               <Box display="flex" alignItems="center" gap={1.5}>
-                {c === 'General' && <CategoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                {c === 'Deep Work' && <AutoFixHighIcon sx={{ fontSize: 18, color: 'secondary.main' }} />}
-                {c === 'Meeting' && <GroupsIcon sx={{ fontSize: 18, color: 'info.main' }} />}
-                {c === 'Admin' && <AssignmentIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-                {c === 'Design' && <BrushIcon sx={{ fontSize: 18, color: 'warning.main' }} />}
-                {c === 'Development' && <CodeIcon sx={{ fontSize: 18, color: 'primary.main' }} />}
-                {c === 'Marketing' && <TrendingUpIcon sx={{ fontSize: 18, color: 'error.main' }} />}
-                {c === 'Planning' && <EventNoteIcon sx={{ fontSize: 18, color: 'info.main' }} />}
-                {c === 'Research' && <PsychologyIcon sx={{ fontSize: 18, color: 'secondary.main' }} />}
-                {c === 'Learning' && <SchoolIcon sx={{ fontSize: 18, color: 'warning.main' }} />}
-                {c === 'Personal' && <PersonIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                {c === 'General' && (
+                  <CategoryIcon
+                    sx={{ fontSize: 18, color: 'text.secondary' }}
+                  />
+                )}
+                {c === 'Deep Work' && (
+                  <AutoFixHighIcon
+                    sx={{ fontSize: 18, color: 'secondary.main' }}
+                  />
+                )}
+                {c === 'Meeting' && (
+                  <GroupsIcon sx={{ fontSize: 18, color: 'info.main' }} />
+                )}
+                {c === 'Admin' && (
+                  <AssignmentIcon
+                    sx={{ fontSize: 18, color: 'text.secondary' }}
+                  />
+                )}
+                {c === 'Design' && (
+                  <BrushIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+                )}
+                {c === 'Development' && (
+                  <CodeIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                )}
+                {c === 'Marketing' && (
+                  <TrendingUpIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                )}
+                {c === 'Planning' && (
+                  <EventNoteIcon sx={{ fontSize: 18, color: 'info.main' }} />
+                )}
+                {c === 'Research' && (
+                  <PsychologyIcon
+                    sx={{ fontSize: 18, color: 'secondary.main' }}
+                  />
+                )}
+                {c === 'Learning' && (
+                  <SchoolIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+                )}
+                {c === 'Personal' && (
+                  <PersonIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                )}
                 <Typography variant="body2" fontWeight={500}>
                   {c}
                 </Typography>

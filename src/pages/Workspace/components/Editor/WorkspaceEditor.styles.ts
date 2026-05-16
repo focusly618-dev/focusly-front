@@ -49,13 +49,38 @@ export const MainEditorArea = styled(Box)(({ theme }) => ({
   colorScheme: theme.palette.mode,
 }));
 
-export const EditorHeader = styled(Box)(({ theme }) => ({
+export const EditorHeader = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'gradient',
+})<{ gradient?: string }>(({ theme, gradient }) => ({
   height: '60px',
   borderBottom: `1px solid ${theme.palette.divider}`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: '35px 24px',
+  background: gradient || 'transparent',
+  backgroundSize: 'cover',
+  position: 'relative',
+  '&::before': gradient
+    ? {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor:
+          theme.palette.mode === 'dark'
+            ? 'rgba(0, 0, 0, 0.15)'
+            : 'rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(12px)',
+        zIndex: 0,
+      }
+    : {},
+  '& > *': {
+    position: 'relative',
+    zIndex: 1,
+  },
 }));
 
 export const EditorContent = styled(Box)({

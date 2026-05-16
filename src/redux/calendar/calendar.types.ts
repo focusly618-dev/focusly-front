@@ -13,7 +13,7 @@ export interface GoogleCalendarEvent {
     | 'Canceled'
     | 'Todo'
     | 'Planning'
-    | 'OnHold'
+    | 'On Hold'
     | 'Review'
     | 'Done'
     | 'Backlog'

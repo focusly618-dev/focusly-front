@@ -14,30 +14,60 @@ import { TasksSkeletons } from '../TasksSkeletons/TasksSkeletons';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { TasksContentViewProps } from './TasksContentView.types';
 
-const PRIORITY_SECTIONS = [
+const STATUS_SECTIONS = [
   {
-    id: 'high',
-    label: 'High Priority',
-    color: 'error.main',
-    filter: (t: TaskResponse) => (t.priority_level ?? 0) >= 3,
+    id: 'Todo',
+    label: 'To Do',
+    color: '#64748b',
+    filter: (t: TaskResponse) => t.status === 'Todo' || !t.status,
   },
   {
-    id: 'medium',
-    label: 'Medium Priority',
-    color: '#f59e0b',
-    filter: (t: TaskResponse) => (t.priority_level ?? 0) === 2,
-  },
-  {
-    id: 'low',
-    label: 'Low Priority',
+    id: 'Planning',
+    label: 'Planning',
     color: '#3b82f6',
-    filter: (t: TaskResponse) => (t.priority_level ?? 0) === 1,
+    filter: (t: TaskResponse) => t.status === 'Planning',
   },
   {
-    id: 'none',
-    label: 'Other Tasks',
+    id: 'Scheduled',
+    label: 'Scheduled',
+    color: '#8b5cf6',
+    filter: (t: TaskResponse) => t.status === 'Scheduled',
+  },
+  {
+    id: 'Review',
+    label: 'Review',
+    color: '#06b6d4',
+    filter: (t: TaskResponse) => t.status === 'Review',
+  },
+  {
+    id: 'Pending',
+    label: 'Pending',
+    color: '#f59e0b',
+    filter: (t: TaskResponse) => t.status === 'Pending',
+  },
+  {
+    id: 'On Hold',
+    label: 'On Hold',
+    color: '#ef4444',
+    filter: (t: TaskResponse) => t.status === 'On Hold',
+  },
+  {
+    id: 'Done',
+    label: 'Done',
+    color: '#10b981',
+    filter: (t: TaskResponse) => t.status === 'Done',
+  },
+  {
+    id: 'Backlog',
+    label: 'Backlog',
     color: '#94a3b8',
-    filter: (t: TaskResponse) => !t.priority_level || t.priority_level === 0,
+    filter: (t: TaskResponse) => t.status === 'Backlog',
+  },
+  {
+    id: 'Archived',
+    label: 'Archived',
+    color: '#4b5563',
+    filter: (t: TaskResponse) => t.status === 'Archived',
   },
 ];
 
@@ -116,12 +146,12 @@ export const TasksContentView = ({
         </GridTaskContainer>
       ) : (
         <>
-          {PRIORITY_SECTIONS.map((section) => {
+          {STATUS_SECTIONS.map((section) => {
             const sectionTasks = filteredTasks.filter(section.filter);
             if (sectionTasks.length === 0) return null;
 
             return (
-              <Box key={section.id}>
+              <Box key={section.id} sx={{ mb: 4 }}>
                 <SectionTitle colorIndicator={section.color}>
                   {section.label}
                   <Box
@@ -137,12 +167,13 @@ export const TasksContentView = ({
                       alignItems: 'center',
                       justifyContent: 'center',
                       minWidth: '20px',
+                      fontWeight: 700,
                     }}
                   >
                     {sectionTasks.length}
                   </Box>
                 </SectionTitle>
-                <Box sx={{ paddingTop: 2 }}>
+                <Box sx={{ paddingTop: 1 }}>
                   {sectionTasks.map((task) => (
                     <ListViewTask
                       key={task.id}

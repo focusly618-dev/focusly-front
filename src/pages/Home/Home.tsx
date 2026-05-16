@@ -63,7 +63,7 @@ export const Home = () => {
     <>
       <LayoutContainer>
         <Sidebar activeTab={activeTab} changeStatusTab={changeStatusTab} />
-        <MainContent id="joyride-main-content">
+        <MainContent id="joyride-main-content" key={activeTab}>
           {activeTab === TaskBar.DailyPlan && (
             <CalendarView
               onStartFocus={(task: Task) => handleStartFocus(task)}
