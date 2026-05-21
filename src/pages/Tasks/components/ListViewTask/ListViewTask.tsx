@@ -1,17 +1,13 @@
-import { useState } from 'react';
 import {
   Box,
   Typography,
   Collapse,
   Menu,
   MenuItem,
-  IconButton,
   Tooltip,
-  alpha,
 } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
-  SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
   AccessTime as AccessTimeIcon,
   Link as LinkIcon,
   AutoAwesome as AutoAwesomeIcon,
@@ -21,12 +17,30 @@ import {
 import {
   TaskCard,
   CardLeft,
+  CardRight,
+  TaskMainInfo,
+  TitleWrapper,
+  TaskTitle,
+  TaskMetaSection,
   TaskMetaItem,
+  InteractiveMetaItem,
+  LinkMetaItem,
+  SubtaskToggleBtn,
+  SubtaskArrow,
+  MetaText,
   StatusBadge,
   CategoryChip,
   PriorityIndicator,
+  ProgressBarWrapper,
+  ProgressText,
+  TaskProgressBar,
+  FocusIconButton,
+  AIBadge,
+  AIText,
+  SubtasksContainer,
+  SubtaskRow,
+  SubtaskTitle,
 } from './ListViewTask.styles';
-import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import {
   differenceInHours,
   differenceInDays,
@@ -35,7 +49,9 @@ import {
   differenceInYears,
 } from 'date-fns';
 import type { Task } from '@/redux/tasks/task.types';
-// import { formatDuration } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import type { ListViewTaskProps } from './ListViewTask.types';
+import { useListViewTask } from './ListViewTask.hook';
+import { formatDuration } from '../TaskDetailModal/TaskDetailModal.utils';
 
 const formatTimeSinceCompletion = (dateString: string | undefined) => {
   if (!dateString) return '';
@@ -58,64 +74,17 @@ const formatTimeSinceCompletion = (dateString: string | undefined) => {
   return `${years}y ago`;
 };
 
-interface ListViewTaskProps {
-  task: TaskResponse;
-  expandedTaskIds: Set<string>;
-  toggleTaskExpansion: (taskId: string) => void;
-  handleSubtaskToggle: (task: TaskResponse, index: number) => void;
-  handleOpenSubtaskModal: (task: TaskResponse, index?: number) => void;
-  onTaskClick: (task: TaskResponse) => void;
-  updateTask?: (taskId: string, updates: TaskResponse) => Promise<void>;
-  isAIScheduleEnabled?: boolean;
-  onStartFocus?: (task: Task) => void;
-}
 
 const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
-  Todo: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#3b82f6' }}
-    />
-  ),
-  Planning: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#8b5cf6' }}
-    />
-  ),
-  Pending: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#f59e0b' }}
-    />
-  ),
-  'On Hold': (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ef4444' }}
-    />
-  ),
-  Review: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#06b6d4' }}
-    />
-  ),
-  Done: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#22c55e' }}
-    />
-  ),
-  Backlog: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#6b7280' }}
-    />
-  ),
-  Scheduled: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#8b5cf6' }}
-    />
-  ),
-  Archived: (
-    <Box
-      sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#4b5563' }}
-    />
-  ),
+  Todo: <StatusBadge statusColor="#3b82f6" />,
+  Planning: <StatusBadge statusColor="#8b5cf6" />,
+  Pending: <StatusBadge statusColor="#f59e0b" />,
+  'On Hold': <StatusBadge statusColor="#ef4444" />,
+  Review: <StatusBadge statusColor="#06b6d4" />,
+  Done: <StatusBadge statusColor="#22c55e" />,
+  Backlog: <StatusBadge statusColor="#6b7280" />,
+  Scheduled: <StatusBadge statusColor="#8b5cf6" />,
+  Archived: <StatusBadge statusColor="#4b5563" />,
 };
 
 export const ListViewTask = ({
@@ -128,154 +97,54 @@ export const ListViewTask = ({
   isAIScheduleEnabled,
   onStartFocus,
 }: ListViewTaskProps) => {
-  const [statusAnchor, setStatusAnchor] = useState<null | HTMLElement>(null);
-  const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
-    null,
-  );
-  const [dateAnchor, setDateAnchor] = useState<null | HTMLElement>(null);
 
-  const handlePrioritySelect = async (level: number) => {
-    setPriorityAnchor(null);
-    if (updateTask && task.priority_level !== level) {
-      await updateTask(task.id, { ...task, priority_level: level });
-    }
-  };
-
-  const handleDateSelect = async (daysToAdd: number) => {
-    setDateAnchor(null);
-    if (updateTask) {
-      const newDate = new Date();
-      newDate.setDate(newDate.getDate() + daysToAdd);
-      await updateTask(task.id, { ...task, deadline: newDate.toISOString() });
-    }
-  };
-
-  const handleStatusSelect = async (status: string) => {
-    setStatusAnchor(null);
-    if (updateTask && task.status !== status) {
-      await updateTask(task.id, {
-        ...task,
-        status: status as TaskResponse['status'],
-      });
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      Done: '#22c55e',
-      Todo: '#3b82f6',
-      Planning: '#8b5cf6',
-      Pending: '#f59e0b',
-      'On Hold': '#ef4444',
-      Review: '#06b6d4',
-      Backlog: '#6b7280',
-      Scheduled: '#8b5cf6',
-      Archived: '#4b5563',
-    };
-    return colors[status] || '#6b7280';
-  };
-
-  const getPriorityColor = (level: number) => {
-    if (level >= 3) return '#ef4444';
-    if (level === 2) return '#f59e0b';
-    return '#22c55e';
-  };
-
-  const statusColor = getStatusColor(task.status);
-  const priorityColor = getPriorityColor(task.priority_level);
+  const {statusAnchor, setStatusAnchor, getStatusColor, priorityAnchor, setPriorityAnchor, dateAnchor, setDateAnchor, handlePrioritySelect, handleDateSelect, handleStatusSelect, statusColor, priorityColor} = useListViewTask({task, updateTask});
+  
+  const estimateMin = task.estimate_timer || task.estimate_minutes || 0;
+  const realMin = task.real_timer || 0;
+  const progressValue = estimateMin > 0
+    ? Math.min(100, (realMin / estimateMin) * 100)
+    : 0;
+  const isOverLimit = estimateMin > 0 && realMin > estimateMin;
+  const showProgress = estimateMin > 0;
 
   return (
     <>
       <TaskCard
         onClick={() => onTaskClick(task)}
-        sx={{
-          cursor: 'pointer',
-          borderLeft: `3px solid ${statusColor}`,
-          background: 'background.paper',
-        }}
+        statusColor={statusColor}
       >
-        <CardLeft sx={{ alignItems: 'center', gap: '12px' }}>
+        <CardLeft>
           <StatusBadge
             statusColor={statusColor}
             onClick={(e) => {
               e.stopPropagation();
               setStatusAnchor(e.currentTarget);
             }}
-            sx={{
-              cursor: 'pointer',
-              '&:hover': { transform: 'scale(1.2)' },
-              transition: 'transform 0.2s',
-            }}
           />
 
-          <Box
-            sx={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              minWidth: 0,
-            }}
-          >
-            {/* Title & Category */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                minWidth: 0,
-                flexShrink: 1,
-              }}
-            >
-              <Typography
-                variant="body1"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '14px',
-                  color: 'text.primary',
-                  lineHeight: 1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+          <TaskMainInfo>
+            <TitleWrapper>
+              <TaskTitle variant="body1">
                 {task.title}
-              </Typography>
+              </TaskTitle>
               {task.category && (
-                <CategoryChip sx={{ flexShrink: 0 }}>
+                <CategoryChip>
                   {task.category}
                 </CategoryChip>
               )}
-            </Box>
+            </TitleWrapper>
 
             {/* Metadata Section - Single Row */}
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                color: 'text.secondary',
-                flexShrink: 0,
-              }}
-            >
-              <TaskMetaItem
+            <TaskMetaSection>
+              <InteractiveMetaItem
                 onClick={(e) => {
                   e.stopPropagation();
                   setPriorityAnchor(e.currentTarget);
                 }}
-                sx={{
-                  cursor: 'pointer',
-                  px: 0.5,
-                  py: 0.25,
-                  borderRadius: '4px',
-                  '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
-                }}
               >
                 <PriorityIndicator priorityColor={priorityColor} />
-                <Typography
-                  variant="caption"
-                  sx={{ fontSize: '11px', fontWeight: 600 }}
-                >
+                <MetaText variant="caption">
                   {task.priority_level >= 3
                     ? 'High'
                     : task.priority_level === 2
@@ -283,24 +152,14 @@ export const ListViewTask = ({
                       : task.priority_level === 1
                         ? 'Low'
                         : ''}
-                </Typography>
-              </TaskMetaItem>
+                </MetaText>
+              </InteractiveMetaItem>
 
               {(task.deadline || task.status === 'Done') && (
-                <TaskMetaItem
+                <InteractiveMetaItem
                   onClick={(e) => {
                     e.stopPropagation();
                     setDateAnchor(e.currentTarget);
-                  }}
-                  sx={{
-                    cursor: 'pointer',
-                    px: 0.5,
-                    py: 0.25,
-                    borderRadius: '4px',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      color: 'text.primary',
-                    },
                   }}
                 >
                   <CalendarTodayIcon sx={{ fontSize: 13, opacity: 0.7 }} />
@@ -312,7 +171,7 @@ export const ListViewTask = ({
                           day: 'numeric',
                         })}
                   </Typography>
-                </TaskMetaItem>
+                </InteractiveMetaItem>
               )}
 
               {task.estimate_minutes > 0 && (
@@ -324,154 +183,96 @@ export const ListViewTask = ({
                 </TaskMetaItem>
               )}
 
-              <Box
+
+              <SubtaskToggleBtn
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleTaskExpansion(task.id);
                 }}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  cursor: 'pointer',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  bgcolor: task.subtasks?.length
-                    ? 'action.hover'
-                    : 'transparent',
-                  '&:hover': { bgcolor: 'action.selected' },
-                }}
+                hasSubtasks={Boolean(task.subtasks?.length)}
               >
-                <SubdirectoryArrowRightIcon
-                  sx={{
-                    fontSize: 13,
-                    opacity: 0.7,
-                    transform: expandedTaskIds.has(task.id)
-                      ? 'rotate(90deg)'
-                      : 'none',
-                    transition: 'transform 0.2s',
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{ fontSize: '11px', fontWeight: 600 }}
-                >
+                <SubtaskArrow isExpanded={expandedTaskIds.has(task.id)} />
+                <MetaText variant="caption">
                   {task.subtasks?.length || 0}
-                </Typography>
-              </Box>
+                </MetaText>
+              </SubtaskToggleBtn>
 
               {task.links && task.links.length > 0 && (
-                <TaskMetaItem sx={{ color: 'primary.main' }}>
+                <LinkMetaItem>
                   <LinkIcon sx={{ fontSize: 13 }} />
-                  <Typography
-                    variant="caption"
-                    sx={{ fontSize: '11px', fontWeight: 600 }}
-                  >
+                  <MetaText variant="caption">
                     {task.links.length}
-                  </Typography>
-                </TaskMetaItem>
+                  </MetaText>
+                </LinkMetaItem>
               )}
-            </Box>
-          </Box>
+            </TaskMetaSection>
+          </TaskMainInfo>
         </CardLeft>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <CardRight>
+          {showProgress && (
+            <ProgressBarWrapper>
+              <ProgressText
+                variant="caption"
+                overLimit={isOverLimit}
+              >
+                {formatDuration(realMin) || '0m'}
+                <span style={{ opacity: 0.5, margin: '0 2px' }}>/</span>
+                {formatDuration(estimateMin)}
+              </ProgressText>
+              <TaskProgressBar
+                variant="determinate"
+                value={progressValue}
+                overLimit={isOverLimit}
+              />
+            </ProgressBarWrapper>
+          )}
           {onStartFocus && (
             <Tooltip title="Start Focus Mode">
-              <IconButton
+              <FocusIconButton
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
                   onStartFocus(task as unknown as Task);
                 }}
-                sx={{
-                  color: 'primary.main',
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
-                  '&:hover': {
-                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.2),
-                    transform: 'scale(1.1)',
-                  },
-                  transition: 'all 0.2s',
-                  width: 32,
-                  height: 32,
-                }}
               >
                 <PlayIcon sx={{ fontSize: 20 }} />
-              </IconButton>
+              </FocusIconButton>
             </Tooltip>
           )}
           {isAIScheduleEnabled && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                color: '#7c3aed',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                background: 'rgba(124, 58, 237, 0.1)',
-                border: '1px solid rgba(124, 58, 237, 0.2)',
-                boxShadow: '0 0 10px rgba(124, 58, 237, 0.2)',
-              }}
-            >
+            <AIBadge>
               <AutoAwesomeIcon sx={{ fontSize: 14 }} />
-              <Typography
-                sx={{
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  letterSpacing: '0.05em',
-                }}
-              >
+              <AIText>
                 AI
-              </Typography>
-            </Box>
+              </AIText>
+            </AIBadge>
           )}
-        </Box>
+        </CardRight>
       </TaskCard>
 
       <Collapse in={expandedTaskIds.has(task.id)} timeout="auto" unmountOnExit>
-        <Box
-          sx={{ ml: 6, mb: 2, borderLeft: '1px solid', borderColor: 'divider' }}
-        >
+        <SubtasksContainer>
           {task.subtasks?.map((subtask, index) => {
             if (typeof subtask === 'string') return null;
             return (
-              <Box
-                key={index}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  py: 0.5,
-                  px: 2,
-                  borderRadius: '8px',
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
-              >
+              <SubtaskRow key={index}>
                 <StatusBadge
                   statusColor={getStatusColor(subtask.status || 'Todo')}
                 />
-                <Typography
+                <SubtaskTitle
                   variant="body2"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenSubtaskModal(task, index);
                   }}
-                  sx={{
-                    color: subtask.completed
-                      ? 'text.secondary'
-                      : 'text.primary',
-                    flexGrow: 1,
-                    fontSize: '13px',
-                    textDecoration: subtask.completed ? 'line-through' : 'none',
-                    cursor: 'pointer',
-                  }}
+                  completed={subtask.completed}
                 >
                   {subtask.title}
-                </Typography>
-              </Box>
+                </SubtaskTitle>
+              </SubtaskRow>
             );
           })}
-        </Box>
+        </SubtasksContainer>
       </Collapse>
 
       {/* Priority Quick Select */}
