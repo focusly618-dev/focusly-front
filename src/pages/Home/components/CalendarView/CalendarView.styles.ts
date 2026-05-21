@@ -329,7 +329,6 @@ export const CalendarContainer = styled(Box, {
       backgroundColor: 'transparent !important',
       '& .event-icon-container': { display: 'none' },
       '& .event-card-inner': {
-        padding: '0 4px !important',
         height: '100%',
         display: 'flex',
         alignItems: 'center',
@@ -350,10 +349,8 @@ export const CalendarContainer = styled(Box, {
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     '& .rbc-time-view .rbc-event': {
       overflow: 'visible',
-      width: '92% !important', // Take almost full width
-      left: '2% !important', // Align to the left
+      width: '100% !important', // Take almost full width
       backgroundColor: 'transparent !important',
-      boxShadow: 'none !important',
       '& .event-card-inner': {
         overflow: 'hidden',
       },

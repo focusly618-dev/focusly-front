@@ -18,7 +18,7 @@ import {
   updateGoogleEvent,
   deleteGoogleEvent,
 } from '@/api/GoogleCalendar/googleCalendarApi';
-import { removeTask } from '@/redux/tasks/task.slice';
+import { removeTask, updateTask } from '@/redux/tasks/task.slice';
 import {
   deduplicateLinks,
   parseDuration,
@@ -229,6 +229,31 @@ export const useTaskMutations = ({
       state.realTime !== undefined && state.realTime !== null
         ? parseRealTime(state.realTime)
         : initialTask.real_timer || 0;
+
+    // Optimistic update for calendar: recalculate estimated dates based on new duration
+    const deadline = state.deadline
+      ? state.deadline instanceof Date
+        ? state.deadline
+        : new Date(state.deadline)
+      : new Date(initialTask.deadline || new Date());
+
+    const estimatedStartDate = initialTask.estimated_start_date
+      ? new Date(initialTask.estimated_start_date)
+      : deadline;
+
+    const newEstimatedEndDate = new Date(
+      estimatedStartDate.getTime() + estimateTimer * 60000,
+    );
+
+    // Update Redux immediately for calendar to reflect changes
+    dispatch(
+      updateTask({
+        ...initialTask,
+        estimate_timer: estimateTimer,
+        estimated_end_date: newEstimatedEndDate.toISOString(),
+        deadline: deadline.toISOString(),
+      }),
+    );
 
     if (parentTask && typeof subtaskIndex === 'number') {
       const updatedSubtasks = [...(parentTask.subtasks || [])].map((st, i) => {

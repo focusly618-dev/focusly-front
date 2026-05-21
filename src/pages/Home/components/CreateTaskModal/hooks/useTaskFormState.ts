@@ -92,6 +92,22 @@ export const useTaskFormState = ({
     if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
   };
 
+  const handleDurationChange = (value: string) => {
+    setDuration(value);
+    const newErrors: { title?: string; duration?: string } = { ...errors };
+    if (value.trim()) {
+      const durationMinutes = parseDuration(value);
+      if (durationMinutes > 0 && durationMinutes < 15) {
+        newErrors.duration = 'Duration must be at least 15 minutes';
+      } else {
+        delete newErrors.duration;
+      }
+    } else {
+      delete newErrors.duration;
+    }
+    setErrors(newErrors);
+  };
+
   const validateForm = () => {
     let isValid = true;
     const newErrors: { title?: string; duration?: string } = {};
@@ -102,6 +118,12 @@ export const useTaskFormState = ({
     if (!duration.trim()) {
       newErrors.duration = 'Duration is required';
       isValid = false;
+    } else {
+      const durationMinutes = parseDuration(duration);
+      if (durationMinutes < 15) {
+        newErrors.duration = 'Duration must be at least 15 minutes';
+        isValid = false;
+      }
     }
     setErrors(newErrors);
     return isValid;
@@ -136,6 +158,7 @@ export const useTaskFormState = ({
     errors,
     setErrors,
     handleTitleChange,
+    handleDurationChange,
     validateForm,
     initialState,
     timeSlotDisplay,
