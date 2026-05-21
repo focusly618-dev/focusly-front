@@ -183,6 +183,7 @@ export const ListViewTask = ({
                 </TaskMetaItem>
               )}
 
+
               <SubtaskToggleBtn
                 onClick={(e) => {
                   e.stopPropagation();
