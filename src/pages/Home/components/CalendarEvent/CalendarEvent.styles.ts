@@ -69,9 +69,7 @@ export const EventContainer = styled(Box, {
       borderLeft: `3px solid ${MEETING_COLOR}`,
       overflow: 'hidden',
       cursor: 'pointer',
-      boxShadow: isDark
-        ? `0 1px 3px ${alpha('#000', 0.4)}`
-        : `0 1px 3px ${alpha('#000', 0.06)}`,
+      boxShadow: 'none',
       filter:
         overlapIndex > 0
           ? `hue-rotate(${hueRotation}deg) brightness(${brightnessIdx})`
@@ -92,9 +90,7 @@ export const EventContainer = styled(Box, {
       },
       '&:hover': {
         backgroundColor: isDark ? alpha('#1e293b', 1) : '#f8fafc',
-        boxShadow: isDark
-          ? `0 4px 12px ${alpha('#000', 0.5)}`
-          : `0 4px 12px ${alpha('#000', 0.1)}`,
+        boxShadow: 'none',
         zIndex: 50,
       },
     };
@@ -122,9 +118,7 @@ export const EventContainer = styled(Box, {
     overflow: 'hidden',
     cursor: 'pointer',
     zIndex: overlapIndex + 1,
-    boxShadow: isDark
-      ? `0 4px 12px ${alpha('#000', 0.85)}`
-      : `0 2px 8px ${alpha('#000', 0.15)}`,
+    boxShadow: 'none',
     filter: overlapIndex > 0 ? `brightness(${brightnessIdx})` : 'none',
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
     border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'}`,
@@ -135,9 +129,7 @@ export const EventContainer = styled(Box, {
 
     '&:hover': {
       backgroundColor: bgHover,
-      boxShadow: isDark
-        ? `0 12px 32px ${alpha('#000', 0.95)}`
-        : `0 8px 24px ${alpha('#000', 0.25)}`,
+      boxShadow: 'none',
       zIndex: 200,
       transform: `translateX(${overlapIndex * 32}px) scale(1.02) translateZ(0)`,
       borderColor: alpha(variant.main, 0.6),

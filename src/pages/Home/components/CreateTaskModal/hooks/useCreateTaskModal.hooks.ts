@@ -40,6 +40,7 @@ export const useCreateTaskModal = ({
     errors,
     setErrors,
     handleTitleChange,
+    handleDurationChange,
     validateForm,
     initialState,
     timeSlotDisplay,
@@ -274,6 +275,11 @@ export const useCreateTaskModal = ({
     const suggestions = getTimerSuggestions(value);
     setSuggestions(suggestions);
     setAnchor(suggestions.length > 0 ? target : null);
+
+    // Validate duration in real-time if this is the duration field
+    if (setter === setDuration) {
+      handleDurationChange(value);
+    }
   };
 
   const hasMeetLink =

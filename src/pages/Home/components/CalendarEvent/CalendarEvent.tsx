@@ -140,7 +140,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     hasVideoLinkInTask;
 
   const durationMinutes = (event.end.getTime() - event.start.getTime()) / 60000;
-  const isShortEvent = durationMinutes <= 20;
+  const isShortEvent = durationMinutes <= 30;
   const startTime = moment(event.start).format('HH:mm');
 
   const currentPriority =
@@ -171,7 +171,6 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           gap: '4px',
           height: '100%',
           minWidth: 0,
-          padding: '4px 4px',
         }}
       >
         {(event.overlapIndex || 0) < 3 && (
@@ -181,7 +180,6 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
-              marginTop: '2px',
             }}
           >
             {isMeeting ? (
@@ -211,37 +209,65 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               alignItems: 'center',
               gap: 0.5,
               flexWrap: isShortEvent ? 'nowrap' : 'wrap',
+              justifyContent: 'space-between',
+              width: '100%',
             }}
           >
-            {currentPriority && (
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 24 24"
-                fill={PRIORITY_COLORS[currentPriority as 1 | 2 | 3 | 4]?.main}
-                xmlns="http://www.w3.org/2000/svg"
-                style={{ flexShrink: 0 }}
-              >
-                <path d="M12.45 4L12.15 2.52C12.07 2.22 11.8 2 11.5 2H4C3.45 2 3 2.45 3 3V19C3 19.55 3.45 20 4 20H5C5.55 20 6 19.55 6 19V14H10.55L10.85 15.48C10.93 15.78 11.2 16 11.5 16H19C19.55 16 20 15.55 20 15V5C20 4.45 19.55 4 19 4H12.45Z" />
-              </svg>
-            )}
-            <Typography
-              variant="caption"
+            <Box
               sx={{
-                fontWeight: 600,
-                fontSize: '11px',
-                lineHeight: 1.2,
-                display: 'inline',
-                color: 'inherit',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: isShortEvent ? 'nowrap' : 'normal',
-                fontFamily: '"Inter", "Roboto", sans-serif',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                minWidth: 0,
+                flex: 1,
               }}
-              title={title}
             >
-              {title} {isShortEvent && startTime}
-            </Typography>
+              {currentPriority && (
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill={PRIORITY_COLORS[currentPriority as 1 | 2 | 3 | 4]?.main}
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ flexShrink: 0 }}
+                >
+                  <path d="M12.45 4L12.15 2.52C12.07 2.22 11.8 2 11.5 2H4C3.45 2 3 2.45 3 3V19C3 19.55 3.45 20 4 20H5C5.55 20 6 19.55 6 19V14H10.55L10.85 15.48C10.93 15.78 11.2 16 11.5 16H19C19.55 16 20 15.55 20 15V5C20 4.45 19.55 4 19 4H12.45Z" />
+                </svg>
+              )}
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '11px',
+                  lineHeight: 1.2,
+                  display: 'inline',
+                  color: 'inherit',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  fontFamily: '"Inter", "Roboto", sans-serif',
+                }}
+                title={title}
+              >
+                {title}
+              </Typography>
+            </Box>
+            {isShortEvent && (
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 500,
+                  opacity: 0.7,
+                  color: 'inherit',
+                  lineHeight: 1.2,
+                  fontFamily: '"Inter", "Roboto Mono", monospace',
+                  flexShrink: 0,
+                }}
+              >
+                {startTime}
+              </Typography>
+            )}
           </Box>
           {!isShortEvent && (
             <Typography

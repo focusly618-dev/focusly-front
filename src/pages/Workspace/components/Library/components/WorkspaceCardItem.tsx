@@ -62,8 +62,9 @@ export const WorkspaceCardItem = ({
           sx={{
             display: 'flex',
             alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'center',
             gap: 0.8,
-            mt: 0.5,
             bgcolor: isBackgroundActive
               ? isLightBg
                 ? 'rgba(255, 255, 255, 0.8)'
@@ -112,8 +113,24 @@ export const WorkspaceCardItem = ({
             }}
           >
             {(workspace.folder?.name?.length ?? 0) > 40
-              ? `${workspace.folder?.name?.substring(0, 40)}...`
+              ? `${workspace.folder?.name?.substring(0, 10)}...`
               : workspace.folder?.name || 'All Notes'}
+          </Typography>
+          <Typography
+            variant="caption"
+            fontSize={10}
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? 'rgba(0, 0, 0, 0.5)'
+                  : 'rgba(255, 255, 255, 0.6)'
+                : 'text.secondary',
+              display: 'block',
+            }}
+          >
+            {formatDistanceToNow(new Date(workspace.updatedAt), {
+              addSuffix: true,
+            })}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex' }}>
@@ -209,23 +226,6 @@ export const WorkspaceCardItem = ({
       </Typography>
 
       <Box mt="auto" width="100%">
-        <Typography
-          variant="caption"
-          sx={{
-            color: isBackgroundActive
-              ? isLightBg
-                ? 'rgba(0, 0, 0, 0.5)'
-                : 'rgba(255, 255, 255, 0.6)'
-              : 'text.secondary',
-            display: 'block',
-            mb: workspace.task ? 1.5 : 0,
-          }}
-        >
-          {formatDistanceToNow(new Date(workspace.updatedAt), {
-            addSuffix: true,
-          })}
-        </Typography>
-
         {workspace.task && (
           <TaskPill
             sx={{

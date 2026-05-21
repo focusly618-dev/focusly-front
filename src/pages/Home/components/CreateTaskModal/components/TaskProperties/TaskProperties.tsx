@@ -83,6 +83,7 @@ interface TaskPropertiesProps {
   setRealTimeSuggestions: (s: string[]) => void;
   realTimeAnchor: HTMLDivElement | null;
   setRealTimeAnchor: (el: HTMLDivElement | null) => void;
+  errors?: { duration?: string };
 }
 
 export const TaskProperties = (props: TaskPropertiesProps) => {
@@ -116,6 +117,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
     setRealTimeSuggestions,
     realTimeAnchor,
     setRealTimeAnchor,
+    errors,
   } = props;
 
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -473,6 +475,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                 }
                 onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
                 placeholder="2h 00m"
+                error={!!errors?.duration}
                 InputProps={{
                   disableUnderline: true,
                   sx: {
@@ -488,6 +491,20 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   px: 1,
                 }}
               />
+              {errors?.duration && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'error.main',
+                    fontSize: '10px',
+                    mt: 0.5,
+                    display: 'block',
+                    textAlign: 'center',
+                  }}
+                >
+                  {errors.duration}
+                </Typography>
+              )}
               <Popover
                 open={Boolean(durationAnchor)}
                 anchorEl={durationAnchor}

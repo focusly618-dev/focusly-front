@@ -132,8 +132,6 @@ export const CreateTaskModal = ({
           backdrop: { sx: modalBackdropSx },
         }}
       >
-
-
         <DialogContent
           sx={{
             ...dialogContentSx,
@@ -190,70 +188,71 @@ export const CreateTaskModal = ({
               handleDelete={handleDelete}
             />
             <Box sx={{ p: 3, pt: 1.5 }}>
-            <Box sx={{ px: 1, mb: 1 }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Give your task a clear name..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                sx={titleInputPropsSx}
-                error={!!errors.title}
-                helperText={errors.title}
+              <Box sx={{ px: 1, mb: 1 }}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Give your task a clear name..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  sx={titleInputPropsSx}
+                  error={!!errors.title}
+                  helperText={errors.title}
+                />
+              </Box>
+
+              <TaskProperties
+                status={status}
+                setStatusAnchor={setStatusAnchor}
+                priority={priority}
+                setPriorityAnchor={setPriorityAnchor}
+                category={category}
+                setCategoryAnchor={setCategoryAnchor}
+                currentDate={currentDate}
+                setCurrentDate={setCurrentDate}
+                timeSlotDisplay={timeSlotDisplay}
+                tags={tags}
+                setTags={setTags}
+                newTag={newTag}
+                setNewTag={setNewTag}
+                isAddingTag={isAddingTag}
+                setIsAddingTag={setIsAddingTag}
+                handleAddTag={handleAddTag}
+                duration={duration}
+                setDuration={setDuration}
+                realTime={realTime}
+                setRealTime={setRealTime}
+                handleTimerChange={handleTimerChange}
+                durationSuggestions={durationSuggestions}
+                setDurationSuggestions={setDurationSuggestions}
+                durationAnchor={durationAnchor}
+                setDurationAnchor={setDurationAnchor}
+                realTimeSuggestions={realTimeSuggestions}
+                setRealTimeSuggestions={setRealTimeSuggestions}
+                realTimeAnchor={realTimeAnchor}
+                setRealTimeAnchor={setRealTimeAnchor}
+                errors={errors}
               />
-            </Box>
 
-            <TaskProperties
-              status={status}
-              setStatusAnchor={setStatusAnchor}
-              priority={priority}
-              setPriorityAnchor={setPriorityAnchor}
-              category={category}
-              setCategoryAnchor={setCategoryAnchor}
-              currentDate={currentDate}
-              setCurrentDate={setCurrentDate}
-              timeSlotDisplay={timeSlotDisplay}
-              tags={tags}
-              setTags={setTags}
-              newTag={newTag}
-              setNewTag={setNewTag}
-              isAddingTag={isAddingTag}
-              setIsAddingTag={setIsAddingTag}
-              handleAddTag={handleAddTag}
-              duration={duration}
-              setDuration={setDuration}
-              realTime={realTime}
-              setRealTime={setRealTime}
-              handleTimerChange={handleTimerChange}
-              durationSuggestions={durationSuggestions}
-              setDurationSuggestions={setDurationSuggestions}
-              durationAnchor={durationAnchor}
-              setDurationAnchor={setDurationAnchor}
-              realTimeSuggestions={realTimeSuggestions}
-              setRealTimeSuggestions={setRealTimeSuggestions}
-              realTimeAnchor={realTimeAnchor}
-              setRealTimeAnchor={setRealTimeAnchor}
-            />
+              <TaskLinksResources
+                links={links}
+                handleAddLink={handleAddLink}
+                handleRemoveLink={handleRemoveLink}
+                newLinkTitle={newLinkTitle}
+                setNewLinkTitle={setNewLinkTitle}
+                newLinkUrl={newLinkUrl}
+                setNewLinkUrl={setNewLinkUrl}
+                isAddingLink={isAddingLink}
+                setIsAddingLink={setIsAddingLink}
+                hasMeetLink={hasMeetLink}
+                isGeneratingMeet={isGeneratingMeet}
+                handleGenerateMeet={handleGenerateMeet}
+              />
 
-            <TaskLinksResources
-              links={links}
-              handleAddLink={handleAddLink}
-              handleRemoveLink={handleRemoveLink}
-              newLinkTitle={newLinkTitle}
-              setNewLinkTitle={setNewLinkTitle}
-              newLinkUrl={newLinkUrl}
-              setNewLinkUrl={setNewLinkUrl}
-              isAddingLink={isAddingLink}
-              setIsAddingLink={setIsAddingLink}
-              hasMeetLink={hasMeetLink}
-              isGeneratingMeet={isGeneratingMeet}
-              handleGenerateMeet={handleGenerateMeet}
-            />
-
-            <TaskDescription
-              description={description}
-              setDescription={setDescription}
-            />
+              <TaskDescription
+                description={description}
+                setDescription={setDescription}
+              />
             </Box>
           </PerfectScrollbar>
         </DialogContent>
