@@ -1,4 +1,12 @@
-import { Box, Button, InputBase, Paper, Typography, styled } from '@mui/material';
+import {
+  Box,
+  Button,
+  InputBase,
+  Paper,
+  Typography,
+  styled,
+  alpha,
+} from '@mui/material';
 
 // --- Global Page Wrapper ---
 export const PageWrapper = styled(Box)(({ theme }) => ({
@@ -53,9 +61,10 @@ export const LoginCard = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: '16px',
-  boxShadow: theme.palette.mode === 'dark' 
-    ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' 
-    : '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+      : '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(3),
     margin: theme.spacing(2),
@@ -78,7 +87,8 @@ export const StyledInput = styled(InputBase)(({ theme }) => ({
   '& .MuiInputBase-input': {
     borderRadius: '8px',
     position: 'relative',
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : '#f1f5f9',
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : '#f1f5f9',
     border: `1px solid ${theme.palette.divider}`,
     fontSize: '0.875rem',
     width: '100%',
@@ -86,43 +96,43 @@ export const StyledInput = styled(InputBase)(({ theme }) => ({
     color: theme.palette.text.primary,
     transition: theme.transitions.create(['border-color', 'box-shadow']),
     '&:focus': {
-      borderColor: '#137fec',
-      boxShadow: '0 0 0 4px rgba(19, 127, 236, 0.2)',
+      borderColor: theme.palette.primary.main,
+      boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.2)}`,
     },
     '&::placeholder': {
-      color: '#64748b', // slate-500
+      color: theme.palette.text.disabled,
       opacity: 1,
     },
   },
 }));
 
-export const ForgotPasswordLink = styled('a')({
-  color: '#137fec',
+export const ForgotPasswordLink = styled('a')(({ theme }) => ({
+  color: theme.palette.primary.main,
   fontSize: '0.875rem',
   fontWeight: 500,
   textDecoration: 'none',
   cursor: 'pointer',
   transition: 'color 0.2s',
   '&:hover': {
-    color: '#60a5fa', // lighter blue
+    color: theme.palette.primary.light,
   },
-});
+}));
 
-export const SignInButton = styled(Button)({
+export const SignInButton = styled(Button)(({ theme }) => ({
   marginTop: '24px',
   width: '100%',
   padding: '10px 16px',
-  backgroundColor: '#137fec',
+  backgroundColor: theme.palette.primary.main,
   color: '#fff',
   fontWeight: 700,
   fontSize: '0.875rem',
   textTransform: 'none',
   borderRadius: '8px',
-  boxShadow: '0 4px 6px -1px rgba(19, 127, 236, 0.25)',
+  boxShadow: `0 4px 6px -1px ${alpha(theme.palette.primary.main, 0.25)}`,
   '&:hover': {
-    backgroundColor: '#2563eb', // blue-600
+    backgroundColor: theme.palette.primary.dark,
   },
-});
+}));
 
 // --- Divider ---
 export const DividerWrapper = styled(Box)({
@@ -160,7 +170,8 @@ export const SocialButtonsStack = styled(Box)({
 export const FullWidthSocialButton = styled(Button)(({ theme }) => ({
   width: '100%',
   padding: '10px 16px',
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#f8fafc',
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: '8px',
   color: theme.palette.text.primary,
@@ -172,8 +183,11 @@ export const FullWidthSocialButton = styled(Button)(({ theme }) => ({
   gap: '12px',
   transition: 'all 0.2s',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#1f2d3b' : theme.palette.action.hover,
-    borderColor: theme.palette.mode === 'dark' ? '#334155' : theme.palette.primary.main,
+    backgroundColor: theme.palette.action.hover,
+    borderColor:
+      theme.palette.mode === 'dark'
+        ? theme.palette.divider
+        : theme.palette.primary.main,
   },
   '& .MuiButton-startIcon': {
     margin: 0,

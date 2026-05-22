@@ -1,10 +1,13 @@
-import React from 'react';
-import { Container, Stack } from '@mui/material';
-import { 
-  Menu as MenuIcon, 
-  AutoAwesome as AutoAwesomeIcon 
+import React, { useContext } from 'react';
+import { Container, Stack, IconButton } from '@mui/material';
+import {
+  Menu as MenuIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  Brightness4 as DarkModeIcon,
+  Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
+import { ColorModeContext } from '@/context/ColorModeContext';
 import {
   Header,
   LogoWrapper,
@@ -16,6 +19,8 @@ import {
 } from './Navbar.styles';
 
 const Navbar: React.FC = () => {
+  const colorMode = useContext(ColorModeContext);
+
   return (
     <Header position="sticky">
       <Container maxWidth="lg">
@@ -25,7 +30,11 @@ const Navbar: React.FC = () => {
           alignItems="center"
           sx={{ height: 64 }}
         >
-          <LogoWrapper component={NavLink} to="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
+          <LogoWrapper
+            component={NavLink}
+            to="/"
+            sx={{ textDecoration: 'none', color: 'inherit' }}
+          >
             <LogoIconWrapper>
               <AutoAwesomeIcon sx={{ fontSize: 20 }} />
             </LogoIconWrapper>
@@ -48,7 +57,7 @@ const Navbar: React.FC = () => {
             </NavbarLink>
             <NavbarLink
               component={NavLink}
-              to="login"
+              to="/login"
               sx={{
                 color: 'text.primary',
                 textTransform: 'none',
@@ -59,12 +68,33 @@ const Navbar: React.FC = () => {
             >
               Log In
             </NavbarLink>
+            <IconButton
+              onClick={colorMode.toggleColorMode}
+              color="inherit"
+              sx={{ mx: 1 }}
+            >
+              {colorMode.mode === 'dark' ? (
+                <LightModeIcon sx={{ fontSize: 20 }} />
+              ) : (
+                <DarkModeIcon sx={{ fontSize: 20 }} />
+              )}
+            </IconButton>
             <GetStartedButton variant="contained">Get Started</GetStartedButton>
           </Stack>
 
-          <MobileMenuButton>
-            <MenuIcon />
-          </MobileMenuButton>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ display: { md: 'none' } }}
+            alignItems="center"
+          >
+            <IconButton onClick={colorMode.toggleColorMode} color="inherit">
+              {colorMode.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
+            <MobileMenuButton>
+              <MenuIcon />
+            </MobileMenuButton>
+          </Stack>
         </Stack>
       </Container>
     </Header>

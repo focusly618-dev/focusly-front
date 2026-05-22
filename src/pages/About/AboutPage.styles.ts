@@ -33,8 +33,9 @@ export const MissionBadge = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1),
   padding: theme.spacing(0.5, 1.5),
   borderRadius: '9999px',
-  backgroundColor: '#eff6ff', // blue-50
-  border: '1px solid #dbeafe', // blue-100
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(19, 127, 236, 0.15)' : '#eff6ff',
+  border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(19, 127, 236, 0.3)' : '#dbeafe'}`,
   width: 'fit-content',
   marginBottom: theme.spacing(4),
   [theme.breakpoints.down('sm')]: {
@@ -84,8 +85,8 @@ export const HeroImageContainer = styled(Box)(({ theme }) => ({
   aspectRatio: '4/3',
   borderRadius: 16,
   overflow: 'hidden',
-  border: '1px solid #e5e7eb',
-  backgroundColor: '#f8fafc',
+  border: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
   [theme.breakpoints.down('lg')]: {
     marginTop: theme.spacing(8),
     minHeight: 400,
@@ -102,8 +103,13 @@ export const ProblemCard = styled(Box)(({ theme }) => ({
   position: 'absolute',
   top: 48,
   left: 32,
-  backgroundColor: '#192633',
-  backdropFilter: 'blur(4px)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(35, 37, 42, 0.85)'
+      : 'rgba(255, 255, 255, 0.85)',
+  border: `1px solid ${theme.palette.divider}`,
+  backdropFilter: 'blur(10px)',
+  boxShadow: theme.shadows[4],
   padding: theme.spacing(2),
   borderRadius: 12,
   maxWidth: 220,
@@ -119,8 +125,13 @@ export const SolutionCard = styled(Box)(({ theme }) => ({
   position: 'absolute',
   bottom: 48,
   right: 32,
-  backgroundColor: '#192633',
-  backdropFilter: 'blur(4px)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(35, 37, 42, 0.85)'
+      : 'rgba(255, 255, 255, 0.85)',
+  border: `1px solid ${theme.palette.divider}`,
+  backdropFilter: 'blur(10px)',
+  boxShadow: theme.shadows[4],
   padding: theme.spacing(2.5),
   borderRadius: 12,
   maxWidth: 260,
@@ -134,7 +145,7 @@ export const SolutionCard = styled(Box)(({ theme }) => ({
 
 // --- Values Section ---
 export const ValuesSection = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#0d141c' : 'white',
+  backgroundColor: theme.palette.background.default,
   borderTop: `1px solid ${theme.palette.divider}`,
   padding: theme.spacing(10, 0),
 }));
@@ -142,12 +153,16 @@ export const ValuesSection = styled(Box)(({ theme }) => ({
 export const ValueCard = styled(Box)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: 16,
-  backgroundColor: '#192633',
-  border: `1px solid ${theme.palette.mode === 'dark' ? '#233648' : '#f3f4f6'}`, // surface-border : gray-100
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
   transition: 'all 0.3s ease',
   height: '100%',
   '&:hover': {
-    borderColor: 'rgba(19, 127, 236, 0.3)',
+    borderColor: theme.palette.primary.main,
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? '0 8px 30px rgba(0, 0, 0, 0.4)'
+        : '0 8px 30px rgba(19, 127, 236, 0.08)',
   },
 }));
 
@@ -161,7 +176,8 @@ export const ValueIconBox = styled(Box, {
   alignItems: 'center',
   justifyContent: 'center',
   marginBottom: theme.spacing(2.5),
-  backgroundColor: color, // The color prop will be the bg with opacity already? Or pass raw color and apply opacity here?
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : color, // The color prop will be the bg with opacity already? Or pass raw color and apply opacity here?
   // Design says bg-blue-100 text-primary, bg-purple-100 text-purple-500 etc.
   // We'll pass the exact bg color string for simplicity or handle it in component
 }));

@@ -20,8 +20,11 @@ export const SectionBadge = styled(Box)(({ theme }) => ({
   padding: theme.spacing(0.5, 2),
   marginBottom: theme.spacing(3),
   borderRadius: '9999px',
-  backgroundColor: 'rgba(19, 127, 236, 0.1)',
-  border: '1px solid rgba(19, 127, 236, 0.2)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(19, 127, 236, 0.15)'
+      : 'rgba(19, 127, 236, 0.08)',
+  border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(19, 127, 236, 0.3)' : 'rgba(19, 127, 236, 0.15)'}`,
 }));
 
 export const SectionBadgeText = styled(Typography)(({ theme }) => ({
@@ -52,15 +55,18 @@ export const StepCard = styled(Box)(({ theme }) => ({
   position: 'relative',
   padding: theme.spacing(5),
   borderRadius: 24,
-  backgroundColor: '#192633',
-  border: '1px solid #233648',
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
   height: '100%',
   transition: 'all 0.3s ease',
   overflow: 'hidden',
   '&:hover': {
-    borderColor: 'rgba(19, 127, 236, 0.5)',
+    borderColor: theme.palette.primary.main,
     transform: 'translateY(-8px)',
-    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? '0 20px 40px rgba(0,0,0,0.4)'
+        : '0 20px 40px rgba(19, 127, 236, 0.08)',
     '& .step-number': {
       color: 'rgba(19, 127, 236, 0.1)',
     },
@@ -70,17 +76,20 @@ export const StepCard = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const StepNumber = styled(Typography)({
+export const StepNumber = styled(Typography)(({ theme }) => ({
   position: 'absolute',
   top: -10,
   right: 10,
   fontSize: '8rem',
   fontWeight: 900,
-  color: 'rgba(255, 255, 255, 0.03)',
+  color:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.03)'
+      : 'rgba(0, 0, 0, 0.03)',
   lineHeight: 1,
   userSelect: 'none',
   zIndex: 0,
-});
+}));
 
 export const StepContent = styled(Box)({
   position: 'relative',
@@ -110,15 +119,18 @@ export const StepIconContainer = styled(Box, {
 export const CTASection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(12, 0),
   borderTop: `1px solid ${theme.palette.divider}`,
-  backgroundColor: '#0d141c',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(0, 0, 0, 0.15)'
+      : 'rgba(19, 127, 236, 0.02)',
 }));
 
 export const CTAContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   borderRadius: 32,
   overflow: 'hidden',
-  backgroundColor: '#192633',
-  border: '1px solid #233648',
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
   padding: theme.spacing(8, 4),
   [theme.breakpoints.up('md')]: {
     padding: theme.spacing(12, 8),
@@ -145,20 +157,23 @@ export const CTAContent = styled(Stack)({
 
 export const CTATitle = styled(Typography)(({ theme }) => ({
   fontWeight: 900,
-  color: 'white',
+  color: theme.palette.text.primary,
   marginBottom: theme.spacing(2),
 }));
 
-export const CTADescription = styled(Typography)({
-  color: 'rgba(255, 255, 255, 0.7)',
+export const CTADescription = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
   maxWidth: 600,
-});
+}));
 
-export const CTASecondaryButton = styled(HeroSecondaryButton)({
-  color: 'white',
-  borderColor: 'rgba(255, 255, 255, 0.2)',
+export const CTASecondaryButton = styled(HeroSecondaryButton)(({ theme }) => ({
+  color: theme.palette.text.primary,
+  borderColor: theme.palette.divider,
   '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderColor: 'white',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(0, 0, 0, 0.05)',
+    borderColor: theme.palette.text.secondary,
   },
-});
+}));

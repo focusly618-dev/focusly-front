@@ -3,11 +3,11 @@ import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import AvatarGroup from '@mui/material/AvatarGroup';
-import { 
-  CheckCircle as CheckCircleIcon, 
-  Bolt as BoltIcon, 
-  Sync as SyncIcon, 
-  Psychology as PsychologyIcon 
+import {
+  CheckCircle as CheckCircleIcon,
+  Bolt as BoltIcon,
+  Sync as SyncIcon,
+  Psychology as PsychologyIcon,
 } from '@mui/icons-material';
 import { styled, Typography } from '@mui/material';
 // --- Animations ---
@@ -79,8 +79,11 @@ export const HeroBadge = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1.5),
   padding: theme.spacing(0.5, 1.5),
   borderRadius: '9999px',
-  backgroundColor: 'rgba(19, 127, 236, 0.1)',
-  border: '1px solid rgba(19, 127, 236, 0.2)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(19, 127, 236, 0.15)'
+      : 'rgba(19, 127, 236, 0.08)',
+  border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(19, 127, 236, 0.3)' : 'rgba(19, 127, 236, 0.15)'}`,
   width: 'fit-content',
 }));
 
@@ -159,7 +162,10 @@ export const HeroSecondaryButton = styled(Button)(({ theme }) => ({
   color: theme.palette.text.primary,
   '&:hover': {
     borderColor: theme.palette.text.secondary,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(0, 0, 0, 0.05)',
   },
 }));
 
@@ -199,7 +205,10 @@ export const OverlayCard = styled(Box)(({ theme }) => ({
   position: 'absolute',
   top: 32,
   right: 32,
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(30, 41, 59, 0.8)'
+      : 'rgba(255, 255, 255, 0.9)',
   backdropFilter: 'blur(8px)',
   padding: 16,
   borderRadius: 12,
@@ -236,7 +245,10 @@ export const EnergyCard = styled(Box)(({ theme }) => ({
   position: 'absolute',
   bottom: 32,
   left: 32,
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(30, 41, 59, 0.8)'
+      : 'rgba(255, 255, 255, 0.9)',
   backdropFilter: 'blur(8px)',
   padding: theme.spacing(2),
   borderRadius: 12,
@@ -263,13 +275,16 @@ export const EnergyLabel = styled(Typography)({
   fontWeight: 600,
 });
 
-export const ProgressBarWrapper = styled(Box)({
+export const ProgressBarWrapper = styled(Box)(({ theme }) => ({
   height: 6,
   width: '100%',
-  backgroundColor: 'rgba(255,255,255,0.1)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.1)'
+      : 'rgba(0, 0, 0, 0.1)',
   borderRadius: 12,
   overflow: 'hidden',
-});
+}));
 
 export const ProgressBarFill = styled(Box)(({ theme }) => ({
   height: '100%',
@@ -290,7 +305,8 @@ export const MetricLabel = styled(Typography)(({ theme }) => ({
 export const FeaturesStrip = styled(Box)(({ theme }) => ({
   borderTop: '1px solid',
   borderColor: theme.palette.divider,
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.1)' : '#f8fafc',
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.1)' : '#f8fafc',
   padding: theme.spacing(10, 0),
 }));
 
