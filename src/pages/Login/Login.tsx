@@ -79,8 +79,8 @@ export const Login: React.FC = () => {
               Check your email
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={4}>
-              We've sent a magic link to <strong>{email}</strong>. <br />
-              Click the link to sign in instantly.
+              We've sent a link to <strong>{email}</strong>. <br />
+              Click the link to sign in instantly and check your spam folder if you don't receive the email.
             </Typography>
             <Button
               variant="text"

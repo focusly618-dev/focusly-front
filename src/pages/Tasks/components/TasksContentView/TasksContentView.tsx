@@ -1,8 +1,11 @@
-import { Box } from '@mui/material';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@apollo/client';
+import { useAppSelector } from '@/redux/hooks';
+import moment from 'moment';
+import { Box, Typography, Button } from '@mui/material';
 import { CheckBox as CheckBoxIcon } from '@mui/icons-material';
 import {
   AnimatedContainer,
-  SectionTitle,
   GridTaskContainer,
 } from '../../Tasks.styles';
 import { EmptyState } from '@/utils/EmptyState';
@@ -11,6 +14,14 @@ import { WorkloadDashboard } from '../WorkloadDashboard/WorkloadDashboard';
 import { ListViewTask } from '../ListViewTask/ListViewTask';
 import { GridViewTask } from '../GridViewTask/GridViewTask';
 import { TasksSkeletons } from '../TasksSkeletons/TasksSkeletons';
+import {
+  TableWrapper,
+  TableHeader,
+  TableHeaderCell,
+  TableStatusGroupRow,
+  TableBodyContainer,
+} from '../ListViewTask/ListViewTask.styles';
+import { GET_TASKS_PAGINATED } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { TasksContentViewProps } from './TasksContentView.types';
 
@@ -71,6 +82,183 @@ const STATUS_SECTIONS = [
   },
 ];
 
+const StatusTableGroup = ({
+  section,
+  userId,
+  activeFilters,
+  activeSort,
+  expandedTaskIds,
+  toggleTaskExpansion,
+  handleSubtaskToggle,
+  handleOpenSubtaskModal,
+  handleTaskClick,
+  updateTask,
+  isAIScheduleEnabled,
+  onStartFocus,
+  searchTerm,
+  dateRange,
+}: {
+  section: typeof STATUS_SECTIONS[number];
+  userId: string;
+  activeFilters: any;
+  activeSort: any;
+  expandedTaskIds: Set<string>;
+  toggleTaskExpansion: (taskId: string) => void;
+  handleSubtaskToggle: (task: TaskResponse, index: number) => void;
+  handleOpenSubtaskModal: (task: TaskResponse, index?: number) => void;
+  handleTaskClick: (task: TaskResponse) => void;
+  updateTask: (taskId: string, updates: TaskResponse) => Promise<void>;
+  isAIScheduleEnabled?: boolean;
+  onStartFocus?: (task: any) => void;
+  searchTerm?: string;
+  dateRange?: string;
+}) => {
+  const [limit, setLimit] = useState(24);
+
+  const queryFilters = useMemo(() => {
+    const f = activeFilters ? { ...activeFilters } : {};
+    if (activeFilters?.status && activeFilters.status.length > 0) {
+      if (!activeFilters.status.includes(section.id)) {
+        return null;
+      }
+    }
+    f.status = [section.id];
+
+    if (searchTerm) {
+      f.searchTerm = searchTerm;
+    }
+
+    if (dateRange && dateRange !== 'all') {
+      if (dateRange === 'today') {
+        const todayStart = moment().startOf('day').toISOString();
+        const todayEnd = moment().endOf('day').toISOString();
+        f.startDate = todayStart;
+        f.endDate = todayEnd;
+      } else if (dateRange === 'last7') {
+        f.startDate = moment().subtract(7, 'days').startOf('day').toISOString();
+      } else if (dateRange === 'last30') {
+        f.startDate = moment().subtract(30, 'days').startOf('day').toISOString();
+      }
+    }
+
+    return f;
+  }, [activeFilters, section.id, searchTerm, dateRange]);
+
+  const skipQuery = !userId || queryFilters === null;
+
+  const { data, loading } = useQuery(GET_TASKS_PAGINATED, {
+    skip: skipQuery,
+    variables: {
+      userId,
+      filters: queryFilters || {},
+      sort: activeSort || null,
+      offset: 0,
+      limit,
+    },
+    fetchPolicy: 'cache-and-network',
+  });
+
+  if (skipQuery) return null;
+
+  const displayedTasks: TaskResponse[] = data?.result?.tasks || [];
+  const totalCount = data?.result?.totalCount || 0;
+
+  if (!loading && displayedTasks.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box>
+      <TableStatusGroupRow statusColor={section.color}>
+        <Box
+          sx={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            backgroundColor: section.color,
+          }}
+        />
+        <Typography
+          variant="caption"
+          sx={{
+            fontWeight: 700,
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            color: section.color,
+          }}
+        >
+          {section.label}
+        </Typography>
+        <Box
+          component="span"
+          sx={{
+            fontSize: '10px',
+            backgroundColor: `${section.color}1a`,
+            color: section.color,
+            padding: '2px 8px',
+            borderRadius: '10px',
+            fontWeight: 700,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: '18px',
+          }}
+        >
+          {totalCount}
+        </Box>
+      </TableStatusGroupRow>
+      {displayedTasks.map((task) => (
+        <ListViewTask
+          key={task.id}
+          task={task}
+          expandedTaskIds={expandedTaskIds}
+          toggleTaskExpansion={toggleTaskExpansion}
+          handleSubtaskToggle={handleSubtaskToggle}
+          handleOpenSubtaskModal={handleOpenSubtaskModal}
+          onTaskClick={handleTaskClick}
+          updateTask={updateTask}
+          isAIScheduleEnabled={isAIScheduleEnabled}
+          onStartFocus={onStartFocus}
+        />
+      ))}
+      {totalCount > displayedTasks.length && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '12px 16px',
+            backgroundColor: 'transparent',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Button
+            size="small"
+            onClick={() => setLimit((prev) => prev + 24)}
+            sx={{
+              textTransform: 'none',
+              fontSize: '11px',
+              fontWeight: 700,
+              color: section.color,
+              backgroundColor: `${section.color}0a`,
+              borderRadius: '8px',
+              px: 3,
+              py: 0.5,
+              '&:hover': {
+                backgroundColor: `${section.color}15`,
+              },
+            }}
+          >
+            Show More ({totalCount - displayedTasks.length} remaining)
+          </Button>
+        </Box>
+      )}
+    </Box>
+  );
+};
+
 export const TasksContentView = ({
   viewMode,
   isLoading,
@@ -85,7 +273,14 @@ export const TasksContentView = ({
   setSearchTerm,
   isAIScheduleEnabled,
   onStartFocus,
+  activeFilters,
+  activeSort,
+  searchTerm,
+  dateRange,
 }: TasksContentViewProps) => {
+  const { user } = useAppSelector((state) => state.auth);
+  const userId = user?.id || '';
+
   // Loading skeletons
   if (isLoading && filteredTasks.length === 0) {
     return (
@@ -98,7 +293,15 @@ export const TasksContentView = ({
   // No tasks at all
   if (tasks.length === 0) {
     return (
-      <AnimatedContainer id="joyride-tasks-list" key={viewMode}>
+      <AnimatedContainer
+        id="joyride-tasks-list"
+        key={viewMode}
+        sx={
+          viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload'
+            ? { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', paddingTop: 0, minHeight: 0 }
+            : undefined
+        }
+      >
         <EmptyState
           icon={<CheckBoxIcon />}
           title="No tasks yet"
@@ -111,7 +314,15 @@ export const TasksContentView = ({
   // No tasks match filters
   if (filteredTasks.length === 0) {
     return (
-      <AnimatedContainer id="joyride-tasks-list" key={viewMode}>
+      <AnimatedContainer
+        id="joyride-tasks-list"
+        key={viewMode}
+        sx={
+          viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload'
+            ? { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', paddingTop: 0, minHeight: 0 }
+            : undefined
+        }
+      >
         <EmptyState
           title="No tasks match your search"
           description="Try a different keyword or filter to find what you're looking for, or create a new task above."
@@ -122,9 +333,25 @@ export const TasksContentView = ({
     );
   }
 
-  // Render the active view
+  const isListView = viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload';
+
   return (
-    <AnimatedContainer id="joyride-tasks-list" key={viewMode}>
+    <AnimatedContainer
+      id="joyride-tasks-list"
+      key={viewMode}
+      sx={
+        isListView
+          ? {
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              paddingTop: 0,
+              minHeight: 0,
+            }
+          : undefined
+      }
+    >
       {viewMode === 'workload' ? (
         <WorkloadDashboard />
       ) : viewMode === 'board' ? (
@@ -145,54 +372,40 @@ export const TasksContentView = ({
           ))}
         </GridTaskContainer>
       ) : (
-        <>
-          {STATUS_SECTIONS.map((section) => {
-            const sectionTasks = filteredTasks.filter(section.filter);
-            if (sectionTasks.length === 0) return null;
-
-            return (
-              <Box key={section.id} sx={{ mb: 4 }}>
-                <SectionTitle colorIndicator={section.color}>
-                  {section.label}
-                  <Box
-                    component="span"
-                    sx={{
-                      ml: 1,
-                      fontSize: '11px',
-                      backgroundColor: `${section.color}1f`,
-                      color: section.color,
-                      padding: '2px 8px',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      minWidth: '20px',
-                      fontWeight: 700,
-                    }}
-                  >
-                    {sectionTasks.length}
-                  </Box>
-                </SectionTitle>
-                <Box sx={{ paddingTop: 1 }}>
-                  {sectionTasks.map((task) => (
-                    <ListViewTask
-                      key={task.id}
-                      task={task}
-                      expandedTaskIds={expandedTaskIds}
-                      toggleTaskExpansion={toggleTaskExpansion}
-                      handleSubtaskToggle={handleSubtaskToggle}
-                      handleOpenSubtaskModal={handleOpenSubtaskModal}
-                      onTaskClick={handleTaskClick}
-                      updateTask={updateTask}
-                      isAIScheduleEnabled={isAIScheduleEnabled}
-                      onStartFocus={onStartFocus}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            );
-          })}
-        </>
+        <TableWrapper>
+          <TableHeader>
+            <TableHeaderCell /> {/* Status Checkbox */}
+            <TableHeaderCell>Task Name</TableHeaderCell>
+            <TableHeaderCell className="col-category">Category</TableHeaderCell>
+            <TableHeaderCell>Priority</TableHeaderCell>
+            <TableHeaderCell>Due Date</TableHeaderCell>
+            <TableHeaderCell className="col-subtasks">Subtasks</TableHeaderCell>
+            <TableHeaderCell className="col-links">Links</TableHeaderCell>
+            <TableHeaderCell className="col-progress">Progress</TableHeaderCell>
+            <TableHeaderCell>Actions</TableHeaderCell>
+          </TableHeader>
+          <TableBodyContainer>
+            {STATUS_SECTIONS.map((section) => (
+              <StatusTableGroup
+                key={section.id}
+                section={section}
+                userId={userId}
+                activeFilters={activeFilters}
+                activeSort={activeSort}
+                expandedTaskIds={expandedTaskIds}
+                toggleTaskExpansion={toggleTaskExpansion}
+                handleSubtaskToggle={handleSubtaskToggle}
+                handleOpenSubtaskModal={handleOpenSubtaskModal}
+                handleTaskClick={handleTaskClick}
+                updateTask={updateTask}
+                isAIScheduleEnabled={isAIScheduleEnabled}
+                onStartFocus={onStartFocus}
+                searchTerm={searchTerm}
+                dateRange={dateRange}
+              />
+            ))}
+          </TableBodyContainer>
+        </TableWrapper>
       )}
     </AnimatedContainer>
   );
