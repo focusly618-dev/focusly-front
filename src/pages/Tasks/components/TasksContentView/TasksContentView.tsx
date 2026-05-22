@@ -126,7 +126,7 @@ export const TasksContentView = ({
   return (
     <AnimatedContainer id="joyride-tasks-list" key={viewMode}>
       {viewMode === 'workload' ? (
-        <WorkloadDashboard />
+        <WorkloadDashboard filteredTasks={filteredTasks} />
       ) : viewMode === 'board' ? (
         <BoardView
           tasks={filteredTasks}

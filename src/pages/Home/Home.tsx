@@ -8,12 +8,11 @@ import Workspace from '../Workspace/Workspace';
 import { ChatAI } from '@/components/chat';
 import { FocusMode } from './components/FocusMode/FocusMode';
 import { TaskDetailModal } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal';
-import { TaskDetailsFullModal } from '../Workspace/components/TaskDetailsFull/TaskDetailsFullModal';
 import { useHome } from './hooks/useHome.hook';
 import { Settings } from '../Settings/Settings';
 import type { Task } from '@/redux/tasks/task.types';
-import type { TaskSearchItems } from '../Workspace/types/workspace.types';
 import { OnboardingTour } from '@/components/Onboarding';
+import { AskAI } from '../AskAI/AskAI';
 
 const LayoutContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -47,10 +46,8 @@ export const Home = () => {
     handleStartFocus,
     handleOpenTaskDetails,
     taskDetailsTask,
-    isFullViewOpen,
     isEditModalOpen,
     closeTaskDetails,
-    handleToggleSubtask,
     handleSaveTask,
     deleteTask,
     initialStart,
@@ -90,19 +87,22 @@ export const Home = () => {
           )}
           {activeTab === TaskBar.Insights && <Insights />}
           {activeTab === TaskBar.Settings && <Settings />}
+          {activeTab === TaskBar.AskAI && <AskAI />}
         </MainContent>
         <Box id="joyride-chat-ai">
-          <ChatAI
-            rightOffset={
-              activeTab === TaskBar.Workspace && isWorkspaceEditorOpen
-                ? isWorkspaceSidebarOpen
-                  ? 352
-                  : 92
-                : activeTab === TaskBar.Workspace
-                  ? 32
-                  : 92
-            }
-          />
+          {activeTab !== TaskBar.AskAI && (
+            <ChatAI
+              rightOffset={
+                activeTab === TaskBar.Workspace && isWorkspaceEditorOpen
+                  ? isWorkspaceSidebarOpen
+                    ? 352
+                    : 92
+                  : activeTab === TaskBar.Workspace
+                    ? 32
+                    : 92
+              }
+            />
+          )}
         </Box>
       </LayoutContainer>
 
@@ -135,17 +135,6 @@ export const Home = () => {
           handleDelete={deleteTask}
           isAIScheduleEnabled={isAIScheduleEnabled}
           setIsAIScheduleEnabled={setIsAIScheduleEnabled}
-        />
-      )}
-
-      {isFullViewOpen && taskDetailsTask && (
-        <TaskDetailsFullModal
-          open={isFullViewOpen}
-          onClose={closeTaskDetails}
-          task={taskDetailsTask as unknown as TaskSearchItems}
-          onStartFocus={handleStartFocus}
-          onToggleSubtask={handleToggleSubtask}
-          activeFocusTaskId={activeFocusTask?.id}
         />
       )}
 

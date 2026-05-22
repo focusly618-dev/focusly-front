@@ -40,6 +40,7 @@ import { TaskBar, type SidebarProps } from './types/Sidebar.types';
 import { useAppSelector } from '@/redux/hooks';
 import { useSearchParams } from 'react-router-dom';
 import { FocuslyLogo } from '@/components/ui';
+import { CuteRobotIcon } from '@/components/ui';
 import { useContext } from 'react';
 import { ColorModeContext } from '@/context/ColorModeContext';
 
@@ -372,6 +373,73 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
             <ListItemText
               primary="Workspace"
               primaryTypographyProps={{ fontWeight: 500 }}
+            />
+          </NavItem>
+        </ListItem>
+        <ListItem disablePadding>
+          <NavItem
+            id="joyride-ask-ai"
+            active={activeTab === TaskBar.AskAI}
+            onClick={() => changeStatusTab(TaskBar.AskAI)}
+            sx={{
+              '&': {
+                position: 'relative',
+                overflow: 'hidden',
+              },
+              ...(activeTab === TaskBar.AskAI && {
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  inset: 0,
+                  background:
+                    'linear-gradient(135deg, rgba(19,127,236,0.12) 0%, rgba(124,58,237,0.08) 100%)',
+                  borderRadius: 'inherit',
+                },
+              }),
+            }}
+          >
+            <ListItemIcon>
+              <Box
+                sx={{
+                  width: 24,
+                  height: 24,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                }}
+              >
+                <CuteRobotIcon
+                  size={22}
+                  variant="mini"
+                  primaryColor={
+                    activeTab === TaskBar.AskAI
+                      ? theme.palette.primary.main
+                      : theme.palette.text.secondary
+                  }
+                  eyeColor={
+                    activeTab === TaskBar.AskAI
+                      ? '#22d3ee'
+                      : theme.palette.text.secondary
+                  }
+                />
+              </Box>
+            </ListItemIcon>
+            <ListItemText
+              primary="Ask AI"
+              primaryTypographyProps={{
+                fontWeight: activeTab === TaskBar.AskAI ? 700 : 500,
+                sx: {
+                  background:
+                    activeTab === TaskBar.AskAI
+                      ? `linear-gradient(90deg, ${theme.palette.primary.main}, #7c3aed)`
+                      : 'none',
+                  WebkitBackgroundClip:
+                    activeTab === TaskBar.AskAI ? 'text' : 'unset',
+                  WebkitTextFillColor:
+                    activeTab === TaskBar.AskAI ? 'transparent' : 'inherit',
+                },
+              }}
             />
           </NavItem>
         </ListItem>

@@ -15,22 +15,40 @@ export const ChatContainer = styled(Box, {
 }));
 
 export const FloatingButton = styled(IconButton)(() => ({
-  width: '64px',
-  height: '64px',
-  background: 'linear-gradient(135deg, #2563eb, #7c3aed)', // Blue to Purple gradient
+  width: '60px',
+  height: '60px',
+  background: 'linear-gradient(135deg, #137fec 0%, #0f5fba 100%)',
   color: '#ffffff',
-  boxShadow: '0 8px 32px rgba(37, 99, 235, 0.4)',
-  transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-  border: '2px solid rgba(255, 255, 255, 0.1)',
+  boxShadow: '0 0 0 0 rgba(19,127,236,0.5), 0 8px 32px rgba(19,127,236,0.35)',
+  transition:
+    'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease',
+  border: '2px solid rgba(255, 255, 255, 0.15)',
+  animation: 'floatingPulse 2.8s ease-in-out infinite',
+  '@keyframes floatingPulse': {
+    '0%': {
+      boxShadow:
+        '0 0 0 0 rgba(19,127,236,0.45), 0 8px 28px rgba(19,127,236,0.3)',
+    },
+    '60%': {
+      boxShadow:
+        '0 0 0 10px rgba(19,127,236,0), 0 8px 28px rgba(19,127,236,0.3)',
+    },
+    '100%': {
+      boxShadow: '0 0 0 0 rgba(19,127,236,0), 0 8px 28px rgba(19,127,236,0.3)',
+    },
+  },
   '&:hover': {
-    transform: 'scale(1.1) rotate(-5deg)',
-    background: 'linear-gradient(135deg, #1d4ed8, #6d28d9)',
+    transform: 'scale(1.12) translateY(-2px)',
+    background: 'linear-gradient(135deg, #1e91ff 0%, #137fec 100%)',
+    boxShadow: '0 12px 40px rgba(19,127,236,0.5)',
   },
 }));
 
 export const NotificationCard = styled(Paper)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    theme.palette.mode === 'dark'
+      ? 'rgba(30, 41, 59, 0.95)'
+      : 'rgba(255, 255, 255, 0.95)',
   backdropFilter: 'blur(12px)',
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: '16px',
@@ -55,7 +73,9 @@ export const NotificationCard = styled(Paper)(({ theme }) => ({
     width: '16px',
     height: '16px',
     backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+      theme.palette.mode === 'dark'
+        ? 'rgba(30, 41, 59, 0.95)'
+        : 'rgba(255, 255, 255, 0.95)',
     transform: 'rotate(45deg)',
     borderRight: `1px solid ${theme.palette.divider}`,
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -103,18 +123,24 @@ export const MessageList = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const MessageBubble = styled(Box)<{ isUser?: boolean }>(({ theme, isUser }) => ({
-  alignSelf: isUser ? 'flex-end' : 'flex-start',
-  backgroundColor: isUser ? theme.palette.primary.main : theme.palette.action.hover,
-  color: isUser ? theme.palette.primary.contrastText : theme.palette.text.primary,
-  padding: '12px 16px',
-  borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-  maxWidth: '85%',
-  fontSize: '14px',
-  lineHeight: '1.5',
-  boxShadow: isUser ? '0 4px 12px rgba(37, 99, 235, 0.2)' : 'none',
-  border: isUser ? 'none' : `1px solid ${theme.palette.divider}`,
-}));
+export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
+  ({ theme, isUser }) => ({
+    alignSelf: isUser ? 'flex-end' : 'flex-start',
+    backgroundColor: isUser
+      ? theme.palette.primary.main
+      : theme.palette.action.hover,
+    color: isUser
+      ? theme.palette.primary.contrastText
+      : theme.palette.text.primary,
+    padding: '12px 16px',
+    borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+    maxWidth: '85%',
+    fontSize: '14px',
+    lineHeight: '1.5',
+    boxShadow: isUser ? '0 4px 12px rgba(37, 99, 235, 0.2)' : 'none',
+    border: isUser ? 'none' : `1px solid ${theme.palette.divider}`,
+  }),
+);
 
 export const InputArea = styled(Box)(({ theme }) => ({
   padding: '16px',

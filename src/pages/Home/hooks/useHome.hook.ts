@@ -103,14 +103,11 @@ export const useHome = () => {
   }, [tasks, reduxEvents, taskIdParam, tempTask]);
 
   const isTaskDetailsOpen = !!taskIdParam && !!taskDetailsTask;
-  const isViewFull = searchParams.get('view') === 'full';
 
   // New Case: "New Task" via URL (e.g. from calendar slot)
   const isCreatingNewTask = searchParams.get('action') === 'create';
 
-  const isEditModalOpen =
-    (isTaskDetailsOpen && !isViewFull) || isCreatingNewTask;
-  const isFullViewOpen = isTaskDetailsOpen && isViewFull;
+  const isEditModalOpen = isTaskDetailsOpen || isCreatingNewTask;
 
   const initialStart = useMemo(() => {
     const startParam = searchParams.get('start');
@@ -354,7 +351,6 @@ export const useHome = () => {
     handleStartFocus,
     handleOpenTaskDetails,
     taskDetailsTask,
-    isFullViewOpen,
     isEditModalOpen,
     closeTaskDetails,
     handleToggleSubtask,

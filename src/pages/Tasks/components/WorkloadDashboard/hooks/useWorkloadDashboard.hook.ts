@@ -4,10 +4,17 @@ import { useAppSelector } from '@/redux/hooks';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { RootState } from '@/redux/store';
 
-export const useWorkloadDashboard = (): TWorkloadDashboard => {
-  const { tasks } = useAppSelector((state: RootState) => state.task) as unknown as {
+export const useWorkloadDashboard = (
+  filteredTasks?: TaskResponse[],
+): TWorkloadDashboard => {
+  const { tasks } = useAppSelector(
+    (state: RootState) => state.task,
+  ) as unknown as {
     tasks: TaskResponse[] | null;
   };
+
+  // Use filteredTasks if provided, otherwise fall back to all tasks
+  const tasksToUse = filteredTasks || tasks;
 
   const daysWeek = useMemo((): Date[] => {
     const days = [];
@@ -28,13 +35,13 @@ export const useWorkloadDashboard = (): TWorkloadDashboard => {
   }, []);
 
   const [dailyWorkload, estimationWeek] = useMemo((): [number[], number] => {
-    if (daysWeek.length === 0 || !tasks) return [[0, 0, 0, 0, 0, 0, 0], 0];
+    if (daysWeek.length === 0 || !tasksToUse) return [[0, 0, 0, 0, 0, 0, 0], 0];
 
     const startOfWeek = daysWeek[0];
     const endOfWeek = new Date(daysWeek[6]);
     endOfWeek.setHours(23, 59, 59, 999);
 
-    const tasksThisWeek = tasks.filter((task: TaskResponse) => {
+    const tasksThisWeek = tasksToUse.filter((task: TaskResponse) => {
       if (!task.deadline) return false;
       const taskDate = new Date(task.deadline);
       return taskDate >= startOfWeek && taskDate <= endOfWeek;
@@ -42,22 +49,25 @@ export const useWorkloadDashboard = (): TWorkloadDashboard => {
 
     const dailyMins = new Array(7).fill(0);
 
-    const totalMinutes = tasksThisWeek.reduce((sum: number, task: TaskResponse) => {
-      const mins = task.estimate_minutes || task.estimate_timer || 0;
+    const totalMinutes = tasksThisWeek.reduce(
+      (sum: number, task: TaskResponse) => {
+        const mins = task.estimate_minutes || task.estimate_timer || 0;
 
-      const taskDate = new Date(task.deadline);
-      const dayIndex = Math.floor(
-        (taskDate.getTime() - startOfWeek.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      if (dayIndex >= 0 && dayIndex < 7) {
-        dailyMins[dayIndex] += mins;
-      }
+        const taskDate = new Date(task.deadline);
+        const dayIndex = Math.floor(
+          (taskDate.getTime() - startOfWeek.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        if (dayIndex >= 0 && dayIndex < 7) {
+          dailyMins[dayIndex] += mins;
+        }
 
-      return sum + mins;
-    }, 0);
+        return sum + mins;
+      },
+      0,
+    );
 
     return [dailyMins.map((m) => m / 60), totalMinutes / 60];
-  }, [daysWeek, tasks]);
+  }, [daysWeek, tasksToUse]);
 
   const availableSlots = useMemo((): number => {
     return Math.max(0, limitWeek - estimationWeek);
