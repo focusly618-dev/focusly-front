@@ -87,6 +87,26 @@ type HeaderColor =
   | 'blood'
   | 'silver'
   | 'obsidian'
+  | 'pastel_pink'
+  | 'pastel_rose'
+  | 'pastel_coral'
+  | 'pastel_peach'
+  | 'pastel_orange'
+  | 'pastel_yellow'
+  | 'pastel_lime'
+  | 'pastel_green'
+  | 'pastel_mint'
+  | 'pastel_teal'
+  | 'pastel_cyan'
+  | 'pastel_sky'
+  | 'pastel_blue'
+  | 'pastel_indigo'
+  | 'pastel_violet'
+  | 'pastel_purple'
+  | 'pastel_magenta'
+  | 'pastel_lavender'
+  | 'pastel_gray'
+  | 'pastel_slate'
   | 'none';
 
 const colorPalette: { color: HeaderColor; gradient: string; label: string }[] =
@@ -231,6 +251,107 @@ const colorPalette: { color: HeaderColor; gradient: string; label: string }[] =
       color: 'obsidian',
       gradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
       label: 'Obsidian',
+    },
+    // Solid pastel colors
+    {
+      color: 'pastel_pink',
+      gradient: '#fecdd3',
+      label: 'Pastel Pink',
+    },
+    {
+      color: 'pastel_rose',
+      gradient: '#fda4af',
+      label: 'Pastel Rose',
+    },
+    {
+      color: 'pastel_coral',
+      gradient: '#fca5a5',
+      label: 'Pastel Coral',
+    },
+    {
+      color: 'pastel_peach',
+      gradient: '#ffedd5',
+      label: 'Pastel Peach',
+    },
+    {
+      color: 'pastel_orange',
+      gradient: '#fed7aa',
+      label: 'Pastel Orange',
+    },
+    {
+      color: 'pastel_yellow',
+      gradient: '#fef08a',
+      label: 'Pastel Yellow',
+    },
+    {
+      color: 'pastel_lime',
+      gradient: '#bef264',
+      label: 'Pastel Lime',
+    },
+    {
+      color: 'pastel_green',
+      gradient: '#86efac',
+      label: 'Pastel Green',
+    },
+    {
+      color: 'pastel_mint',
+      gradient: '#99f6e4',
+      label: 'Pastel Mint',
+    },
+    {
+      color: 'pastel_teal',
+      gradient: '#5eead4',
+      label: 'Pastel Teal',
+    },
+    {
+      color: 'pastel_cyan',
+      gradient: '#67e8f9',
+      label: 'Pastel Cyan',
+    },
+    {
+      color: 'pastel_sky',
+      gradient: '#7dd3fc',
+      label: 'Pastel Sky',
+    },
+    {
+      color: 'pastel_blue',
+      gradient: '#a5b4fc',
+      label: 'Pastel Blue',
+    },
+    {
+      color: 'pastel_indigo',
+      gradient: '#c7d2fe',
+      label: 'Pastel Indigo',
+    },
+    {
+      color: 'pastel_violet',
+      gradient: '#c4b5fd',
+      label: 'Pastel Violet',
+    },
+    {
+      color: 'pastel_purple',
+      gradient: '#d8b4fe',
+      label: 'Pastel Purple',
+    },
+    {
+      color: 'pastel_magenta',
+      gradient: '#f5d0fe',
+      label: 'Pastel Magenta',
+    },
+    {
+      color: 'pastel_lavender',
+      gradient: '#e9d5ff',
+      label: 'Pastel Lavender',
+    },
+    {
+      color: 'pastel_gray',
+      gradient: '#e2e8f0',
+      label: 'Pastel Gray',
+    },
+    {
+      color: 'pastel_slate',
+      gradient: '#cbd5e1',
+      label: 'Pastel Slate',
     },
   ];
 
@@ -416,7 +537,6 @@ export const EditorContent = ({
 
   return (
     <StyledEditorContent>
-      {/* ── COVER BANNER (with icon + action buttons overlaid at bottom) ── */}
       {hasCover ? (
         <Box
           sx={{
@@ -492,10 +612,9 @@ export const EditorContent = ({
                 </Box>
               </Tooltip>
             ) : (
-              <Box /> /* spacer so buttons stay right */
+              <Box />
             )}
 
-            {/* Ghost action buttons */}
             <Box
               sx={{
                 display: 'flex',

@@ -31,6 +31,7 @@ export const TasksHeader = ({
   setViewMode,
   children,
 }: TasksHeaderProps) => {
+  console.log(dateRange);
   return (
     <Header>
       <Box>
@@ -79,9 +80,8 @@ export const TasksHeader = ({
           }}
         >
           <MenuItem value="today">Today</MenuItem>
-          <MenuItem value="last7">Last 7 Days</MenuItem>
-          <MenuItem value="last30">Last 30 Days</MenuItem>
-          <MenuItem value="all">All Time</MenuItem>
+          <MenuItem value="this_week">This Week</MenuItem>
+          <MenuItem value="this_month">This Month</MenuItem>
         </Select>
 
         <ViewToggleGroup id="joyride-tasks-view-toggle">

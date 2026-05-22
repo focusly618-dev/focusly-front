@@ -396,63 +396,68 @@ export const GridContainer = styled(Box)(({ theme }) => ({
 
 export const WorkspaceCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== 'gradient',
-})<{ gradient?: string }>(({ theme, gradient }) => ({
-  backgroundColor: gradient ? 'transparent' : theme.palette.background.paper,
-  backgroundImage: gradient || 'none',
-  backgroundSize: 'cover',
-  borderRadius: '16px',
-  padding: theme.spacing(2.5),
-  display: 'flex',
-  flexDirection: 'column',
-  height: '220px',
-  cursor: 'pointer',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  border: `2px solid ${
-    gradient
-      ? theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.25)'
-        : 'rgba(0, 0, 0, 0.15)'
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.1)'
-        : 'rgba(0, 0, 0, 0.08)'
-  }`,
-  backgroundClip: 'padding-box',
-  position: 'relative',
-  overflow: 'hidden',
-  boxShadow: gradient ? '0 4px 20px rgba(0, 0, 0, 0.2)' : 'none',
-  '&::before': gradient
-    ? {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background:
-          theme.palette.mode === 'dark'
-            ? 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)'
-            : 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%)',
-        backdropFilter: 'blur(8px)',
-        zIndex: 0,
-      }
-    : {},
-  '& > *': {
+})<{ gradient?: string }>(({ theme, gradient }) => {
+  const isGradient = gradient?.startsWith('linear-gradient');
+  return {
+    backgroundColor: isGradient
+      ? 'transparent'
+      : gradient || theme.palette.background.paper,
+    backgroundImage: isGradient ? gradient : 'none',
+    backgroundSize: 'cover',
+    borderRadius: '16px',
+    padding: theme.spacing(2.5),
+    display: 'flex',
+    flexDirection: 'column',
+    height: '220px',
+    cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    border: `2px solid ${
+      gradient
+        ? theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.25)'
+          : 'rgba(0, 0, 0, 0.15)'
+        : theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.08)'
+    }`,
+    backgroundClip: 'padding-box',
     position: 'relative',
-    zIndex: 1,
-  },
-  '&:hover': {
-    transform: 'translateY(-6px)',
-    boxShadow:
-      theme.palette.mode === 'dark'
-        ? gradient
-          ? '0 15px 35px rgba(0, 0, 0, 0.6)'
-          : '0 10px 30px -10px rgba(0, 0, 0, 0.5)'
-        : '0 10px 30px -10px rgba(0, 0, 0, 0.12)',
-    borderColor: gradient
-      ? 'rgba(255, 255, 255, 0.3)'
-      : theme.palette.primary.main,
-  },
-}));
+    overflow: 'hidden',
+    boxShadow: gradient ? '0 4px 20px rgba(0, 0, 0, 0.2)' : 'none',
+    '&::before': isGradient
+      ? {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background:
+            theme.palette.mode === 'dark'
+              ? 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)'
+              : 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 0,
+        }
+      : {},
+    '& > *': {
+      position: 'relative',
+      zIndex: 1,
+    },
+    '&:hover': {
+      transform: 'translateY(-6px)',
+      boxShadow:
+        theme.palette.mode === 'dark'
+          ? gradient
+            ? '0 15px 35px rgba(0, 0, 0, 0.6)'
+            : '0 10px 30px -10px rgba(0, 0, 0, 0.5)'
+          : '0 10px 30px -10px rgba(0, 0, 0, 0.12)',
+      borderColor: gradient
+        ? 'rgba(255, 255, 255, 0.3)'
+        : theme.palette.primary.main,
+    },
+  };
+});
 
 export const TaskPill = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,

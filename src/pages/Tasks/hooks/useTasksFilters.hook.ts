@@ -8,7 +8,7 @@ import type {
 import type { FilterState } from '../components/FilterPopover/FilterPopover';
 import type { SortState } from '../components/SortPopover/SortPopover';
 
-export type DateRangeFilter = 'today' | 'last7' | 'last30' | 'all';
+export type DateRangeFilter = 'today' | 'this_week' | 'this_month' | 'all';
 
 export const useTasksFilters = (tasks: TaskResponse[]) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,20 +45,26 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
 
           if (!dateToUse) return false;
 
-          const taskDateStr = moment(dateToUse).format('YYYY-MM-DD');
+          const taskDate = moment(dateToUse);
+          const now = moment();
 
           if (dateRange === 'today') {
-            return taskDateStr === moment().format('YYYY-MM-DD');
+            return taskDate.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
           }
 
-          let startDateStr = '';
-          if (dateRange === 'last7') {
-            startDateStr = moment().subtract(7, 'days').format('YYYY-MM-DD');
-          } else if (dateRange === 'last30') {
-            startDateStr = moment().subtract(30, 'days').format('YYYY-MM-DD');
+          if (dateRange === 'this_week') {
+            const startOfWeek = now.clone().startOf('week');
+            const endOfWeek = now.clone().endOf('week');
+            return taskDate.isBetween(startOfWeek, endOfWeek, null, '[]');
           }
 
-          return taskDateStr >= startDateStr;
+          if (dateRange === 'this_month') {
+            const startOfMonth = now.clone().startOf('month');
+            const endOfMonth = now.clone().endOf('month');
+            return taskDate.isBetween(startOfMonth, endOfMonth, null, '[]');
+          }
+
+          return true;
         });
       }
 

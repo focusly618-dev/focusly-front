@@ -117,6 +117,7 @@ export const FolderBadge = styled(Box, {
   borderRadius: '6px',
   fontSize: '11px',
   fontWeight: 700,
+  marginTop: '16px',
   letterSpacing: '0.5px',
   marginBottom: '16px',
   border: `1px solid ${bgColor ? `${bgColor}33` : theme.palette.divider}`,

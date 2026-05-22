@@ -146,6 +146,87 @@ export const colorPaletteMap: Record<
     gradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
     isLight: false,
   },
+  // Solid pastel colors without gradients
+  pastel_pink: {
+    gradient: '#fecdd3',
+    isLight: true,
+  },
+  pastel_rose: {
+    gradient: '#fda4af',
+    isLight: true,
+  },
+  pastel_coral: {
+    gradient: '#fca5a5',
+    isLight: true,
+  },
+  pastel_peach: {
+    gradient: '#ffedd5',
+    isLight: true,
+  },
+  pastel_orange: {
+    gradient: '#fed7aa',
+    isLight: true,
+  },
+  pastel_yellow: {
+    gradient: '#fef08a',
+    isLight: true,
+  },
+  pastel_lime: {
+    gradient: '#bef264',
+    isLight: true,
+  },
+  pastel_green: {
+    gradient: '#86efac',
+    isLight: true,
+  },
+  pastel_mint: {
+    gradient: '#99f6e4',
+    isLight: true,
+  },
+  pastel_teal: {
+    gradient: '#5eead4',
+    isLight: true,
+  },
+  pastel_cyan: {
+    gradient: '#67e8f9',
+    isLight: true,
+  },
+  pastel_sky: {
+    gradient: '#7dd3fc',
+    isLight: true,
+  },
+  pastel_blue: {
+    gradient: '#a5b4fc',
+    isLight: true,
+  },
+  pastel_indigo: {
+    gradient: '#c7d2fe',
+    isLight: true,
+  },
+  pastel_violet: {
+    gradient: '#c4b5fd',
+    isLight: true,
+  },
+  pastel_purple: {
+    gradient: '#d8b4fe',
+    isLight: true,
+  },
+  pastel_magenta: {
+    gradient: '#f5d0fe',
+    isLight: true,
+  },
+  pastel_lavender: {
+    gradient: '#e9d5ff',
+    isLight: true,
+  },
+  pastel_gray: {
+    gradient: '#e2e8f0',
+    isLight: true,
+  },
+  pastel_slate: {
+    gradient: '#cbd5e1',
+    isLight: true,
+  },
 };
 
 export const iconMap: Record<string, React.ElementType> = {

@@ -229,6 +229,7 @@ export const Workspace = ({
           style={{ height: '100%', width: '100%' }}
         >
           <WorkspaceEditor
+            key={watch('id') || 'new-workspace'}
             onBack={() => {
               onEditorChange(false);
               const newParams = new URLSearchParams(searchParams);

@@ -10,18 +10,31 @@ import {
   ProgressHeader,
   StyledLinearProgress,
 } from './WorkloadDashboard.styles';
-import { 
-  WarningAmber as WarningAmberIcon, 
-  FlashOn as FlashOnIcon, 
-  AccessTime as AccessTimeIcon, 
-  HelpOutline as HelpOutlineIcon 
+import {
+  WarningAmber as WarningAmberIcon,
+  FlashOn as FlashOnIcon,
+  AccessTime as AccessTimeIcon,
+  HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
 import { useWorkloadDashboard } from './hooks/useWorkloadDashboard.hook';
 import { useEffect } from 'react';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
-export const WorkloadDashboard = () => {
-  const { daysWeek, getDaysWeek, estimationWeek, limitWeek, availableSlots, dailyWorkload } =
-    useWorkloadDashboard();
+interface WorkloadDashboardProps {
+  filteredTasks?: TaskResponse[];
+}
+
+export const WorkloadDashboard = ({
+  filteredTasks,
+}: WorkloadDashboardProps) => {
+  const {
+    daysWeek,
+    getDaysWeek,
+    estimationWeek,
+    limitWeek,
+    availableSlots,
+    dailyWorkload,
+  } = useWorkloadDashboard(filteredTasks);
 
   const dailyLimit = limitWeek / 7;
 
@@ -44,9 +57,16 @@ export const WorkloadDashboard = () => {
         {/* 3 Summary Cards */}
         <StatBoxContainer>
           <StatCard>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Box display="flex" alignItems="center" gap={0.5}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.secondary', fontWeight: 600 }}
+                >
                   AVG DAILY WORKLOAD
                 </Typography>
                 <Tooltip
@@ -54,30 +74,54 @@ export const WorkloadDashboard = () => {
                   arrow
                   placement="top"
                 >
-                  <HelpOutlineIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
+                  <HelpOutlineIcon
+                    sx={{
+                      fontSize: 14,
+                      color: 'text.disabled',
+                      cursor: 'help',
+                    }}
+                  />
                 </Tooltip>
               </Box>
               <AccessTimeIcon sx={{ color: '#2f81f7', fontSize: 25 }} />
             </Box>
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 700, display: 'inline', mr: 1 }}>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, display: 'inline', mr: 1 }}
+              >
                 {avgDailyWorkload}h
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline' }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.secondary', display: 'inline' }}
+              >
                 / {(limitWeek / 7).toFixed(1)}h limit
               </Typography>
             </Box>
             <StyledLinearProgress
               variant="determinate"
-              value={Math.min(100, (parseFloat(avgDailyWorkload) / (limitWeek / 7)) * 100) || 0}
+              value={
+                Math.min(
+                  100,
+                  (parseFloat(avgDailyWorkload) / (limitWeek / 7)) * 100,
+                ) || 0
+              }
               sx={{ mt: 'auto', height: 6 }}
             />
           </StatCard>
 
           <StatCard>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Box display="flex" alignItems="center" gap={0.5}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.secondary', fontWeight: 600 }}
+                >
                   TOTAL ESTIMATED TIME
                 </Typography>
                 <Tooltip
@@ -85,25 +129,44 @@ export const WorkloadDashboard = () => {
                   arrow
                   placement="top"
                 >
-                  <HelpOutlineIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
+                  <HelpOutlineIcon
+                    sx={{
+                      fontSize: 14,
+                      color: 'text.disabled',
+                      cursor: 'help',
+                    }}
+                  />
                 </Tooltip>
               </Box>
               <FlashOnIcon sx={{ color: '#8a2be2', fontSize: 16 }} />
             </Box>
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 700, display: 'inline', mr: 1 }}>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, display: 'inline', mr: 1 }}
+              >
                 {estimationWeek.toFixed(1)}h
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline' }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.secondary', display: 'inline' }}
+              >
                 this week
               </Typography>
             </Box>
           </StatCard>
 
           <StatCard>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Box display="flex" alignItems="center" gap={0.5}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.secondary', fontWeight: 600 }}
+                >
                   AVAILABLE SLOTS
                 </Typography>
                 <Tooltip
@@ -111,13 +174,22 @@ export const WorkloadDashboard = () => {
                   arrow
                   placement="top"
                 >
-                  <HelpOutlineIcon sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }} />
+                  <HelpOutlineIcon
+                    sx={{
+                      fontSize: 14,
+                      color: 'text.disabled',
+                      cursor: 'help',
+                    }}
+                  />
                 </Tooltip>
               </Box>
               <FlashOnIcon sx={{ color: '#3fb950', fontSize: 16 }} />
             </Box>
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 700, display: 'inline', mr: 1 }}>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, display: 'inline', mr: 1 }}
+              >
                 {availableSlots.toFixed(1)}h
               </Typography>
               <Typography
@@ -141,16 +213,25 @@ export const WorkloadDashboard = () => {
                   Monday
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {daysWeek[0]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {daysWeek[0]?.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </Typography>
               </Box>
               <Box display="flex" gap={2} alignItems="center">
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
                     Est:{' '}
                     <strong
                       style={{
-                        color: (dailyWorkload[0] || 0) > dailyLimit ? '#ff4d4f' : 'inherit',
+                        color:
+                          (dailyWorkload[0] || 0) > dailyLimit
+                            ? '#ff4d4f'
+                            : 'inherit',
                       }}
                     >
                       {(dailyWorkload[0] || 0).toFixed(1)}h
@@ -162,12 +243,19 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
                     Limit: <strong style={{ color: 'inherit' }}>8h</strong>
                   </Typography>
                   <Tooltip
@@ -176,7 +264,11 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -187,15 +279,26 @@ export const WorkloadDashboard = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: (dailyWorkload[0] || 0) > dailyLimit ? '#ff4d4f' : '#2f81f7',
+                      color:
+                        (dailyWorkload[0] || 0) > dailyLimit
+                          ? '#ff4d4f'
+                          : '#2f81f7',
                       fontWeight: 600,
                     }}
                   >
                     {Math.round(((dailyWorkload[0] || 0) / dailyLimit) * 100)}%
                   </Typography>
-                  <Tooltip title="Percentage of daily capacity used" arrow placement="top">
+                  <Tooltip
+                    title="Percentage of daily capacity used"
+                    arrow
+                    placement="top"
+                  >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -203,7 +306,10 @@ export const WorkloadDashboard = () => {
             </ProgressHeader>
             <StyledLinearProgress
               variant="determinate"
-              value={Math.min(100, ((dailyWorkload[0] || 0) / dailyLimit) * 100)}
+              value={Math.min(
+                100,
+                ((dailyWorkload[0] || 0) / dailyLimit) * 100,
+              )}
               overLimit={(dailyWorkload[0] || 0) > dailyLimit}
             />
           </ProgressRow>
@@ -215,16 +321,25 @@ export const WorkloadDashboard = () => {
                   Tuesday
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {daysWeek[1]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {daysWeek[1]?.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </Typography>
               </Box>
               <Box display="flex" gap={2} alignItems="center">
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
                     Est:
                     <strong
                       style={{
-                        color: (dailyWorkload[1] || 0) > dailyLimit ? '#ff4d4f' : 'inherit',
+                        color:
+                          (dailyWorkload[1] || 0) > dailyLimit
+                            ? '#ff4d4f'
+                            : 'inherit',
                       }}
                     >
                       {(dailyWorkload[1] || 0).toFixed(1)}h
@@ -236,13 +351,23 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Limit: <strong style={{ color: 'inherit' }}>{dailyLimit.toFixed(1)}h</strong>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    Limit:{' '}
+                    <strong style={{ color: 'inherit' }}>
+                      {dailyLimit.toFixed(1)}h
+                    </strong>
                   </Typography>
                   <Tooltip
                     title="Your max daily capacity. Tasks beyond this limit will be flagged"
@@ -250,7 +375,11 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -261,15 +390,26 @@ export const WorkloadDashboard = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: (dailyWorkload[1] || 0) > dailyLimit ? '#ff4d4f' : '#2f81f7',
+                      color:
+                        (dailyWorkload[1] || 0) > dailyLimit
+                          ? '#ff4d4f'
+                          : '#2f81f7',
                       fontWeight: 600,
                     }}
                   >
                     {Math.round(((dailyWorkload[1] || 0) / dailyLimit) * 100)}%
                   </Typography>
-                  <Tooltip title="Percentage of daily capacity used" arrow placement="top">
+                  <Tooltip
+                    title="Percentage of daily capacity used"
+                    arrow
+                    placement="top"
+                  >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -277,7 +417,10 @@ export const WorkloadDashboard = () => {
             </ProgressHeader>
             <StyledLinearProgress
               variant="determinate"
-              value={Math.min(100, ((dailyWorkload[1] || 0) / dailyLimit) * 100)}
+              value={Math.min(
+                100,
+                ((dailyWorkload[1] || 0) / dailyLimit) * 100,
+              )}
               overLimit={(dailyWorkload[1] || 0) > dailyLimit}
             />
           </ProgressRow>
@@ -289,16 +432,25 @@ export const WorkloadDashboard = () => {
                   Wednesday
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {daysWeek[2]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {daysWeek[2]?.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </Typography>
               </Box>
               <Box display="flex" gap={2} alignItems="center">
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
                     Est:{' '}
                     <strong
                       style={{
-                        color: (dailyWorkload[2] || 0) > dailyLimit ? '#ff4d4f' : 'inherit',
+                        color:
+                          (dailyWorkload[2] || 0) > dailyLimit
+                            ? '#ff4d4f'
+                            : 'inherit',
                       }}
                     >
                       {(dailyWorkload[2] || 0).toFixed(1)}h
@@ -310,13 +462,23 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Limit: <strong style={{ color: 'inherit' }}>{dailyLimit.toFixed(1)}h</strong>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    Limit:{' '}
+                    <strong style={{ color: 'inherit' }}>
+                      {dailyLimit.toFixed(1)}h
+                    </strong>
                   </Typography>
                   <Tooltip
                     title="Your max daily capacity. Tasks beyond this limit will be flagged"
@@ -324,7 +486,11 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -335,15 +501,26 @@ export const WorkloadDashboard = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: (dailyWorkload[2] || 0) > dailyLimit ? '#ff4d4f' : '#2f81f7',
+                      color:
+                        (dailyWorkload[2] || 0) > dailyLimit
+                          ? '#ff4d4f'
+                          : '#2f81f7',
                       fontWeight: 600,
                     }}
                   >
                     {Math.round(((dailyWorkload[2] || 0) / dailyLimit) * 100)}%
                   </Typography>
-                  <Tooltip title="Percentage of daily capacity used" arrow placement="top">
+                  <Tooltip
+                    title="Percentage of daily capacity used"
+                    arrow
+                    placement="top"
+                  >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -351,7 +528,10 @@ export const WorkloadDashboard = () => {
             </ProgressHeader>
             <StyledLinearProgress
               variant="determinate"
-              value={Math.min(100, ((dailyWorkload[2] || 0) / dailyLimit) * 100)}
+              value={Math.min(
+                100,
+                ((dailyWorkload[2] || 0) / dailyLimit) * 100,
+              )}
               overLimit={(dailyWorkload[2] || 0) > dailyLimit}
             />
           </ProgressRow>
@@ -363,16 +543,25 @@ export const WorkloadDashboard = () => {
                   Thursday
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {daysWeek[3]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {daysWeek[3]?.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </Typography>
               </Box>
               <Box display="flex" gap={2} alignItems="center">
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
                     Est:{' '}
                     <strong
                       style={{
-                        color: (dailyWorkload[3] || 0) > dailyLimit ? '#ff4d4f' : 'inherit',
+                        color:
+                          (dailyWorkload[3] || 0) > dailyLimit
+                            ? '#ff4d4f'
+                            : 'inherit',
                       }}
                     >
                       {(dailyWorkload[3] || 0).toFixed(1)}h
@@ -384,13 +573,23 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Limit: <strong style={{ color: 'inherit' }}>{dailyLimit.toFixed(1)}h</strong>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    Limit:{' '}
+                    <strong style={{ color: 'inherit' }}>
+                      {dailyLimit.toFixed(1)}h
+                    </strong>
                   </Typography>
                   <Tooltip
                     title="Your max daily capacity. Tasks beyond this limit will be flagged"
@@ -398,7 +597,11 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -409,15 +612,26 @@ export const WorkloadDashboard = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: (dailyWorkload[3] || 0) > dailyLimit ? '#ff4d4f' : '#2f81f7',
+                      color:
+                        (dailyWorkload[3] || 0) > dailyLimit
+                          ? '#ff4d4f'
+                          : '#2f81f7',
                       fontWeight: 600,
                     }}
                   >
                     {Math.round(((dailyWorkload[3] || 0) / dailyLimit) * 100)}%
                   </Typography>
-                  <Tooltip title="Percentage of daily capacity used" arrow placement="top">
+                  <Tooltip
+                    title="Percentage of daily capacity used"
+                    arrow
+                    placement="top"
+                  >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -425,7 +639,10 @@ export const WorkloadDashboard = () => {
             </ProgressHeader>
             <StyledLinearProgress
               variant="determinate"
-              value={Math.min(100, ((dailyWorkload[3] || 0) / dailyLimit) * 100)}
+              value={Math.min(
+                100,
+                ((dailyWorkload[3] || 0) / dailyLimit) * 100,
+              )}
               overLimit={(dailyWorkload[3] || 0) > dailyLimit}
             />
           </ProgressRow>
@@ -437,16 +654,25 @@ export const WorkloadDashboard = () => {
                   Friday
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {daysWeek[4]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {daysWeek[4]?.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </Typography>
               </Box>
               <Box display="flex" gap={2} alignItems="center">
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
                     Est:{' '}
                     <strong
                       style={{
-                        color: (dailyWorkload[4] || 0) > dailyLimit ? '#ff4d4f' : 'inherit',
+                        color:
+                          (dailyWorkload[4] || 0) > dailyLimit
+                            ? '#ff4d4f'
+                            : 'inherit',
                       }}
                     >
                       {(dailyWorkload[4] || 0).toFixed(1)}h
@@ -458,13 +684,23 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
                 <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Limit: <strong style={{ color: 'inherit' }}>{dailyLimit.toFixed(1)}h</strong>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    Limit:{' '}
+                    <strong style={{ color: 'inherit' }}>
+                      {dailyLimit.toFixed(1)}h
+                    </strong>
                   </Typography>
                   <Tooltip
                     title="Your max daily capacity. Tasks beyond this limit will be flagged"
@@ -472,7 +708,11 @@ export const WorkloadDashboard = () => {
                     placement="top"
                   >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -483,15 +723,26 @@ export const WorkloadDashboard = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: (dailyWorkload[4] || 0) > dailyLimit ? '#ff4d4f' : '#2f81f7',
+                      color:
+                        (dailyWorkload[4] || 0) > dailyLimit
+                          ? '#ff4d4f'
+                          : '#2f81f7',
                       fontWeight: 600,
                     }}
                   >
                     {Math.round(((dailyWorkload[4] || 0) / dailyLimit) * 100)}%
                   </Typography>
-                  <Tooltip title="Percentage of daily capacity used" arrow placement="top">
+                  <Tooltip
+                    title="Percentage of daily capacity used"
+                    arrow
+                    placement="top"
+                  >
                     <HelpOutlineIcon
-                      sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
+                      sx={{
+                        fontSize: 14,
+                        color: 'text.disabled',
+                        cursor: 'help',
+                      }}
                     />
                   </Tooltip>
                 </Box>
@@ -499,7 +750,10 @@ export const WorkloadDashboard = () => {
             </ProgressHeader>
             <StyledLinearProgress
               variant="determinate"
-              value={Math.min(100, ((dailyWorkload[4] || 0) / dailyLimit) * 100)}
+              value={Math.min(
+                100,
+                ((dailyWorkload[4] || 0) / dailyLimit) * 100,
+              )}
               overLimit={(dailyWorkload[4] || 0) > dailyLimit}
             />
           </ProgressRow>
