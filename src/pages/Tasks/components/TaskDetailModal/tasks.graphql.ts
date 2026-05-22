@@ -271,3 +271,82 @@ export const GET_TAGS = gql`
     }
   }
 `;
+
+export const GET_TASKS_PAGINATED = gql`
+  query GetTasksByUserPaginated(
+    $userId: String!
+    $filters: TaskFilterInput
+    $sort: TaskSortInput
+    $offset: Int
+    $limit: Int
+  ) {
+    result: getTasksByUserPaginated(
+      userId: $userId
+      filters: $filters
+      sort: $sort
+      offset: $offset
+      limit: $limit
+    ) {
+      tasks {
+        id
+        title
+        notes_encrypted
+        status
+        estimate_timer
+        real_timer
+        duration
+        priority_level
+        user_id
+        category
+        color
+        subtasks {
+          title
+          completed
+          timer
+          notes_encrypted
+          estimate_timer
+          priority_level
+          status
+          deadline
+          category
+          links {
+            title
+            url
+          }
+        }
+        tags {
+          name
+        }
+        filters {
+          status
+          priorityLevel
+          category
+        }
+        deadline
+        created_at
+        updated_at
+        links {
+          title
+          url
+        }
+        google_event_id
+        task_type
+        estimated_start_date
+        estimated_end_date
+        collaborators {
+          name
+          email
+          avatar
+          responseStatus
+        }
+        workspace {
+          id
+          title
+          content
+          updatedAt
+        }
+      }
+      totalCount
+    }
+  }
+`;

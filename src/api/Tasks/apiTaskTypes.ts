@@ -12,6 +12,9 @@ export interface TaskFilterInput {
   )[];
   priorityLevel?: number[];
   category?: string[];
+  startDate?: string;
+  endDate?: string;
+  searchTerm?: string;
 }
 
 export interface TaskSortInput {

@@ -38,6 +38,7 @@ export const Tasks = ({
     setDateRange,
     isCompletedFilterActive,
     activeSort,
+    activeFilters,
     activeFilterState,
     filterAnchorEl,
     sortAnchorEl,
@@ -193,6 +194,10 @@ export const Tasks = ({
             isAIScheduleEnabled={isAIScheduleEnabled}
             setIsAIScheduleEnabled={setIsAIScheduleEnabled}
             onStartFocus={onStartFocus}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            searchTerm={searchTerm}
+            dateRange={dateRange}
           />
         </MainContent>
 

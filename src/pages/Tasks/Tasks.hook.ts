@@ -181,6 +181,7 @@ export const useTasks = () => {
     dateRange: filterLogic.dateRange,
     setDateRange: filterLogic.setDateRange,
     activeSort: filterLogic.activeSort,
+    activeFilters: filterLogic.activeFilters,
     activeFilterState: filterLogic.activeFilterState,
     handleApplySort: filterLogic.handleApplySort,
     handleApplyFilters: filterLogic.handleApplyFilters,

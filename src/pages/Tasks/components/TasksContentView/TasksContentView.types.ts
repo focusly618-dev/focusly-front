@@ -1,4 +1,8 @@
-import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import type {
+  TaskResponse,
+  TaskFilterInput,
+  TaskSortInput,
+} from '@/api/Tasks/apiTaskTypes';
 import type { Task } from '@/redux/tasks/task.types';
 
 export interface TasksContentViewProps {
@@ -16,4 +20,8 @@ export interface TasksContentViewProps {
   isAIScheduleEnabled?: boolean;
   setIsAIScheduleEnabled?: (enabled: boolean) => void;
   onStartFocus?: (task: Task) => void;
+  activeFilters?: TaskFilterInput;
+  activeSort?: TaskSortInput;
+  searchTerm?: string;
+  dateRange?: string;
 }
