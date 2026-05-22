@@ -4,10 +4,7 @@ import { useAppSelector } from '@/redux/hooks';
 import moment from 'moment';
 import { Box, Typography, Button } from '@mui/material';
 import { CheckBox as CheckBoxIcon } from '@mui/icons-material';
-import {
-  AnimatedContainer,
-  GridTaskContainer,
-} from '../../Tasks.styles';
+import { AnimatedContainer, GridTaskContainer } from '../../Tasks.styles';
 import { EmptyState } from '@/utils/EmptyState';
 import { BoardView } from '../BoardView/BoardView';
 import { WorkloadDashboard } from '../WorkloadDashboard/WorkloadDashboard';
@@ -22,8 +19,13 @@ import {
   TableBodyContainer,
 } from '../ListViewTask/ListViewTask.styles';
 import { GET_TASKS_PAGINATED } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
-import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import type {
+  TaskResponse,
+  TaskFilterInput,
+  TaskSortInput,
+} from '@/api/Tasks/apiTaskTypes';
 import type { TasksContentViewProps } from './TasksContentView.types';
+import type { Task } from '@/redux/tasks/task.types';
 
 const STATUS_SECTIONS = [
   {
@@ -98,10 +100,10 @@ const StatusTableGroup = ({
   searchTerm,
   dateRange,
 }: {
-  section: typeof STATUS_SECTIONS[number];
+  section: (typeof STATUS_SECTIONS)[number];
   userId: string;
-  activeFilters: any;
-  activeSort: any;
+  activeFilters?: TaskFilterInput;
+  activeSort?: TaskSortInput;
   expandedTaskIds: Set<string>;
   toggleTaskExpansion: (taskId: string) => void;
   handleSubtaskToggle: (task: TaskResponse, index: number) => void;
@@ -109,7 +111,7 @@ const StatusTableGroup = ({
   handleTaskClick: (task: TaskResponse) => void;
   updateTask: (taskId: string, updates: TaskResponse) => Promise<void>;
   isAIScheduleEnabled?: boolean;
-  onStartFocus?: (task: any) => void;
+  onStartFocus?: (task: Task) => void;
   searchTerm?: string;
   dateRange?: string;
 }) => {
@@ -118,11 +120,13 @@ const StatusTableGroup = ({
   const queryFilters = useMemo(() => {
     const f = activeFilters ? { ...activeFilters } : {};
     if (activeFilters?.status && activeFilters.status.length > 0) {
-      if (!activeFilters.status.includes(section.id)) {
+      if (
+        !activeFilters.status.includes(section.id as TaskResponse['status'])
+      ) {
         return null;
       }
     }
-    f.status = [section.id];
+    f.status = [section.id as TaskResponse['status']];
 
     if (searchTerm) {
       f.searchTerm = searchTerm;
@@ -137,7 +141,10 @@ const StatusTableGroup = ({
       } else if (dateRange === 'last7') {
         f.startDate = moment().subtract(7, 'days').startOf('day').toISOString();
       } else if (dateRange === 'last30') {
-        f.startDate = moment().subtract(30, 'days').startOf('day').toISOString();
+        f.startDate = moment()
+          .subtract(30, 'days')
+          .startOf('day')
+          .toISOString();
       }
     }
 
@@ -298,7 +305,14 @@ export const TasksContentView = ({
         key={viewMode}
         sx={
           viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload'
-            ? { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', paddingTop: 0, minHeight: 0 }
+            ? {
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                paddingTop: 0,
+                minHeight: 0,
+              }
             : undefined
         }
       >
@@ -319,7 +333,14 @@ export const TasksContentView = ({
         key={viewMode}
         sx={
           viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload'
-            ? { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', paddingTop: 0, minHeight: 0 }
+            ? {
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                paddingTop: 0,
+                minHeight: 0,
+              }
             : undefined
         }
       >
@@ -333,7 +354,8 @@ export const TasksContentView = ({
     );
   }
 
-  const isListView = viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload';
+  const isListView =
+    viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload';
 
   return (
     <AnimatedContainer

@@ -1,5 +1,12 @@
 import { styled } from '@mui/material/styles';
-import { Box, Typography, IconButton, LinearProgress, linearProgressClasses, alpha } from '@mui/material';
+import {
+  Box,
+  Typography,
+  IconButton,
+  LinearProgress,
+  linearProgressClasses,
+  alpha,
+} from '@mui/material';
 import { SubdirectoryArrowRight as SubdirectoryArrowRightIcon } from '@mui/icons-material';
 
 // Motion-inspired professional design
@@ -194,7 +201,9 @@ export const TaskProgressBar = styled(LinearProgress, {
   backgroundColor: theme.palette.divider,
   [`& .${linearProgressClasses.bar}`]: {
     borderRadius: 3,
-    backgroundColor: overLimit ? theme.palette.error.main : theme.palette.primary.main,
+    backgroundColor: overLimit
+      ? theme.palette.error.main
+      : theme.palette.primary.main,
   },
 }));
 
@@ -267,24 +276,28 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: '12px',
-  backgroundColor: theme.palette.mode === 'dark' 
-    ? 'rgba(15, 23, 42, 0.4)' 
-    : 'rgba(255, 255, 255, 0.4)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(15, 23, 42, 0.4)'
+      : 'rgba(255, 255, 255, 0.4)',
   backdropFilter: 'blur(12px)',
   overflow: 'hidden',
-  boxShadow: theme.palette.mode === 'dark' 
-    ? '0 8px 32px 0 rgba(0, 0, 0, 0.3)' 
-    : '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
+      : '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
   marginBottom: '24px',
 }));
 
 export const TableHeader = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: '40px minmax(180px, 3fr) 120px 100px 120px 85px 60px 130px 100px',
+  gridTemplateColumns:
+    '40px minmax(180px, 3fr) 120px 100px 120px 85px 60px 130px 100px',
   padding: '14px 16px',
-  backgroundColor: theme.palette.mode === 'dark'
-    ? 'rgba(15, 23, 42, 0.6)'
-    : 'rgba(255, 255, 255, 0.6)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(15, 23, 42, 0.6)'
+      : 'rgba(255, 255, 255, 0.6)',
   borderBottom: `1px solid ${theme.palette.divider}`,
   color: theme.palette.text.secondary,
   fontWeight: 700,
@@ -306,7 +319,9 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   },
   [theme.breakpoints.down('sm')]: {
     gridTemplateColumns: '40px minmax(120px, 2fr) 90px 100px 80px',
-    '& .col-links, & .col-progress, & .col-subtasks, & .col-category': { display: 'none' },
+    '& .col-links, & .col-progress, & .col-subtasks, & .col-category': {
+      display: 'none',
+    },
   },
 }));
 
@@ -339,14 +354,15 @@ export const TableBodyContainer = styled(Box)(({ theme }) => ({
 
 export const TableStatusGroupRow = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'statusColor',
-})<{ statusColor?: string }>(({ theme, statusColor }) => ({
+})<{ statusColor?: string }>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: '10px',
   padding: '10px 16px',
-  backgroundColor: theme.palette.mode === 'dark' 
-    ? 'rgba(30, 41, 59, 0.7)'
-    : 'rgba(241, 245, 249, 0.9)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(30, 41, 59, 0.7)'
+      : 'rgba(241, 245, 249, 0.9)',
   borderBottom: `1px solid ${theme.palette.divider}`,
   backdropFilter: 'blur(8px)',
   position: 'sticky',
@@ -358,7 +374,8 @@ export const TaskRow = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'statusColor',
 })<{ statusColor?: string }>(({ theme, statusColor }) => ({
   display: 'grid',
-  gridTemplateColumns: '40px minmax(180px, 3fr) 120px 100px 120px 85px 60px 130px 100px',
+  gridTemplateColumns:
+    '40px minmax(180px, 3fr) 120px 100px 120px 85px 60px 130px 100px',
   alignItems: 'center',
   padding: '12px 16px',
   backgroundColor: 'transparent',
@@ -369,13 +386,15 @@ export const TaskRow = styled(Box, {
   gap: '12px',
 
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.03)'
-      : 'rgba(0, 0, 0, 0.015)',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.03)'
+        : 'rgba(0, 0, 0, 0.015)',
     transform: 'translateY(-0.5px)',
-    boxShadow: theme.palette.mode === 'dark'
-      ? '0 4px 12px rgba(0, 0, 0, 0.2)'
-      : '0 4px 12px rgba(0, 0, 0, 0.02)',
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? '0 4px 12px rgba(0, 0, 0, 0.2)'
+        : '0 4px 12px rgba(0, 0, 0, 0.02)',
   },
 
   // Responsive hiding
@@ -389,6 +408,8 @@ export const TaskRow = styled(Box, {
   },
   [theme.breakpoints.down('sm')]: {
     gridTemplateColumns: '40px minmax(120px, 2fr) 90px 100px 80px',
-    '& .cell-links, & .cell-progress, & .cell-subtasks, & .cell-category': { display: 'none' },
+    '& .cell-links, & .cell-progress, & .cell-subtasks, & .cell-category': {
+      display: 'none',
+    },
   },
 }));
