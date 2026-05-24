@@ -30,25 +30,3 @@ export const headerIconButtonSx = (isCustomColor: boolean) => ({
       : 'action.hover',
   },
 });
-
-export const parentTaskContainerSx = { 
-  px: 5, 
-  mb: 1,
-  display: 'flex',
-  alignItems: 'center',
-  gap: 1
-};
-
-export const parentTaskTypographySx = (isCustomColor: boolean) => ({
-  fontWeight: 500,
-  color: isCustomColor ? '#fff' : 'text.primary',
-  fontSize: 12,
-  display: 'flex',
-  alignItems: 'center',
-  gap: 0.5,
-});
-
-export const subtaskTypographySx = (isCustomColor: boolean) => ({ 
-  fontSize: 12, 
-  color: isCustomColor ? 'rgba(255,255,255,0.9)' : 'text.secondary' 
-});

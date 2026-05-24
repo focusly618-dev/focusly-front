@@ -342,17 +342,6 @@ export const TaskItemContainer = styled(Box)<{ active?: boolean }>(
   }),
 );
 
-export const SubTaskItemContainer = styled(Box)(({ theme }) => ({
-  padding: '8px 16px 8px 48px', // Indented
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
 export const StyledBadge = styled(Box)<{ color: string; bgColor: string }>(
   ({ color, bgColor }) => ({
     backgroundColor: bgColor,

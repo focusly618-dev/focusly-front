@@ -5,7 +5,6 @@ import React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import type { TaskDetailModalProps } from './types/TaskDetailModal.types';
-import type { Task } from '@/redux/tasks/task.types';
 import {
   modalBackdropSx,
   paperPropsSx,
@@ -41,8 +40,6 @@ export const TaskDetailModal = ({
   initialStart,
   initialTask,
   handleDelete: onDelete,
-  parentTask,
-  subtaskIndex,
   isAIScheduleEnabled,
   setIsAIScheduleEnabled,
 }: TaskDetailModalProps) => {
@@ -95,22 +92,12 @@ export const TaskDetailModal = ({
     hasMeetLink,
     createURLWorkSpace,
     handleRemoveWorkspace,
-    isSplitable,
-    setIsSplitable,
-    minBlockDuration,
-    setMinBlockDuration,
-    preferredTimeOfDay,
-    setPreferredTimeOfDay,
-    isLocked,
-    setIsLocked,
   } = useTaskDetailModal({
     onSave,
     onClose,
     initialStart,
     initialTask,
     onDelete,
-    parentTask: parentTask ? (parentTask as unknown as Task) : undefined,
-    subtaskIndex,
     isAIScheduleEnabled,
     setIsAIScheduleEnabled,
   });
@@ -192,9 +179,6 @@ export const TaskDetailModal = ({
               color={color}
               isFullScreen={isFullScreen}
               setIsFullScreen={setIsFullScreen}
-              parentTask={
-                parentTask ? (parentTask as unknown as Task) : undefined
-              }
               title={title}
               onClose={onClose}
               initialTask={initialTask}
@@ -241,14 +225,6 @@ export const TaskDetailModal = ({
                 isPureGoogleTask={isPureGoogleTask}
                 timeSlotDisplay={timeSlotDisplay}
                 handleTimerChange={handleTimerChange}
-                isSplitable={isSplitable}
-                setIsSplitable={setIsSplitable}
-                minBlockDuration={minBlockDuration}
-                setMinBlockDuration={setMinBlockDuration}
-                preferredTimeOfDay={preferredTimeOfDay}
-                setPreferredTimeOfDay={setPreferredTimeOfDay}
-                isLocked={isLocked}
-                setIsLocked={setIsLocked}
               />
 
               <TaskResources

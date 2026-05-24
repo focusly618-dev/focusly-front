@@ -9,7 +9,6 @@ import {
   CREATE_TASK,
   UPDATE_TASK,
   DELETE_TASK,
-  ADD_SUBTASK,
   GET_TASKS,
 } from '../tasks.graphql';
 import { sileo } from 'sileo';
@@ -18,11 +17,7 @@ import {
   updateGoogleEvent,
   deleteGoogleEvent,
 } from '@/api/GoogleCalendar/googleCalendarApi';
-import {
-  removeTask,
-  upsertTask as upsertTaskRedux,
-} from '@/redux/tasks/task.slice';
-import { mapResponseToTask } from '@/api/Tasks/taskMapper';
+import { removeTask } from '@/redux/tasks/task.slice';
 import {
   deduplicateLinks,
   parseDuration,
@@ -42,8 +37,6 @@ export const useTaskMutations = ({
   onClose,
   onDelete,
   initialTask,
-  parentTask,
-  subtaskIndex,
   resetForm,
 }: UseTaskMutationsProps) => {
   const { user } = useAppSelector((state) => state.auth);
@@ -53,7 +46,6 @@ export const useTaskMutations = ({
   const [createTaskMutation] = useMutation(CREATE_TASK);
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
-  const [addSubtaskMutation] = useMutation(ADD_SUBTASK);
 
   const generateMeetLinkNow = async (
     googleEventId?: string,
@@ -161,54 +153,7 @@ export const useTaskMutations = ({
       color: state.color,
       links,
       collaborators: state.collaborators,
-      is_splitable: state.is_splitable,
-      min_block_duration: state.min_block_duration,
-      preferred_time_of_day: state.preferred_time_of_day,
-      is_locked: state.is_locked,
     };
-
-    if (parentTask?.id) {
-      try {
-        const subtaskInput = {
-          title: state.title,
-          notes_encrypted: `${cleanDesc} [COLOR:${state.color}]`,
-          completed: state.status === 'Done',
-          timer: realTimer || 0,
-          estimate_timer: estimateTimer,
-          priority_level: priorityLevel,
-          status: state.status || 'Backlog',
-          deadline: state.deadline
-            ? state.deadline.toISOString()
-            : new Date().toISOString(),
-          category: state.category,
-          color: state.color,
-          links,
-        };
-
-        const { data } = await addSubtaskMutation({
-          variables: {
-            taskId: parentTask.id,
-            subtask: subtaskInput,
-          },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user.id } },
-          ],
-        });
-        if (data?.addSubtask) {
-          dispatch(upsertTaskRedux(mapResponseToTask(data.addSubtask)));
-          sileo.success({
-            title: 'Subtask added',
-            fill: 'var(--sileo-success-bg)',
-          });
-          onSave(data.addSubtask);
-          resetForm();
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      setLoadingSave(false);
-      return;
-    }
 
     const createInput: TaskInput = {
       ...commonInput,
@@ -216,11 +161,6 @@ export const useTaskMutations = ({
       status: state.status || 'Backlog',
       google_event_id: (initialTask as { google_event_id?: string })
         ?.google_event_id,
-      subtasks: state.subtasks?.map((st) => ({
-        title: st.title,
-        completed: st.completed,
-        timer: st.timer,
-      })),
     };
 
     try {
@@ -260,71 +200,7 @@ export const useTaskMutations = ({
         ? parseRealTime(state.realTime)
         : initialTask.real_timer || 0;
 
-    // 1. Handle Subtask Update (Special case for nested structure)
-    if (parentTask && typeof subtaskIndex === 'number') {
-      const updatedSubtasks = [...(parentTask.subtasks || [])].map((st, i) => {
-        const baseSubtask =
-          typeof st === 'string'
-            ? { title: st, completed: false, timer: 0 }
-            : st;
-        const cleanSt = { ...(baseSubtask as Record<string, unknown>) };
-        delete cleanSt.__typename;
-        delete (cleanSt as Record<string, unknown>).real_timer;
-        delete (cleanSt as Record<string, unknown>).tags;
-        delete (cleanSt as Record<string, unknown>).collaborators;
-
-        if (i !== subtaskIndex) return cleanSt;
-
-        const subtaskColor =
-          state.color ||
-          (initialTask as { color?: string | undefined }).color ||
-          '#3b82f6';
-        return {
-          title: state.title || initialTask.title,
-          timer: realTimer || 0,
-          completed: (state.status || initialTask.status) === 'Done',
-          notes_encrypted: `${state.description || initialTask.notes_encrypted || ''} [COLOR:${subtaskColor}]`,
-          estimate_timer: estimateTimer,
-          priority_level: priorityLevel,
-          status: state.status,
-          deadline:
-            state.deadline instanceof Date
-              ? state.deadline.toISOString()
-              : state.deadline || initialTask.deadline,
-          category: state.category,
-          color: subtaskColor,
-          links: state.links?.map((l) => ({ title: l.title, url: l.url })),
-        };
-      });
-
-      try {
-        const { data } = await updateTaskMutation({
-          variables: {
-            updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks },
-          },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user.id } },
-          ],
-        });
-        if (data?.updateTask) {
-          dispatch(upsertTaskRedux(mapResponseToTask(data.updateTask)));
-          sileo.success({
-            title: 'Subtask updated',
-            fill: 'var(--sileo-update-bg)',
-          });
-          onSave(data.updateTask);
-          resetForm();
-          if (shouldClose) onClose();
-        }
-      } catch (e) {
-        console.error(e);
-        sileo.error({ title: 'Failed to update subtask' });
-      }
-      setLoadingSave(false);
-      return;
-    }
-
-    // 2. Handle Task Update (Config-driven diffing)
+    // Task update (config-driven diffing)
     const taskColor =
       state.color ||
       (initialTask as { color?: string | undefined }).color ||
@@ -412,48 +288,11 @@ export const useTaskMutations = ({
         })),
         isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
       },
-      subtasks: {
-        key: 'subtasks',
-        val: (state.subtasks || []).map((st: Record<string, unknown>) => {
-          const rest = { ...st };
-          delete rest.__typename;
-          return rest;
-        }),
-        initial: (initialTask.subtasks || []).map((st: unknown) => {
-          const rest =
-            typeof st === 'string'
-              ? { title: st, completed: false, timer: 0 }
-              : { ...(st as Record<string, unknown>) };
-          delete (rest as Record<string, unknown>).__typename;
-          return rest;
-        }),
-        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
-      },
       collaborators: {
         key: 'collaborators',
         val: state.collaborators || [],
         initial: initialTask.collaborators || [],
         isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
-      },
-      is_splitable: {
-        key: 'is_splitable',
-        val: state.is_splitable,
-        initial: initialTask.is_splitable,
-      },
-      min_block_duration: {
-        key: 'min_block_duration',
-        val: state.min_block_duration,
-        initial: initialTask.min_block_duration,
-      },
-      preferred_time_of_day: {
-        key: 'preferred_time_of_day',
-        val: state.preferred_time_of_day,
-        initial: initialTask.preferred_time_of_day,
-      },
-      is_locked: {
-        key: 'is_locked',
-        val: state.is_locked,
-        initial: initialTask.is_locked,
       },
     };
 
@@ -496,43 +335,7 @@ export const useTaskMutations = ({
   const handleDelete = async () => {
     if (!initialTask?.id) return;
 
-    // 1. Handle Subtask Deletion
-    if (parentTask && typeof subtaskIndex === 'number') {
-      const updatedSubtasks = [...(parentTask.subtasks || [])]
-        .filter((_, i) => i !== subtaskIndex)
-        .map((st) => {
-          const cleanSt = { ...(st as Record<string, unknown>) };
-          delete cleanSt.__typename;
-          delete (cleanSt as Record<string, unknown>).real_timer;
-          delete (cleanSt as Record<string, unknown>).tags;
-          delete (cleanSt as Record<string, unknown>).collaborators;
-          return cleanSt;
-        });
-
-      try {
-        const { data } = await updateTaskMutation({
-          variables: {
-            updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks },
-          },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user?.id } },
-          ],
-        });
-        if (data?.updateTask) {
-          sileo.success({
-            title: 'Subtask deleted',
-            fill: 'var(--sileo-delete-bg)',
-          });
-          onSave(data.updateTask);
-          onClose();
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      return;
-    }
-
-    // 2. Handle Regular Task Deletion
+    // Task deletion
     if (onDelete) {
       onDelete(initialTask.id);
       return;

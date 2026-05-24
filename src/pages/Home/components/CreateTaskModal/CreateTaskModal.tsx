@@ -3,7 +3,6 @@ import { Dialog, DialogContent, Box, TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import type { CreateTaskModalProps } from './types/CreateTaskModal.types';
-import type { Task } from '@/redux/tasks/task.types';
 import {
   modalBackdropSx,
   paperPropsSx,
@@ -29,8 +28,6 @@ export const CreateTaskModal = ({
   initialStart,
   initialTask,
   handleDelete: onDelete,
-  parentTask,
-  subtaskIndex,
 }: CreateTaskModalProps) => {
   const {
     title,
@@ -83,8 +80,6 @@ export const CreateTaskModal = ({
     initialStart,
     initialTask,
     onDelete,
-    parentTask: parentTask ? (parentTask as unknown as Task) : undefined,
-    subtaskIndex,
   });
 
   // Popover anchors
@@ -182,8 +177,6 @@ export const CreateTaskModal = ({
               setIsFullScreen={setIsFullScreen}
               setColorAnchor={setColorAnchor}
               onClose={onClose}
-              parentTask={parentTask}
-              title={title}
               initialTask={initialTask}
               handleDelete={handleDelete}
             />

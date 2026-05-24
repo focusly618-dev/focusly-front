@@ -3,20 +3,12 @@ import {
   Box,
   Typography,
   Button,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   useTheme,
-  Tooltip,
 } from '@mui/material';
 import {
   FlashOn as FlashOnIcon,
-  Check as CheckIcon,
   AccessTime as AccessTimeIcon,
   Launch as LaunchIcon,
-  Close as CloseIcon,
-  PlayArrow as PlayArrowIcon,
   KeyboardArrowRight as KeyboardArrowRightIcon,
   Link as LinkIcon,
 } from '@mui/icons-material';
@@ -26,7 +18,6 @@ import {
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskSearchItems } from '../../types/workspace.types';
 
-// Import local styles
 import {
   SidebarTopNav,
   SidebarBreadcrumbs,
@@ -35,27 +26,19 @@ import {
   PropertyCard,
   PropertyLabel,
   PropertyValue,
-  SidebarSubtaskList,
-  SidebarSubtaskItem,
   SidebarFooter,
-  ProgressSection,
-  ProgressBar,
   ViewTaskButton,
   SectionSubtitle,
   DescriptionContainer,
-  SubtaskCheck,
-  FocusButton,
 } from './TaskDetailsFull.styles';
 
-// Import shared styles from WorkspaceEditor
 import { MarkDoneButton } from '../Editor/WorkspaceEditor.styles';
 
 interface TaskDetailsFullProps {
   task: TaskSearchItems;
   onClose: () => void;
   onMarkDone?: (task: TaskSearchItems) => void;
-  onStartFocus?: (task: TaskSearchItems, subtaskIndex?: number | null) => void;
-  onToggleSubtask?: (taskId: string, index: number) => void;
+  onStartFocus?: (task: TaskSearchItems) => void;
   activeFocusTaskId?: string | null;
 }
 
@@ -70,7 +53,6 @@ const cleanDescription = (desc?: string): string => {
     )
     .trim();
 
-  // Check if there is actual text content inside the HTML
   const hasText =
     cleaned
       .replace(/<[^>]*>/g, '')
@@ -84,21 +66,10 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
   onClose,
   onMarkDone,
   onStartFocus,
-  onToggleSubtask,
   activeFocusTaskId,
 }) => {
   const isTaskInFocus = activeFocusTaskId === task.id;
   const theme = useTheme();
-  const [selectedSubtaskDetails, setSelectedSubtaskDetails] = React.useState<
-    NonNullable<TaskSearchItems['subtasks']>[0] | null
-  >(null);
-
-  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
-  const completedSubtasksCount =
-    task.subtasks?.filter((s) => s.completed).length || 0;
-  const progressPercent = hasSubtasks
-    ? Math.round((completedSubtasksCount / (task.subtasks?.length || 1)) * 100)
-    : 0;
 
   return (
     <Box
@@ -350,7 +321,6 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
         </>
       )}
 
-      {/* Main Description */}
       <SectionSubtitle>Description</SectionSubtitle>
       <DescriptionContainer
         dangerouslySetInnerHTML={{
@@ -359,267 +329,6 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
             '<p style="color: grey; font-style: italic;">No description provided for this task.</p>',
         }}
       />
-
-      {hasSubtasks && (
-        <>
-          <SectionSubtitle>
-            Subtasks ({task.subtasks?.length || 0})
-          </SectionSubtitle>
-          <ProgressSection>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color={theme.palette.text.primary}
-              >
-                {completedSubtasksCount} of {task.subtasks?.length} completed
-              </Typography>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color={theme.palette.primary.main}
-              >
-                {progressPercent}%
-              </Typography>
-            </Box>
-            <ProgressBar value={progressPercent} />
-          </ProgressSection>
-
-          <SidebarSubtaskList>
-            {task.subtasks?.map((subtask, index) => {
-              const hasSubNotes = !!cleanDescription(subtask.notes_encrypted);
-
-              const subPriority = subtask.priority_level
-                ? getPriorityFromLevel(subtask.priority_level)
-                : getPriorityFromLevel(task.priority_level);
-
-              return (
-                <SidebarSubtaskItem key={index} completed={subtask.completed}>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    gap={1.5}
-                    sx={{ flex: 1 }}
-                  >
-                    <SubtaskCheck
-                      completed={subtask.completed}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (onToggleSubtask) {
-                          onToggleSubtask(task.id, index);
-                        }
-                      }}
-                    >
-                      {subtask.completed && (
-                        <CheckIcon sx={{ fontSize: 12, color: '#fff' }} />
-                      )}
-                    </SubtaskCheck>
-
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: subtask.completed
-                            ? theme.palette.text.secondary
-                            : theme.palette.text.primary,
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          textDecoration: subtask.completed
-                            ? 'line-through'
-                            : 'none',
-                        }}
-                      >
-                        {subtask.title}
-                      </Typography>
-
-                      <Box display="flex" alignItems="center" gap={1} mt={0.5}>
-                        {/* Subtask Status Badge */}
-                        <Box
-                          sx={{
-                            fontSize: '9px',
-                            fontWeight: 700,
-                            color: subtask.completed
-                              ? theme.palette.success.main
-                              : theme.palette.warning.main,
-                            textTransform: 'uppercase',
-                            px: 0.5,
-                            borderRadius: '2px',
-                            bgcolor: subtask.completed
-                              ? `${theme.palette.success.main}15`
-                              : `${theme.palette.warning.main}15`,
-                          }}
-                        >
-                          {subtask.completed ? 'Done' : 'In Progress'}
-                        </Box>
-
-                        {/* Subtask Priority */}
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.3,
-                          }}
-                        >
-                          <FlashOnIcon
-                            sx={{
-                              fontSize: 10,
-                              color:
-                                subPriority === 'High'
-                                  ? theme.palette.error.main
-                                  : '#f59e0b',
-                            }}
-                          />
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontSize: '9px',
-                              fontWeight: 600,
-                              color: theme.palette.text.secondary,
-                            }}
-                          >
-                            {subPriority}
-                          </Typography>
-                        </Box>
-
-                        {subtask.timer !== undefined && subtask.timer > 0 && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontSize: '9px',
-                              color: theme.palette.text.secondary,
-                              fontFamily: 'monospace',
-                            }}
-                          >
-                            • {formatDuration(subtask.timer)}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  <Box display="flex" alignItems="center" gap={0.5}>
-                    <Tooltip title="Focus Mode on this subtask">
-                      <FocusButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onStartFocus) {
-                            onStartFocus(task, index);
-                          }
-                        }}
-                      >
-                        <PlayArrowIcon sx={{ fontSize: 18 }} />
-                      </FocusButton>
-                    </Tooltip>
-
-                    {hasSubNotes && (
-                      <Tooltip title="View subtask notes">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedSubtaskDetails(subtask);
-                          }}
-                          sx={{
-                            color: theme.palette.info.main,
-                            '&:hover': {
-                              bgcolor: `${theme.palette.info.main}15`,
-                            },
-                          }}
-                        >
-                          <LaunchIcon sx={{ fontSize: 14 }} />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </Box>
-                </SidebarSubtaskItem>
-              );
-            })}
-          </SidebarSubtaskList>
-        </>
-      )}
-
-      {/* Subtask Info Dialog */}
-      <Dialog
-        open={!!selectedSubtaskDetails}
-        onClose={() => setSelectedSubtaskDetails(null)}
-        PaperProps={{
-          sx: {
-            backgroundColor: theme.palette.background.paper,
-            color: theme.palette.text.primary,
-            borderRadius: '12px',
-            border: `1px solid ${theme.palette.divider}`,
-            minWidth: '400px',
-            maxWidth: '500px',
-            backgroundImage: 'none',
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            m: 0,
-            p: 2,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: `1px solid ${theme.palette.divider}`,
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            fontWeight={700}
-            sx={{ color: theme.palette.text.primary, fontSize: '14px' }}
-          >
-            {selectedSubtaskDetails?.title}
-          </Typography>
-          <IconButton
-            onClick={() => setSelectedSubtaskDetails(null)}
-            sx={{
-              color: theme.palette.text.secondary,
-              padding: '6px',
-              '&:hover': {
-                color: theme.palette.text.primary,
-                backgroundColor: theme.palette.action.hover,
-              },
-            }}
-          >
-            <CloseIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ p: 3, pt: '24px !important' }}>
-          <Box
-            sx={{
-              color: theme.palette.text.primary,
-              fontSize: '13px',
-              lineHeight: 1.6,
-              '& p': {
-                margin: 0,
-                marginBottom: '12px',
-                '&:last-child': { marginBottom: 0 },
-              },
-              '& ul, & ol': {
-                marginTop: '4px',
-                marginBottom: '12px',
-                paddingLeft: '20px',
-              },
-              '& a': {
-                color: theme.palette.info.main,
-                textDecoration: 'none',
-                '&:hover': { textDecoration: 'underline' },
-              },
-            }}
-            dangerouslySetInnerHTML={{
-              __html:
-                cleanDescription(selectedSubtaskDetails?.notes_encrypted) ||
-                'No information provided.',
-            }}
-          />
-        </DialogContent>
-      </Dialog>
 
       <SidebarFooter>
         <ViewTaskButton onClick={onClose} startIcon={undefined}>

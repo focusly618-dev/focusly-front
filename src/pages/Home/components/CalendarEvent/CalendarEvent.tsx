@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Box,
   Menu,
@@ -21,38 +20,12 @@ import {
   PRIORITY_COLORS,
 } from './CalendarEvent.styles';
 
-import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
-import type { Task } from '@/redux/tasks/task.types';
+import type { CalendarEventProps } from './CalendarEvent.types';
 import moment from 'moment';
 import { useCalendarContextMenu } from './hooks/useCalendarContextMenu';
 
-export interface ICalendarEvent {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  allDay?: boolean;
-  resource?: Task | GoogleCalendarEvent;
-  type: 'task' | 'event';
-  overlapIndex?: number;
-  provider?: string;
-}
-
-interface CalendarEventProps {
-  event: ICalendarEvent;
-  title: string;
-
-  continuesPrior?: boolean;
-  continuesAfter?: boolean;
-  localizer?: unknown;
-  slotStart?: Date;
-  slotEnd?: Date;
-  onStartFocus?: (task: Task) => void;
-  currentView?: string;
-}
-
 export const CalendarEvent = (props: CalendarEventProps) => {
-  const { event, title, onStartFocus, currentView } = props;
+  const { event, onStartFocus } = props;
   const variant = getEventColor(event as { id?: string });
   const formatTime = (date: Date) => {
     const m = moment(date);
@@ -60,156 +33,40 @@ export const CalendarEvent = (props: CalendarEventProps) => {
   };
   const timeRange = `${formatTime(event.start)} - ${formatTime(event.end)}`;
 
-  const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
   const {
-    handleDuplicateTask,
-    handleChangePriority,
-    handleDeleteTask,
-    handleDeleteGoogleEvent,
-  } = useCalendarContextMenu();
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setContextMenu(
-      contextMenu === null
-        ? { mouseX: e.clientX + 2, mouseY: e.clientY - 4 }
-        : null,
-    );
-  };
-
-  const handleClose = () => {
-    setContextMenu(null);
-  };
-
-  const onDuplicate = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (event.type === 'task' && event.resource) {
-      handleDuplicateTask(event.resource as Task);
-    }
-    handleClose();
-  };
-
-  const onDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (event.id) {
-      if (event.type === 'task') {
-        handleDeleteTask(event.id);
-      } else {
-        handleDeleteGoogleEvent(event.id);
-      }
-    }
-    handleClose();
-  };
-
-  const onPriorityChange = (e: React.MouseEvent, level: number) => {
-    e.stopPropagation();
-    if (event.id) {
-      handleChangePriority(event.id, level);
-    }
-    handleClose();
-  };
-
-  const handleOnStartFocus = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onStartFocus && event.type === 'task' && event.resource) {
-      onStartFocus(event.resource as Task);
-    }
-    handleClose();
-  };
-
-  const VIDEO_CALL_DOMAINS =
-    /meet\.google\.com|zoom\.us|teams\.microsoft\.com|webex\.com|skype\.com|slack\.com|discord\.com|jit\.si|whereby\.com/i;
-
-  const hasVideoLinkInTask =
-    event.type === 'task' &&
-    ((event.resource as Task)?.links?.some((link) =>
-      VIDEO_CALL_DOMAINS.test(link.url),
-    ) ||
-      VIDEO_CALL_DOMAINS.test(event.title));
-
-  const isMeeting =
-    (event.type === 'event' &&
-      !!(
-        (event.resource as GoogleCalendarEvent)?.links?.some((link) =>
-          VIDEO_CALL_DOMAINS.test(link.url),
-        ) ||
-        ((event.resource as GoogleCalendarEvent)?.collaborators?.length ?? 0) >
-          1
-      )) ||
-    hasVideoLinkInTask;
-
-  const durationMinutes = (event.end.getTime() - event.start.getTime()) / 60000;
-  const isShortEvent = durationMinutes <= 30;
-  const startTime = formatTime(event.start);
-
-  const currentPriority =
-    event.type === 'task'
-      ? (event.resource as Task)?.priority_level
-      : undefined;
+    handleContextMenu,
+    handleClose,
+    onDuplicate,
+    onDelete,
+    onPriorityChange,
+    handleOnStartFocus,
+    isMeeting,
+    isShortEvent,
+    startTime,
+    currentPriority,
+    contextMenu,
+  } = useCalendarContextMenu(event, onStartFocus);
 
   const renderClassic = () => (
     <EventContainer
       variant={variant}
       isMeeting={isMeeting}
-      overlapIndex={event.overlapIndex}
       onContextMenu={handleContextMenu}
-      sx={{
-        border: '1px solid #edededff',
-        '&:hover': {
-          border: '1px solid green', // Full opacity on hover even if past
-        },
-      }}
     >
-      <div
-        className="event-card-inner"
-        style={{
-          display: 'flex',
-          flexDirection: currentView === 'month' ? 'row' : 'column',
-          alignItems: currentView === 'month' ? 'center' : 'flex-start',
-          gap: currentView === 'month' ? '6px' : '2px',
-          height: '100%',
-          width: '100%',
+      <Box sx={{ fontSize: '11px', fontWeight: 500, mb: 0.5 }}>
+        {isShortEvent ? startTime : timeRange}
+      </Box>
+      <Box
+        sx={{
+          fontSize: '12px',
+          fontWeight: 600,
           overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         }}
       >
-        <Typography
-          variant="caption"
-          sx={{
-            fontSize: currentView === 'month' ? '9px' : '10px',
-            fontWeight: 500,
-            opacity: 0.7,
-            color: 'inherit',
-            lineHeight: 1.1,
-            fontFamily: '"Inter", "Roboto Mono", monospace',
-            display: 'block',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {isShortEvent ? startTime : timeRange}
-        </Typography>
-
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 600,
-            fontSize: currentView === 'month' ? '10px' : '11px',
-            lineHeight: 1.2,
-            color: 'inherit',
-            fontFamily: '"Inter", "Roboto", sans-serif',
-            display: '-webkit-box',
-            WebkitLineClamp: isShortEvent ? 1 : 4,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            flex: 1,
-          }}
-          title={title}
-        >
-          {title}
-        </Typography>
-      </div>
+        {event.title}
+      </Box>
     </EventContainer>
   );
 

@@ -1,11 +1,9 @@
-import { Box, Typography, IconButton } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import {
   Close as CloseIcon,
   OpenInFull as OpenInFullIcon,
   CloseFullscreen as CloseFullscreenIcon,
   Palette as PaletteIcon,
-  SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
-  ArrowForwardIos,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { headerIconSx } from '../../CreateTaskModal.styles';
@@ -19,8 +17,6 @@ interface TaskHeaderProps {
   setIsFullScreen: (v: boolean) => void;
   setColorAnchor: (el: HTMLElement) => void;
   onClose: () => void;
-  parentTask?: { id: string; title: string; subtasks?: unknown[] };
-  title: string;
   initialTask?: Task | null;
   handleDelete: () => Promise<void>;
 }
@@ -31,8 +27,6 @@ export const TaskHeader = ({
   setIsFullScreen,
   setColorAnchor,
   onClose,
-  parentTask,
-  title,
   handleDelete,
   initialTask,
 }: TaskHeaderProps) => {
@@ -81,40 +75,6 @@ export const TaskHeader = ({
             sx={{ fontSize: 18, color: hasColor ? '#fff' : 'text.secondary' }}
           />
         </IconButton>
-        {parentTask && (
-          <Box display="flex" alignItems="center" gap={1} sx={{ px: 5, mb: 1 }}>
-            <Typography
-              variant="body1"
-              sx={{
-                fontWeight: 500,
-                color: 'text.primary',
-                fontSize: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-              }}
-            >
-              <SubdirectoryArrowRightIcon
-                sx={{ fontSize: 14, color: 'text.secondary' }}
-              />
-              {parentTask.title}
-            </Typography>
-            <IconButton
-              size="small"
-              onClick={onClose}
-              disabled
-              sx={{ padding: 0 }}
-            >
-              <ArrowForwardIos sx={{ fontSize: 10, color: 'text.secondary' }} />
-            </IconButton>
-            <Typography
-              variant="body2"
-              sx={{ fontSize: 12, color: 'text.secondary' }}
-            >
-              {title.length === 0 ? 'New SubTask' : title}
-            </Typography>
-          </Box>
-        )}
       </Box>
       <Box display="flex" alignItems="center" gap={1}>
         <IconButton size="small" onClick={onClose} sx={iconSx}>

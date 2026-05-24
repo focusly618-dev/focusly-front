@@ -132,10 +132,6 @@ const STATUS_SECTIONS = [
 const StatusTableGroup = ({
   section,
   tasks,
-  expandedTaskIds,
-  toggleTaskExpansion,
-  handleSubtaskToggle,
-  handleOpenSubtaskModal,
   handleTaskClick,
   updateTask,
   isAIScheduleEnabled,
@@ -145,10 +141,6 @@ const StatusTableGroup = ({
 }: {
   section: (typeof STATUS_SECTIONS)[number];
   tasks: TaskResponse[];
-  expandedTaskIds: Set<string>;
-  toggleTaskExpansion: (taskId: string) => void;
-  handleSubtaskToggle: (task: TaskResponse, index: number) => void;
-  handleOpenSubtaskModal: (task: TaskResponse, index?: number) => void;
   handleTaskClick: (task: TaskResponse) => void;
   updateTask: (taskId: string, updates: TaskResponse) => Promise<void>;
   isAIScheduleEnabled?: boolean;
@@ -231,10 +223,6 @@ const StatusTableGroup = ({
           <ListViewTask
             key={task.id}
             task={task}
-            expandedTaskIds={expandedTaskIds}
-            toggleTaskExpansion={toggleTaskExpansion}
-            handleSubtaskToggle={handleSubtaskToggle}
-            handleOpenSubtaskModal={handleOpenSubtaskModal}
             onTaskClick={handleTaskClick}
             updateTask={updateTask}
             isAIScheduleEnabled={isAIScheduleEnabled}
@@ -285,10 +273,6 @@ export const TasksContentView = ({
   isLoading,
   tasks,
   filteredTasks,
-  expandedTaskIds,
-  toggleTaskExpansion,
-  handleSubtaskToggle,
-  handleOpenSubtaskModal,
   handleTaskClick,
   updateTask,
   deleteTasks,
@@ -438,25 +422,10 @@ export const TasksContentView = ({
         >
           <TableWrapper>
             <TableHeader>
-              <TableHeaderCell sx={{ justifyContent: 'center' }}>
-                <Checkbox
-                  disabled
-                  size="small"
-                  icon={<CustomUncheckedIcon />}
-                  checkedIcon={<CustomCheckedIcon />}
-                  sx={{ padding: 0 }}
-                />
-              </TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
+              <TableHeaderCell sx={{ justifyContent: 'center' }} />
               <TableHeaderCell>Task Name</TableHeaderCell>
-              <TableHeaderCell className="col-category">
-                Category
-              </TableHeaderCell>
               <TableHeaderCell>Priority</TableHeaderCell>
               <TableHeaderCell>Due Date</TableHeaderCell>
-              <TableHeaderCell className="col-subtasks">
-                Subtasks
-              </TableHeaderCell>
               <TableHeaderCell className="col-estimated">
                 Estimated
               </TableHeaderCell>
@@ -557,35 +526,10 @@ export const TasksContentView = ({
       ) : (
         <TableWrapper>
           <TableHeader>
-            <TableHeaderCell sx={{ justifyContent: 'center' }}>
-              <Checkbox
-                indeterminate={
-                  selectedTaskIds.size > 0 &&
-                  selectedTaskIds.size < filteredTasks.length
-                }
-                checked={
-                  filteredTasks.length > 0 &&
-                  selectedTaskIds.size === filteredTasks.length
-                }
-                onChange={handleToggleAll}
-                size="small"
-                icon={<CustomUncheckedIcon />}
-                checkedIcon={<CustomCheckedIcon />}
-                indeterminateIcon={<CustomIndeterminateIcon />}
-                sx={{
-                  padding: 0,
-                  '&.Mui-checked': {
-                    color: 'primary.main',
-                  },
-                }}
-              />
-            </TableHeaderCell>
-            <TableHeaderCell>Status</TableHeaderCell>
+            <TableHeaderCell sx={{ justifyContent: 'center' }} />
             <TableHeaderCell>Task Name</TableHeaderCell>
-            <TableHeaderCell className="col-category">Category</TableHeaderCell>
             <TableHeaderCell>Priority</TableHeaderCell>
             <TableHeaderCell>Due Date</TableHeaderCell>
-            <TableHeaderCell className="col-subtasks">Subtasks</TableHeaderCell>
             <TableHeaderCell className="col-estimated">
               Estimated
             </TableHeaderCell>
@@ -599,10 +543,6 @@ export const TasksContentView = ({
                 key={section.id}
                 section={section}
                 tasks={filteredTasks}
-                expandedTaskIds={expandedTaskIds}
-                toggleTaskExpansion={toggleTaskExpansion}
-                handleSubtaskToggle={handleSubtaskToggle}
-                handleOpenSubtaskModal={handleOpenSubtaskModal}
                 handleTaskClick={handleTaskClick}
                 updateTask={updateTask}
                 isAIScheduleEnabled={isAIScheduleEnabled}

@@ -131,12 +131,6 @@ export interface Task {
   preferredDays?: PreferredDay[];
 
   status: TaskStatus;
-  subtasks: Array<{
-    id: string;
-    title: string;
-    completed: boolean;
-    estimatedDuration: number;
-  }>;
 
   dependsOnTaskIds: string[];
   blocksTaskIds: string[];

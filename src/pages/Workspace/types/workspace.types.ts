@@ -52,22 +52,14 @@ export interface WorkspaceEditorProps {
   watch: UseFormWatch<WorkspaceFormData>;
   getValues: UseFormGetValues<WorkspaceFormData>;
   selectTask: TaskSearchItems | null;
-  handleSelectTask: (
-    task: TaskSearchItems | null,
-    subtaskIndex?: number | null,
-  ) => void;
+  handleSelectTask: (task: TaskSearchItems | null) => void;
   handleUpdateTask: (
     taskId: string,
     updates: Partial<TaskSearchItems>,
   ) => Promise<void>;
   tasksData: { tasks: TaskSearchItems[] } | undefined;
-  selectedSubtaskIndex: number | null;
-  onStartFocus?: (
-    task?: TaskSearchItems | null,
-    subtaskIndex?: number | null,
-  ) => void;
+  onStartFocus?: (task?: TaskSearchItems | null) => void;
   onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
-  onToggleSubtask?: (taskId: string, index: number) => void;
   isRightSidebarOpen: boolean;
   setIsRightSidebarOpen: (isOpen: boolean) => void;
   saveStatus?: 'idle' | 'saving' | 'saved';
@@ -83,10 +75,7 @@ export interface WorkspaceEditorProps {
 export interface WorkspaceProps {
   isEditorOpen: boolean;
   onEditorChange: (isOpen: boolean) => void;
-  onStartFocus?: (
-    task?: TaskSearchItems | null,
-    subtaskIndex?: number | null,
-  ) => void;
+  onStartFocus?: (task?: TaskSearchItems | null) => void;
   onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   isSidebarOpen: boolean;
   onSidebarChange: (isOpen: boolean) => void;
@@ -103,17 +92,6 @@ export interface TaskSearchItems {
   category?: string;
   deadline: string;
   notes_encrypted?: string;
-  subtasks?: {
-    title: string;
-    completed: boolean;
-    timer: number;
-    notes_encrypted?: string;
-    estimate_timer?: number;
-    priority_level?: number;
-    status?: string;
-    deadline?: string;
-    category?: string;
-  }[];
   links?: { title: string; url: string }[];
   google_event_id?: string;
   workspaces?: {

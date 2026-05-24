@@ -96,16 +96,32 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
           <IconButton
             size="small"
             onClick={goToBack}
-            sx={{ border: 1, borderColor: 'divider', borderRadius: 1.5 }}
+            sx={{
+              border: 2,
+              borderColor: 'divider',
+              borderRadius: 2,
+              '&:hover': {
+                borderColor: 'primary.main',
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+              },
+            }}
           >
-            <ArrowBackIcon sx={{ fontSize: '18px' }} />
+            <ArrowBackIcon sx={{ fontSize: '20px' }} />
           </IconButton>
           <IconButton
             size="small"
             onClick={goToNext}
-            sx={{ border: 1, borderColor: 'divider', borderRadius: 1.5 }}
+            sx={{
+              border: 2,
+              borderColor: 'divider',
+              borderRadius: 2,
+              '&:hover': {
+                borderColor: 'primary.main',
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+              },
+            }}
           >
-            <ArrowForwardIcon sx={{ fontSize: '18px' }} />
+            <ArrowForwardIcon sx={{ fontSize: '20px' }} />
           </IconButton>
         </Box>
         <Typography
@@ -114,19 +130,25 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
         >
           {format(date, 'MMMM yyyy')}
         </Typography>
+
         <Button
           variant="outlined"
-          size="small"
           onClick={goToToday}
+          startIcon={<CalendarTodayIcon sx={{ fontSize: 16 }} />}
           sx={{
             borderRadius: '16px',
             textTransform: 'none',
             fontWeight: 600,
             color: 'text.primary',
             borderColor: 'divider',
+            px: 2,
           }}
         >
-          Today
+          {(() => {
+            const today = new Date();
+            const isToday = date.toDateString() === today.toDateString();
+            return isToday ? 'Today' : label;
+          })()}
         </Button>
       </Box>
 
@@ -155,20 +177,6 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
             Month
           </Button>
         </ViewToggle>
-
-        <Button
-          variant="outlined"
-          startIcon={<CalendarTodayIcon sx={{ fontSize: 16 }} />}
-          sx={{
-            borderRadius: '16px',
-            textTransform: 'none',
-            fontWeight: 600,
-            color: 'text.primary',
-            borderColor: 'divider',
-          }}
-        >
-          {label}
-        </Button>
       </Box>
 
       <Popover

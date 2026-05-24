@@ -19,9 +19,6 @@ export const useWorkspaceTasks = ({
   onTaskSelect,
 }: UseWorkspaceTasksProps) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [selectedSubtaskIndex, setSelectedSubtaskIndex] = useState<
-    number | null
-  >(null);
 
   const { data: rawTasksData, loading: isLoading } = useQuery(
     GET_TASKS_TITLES,
@@ -51,25 +48,9 @@ export const useWorkspaceTasks = ({
     );
   }, [tasksData, selectedTaskId]);
 
-  const handleSelectTask = (
-    selectedTask: TaskSearchItems | null,
-    subtaskIndex?: number | null,
-  ) => {
-    if (selectedTask?.id !== selectedTaskId) {
-      setSelectedSubtaskIndex(
-        typeof subtaskIndex === 'number' ? subtaskIndex : null,
-      );
-    } else {
-      setSelectedSubtaskIndex(
-        typeof subtaskIndex === 'number' ? subtaskIndex : null,
-      );
-    }
-
+  const handleSelectTask = (selectedTask: TaskSearchItems | null) => {
     setSelectedTaskId(selectedTask?.id || null);
     onTaskSelect?.(selectedTask?.id);
-    if (!selectedTask) {
-      setSelectedSubtaskIndex(null);
-    }
   };
 
   const handleUpdateTask = async (
@@ -94,26 +75,11 @@ export const useWorkspaceTasks = ({
     }
   };
 
-  const handleToggleSubtask = async (taskId: string, subtaskIndex: number) => {
-    if (!selectTask || !selectTask.subtasks) return;
-
-    const updatedSubtasks = [...selectTask.subtasks];
-    const subtask = { ...updatedSubtasks[subtaskIndex] };
-    subtask.completed = !subtask.completed;
-    updatedSubtasks[subtaskIndex] = subtask;
-
-    await handleUpdateTask(taskId, { subtasks: updatedSubtasks });
-  };
-
-  // Sync is no longer needed as selectTask is derived from useMemo using tasksData and selectedTaskId
-
   return {
     tasksData,
     isLoading,
     selectTask,
-    selectedSubtaskIndex,
     handleSelectTask,
     handleUpdateTask,
-    handleToggleSubtask,
   };
 };

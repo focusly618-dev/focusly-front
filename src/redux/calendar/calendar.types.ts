@@ -20,7 +20,6 @@ export interface GoogleCalendarEvent {
     | 'Scheduled'
     | 'Archived';
   priority_level: number;
-  subtasks: unknown[];
   tags: string[];
   links: { title: string; url: string }[];
   estimate_timer?: number;

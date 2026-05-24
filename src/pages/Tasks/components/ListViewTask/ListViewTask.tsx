@@ -1,7 +1,6 @@
 import {
   Box,
   Typography,
-  Collapse,
   Menu,
   MenuItem,
   Tooltip,
@@ -17,18 +16,10 @@ import {
 import {
   TaskRow,
   TaskTitle,
-  SubtaskToggleBtn,
-  SubtaskArrow,
-  MetaText,
   StatusBadge,
-  CategoryChip,
   FocusIconButton,
   AIBadge,
   AIText,
-  SubtasksContainer,
-  SubtaskRow,
-  SubtaskTitle,
-  StatusChip,
   PriorityChip,
   DateChip,
   CustomUncheckedIcon,
@@ -46,11 +37,7 @@ import type { Task } from '@/redux/tasks/task.types';
 import type { ListViewTaskProps } from './ListViewTask.types';
 import { useListViewTask } from './ListViewTask.hook';
 import { formatDuration } from '../TaskDetailModal/TaskDetailModal.utils';
-import {
-  getStatusIcon,
-  getCategoryIcon,
-  getPriorityIconColor,
-} from '@/pages/Home/components/CreateTaskModal/components/TaskIcons';
+import { getPriorityIconColor } from '@/pages/Home/components/CreateTaskModal/components/TaskIcons';
 
 const formatTimeSinceCompletion = (dateString: string | undefined) => {
   if (!dateString) return '';
@@ -89,9 +76,6 @@ import { StyledAISwitch } from '../../Tasks.styles';
 
 export const ListViewTask = ({
   task,
-  expandedTaskIds,
-  toggleTaskExpansion,
-  handleOpenSubtaskModal,
   onTaskClick,
   updateTask,
   isAIScheduleEnabled,
@@ -120,12 +104,19 @@ export const ListViewTask = ({
 
   return (
     <>
-      <TaskRow onClick={() => onTaskClick(task)} statusColor={statusColor}>
+      <TaskRow
+        onClick={() => onTaskClick(task)}
+        statusColor={statusColor}
+        className="task-row-item"
+      >
         <Box
+          className="checkbox-cell"
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            opacity: 0,
+            transition: 'opacity 0.2s ease',
           }}
           onClick={(e) => {
             e.stopPropagation();
@@ -146,26 +137,6 @@ export const ListViewTask = ({
           />
         </Box>
 
-        {/* Cell 2: Status Badge */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <StatusChip
-            statusColor={statusColor}
-            onClick={(e) => {
-              e.stopPropagation();
-              setStatusAnchor(e.currentTarget);
-            }}
-          >
-            {getStatusIcon(task.status || 'Todo', 11)}
-            {task.status || 'Todo'}
-          </StatusChip>
-        </Box>
-
         {/* Cell 2: Title */}
         <Box sx={{ minWidth: 0, display: 'flex', alignItems: 'center' }}>
           <TaskTitle variant="body1" title={task.title}>
@@ -173,24 +144,7 @@ export const ListViewTask = ({
           </TaskTitle>
         </Box>
 
-        {/* Cell 3: Category */}
-        <Box
-          className="cell-category"
-          sx={{ display: 'flex', alignItems: 'center' }}
-        >
-          {task.category ? (
-            <CategoryChip>
-              {getCategoryIcon(task.category, 11)}
-              {task.category}
-            </CategoryChip>
-          ) : (
-            <Typography variant="caption" sx={{ opacity: 0.3 }}>
-              -
-            </Typography>
-          )}
-        </Box>
-
-        {/* Cell 4: Priority */}
+        {/* Cell 3: Priority */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <PriorityChip
             priorityColor={priorityColor}
@@ -223,7 +177,7 @@ export const ListViewTask = ({
           </PriorityChip>
         </Box>
 
-        {/* Cell 5: Due Date */}
+        {/* Cell 4: Due Date */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {task.deadline || task.status === 'Done' ? (
             <DateChip
@@ -249,24 +203,7 @@ export const ListViewTask = ({
           )}
         </Box>
 
-        {/* Cell 6: Subtasks Toggle */}
-        <Box
-          className="cell-subtasks"
-          sx={{ display: 'flex', alignItems: 'center' }}
-        >
-          <SubtaskToggleBtn
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleTaskExpansion(task.id);
-            }}
-            hasSubtasks={Boolean(task.subtasks?.length)}
-          >
-            <SubtaskArrow isExpanded={expandedTaskIds.has(task.id)} />
-            <MetaText variant="caption">{task.subtasks?.length || 0}</MetaText>
-          </SubtaskToggleBtn>
-        </Box>
-
-        {/* Cell 7: Estimated */}
+        {/* Cell 5: Estimated */}
         <Box
           className="cell-estimated"
           sx={{ display: 'flex', alignItems: 'center' }}
@@ -282,7 +219,7 @@ export const ListViewTask = ({
           )}
         </Box>
 
-        {/* Cell 8: Actual */}
+        {/* Cell 6: Actual */}
         <Box
           className="cell-actual"
           sx={{ display: 'flex', alignItems: 'center' }}
@@ -300,7 +237,7 @@ export const ListViewTask = ({
           )}
         </Box>
 
-        {/* Cell 9: AI Switch */}
+        {/* Cell 7: AI Switch */}
         <Box
           className="cell-ai"
           sx={{
@@ -333,7 +270,7 @@ export const ListViewTask = ({
           />
         </Box>
 
-        {/* Cell 10: Actions */}
+        {/* Cell 8: Actions */}
         <Box
           sx={{
             display: 'flex',
@@ -363,31 +300,6 @@ export const ListViewTask = ({
           )}
         </Box>
       </TaskRow>
-
-      <Collapse in={expandedTaskIds.has(task.id)} timeout="auto" unmountOnExit>
-        <SubtasksContainer>
-          {task.subtasks?.map((subtask, index) => {
-            if (typeof subtask === 'string') return null;
-            return (
-              <SubtaskRow key={index}>
-                <StatusBadge
-                  statusColor={getStatusColor(subtask.status || 'Todo')}
-                />
-                <SubtaskTitle
-                  variant="body2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOpenSubtaskModal(task, index);
-                  }}
-                  completed={subtask.completed}
-                >
-                  {subtask.title}
-                </SubtaskTitle>
-              </SubtaskRow>
-            );
-          })}
-        </SubtasksContainer>
-      </Collapse>
 
       {/* Priority Quick Select */}
       <Menu

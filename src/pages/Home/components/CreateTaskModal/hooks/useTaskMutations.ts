@@ -5,7 +5,6 @@ import {
   CREATE_TASK,
   UPDATE_TASK,
   DELETE_TASK,
-  ADD_SUBTASK,
   GET_TASKS,
 } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import {
@@ -37,8 +36,6 @@ export const useTaskMutations = ({
   onClose,
   onDelete,
   initialTask,
-  parentTask,
-  subtaskIndex,
   resetForm,
 }: UseTaskMutationsProps) => {
   const { user } = useAppSelector((state) => state.auth);
@@ -48,7 +45,6 @@ export const useTaskMutations = ({
   const [createTaskMutation] = useMutation(CREATE_TASK);
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
-  const [addSubtaskMutation] = useMutation(ADD_SUBTASK);
   const [removeWorkspaceMutation] = useMutation(REMOVE_WORKSPACE);
 
   const generateMeetLinkNow = async (
@@ -152,43 +148,12 @@ export const useTaskMutations = ({
       links,
     };
 
-    if (parentTask?.id) {
-      try {
-        const { data } = await addSubtaskMutation({
-          variables: {
-            taskId: parentTask.id,
-            subtask: { ...commonInput, status: state.status || 'Backlog' },
-          },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user.id } },
-          ],
-        });
-        if (data?.addSubtask) {
-          sileo.success({
-            title: 'Subtask added',
-            fill: 'var(--sileo-success-bg)',
-          });
-          onSave(data.addSubtask);
-          resetForm();
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      setLoadingSave(false);
-      return;
-    }
-
     const createInput: TaskInput = {
       ...commonInput,
       user_id: user.id || '',
       status: state.status || 'Backlog',
       google_event_id: (initialTask as { google_event_id?: string })
         ?.google_event_id,
-      subtasks: state.subtasks?.map((st) => ({
-        title: st.title,
-        completed: st.completed,
-        timer: st.timer,
-      })),
     };
 
     try {
@@ -230,58 +195,6 @@ export const useTaskMutations = ({
         ? parseRealTime(state.realTime)
         : initialTask.real_timer || 0;
 
-    if (parentTask && typeof subtaskIndex === 'number') {
-      const updatedSubtasks = [...(parentTask.subtasks || [])].map((st, i) => {
-        if (i !== subtaskIndex) return st;
-        const subtaskColor =
-          state.color ||
-          (initialTask as { color?: string | undefined }).color ||
-          '#3b82f6';
-        return {
-          title: state.title || initialTask.title,
-          timer: estimateTimer,
-          completed: (state.status || initialTask.status) === 'Done',
-          notes_encrypted: `${
-            state.description || initialTask.notes_encrypted || ''
-          } [COLOR:${subtaskColor}]`,
-          estimate_timer: estimateTimer,
-          priority_level: priorityLevel,
-          status: state.status,
-          deadline:
-            state.deadline instanceof Date
-              ? state.deadline.toISOString()
-              : state.deadline || initialTask.deadline,
-          category: state.category,
-          color: subtaskColor,
-          links: state.links?.map((l) => ({ title: l.title, url: l.url })),
-        };
-      });
-
-      try {
-        const { data } = await updateTaskMutation({
-          variables: {
-            updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks },
-          },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user.id } },
-          ],
-        });
-        if (data?.updateTask) {
-          sileo.success({
-            title: 'Subtask updated',
-            fill: 'var(--sileo-update-bg)',
-          });
-          onSave(data.updateTask);
-          resetForm();
-          if (shouldClose) onClose();
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      setLoadingSave(false);
-      return;
-    }
-
     const taskColor =
       state.color ||
       (initialTask as { color?: string | undefined }).color ||
@@ -309,29 +222,6 @@ export const useTaskMutations = ({
           ? state.deadline.toISOString()
           : state.deadline || initialTask.deadline || '',
       priority_level: priorityLevel,
-      subtasks:
-        state.subtasks?.map((st) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { __typename, ...rest } = st as {
-            title: string;
-            completed: boolean;
-            timer: number;
-            __typename?: string;
-          };
-          return rest;
-        }) ||
-        (initialTask.subtasks || []).map((st) => {
-          if (typeof st === 'string')
-            return { title: st, completed: false, timer: 0 };
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { __typename, ...rest } = st as {
-            title: string;
-            completed: boolean;
-            timer: number;
-            __typename?: string;
-          };
-          return rest;
-        }),
       tags: state.tags || initialTask.tags,
       links: deduplicateLinks(state.links || initialTask.links || []).map(
         (l) => ({

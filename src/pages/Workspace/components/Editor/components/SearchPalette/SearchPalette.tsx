@@ -1,10 +1,7 @@
 import { useRef } from 'react';
-import type { MouseEvent } from 'react';
 import { Box, Typography } from '@mui/material';
 import {
   Search as SearchIcon,
-  SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
-  Check as CheckIcon,
   Add as AddIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
@@ -16,14 +13,10 @@ import {
   ResultHeader,
   ResultTitle,
   ResultCount,
-  CustomTabsContainer,
-  CustomTabButton,
   TaskItemContainer,
-  SubTaskItemContainer,
   StyledBadge,
   StyledCategory,
   RadioCircle,
-  CheckSquare,
   PaletteFooter,
   AddTaskButton,
   CollapsedSearchContainer,
@@ -37,14 +30,8 @@ interface SearchPaletteProps {
   searchTerm: string;
   setSearchTerm: (s: string) => void;
   filteredTasks: TaskSearchItems[];
-  filterTab: 'TASKS' | 'SUBTASKS';
-  setFilterTab: (t: 'TASKS' | 'SUBTASKS') => void;
   selectTask: TaskSearchItems | null;
-  selectedSubtaskIndex: number | null;
-  handleSelectTask: (
-    task: TaskSearchItems | null,
-    index: number | null,
-  ) => void;
+  handleSelectTask: (task: TaskSearchItems | null) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (field: any, value: any) => void;
 }
@@ -55,17 +42,13 @@ export const SearchPalette = ({
   searchTerm,
   setSearchTerm,
   filteredTasks,
-  filterTab,
-  setFilterTab,
   selectTask,
-  selectedSubtaskIndex,
   handleSelectTask,
   setValue,
 }: SearchPaletteProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleBlur = (e: React.FocusEvent) => {
-    // If the new focus target is inside the palette, don't close it
     if (containerRef.current?.contains(e.relatedTarget as Node)) {
       return;
     }
@@ -86,12 +69,7 @@ export const SearchPalette = ({
               placeholder="Search tasks to link..."
               autoFocus
               value={
-                showPalette && selectTask
-                  ? typeof selectedSubtaskIndex === 'number' &&
-                    selectTask.subtasks?.[selectedSubtaskIndex]
-                    ? selectTask.subtasks[selectedSubtaskIndex].title
-                    : selectTask.title
-                  : searchTerm
+                showPalette && selectTask ? selectTask.title : searchTerm
               }
               onChange={(e) => setSearchTerm(e.target.value)}
               readOnly={!!selectTask}
@@ -102,22 +80,6 @@ export const SearchPalette = ({
               <ResultTitle>AVAILABLE PROJECTS & TASKS</ResultTitle>
               <ResultCount>{filteredTasks.length} MATCHES</ResultCount>
             </ResultHeader>
-            <CustomTabsContainer>
-              <CustomTabButton
-                active={filterTab === 'TASKS'}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => setFilterTab('TASKS')}
-              >
-                TASKS
-              </CustomTabButton>
-              <CustomTabButton
-                active={filterTab === 'SUBTASKS'}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => setFilterTab('SUBTASKS')}
-              >
-                SUBTASKS
-              </CustomTabButton>
-            </CustomTabsContainer>
 
             {filteredTasks.map((task: TaskSearchItems) => {
               const isSelected = selectTask?.id === task.id;
@@ -144,140 +106,43 @@ export const SearchPalette = ({
                         : 'error.light';
 
               return (
-                <Box key={task.id}>
-                  {filterTab !== 'SUBTASKS' && (
-                    <TaskItemContainer
-                      active={isSelected}
-                      onClick={() => {
-                        if (isSelected) {
-                          handleSelectTask(null, null);
-                          setValue('taskId', null);
-                        } else {
-                          handleSelectTask(task, null);
-                          setValue('taskId', task.id);
-                          setSearchTerm('');
-                          setShowPalette(false);
-                        }
-                      }}
-                    >
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        width="100%"
-                      >
-                        <Box display="flex" flexDirection="column" gap={0.5}>
-                          <ItemText sx={{ fontWeight: 700, fontSize: '13px' }}>
-                            {task.title}
-                          </ItemText>
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <StyledBadge color={statusColor} bgColor={statusBg}>
-                              {task.status}
-                            </StyledBadge>
-                            {task.category && (
-                              <StyledCategory>{task.category}</StyledCategory>
-                            )}
-                          </Box>
-                        </Box>
-                        <RadioCircle
-                          selected={isSelected}
-                          color={statusColor}
-                        />
+                <TaskItemContainer
+                  key={task.id}
+                  active={isSelected}
+                  onClick={() => {
+                    if (isSelected) {
+                      handleSelectTask(null);
+                      setValue('taskId', null);
+                    } else {
+                      handleSelectTask(task);
+                      setValue('taskId', task.id);
+                      setSearchTerm('');
+                      setShowPalette(false);
+                    }
+                  }}
+                >
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width="100%"
+                  >
+                    <Box display="flex" flexDirection="column" gap={0.5}>
+                      <ItemText sx={{ fontWeight: 700, fontSize: '13px' }}>
+                        {task.title}
+                      </ItemText>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <StyledBadge color={statusColor} bgColor={statusBg}>
+                          {task.status}
+                        </StyledBadge>
+                        {task.category && (
+                          <StyledCategory>{task.category}</StyledCategory>
+                        )}
                       </Box>
-                    </TaskItemContainer>
-                  )}
-
-                  {filterTab === 'SUBTASKS' &&
-                    task.subtasks?.map((subtask, index) => {
-                      const isSubtaskSelected =
-                        isSelected && selectedSubtaskIndex === index;
-                      return (
-                        <SubTaskItemContainer
-                          key={`${task.id}-sub-${index}`}
-                          onClick={(e: MouseEvent<HTMLDivElement>) => {
-                            e.stopPropagation();
-                            if (isSubtaskSelected) {
-                              handleSelectTask(null, null);
-                              setValue('taskId', null);
-                            } else {
-                              handleSelectTask(task, index);
-                              setValue('taskId', task.id);
-                              setSearchTerm('');
-                              setShowPalette(false);
-                            }
-                          }}
-                          sx={{
-                            backgroundColor: isSubtaskSelected
-                              ? 'action.selected'
-                              : 'transparent',
-                            borderLeft: isSubtaskSelected
-                              ? '2px solid'
-                              : '2px solid transparent',
-                            borderColor: 'info.main',
-                          }}
-                        >
-                          <Box
-                            display="flex"
-                            alignItems="center"
-                            gap={1.5}
-                            sx={{ flex: 1 }}
-                          >
-                            <SubdirectoryArrowRightIcon
-                              sx={{
-                                color: isSubtaskSelected
-                                  ? 'info.main'
-                                  : 'text.disabled',
-                                fontSize: 16,
-                              }}
-                            />
-                            <ItemText
-                              sx={{
-                                color: isSubtaskSelected
-                                  ? 'text.primary'
-                                  : 'text.secondary',
-                                fontSize: '13px',
-                              }}
-                            >
-                              {subtask.title}
-                            </ItemText>
-                          </Box>
-
-                          <Box
-                            sx={{
-                              backgroundColor: 'action.hover',
-                              border: '1px solid',
-                              borderColor: 'divider',
-                              borderRadius: '4px',
-                              padding: '2px 6px',
-                              marginRight: '12px',
-                              display: 'flex',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <Typography
-                              sx={{
-                                fontSize: '10px',
-                                fontWeight: 600,
-                                color: 'text.secondary',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px',
-                              }}
-                            >
-                              {task.title}
-                            </Typography>
-                          </Box>
-
-                          <CheckSquare selected={isSubtaskSelected}>
-                            {isSubtaskSelected && (
-                              <CheckIcon
-                                sx={{ fontSize: 12, color: '#0f172a' }}
-                              />
-                            )}
-                          </CheckSquare>
-                        </SubTaskItemContainer>
-                      );
-                    })}
-                </Box>
+                    </Box>
+                    <RadioCircle selected={isSelected} color={statusColor} />
+                  </Box>
+                </TaskItemContainer>
               );
             })}
           </ResultList>
@@ -326,38 +191,7 @@ export const SearchPalette = ({
                 alignItems: 'center',
               }}
             >
-              {typeof selectedSubtaskIndex === 'number' &&
-              selectTask.subtasks?.[selectedSubtaskIndex]
-                ? selectTask.subtasks[selectedSubtaskIndex].title
-                : selectTask.title}
-
-              {typeof selectedSubtaskIndex === 'number' &&
-                selectTask.subtasks?.[selectedSubtaskIndex] && (
-                  <Box
-                    sx={{
-                      backgroundColor: 'action.hover',
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '4px',
-                      padding: '2px 6px',
-                      marginLeft: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontSize: '10px',
-                        fontWeight: 600,
-                        color: 'text.secondary',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                      }}
-                    >
-                      {selectTask.title}
-                    </Typography>
-                  </Box>
-                )}
+              {selectTask.title}
             </Typography>
             <CloseIcon
               sx={{
@@ -368,7 +202,7 @@ export const SearchPalette = ({
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                handleSelectTask(null, null);
+                handleSelectTask(null);
                 setValue('taskId', undefined);
               }}
             />

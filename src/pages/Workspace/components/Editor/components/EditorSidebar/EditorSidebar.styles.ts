@@ -133,74 +133,6 @@ export const PropertyValue = styled(Box)(({ theme }) => ({
   justifyContent: 'flex-start',
 }));
 
-export const SidebarSubtaskList = styled(Box)({
-  marginBottom: '24px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-});
-
-export const SubtaskActions = styled(Box)({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
-  opacity: 0,
-  transition: 'opacity 0.2s ease, transform 0.2s ease',
-  transform: 'translateX(4px)',
-});
-
-export const SidebarSubtaskItem = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'completed',
-})<{ completed?: boolean }>(({ theme, completed }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '12px 8px',
-  borderRadius: '8px',
-  backgroundColor: 'transparent',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  transition: 'all 0.2s ease',
-  opacity: completed ? 0.6 : 1,
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-    paddingLeft: '12px',
-  },
-  [`&:hover ${SubtaskActions}`]: {
-    opacity: 1,
-    transform: 'translateX(0)',
-  },
-}));
-
-export const ProgressSection = styled(Box)({
-  marginBottom: '24px',
-});
-
-export const ProgressBar = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'value',
-})<{ value: number }>(({ theme, value }) => ({
-  height: '4px',
-  width: '100%',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.05)'
-      : 'rgba(0, 0, 0, 0.05)',
-  borderRadius: '2px',
-  marginTop: '8px',
-  position: 'relative',
-  overflow: 'hidden',
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: `${value}%`,
-    backgroundColor: theme.palette.primary.main,
-    borderRadius: '2px',
-    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  },
-}));
-
 export const SectionSubtitle = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
   fontSize: '11px',
@@ -236,40 +168,6 @@ export const DescriptionHeader = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
   opacity: 0.8,
   marginBottom: '4px',
-}));
-
-export const SubtaskCheck = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'completed',
-})<{ completed?: boolean }>(({ theme, completed }) => ({
-  width: 18,
-  height: 18,
-  borderRadius: '50%',
-  border: `1.5px solid ${completed ? theme.palette.primary.main : theme.palette.text.secondary}80`,
-  backgroundColor: completed
-    ? `${theme.palette.primary.main}15`
-    : 'transparent',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-  '&:hover': {
-    borderColor: theme.palette.primary.main,
-    backgroundColor: `${theme.palette.primary.main}10`,
-    transform: 'scale(1.05)',
-  },
-}));
-
-export const FocusButton = styled(IconButton)(({ theme }) => ({
-  padding: '4px',
-  color: theme.palette.warning.main,
-  opacity: 0.8,
-  transition: 'all 0.2s ease',
-  '&:hover': {
-    opacity: 1,
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-    transform: 'scale(1.1)',
-  },
 }));
 
 // Clean, modern link item container

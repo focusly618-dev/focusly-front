@@ -70,6 +70,8 @@ export const useCalendarView = () => {
     return new Date();
   });
 
+  const [scrollToTime, setScrollToTime] = useState<Date | undefined>(undefined);
+
   // Sync URL with state
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams.toString());
@@ -331,6 +333,26 @@ export const useCalendarView = () => {
   const handleNavigateAction = (action: CalendarNavigateAction) => {
     if (action === 'TODAY') {
       setCurrentDate(new Date());
+      // Find the first task of the day to scroll to
+      const todayStart = startOfDay(new Date());
+      const todayEnd = endOfDay(new Date());
+
+      const todayTasks = events.filter((event) => {
+        const eventStart = event.start?.getTime() || 0;
+        return (
+          eventStart >= todayStart.getTime() && eventStart <= todayEnd.getTime()
+        );
+      });
+
+      if (todayTasks.length > 0) {
+        const firstTask = todayTasks.sort(
+          (a, b) => (a.start?.getTime() || 0) - (b.start?.getTime() || 0),
+        )[0];
+
+        if (firstTask.start) {
+          setScrollToTime(firstTask.start);
+        }
+      }
       return;
     }
 
@@ -344,6 +366,13 @@ export const useCalendarView = () => {
     if (currentView === Views.WEEK) {
       setCurrentDate((prev) =>
         action === 'NEXT' ? addWeeks(prev, 1) : subWeeks(prev, 1),
+      );
+      return;
+    }
+
+    if (currentView === Views.DAY) {
+      setCurrentDate((prev) =>
+        action === 'NEXT' ? addDays(prev, 1) : subDays(prev, 1),
       );
       return;
     }
@@ -606,5 +635,6 @@ export const useCalendarView = () => {
     slotContextMenu,
     handleSlotContextMenu,
     closeSlotContextMenu,
+    scrollToTime,
   };
 };

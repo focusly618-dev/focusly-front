@@ -28,7 +28,6 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     links: event.links || [],
     task_type: 'GoogleTask',
     google_event_id: normalizeGoogleId(event.id),
-    subtasks: [],
     tags: event.tags || [],
     estimated_start_date: event.estimated_start_date,
     estimated_end_date: event.deadline,
@@ -72,26 +71,6 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     updated_at: safeISO(t.updated_at) || new Date().toISOString(),
     completed_at: safeISO(t.completed_at),
     deleted_at: safeISO(t.deleted_at),
-    subtasks: (t.subtasks || []).map((s) => {
-      if (typeof s === 'string') {
-        return { title: s, completed: false, timer: 0 };
-      }
-      return {
-        title: s.title,
-        completed: !!s.completed,
-        timer: s.timer || 0,
-        notes_encrypted: s.notes_encrypted,
-        estimate_timer: s.estimate_timer,
-        priority_level: s.priority_level,
-        status: s.status as TaskStatus,
-        deadline: s.deadline,
-        category: s.category,
-        color: s.color,
-        id: s.id,
-        created_at: s.created_at,
-        links: s.links,
-      };
-    }),
     links: t.links || [],
     task_type: (t.task_type || 'PlatformTask') as 'GoogleTask' | 'PlatformTask',
     google_event_id: normalizeGoogleId(t.google_event_id),
@@ -110,10 +89,6 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     estimated_start_date: safeISO(t.estimated_start_date),
     estimated_end_date: safeISO(t.estimated_end_date),
     use_ai: t.use_ai,
-    is_splitable: t.is_splitable,
-    min_block_duration: t.min_block_duration,
-    preferred_time_of_day: t.preferred_time_of_day,
-    is_locked: t.is_locked,
     workspaces: t.workspace
       ? [
           {

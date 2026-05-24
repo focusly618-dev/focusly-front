@@ -10,7 +10,6 @@ import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 
-// Hook
 import { useWorkspaceEditor } from './hooks/useWorkspaceEditor.hook';
 
 export const WorkspaceEditor = ({
@@ -21,7 +20,6 @@ export const WorkspaceEditor = ({
   handleSelectTask,
   handleUpdateTask,
   tasksData,
-  selectedSubtaskIndex,
   onStartFocus,
   onOpenTaskDetails,
   isRightSidebarOpen,
@@ -40,9 +38,6 @@ export const WorkspaceEditor = ({
 
     searchTerm,
     setSearchTerm,
-
-    filterTab,
-    setFilterTab,
 
     filteredTasks,
 
@@ -67,10 +62,7 @@ export const WorkspaceEditor = ({
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             filteredTasks={filteredTasks}
-            filterTab={filterTab}
-            setFilterTab={setFilterTab}
             selectTask={selectTask}
-            selectedSubtaskIndex={selectedSubtaskIndex}
             handleSelectTask={handleSelectTask}
             setValue={setValue}
           />
@@ -93,7 +85,6 @@ export const WorkspaceEditor = ({
         <EditorSidebar
           isRightSidebarOpen={isRightSidebarOpen}
           setIsRightSidebarOpen={setIsRightSidebarOpen}
-          selectedSubtaskIndex={selectedSubtaskIndex}
           selectTask={selectTask}
           handleUpdateTask={handleUpdateTask}
           onOpenTaskDetails={onOpenTaskDetails}

@@ -43,8 +43,8 @@ const suggestions = [
   {
     emoji: '🔨',
     title: 'Break down a big task',
-    subtitle: 'Split your largest task into subtasks',
-    prompt: 'Break down my biggest task into subtasks',
+    subtitle: 'Split your largest task into smaller tasks',
+    prompt: 'Break down my biggest task into smaller tasks',
   },
   {
     emoji: '⚡',
@@ -89,11 +89,11 @@ Spend 30 mins reviewing what you finished and setting tomorrow's top 3 prioritie
 💡 <strong>Tip:</strong> Time-box each task to prevent scope creep. 25-minute sprints work wonders!`;
   }
 
-  if (p.includes('break down') || p.includes('subtask')) {
+  if (p.includes('break down') || p.includes('smaller task')) {
     if (biggestTask) {
       return `<strong>🔨 Breaking Down: "${biggestTask}"</strong>
 
-Here are 5 focused subtasks to tackle this effectively:
+Here are 5 focused tasks to tackle this effectively:
 
 <strong>1. Define scope & success metrics</strong>
 Clarify what done looks like. Write 3–5 acceptance criteria. <code>~30 min</code>
@@ -110,7 +110,7 @@ Step away, then come back with fresh eyes to refine. <code>~1 hr</code>
 <strong>5. Polish & finalize</strong>
 Final quality pass, proofread, validate against success criteria. <code>~45 min</code>
 
-💡 Add these subtasks directly in your Workspace to start tracking progress!`;
+💡 Add these tasks directly in your Workspace to start tracking progress!`;
     }
     return `<strong>🔨 Task Breakdown Template</strong>
 
@@ -165,7 +165,7 @@ Based on your Focusly data:
 
 <strong>🟢 What's working:</strong>
 • You're organized enough to use a productivity app — that's already ahead of 80% of people!
-• Breaking tasks into subtasks dramatically reduces cognitive load.
+• Breaking large tasks into smaller steps dramatically reduces cognitive load.
 
 <strong>🟡 Opportunities:</strong>
 • If tasks sit at "In Progress" for more than 3 days, they may be too large. Break them down.

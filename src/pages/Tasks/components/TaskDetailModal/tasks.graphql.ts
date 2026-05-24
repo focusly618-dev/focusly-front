@@ -19,21 +19,6 @@ export const GET_TASKS = gql`
       category
       color
       use_ai
-      subtasks {
-        title
-        completed
-        timer
-        notes_encrypted
-        estimate_timer
-        priority_level
-        status
-        deadline
-        category
-        links {
-          title
-          url
-        }
-      }
       tags {
         name
       }
@@ -53,10 +38,7 @@ export const GET_TASKS = gql`
       task_type
       estimated_start_date
       estimated_end_date
-      is_splitable
-      min_block_duration
-      preferred_time_of_day
-      is_locked
+
       collaborators {
         name
         email
@@ -94,10 +76,7 @@ export const GET_TASKS_TITLES = gql`
       task_type
       estimated_start_date
       estimated_end_date
-      is_splitable
-      min_block_duration
-      preferred_time_of_day
-      is_locked
+
       collaborators {
         name
         email
@@ -111,22 +90,6 @@ export const GET_TASKS_TITLES = gql`
           id
           name
           color
-        }
-      }
-      subtasks {
-        title
-        completed
-        timer
-        notes_encrypted
-        estimate_timer
-        priority_level
-        status
-        deadline
-        category
-        color
-        links {
-          title
-          url
         }
       }
     }
@@ -143,22 +106,6 @@ export const UPDATE_TASK = gql`
       category
       color
       use_ai
-      subtasks {
-        title
-        completed
-        timer
-        notes_encrypted
-        estimate_timer
-        priority_level
-        status
-        deadline
-        category
-        color
-        links {
-          title
-          url
-        }
-      }
       estimate_timer
       real_timer
       duration
@@ -175,10 +122,7 @@ export const UPDATE_TASK = gql`
       task_type
       estimated_start_date
       estimated_end_date
-      is_splitable
-      min_block_duration
-      preferred_time_of_day
-      is_locked
+
       collaborators {
         name
         email
@@ -200,22 +144,6 @@ export const CREATE_TASK = gql`
       category
       color
       use_ai
-      subtasks {
-        title
-        completed
-        timer
-        notes_encrypted
-        estimate_timer
-        priority_level
-        status
-        deadline
-        category
-        color
-        links {
-          title
-          url
-        }
-      }
       estimate_timer
       real_timer
       duration
@@ -232,10 +160,7 @@ export const CREATE_TASK = gql`
       task_type
       estimated_start_date
       estimated_end_date
-      is_splitable
-      min_block_duration
-      preferred_time_of_day
-      is_locked
+
       collaborators {
         name
         email
@@ -243,31 +168,6 @@ export const CREATE_TASK = gql`
         responseStatus
       }
       priority_level
-    }
-  }
-`;
-
-export const ADD_SUBTASK = gql`
-  mutation AddSubtask($taskId: String!, $subtask: SubtaskInput!) {
-    addSubtask(taskId: $taskId, subtask: $subtask) {
-      id
-      title
-      subtasks {
-        title
-        completed
-        timer
-        notes_encrypted
-        estimate_timer
-        priority_level
-        status
-        deadline
-        category
-        color
-        links {
-          title
-          url
-        }
-      }
     }
   }
 `;
@@ -326,21 +226,6 @@ export const GET_TASKS_PAGINATED = gql`
         category
         color
         use_ai
-        subtasks {
-          title
-          completed
-          timer
-          notes_encrypted
-          estimate_timer
-          priority_level
-          status
-          deadline
-          category
-          links {
-            title
-            url
-          }
-        }
         tags {
           name
         }

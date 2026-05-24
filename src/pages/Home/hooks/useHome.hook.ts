@@ -6,7 +6,6 @@ import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
 import {
   GET_TASKS,
   DELETE_TASK,
-  UPDATE_TASK,
 } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import {
   removeTask,
@@ -50,13 +49,6 @@ export const useHome = () => {
     const saved = localStorage.getItem('focus_mode_task');
     return saved ? JSON.parse(saved) : null;
   });
-  const [activeFocusSubtaskIndex, setActiveFocusSubtaskIndex] = useState<
-    number | null
-  >(() => {
-    const saved = localStorage.getItem('focus_mode_subtask_index');
-    return saved ? JSON.parse(saved) : null;
-  });
-
   useEffect(() => {
     localStorage.setItem('focus_mode_open', String(isFocusModeOpen));
     if (activeFocusTask) {
@@ -64,28 +56,15 @@ export const useHome = () => {
     } else {
       localStorage.removeItem('focus_mode_task');
     }
-    if (activeFocusSubtaskIndex !== null) {
-      localStorage.setItem(
-        'focus_mode_subtask_index',
-        JSON.stringify(activeFocusSubtaskIndex),
-      );
-    } else {
-      localStorage.removeItem('focus_mode_subtask_index');
-    }
+    localStorage.removeItem('focus_mode_subtask_index');
     localStorage.setItem('ai_schedule_enabled', String(isAIScheduleEnabled));
-  }, [
-    isFocusModeOpen,
-    activeFocusTask,
-    activeFocusSubtaskIndex,
-    isAIScheduleEnabled,
-  ]);
+  }, [isFocusModeOpen, activeFocusTask, isAIScheduleEnabled]);
 
   // Task Details Management via URL
   const taskIdParam = searchParams.get('taskId');
   const [tempTask, setTempTask] = useState<Task | TaskSearchItems | null>(null);
 
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
-  const [updateTaskMutation] = useMutation(UPDATE_TASK);
 
   const taskDetailsTask = useMemo(() => {
     if (!taskIdParam) return null;
@@ -123,23 +102,14 @@ export const useHome = () => {
     return isNaN(date.getTime()) ? null : date;
   }, [searchParams]);
 
-  const handleStartFocus = (
-    task?: Task | TaskSearchItems | null,
-    subtaskIndex?: number | null,
-  ) => {
-    if (
-      task?.id !== activeFocusTask?.id ||
-      subtaskIndex !== activeFocusSubtaskIndex
-    ) {
+  const handleStartFocus = (task?: Task | TaskSearchItems | null) => {
+    if (task?.id !== activeFocusTask?.id) {
       localStorage.removeItem('focus_mode_time_left');
       localStorage.removeItem('focus_mode_is_active');
     }
     if (task) {
       setActiveFocusTask(task as Task);
     }
-    setActiveFocusSubtaskIndex(
-      typeof subtaskIndex === 'number' ? subtaskIndex : null,
-    );
     setIsFocusModeOpen(true);
     setIsFocusModeActive(true);
   };
@@ -163,78 +133,6 @@ export const useHome = () => {
     newParams.delete('end');
     setSearchParams(newParams);
     setTempTask(null);
-  };
-
-  const handleToggleSubtask = async (taskId: string, subtaskIndex: number) => {
-    if (!taskDetailsTask || !taskDetailsTask.subtasks) return;
-
-    const updatedSubtasks = [...taskDetailsTask.subtasks].map((s) =>
-      typeof s === 'string'
-        ? { title: s, completed: false, timer: 0 }
-        : { ...s },
-    );
-    updatedSubtasks[subtaskIndex].completed =
-      !updatedSubtasks[subtaskIndex].completed;
-
-    try {
-      const { data } = await updateTaskMutation({
-        variables: {
-          updateTaskInput: {
-            id: taskId,
-            subtasks: updatedSubtasks.map((s) => ({
-              title: s.title,
-              completed: s.completed,
-              timer: s.timer,
-              notes_encrypted: s.notes_encrypted,
-              estimate_timer: s.estimate_timer,
-              priority_level: s.priority_level,
-              status: s.status,
-              deadline: s.deadline,
-              category: s.category,
-            })),
-            real_timer: (taskDetailsTask as Task).real_timer,
-            google_event_id: (taskDetailsTask as Task).google_event_id,
-            estimated_start_date: (taskDetailsTask as Task)
-              .estimated_start_date,
-            estimated_end_date: (taskDetailsTask as Task).estimated_end_date,
-          },
-        },
-        refetchQueries: [
-          {
-            query: GET_TASKS,
-            variables: { userId: (taskDetailsTask as Task).user_id || '' },
-          },
-          { query: GET_WORKSPACES, variables: { search: '' } },
-        ],
-      });
-
-      if (data?.updateTask) {
-        // Map TaskResponse (backend) to Task (Redux/Frontend)
-        const mappedTask: Task = {
-          ...data.updateTask,
-          user_id: data.updateTask.user_id || (taskDetailsTask as Task).user_id,
-          notes_encrypted: data.updateTask.notes_encrypted || '',
-          deadline: data.updateTask.deadline || new Date().toISOString(),
-          estimated_start_date: data.updateTask.estimated_start_date,
-          estimated_end_date: data.updateTask.estimated_end_date,
-          tags:
-            data.updateTask.tags?.map((t: { name: string } | string) =>
-              typeof t === 'string' ? t : t.name,
-            ) || [],
-        };
-        dispatch(upsertTaskRedux(mappedTask));
-      }
-
-      if (tempTask && tempTask.id === taskId) {
-        setTempTask({
-          ...tempTask,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          subtasks: updatedSubtasks as any,
-        });
-      }
-    } catch (e) {
-      console.error('Failed to toggle subtask', e);
-    }
   };
 
   const changeStatusTab = (active: TaskBar) => {
@@ -347,13 +245,11 @@ export const useHome = () => {
     isFocusModeActive,
     setIsFocusModeActive,
     activeFocusTask,
-    activeFocusSubtaskIndex,
     handleStartFocus,
     handleOpenTaskDetails,
     taskDetailsTask,
     isEditModalOpen,
     closeTaskDetails,
-    handleToggleSubtask,
     handleSaveTask,
     deleteTask,
     initialStart,
