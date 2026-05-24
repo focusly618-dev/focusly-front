@@ -1,21 +1,30 @@
 import { createElement } from 'react';
-import { Box, Typography, IconButton, useTheme } from '@mui/material';
 import {
-  Folder as FolderIcon,
+  Box,
+  Typography,
+  IconButton,
+  useTheme,
+  alpha,
+  lighten,
+} from '@mui/material';
+import {
   MoreVert as MoreVertIcon,
   CheckBox as CheckBoxIcon,
-  ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import {
   WorkspaceCard,
-  TaskPill,
-  TaskPillLabel,
-  TaskPillTitle,
+  CardAvatarCircle,
+  BadgeChip,
+  PropertyGrid,
+  PropertyItem,
+  PropertyLabel,
+  PropertyValue,
   HoverArrowButton,
 } from '../WorkspaceLibrary.styles';
 import { colorPaletteMap, iconMap } from '../constants/library.constants';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
+import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 
 interface WorkspaceCardItemProps {
   workspace: WorkspaceTypes;
@@ -26,6 +35,35 @@ interface WorkspaceCardItemProps {
   ) => void;
   onUnlinkTask: (workspace: WorkspaceTypes) => void;
 }
+
+// Safely parse the document content to get a plain text preview snippet
+const getSnippet = (contentStr?: string): string => {
+  if (!contentStr) return 'No content yet';
+  try {
+    const parsed = JSON.parse(contentStr);
+    if (Array.isArray(parsed)) {
+      for (const block of parsed) {
+        if (block.content) {
+          if (typeof block.content === 'string') {
+            return block.content;
+          }
+          if (Array.isArray(block.content)) {
+            const text = block.content
+              .map((c: { text?: string }) => c.text || '')
+              .join('');
+            if (text.trim()) return text;
+          }
+        }
+      }
+    }
+  } catch {
+    if (contentStr.startsWith('[') || contentStr.startsWith('{')) {
+      return 'No content yet';
+    }
+    return contentStr;
+  }
+  return 'No content yet';
+};
 
 export const WorkspaceCardItem = ({
   workspace,
@@ -46,94 +84,70 @@ export const WorkspaceCardItem = ({
     workspace.background_color &&
     workspace.background_color !== 'none';
 
+  const isDark = theme.palette.mode === 'dark';
+  const folderName = workspace.folder?.name || 'All Notes';
+  const baseColor = workspace.folder?.color || theme.palette.primary.main;
+  const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
+  const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
+
+  const IconComponent =
+    (workspace.emoji && iconMap[workspace.emoji]) || iconMap.Article;
+
+  const snippet = getSnippet(workspace.content);
+
   return (
     <WorkspaceCard
       onClick={() => onSelect(workspace)}
       gradient={isBackgroundActive ? gradient : undefined}
     >
+      {/* Top Row: Avatar (left), Folder Badge & Menu Options (right) */}
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
+          alignItems: 'center',
+          mb: 2,
         }}
       >
-        <Box
+        <CardAvatarCircle
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            gap: 0.8,
-            bgcolor: isBackgroundActive
-              ? isLightBg
-                ? 'rgba(255, 255, 255, 0.8)'
-                : 'rgba(0, 0, 0, 0.4)'
-              : theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.05)'
-                : 'rgba(0, 0, 0, 0.03)',
-            backdropFilter: 'blur(12px)',
-            px: 1.5,
-            py: 0.4,
-            borderRadius: '20px',
-            border: '1px solid',
-            borderColor: isBackgroundActive
-              ? isLightBg
-                ? 'rgba(0, 0, 0, 0.08)'
-                : 'rgba(255, 255, 255, 0.15)'
-              : 'transparent',
+            ...(isBackgroundActive && {
+              bgcolor: isDark
+                ? 'rgba(255, 255, 255, 0.12)'
+                : 'rgba(255, 255, 255, 0.5)',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+            }),
           }}
         >
-          <FolderIcon
-            sx={{
-              fontSize: 14,
-              color:
-                workspace.folder?.color ||
-                (theme.palette.mode === 'dark' ? '#fff' : 'primary.main'),
-              opacity: 0.8,
-            }}
-          />
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 800,
-              fontSize: '0.68rem',
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase',
+          {createElement(IconComponent, {
+            sx: {
+              fontSize: 20,
               color: isBackgroundActive
                 ? isLightBg
-                  ? 'rgba(0, 0, 0, 0.8)'
+                  ? '#000'
                   : '#fff'
                 : 'text.primary',
               opacity: 0.9,
-              maxWidth: '120px',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {(workspace.folder?.name?.length ?? 0) > 40
-              ? `${workspace.folder?.name?.substring(0, 10)}...`
-              : workspace.folder?.name || 'All Notes'}
-          </Typography>
-          <Typography
-            variant="caption"
-            fontSize={10}
+            },
+          })}
+        </CardAvatarCircle>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <BadgeChip
+            color={visibleColor}
+            bgColor={badgeBgColor}
             sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? 'rgba(0, 0, 0, 0.5)'
-                  : 'rgba(255, 255, 255, 0.6)'
-                : 'text.secondary',
-              display: 'block',
+              ...(isBackgroundActive && {
+                bgcolor: isLightBg
+                  ? 'rgba(0, 0, 0, 0.08)'
+                  : 'rgba(255, 255, 255, 0.15)',
+                color: isLightBg ? 'rgba(0, 0, 0, 0.8)' : '#fff',
+              }),
             }}
           >
-            {formatDistanceToNow(new Date(workspace.updatedAt), {
-              addSuffix: true,
-            })}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex' }}>
+            {folderName}
+          </BadgeChip>
+
           <IconButton
             size="small"
             onClick={(e) => {
@@ -147,7 +161,11 @@ export const WorkspaceCardItem = ({
                   : '#fff'
                 : 'text.secondary',
               '&:hover': {
-                backgroundColor: 'action.hover',
+                backgroundColor: isBackgroundActive
+                  ? isLightBg
+                    ? 'rgba(0,0,0,0.05)'
+                    : 'rgba(255,255,255,0.1)'
+                  : 'action.hover',
               },
             }}
           >
@@ -156,146 +174,247 @@ export const WorkspaceCardItem = ({
         </Box>
       </Box>
 
-      {workspace.emoji && iconMap[workspace.emoji] && (
-        <Box
+      {/* Middle Section: Workspace Title and Snippet Description */}
+      <Box sx={{ mb: 1 }}>
+        <Typography
+          variant="h6"
           sx={{
-            mb: 1,
-            mt: 1.5,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 50,
-            height: 50,
-            padding: '5px',
-            borderRadius: '12px',
-            bgcolor: isBackgroundActive
-              ? theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.12)'
-                : 'rgba(255, 255, 255, 0.4)'
-              : 'action.hover',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid',
-            borderColor: isBackgroundActive
-              ? 'rgba(255, 255, 255, 0.15)'
-              : 'divider',
-            boxShadow: isBackgroundActive
-              ? '0 4px 15px rgba(0,0,0,0.1)'
-              : 'none',
+            fontWeight: 600,
+            fontSize: '1.05rem',
+            lineHeight: 1.3,
+            mb: 0.5,
+            color: isBackgroundActive
+              ? isLightBg
+                ? '#000'
+                : '#fff'
+              : 'text.primary',
+            textShadow:
+              isBackgroundActive && !isLightBg
+                ? '0 1px 3px rgba(0,0,0,0.3)'
+                : 'none',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
-          {createElement(iconMap[workspace.emoji], {
-            sx: {
-              fontSize: 20,
-              color: isBackgroundActive
-                ? theme.palette.mode === 'dark'
-                  ? '#fff'
-                  : '#000'
-                : 'text.primary',
-              opacity: 0.9,
-            },
-          })}
-        </Box>
-      )}
+          {workspace.title}
+        </Typography>
 
-      <Typography
-        variant="h6"
+        <Typography
+          variant="body2"
+          sx={{
+            fontSize: '0.85rem',
+            color: isBackgroundActive
+              ? isLightBg
+                ? 'rgba(0, 0, 0, 0.6)'
+                : 'rgba(255, 255, 255, 0.7)'
+              : 'text.secondary',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            minHeight: '38px',
+            lineHeight: 1.4,
+          }}
+        >
+          {snippet}
+        </Typography>
+      </Box>
+
+      {/* Properties Section: 2x2 Grid */}
+      <PropertyGrid
         sx={{
-          fontWeight: 800,
-          fontSize: '1.25rem',
-          lineHeight: 1.2,
-          mb: 'auto',
-          color: isBackgroundActive
-            ? isLightBg
-              ? '#000'
-              : '#fff'
-            : 'text.primary',
-          textShadow:
-            isBackgroundActive && !isLightBg
-              ? '0 2px 4px rgba(0,0,0,0.3)'
-              : 'none',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
+          ...(isBackgroundActive && {
+            borderTopColor: isLightBg
+              ? 'rgba(0, 0, 0, 0.08)'
+              : 'rgba(255, 255, 255, 0.15)',
+          }),
         }}
       >
-        {workspace.title.length > 40
-          ? `${workspace.title.substring(0, 40)}...`
-          : workspace.title}
-      </Typography>
-
-      <Box mt="auto" width="100%">
-        {workspace.task && (
-          <TaskPill
+        <PropertyItem>
+          <PropertyLabel
             sx={{
-              ...(isBackgroundActive && {
-                bgcolor:
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.4)'
-                    : 'rgba(255, 255, 255, 0.7)',
-                borderColor: 'rgba(255, 255, 255, 0.2)',
-              }),
+              color: isBackgroundActive
+                ? isLightBg
+                  ? 'rgba(0, 0, 0, 0.5)'
+                  : 'rgba(255, 255, 255, 0.5)'
+                : 'text.secondary',
             }}
           >
-            <Box
+            Folder
+          </PropertyLabel>
+          <PropertyValue
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? '#000'
+                  : '#fff'
+                : 'text.primary',
+            }}
+          >
+            {folderName}
+          </PropertyValue>
+        </PropertyItem>
+
+        <PropertyItem>
+          <PropertyLabel
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? 'rgba(0, 0, 0, 0.5)'
+                  : 'rgba(255, 255, 255, 0.5)'
+                : 'text.secondary',
+            }}
+          >
+            Created
+          </PropertyLabel>
+          <PropertyValue
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? '#000'
+                  : '#fff'
+                : 'text.primary',
+            }}
+          >
+            {format(new Date(workspace.createdAt), 'MMM dd, yyyy')}
+          </PropertyValue>
+        </PropertyItem>
+
+        <PropertyItem>
+          <PropertyLabel
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? 'rgba(0, 0, 0, 0.5)'
+                  : 'rgba(255, 255, 255, 0.5)'
+                : 'text.secondary',
+            }}
+          >
+            Task Status
+          </PropertyLabel>
+          <PropertyValue
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? '#000'
+                  : '#fff'
+                : 'text.primary',
+              textTransform: 'capitalize',
+            }}
+          >
+            {workspace.task
+              ? workspace.task.status.toLowerCase().replace('_', ' ')
+              : 'None'}
+          </PropertyValue>
+        </PropertyItem>
+
+        <PropertyItem>
+          <PropertyLabel
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? 'rgba(0, 0, 0, 0.5)'
+                  : 'rgba(255, 255, 255, 0.5)'
+                : 'text.secondary',
+            }}
+          >
+            Time Est/Act
+          </PropertyLabel>
+          <PropertyValue
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? '#000'
+                  : '#fff'
+                : 'text.primary',
+            }}
+          >
+            {workspace.task
+              ? `${formatDuration(workspace.task.estimate_timer) || '0m'} / ${formatDuration(workspace.task.real_timer) || '0m'}`
+              : '—'}
+          </PropertyValue>
+        </PropertyItem>
+      </PropertyGrid>
+
+      {/* Footer Section: Action Buttons */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mt: 'auto',
+          pt: 1,
+        }}
+      >
+        {workspace.task ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              cursor: 'pointer',
+              color: isBackgroundActive
+                ? isLightBg
+                  ? 'rgba(0, 0, 0, 0.7)'
+                  : 'rgba(255, 255, 255, 0.8)'
+                : 'primary.main',
+              transition: 'all 0.2s',
+              '&:hover': {
+                color: 'error.main',
+              },
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onUnlinkTask(workspace);
+            }}
+          >
+            <CheckBoxIcon sx={{ fontSize: 18 }} />
+            <Typography
+              variant="caption"
               sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? '#000'
-                    : '#fff'
-                  : 'primary.main',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mr: 1.5,
-                cursor: 'pointer',
-                '&:hover': {
-                  color: 'error.main',
-                  transform: 'scale(1.1)',
-                },
-                transition: 'all 0.2s',
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onUnlinkTask(workspace);
+                fontWeight: 700,
+                fontSize: '11px',
+                maxWidth: '180px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
-              <CheckBoxIcon sx={{ fontSize: 20 }} />
-            </Box>
-            <Box display="flex" flexDirection="column">
-              <TaskPillLabel
-                sx={{
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(0, 0, 0, 0.5)'
-                      : 'rgba(255, 255, 255, 0.7)'
-                    : 'primary.main',
-                }}
-              >
-                ASSIGNED TASK
-              </TaskPillLabel>
-              <TaskPillTitle
-                sx={{
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? '#000'
-                      : '#fff'
-                    : 'text.primary',
-                  textShadow:
-                    isBackgroundActive && !isLightBg
-                      ? '0 1px 2px rgba(0,0,0,0.2)'
-                      : 'none',
-                }}
-              >
-                {workspace.task.title}
-              </TaskPillTitle>
-            </Box>
-            <HoverArrowButton className="arrow-button">
-              <ArrowForwardIcon sx={{ fontSize: 14 }} />
-            </HoverArrowButton>
-          </TaskPill>
+              Linked: {workspace.task.title}
+            </Typography>
+          </Box>
+        ) : (
+          <Typography
+            variant="caption"
+            sx={{
+              color: isBackgroundActive
+                ? isLightBg
+                  ? 'rgba(0, 0, 0, 0.5)'
+                  : 'rgba(255, 255, 255, 0.5)'
+                : 'text.secondary',
+              fontStyle: 'italic',
+              fontSize: '11px',
+            }}
+          >
+            No task linked
+          </Typography>
         )}
+        <HoverArrowButton
+          className="arrow-button"
+          sx={{
+            fontSize: '16px',
+            fontWeight: 500,
+            color: isBackgroundActive
+              ? isLightBg
+                ? 'rgba(0, 0, 0, 0.7)'
+                : 'rgba(255, 255, 255, 0.8)'
+              : 'text.secondary',
+          }}
+        >
+          →
+        </HoverArrowButton>
       </Box>
     </WorkspaceCard>
   );

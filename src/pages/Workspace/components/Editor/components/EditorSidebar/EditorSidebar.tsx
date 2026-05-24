@@ -575,10 +575,9 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
 
                   <SidebarSubtaskList>
                     {selectTask.subtasks?.map((subtask, index) => {
-                      const hasSubNotes =
-                        subtask.notes_encrypted &&
-                        subtask.notes_encrypted.trim().length > 0 &&
-                        subtask.notes_encrypted !== '<p></p>';
+                      const hasSubNotes = !!cleanDescription(
+                        subtask.notes_encrypted,
+                      );
 
                       const subPriority = subtask.priority_level
                         ? getPriorityFromLevel(subtask.priority_level)
@@ -804,11 +803,10 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                         ? cleanDescription(
                             selectTask?.subtasks?.[selectedSubtaskIndex]
                               ?.notes_encrypted,
-                          )
-                        : selectTask?.notes_encrypted &&
-                            selectTask.notes_encrypted !== '<p></p>'
-                          ? selectTask.notes_encrypted
-                          : '<p style="color: grey; font-style: italic; font-size: 13px;">No description provided for this task.</p>',
+                          ) ||
+                          '<p style="color: grey; font-style: italic; font-size: 13px;">No description provided for this subtask.</p>'
+                        : cleanDescription(selectTask?.notes_encrypted) ||
+                          '<p style="color: grey; font-style: italic; font-size: 13px;">No description provided for this task.</p>',
                   }}
                 />
               </Box>
@@ -976,7 +974,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
             }}
             dangerouslySetInnerHTML={{
               __html:
-                selectedSubtaskDetails?.notes_encrypted ||
+                cleanDescription(selectedSubtaskDetails?.notes_encrypted) ||
                 'No information provided.',
             }}
           />

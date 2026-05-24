@@ -34,7 +34,6 @@ import {
   Logo,
   AddTaskButton,
   NavItem,
-  EnergyCard,
 } from './Sidebar.styles';
 import { TaskBar, type SidebarProps } from './types/Sidebar.types';
 import { useAppSelector } from '@/redux/hooks';
@@ -461,41 +460,6 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
       </List>
 
       <Box flexGrow={1} />
-
-      <EnergyCard id="joyride-energy">
-        <Typography
-          color="primary.main"
-          fontWeight="700"
-          fontSize="0.85rem"
-          mb={1}
-        >
-          Afternoon Slump Predicted
-        </Typography>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          display="block"
-          mb={2}
-        >
-          Your energy usually dips around 2 PM. Schedule light tasks.
-        </Typography>
-        <Button
-          variant="outlined"
-          size="small"
-          fullWidth
-          sx={{
-            color: 'primary.main',
-            borderColor: 'primary.main',
-            textTransform: 'none',
-            borderRadius: 2,
-            fontSize: '0.75rem',
-            py: 0.5,
-          }}
-        >
-          Optimize Schedule
-        </Button>
-      </EnergyCard>
-
       <Box
         id="joyride-user-profile"
         onClick={() => changeStatusTab(TaskBar.Settings)}

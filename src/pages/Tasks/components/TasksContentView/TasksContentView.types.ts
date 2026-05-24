@@ -24,4 +24,5 @@ export interface TasksContentViewProps {
   activeSort?: TaskSortInput;
   searchTerm?: string;
   dateRange?: string;
+  deleteTasks?: (ids: string[]) => Promise<void>;
 }

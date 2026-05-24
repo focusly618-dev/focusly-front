@@ -7,9 +7,9 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
     palette: {
       mode,
       primary: {
-        main: '#137fec',
-        light: '#42a5f5',
-        dark: '#1565c0',
+        main: isDark ? '#3b82f6' : '#137fec',
+        light: isDark ? '#60a5fa' : '#42a5f5',
+        dark: isDark ? '#1d4ed8' : '#1565c0',
         contrastText: '#fff',
       },
       success: {
@@ -25,15 +25,15 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
         light: isDark ? 'rgba(251, 191, 36, 0.1)' : 'rgba(245, 158, 11, 0.1)',
       },
       background: {
-        default: isDark ? '#1b1b1d' : '#f8fafc',
-        paper: isDark ? '#23252a' : '#ffffff',
+        default: isDark ? '#0B0F14' : '#F8F8F7',
+        paper: isDark ? '#111827' : '#ffffff',
       },
       text: {
-        primary: isDark ? '#e0e2e9' : '#0f172a',
-        secondary: isDark ? '#a1a1aa' : '#64748b',
-        disabled: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.38)',
+        primary: isDark ? '#e0e2e9' : '#1C1C1A',
+        secondary: isDark ? '#a1a1aa' : '#8A8A85',
+        disabled: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
       },
-      divider: isDark ? 'rgba(255, 255, 255, 0.05)' : '#e2e8f0',
+      divider: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.06)',
     },
     typography: {
       fontFamily:
@@ -81,11 +81,21 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
           root: {
             borderRadius: '8px',
             padding: '10px 24px',
+            transition: 'all 0.2s ease-in-out',
           },
           containedPrimary: {
-            boxShadow: '0 4px 14px 0 rgba(19, 127, 236, 0.39)',
+            boxShadow: isDark
+              ? '0 4px 14px 0 rgba(99, 102, 241, 0.3)'
+              : '0 4px 14px 0 rgba(19, 127, 236, 0.39)',
+            background: isDark
+              ? 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)'
+              : undefined,
+            border: 'none',
             '&:hover': {
-              boxShadow: '0 6px 20px rgba(19, 127, 236, 0.23)',
+              boxShadow: isDark
+                ? '0 6px 20px rgba(99, 102, 241, 0.5)'
+                : '0 6px 20px rgba(19, 127, 236, 0.23)',
+              transform: 'translateY(-1px)',
             },
           },
         },
@@ -94,9 +104,86 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
+            backgroundColor: isDark ? '#111827' : '#ffffff',
+            border: isDark
+              ? '1px solid rgba(255, 255, 255, 0.05)'
+              : '1px solid rgba(0, 0, 0, 0.05)',
             boxShadow: isDark
-              ? 'none'
-              : '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+              ? '0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.2)'
+              : '0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03)',
+          },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: isDark ? 'rgba(17, 24, 39, 0.85)' : undefined,
+            backdropFilter: isDark ? 'blur(16px)' : undefined,
+            WebkitBackdropFilter: isDark ? 'blur(16px)' : undefined,
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : undefined,
+            borderRadius: '16px',
+            boxShadow: isDark
+              ? '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+              : undefined,
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            borderRadius: '8px',
+            transition: 'all 0.2s ease-in-out',
+            backgroundColor: isDark ? '#1A1F2B' : undefined,
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : undefined,
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.18)' : undefined,
+            },
+            '&.Mui-focused': {
+              backgroundColor: isDark ? 'rgba(26, 31, 43, 0.9)' : undefined,
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: isDark ? '#6366f1' : undefined,
+                borderWidth: '1px',
+              },
+              boxShadow: isDark
+                ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
+                : undefined,
+            },
+          },
+        },
+      },
+      MuiMenu: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: isDark ? 'rgba(26, 31, 43, 0.95)' : undefined,
+            backdropFilter: isDark ? 'blur(16px)' : undefined,
+            WebkitBackdropFilter: isDark ? 'blur(16px)' : undefined,
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : undefined,
+            borderRadius: '10px',
+            boxShadow: isDark ? '0 10px 20px rgba(0,0,0,0.3)' : undefined,
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            borderRadius: '6px',
+            margin: '2px 6px',
+            padding: '8px 12px',
+            transition: 'all 0.15s ease-in-out',
+            '&:hover': {
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : undefined,
+            },
+            '&.Mui-selected': {
+              backgroundColor: isDark ? 'rgba(99, 102, 241, 0.15)' : undefined,
+              color: isDark ? '#818cf8' : undefined,
+              '&:hover': {
+                backgroundColor: isDark
+                  ? 'rgba(99, 102, 241, 0.25)'
+                  : undefined,
+              },
+            },
           },
         },
       },

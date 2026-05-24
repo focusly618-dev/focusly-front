@@ -16,6 +16,10 @@ export interface TaskData {
   realTime?: string;
   shouldGenerateMeet?: boolean;
   collaborators?: { name: string; email: string; avatar?: string }[];
+  is_splitable?: boolean;
+  min_block_duration?: number;
+  preferred_time_of_day?: string;
+  is_locked?: boolean;
 }
 
 export interface TaskDetailModalProps {
@@ -71,6 +75,10 @@ export interface TaskInput {
   google_event_id?: string;
   user_id?: string;
   collaborators?: { name: string; email: string; avatar?: string }[];
+  is_splitable?: boolean;
+  min_block_duration?: number;
+  preferred_time_of_day?: string;
+  is_locked?: boolean;
 }
 
 export interface UseTaskCollectionsProps {

@@ -1,67 +1,67 @@
 export const getStatusColor = (status: string | null): string => {
   switch (status) {
     case 'Todo':
-      return 'text.secondary';
+      return '#3b82f6';
     case 'Planning':
-      return 'info.main';
+      return '#3b82f6';
     case 'Scheduled':
       return '#8b5cf6';
     case 'Pending':
-      return 'warning.main';
+      return '#f59e0b';
     case 'On Hold':
-      return 'error.main';
+      return '#ef4444';
     case 'Review':
       return '#06b6d4';
     case 'Done':
-      return 'success.main';
+      return '#22c55e';
     case 'Backlog':
-      return 'text.secondary';
+      return '#6b7280';
     case 'Archived':
       return '#4b5563';
     default:
-      return 'primary.main';
+      return '#3b82f6';
   }
 };
 
 export const getCategoryColor = (category: string | null): string => {
   switch (category) {
     case 'General':
-      return 'text.secondary';
+      return '#6b7280';
     case 'Deep Work':
-      return 'secondary.main';
+      return '#8b5cf6';
     case 'Meeting':
-      return 'info.main';
+      return '#3b82f6';
     case 'Admin':
-      return 'text.secondary';
+      return '#6b7280';
     case 'Design':
-      return 'warning.main';
+      return '#f59e0b';
     case 'Development':
-      return 'primary.main';
+      return '#2563eb';
     case 'Marketing':
-      return 'error.main';
+      return '#ef4444';
     case 'Planning':
-      return 'info.main';
+      return '#3b82f6';
     case 'Research':
-      return 'secondary.main';
+      return '#8b5cf6';
     case 'Learning':
-      return 'warning.main';
+      return '#f59e0b';
     case 'Personal':
-      return 'text.secondary';
+      return '#ec4899';
     default:
-      return 'text.secondary';
+      return '#6b7280';
   }
 };
 
 export const getPriorityIconColor = (priority: string | null): string => {
   switch (priority) {
     case 'High':
-      return 'error.main';
+      return '#ef4444';
     case 'Med':
-      return 'warning.main';
+      return '#f59e0b';
     case 'Low':
-      return 'success.main';
+      return '#22c55e';
     default:
-      return 'inherit';
+      return '#6b7280';
   }
 };
 

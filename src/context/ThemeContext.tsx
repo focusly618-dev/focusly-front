@@ -12,6 +12,11 @@ export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     localStorage.setItem('themeMode', mode);
+    if (mode === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [mode]);
 
   const colorMode = useMemo(
@@ -37,7 +42,7 @@ export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
       },
       mode,
     }),
-    [mode]
+    [mode],
   );
 
   const theme = useMemo(() => getDesignTokens(mode), [mode]);

@@ -8,12 +8,12 @@ export const CalendarContainer = styled(Box, {
   // ── Use the SAME colors as the global MUI theme ──
   const bgDefault = theme.palette.background.default; // #1b1b1d (dark) / #f8fafc (light)
   const bgPaper = theme.palette.background.paper; // #23252a (dark) / #ffffff (light)
-  const divider = isDark ? 'rgba(255, 255, 255, 0.08)' : theme.palette.divider; // theme divider is 0.05, slightly boosted
+  const divider = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
   const dividerStrong = isDark
-    ? 'rgba(255, 255, 255, 0.14)'
-    : 'rgba(0, 0, 0, 0.1)';
+    ? 'rgba(255, 255, 255, 0.1)'
+    : 'rgba(0, 0, 0, 0.08)';
   const dividerSubtle = isDark
-    ? 'rgba(255, 255, 255, 0.04)'
+    ? 'rgba(255, 255, 255, 0.03)'
     : 'rgba(0, 0, 0, 0.03)';
   const textPrimary = theme.palette.text.primary;
   const textSecondary = theme.palette.text.secondary;
@@ -187,7 +187,6 @@ export const CalendarContainer = styled(Box, {
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     '& .rbc-event-label': { display: 'none' },
     '& .rbc-event': {
-      backgroundColor: 'transparent',
       padding: 0,
       outline: 'none',
       border: 'none',
@@ -196,18 +195,18 @@ export const CalendarContainer = styled(Box, {
 
     // ── Current time indicator ──
     '& .rbc-current-time-indicator': {
-      backgroundColor: '#ef4444',
-      height: '2px',
+      backgroundColor: '#3b82f6', // subtle blue line
+      height: '1px',
       zIndex: 3,
       '&::before': {
         content: '""',
         position: 'absolute',
-        left: '-4px',
-        top: '-3px',
-        width: '8px',
-        height: '8px',
+        left: '-3px',
+        top: '-2px',
+        width: '5px',
+        height: '5px',
         borderRadius: '50%',
-        backgroundColor: '#ef4444',
+        backgroundColor: '#3b82f6',
       },
     },
 
@@ -250,7 +249,7 @@ export const CalendarContainer = styled(Box, {
       backgroundColor: `${bgDefault} !important`,
       flex: 1,
       minHeight: 0,
-      overflow: 'hidden',
+      overflow: 'visible',
       display: 'flex',
       flexDirection: 'column',
     },
@@ -266,7 +265,7 @@ export const CalendarContainer = styled(Box, {
       backgroundColor: isDark
         ? `${theme.palette.background.default} !important`
         : '#f3f4f6 !important',
-      opacity: isDark ? 0.6 : 1,
+      opacity: isDark ? 0.4 : 0.6,
     },
     '& .rbc-month-view .rbc-row-bg': {
       flex: 1,
@@ -275,73 +274,58 @@ export const CalendarContainer = styled(Box, {
     '& .rbc-month-view .rbc-row-content': {
       flex: 1,
       minHeight: 0,
-      overflow: 'hidden',
+      overflow: 'visible',
       display: 'flex',
       flexDirection: 'column',
     },
     '& .rbc-month-view .rbc-row-content .rbc-row': {
-      minHeight: '22px',
+      minHeight: '28px',
     },
     '& .rbc-month-view .rbc-row-segment': {
-      padding: '0 2px 1px 2px',
-    },
-    '& .rbc-month-view .rbc-show-more': {
-      color: theme.palette.primary.main,
-      fontWeight: 600,
-      fontSize: '11px',
-      lineHeight: 1.1,
-      padding: '0 4px',
-      marginTop: '1px',
-      background: 'none',
+      padding: '0 3px 2px 3px',
     },
     '& .rbc-month-view .rbc-date-cell': {
-      padding: '4px 8px 2px 0',
+      padding: '6px 8px 4px 0',
       textAlign: 'right',
       '& button': {
-        fontSize: '12px',
-        fontWeight: 500,
+        fontSize: '13px',
+        fontWeight: 600,
         color: textPrimary,
       },
     },
     '& .rbc-month-view .rbc-date-cell.rbc-now': {
       '& button': {
-        backgroundColor: theme.palette.primary.main,
-        color: '#ffffff !important',
-        width: '24px',
-        height: '24px',
-        borderRadius: '50%',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        margin: '0',
-        padding: '0',
-        minWidth: '24px',
-        fontWeight: 600,
-        fontSize: '12px',
+        color: textPrimary,
+        fontWeight: 700,
+        fontSize: '13px',
       },
     },
     '& .rbc-month-view .rbc-event': {
-      height: '24px !important',
-      minHeight: '24px !important',
-      maxHeight: '24px !important',
+      height: 'auto !important',
+      minHeight: '20px !important',
+      maxHeight: 'none !important',
       margin: '1px 0 !important',
       padding: '0 !important',
-      backgroundColor: 'transparent !important',
+      borderRadius: '4px',
       '& .event-icon-container': { display: 'none' },
       '& .event-card-inner': {
         height: '100%',
         display: 'flex',
         alignItems: 'center',
-      },
-      '& .event-info': {
-        display: 'flex',
         flexDirection: 'row',
-        alignItems: 'center',
         gap: '4px',
-        width: '100%',
-        overflow: 'hidden',
+        padding: '0',
       },
-      '& .event-info > *:last-child': { display: 'none' }, // Hide time range in month view
+    },
+
+    // Show more button visible and styled
+    '& .rbc-month-view .rbc-show-more': {
+      display: 'block !important',
+      visibility: 'visible !important',
+      overflow: 'visible !important',
+
+      position: 'relative',
+      '&:hover': { textDecoration: 'underline' },
     },
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -349,11 +333,7 @@ export const CalendarContainer = styled(Box, {
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     '& .rbc-time-view .rbc-event': {
       overflow: 'visible',
-      width: '100% !important', // Take almost full width
-      backgroundColor: 'transparent !important',
-      '& .event-card-inner': {
-        overflow: 'hidden',
-      },
+      width: '100% !important',
     },
     '& .rbc-time-view .rbc-event[style*="height"]': {
       minHeight: '20px !important',

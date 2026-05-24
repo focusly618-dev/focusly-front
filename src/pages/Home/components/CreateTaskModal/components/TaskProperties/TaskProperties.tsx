@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { alpha } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import {
   Box,
   Typography,
@@ -123,15 +125,39 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
 
-  const chipBase = {
-    borderRadius: '8px',
-    px: 1,
-    height: '32px',
-    fontSize: '14px',
+  const getChipSx = (colorCode: string) => ({
+    borderRadius: '20px',
+    px: 1.5,
+    height: '28px',
+    fontSize: '12px',
     fontWeight: 600,
     cursor: 'pointer',
-    '& .MuiChip-icon': { marginRight: '-4px', color: 'inherit' },
-  };
+    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+    bgcolor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? alpha(colorCode, 0.12)
+        : alpha(colorCode, 0.08),
+    border: '1px solid',
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? alpha(colorCode, 0.2)
+        : alpha(colorCode, 0.15),
+    color: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? alpha(colorCode, 0.9) : colorCode,
+    '&:hover': {
+      bgcolor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? alpha(colorCode, 0.18)
+          : alpha(colorCode, 0.12),
+      transform: 'translateY(-0.5px)',
+    },
+    '& .MuiChip-icon': {
+      marginLeft: '-2px',
+      marginRight: '-4px',
+      color: 'inherit !important',
+      fontSize: '14px',
+    },
+  });
 
   return (
     <Box sx={propertyListSx}>
@@ -151,17 +177,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             icon={getStatusIcon(status)}
             label={status || 'Todo'}
             onClick={(e) => setStatusAnchor(e.currentTarget)}
-            sx={{
-              ...chipBase,
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(30, 41, 59, 1)'
-                  : 'rgba(0, 0, 0, 0.04)',
-              border: '1px solid',
-              borderColor: 'divider',
-              color: getStatusColor(status),
-              '&:hover': { bgcolor: 'action.hover' },
-            }}
+            sx={getChipSx(getStatusColor(status))}
           />
         </Box>
       </Box>
@@ -179,42 +195,10 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
         </Box>
         <Box sx={propertyValueSx}>
           <Chip
-            icon={
-              <FlagIcon
-                sx={{ fontSize: 16, color: getPriorityIconColor(priority) }}
-              />
-            }
+            icon={<FlagIcon sx={{ fontSize: 16 }} />}
             label={priority || 'No priority'}
             onClick={(e) => setPriorityAnchor(e.currentTarget)}
-            sx={{
-              ...chipBase,
-              bgcolor:
-                priority === 'High'
-                  ? 'rgba(239, 68, 68, 0.1)'
-                  : priority === 'Med'
-                    ? 'rgba(245, 158, 11, 0.1)'
-                    : priority === 'Low'
-                      ? 'rgba(16, 185, 129, 0.1)'
-                      : (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.05)'
-                            : 'rgba(0, 0, 0, 0.04)',
-              border: '1px solid',
-              borderColor:
-                priority === 'High'
-                  ? 'error.main'
-                  : priority === 'Med'
-                    ? 'warning.main'
-                    : priority === 'Low'
-                      ? 'success.main'
-                      : 'divider',
-              color:
-                getPriorityIconColor(priority) === 'inherit'
-                  ? 'text.secondary'
-                  : getPriorityIconColor(priority),
-              '&:hover': { opacity: 0.8 },
-              '& .MuiChip-icon': { marginRight: '-4px', color: 'inherit' },
-            }}
+            sx={getChipSx(getPriorityIconColor(priority))}
           />
         </Box>
       </Box>
@@ -235,17 +219,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             icon={getCategoryIcon(category)}
             label={category || 'General'}
             onClick={(e) => setCategoryAnchor(e.currentTarget)}
-            sx={{
-              ...chipBase,
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(30, 41, 59, 1)'
-                  : 'rgba(0, 0, 0, 0.04)',
-              border: '1px solid',
-              borderColor: 'divider',
-              color: getCategoryColor(category),
-              '&:hover': { bgcolor: 'action.hover' },
-            }}
+            sx={getChipSx(getCategoryColor(category))}
           />
         </Box>
       </Box>

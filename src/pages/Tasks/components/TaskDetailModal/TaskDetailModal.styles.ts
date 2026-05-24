@@ -2,64 +2,112 @@ import type { Theme } from '@mui/material/styles';
 
 // Common Input Sx
 export const darkInputSx = {
-  backgroundColor: 'background.default',
-  borderRadius: '15px',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+  borderRadius: '12px',
   '& .MuiOutlinedInput-root': {
-    backgroundColor: 'background.default',
-    color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#e0e2e9' : '#000',
     fontSize: '14px',
-    '& fieldset': { borderColor: 'divider' },
-    '&:hover fieldset': { borderColor: 'action.hover' },
-    '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+    borderRadius: '12px',
+    '& fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+    },
+    '&:hover fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.18)'
+          : 'action.hover',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+    },
+    '&.Mui-focused': {
+      backgroundColor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(26, 31, 43, 0.9)'
+          : 'background.default',
+      boxShadow: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
+          : 'none',
+    },
     '& input': {
       padding: '10px 14px',
       '&::placeholder': {
         color: 'text.secondary',
-        opacity: 1,
+        opacity: 0.8,
       },
     },
     '& textarea': {
       '&::placeholder': {
         color: 'text.secondary',
-        opacity: 1,
+        opacity: 0.8,
       },
     },
   },
   '& .MuiPickersInputBase-root': {
-    borderRadius: '15px',
+    borderRadius: '12px',
   },
   '& css-mxuir2-MuiButtonBase-root-MuiMenuItem-root-MuiMultiSectionDigitalClockSection-item.Mui-selected':
     {
-      borderRadius: '15px',
+      borderRadius: '12px',
     },
-  '& .MuiInputBase-input': { color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000' },
+  '& .MuiInputBase-input': {
+    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
+  },
   '& .MuiSvgIcon-root': { color: 'text.secondary' },
 };
 
 export const darkInputSxTimers = {
   '& .MuiOutlinedInput-root': {
-    backgroundColor: 'background.default',
-    borderRadius: '10px',
-    color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+    borderRadius: '8px',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#e0e2e9' : '#000',
     fontSize: '14px',
-    '& fieldset': { borderColor: 'divider' },
-    '&:hover fieldset': { borderColor: 'action.hover' },
-    '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+    '& fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+    },
+    '&:hover fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.18)'
+          : 'action.hover',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+    },
+    '&.Mui-focused': {
+      boxShadow: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
+          : 'none',
+    },
     '& input': {
       padding: '5px 5px',
       '&::placeholder': {
         color: 'text.secondary',
-        opacity: 1,
+        opacity: 0.8,
       },
     },
     '& textarea': {
       '&::placeholder': {
         color: 'text.secondary',
-        opacity: 1,
+        opacity: 0.8,
       },
     },
   },
-  '& .MuiInputBase-input': { color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000' },
+  '& .MuiInputBase-input': {
+    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
+  },
   '& .MuiSvgIcon-root': { color: 'text.secondary' },
 };
 
@@ -74,12 +122,24 @@ export const labelSx = {
 };
 
 export const paperPropsSx = {
-  backgroundColor: 'background.paper',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(17, 24, 39, 0.85)'
+      : 'background.paper',
   backgroundImage: 'none',
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#e0e2e9' : '#000'),
   borderRadius: '16px',
   border: '1px solid',
-  borderColor: 'divider',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+  backdropFilter: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
+  WebkitBackdropFilter: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
+  boxShadow: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+      : 'none',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
 };
 
@@ -109,7 +169,11 @@ export const dialogTitleSx = {
   borderBottom: '1px solid',
   borderColor: 'divider',
   padding: '16px 24px',
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(17, 24, 39, 0.4)'
+      : 'background.paper',
 };
 
 export const iconBoxSx = {
@@ -164,17 +228,35 @@ export const propertyValueSx = {
 
 export const titleInputPropsSx = {
   '& .MuiOutlinedInput-root': {
-    backgroundColor: 'background.default',
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
     borderRadius: '12px',
     padding: '4px 8px',
     fontSize: '1.5rem',
     fontWeight: 700,
-    color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
     '& fieldset': { borderColor: 'transparent' },
-    '&:hover fieldset': { borderColor: 'divider' },
-    '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+    '&:hover fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+    },
+    '&.Mui-focused': {
+      backgroundColor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(26, 31, 43, 0.9)'
+          : 'background.default',
+      boxShadow: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
+          : 'none',
+    },
     '& input': {
-      color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+      color: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? '#fff' : '#000',
       padding: '8px 12px',
       '&::placeholder': {
         color: 'text.secondary',
@@ -192,18 +274,47 @@ export const statusSelectSx = {
 };
 
 export const menuPaperPropsSx = {
-  bgcolor: 'background.paper',
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(26, 31, 43, 0.95)'
+      : 'background.paper',
   border: '1px solid',
-  borderColor: 'divider',
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'divider',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#e0e2e9' : '#000'),
+  boxShadow: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? '0 10px 20px rgba(0,0,0,0.3)'
+      : '0 4px 20px rgba(0,0,0,0.15)',
+  backdropFilter: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
+  WebkitBackdropFilter: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
   mt: 1,
   '& .MuiMenuItem-root': {
-    borderRadius: '8px',
+    borderRadius: '6px',
     mx: 1,
     my: 0.5,
-    '&:hover': { bgcolor: 'action.hover' },
-    '&.Mui-selected': { bgcolor: 'action.selected' },
+    '&:hover': {
+      bgcolor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.05)'
+          : 'action.hover',
+    },
+    '&.Mui-selected': {
+      bgcolor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(99, 102, 241, 0.15)'
+          : 'action.selected',
+      color: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? '#818cf8' : undefined,
+      '&:hover': {
+        bgcolor: (theme: Theme) =>
+          theme.palette.mode === 'dark'
+            ? 'rgba(99, 102, 241, 0.25)'
+            : 'action.selected',
+      },
+    },
   },
 };
 
@@ -211,7 +322,10 @@ export const menuPaperPropsSx = {
 
 export const dialogActionsSx = {
   padding: '16px 24px',
-  backgroundColor: 'background.paper',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(17, 24, 39, 0.4)'
+      : 'background.paper',
   borderTop: '1px solid',
   borderColor: 'divider',
   display: 'flex',
@@ -229,30 +343,64 @@ export const cancelButtonSx = {
 };
 
 export const saveButtonSx = {
-  bgcolor: 'primary.main',
+  background: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)'
+      : undefined,
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? undefined : 'primary.main',
   color: '#fff',
   textTransform: 'none' as const,
   borderRadius: '8px',
-  boxShadow: 'none',
+  boxShadow: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? '0 4px 14px 0 rgba(99, 102, 241, 0.3)'
+      : 'none',
   fontWeight: 600,
   px: 3,
-  '&:hover': { bgcolor: 'primary.dark', boxShadow: 'none' },
+  transition: 'all 0.2s ease-in-out',
+  '&:hover': {
+    background: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)'
+        : undefined,
+    bgcolor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? undefined : 'primary.dark',
+    boxShadow: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? '0 6px 20px rgba(99, 102, 241, 0.5)'
+        : 'none',
+    transform: 'translateY(-1px)',
+  },
 };
 
 export const descriptionInputSx = {
-  backgroundColor: 'background.default',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
   borderRadius: '12px',
   mt: 1,
   '& .MuiOutlinedInput-root': {
     padding: '12px 16px',
     '& fieldset': { borderColor: 'transparent' },
-    '&:hover fieldset': { borderColor: 'divider' },
-    '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+    '&:hover fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+    },
+    '&.Mui-focused': {
+      boxShadow: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
+          : 'none',
+    },
   },
   '& textarea': {
     fontSize: '14px',
     lineHeight: 1.6,
-    color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
     '&::placeholder': {
       color: 'text.secondary',
       opacity: 0.6,
@@ -264,14 +412,14 @@ export const tagChipSx = {
   height: 24,
   fontSize: 12,
   bgcolor: 'action.hover',
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
 };
 
 export const addTagInputSx = {
   height: 24,
   width: 80,
   fontSize: 12,
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
   bgcolor: 'background.default',
 };
 
@@ -283,29 +431,49 @@ export const smallLabelSx = {
 };
 
 export const autocompletePaperSx = {
-  bgcolor: 'background.paper',
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(26, 31, 43, 0.95)'
+      : 'background.paper',
   border: '1px solid',
-  borderColor: 'divider',
-  borderRadius: '8px',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'divider',
+  borderRadius: '10px',
   mt: 1,
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#e0e2e9' : '#000'),
+  boxShadow: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? '0 10px 20px rgba(0,0,0,0.3)'
+      : '0 4px 20px rgba(0,0,0,0.15)',
+  backdropFilter: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
+  WebkitBackdropFilter: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
 };
 
 // removed duplicate autocompletePaperSx
 
 export const timeSlotBoxSx = {
-  backgroundColor: 'background.default',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
   border: '1px solid',
-  borderColor: 'divider',
-  borderRadius: '16px',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+  borderRadius: '12px',
   p: '12px 16px',
   display: 'flex',
   alignItems: 'center',
   gap: 1.5,
   mb: 2,
   cursor: 'pointer',
+  transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    backgroundColor: 'action.hover',
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.04)'
+        : 'action.hover',
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
   },
 };
 
@@ -314,7 +482,7 @@ export const datePickerPopperSx = {
     backgroundColor: 'transparent',
   },
   '& .MuiPickersDay-root': {
-    color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
     backgroundColor: 'transparent',
     '&:hover': {
       backgroundColor: 'action.hover',
@@ -335,7 +503,7 @@ export const datePickerPopperSx = {
     color: 'text.secondary',
   },
   '& .MuiPickersCalendarHeader-label': {
-    color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
   },
   '& .MuiPickersCalendarHeader-switchViewButton': {
     color: 'text.secondary',
@@ -344,7 +512,7 @@ export const datePickerPopperSx = {
     color: 'text.secondary',
   },
   '& .MuiPickersYear-yearButton': {
-    color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
+    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
   },
   '& .MuiPickersYear-yearButton.Mui-selected': {
     backgroundColor: 'primary.main',
@@ -353,12 +521,14 @@ export const datePickerPopperSx = {
 };
 
 export const datePickerPaperSx = {
-  backgroundColor: 'background.default',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#111827' : 'background.default',
   border: '1px solid',
   borderColor: 'divider',
-  borderRadius: '24px',
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
-  boxShadow: 'none',
+  borderRadius: '16px',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#e0e2e9' : '#000'),
+  boxShadow: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '0 10px 20px rgba(0,0,0,0.3)' : 'none',
 };
 
 export const timePickerPopperSx = {
@@ -382,23 +552,25 @@ export const timePickerPopperSx = {
     backgroundColor: 'primary.main',
     color: '#fff',
   },
-  '& .MuiMultiSectionDigitalClockSection-item, & .MuiMultiSectionDigitalClockSectionItem-root': {
-    borderRadius: '12px',
-    '&:hover': {
-      backgroundColor: 'rgba(56, 189, 248, 0.1)',
+  '& .MuiMultiSectionDigitalClockSection-item, & .MuiMultiSectionDigitalClockSectionItem-root':
+    {
+      borderRadius: '12px',
+      '&:hover': {
+        backgroundColor: 'rgba(56, 189, 248, 0.1)',
+      },
     },
-  },
-  '& .MuiMultiSectionDigitalClockSection-item.Mui-selected, & .MuiMultiSectionDigitalClockSectionItem-root.Mui-selected': {
-    border: '1px solid',
-    borderColor: 'primary.main',
-    borderRadius: '12px',
-    backgroundColor: 'rgba(56, 189, 248, 0.15)', // Slightly stronger primary light bg for selected
-    color: 'primary.main',
-    fontWeight: 700,
-    '&:hover': {
-      backgroundColor: 'rgba(56, 189, 248, 0.25)',
-    }
-  },
+  '& .MuiMultiSectionDigitalClockSection-item.Mui-selected, & .MuiMultiSectionDigitalClockSectionItem-root.Mui-selected':
+    {
+      border: '1px solid',
+      borderColor: 'primary.main',
+      borderRadius: '12px',
+      backgroundColor: 'rgba(56, 189, 248, 0.15)',
+      color: 'primary.main',
+      fontWeight: 700,
+      '&:hover': {
+        backgroundColor: 'rgba(56, 189, 248, 0.25)',
+      },
+    },
   '& .MuiDialogActions-root': {
     '& .MuiButton-root': {
       color: 'primary.main',
@@ -408,38 +580,58 @@ export const timePickerPopperSx = {
 };
 
 export const timePickerPaperSx = {
-  backgroundColor: 'background.default',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#111827' : 'background.default',
   border: '1px solid',
   borderColor: 'divider',
-  borderRadius: '24px',
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
-  boxShadow: 'none',
+  borderRadius: '16px',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#e0e2e9' : '#000'),
+  boxShadow: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '0 10px 20px rgba(0,0,0,0.3)' : 'none',
 };
 
 export const timePickerLayoutSx = {
   '& .MuiPickersLayout-contentWrapper': {
-    bgcolor: 'background.default',
+    bgcolor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#111827' : 'background.default',
   },
-  '& .MuiMultiSectionDigitalClockSection-item.Mui-selected, & .MuiMultiSectionDigitalClockSectionItem-root.Mui-selected': {
-    border: '1px solid',
-    borderColor: 'primary.main',
-    borderRadius: '8px',
-    backgroundColor: 'rgba(56, 189, 248, 0.1)',
-    color: 'primary.main',
-    fontWeight: 700,
-  }
+  '& .MuiMultiSectionDigitalClockSection-item.Mui-selected, & .MuiMultiSectionDigitalClockSectionItem-root.Mui-selected':
+    {
+      border: '1px solid',
+      borderColor: 'primary.main',
+      borderRadius: '8px',
+      backgroundColor: 'rgba(56, 189, 248, 0.1)',
+      color: 'primary.main',
+      fontWeight: 700,
+    },
 };
 
 export const modalBackdropSx = {
   backdropFilter: 'blur(8px)',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
 };
 
 export const categorySelectSx = {
-  color: (theme: Theme) => theme.palette.mode === 'dark' ? '#fff' : '#000',
-  bgcolor: 'background.default',
-  borderRadius: '15px',
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+  borderRadius: '12px',
   '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.18)'
+        : 'action.hover',
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+  },
 };
 
-export const durationInputPropsSx = { borderRadius: '15px', bgcolor: 'background.default' };
+export const durationInputPropsSx = {
+  borderRadius: '12px',
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+};

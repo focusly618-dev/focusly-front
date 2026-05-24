@@ -161,6 +161,10 @@ export const useTaskMutations = ({
       color: state.color,
       links,
       collaborators: state.collaborators,
+      is_splitable: state.is_splitable,
+      min_block_duration: state.min_block_duration,
+      preferred_time_of_day: state.preferred_time_of_day,
+      is_locked: state.is_locked,
     };
 
     if (parentTask?.id) {
@@ -430,6 +434,26 @@ export const useTaskMutations = ({
         val: state.collaborators || [],
         initial: initialTask.collaborators || [],
         isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+      },
+      is_splitable: {
+        key: 'is_splitable',
+        val: state.is_splitable,
+        initial: initialTask.is_splitable,
+      },
+      min_block_duration: {
+        key: 'min_block_duration',
+        val: state.min_block_duration,
+        initial: initialTask.min_block_duration,
+      },
+      preferred_time_of_day: {
+        key: 'preferred_time_of_day',
+        val: state.preferred_time_of_day,
+        initial: initialTask.preferred_time_of_day,
+      },
+      is_locked: {
+        key: 'is_locked',
+        val: state.is_locked,
+        initial: initialTask.is_locked,
       },
     };
 

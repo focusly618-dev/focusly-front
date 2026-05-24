@@ -99,6 +99,11 @@ export interface TaskResponse {
       color?: string;
     } | null;
   };
+  use_ai?: boolean;
+  is_splitable?: boolean;
+  min_block_duration?: number;
+  preferred_time_of_day?: string;
+  is_locked?: boolean;
 }
 
 export interface updateTask {
@@ -121,6 +126,7 @@ export interface updateTask {
   subtasks?: string[];
   estimated_start_date?: string;
   estimated_end_date?: string;
+  use_ai?: boolean;
 }
 
 export interface CreateTaskRequest {
@@ -144,4 +150,5 @@ export interface CreateTaskRequest {
   subtasks: string[];
   estimated_start_date?: string;
   estimated_end_date?: string;
+  use_ai?: boolean;
 }

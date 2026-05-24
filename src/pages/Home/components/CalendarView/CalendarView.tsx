@@ -13,17 +13,7 @@ import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePa
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 
 // Material UI
-import {
-  Box,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  Stack,
-  Typography,
-} from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Box, Menu, Stack, Typography } from '@mui/material';
 
 // Styles & Hooks
 import { CalendarContainer } from './CalendarView.styles';
@@ -95,6 +85,30 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
 
   return (
     <CalendarContainer isDayView={currentView === Views.DAY}>
+      {/* Top Header */}
+      <Box
+        sx={{
+          px: 3,
+          pt: 3,
+          pb: 1,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}
+          >
+            Calendar
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Stay Organized and On Track with Your Personalized Calendar
+          </Typography>
+        </Box>
+      </Box>
+
       <Box
         sx={{
           flexGrow: 1,
@@ -134,7 +148,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             header: CalendarHeader,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             event: (props: any) => (
-              <CalendarEvent {...props} onStartFocus={onStartFocus} />
+              <CalendarEvent
+                {...props}
+                onStartFocus={onStartFocus}
+                currentView={currentView}
+              />
             ),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             timeSlotWrapper: (props: any) => (
@@ -157,6 +175,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           popup={false}
           messages={{
             showMore: (count: number) => `+${count} más`,
+          }}
+          formats={{
+            timeGutterFormat: (
+              date: Date,
+              culture?: string,
+              localizer?: {
+                format: (
+                  date: Date,
+                  format: string,
+                  culture?: string,
+                ) => string;
+              },
+            ) => (localizer ? localizer.format(date, 'h A', culture) : ''),
           }}
         />
       </Box>
@@ -202,15 +233,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             ))}
           </Stack>
         </Box>
-
-        <Divider />
-
-        <MenuItem onClick={() => handleCreateTaskAtSlot()}>
-          <ListItemIcon>
-            <AddIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Create Task Here</ListItemText>
-        </MenuItem>
       </Menu>
 
       <Box id="joyride-side-panel">

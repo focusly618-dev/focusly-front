@@ -34,38 +34,44 @@ export const SubDate = styled(Typography)(({ theme }) => ({
 export const ViewToggle = styled(ButtonGroup)(({ theme }) => ({
   backgroundColor:
     theme.palette.mode === 'dark'
-      ? 'rgba(255,255,255,0.03)'
-      : 'rgba(0,0,0,0.03)',
-  borderRadius: '8px',
+      ? 'rgba(255,255,255,0.06)'
+      : 'rgba(0,0,0,0.04)',
+  borderRadius: '10px',
   padding: '3px',
   display: 'flex',
-  gap: '4px',
+  gap: '2px',
   border: `1px solid ${theme.palette.divider}`,
   boxShadow: 'none',
   '& .MuiButton-root': {
     border: 'none !important',
-    color: theme.palette.text.secondary,
+    color:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.55)'
+        : theme.palette.text.secondary,
     textTransform: 'none',
     fontWeight: 600,
     fontSize: '12px',
-    padding: '4px 12px',
+    padding: '4px 14px',
     minWidth: 'auto',
-    borderRadius: '6px !important',
+    borderRadius: '7px !important',
     transition: 'all 0.2s ease',
     backgroundColor: 'transparent',
     '&:hover': {
       backgroundColor:
         theme.palette.mode === 'dark'
-          ? 'rgba(255,255,255,0.05)'
-          : 'rgba(0,0,0,0.05)',
+          ? 'rgba(255,255,255,0.08)'
+          : 'rgba(0,0,0,0.06)',
       color: theme.palette.text.primary,
     },
     '&.active': {
       backgroundColor:
-        theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#ffffff',
-      color: theme.palette.primary.main,
+        theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.14)' : '#ffffff',
+      color:
+        theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.primary.main,
       boxShadow:
-        theme.palette.mode === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.1)',
+        theme.palette.mode === 'dark'
+          ? '0 1px 4px rgba(0,0,0,0.4)'
+          : '0 1px 3px rgba(0,0,0,0.1)',
     },
   },
 }));

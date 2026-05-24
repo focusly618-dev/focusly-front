@@ -40,6 +40,10 @@ const taskSlice = createSlice({
     removeTask: (state, action: PayloadAction<{ id: string }>) => {
       state.tasks = state.tasks.filter((t) => t.id !== action.payload.id);
     },
+    removeTasks: (state, action: PayloadAction<{ ids: string[] }>) => {
+      const idsSet = new Set(action.payload.ids);
+      state.tasks = state.tasks.filter((t) => !idsSet.has(t.id));
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
@@ -54,8 +58,17 @@ const taskSlice = createSlice({
   },
 });
 
-
-export const { setTasks, addTask, updateTask, upsertTask, softDeleteTask, removeTask, setLoading, setError, resetTask } =
-  taskSlice.actions;
+export const {
+  setTasks,
+  addTask,
+  updateTask,
+  upsertTask,
+  softDeleteTask,
+  removeTask,
+  removeTasks,
+  setLoading,
+  setError,
+  resetTask,
+} = taskSlice.actions;
 
 export default taskSlice.reducer;

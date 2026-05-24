@@ -37,9 +37,9 @@ export const SearchBar = styled(Box)(({ theme }) => ({
   backgroundColor:
     theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, 0.05)'
-      : 'rgba(0, 0, 0, 0.04)',
-  borderRadius: '28px',
-  padding: '8px 16px',
+      : 'rgba(0, 0, 0, 0.03)',
+  borderRadius: '8px',
+  padding: '6px 14px',
   width: '380px',
   border: `1px solid ${theme.palette.divider}`,
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -47,17 +47,17 @@ export const SearchBar = styled(Box)(({ theme }) => ({
     borderColor: theme.palette.primary.main,
     backgroundColor:
       theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#fff',
-    boxShadow: `0 0 0 4px ${theme.palette.primary.main}11`,
+    boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.15)}`,
   },
   '& input': {
     border: 'none',
     backgroundColor: 'transparent',
     color: theme.palette.text.primary,
     outline: 'none',
-    fontSize: '15px',
+    fontSize: '14px',
     fontWeight: 500,
     width: '100%',
-    marginLeft: theme.spacing(1.5),
+    marginLeft: theme.spacing(1),
     '&::placeholder': {
       color: theme.palette.text.secondary,
       opacity: 0.6,
@@ -344,8 +344,8 @@ export const FolderOptionsIconButton = styled(Box)(({ theme }) => ({
 export const FilterButton = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'active',
 })<{ active?: boolean }>(({ theme, active }) => ({
-  padding: '8px 20px',
-  borderRadius: '40px',
+  padding: '8px 16px',
+  borderRadius: '8px',
   fontSize: '13px',
   fontWeight: 600,
   cursor: 'pointer',
@@ -354,24 +354,28 @@ export const FilterButton = styled(Box, {
   alignItems: 'center',
   gap: theme.spacing(1),
   backgroundColor: active
-    ? 'rgba(24, 243, 255, 0.1)'
-    : 'rgba(255, 255, 255, 0.03)',
-  color: active ? '#18f3ff' : theme.palette.text.secondary,
-  border: `1px solid ${active ? '#18f3ff44' : 'transparent'}`,
+    ? theme.palette.mode === 'dark'
+      ? 'rgba(59, 130, 246, 0.15)'
+      : 'rgba(19, 127, 236, 0.08)'
+    : 'transparent',
+  color: active ? theme.palette.primary.main : theme.palette.text.secondary,
+  border: `1px solid ${active ? theme.palette.primary.main : theme.palette.divider}`,
   '&:hover': {
     backgroundColor: active
-      ? 'rgba(24, 243, 255, 0.15)'
-      : 'rgba(255, 255, 255, 0.07)',
+      ? theme.palette.mode === 'dark'
+        ? 'rgba(59, 130, 246, 0.2)'
+        : 'rgba(19, 127, 236, 0.12)'
+      : theme.palette.action.hover,
   },
 }));
 
 export const GridContainer = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-  gap: '16px',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+  gap: '20px',
   overflowY: 'auto',
   paddingBottom: '24px',
-  paddingTop: '20px',
+  paddingTop: '16px',
   // Custom scrollbar
   '&::-webkit-scrollbar': {
     width: '6px',
@@ -397,33 +401,38 @@ export const GridContainer = styled(Box)(({ theme }) => ({
 export const WorkspaceCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== 'gradient',
 })<{ gradient?: string }>(({ theme, gradient }) => {
+  const isDark = theme.palette.mode === 'dark';
   const isGradient = gradient?.startsWith('linear-gradient');
   return {
     backgroundColor: isGradient
       ? 'transparent'
-      : gradient || theme.palette.background.paper,
+      : gradient || (isDark ? 'rgba(26, 31, 43, 0.7)' : '#ffffff'),
     backgroundImage: isGradient ? gradient : 'none',
     backgroundSize: 'cover',
-    borderRadius: '16px',
-    padding: theme.spacing(2.5),
+    backdropFilter: isGradient ? 'none' : 'blur(12px)',
+    borderRadius: '12px',
+    padding: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
-    height: '220px',
+    minHeight: '180px',
+    height: '100%',
     cursor: 'pointer',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    border: `2px solid ${
+    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    border: `1px solid ${
       gradient
-        ? theme.palette.mode === 'dark'
+        ? isDark
           ? 'rgba(255, 255, 255, 0.25)'
           : 'rgba(0, 0, 0, 0.15)'
-        : theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.1)'
-          : 'rgba(0, 0, 0, 0.08)'
+        : isDark
+          ? 'rgba(255, 255, 255, 0.06)'
+          : 'rgba(0, 0, 0, 0.06)'
     }`,
     backgroundClip: 'padding-box',
     position: 'relative',
     overflow: 'hidden',
-    boxShadow: gradient ? '0 4px 20px rgba(0, 0, 0, 0.2)' : 'none',
+    boxShadow: isDark
+      ? '0 4px 20px -2px rgba(0, 0, 0, 0.3)'
+      : '0 2px 8px -1px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02)',
     '&::before': isGradient
       ? {
           content: '""',
@@ -432,10 +441,9 @@ export const WorkspaceCard = styled(Card, {
           left: 0,
           right: 0,
           bottom: 0,
-          background:
-            theme.palette.mode === 'dark'
-              ? 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)'
-              : 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 100%)',
+          background: isDark
+            ? 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 100%)'
+            : 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.15) 100%)',
           backdropFilter: 'blur(8px)',
           zIndex: 0,
         }
@@ -445,35 +453,35 @@ export const WorkspaceCard = styled(Card, {
       zIndex: 1,
     },
     '&:hover': {
-      transform: 'translateY(-6px)',
-      boxShadow:
-        theme.palette.mode === 'dark'
-          ? gradient
-            ? '0 15px 35px rgba(0, 0, 0, 0.6)'
-            : '0 10px 30px -10px rgba(0, 0, 0, 0.5)'
-          : '0 10px 30px -10px rgba(0, 0, 0, 0.12)',
-      borderColor: gradient
-        ? 'rgba(255, 255, 255, 0.3)'
-        : theme.palette.primary.main,
+      transform: 'translateY(-1.5px)',
+      boxShadow: isDark
+        ? '0 12px 30px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(99, 102, 241, 0.15)'
+        : '0 8px 24px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
+      borderColor: isDark ? 'rgba(99, 102, 241, 0.3)' : 'rgba(0, 0, 0, 0.15)',
+      '& .arrow-button': {
+        color: theme.palette.primary.main,
+        transform: 'translateX(2px)',
+      },
     },
   };
 });
 
 export const TaskPill = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.background.default,
-  borderRadius: '24px', // More pill-like
-  padding: '6px 16px', // Adjusted padding
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.03)'
+      : 'rgba(0, 0, 0, 0.02)',
+  borderRadius: '12px',
+  padding: '8px 12px',
   marginTop: 'auto',
   border: `1px solid ${theme.palette.divider}`,
   display: 'flex',
-  flexDirection: 'row', // Horizontal
-  alignItems: 'center', // Center vertically
-  gap: '0px', // Managed by internal margins
+  flexDirection: 'row',
+  alignItems: 'center',
   transition: 'all 0.2s',
   '&:hover': {
     borderColor: theme.palette.primary.main,
     backgroundColor: theme.palette.action.hover,
-    // When TaskPill is hovered, show the arrow button
     '& .arrow-button': {
       opacity: 1,
       transform: 'translateX(0)',
@@ -486,44 +494,39 @@ export const TaskPillLabel = styled(Typography)(({ theme }) => ({
   fontSize: '9px',
   fontWeight: 800,
   textTransform: 'uppercase',
-  marginBottom: '2px', // Small gap between label and title
+  marginBottom: '2px',
   letterSpacing: '0.5px',
   lineHeight: 1,
 }));
 
 export const TaskPillTitle = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,
-  fontSize: '11px',
+  fontSize: '12px',
   fontWeight: 600,
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  maxWidth: '140px', // Prevent overflow
+  maxWidth: '180px',
 }));
 
 export const HoverArrowButton = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  borderRadius: '50%',
-  width: '24px',
-  height: '24px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '#fff',
-  marginLeft: 'auto', // Push to right
-  opacity: 0, // Hidden by default
-  transform: 'translateX(-10px)',
-  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  color: theme.palette.text.secondary,
+  marginLeft: 'auto',
+  transition: 'all 0.2s ease',
 }));
 
 export const CreateCard = styled(Box)(({ theme }) => ({
-  borderRadius: '16px',
+  borderRadius: '12px',
   border: `1px dashed ${theme.palette.divider}`,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  height: '220px',
+  minHeight: '180px',
+  height: '100%',
   cursor: 'pointer',
   transition: 'all 0.2s',
   backgroundColor: 'transparent',
@@ -531,4 +534,104 @@ export const CreateCard = styled(Box)(({ theme }) => ({
     borderColor: theme.palette.primary.main,
     backgroundColor: theme.palette.action.hover,
   },
+}));
+
+// Redesigned components for modern SaaS Teams UI
+export const FolderTabsContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  overflowX: 'auto',
+  flex: 1,
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+  WebkitOverflowScrolling: 'touch',
+}));
+
+export const FolderTabItem = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'active' && prop !== 'color',
+})<{ active?: boolean; color?: string }>(({ theme, active }) => {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+    padding: '12px 18px',
+    cursor: 'pointer',
+    position: 'relative',
+    color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+    fontWeight: active ? 700 : 500,
+    fontSize: '14px',
+    transition: 'all 0.2s ease',
+    borderBottom: `2.5px solid ${active ? theme.palette.text.primary : 'transparent'}`,
+    whiteSpace: 'nowrap',
+    marginBottom: '-1px',
+    '&:hover': {
+      color: theme.palette.text.primary,
+    },
+  };
+});
+
+export const CardAvatarCircle = styled(Box)(({ theme }) => ({
+  width: '42px',
+  height: '42px',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.05)'
+      : 'rgba(0, 0, 0, 0.04)',
+  border: `1px solid ${theme.palette.divider}`,
+  fontSize: '20px',
+  boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+  flexShrink: 0,
+}));
+
+export const BadgeChip = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'color' && prop !== 'bgColor',
+})<{ color?: string; bgColor?: string }>(({ theme, color, bgColor }) => ({
+  padding: '3px 8px',
+  borderRadius: '6px',
+  fontSize: '11px',
+  fontWeight: 700,
+  textTransform: 'capitalize',
+  color: color || theme.palette.text.primary,
+  backgroundColor: bgColor || 'rgba(0, 0, 0, 0.05)',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+export const PropertyGrid = styled(Box)(({ theme }) => ({
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: theme.spacing(1.5),
+  marginTop: theme.spacing(1.5),
+  marginBottom: theme.spacing(1.5),
+}));
+
+export const PropertyItem = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '2px',
+});
+
+export const PropertyLabel = styled(Typography)(({ theme }) => ({
+  fontSize: '10px',
+  fontWeight: 700,
+  color: theme.palette.text.secondary,
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
+  opacity: 0.8,
+}));
+
+export const PropertyValue = styled(Typography)(({ theme }) => ({
+  fontSize: '12px',
+  fontWeight: 600,
+  color: theme.palette.text.primary,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 }));

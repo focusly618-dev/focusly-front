@@ -109,6 +109,11 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
       ) || [],
     estimated_start_date: safeISO(t.estimated_start_date),
     estimated_end_date: safeISO(t.estimated_end_date),
+    use_ai: t.use_ai,
+    is_splitable: t.is_splitable,
+    min_block_duration: t.min_block_duration,
+    preferred_time_of_day: t.preferred_time_of_day,
+    is_locked: t.is_locked,
     workspaces: t.workspace
       ? [
           {

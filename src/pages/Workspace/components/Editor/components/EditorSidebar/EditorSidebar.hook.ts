@@ -101,18 +101,24 @@ export const useEditorSidebar = (props: EditorSidebarProps) => {
       ? (selectTask?.subtasks?.[selectedSubtaskIndex]?.priority_level ?? 0)
       : (selectTask?.priority_level ?? 0);
 
-  const cleanDescription = (desc?: string) => {
-    if (!desc) return 'No description provided.';
-    return (
-      desc
-        .replace(/\[COLOR:(.*?)\]/g, '')
-        .replace(/\[START_DATE:(.*?)\]/g, '')
-        .replace(
-          /https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g,
-          '',
-        )
-        .trim() || 'No description provided.'
-    );
+  const cleanDescription = (desc?: string): string => {
+    if (!desc) return '';
+    const cleaned = desc
+      .replace(/\[COLOR:(.*?)\]/g, '')
+      .replace(/\[START_DATE:(.*?)\]/g, '')
+      .replace(
+        /https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g,
+        '',
+      )
+      .trim();
+
+    // Check if there is actual text content inside the HTML
+    const hasText =
+      cleaned
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .trim().length > 0;
+    return hasText ? cleaned : '';
   };
 
   return {

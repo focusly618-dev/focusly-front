@@ -1,4 +1,5 @@
 import { Box, Typography, Popover, Stack, MenuItem } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import { Flag as FlagIcon } from '@mui/icons-material';
 import {
   getStatusIcon,
@@ -33,7 +34,23 @@ interface TaskPopoversProps {
 const popoverPaperSx = {
   borderRadius: '12px',
   mt: 1,
-  boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+  backgroundColor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(26, 31, 43, 0.95)'
+      : 'background.paper',
+  border: '1px solid',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'divider',
+  color: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#e0e2e9' : 'text.primary',
+  boxShadow: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? '0 10px 30px rgba(0,0,0,0.4)'
+      : '0 8px 32px rgba(0,0,0,0.1)',
+  backdropFilter: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
+  WebkitBackdropFilter: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
 };
 
 export const TaskPopovers = ({
@@ -159,9 +176,8 @@ export const TaskPopovers = ({
       anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       PaperProps={{
         sx: {
+          ...popoverPaperSx,
           borderRadius: '16px',
-          mt: 1,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
         },
       }}
     >

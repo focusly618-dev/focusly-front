@@ -2,30 +2,33 @@ import {
   LibraryContainer,
   GridContainer,
   WorkspaceCard,
-  CreateCard,
+  LibraryHeader,
+  HeaderTitle,
+  HeaderSubtitle,
 } from './WorkspaceLibrary.styles';
 import {
   Box,
   Typography,
   LinearProgress,
-  Tooltip,
   Menu,
   MenuItem,
   Divider,
   ListItemIcon,
   ListItemText,
+  Button,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import {
   PushPin as PushPinIcon,
   Add as AddIcon,
-  Palette as PaletteIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   DeleteForever as DeleteForeverIcon,
-  LayersClear as LayersClearIcon,
   FolderSpecial as FolderSpecialIcon,
   Folder as FolderIcon,
   CheckBox as CheckBoxIcon,
+  FolderOpen as FolderOpenIcon,
 } from '@mui/icons-material';
 import { EmptyState } from '@/utils/EmptyState';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
@@ -33,7 +36,6 @@ import type { WorkspaceTypes, FolderTypes } from '../../types/workspace.types';
 import { CreateFolderModal } from './modals/CreateFolderModal';
 import { UpdateFolderModal } from './modals/UpdateFolderModal';
 import { AllFoldersModal } from './modals/AllFoldersModal';
-import { colorPaletteMap } from './constants/library.constants';
 import {
   LibrarySearchHeader,
   FolderSectionList,
@@ -64,7 +66,6 @@ export const WorkspaceLibrary = ({
     selectedFolderToManage,
     isUpdateFolderModalOpen,
     isAllFoldersModalOpen,
-    showPaletteInMenu,
   } = state;
 
   const {
@@ -76,8 +77,6 @@ export const WorkspaceLibrary = ({
     setIsAllFoldersModalOpen,
     handleMenuOpen,
     handleMenuClose,
-    handleSetBackground,
-    handleRemoveBackground,
     handleFolderMenuOpen,
     handleFolderMenuClose,
     handleMoveToFolder,
@@ -87,11 +86,12 @@ export const WorkspaceLibrary = ({
     handleUnlinkTask,
     handleClearSearch,
     setSelectedFolderToManage,
-    setShowPaletteInMenu,
   } = actions;
 
   const { workspaces, folders, allWorkspaces, loading, foldersLoading, error } =
     data;
+
+  const theme = useTheme();
 
   return (
     <LibraryContainer sx={{ position: 'relative' }}>
@@ -112,26 +112,166 @@ export const WorkspaceLibrary = ({
         />
       )}
 
-      <LibrarySearchHeader
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onClearSearch={handleClearSearch}
-        searchMode={searchMode}
-        onSearchModeChange={setSearchMode}
-      />
+      {/* Top Page Header: Title & Action Buttons */}
+      <LibraryHeader>
+        <Box>
+          <HeaderTitle variant="h4">Workspace Library</HeaderTitle>
+          <HeaderSubtitle variant="body2">
+            Organize your notes, ideas, and strategic plan docs
+          </HeaderSubtitle>
+        </Box>
 
-      <FolderSectionList
-        selectedFolderId={selectedFolderId}
-        onFolderSelect={setSelectedFolderId}
-        allWorkspacesCount={allWorkspaces.length}
-        folders={folders}
-        foldersLoading={foldersLoading}
-        onFolderMenuOpen={handleFolderMenuOpen}
-        onAllFoldersOpen={() => setIsAllFoldersModalOpen(true)}
-        onAddFolderOpen={() => setIsFolderModalOpen(true)}
-      />
+        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={() => setIsFolderModalOpen(true)}
+            sx={{
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 2,
+              py: 0.8,
+              borderColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.12)'
+                  : 'rgba(0,0,0,0.12)',
+              color: theme.palette.text.primary,
+              '&:hover': {
+                borderColor: theme.palette.primary.main,
+                backgroundColor: alpha(theme.palette.primary.main, 0.04),
+              },
+            }}
+          >
+            New Folder
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FolderOpenIcon />}
+            onClick={() => setIsAllFoldersModalOpen(true)}
+            sx={{
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 2,
+              py: 0.8,
+              borderColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.12)'
+                  : 'rgba(0,0,0,0.12)',
+              color: theme.palette.text.primary,
+              '&:hover': {
+                borderColor: theme.palette.primary.main,
+                backgroundColor: alpha(theme.palette.primary.main, 0.04),
+              },
+            }}
+          >
+            All Folders
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={onCreate}
+            sx={{
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 700,
+              px: 2.5,
+              py: 0.8,
+              boxShadow: 'none',
+              bgcolor: theme.palette.mode === 'dark' ? '#ffffff' : '#1c1c1a',
+              color: theme.palette.mode === 'dark' ? '#0b0f14' : '#ffffff',
+              '&:hover': {
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.9)'
+                    : 'rgba(28, 28, 26, 0.9)',
+                boxShadow:
+                  theme.palette.mode === 'dark'
+                    ? '0 4px 12px rgba(255, 255, 255, 0.15)'
+                    : '0 4px 12px rgba(0, 0, 0, 0.15)',
+              },
+            }}
+          >
+            New Note
+          </Button>
+        </Box>
+      </LibraryHeader>
 
-      <Box sx={{ height: 4, mb: 1 }} />
+      {/* Second Row: Horizontal folder tabs spanning full width */}
+      <Box
+        sx={{
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          mb: 2.5,
+          width: '100%',
+        }}
+      >
+        <FolderSectionList
+          selectedFolderId={selectedFolderId}
+          onFolderSelect={setSelectedFolderId}
+          allWorkspacesCount={allWorkspaces.length}
+          folders={folders}
+          foldersLoading={foldersLoading}
+          onFolderMenuOpen={handleFolderMenuOpen}
+          onAllFoldersOpen={() => setIsAllFoldersModalOpen(true)}
+          onAddFolderOpen={() => setIsFolderModalOpen(true)}
+        />
+      </Box>
+
+      {/* Third Row: Toolbar Row with Folder Title & Search/Filter Controls */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mb: 3,
+          gap: 2,
+          flexWrap: 'wrap',
+        }}
+      >
+        {/* Left: Active Folder Name & Notes Count */}
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              fontSize: '1.25rem',
+              color: 'text.primary',
+              letterSpacing: '-0.3px',
+            }}
+          >
+            {selectedFolderId
+              ? folders.find((f) => f.id === selectedFolderId)?.name || 'Folder'
+              : 'All Notes'}
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+            }}
+          >
+            {selectedFolderId
+              ? `${folders.find((f) => f.id === selectedFolderId)?.workspaceCount || 0} notes`
+              : `${allWorkspaces.length} notes`}
+          </Typography>
+        </Box>
+
+        {/* Right: Compounded search, filter, and layout toggles */}
+        <LibrarySearchHeader
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          onClearSearch={handleClearSearch}
+          searchMode={searchMode}
+          onSearchModeChange={setSearchMode}
+        />
+      </Box>
+
+      <Box sx={{ height: 4 }} />
 
       {error ? (
         <Box sx={{ p: 4, textAlign: 'center' }}>
@@ -158,32 +298,6 @@ export const WorkspaceLibrary = ({
               onAction={onCreate}
               sx={{ gridColumn: '1 / -1', py: 10 }}
             />
-          )}
-
-          {workspaces.length > 0 && (
-            <CreateCard id="joyride-workspace-create-note" onClick={onCreate}>
-              <Box
-                sx={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: '12px',
-                  backgroundColor: 'action.hover',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 1.5,
-                }}
-              >
-                <AddIcon sx={{ color: 'primary.main' }} />
-              </Box>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                fontWeight={500}
-              >
-                Create New Note
-              </Typography>
-            </CreateCard>
           )}
 
           {loading && !workspaces.length
@@ -246,21 +360,29 @@ export const WorkspaceLibrary = ({
                   <Box sx={{ mt: 'auto', width: '100%' }}>
                     <Box
                       sx={{
-                        width: '40%',
-                        height: 14,
-                        bgcolor: 'action.hover',
-                        mb: 1.5,
-                        borderRadius: 1,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        pt: 1,
                       }}
-                    />
-                    <Box
-                      sx={{
-                        width: '100%',
-                        height: 40,
-                        bgcolor: 'action.hover',
-                        borderRadius: '24px',
-                      }}
-                    />
+                    >
+                      <Box
+                        sx={{
+                          width: '40%',
+                          height: 14,
+                          bgcolor: 'action.hover',
+                          borderRadius: 1,
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          width: 14,
+                          height: 14,
+                          bgcolor: 'action.hover',
+                          borderRadius: 1,
+                        }}
+                      />
+                    </Box>
                   </Box>
                 </WorkspaceCard>
               ))
@@ -286,203 +408,119 @@ export const WorkspaceLibrary = ({
             borderRadius: '12px',
             mt: 1,
             boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-            minWidth: showPaletteInMenu ? 240 : 180,
+            minWidth: 180,
             bgcolor: 'background.paper',
             backgroundImage: 'none',
-            p: showPaletteInMenu ? 1.5 : 0,
+            p: 0,
           },
         }}
       >
-        {showPaletteInMenu ? (
-          <Box>
-            <Typography
-              variant="caption"
-              sx={{
-                px: 1,
-                mb: 1.5,
-                display: 'block',
-                fontWeight: 800,
-                color: 'primary.main',
-                letterSpacing: '0.5px',
-                textTransform: 'uppercase',
-              }}
-            >
-              Select Background
-            </Typography>
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(5, 1fr)',
-                gap: 1,
-              }}
-            >
-              {Object.entries(colorPaletteMap).map(([name, entry]) => (
-                <Tooltip key={name} title={name} arrow>
-                  <Box
-                    onClick={() => handleSetBackground(name)}
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      background: entry.gradient,
-                      cursor: 'pointer',
-                      border:
-                        selectedWorkspace?.background_color === name
-                          ? '2px solid #fff'
-                          : '1px solid rgba(255,255,255,0.1)',
-                      boxShadow:
-                        selectedWorkspace?.background_color === name
-                          ? '0 0 0 2px var(--mui-palette-primary-main)'
-                          : 'none',
-                      transition: 'transform 0.2s',
-                      '&:hover': {
-                        transform: 'scale(1.1)',
-                      },
-                    }}
-                  />
-                </Tooltip>
-              ))}
-            </Box>
-          </Box>
-        ) : (
-          <>
-            {selectedWorkspace?.background_color &&
-            selectedWorkspace.background_color !== 'none' ? (
-              <MenuItem
-                onClick={handleRemoveBackground}
-                sx={{
-                  fontSize: '13px',
-                  py: 1,
-                  fontWeight: 500,
-                  color: 'error.main',
-                }}
-              >
-                <LayersClearIcon
-                  sx={{ fontSize: 18, mr: 1.5, color: 'error.main' }}
-                />
-                Remove background color
-              </MenuItem>
-            ) : (
-              <MenuItem
-                onClick={() => setShowPaletteInMenu(true)}
-                sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
-              >
-                <PaletteIcon sx={{ fontSize: 18, mr: 1.5, opacity: 0.7 }} />
-                Add background color
-              </MenuItem>
-            )}
+        <Typography
+          variant="caption"
+          sx={{
+            px: 2,
+            py: 1,
+            display: 'block',
+            fontWeight: 800,
+            color: 'primary.main',
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase',
+            opacity: 0.8,
+          }}
+        >
+          Organize
+        </Typography>
 
-            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
+        <MenuItem
+          onClick={() => {
+            if (selectedWorkspace) handleMoveToFolder(selectedWorkspace, null);
+          }}
+          sx={{
+            fontSize: '13px',
+            py: 1.2,
+            fontWeight: !selectedWorkspace?.folderId ? 700 : 500,
+            bgcolor: !selectedWorkspace?.folderId
+              ? 'action.selected'
+              : 'transparent',
+          }}
+        >
+          <FolderSpecialIcon
+            sx={{
+              fontSize: 18,
+              mr: 1.5,
+              opacity: !selectedWorkspace?.folderId ? 1 : 0.7,
+            }}
+          />
+          <Box sx={{ flex: 1 }}>All Notes (Default)</Box>
+          {!selectedWorkspace?.folderId && (
+            <CheckBoxIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+          )}
+        </MenuItem>
 
-            <Typography
-              variant="caption"
-              sx={{
-                px: 2,
-                py: 1,
-                display: 'block',
-                fontWeight: 800,
-                color: 'primary.main',
-                letterSpacing: '0.5px',
-                textTransform: 'uppercase',
-                opacity: 0.8,
-              }}
-            >
-              Organize
-            </Typography>
-
+        {folders.map((folder: FolderTypes) => {
+          const isCurrent = selectedWorkspace?.folderId === folder.id;
+          return (
             <MenuItem
+              key={folder.id}
               onClick={() => {
                 if (selectedWorkspace)
-                  handleMoveToFolder(selectedWorkspace, null);
+                  handleMoveToFolder(selectedWorkspace, folder.id);
               }}
               sx={{
                 fontSize: '13px',
                 py: 1.2,
-                fontWeight: !selectedWorkspace?.folderId ? 700 : 500,
-                bgcolor: !selectedWorkspace?.folderId
-                  ? 'action.selected'
-                  : 'transparent',
+                fontWeight: isCurrent ? 700 : 500,
+                bgcolor: isCurrent ? 'action.selected' : 'transparent',
               }}
             >
-              <FolderSpecialIcon
+              <FolderIcon
                 sx={{
                   fontSize: 18,
                   mr: 1.5,
-                  opacity: !selectedWorkspace?.folderId ? 1 : 0.7,
+                  color: folder.color || 'primary.main',
+                  opacity: isCurrent ? 1 : 0.7,
                 }}
               />
-              <Box sx={{ flex: 1 }}>All Notes (Default)</Box>
-              {!selectedWorkspace?.folderId && (
-                <CheckBoxIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+              <Box sx={{ flex: 1 }}>{folder.name}</Box>
+              {isCurrent && (
+                <CheckBoxIcon
+                  sx={{
+                    fontSize: 16,
+                    color: folder.color || 'primary.main',
+                  }}
+                />
               )}
             </MenuItem>
+          );
+        })}
 
-            {folders.map((folder: FolderTypes) => {
-              const isCurrent = selectedWorkspace?.folderId === folder.id;
-              return (
-                <MenuItem
-                  key={folder.id}
-                  onClick={() => {
-                    if (selectedWorkspace)
-                      handleMoveToFolder(selectedWorkspace, folder.id);
-                  }}
-                  sx={{
-                    fontSize: '13px',
-                    py: 1.2,
-                    fontWeight: isCurrent ? 700 : 500,
-                    bgcolor: isCurrent ? 'action.selected' : 'transparent',
-                  }}
-                >
-                  <FolderIcon
-                    sx={{
-                      fontSize: 18,
-                      mr: 1.5,
-                      color: folder.color || 'primary.main',
-                      opacity: isCurrent ? 1 : 0.7,
-                    }}
-                  />
-                  <Box sx={{ flex: 1 }}>{folder.name}</Box>
-                  {isCurrent && (
-                    <CheckBoxIcon
-                      sx={{
-                        fontSize: 16,
-                        color: folder.color || 'primary.main',
-                      }}
-                    />
-                  )}
-                </MenuItem>
-              );
-            })}
+        <Divider sx={{ my: 0.5, opacity: 0.1 }} />
 
-            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
-
-            <MenuItem
-              onClick={() => {
-                if (selectedWorkspace) {
-                  console.log('Deleting workspace:', selectedWorkspace.id);
-                  handleDeleteConfirm(selectedWorkspace.id);
-                  handleMenuClose();
-                } else {
-                  console.warn('No selected workspace to delete');
-                }
-              }}
-              sx={{
-                fontSize: '13px',
-                py: 1,
-                fontWeight: 500,
-                color: 'error.main',
-                '&:hover': {
-                  bgcolor: 'error.lighter',
-                },
-              }}
-            >
-              <DeleteForeverIcon
-                sx={{ fontSize: 18, mr: 1.5, color: 'error.main' }}
-              />
-              Delete Workspace
-            </MenuItem>
-          </>
-        )}
+        <MenuItem
+          onClick={() => {
+            if (selectedWorkspace) {
+              console.log('Deleting workspace:', selectedWorkspace.id);
+              handleDeleteConfirm(selectedWorkspace.id);
+              handleMenuClose();
+            } else {
+              console.warn('No selected workspace to delete');
+            }
+          }}
+          sx={{
+            fontSize: '13px',
+            py: 1,
+            fontWeight: 500,
+            color: 'error.main',
+            '&:hover': {
+              bgcolor: 'error.lighter',
+            },
+          }}
+        >
+          <DeleteForeverIcon
+            sx={{ fontSize: 18, mr: 1.5, color: 'error.main' }}
+          />
+          Delete Workspace
+        </MenuItem>
       </Menu>
 
       <CreateFolderModal

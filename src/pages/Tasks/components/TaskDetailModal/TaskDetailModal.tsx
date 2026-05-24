@@ -95,6 +95,14 @@ export const TaskDetailModal = ({
     hasMeetLink,
     createURLWorkSpace,
     handleRemoveWorkspace,
+    isSplitable,
+    setIsSplitable,
+    minBlockDuration,
+    setMinBlockDuration,
+    preferredTimeOfDay,
+    setPreferredTimeOfDay,
+    isLocked,
+    setIsLocked,
   } = useTaskDetailModal({
     onSave,
     onClose,
@@ -136,8 +144,6 @@ export const TaskDetailModal = ({
           backdrop: { sx: modalBackdropSx },
         }}
       >
-
-
         <DialogContent
           sx={{
             ...dialogContentSx,
@@ -235,6 +241,14 @@ export const TaskDetailModal = ({
                 isPureGoogleTask={isPureGoogleTask}
                 timeSlotDisplay={timeSlotDisplay}
                 handleTimerChange={handleTimerChange}
+                isSplitable={isSplitable}
+                setIsSplitable={setIsSplitable}
+                minBlockDuration={minBlockDuration}
+                setMinBlockDuration={setMinBlockDuration}
+                preferredTimeOfDay={preferredTimeOfDay}
+                setPreferredTimeOfDay={setPreferredTimeOfDay}
+                isLocked={isLocked}
+                setIsLocked={setIsLocked}
               />
 
               <TaskResources

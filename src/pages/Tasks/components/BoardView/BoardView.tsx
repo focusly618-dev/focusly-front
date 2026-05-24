@@ -195,7 +195,22 @@ export const BoardView = ({
                 {column.title}
               </ColumnTitle>
               <TaskCountBadge
-                sx={{ backgroundColor: column.badge, color: 'white' }}
+                sx={{
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? column.id === 'Todo'
+                        ? 'rgba(59, 130, 246, 0.15)'
+                        : column.id === 'Planning'
+                          ? 'rgba(234, 179, 8, 0.15)'
+                          : column.id === 'Pending'
+                            ? 'rgba(168, 85, 247, 0.15)'
+                            : 'rgba(244, 63, 94, 0.15)'
+                      : column.badge,
+                  color: (theme) =>
+                    theme.palette.mode === 'dark' ? column.color : 'white',
+                  borderRadius: '6px',
+                  padding: '2px 8px',
+                }}
               >
                 {tasksByColumn[column.id].length}
               </TaskCountBadge>

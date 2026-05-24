@@ -59,6 +59,26 @@ interface TaskDetailsFullProps {
   activeFocusTaskId?: string | null;
 }
 
+const cleanDescription = (desc?: string): string => {
+  if (!desc) return '';
+  const cleaned = desc
+    .replace(/\[COLOR:(.*?)\]/g, '')
+    .replace(/\[START_DATE:(.*?)\]/g, '')
+    .replace(
+      /https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g,
+      '',
+    )
+    .trim();
+
+  // Check if there is actual text content inside the HTML
+  const hasText =
+    cleaned
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .trim().length > 0;
+  return hasText ? cleaned : '';
+};
+
 export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
   task,
   onClose,
@@ -335,9 +355,8 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
       <DescriptionContainer
         dangerouslySetInnerHTML={{
           __html:
-            task.notes_encrypted && task.notes_encrypted !== '<p></p>'
-              ? task.notes_encrypted
-              : '<p style="color: grey; font-style: italic;">No description provided for this task.</p>',
+            cleanDescription(task.notes_encrypted) ||
+            '<p style="color: grey; font-style: italic;">No description provided for this task.</p>',
         }}
       />
 
@@ -372,10 +391,7 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
 
           <SidebarSubtaskList>
             {task.subtasks?.map((subtask, index) => {
-              const hasSubNotes =
-                subtask.notes_encrypted &&
-                subtask.notes_encrypted.trim().length > 0 &&
-                subtask.notes_encrypted !== '<p></p>';
+              const hasSubNotes = !!cleanDescription(subtask.notes_encrypted);
 
               const subPriority = subtask.priority_level
                 ? getPriorityFromLevel(subtask.priority_level)
@@ -598,7 +614,7 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
             }}
             dangerouslySetInnerHTML={{
               __html:
-                selectedSubtaskDetails?.notes_encrypted ||
+                cleanDescription(selectedSubtaskDetails?.notes_encrypted) ||
                 'No information provided.',
             }}
           />

@@ -1,4 +1,5 @@
 import { Typography, Box, LinearProgress } from '@mui/material';
+import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTasks } from './Tasks.hook';
@@ -62,6 +63,7 @@ export const Tasks = ({
     handleOpenSubtaskModal,
     handleSaveSubtask,
     handleSubtaskToggle,
+    deleteTasks,
   } = useTasks();
 
   const isAIScheduleEnabled = isAIScheduleEnabledProp;
@@ -138,7 +140,14 @@ export const Tasks = ({
             viewMode={viewMode}
             setViewMode={setViewMode}
           >
-            <AISwitchContainer sx={{ height: 'fit-content' }}>
+            <AISwitchContainer sx={{ height: 'fit-content', gap: 1 }}>
+              <AutoAwesomeIcon
+                sx={{
+                  fontSize: 16,
+                  color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
+                  transition: 'color 0.3s ease',
+                }}
+              />
               <Typography
                 variant="body2"
                 sx={{
@@ -190,6 +199,7 @@ export const Tasks = ({
             handleOpenSubtaskModal={handleOpenSubtaskModal}
             handleTaskClick={handleTaskClick}
             updateTask={updateTask}
+            deleteTasks={deleteTasks}
             setSearchTerm={setSearchTerm}
             isAIScheduleEnabled={isAIScheduleEnabled}
             setIsAIScheduleEnabled={setIsAIScheduleEnabled}

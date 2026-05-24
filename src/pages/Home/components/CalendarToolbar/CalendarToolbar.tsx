@@ -16,21 +16,16 @@ import {
 } from '@mui/material';
 import { format } from 'date-fns';
 import {
-  ArrowBackIosNew as ArrowBackIosNewIcon,
-  ArrowForwardIos as ArrowForwardIosIcon,
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
   CheckCircleOutline as CheckIcon,
   DeleteOutline as DeleteIcon,
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
+  CalendarToday as CalendarTodayIcon,
 } from '@mui/icons-material';
 
-import {
-  ToolbarContainer,
-  DateHeader,
-  MainDate,
-  ViewToggle,
-  NavButton,
-} from './CalendarToolbar.styles';
+import { ToolbarContainer, ViewToggle } from './CalendarToolbar.styles';
 
 interface Notification {
   id: string;
@@ -83,55 +78,98 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
     onNavigateAction ? onNavigateAction('TODAY') : onNavigate(Navigate.TODAY);
   const handleViewChange = (newView: View) => onView(newView);
 
-  const getFormattedDate = () => {
-    if (view === 'month') return format(date, 'MMMM yyyy');
-    if (view === 'week') return label;
-    if (view === 'day') return format(date, 'EEEE, MMMM do');
-    return label;
-  };
-
   return (
-    <ToolbarContainer>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <DateHeader>
-          <MainDate>{getFormattedDate()}</MainDate>
-        </DateHeader>
-        <Box sx={{ display: 'flex', gap: '8px' }}>
-          <NavButton onClick={goToBack}>
-            <ArrowBackIosNewIcon sx={{ fontSize: '14px' }} />
-          </NavButton>
-          <NavButton onClick={goToNext}>
-            <ArrowForwardIosIcon sx={{ fontSize: '14px' }} />
-          </NavButton>
+    <ToolbarContainer
+      sx={{
+        px: 3,
+        py: 2,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottom: 1,
+        borderColor: 'divider',
+      }}
+    >
+      {/* Left side: Arrows + Month + Today */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton
+            size="small"
+            onClick={goToBack}
+            sx={{ border: 1, borderColor: 'divider', borderRadius: 1.5 }}
+          >
+            <ArrowBackIcon sx={{ fontSize: '18px' }} />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={goToNext}
+            sx={{ border: 1, borderColor: 'divider', borderRadius: 1.5 }}
+          >
+            <ArrowForwardIcon sx={{ fontSize: '18px' }} />
+          </IconButton>
         </Box>
-      </Box>
-
-      <ViewToggle
-        variant="contained"
-        aria-label="outlined primary button group"
-      >
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 600, color: 'text.primary', minWidth: '120px' }}
+        >
+          {format(date, 'MMMM yyyy')}
+        </Typography>
         <Button
-          onClick={() => {
-            handleViewChange('day');
-            goToToday();
+          variant="outlined"
+          size="small"
+          onClick={goToToday}
+          sx={{
+            borderRadius: '16px',
+            textTransform: 'none',
+            fontWeight: 600,
+            color: 'text.primary',
+            borderColor: 'divider',
           }}
-          className={view === 'day' ? 'active' : ''}
         >
           Today
         </Button>
-        <Button
-          onClick={() => handleViewChange('week')}
-          className={view === 'week' ? 'active' : ''}
+      </Box>
+
+      {/* Right side: View Toggle + Date Range */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <ViewToggle
+          variant="contained"
+          aria-label="outlined primary button group"
         >
-          Week
-        </Button>
+          <Button
+            onClick={() => handleViewChange('day')}
+            className={view === 'day' ? 'active' : ''}
+          >
+            Day
+          </Button>
+          <Button
+            onClick={() => handleViewChange('week')}
+            className={view === 'week' ? 'active' : ''}
+          >
+            Week
+          </Button>
+          <Button
+            onClick={() => handleViewChange('month')}
+            className={view === 'month' ? 'active' : ''}
+          >
+            Month
+          </Button>
+        </ViewToggle>
+
         <Button
-          onClick={() => handleViewChange('month')}
-          className={view === 'month' ? 'active' : ''}
+          variant="outlined"
+          startIcon={<CalendarTodayIcon sx={{ fontSize: 16 }} />}
+          sx={{
+            borderRadius: '16px',
+            textTransform: 'none',
+            fontWeight: 600,
+            color: 'text.primary',
+            borderColor: 'divider',
+          }}
         >
-          Month
+          {label}
         </Button>
-      </ViewToggle>
+      </Box>
 
       <Popover
         open={open}

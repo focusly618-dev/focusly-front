@@ -1,14 +1,8 @@
 import React from 'react';
-import { 
-  Popover, 
-  IconButton, 
-  Typography, 
-  Box, 
-  Divider,
-} from '@mui/material';
-import { 
-  Close as CloseIcon, 
-  EventNote as EventNoteIcon 
+import { Popover, IconButton, Typography, Box, Divider } from '@mui/material';
+import {
+  Close as CloseIcon,
+  EventNote as EventNoteIcon,
 } from '@mui/icons-material';
 import moment from 'moment';
 import { momentLocalizer } from 'react-big-calendar';
@@ -51,8 +45,10 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
       }}
       PaperProps={{
         sx: {
-          backgroundColor: (theme) => 
-            theme.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)',
+          backgroundColor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(15, 23, 42, 0.9)'
+              : 'rgba(255, 255, 255, 0.95)',
           backgroundImage: 'none',
           borderRadius: '16px',
           padding: '8px',
@@ -61,28 +57,50 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
           border: '1px solid rgba(255, 255, 255, 0.1)',
           boxShadow: '0 16px 32px rgba(0,0,0,0.4)',
           overflow: 'hidden',
-        }
+        },
       }}
     >
-      <Box sx={{ p: 1.5, pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <Box
+        sx={{
+          p: 1.5,
+          pb: 1,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}
+      >
         <Box>
-          <Typography variant="body2" sx={{ fontWeight: 800, color: '#ffffff', mb: 0.2 }}>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 800, color: '#ffffff', mb: 0.2 }}
+          >
             {formattedDate}
           </Typography>
-          <Box display="flex" alignItems="center" gap={0.5} sx={{ opacity: 0.5 }}>
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={0.5}
+            sx={{ opacity: 0.5 }}
+          >
             <EventNoteIcon sx={{ fontSize: '12px', color: '#ffffff' }} />
-            <Typography variant="caption" sx={{ color: '#ffffff', fontWeight: 600, fontSize: '10px' }}>
+            <Typography
+              variant="caption"
+              sx={{ color: '#ffffff', fontWeight: 600, fontSize: '10px' }}
+            >
               {events.length} {events.length === 1 ? 'Task' : 'Tasks'}
             </Typography>
           </Box>
         </Box>
-        <IconButton 
-          onClick={onClose} 
-          size="small" 
-          sx={{ 
+        <IconButton
+          onClick={onClose}
+          size="small"
+          sx={{
             color: 'rgba(255,255,255,0.4)',
             padding: '2px',
-            '&:hover': { color: '#ffffff', backgroundColor: 'rgba(255,255,255,0.05)' }
+            '&:hover': {
+              color: '#ffffff',
+              backgroundColor: 'rgba(255,255,255,0.05)',
+            },
           }}
         >
           <CloseIcon sx={{ fontSize: '16px' }} />
@@ -91,21 +109,24 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
 
       <Divider sx={{ mx: 1.5, mb: 1, borderColor: 'rgba(255,255,255,0.06)' }} />
 
-      <Box 
-        sx={{ 
-          p: 1, 
-          display: 'flex', 
-          flexDirection: 'column', 
+      <Box
+        sx={{
+          p: 1,
+          display: 'flex',
+          flexDirection: 'column',
           gap: 1.2,
           maxHeight: '380px',
           overflowY: 'auto',
           '&::-webkit-scrollbar': { width: '3px' },
-          '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '10px' },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            borderRadius: '10px',
+          },
         }}
       >
         {events.map((event) => (
-          <Box 
-            key={event.id} 
+          <Box
+            key={event.id}
             onClick={() => {
               onSelectEvent(event);
               onClose();
@@ -122,8 +143,8 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
                 boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
                 borderColor: 'rgba(255, 255, 255, 0.08)',
               },
-              '& .rbc-event': { 
-                background: 'none !important', 
+              '& .rbc-event': {
+                background: 'none !important',
                 padding: '0 !important',
                 width: '100%',
                 // Make the iç cards even smaller for the popover
@@ -131,11 +152,11 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
                 '& .event-icon-container': { width: '32px', height: '32px' },
                 '& .event-info span:first-child': { fontSize: '12px' },
                 '& .event-info span:last-child': { fontSize: '10px' },
-              }
+              },
             }}
           >
-            <CalendarEvent 
-              event={event} 
+            <CalendarEvent
+              event={event}
               title={event.title}
               continuesPrior={false}
               continuesAfter={false}

@@ -5,6 +5,7 @@ import {
   DialogActions,
   Typography,
 } from '@mui/material';
+import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { dialogActionsSx, saveButtonSx } from './TaskActions.styles';
 import { AISwitchContainer, StyledAISwitch } from '@/pages/Tasks/Tasks.styles';
 import type { TaskActionsProps } from './TaskActions.types';
@@ -22,8 +23,20 @@ export const TaskActions = ({
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
         {setIsAIScheduleEnabled && (
           <AISwitchContainer
-            sx={{ border: 'none', backgroundColor: 'transparent', p: 0 }}
+            sx={{
+              border: 'none',
+              backgroundColor: 'transparent',
+              p: 0,
+              gap: 0.5,
+            }}
           >
+            <AutoAwesomeIcon
+              sx={{
+                fontSize: 14,
+                color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
+                transition: 'color 0.3s ease',
+              }}
+            />
             <Typography
               variant="caption"
               sx={{

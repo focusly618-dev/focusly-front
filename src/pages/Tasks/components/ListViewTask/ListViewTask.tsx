@@ -5,34 +5,35 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Checkbox,
 } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
-  Link as LinkIcon,
   AutoAwesome as AutoAwesomeIcon,
   PlayArrow as PlayIcon,
+  Flag as FlagIcon,
 } from '@mui/icons-material';
 
 import {
   TaskRow,
   TaskTitle,
-  InteractiveMetaItem,
-  LinkMetaItem,
   SubtaskToggleBtn,
   SubtaskArrow,
   MetaText,
   StatusBadge,
   CategoryChip,
-  PriorityIndicator,
-  ProgressBarWrapper,
-  ProgressText,
-  TaskProgressBar,
   FocusIconButton,
   AIBadge,
   AIText,
   SubtasksContainer,
   SubtaskRow,
   SubtaskTitle,
+  StatusChip,
+  PriorityChip,
+  DateChip,
+  CustomUncheckedIcon,
+  CustomCheckedIcon,
+  TimeChip,
 } from './ListViewTask.styles';
 import {
   differenceInHours,
@@ -45,6 +46,11 @@ import type { Task } from '@/redux/tasks/task.types';
 import type { ListViewTaskProps } from './ListViewTask.types';
 import { useListViewTask } from './ListViewTask.hook';
 import { formatDuration } from '../TaskDetailModal/TaskDetailModal.utils';
+import {
+  getStatusIcon,
+  getCategoryIcon,
+  getPriorityIconColor,
+} from '@/pages/Home/components/CreateTaskModal/components/TaskIcons';
 
 const formatTimeSinceCompletion = (dateString: string | undefined) => {
   if (!dateString) return '';
@@ -79,6 +85,8 @@ const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
   Archived: <StatusBadge statusColor="#4b5563" />,
 };
 
+import { StyledAISwitch } from '../../Tasks.styles';
+
 export const ListViewTask = ({
   task,
   expandedTaskIds,
@@ -88,6 +96,8 @@ export const ListViewTask = ({
   updateTask,
   isAIScheduleEnabled,
   onStartFocus,
+  isSelected,
+  onToggleSelect,
 }: ListViewTaskProps) => {
   const {
     statusAnchor,
@@ -106,29 +116,54 @@ export const ListViewTask = ({
 
   const estimateMin = task.estimate_timer || task.estimate_minutes || 0;
   const realMin = task.real_timer || 0;
-  const progressValue =
-    estimateMin > 0 ? Math.min(100, (realMin / estimateMin) * 100) : 0;
   const isOverLimit = estimateMin > 0 && realMin > estimateMin;
-  const showProgress = estimateMin > 0;
 
   return (
     <>
       <TaskRow onClick={() => onTaskClick(task)} statusColor={statusColor}>
-        {/* Cell 1: Status Badge */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleSelect?.(e);
+          }}
         >
-          <StatusBadge
+          <Checkbox
+            checked={isSelected || false}
+            size="small"
+            icon={<CustomUncheckedIcon />}
+            checkedIcon={<CustomCheckedIcon />}
+            sx={{
+              padding: 0,
+              '&.Mui-checked': {
+                color: 'primary.main',
+              },
+            }}
+          />
+        </Box>
+
+        {/* Cell 2: Status Badge */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+          }}
+        >
+          <StatusChip
             statusColor={statusColor}
             onClick={(e) => {
               e.stopPropagation();
               setStatusAnchor(e.currentTarget);
             }}
-          />
+          >
+            {getStatusIcon(task.status || 'Todo', 11)}
+            {task.status || 'Todo'}
+          </StatusChip>
         </Box>
 
         {/* Cell 2: Title */}
@@ -144,7 +179,10 @@ export const ListViewTask = ({
           sx={{ display: 'flex', alignItems: 'center' }}
         >
           {task.category ? (
-            <CategoryChip>{task.category}</CategoryChip>
+            <CategoryChip>
+              {getCategoryIcon(task.category, 11)}
+              {task.category}
+            </CategoryChip>
           ) : (
             <Typography variant="caption" sx={{ opacity: 0.3 }}>
               -
@@ -154,47 +192,56 @@ export const ListViewTask = ({
 
         {/* Cell 4: Priority */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <InteractiveMetaItem
+          <PriorityChip
+            priorityColor={priorityColor}
             onClick={(e) => {
               e.stopPropagation();
               setPriorityAnchor(e.currentTarget);
             }}
           >
-            <PriorityIndicator priorityColor={priorityColor} />
-            <MetaText variant="caption">
-              {task.priority_level >= 3
-                ? 'High'
-                : task.priority_level === 2
-                  ? 'Med'
-                  : task.priority_level === 1
-                    ? 'Low'
-                    : 'None'}
-            </MetaText>
-          </InteractiveMetaItem>
+            <FlagIcon
+              sx={{
+                fontSize: 11,
+                flexShrink: 0,
+                color:
+                  task.priority_level >= 3
+                    ? getPriorityIconColor('High')
+                    : task.priority_level === 2
+                      ? getPriorityIconColor('Med')
+                      : task.priority_level === 1
+                        ? getPriorityIconColor('Low')
+                        : getPriorityIconColor(null),
+              }}
+            />
+            {task.priority_level >= 3
+              ? 'High'
+              : task.priority_level === 2
+                ? 'Med'
+                : task.priority_level === 1
+                  ? 'Low'
+                  : 'None'}
+          </PriorityChip>
         </Box>
 
         {/* Cell 5: Due Date */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {task.deadline || task.status === 'Done' ? (
-            <InteractiveMetaItem
+            <DateChip
               onClick={(e) => {
                 e.stopPropagation();
                 setDateAnchor(e.currentTarget);
               }}
             >
-              <CalendarTodayIcon sx={{ fontSize: 13, opacity: 0.7 }} />
-              <Typography
-                variant="caption"
-                sx={{ fontSize: '11px', fontWeight: 600 }}
-              >
+              <CalendarTodayIcon sx={{ fontSize: 11, opacity: 0.7 }} />
+              <span>
                 {task.status === 'Done'
                   ? formatTimeSinceCompletion(task.updated_at)
                   : new Date(task.deadline!).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                     })}
-              </Typography>
-            </InteractiveMetaItem>
+              </span>
+            </DateChip>
           ) : (
             <Typography variant="caption" sx={{ opacity: 0.3 }}>
               -
@@ -219,16 +266,15 @@ export const ListViewTask = ({
           </SubtaskToggleBtn>
         </Box>
 
-        {/* Cell 7: Links */}
+        {/* Cell 7: Estimated */}
         <Box
-          className="cell-links"
+          className="cell-estimated"
           sx={{ display: 'flex', alignItems: 'center' }}
         >
-          {task.links && task.links.length > 0 ? (
-            <LinkMetaItem>
-              <LinkIcon sx={{ fontSize: 13 }} />
-              <MetaText variant="caption">{task.links.length}</MetaText>
-            </LinkMetaItem>
+          {estimateMin > 0 ? (
+            <TimeChip variant="estimated">
+              {formatDuration(estimateMin)}
+            </TimeChip>
           ) : (
             <Typography variant="caption" sx={{ opacity: 0.3 }}>
               -
@@ -236,24 +282,17 @@ export const ListViewTask = ({
           )}
         </Box>
 
-        {/* Cell 8: Progress / Estimate */}
+        {/* Cell 8: Actual */}
         <Box
-          className="cell-progress"
+          className="cell-actual"
           sx={{ display: 'flex', alignItems: 'center' }}
         >
-          {showProgress ? (
-            <ProgressBarWrapper>
-              <ProgressText variant="caption" overLimit={isOverLimit}>
-                {formatDuration(realMin) || '0m'}
-                <span style={{ opacity: 0.5, margin: '0 2px' }}>/</span>
-                {formatDuration(estimateMin)}
-              </ProgressText>
-              <TaskProgressBar
-                variant="determinate"
-                value={progressValue}
-                overLimit={isOverLimit}
-              />
-            </ProgressBarWrapper>
+          {realMin > 0 ? (
+            <TimeChip variant={isOverLimit ? 'actual-over' : 'actual'}>
+              {formatDuration(realMin)}
+            </TimeChip>
+          ) : estimateMin > 0 ? (
+            <TimeChip variant="estimated">0m</TimeChip>
           ) : (
             <Typography variant="caption" sx={{ opacity: 0.3 }}>
               -
@@ -261,8 +300,48 @@ export const ListViewTask = ({
           )}
         </Box>
 
-        {/* Cell 9: Actions */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Cell 9: AI Switch */}
+        <Box
+          className="cell-ai"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            gap: '6px',
+          }}
+        >
+          <AutoAwesomeIcon
+            sx={{
+              fontSize: 14,
+              color: task.use_ai ? '#7c3aed' : 'text.secondary',
+              opacity: task.use_ai ? 1 : 0.35,
+              transition: 'all 0.3s ease',
+            }}
+          />
+          <StyledAISwitch
+            size="small"
+            checked={task.use_ai || false}
+            onChange={async (e) => {
+              if (updateTask) {
+                await updateTask(task.id, {
+                  ...task,
+                  use_ai: e.target.checked,
+                });
+              }
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </Box>
+
+        {/* Cell 10: Actions */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
+          }}
+        >
           {onStartFocus && (
             <Tooltip title="Start Focus Mode">
               <FocusIconButton

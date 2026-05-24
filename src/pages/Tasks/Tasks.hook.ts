@@ -204,6 +204,7 @@ export const useTasks = () => {
 
     updateTask: mutations.updateTask,
     handleAddSubtask: mutations.handleAddSubtask,
+    deleteTasks: mutations.deleteTasks,
 
     // View & modal
     viewMode,

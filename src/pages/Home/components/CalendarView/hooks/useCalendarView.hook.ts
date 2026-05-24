@@ -205,18 +205,6 @@ export const useCalendarView = () => {
 
     // 2. Map Google Calendar Events (Virtual) with robust Deduplication
     const calendarEvents = reduxEvents
-      .filter((ge) => {
-        const targetId = ge.google_event_id || ge.id;
-        const normGoogleId = normalizeGoogleId(targetId);
-        const baseGoogleId = getBaseGoogleId(targetId);
-
-        // Hide if there's any match in our synced IDs set
-        const isAlreadySaved =
-          syncedGoogleIds.has(normGoogleId) ||
-          syncedGoogleIds.has(baseGoogleId);
-
-        return !isAlreadySaved;
-      })
       .map((ge) => {
         try {
           return {
@@ -286,6 +274,7 @@ export const useCalendarView = () => {
       const existing = mergedEventsMap.get(key);
 
       // Rule: Always prefer native 'task' type over virtual 'event' type if they overlap
+      // This ensures that if a Google event was converted to a Task, we show the Task
       if (!existing || (event.type === 'task' && existing.type === 'event')) {
         mergedEventsMap.set(key, event as ICalendarEvent);
       }
