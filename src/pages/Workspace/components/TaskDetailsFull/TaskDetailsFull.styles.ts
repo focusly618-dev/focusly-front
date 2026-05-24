@@ -1,4 +1,4 @@
-import { styled, Box, Typography, Button, IconButton } from '@mui/material';
+import { styled, Box, Typography, Button } from '@mui/material';
 
 export const SidebarTopNav = styled(Box)({
   display: 'flex',
@@ -68,7 +68,9 @@ export const SidebarFooter = styled(Box)(({ theme }) => ({
 
 export const ViewTaskButton = styled(Button)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.5)' : theme.palette.action.selected,
+    theme.palette.mode === 'dark'
+      ? 'rgba(30, 41, 59, 0.5)'
+      : theme.palette.action.selected,
   color: theme.palette.text.primary,
   flex: 1,
   fontWeight: 600,
@@ -101,6 +103,10 @@ export const DescriptionContainer = styled(Box)(({ theme }) => ({
   fontSize: '13px',
   lineHeight: 1.6,
   color: theme.palette.text.primary,
-  '& p': { margin: 0, marginBottom: '8px', '&:last-child': { marginBottom: 0 } },
+  '& p': {
+    margin: 0,
+    marginBottom: '8px',
+    '&:last-child': { marginBottom: 0 },
+  },
   '& ul, & ol': { margin: '8px 0', paddingLeft: '20px' },
 }));

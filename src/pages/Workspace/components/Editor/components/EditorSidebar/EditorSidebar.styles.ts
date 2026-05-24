@@ -1,4 +1,4 @@
-import { styled, Box, Typography, Button, IconButton } from '@mui/material';
+import { styled, Box, Typography, Button } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import {
   SidebarHeader as BaseSidebarHeader,

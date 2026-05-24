@@ -22,8 +22,6 @@ import {
   AIText,
   PriorityChip,
   DateChip,
-  CustomUncheckedIcon,
-  CustomCheckedIcon,
   TimeChip,
 } from './ListViewTask.styles';
 import {
@@ -86,7 +84,6 @@ export const ListViewTask = ({
   const {
     statusAnchor,
     setStatusAnchor,
-    getStatusColor,
     priorityAnchor,
     setPriorityAnchor,
     dateAnchor,
@@ -126,8 +123,6 @@ export const ListViewTask = ({
           <Checkbox
             checked={isSelected || false}
             size="small"
-            icon={<CustomUncheckedIcon />}
-            checkedIcon={<CustomCheckedIcon />}
             sx={{
               padding: 0,
               '&.Mui-checked': {

@@ -11,7 +11,6 @@ import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
 export const useTasks = () => {
   const { user } = useAppSelector((state) => state.auth);
-  const tasks = useAppSelector((state) => state.task.tasks);
   const [, setSearchParams] = useSearchParams();
 
   // ── View & UI local state ──────────────────────────────────────────

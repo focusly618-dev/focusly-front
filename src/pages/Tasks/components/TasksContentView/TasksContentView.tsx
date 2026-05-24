@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Button,
-  Checkbox,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -30,9 +29,6 @@ import {
   TableHeaderCell,
   TableStatusGroupRow,
   TableBodyContainer,
-  CustomUncheckedIcon,
-  CustomCheckedIcon,
-  CustomIndeterminateIcon,
 } from '../ListViewTask/ListViewTask.styles';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { TasksContentViewProps } from './TasksContentView.types';
@@ -305,24 +301,6 @@ export const TasksContentView = ({
       }
       return next;
     });
-  };
-
-  const handleToggleAll = () => {
-    const allFilteredIds = filteredTasks.map((t) => t.id);
-    const allSelected = allFilteredIds.every((id) => selectedTaskIds.has(id));
-    if (allSelected) {
-      setSelectedTaskIds((prev) => {
-        const next = new Set(prev);
-        allFilteredIds.forEach((id) => next.delete(id));
-        return next;
-      });
-    } else {
-      setSelectedTaskIds((prev) => {
-        const next = new Set(prev);
-        allFilteredIds.forEach((id) => next.add(id));
-        return next;
-      });
-    }
   };
 
   const handleDeleteSelectedClick = () => {

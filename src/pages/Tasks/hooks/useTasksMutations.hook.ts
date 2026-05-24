@@ -21,7 +21,6 @@ interface UseTasksMutationsProps {
 
 export const useTasksMutations = ({
   userId,
-  tasks,
   onSuccess,
 }: UseTasksMutationsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
