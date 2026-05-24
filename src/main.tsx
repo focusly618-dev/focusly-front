@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import { store } from '@/redux/store.ts';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@/api/apollo';
+import { RealTimeProvider } from '@/context/RealTimeContext';
 
 import { Toaster } from 'sileo';
 import { BrowserRouter } from 'react-router-dom';
@@ -24,9 +25,11 @@ createRoot(document.getElementById('root')!).render(
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <ApolloProvider client={client}>
         <Provider store={store}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <RealTimeProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </RealTimeProvider>
         </Provider>
       </ApolloProvider>
     </GoogleOAuthProvider>

@@ -47,6 +47,8 @@ export const useCalendarView = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const reduxEvents =
     useSelector((state: RootState) => state.calendar?.reduxEvents) || [];
+  const syncVersion =
+    useSelector((state: RootState) => state.calendar?.syncVersion) || 0;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const tasks = useSelector((state: RootState) => state.task?.tasks) || [];
   const [searchParams, setSearchParams] = useSearchParams();
@@ -182,7 +184,7 @@ export const useCalendarView = () => {
     return () => {
       isMounted = false;
     };
-  }, [dispatch, user?.id, user?.authProvider, dateRange]);
+  }, [dispatch, user?.id, user?.authProvider, dateRange, syncVersion]);
 
   const hasRenderableCalendarData =
     reduxEvents.length > 0 ||
