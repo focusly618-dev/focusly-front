@@ -1,9 +1,22 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@apollo/client';
-import { useAppSelector } from '@/redux/hooks';
-import moment from 'moment';
-import { Box, Typography, Button } from '@mui/material';
-import { CheckBox as CheckBoxIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from '@mui/material';
+import {
+  CheckBox as CheckBoxIcon,
+  Delete as DeleteIcon,
+  Close as CloseIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
+import { styled as muiStyled } from '@mui/material/styles';
 import { AnimatedContainer, GridTaskContainer } from '../../Tasks.styles';
 import { EmptyState } from '@/utils/EmptyState';
 import { BoardView } from '../BoardView/BoardView';
@@ -17,15 +30,47 @@ import {
   TableHeaderCell,
   TableStatusGroupRow,
   TableBodyContainer,
+  CustomUncheckedIcon,
+  CustomCheckedIcon,
+  CustomIndeterminateIcon,
 } from '../ListViewTask/ListViewTask.styles';
-import { GET_TASKS_PAGINATED } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
-import type {
-  TaskResponse,
-  TaskFilterInput,
-  TaskSortInput,
-} from '@/api/Tasks/apiTaskTypes';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { TasksContentViewProps } from './TasksContentView.types';
 import type { Task } from '@/redux/tasks/task.types';
+
+const FloatingActionBar = muiStyled(Box)(({ theme }) => ({
+  position: 'fixed',
+  bottom: '24px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '24px',
+  padding: '12px 24px',
+  borderRadius: '16px',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(35, 37, 42, 0.85)'
+      : 'rgba(255, 255, 255, 0.85)',
+  border: `1px solid ${theme.palette.divider}`,
+  backdropFilter: 'blur(20px)',
+  boxShadow: '0 20px 40px 0 rgba(0, 0, 0, 0.25)',
+  zIndex: 1000,
+  minWidth: '380px',
+  animation: 'slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+
+  '@keyframes slideUp': {
+    '0%': {
+      transform: 'translate(-50%, 100px)',
+      opacity: 0,
+    },
+    '100%': {
+      transform: 'translate(-50%, 0)',
+      opacity: 1,
+    },
+  },
+}));
 
 const STATUS_SECTIONS = [
   {
@@ -86,9 +131,7 @@ const STATUS_SECTIONS = [
 
 const StatusTableGroup = ({
   section,
-  userId,
-  activeFilters,
-  activeSort,
+  tasks,
   expandedTaskIds,
   toggleTaskExpansion,
   handleSubtaskToggle,
@@ -97,13 +140,11 @@ const StatusTableGroup = ({
   updateTask,
   isAIScheduleEnabled,
   onStartFocus,
-  searchTerm,
-  dateRange,
+  selectedTaskIds,
+  onToggleSelect,
 }: {
   section: (typeof STATUS_SECTIONS)[number];
-  userId: string;
-  activeFilters?: TaskFilterInput;
-  activeSort?: TaskSortInput;
+  tasks: TaskResponse[];
   expandedTaskIds: Set<string>;
   toggleTaskExpansion: (taskId: string) => void;
   handleSubtaskToggle: (task: TaskResponse, index: number) => void;
@@ -112,71 +153,41 @@ const StatusTableGroup = ({
   updateTask: (taskId: string, updates: TaskResponse) => Promise<void>;
   isAIScheduleEnabled?: boolean;
   onStartFocus?: (task: Task) => void;
-  searchTerm?: string;
-  dateRange?: string;
+  selectedTaskIds: Set<string>;
+  onToggleSelect: (taskId: string) => void;
 }) => {
   const [limit, setLimit] = useState(24);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const queryFilters = useMemo(() => {
-    const f = activeFilters ? { ...activeFilters } : {};
-    if (activeFilters?.status && activeFilters.status.length > 0) {
-      if (
-        !activeFilters.status.includes(section.id as TaskResponse['status'])
-      ) {
-        return null;
-      }
-    }
-    f.status = [section.id as TaskResponse['status']];
+  const displayedTasks = useMemo(() => {
+    return tasks.filter(section.filter);
+  }, [tasks, section.filter]);
 
-    if (searchTerm) {
-      f.searchTerm = searchTerm;
-    }
+  const paginatedTasks = useMemo(() => {
+    return displayedTasks.slice(0, limit);
+  }, [displayedTasks, limit]);
 
-    if (dateRange && dateRange !== 'all') {
-      if (dateRange === 'today') {
-        const todayStart = moment().startOf('day').toISOString();
-        const todayEnd = moment().endOf('day').toISOString();
-        f.startDate = todayStart;
-        f.endDate = todayEnd;
-      } else if (dateRange === 'last7') {
-        f.startDate = moment().subtract(7, 'days').startOf('day').toISOString();
-      } else if (dateRange === 'last30') {
-        f.startDate = moment()
-          .subtract(30, 'days')
-          .startOf('day')
-          .toISOString();
-      }
-    }
+  const totalCount = displayedTasks.length;
 
-    return f;
-  }, [activeFilters, section.id, searchTerm, dateRange]);
-
-  const skipQuery = !userId || queryFilters === null;
-
-  const { data, loading } = useQuery(GET_TASKS_PAGINATED, {
-    skip: skipQuery,
-    variables: {
-      userId,
-      filters: queryFilters || {},
-      sort: activeSort || null,
-      offset: 0,
-      limit,
-    },
-    fetchPolicy: 'cache-and-network',
-  });
-
-  if (skipQuery) return null;
-
-  const displayedTasks: TaskResponse[] = data?.result?.tasks || [];
-  const totalCount = data?.result?.totalCount || 0;
-
-  if (!loading && displayedTasks.length === 0) {
+  if (totalCount === 0) {
     return null;
   }
 
   return (
     <Box>
-      <TableStatusGroupRow statusColor={section.color}>
+      <TableStatusGroupRow
+        statusColor={section.color}
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <ChevronRightIcon
+          sx={{
+            fontSize: '14px',
+            color: section.color,
+            transform: isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)',
+            transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            mr: '2px',
+          }}
+        />
         <Box
           sx={{
             width: '6px',
@@ -215,21 +226,24 @@ const StatusTableGroup = ({
           {totalCount}
         </Box>
       </TableStatusGroupRow>
-      {displayedTasks.map((task) => (
-        <ListViewTask
-          key={task.id}
-          task={task}
-          expandedTaskIds={expandedTaskIds}
-          toggleTaskExpansion={toggleTaskExpansion}
-          handleSubtaskToggle={handleSubtaskToggle}
-          handleOpenSubtaskModal={handleOpenSubtaskModal}
-          onTaskClick={handleTaskClick}
-          updateTask={updateTask}
-          isAIScheduleEnabled={isAIScheduleEnabled}
-          onStartFocus={onStartFocus}
-        />
-      ))}
-      {totalCount > displayedTasks.length && (
+      {!isCollapsed &&
+        paginatedTasks.map((task) => (
+          <ListViewTask
+            key={task.id}
+            task={task}
+            expandedTaskIds={expandedTaskIds}
+            toggleTaskExpansion={toggleTaskExpansion}
+            handleSubtaskToggle={handleSubtaskToggle}
+            handleOpenSubtaskModal={handleOpenSubtaskModal}
+            onTaskClick={handleTaskClick}
+            updateTask={updateTask}
+            isAIScheduleEnabled={isAIScheduleEnabled}
+            onStartFocus={onStartFocus}
+            isSelected={selectedTaskIds.has(task.id)}
+            onToggleSelect={() => onToggleSelect(task.id)}
+          />
+        ))}
+      {!isCollapsed && totalCount > paginatedTasks.length && (
         <Box
           sx={{
             display: 'flex',
@@ -258,7 +272,7 @@ const StatusTableGroup = ({
               },
             }}
           >
-            Show More ({totalCount - displayedTasks.length} remaining)
+            Show More ({totalCount - paginatedTasks.length} remaining)
           </Button>
         </Box>
       )}
@@ -277,21 +291,98 @@ export const TasksContentView = ({
   handleOpenSubtaskModal,
   handleTaskClick,
   updateTask,
+  deleteTasks,
   setSearchTerm,
   isAIScheduleEnabled,
   onStartFocus,
-  activeFilters,
-  activeSort,
-  searchTerm,
-  dateRange,
 }: TasksContentViewProps) => {
-  const { user } = useAppSelector((state) => state.auth);
-  const userId = user?.id || '';
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [prevViewMode, setPrevViewMode] = useState(viewMode);
+
+  if (viewMode !== prevViewMode) {
+    setPrevViewMode(viewMode);
+    setSelectedTaskIds(new Set());
+    setIsConfirmOpen(false);
+  }
+
+  const isListView =
+    viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload';
+
+  const handleToggleSelect = (taskId: string) => {
+    setSelectedTaskIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(taskId)) {
+        next.delete(taskId);
+      } else {
+        next.add(taskId);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleAll = () => {
+    const allFilteredIds = filteredTasks.map((t) => t.id);
+    const allSelected = allFilteredIds.every((id) => selectedTaskIds.has(id));
+    if (allSelected) {
+      setSelectedTaskIds((prev) => {
+        const next = new Set(prev);
+        allFilteredIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      setSelectedTaskIds((prev) => {
+        const next = new Set(prev);
+        allFilteredIds.forEach((id) => next.add(id));
+        return next;
+      });
+    }
+  };
+
+  const handleDeleteSelectedClick = () => {
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsConfirmOpen(false);
+    if (deleteTasks) {
+      await deleteTasks(Array.from(selectedTaskIds));
+      setSelectedTaskIds(new Set());
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsConfirmOpen(false);
+  };
+
+  const handleClearSelection = () => {
+    setSelectedTaskIds(new Set());
+  };
 
   // Loading skeletons
   if (isLoading && filteredTasks.length === 0) {
     return (
-      <AnimatedContainer id="joyride-tasks-list" key={viewMode}>
+      <AnimatedContainer
+        id="joyride-tasks-list"
+        key={viewMode}
+        sx={
+          isListView
+            ? {
+                flex: 1,
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                paddingTop: 0,
+                minHeight: 0,
+              }
+            : {
+                padding: '16px 24px',
+              }
+        }
+      >
         <TasksSkeletons viewMode={viewMode} />
       </AnimatedContainer>
     );
@@ -304,16 +395,19 @@ export const TasksContentView = ({
         id="joyride-tasks-list"
         key={viewMode}
         sx={
-          viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload'
+          isListView
             ? {
                 flex: 1,
+                width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
                 paddingTop: 0,
                 minHeight: 0,
               }
-            : undefined
+            : {
+                padding: '16px 24px',
+              }
         }
       >
         <EmptyState
@@ -327,12 +421,77 @@ export const TasksContentView = ({
 
   // No tasks match filters
   if (filteredTasks.length === 0) {
+    if (isListView) {
+      return (
+        <AnimatedContainer
+          id="joyride-tasks-list"
+          key={viewMode}
+          sx={{
+            flex: 1,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            paddingTop: 0,
+            minHeight: 0,
+          }}
+        >
+          <TableWrapper>
+            <TableHeader>
+              <TableHeaderCell sx={{ justifyContent: 'center' }}>
+                <Checkbox
+                  disabled
+                  size="small"
+                  icon={<CustomUncheckedIcon />}
+                  checkedIcon={<CustomCheckedIcon />}
+                  sx={{ padding: 0 }}
+                />
+              </TableHeaderCell>
+              <TableHeaderCell>Status</TableHeaderCell>
+              <TableHeaderCell>Task Name</TableHeaderCell>
+              <TableHeaderCell className="col-category">
+                Category
+              </TableHeaderCell>
+              <TableHeaderCell>Priority</TableHeaderCell>
+              <TableHeaderCell>Due Date</TableHeaderCell>
+              <TableHeaderCell className="col-subtasks">
+                Subtasks
+              </TableHeaderCell>
+              <TableHeaderCell className="col-estimated">
+                Estimated
+              </TableHeaderCell>
+              <TableHeaderCell className="col-actual">Actual</TableHeaderCell>
+              <TableHeaderCell className="col-ai">AI Schedule</TableHeaderCell>
+              <TableHeaderCell sx={{ justifyContent: 'center' }}>
+                Actions
+              </TableHeaderCell>
+            </TableHeader>
+            <TableBodyContainer
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                py: 8,
+              }}
+            >
+              <EmptyState
+                title="No tasks match your search"
+                description="Try a different keyword or filter to find what you're looking for, or create a new task above."
+                actionText="Clear all filters"
+                onAction={() => setSearchTerm('')}
+              />
+            </TableBodyContainer>
+          </TableWrapper>
+        </AnimatedContainer>
+      );
+    }
+
     return (
       <AnimatedContainer
         id="joyride-tasks-list"
         key={viewMode}
         sx={
-          viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload'
+          isListView
             ? {
                 flex: 1,
                 display: 'flex',
@@ -341,7 +500,9 @@ export const TasksContentView = ({
                 paddingTop: 0,
                 minHeight: 0,
               }
-            : undefined
+            : {
+                padding: '16px 24px',
+              }
         }
       >
         <EmptyState
@@ -354,9 +515,6 @@ export const TasksContentView = ({
     );
   }
 
-  const isListView =
-    viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload';
-
   return (
     <AnimatedContainer
       id="joyride-tasks-list"
@@ -365,13 +523,16 @@ export const TasksContentView = ({
         isListView
           ? {
               flex: 1,
+              width: '100%',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
               paddingTop: 0,
               minHeight: 0,
             }
-          : undefined
+          : {
+              padding: '16px 24px',
+            }
       }
     >
       {viewMode === 'workload' ? (
@@ -396,14 +557,40 @@ export const TasksContentView = ({
       ) : (
         <TableWrapper>
           <TableHeader>
-            <TableHeaderCell /> {/* Status Checkbox */}
+            <TableHeaderCell sx={{ justifyContent: 'center' }}>
+              <Checkbox
+                indeterminate={
+                  selectedTaskIds.size > 0 &&
+                  selectedTaskIds.size < filteredTasks.length
+                }
+                checked={
+                  filteredTasks.length > 0 &&
+                  selectedTaskIds.size === filteredTasks.length
+                }
+                onChange={handleToggleAll}
+                size="small"
+                icon={<CustomUncheckedIcon />}
+                checkedIcon={<CustomCheckedIcon />}
+                indeterminateIcon={<CustomIndeterminateIcon />}
+                sx={{
+                  padding: 0,
+                  '&.Mui-checked': {
+                    color: 'primary.main',
+                  },
+                }}
+              />
+            </TableHeaderCell>
+            <TableHeaderCell>Status</TableHeaderCell>
             <TableHeaderCell>Task Name</TableHeaderCell>
             <TableHeaderCell className="col-category">Category</TableHeaderCell>
             <TableHeaderCell>Priority</TableHeaderCell>
             <TableHeaderCell>Due Date</TableHeaderCell>
             <TableHeaderCell className="col-subtasks">Subtasks</TableHeaderCell>
-            <TableHeaderCell className="col-links">Links</TableHeaderCell>
-            <TableHeaderCell className="col-progress">Progress</TableHeaderCell>
+            <TableHeaderCell className="col-estimated">
+              Estimated
+            </TableHeaderCell>
+            <TableHeaderCell className="col-actual">Actual</TableHeaderCell>
+            <TableHeaderCell className="col-ai">AI Schedule</TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableHeader>
           <TableBodyContainer>
@@ -411,9 +598,7 @@ export const TasksContentView = ({
               <StatusTableGroup
                 key={section.id}
                 section={section}
-                userId={userId}
-                activeFilters={activeFilters}
-                activeSort={activeSort}
+                tasks={filteredTasks}
                 expandedTaskIds={expandedTaskIds}
                 toggleTaskExpansion={toggleTaskExpansion}
                 handleSubtaskToggle={handleSubtaskToggle}
@@ -422,13 +607,111 @@ export const TasksContentView = ({
                 updateTask={updateTask}
                 isAIScheduleEnabled={isAIScheduleEnabled}
                 onStartFocus={onStartFocus}
-                searchTerm={searchTerm}
-                dateRange={dateRange}
+                selectedTaskIds={selectedTaskIds}
+                onToggleSelect={handleToggleSelect}
               />
             ))}
           </TableBodyContainer>
         </TableWrapper>
       )}
+
+      {isListView && selectedTaskIds.size > 0 && (
+        <FloatingActionBar>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 700, color: 'text.primary' }}
+            >
+              {selectedTaskIds.size}{' '}
+              {selectedTaskIds.size === 1 ? 'task' : 'tasks'} selected
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Button
+              variant="text"
+              size="small"
+              onClick={handleClearSelection}
+              startIcon={<CloseIcon />}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary' },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              color="error"
+              onClick={handleDeleteSelectedClick}
+              startIcon={<DeleteIcon />}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                borderRadius: '8px',
+                px: 2,
+              }}
+            >
+              Delete Selected
+            </Button>
+          </Box>
+        </FloatingActionBar>
+      )}
+
+      {/* Modern Confirmation Dialog */}
+      <Dialog
+        open={isConfirmOpen}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            padding: '16px',
+            maxWidth: '400px',
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
+            boxShadow: '0 24px 48px rgba(0, 0, 0, 0.2)',
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, px: 2, py: 1 }}>
+          Confirm Delete
+        </DialogTitle>
+        <DialogContent sx={{ px: 2, py: 1 }}>
+          <DialogContentText sx={{ color: 'text.secondary', fontSize: '14px' }}>
+            Are you sure you want to delete {selectedTaskIds.size} selected{' '}
+            {selectedTaskIds.size === 1 ? 'task' : 'tasks'}? This action cannot
+            be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 2, py: 1.5, gap: 1 }}>
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              color: 'text.secondary',
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+            autoFocus
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: '8px',
+              px: 2.5,
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AnimatedContainer>
   );
 };

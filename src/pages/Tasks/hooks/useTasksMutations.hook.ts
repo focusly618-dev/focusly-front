@@ -3,10 +3,14 @@ import {
   UPDATE_TASK,
   GET_TASKS,
   GET_TASKS_TITLES,
+  DELETE_TASKS,
 } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
-import { upsertTask as upsertTaskRedux } from '@/redux/tasks/task.slice';
+import {
+  upsertTask as upsertTaskRedux,
+  removeTasks,
+} from '@/redux/tasks/task.slice';
 import type { Task } from '@/redux/tasks/task.types';
 
 interface UseTasksMutationsProps {
@@ -21,6 +25,7 @@ export const useTasksMutations = ({
   onSuccess,
 }: UseTasksMutationsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
+  const [deleteTasksMutation] = useMutation(DELETE_TASKS);
   const dispatch = useAppDispatch();
 
   const mapResponseToTask = (t: TaskResponse): Task => ({
@@ -43,6 +48,7 @@ export const useTasksMutations = ({
     google_event_id: t.google_event_id,
     estimated_start_date: t.estimated_start_date,
     estimated_end_date: t.estimated_end_date,
+    use_ai: t.use_ai,
     tags:
       t.tags?.map((tag: string | { name: string }) =>
         typeof tag === 'string' ? tag : tag.name,
@@ -65,6 +71,7 @@ export const useTasksMutations = ({
         estimated_start_date,
         estimated_end_date,
         real_timer,
+        use_ai,
       } = task;
 
       const { data } = await updateTaskMutation({
@@ -79,6 +86,7 @@ export const useTasksMutations = ({
             duration: null,
             priority_level,
             deadline,
+            use_ai,
             subtasks: subtasks?.map((st) => ({
               title: st.title,
               completed: st.completed,
@@ -156,6 +164,7 @@ export const useTasksMutations = ({
             google_event_id: parentTask.google_event_id,
             estimated_start_date: parentTask.estimated_start_date,
             estimated_end_date: parentTask.estimated_end_date,
+            use_ai: parentTask.use_ai,
             tags:
               parentTask.tags?.map((t: string | { name: string }) =>
                 typeof t === 'string' ? t : t.name,
@@ -181,8 +190,31 @@ export const useTasksMutations = ({
     }
   };
 
+  const deleteTasks = async (ids: string[]) => {
+    try {
+      const { data } = await deleteTasksMutation({
+        variables: { ids },
+        refetchQueries: [
+          { query: GET_TASKS, variables: { userId } },
+          { query: GET_TASKS_TITLES, variables: { userId } },
+        ],
+      });
+
+      if (data?.deleteTasks) {
+        dispatch(removeTasks({ ids }));
+        onSuccess?.(
+          'Tasks deleted successfully!',
+          `${ids.length} task${ids.length > 1 ? 's have' : ' has'} been deleted.`,
+        );
+      }
+    } catch (error) {
+      console.error('Error deleting tasks:', error);
+    }
+  };
+
   return {
     updateTask,
     handleAddSubtask,
+    deleteTasks,
   };
 };

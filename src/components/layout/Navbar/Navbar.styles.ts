@@ -11,14 +11,17 @@ import {
 } from '@mui/material';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 
-// --- Header & Navbar ---
-export const Header = styled(AppBar)({
-  backgroundColor: 'rgba(17, 26, 34, 0.8)',
+export const Header = styled(AppBar)(({ theme }) => ({
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(27, 27, 29, 0.8)'
+      : 'rgba(255, 255, 255, 0.8)',
   backdropFilter: 'blur(12px)',
   borderBottom: '1px solid',
-  borderColor: 'rgba(255, 255, 255, 0.1)',
+  borderColor: theme.palette.divider,
   boxShadow: 'none',
-});
+  color: theme.palette.text.primary,
+}));
 
 export const StyledToolbar = styled(Toolbar)({
   display: 'flex',
@@ -26,7 +29,10 @@ export const StyledToolbar = styled(Toolbar)({
   width: '100%',
 });
 
-export const LogoWrapper = styled(Box)<{ component?: React.ElementType; to?: string }>({
+export const LogoWrapper = styled(Box)<{
+  component?: React.ElementType;
+  to?: string;
+}>({
   display: 'flex',
   alignItems: 'center',
   cursor: 'pointer',
@@ -66,7 +72,10 @@ export const NavStack = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export const NavbarLink = styled(Link)<{ component?: React.ElementType; to?: string }>(({ theme }) => ({
+export const NavbarLink = styled(Link)<{
+  component?: React.ElementType;
+  to?: string;
+}>(({ theme }) => ({
   fontSize: '0.875rem',
   fontWeight: 500,
   color: theme.palette.text.secondary,

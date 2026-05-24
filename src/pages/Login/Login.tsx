@@ -1,10 +1,16 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, CircularProgress, Button , alpha} from '@mui/material';
-import { 
-  Lock as LockIcon, 
-  Google as GoogleIcon, 
-  Apple as AppleIcon, 
-  Email as EmailIcon 
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Button,
+  alpha,
+} from '@mui/material';
+import {
+  Lock as LockIcon,
+  Google as GoogleIcon,
+  Apple as AppleIcon,
+  Email as EmailIcon,
 } from '@mui/icons-material';
 import {
   PageWrapper,
@@ -60,7 +66,12 @@ export const Login: React.FC = () => {
           <IconContainer>
             <LockIcon fontSize="medium" />
           </IconContainer>
-          <Typography variant="h5" fontWeight="700" color="text.primary" gutterBottom>
+          <Typography
+            variant="h5"
+            fontWeight="700"
+            color="text.primary"
+            gutterBottom
+          >
             {isRegistering ? 'Create Account' : 'Welcome back'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -72,7 +83,9 @@ export const Login: React.FC = () => {
 
         {linkSent ? (
           <Box textAlign="center" py={4}>
-            <IconContainer style={{ margin: '0 auto 24px', backgroundColor: '#137fec20' }}>
+            <IconContainer
+              style={{ margin: '0 auto 24px', backgroundColor: '#137fec20' }}
+            >
               <EmailIcon style={{ color: '#137fec' }} />
             </IconContainer>
             <Typography variant="h6" color="text.primary" gutterBottom>
@@ -80,7 +93,8 @@ export const Login: React.FC = () => {
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={4}>
               We've sent a link to <strong>{email}</strong>. <br />
-              Click the link to sign in instantly and check your spam folder if you don't receive the email.
+              Click the link to sign in instantly and check your spam folder if
+              you don't receive the email.
             </Typography>
             <Button
               variant="text"
@@ -167,18 +181,28 @@ export const Login: React.FC = () => {
           textAlign="center"
           borderTop={(theme) => `1px solid ${theme.palette.divider}`}
           pt={2}
-          bgcolor={(theme) => theme.palette.mode === 'dark' ? '#10192250' : alpha(theme.palette.primary.main, 0.03)}
+          bgcolor={(theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(0, 0, 0, 0.2)'
+              : alpha(theme.palette.primary.main, 0.03)
+          }
           mx={-4}
           mb={-4}
           pb={2}
         >
           <Typography variant="caption" color="text.secondary">
             By signing in, you agree to our{' '}
-            <a href="#" style={{ color: 'inherit', textDecoration: 'underline' }}>
+            <a
+              href="#"
+              style={{ color: 'inherit', textDecoration: 'underline' }}
+            >
               Terms of Service
             </a>{' '}
             and{' '}
-            <a href="#" style={{ color: 'inherit', textDecoration: 'underline' }}>
+            <a
+              href="#"
+              style={{ color: 'inherit', textDecoration: 'underline' }}
+            >
               Privacy Policy
             </a>
             .

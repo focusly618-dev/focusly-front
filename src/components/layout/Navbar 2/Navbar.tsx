@@ -1,8 +1,8 @@
 import React from 'react';
 import { Container, Stack } from '@mui/material';
-import { 
-  Menu as MenuIcon, 
-  AutoAwesome as AutoAwesomeIcon 
+import {
+  Menu as MenuIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
 import {
@@ -25,7 +25,11 @@ const Navbar: React.FC = () => {
           alignItems="center"
           sx={{ height: 64 }}
         >
-          <LogoWrapper component={NavLink} to="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
+          <LogoWrapper
+            component={NavLink}
+            to="/"
+            sx={{ textDecoration: 'none', color: 'inherit' }}
+          >
             <LogoIconWrapper>
               <AutoAwesomeIcon sx={{ fontSize: 20 }} />
             </LogoIconWrapper>
@@ -48,7 +52,7 @@ const Navbar: React.FC = () => {
             </NavbarLink>
             <NavbarLink
               component={NavLink}
-              to="login"
+              to="/login"
               sx={{
                 color: 'text.primary',
                 textTransform: 'none',

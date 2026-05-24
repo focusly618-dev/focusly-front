@@ -65,19 +65,29 @@ export const PricingCard = styled(Box, {
   position: 'relative',
   padding: theme.spacing(5),
   borderRadius: 24,
-  backgroundColor: '#192633',
-  border: isPopular ? `2px solid ${theme.palette.primary.main}` : '1px solid #233648',
+  backgroundColor: theme.palette.background.paper,
+  border: isPopular
+    ? `2px solid ${theme.palette.primary.main}`
+    : `1px solid ${theme.palette.divider}`,
   height: isPopular ? '100%' : 'fit-content',
   display: 'flex',
   flexDirection: 'column',
   transition: 'all 0.3s ease',
-  boxShadow: isPopular ? '0 25px 50px -12px rgba(19, 127, 236, 0.2)' : 'none',
+  boxShadow: isPopular
+    ? theme.palette.mode === 'dark'
+      ? '0 25px 50px -12px rgba(19, 127, 236, 0.3)'
+      : '0 25px 50px -12px rgba(19, 127, 236, 0.15)'
+    : 'none',
   transform: isPopular ? 'scale(1.05)' : 'none',
   zIndex: isPopular ? 10 : 1,
   '&:hover': {
     boxShadow: isPopular
-      ? '0 25px 50px -12px rgba(19, 127, 236, 0.3)'
-      : '0 10px 30px rgba(0, 0, 0, 0.3)',
+      ? theme.palette.mode === 'dark'
+        ? '0 25px 50px -12px rgba(19, 127, 236, 0.4)'
+        : '0 25px 50px -12px rgba(19, 127, 236, 0.25)'
+      : theme.palette.mode === 'dark'
+        ? '0 10px 30px rgba(0, 0, 0, 0.4)'
+        : '0 10px 30px rgba(19, 127, 236, 0.08)',
   },
   [theme.breakpoints.down('md')]: {
     transform: 'none',
@@ -136,8 +146,8 @@ export const FeatureItem = styled('li')(({ theme }) => ({
   },
 }));
 
-export const FeatureItemPro = styled(FeatureItem)(() => ({
-  color: 'white',
+export const FeatureItemPro = styled(FeatureItem)(({ theme }) => ({
+  color: theme.palette.text.primary,
   fontWeight: 500,
 }));
 
@@ -152,12 +162,15 @@ export const PricingButton = styled(Button, {
   transition: 'all 0.2s ease',
   ...(variant === 'outlined'
     ? {
-        border: '1px solid #233648',
-        color: 'white',
+        border: `1px solid ${theme.palette.divider}`,
+        color: theme.palette.text.primary,
         '&:hover': {
           borderColor: theme.palette.primary.main,
           color: theme.palette.primary.main,
-          backgroundColor: 'transparent',
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.05)'
+              : 'rgba(0, 0, 0, 0.05)',
         },
       }
     : {
@@ -174,7 +187,7 @@ export const PricingButton = styled(Button, {
 export const StatsSection = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(10),
   paddingTop: theme.spacing(6),
-  borderTop: '1px solid #233648',
+  borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
 export const StatItem = styled(Box)(() => ({

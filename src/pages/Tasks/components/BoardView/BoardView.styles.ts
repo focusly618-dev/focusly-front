@@ -25,9 +25,23 @@ export const ColumnHeader = styled(Box)<{ borderColor?: string }>(
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: theme.spacing(2),
+    paddingBottom: theme.spacing(1.5),
     marginBottom: theme.spacing(2),
-    borderBottom: `3px solid ${borderColor || theme.palette.divider}`,
+    borderBottom:
+      theme.palette.mode === 'dark'
+        ? '1px solid rgba(255, 255, 255, 0.06)'
+        : `1px solid ${theme.palette.divider}`,
+    position: 'relative',
+    '&:after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      width: '40px',
+      height: '2px',
+      backgroundColor: borderColor || theme.palette.primary.main,
+      borderRadius: '1px',
+    },
   }),
 );
 
@@ -63,13 +77,13 @@ export const DroppableArea = styled(Box)<{ isOver?: boolean }>(
     borderRadius: '12px',
     backgroundColor: isOver
       ? theme.palette.mode === 'dark'
-        ? 'rgba(59, 130, 246, 0.08)'
+        ? 'rgba(99, 102, 241, 0.05)'
         : 'rgba(59, 130, 246, 0.04)'
       : 'transparent',
     border: isOver
-      ? `2px dashed ${theme.palette.primary.main}`
-      : '2px dashed transparent',
-    transition: 'all 0.15s ease',
+      ? `1px dashed ${theme.palette.mode === 'dark' ? '#6366f1' : theme.palette.primary.main}`
+      : '1px dashed transparent',
+    transition: 'all 0.2s ease-in-out',
     overflowY: 'auto',
     overflowX: 'hidden',
     '&::-webkit-scrollbar': {
@@ -79,11 +93,17 @@ export const DroppableArea = styled(Box)<{ isOver?: boolean }>(
       background: 'transparent',
     },
     '&::-webkit-scrollbar-thumb': {
-      background: theme.palette.divider,
+      background:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.1)'
+          : theme.palette.divider,
       borderRadius: '3px',
     },
     '&::-webkit-scrollbar-thumb:hover': {
-      background: theme.palette.text.disabled,
+      background:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.2)'
+          : theme.palette.text.disabled,
     },
   }),
 );

@@ -10,7 +10,7 @@ export const PRIORITY_COLORS: Record<number, { main: string }> = {
 };
 
 const GOOGLE_EVENT_COLOR = { main: '#22D3EE' }; // Cyan for Google events
-const DEFAULT_COLOR = { main: '#A78BFA' }; // Lavender fallback
+const DEFAULT_COLOR = { main: '#A78BFA' }; // Lavender fallback (indicates no color assigned)
 
 export const getEventColor = (event: {
   id?: string;
@@ -44,19 +44,14 @@ export const EventContainer = styled(Box, {
   theme,
   variant,
   isMeeting,
-  overlapIndex = 0,
 }) => {
   const isDark = theme.palette.mode === 'dark';
-
-  // Overlap adjustments
-  const hueRotation = overlapIndex > 0 ? (overlapIndex * 40) % 360 : 0;
-  const brightnessIdx = overlapIndex > 0 ? 1 - overlapIndex * 0.08 : 1;
 
   // ── Meeting card (dashed border, clean background) ──
   if (isMeeting) {
     const MEETING_COLOR = '#60A5FA';
     return {
-      backgroundColor: isDark ? alpha('#1e293b', 0.9) : '#ffffff',
+      backgroundColor: isDark ? alpha('#1e293b', 0.1) : '#ffffff',
       color: isDark ? '#e2e8f0' : '#1e293b',
       height: '100%',
       width: '100%',
@@ -70,11 +65,7 @@ export const EventContainer = styled(Box, {
       overflow: 'hidden',
       cursor: 'pointer',
       boxShadow: 'none',
-      filter:
-        overlapIndex > 0
-          ? `hue-rotate(${hueRotation}deg) brightness(${brightnessIdx})`
-          : 'none',
-      zIndex: overlapIndex + 1,
+      zIndex: 1,
       transition: 'all 0.15s ease',
       '&::before': {
         content: '""',
@@ -96,43 +87,54 @@ export const EventContainer = styled(Box, {
     };
   }
 
-  // ── Standard task card — Opaque backgrounds with subtle tint ──
-  const bgColor = isDark
-    ? '#1e1e21' // Solid dark, matches app background
-    : '#ffffff'; // Solid white
+  // ── Standard task card — Solid pastel backgrounds ──
+  // Use lighten/darken to create solid colors instead of transparent alpha, so grid lines don't show through.
+  const isDefaultColor = variant.main === DEFAULT_COLOR.main;
 
-  const bgHover = isDark ? '#2a2a2e' : '#f1f5f9';
+  const textColor = isDark ? alpha('#ffffff', 0.95) : '#6f6f6fff';
 
-  const textColor = isDark ? alpha('#ffffff', 0.95) : alpha('#0f172a', 0.9);
+  // If no color assigned (DEFAULT_COLOR), use neutral background with black left border
+  // If color assigned, use colored background with colored left border
+  const finalBgColor = isDefaultColor
+    ? isDark
+      ? '#1e293b'
+      : '#ffffff'
+    : isDark
+      ? '#1e293b'
+      : '#ffffff';
+
+  const finalBgHover = isDefaultColor
+    ? isDark
+      ? '#2d3748'
+      : '#f1f5f9'
+    : isDark
+      ? '#2d3748'
+      : '#f1f5f9';
+
+  const borderColor = variant.main;
 
   return {
-    backgroundColor: bgColor,
+    backgroundColor: finalBgColor,
     color: textColor,
     height: '100%',
-    width: `calc(100% - ${overlapIndex * 32}px)`,
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     padding: '4px 6px',
-    borderRadius: '4px',
     overflow: 'hidden',
     cursor: 'pointer',
-    zIndex: overlapIndex + 1,
+    zIndex: 1,
     boxShadow: 'none',
-    filter: overlapIndex > 0 ? `brightness(${brightnessIdx})` : 'none',
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-    border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'}`,
-    borderLeft: `4px solid ${variant.main}`,
-
-    // ── Staircase Stacking (32px offset for title visibility) ──
-    transform: `translateX(${overlapIndex * 32}px)`,
-
+    border: 'none',
+    borderLeft: `3px solid ${borderColor}`,
     '&:hover': {
-      backgroundColor: bgHover,
+      backgroundColor: finalBgHover,
       boxShadow: 'none',
       zIndex: 200,
-      transform: `translateX(${overlapIndex * 32}px) scale(1.02) translateZ(0)`,
-      borderColor: alpha(variant.main, 0.6),
+      transform: 'none',
+      borderLeftColor: alpha(borderColor, 0.8),
     },
   };
 });

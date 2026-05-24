@@ -1,9 +1,14 @@
-import { Box, Typography, Button, ListItemButton, styled, alpha } from '@mui/material';
+import { Box, Typography, Button, ListItemButton, styled } from '@mui/material';
 
 export const SidebarContainer = styled(Box)(({ theme }) => ({
   width: 260,
-  backgroundColor: theme.palette.background.paper,
-  borderRight: `2px solid ${theme.palette.divider}`,
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.6)' : '#F5F5F4',
+  backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
+  borderRight:
+    theme.palette.mode === 'dark'
+      ? '1px solid rgba(255, 255, 255, 0.05)'
+      : '1px solid rgba(0, 0, 0, 0.06)',
   height: '100vh',
   display: 'flex',
   flexDirection: 'column',
@@ -24,8 +29,12 @@ export const Logo = styled(Typography)(({ theme }) => ({
 }));
 
 export const AddTaskButton = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1e2329' : theme.palette.grey[100],
-  border: `1px solid ${theme.palette.divider}`,
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#ffffff',
+  border:
+    theme.palette.mode === 'dark'
+      ? '1px solid rgba(255, 255, 255, 0.05)'
+      : '1px solid rgba(0, 0, 0, 0.05)',
   color: theme.palette.text.primary,
   textTransform: 'none',
   justifyContent: 'center',
@@ -34,8 +43,17 @@ export const AddTaskButton = styled(Button)(({ theme }) => ({
   borderRadius: 12,
   alignItems: 'center',
   textAlign: 'center',
+  boxShadow:
+    theme.palette.mode === 'dark' ? 'none' : '0 1px 2px rgba(0,0,0,0.02)',
+  transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#2a2f36' : theme.palette.grey[200],
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#fafafa',
+    transform: 'translateY(-1px)',
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? '0 4px 12px rgba(0,0,0,0.2)'
+        : '0 2px 6px rgba(0,0,0,0.04)',
   },
 }));
 
@@ -46,15 +64,26 @@ export const NavItem = styled(ListItemButton, {
   marginBottom: 4,
   backgroundColor: active
     ? theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.08)'
-      : alpha(theme.palette.primary.main, 0.1)
+      ? 'rgba(99, 102, 241, 0.15)'
+      : 'rgba(0, 0, 0, 0.05)'
     : 'transparent',
-  color: active ? theme.palette.primary.main : theme.palette.text.secondary,
+  color: active
+    ? theme.palette.mode === 'dark'
+      ? '#818cf8'
+      : '#1C1C1A'
+    : theme.palette.text.secondary,
+  borderLeft:
+    active && theme.palette.mode === 'dark'
+      ? '3px solid #6366f1'
+      : '3px solid transparent',
+  paddingLeft: active && theme.palette.mode === 'dark' ? 13 : 16,
+  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' 
-      ? 'rgba(255, 255, 255, 0.05)' 
-      : alpha(theme.palette.primary.main, 0.05),
-    color: theme.palette.primary.main,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(99, 102, 241, 0.08)'
+        : 'rgba(0, 0, 0, 0.03)',
+    color: theme.palette.mode === 'dark' ? '#818cf8' : '#1C1C1A',
   },
   '& .MuiListItemIcon-root': {
     color: 'inherit',
@@ -63,8 +92,16 @@ export const NavItem = styled(ListItemButton, {
 }));
 
 export const EnergyCard = styled(Box)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.action.hover} 100%)`,
-  border: `1px solid ${theme.palette.divider}`,
+  background:
+    theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(26, 31, 43, 0.5) 0%, rgba(17, 24, 39, 0.8) 100%)'
+      : '#ffffff',
+  border:
+    theme.palette.mode === 'dark'
+      ? '1px solid rgba(255, 255, 255, 0.05)'
+      : '1px solid rgba(0, 0, 0, 0.05)',
+  boxShadow:
+    theme.palette.mode === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.02)',
   borderRadius: 12,
   padding: '16px',
   textAlign: 'center',

@@ -53,15 +53,10 @@ export const TasksControlsBar = ({
       <Box sx={{ display: 'flex', gap: 1 }}>
         <FilterButton
           onClick={(e) => handleFilterClick(e, 'filter')}
-          sx={{
-            backgroundColor: filterAnchorEl ? '#257df0' : 'background.paper',
-          }}
+          active={Boolean(filterAnchorEl)}
         >
-          <FilterListIcon sx={{ color: 'text.primary', fontSize: 20 }} />
-          <Typography
-            variant="body2"
-            sx={{ color: 'text.primary', fontWeight: 600 }}
-          >
+          <FilterListIcon sx={{ fontSize: 20 }} />
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
             Filter
           </Typography>
         </FilterButton>
@@ -75,15 +70,10 @@ export const TasksControlsBar = ({
         />
         <SortButton
           onClick={(e) => handleFilterClick(e, 'sort')}
-          sx={{
-            backgroundColor: sortAnchorEl ? '#257df0' : 'background.paper',
-          }}
+          active={Boolean(sortAnchorEl)}
         >
-          <SortIcon sx={{ color: 'text.primary', fontSize: 20 }} />
-          <Typography
-            variant="body2"
-            sx={{ color: 'text.primary', fontWeight: 600 }}
-          >
+          <SortIcon sx={{ fontSize: 20 }} />
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
             Sort
           </Typography>
         </SortButton>
@@ -97,31 +87,10 @@ export const TasksControlsBar = ({
         <CompletedButton
           id="joyride-tasks-completed"
           onClick={(e) => handleFilterClick(e, 'completed')}
-          sx={{
-            backgroundColor: isCompletedFilterActive
-              ? '#14913e'
-              : 'background.paper',
-            color: isCompletedFilterActive ? '#ffffff' : 'text.primary',
-            '&:hover': {
-              backgroundColor: isCompletedFilterActive
-                ? '#117a34'
-                : 'action.hover',
-            },
-          }}
+          active={isCompletedFilterActive}
         >
-          <CheckCircleIcon
-            sx={{
-              color: isCompletedFilterActive ? '#ffffff' : 'text.primary',
-              fontSize: 20,
-            }}
-          />
-          <Typography
-            variant="body2"
-            sx={{
-              color: isCompletedFilterActive ? '#ffffff' : 'text.primary',
-              fontWeight: 600,
-            }}
-          >
+          <CheckCircleIcon sx={{ fontSize: 20 }} />
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
             Completed
           </Typography>
         </CompletedButton>

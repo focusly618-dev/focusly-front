@@ -37,6 +37,14 @@ export const useTaskDetailModal = ({
     setRealTime,
     color,
     setColor,
+    isSplitable,
+    setIsSplitable,
+    minBlockDuration,
+    setMinBlockDuration,
+    preferredTimeOfDay,
+    setPreferredTimeOfDay,
+    isLocked,
+    setIsLocked,
     errors,
     setErrors,
     handleTitleChange,
@@ -107,6 +115,10 @@ export const useTaskDetailModal = ({
             subtasks,
             links: updatedLinks,
             color,
+            is_splitable: isSplitable,
+            min_block_duration: minBlockDuration,
+            preferred_time_of_day: preferredTimeOfDay,
+            is_locked: isLocked,
           },
           false,
         );
@@ -128,6 +140,10 @@ export const useTaskDetailModal = ({
             subtasks,
             links: updatedLinks,
             color,
+            is_splitable: isSplitable,
+            min_block_duration: minBlockDuration,
+            preferred_time_of_day: preferredTimeOfDay,
+            is_locked: isLocked,
           },
           false,
         );
@@ -145,6 +161,11 @@ export const useTaskDetailModal = ({
     setColor(initialState.color);
     setRealTime(initialState.realTime);
     setStatus(initialState.status);
+
+    setIsSplitable(initialState.isSplitable);
+    setMinBlockDuration(initialState.minBlockDuration);
+    setPreferredTimeOfDay(initialState.preferredTimeOfDay);
+    setIsLocked(initialState.isLocked);
 
     setTags(initialCollections.tags);
     setSubtasks(initialCollections.subtasks);
@@ -167,6 +188,10 @@ export const useTaskDetailModal = ({
     setColor,
     setRealTime,
     setStatus,
+    setIsSplitable,
+    setMinBlockDuration,
+    setPreferredTimeOfDay,
+    setIsLocked,
     setTags,
     setSubtasks,
     setLinks,
@@ -198,6 +223,10 @@ export const useTaskDetailModal = ({
       collaborators,
       color,
       shouldGenerateMeet,
+      is_splitable: isSplitable,
+      min_block_duration: minBlockDuration,
+      preferred_time_of_day: preferredTimeOfDay,
+      is_locked: isLocked,
     });
     if (shouldClose) onClose();
   };
@@ -220,6 +249,10 @@ export const useTaskDetailModal = ({
         collaborators,
         color,
         shouldGenerateMeet,
+        is_splitable: isSplitable,
+        min_block_duration: minBlockDuration,
+        preferred_time_of_day: preferredTimeOfDay,
+        is_locked: isLocked,
       },
       shouldClose,
     );
@@ -316,6 +349,14 @@ export const useTaskDetailModal = ({
     setRealTime,
     color,
     setColor,
+    isSplitable,
+    setIsSplitable,
+    minBlockDuration,
+    setMinBlockDuration,
+    preferredTimeOfDay,
+    setPreferredTimeOfDay,
+    isLocked,
+    setIsLocked,
     errors,
     setErrors,
     handleTitleChange,

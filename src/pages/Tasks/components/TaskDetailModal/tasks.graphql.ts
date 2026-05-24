@@ -18,6 +18,7 @@ export const GET_TASKS = gql`
       user_id
       category
       color
+      use_ai
       subtasks {
         title
         completed
@@ -52,6 +53,10 @@ export const GET_TASKS = gql`
       task_type
       estimated_start_date
       estimated_end_date
+      is_splitable
+      min_block_duration
+      preferred_time_of_day
+      is_locked
       collaborators {
         name
         email
@@ -80,6 +85,7 @@ export const GET_TASKS_TITLES = gql`
       category
       color
       notes_encrypted
+      use_ai
       links {
         title
         url
@@ -88,6 +94,10 @@ export const GET_TASKS_TITLES = gql`
       task_type
       estimated_start_date
       estimated_end_date
+      is_splitable
+      min_block_duration
+      preferred_time_of_day
+      is_locked
       collaborators {
         name
         email
@@ -132,6 +142,7 @@ export const UPDATE_TASK = gql`
       status
       category
       color
+      use_ai
       subtasks {
         title
         completed
@@ -164,6 +175,10 @@ export const UPDATE_TASK = gql`
       task_type
       estimated_start_date
       estimated_end_date
+      is_splitable
+      min_block_duration
+      preferred_time_of_day
+      is_locked
       collaborators {
         name
         email
@@ -184,6 +199,7 @@ export const CREATE_TASK = gql`
       status
       category
       color
+      use_ai
       subtasks {
         title
         completed
@@ -216,6 +232,10 @@ export const CREATE_TASK = gql`
       task_type
       estimated_start_date
       estimated_end_date
+      is_splitable
+      min_block_duration
+      preferred_time_of_day
+      is_locked
       collaborators {
         name
         email
@@ -255,6 +275,12 @@ export const ADD_SUBTASK = gql`
 export const DELETE_TASK = gql`
   mutation DeleteTask($id: String!) {
     deleteTask(id: $id)
+  }
+`;
+
+export const DELETE_TASKS = gql`
+  mutation DeleteTasks($ids: [String!]!) {
+    deleteTasks(ids: $ids)
   }
 `;
 
@@ -299,6 +325,7 @@ export const GET_TASKS_PAGINATED = gql`
         user_id
         category
         color
+        use_ai
         subtasks {
           title
           completed
@@ -333,6 +360,10 @@ export const GET_TASKS_PAGINATED = gql`
         task_type
         estimated_start_date
         estimated_end_date
+        is_splitable
+        min_block_duration
+        preferred_time_of_day
+        is_locked
         collaborators {
           name
           email

@@ -1,4 +1,7 @@
 import { useMutation } from '@apollo/client';
+import { useAppDispatch } from '@/redux/hooks';
+import { upsertTask } from '@/redux/tasks/task.slice';
+import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import {
   GET_TOTAL_WORKSPACES,
   GET_WORKSPACES,
@@ -20,6 +23,7 @@ export const useFocusModeActions = ({
   onSessionComplete,
 }: UseFocusModeActionsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
+  const dispatch = useAppDispatch();
 
   const handleCompleteTask = async (
     activeTask: Task,
@@ -40,6 +44,10 @@ export const useFocusModeActions = ({
           estimate_timer: subtask.estimate_timer,
           priority_level: subtask.priority_level,
           category: subtask.category,
+          status: subtask.status,
+          deadline: subtask.deadline,
+          color: subtask.color,
+          notes_encrypted: subtask.notes_encrypted,
         };
 
         const subtasksInput = updatedSubtasks.map((st, idx) => {
@@ -53,10 +61,14 @@ export const useFocusModeActions = ({
             estimate_timer: st.estimate_timer,
             priority_level: st.priority_level,
             category: st.category,
+            status: st.status,
+            deadline: st.deadline,
+            color: st.color,
+            notes_encrypted: st.notes_encrypted,
           };
         });
 
-        await updateTaskMutation({
+        const { data } = await updateTaskMutation({
           variables: {
             updateTaskInput: {
               id: activeTask.id,
@@ -70,17 +82,21 @@ export const useFocusModeActions = ({
             { query: GET_WORKSPACES, variables: { search: '' } },
           ],
         });
+
+        if (data?.updateTask) {
+          dispatch(upsertTask(mapResponseToTask(data.updateTask)));
+        }
       } else {
         const totalRealTimer = Math.round(
           (activeTask.real_timer || 0) + timeSpentMinutes,
         );
-        await updateTaskMutation({
+        const { data } = await updateTaskMutation({
           variables: {
             updateTaskInput: {
               id: activeTask.id,
               status: 'Done',
               real_timer: totalRealTimer,
-              duration: totalRealTimer.toString(),
+              duration: null,
             },
           },
           refetchQueries: [
@@ -90,6 +106,10 @@ export const useFocusModeActions = ({
             { query: GET_WORKSPACES, variables: { search: '' } },
           ],
         });
+
+        if (data?.updateTask) {
+          dispatch(upsertTask(mapResponseToTask(data.updateTask)));
+        }
       }
       onSessionComplete();
     } catch (error) {
@@ -119,7 +139,7 @@ export const useFocusModeActions = ({
           };
         });
 
-        await updateTaskMutation({
+        const { data } = await updateTaskMutation({
           variables: {
             updateTaskInput: {
               id: activeTask.id,
@@ -131,8 +151,12 @@ export const useFocusModeActions = ({
             { query: GET_TASKS_TITLES, variables: { userId } },
           ],
         });
+
+        if (data?.updateTask) {
+          dispatch(upsertTask(mapResponseToTask(data.updateTask)));
+        }
       } else {
-        await updateTaskMutation({
+        const { data } = await updateTaskMutation({
           variables: {
             updateTaskInput: {
               id: activeTask.id,
@@ -144,6 +168,10 @@ export const useFocusModeActions = ({
             { query: GET_TASKS_TITLES, variables: { userId } },
           ],
         });
+
+        if (data?.updateTask) {
+          dispatch(upsertTask(mapResponseToTask(data.updateTask)));
+        }
       }
     } catch (error) {
       console.error('Failed to update status:', error);
@@ -173,7 +201,7 @@ export const useFocusModeActions = ({
           };
         });
 
-        await updateTaskMutation({
+        const { data } = await updateTaskMutation({
           variables: {
             updateTaskInput: {
               id: activeTask.id,
@@ -185,8 +213,12 @@ export const useFocusModeActions = ({
             { query: GET_TASKS_TITLES, variables: { userId } },
           ],
         });
+
+        if (data?.updateTask) {
+          dispatch(upsertTask(mapResponseToTask(data.updateTask)));
+        }
       } else {
-        await updateTaskMutation({
+        const { data } = await updateTaskMutation({
           variables: {
             updateTaskInput: {
               id: activeTask.id,
@@ -198,6 +230,10 @@ export const useFocusModeActions = ({
             { query: GET_TASKS_TITLES, variables: { userId } },
           ],
         });
+
+        if (data?.updateTask) {
+          dispatch(upsertTask(mapResponseToTask(data.updateTask)));
+        }
       }
     } catch (error) {
       console.error('Failed to update priority:', error);

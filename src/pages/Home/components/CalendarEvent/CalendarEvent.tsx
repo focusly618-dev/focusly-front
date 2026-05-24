@@ -9,8 +9,6 @@ import {
   alpha,
 } from '@mui/material';
 import {
-  CalendarToday as CalendarTodayIcon,
-  Videocam as VideocamIcon,
   ContentCopy as DuplicateIcon,
   DeleteOutline as DeleteIcon,
   Schedule as ScheduleIcon,
@@ -50,12 +48,17 @@ interface CalendarEventProps {
   slotStart?: Date;
   slotEnd?: Date;
   onStartFocus?: (task: Task) => void;
+  currentView?: string;
 }
 
 export const CalendarEvent = (props: CalendarEventProps) => {
-  const { event, title, onStartFocus } = props;
+  const { event, title, onStartFocus, currentView } = props;
   const variant = getEventColor(event as { id?: string });
-  const timeRange = `${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}`;
+  const formatTime = (date: Date) => {
+    const m = moment(date);
+    return m.minutes() === 0 ? m.format('h A') : m.format('h.mm A');
+  };
+  const timeRange = `${formatTime(event.start)} - ${formatTime(event.end)}`;
 
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
@@ -117,7 +120,6 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     handleClose();
   };
 
-  const isPast = moment(event.end).isBefore(moment());
   const VIDEO_CALL_DOMAINS =
     /meet\.google\.com|zoom\.us|teams\.microsoft\.com|webex\.com|skype\.com|slack\.com|discord\.com|jit\.si|whereby\.com/i;
 
@@ -141,7 +143,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
 
   const durationMinutes = (event.end.getTime() - event.start.getTime()) / 60000;
   const isShortEvent = durationMinutes <= 30;
-  const startTime = moment(event.start).format('HH:mm');
+  const startTime = formatTime(event.start);
 
   const currentPriority =
     event.type === 'task'
@@ -155,11 +157,9 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       overlapIndex={event.overlapIndex}
       onContextMenu={handleContextMenu}
       sx={{
-        opacity: isPast ? 0.45 : 1,
-        filter: isPast ? 'grayscale(0.2)' : 'none',
-        transition: 'opacity 0.2s ease, transform 0.1s ease',
+        border: '1px solid #edededff',
         '&:hover': {
-          opacity: 1, // Full opacity on hover even if past
+          border: '1px solid green', // Full opacity on hover even if past
         },
       }}
     >
@@ -167,126 +167,48 @@ export const CalendarEvent = (props: CalendarEventProps) => {
         className="event-card-inner"
         style={{
           display: 'flex',
-          alignItems: 'flex-start',
-          gap: '4px',
+          flexDirection: currentView === 'month' ? 'row' : 'column',
+          alignItems: currentView === 'month' ? 'center' : 'flex-start',
+          gap: currentView === 'month' ? '6px' : '2px',
           height: '100%',
-          minWidth: 0,
+          width: '100%',
+          overflow: 'hidden',
         }}
       >
-        {(event.overlapIndex || 0) < 3 && (
-          <div
-            className="event-icon-container"
-            style={{
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            {isMeeting ? (
-              <VideocamIcon
-                sx={{ fontSize: '12px', color: '#60A5FA', opacity: 0.9 }}
-              />
-            ) : (
-              <CalendarTodayIcon
-                sx={{ fontSize: '10px', opacity: 0.6, color: 'inherit' }}
-              />
-            )}
-          </div>
-        )}
-        <div
-          className="event-info"
-          style={{
-            minWidth: 0,
-            flex: 1,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: currentView === 'month' ? '9px' : '10px',
+            fontWeight: 500,
+            opacity: 0.7,
+            color: 'inherit',
+            lineHeight: 1.1,
+            fontFamily: '"Inter", "Roboto Mono", monospace',
+            display: 'block',
+            whiteSpace: 'nowrap',
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              flexWrap: isShortEvent ? 'nowrap' : 'wrap',
-              justifyContent: 'space-between',
-              width: '100%',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                minWidth: 0,
-                flex: 1,
-              }}
-            >
-              {currentPriority && (
-                <svg
-                  width="10"
-                  height="10"
-                  viewBox="0 0 24 24"
-                  fill={PRIORITY_COLORS[currentPriority as 1 | 2 | 3 | 4]?.main}
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{ flexShrink: 0 }}
-                >
-                  <path d="M12.45 4L12.15 2.52C12.07 2.22 11.8 2 11.5 2H4C3.45 2 3 2.45 3 3V19C3 19.55 3.45 20 4 20H5C5.55 20 6 19.55 6 19V14H10.55L10.85 15.48C10.93 15.78 11.2 16 11.5 16H19C19.55 16 20 15.55 20 15V5C20 4.45 19.55 4 19 4H12.45Z" />
-                </svg>
-              )}
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '11px',
-                  lineHeight: 1.2,
-                  display: 'inline',
-                  color: 'inherit',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  fontFamily: '"Inter", "Roboto", sans-serif',
-                }}
-                title={title}
-              >
-                {title}
-              </Typography>
-            </Box>
-            {isShortEvent && (
-              <Typography
-                variant="caption"
-                sx={{
-                  fontSize: '10px',
-                  fontWeight: 500,
-                  opacity: 0.7,
-                  color: 'inherit',
-                  lineHeight: 1.2,
-                  fontFamily: '"Inter", "Roboto Mono", monospace',
-                  flexShrink: 0,
-                }}
-              >
-                {startTime}
-              </Typography>
-            )}
-          </Box>
-          {!isShortEvent && (
-            <Typography
-              variant="caption"
-              sx={{
-                fontSize: '9px',
-                fontWeight: 500,
-                display: 'block',
-                opacity: 0.6,
-                color: 'inherit',
-                lineHeight: 1.1,
-                fontFamily: '"Inter", "Roboto Mono", monospace',
-                mt: 0.2,
-              }}
-            >
-              {timeRange}
-            </Typography>
-          )}
-        </div>
+          {isShortEvent ? startTime : timeRange}
+        </Typography>
+
+        <Typography
+          variant="caption"
+          sx={{
+            fontWeight: 600,
+            fontSize: currentView === 'month' ? '10px' : '11px',
+            lineHeight: 1.2,
+            color: 'inherit',
+            fontFamily: '"Inter", "Roboto", sans-serif',
+            display: '-webkit-box',
+            WebkitLineClamp: isShortEvent ? 1 : 4,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            flex: 1,
+          }}
+          title={title}
+        >
+          {title}
+        </Typography>
       </div>
     </EventContainer>
   );

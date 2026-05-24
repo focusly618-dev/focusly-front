@@ -4,8 +4,18 @@
   font-weight: 400;
 
   color-scheme: dark light; /* Prefer dark */
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #1b1b1d;
+  
+  --bg-layout: #f8fafc;
+  --bg-panel: #ffffff;
+  --bg-card: #ffffff;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+  --scrollbar-track: transparent;
+  --glow-color: rgba(19, 127, 236, 0.15);
+  
+  background-color: var(--bg-layout);
+  color: #0f172a;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,6 +33,20 @@
   --sileo-error-bg: #fff1f2;
   --sileo-error-text: #991b1b;
   --sileo-desc-text: #475569;
+}
+
+html.dark {
+  --bg-layout: #0B0F14;
+  --bg-panel: #111827;
+  --bg-card: #1A1F2B;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.12);
+  --scrollbar-track: rgba(0, 0, 0, 0.2);
+  --glow-color: rgba(99, 102, 241, 0.15);
+  
+  background-color: var(--bg-layout);
+  color: #e0e2e9;
 }
 
 body {
@@ -94,4 +118,32 @@ body {
   font-weight: 700 !important;
   border-radius: 8px !important;
   text-transform: none !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }

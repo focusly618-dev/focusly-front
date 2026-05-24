@@ -24,6 +24,10 @@ export const useTaskFormState = ({
       currentDate: initialStart || new Date(),
       duration: '',
       realTime: '00:00',
+      isSplitable: true,
+      minBlockDuration: 30,
+      preferredTimeOfDay: 'any',
+      isLocked: false,
     };
 
     if (!initialTask) return defaults;
@@ -38,16 +42,14 @@ export const useTaskFormState = ({
       deadline,
       estimate_timer,
       real_timer,
+      is_splitable,
+      min_block_duration,
+      preferred_time_of_day,
+      is_locked,
     } = initialTask;
 
     // Use color field directly if available, otherwise fall back to parsing from notes_encrypted
     let color = initialColor || '#1e293b';
-    if (!color) {
-      const colorMatch = notes_encrypted.match(/\[COLOR:(.*?)\]/);
-      if (colorMatch && colorMatch[1]) {
-        color = colorMatch[1];
-      }
-    }
     if (!color) {
       const colorMatch = notes_encrypted.match(/\[COLOR:(.*?)\]/);
       if (colorMatch && colorMatch[1]) {
@@ -81,6 +83,12 @@ export const useTaskFormState = ({
       currentDate: startInitial,
       duration: estimate_timer ? formatDuration(estimate_timer) : '',
       realTime: real_timer ? formatDuration(real_timer) : '',
+      isSplitable: is_splitable !== undefined ? is_splitable : true,
+      minBlockDuration:
+        min_block_duration !== undefined ? min_block_duration : 30,
+      preferredTimeOfDay:
+        preferred_time_of_day !== undefined ? preferred_time_of_day : 'any',
+      isLocked: is_locked !== undefined ? is_locked : false,
     };
   }, [initialTask, initialStart]);
 
@@ -96,6 +104,14 @@ export const useTaskFormState = ({
   const [duration, setDuration] = useState(initialState.duration);
   const [realTime, setRealTime] = useState(initialState.realTime);
   const [color, setColor] = useState(initialState.color);
+  const [isSplitable, setIsSplitable] = useState(initialState.isSplitable);
+  const [minBlockDuration, setMinBlockDuration] = useState(
+    initialState.minBlockDuration,
+  );
+  const [preferredTimeOfDay, setPreferredTimeOfDay] = useState(
+    initialState.preferredTimeOfDay,
+  );
+  const [isLocked, setIsLocked] = useState(initialState.isLocked);
   const [errors, setErrors] = useState<{ title?: string; duration?: string }>(
     {},
   );
@@ -146,6 +162,14 @@ export const useTaskFormState = ({
     setRealTime,
     color,
     setColor,
+    isSplitable,
+    setIsSplitable,
+    minBlockDuration,
+    setMinBlockDuration,
+    preferredTimeOfDay,
+    setPreferredTimeOfDay,
+    isLocked,
+    setIsLocked,
     errors,
     setErrors,
     handleTitleChange,
