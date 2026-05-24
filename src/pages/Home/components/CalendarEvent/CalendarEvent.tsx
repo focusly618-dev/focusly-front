@@ -13,16 +13,16 @@ import {
   Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 
+import type { CalendarEventProps } from './CalendarEvent.types';
+import moment from 'moment';
+import { useCalendarContextMenu } from './hooks/useCalendarContextMenu';
+
 import {
   getEventColor,
   EventContainer,
   contextMenuSx,
   PRIORITY_COLORS,
 } from './CalendarEvent.styles';
-
-import type { CalendarEventProps } from './CalendarEvent.types';
-import moment from 'moment';
-import { useCalendarContextMenu } from './hooks/useCalendarContextMenu';
 
 export const CalendarEvent = (props: CalendarEventProps) => {
   const { event, onStartFocus } = props;

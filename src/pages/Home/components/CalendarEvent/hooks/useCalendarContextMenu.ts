@@ -21,7 +21,6 @@ import { useState } from 'react';
 import type { ICalendarEvent } from '../CalendarEvent.types';
 import type { UseCalendarContextMenuReturn } from '../CalendarEvent.types';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
-import type { Task } from '@/redux/tasks/task.types';
 
 export const useCalendarContextMenu = (
   event: ICalendarEvent,

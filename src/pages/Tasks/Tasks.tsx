@@ -42,8 +42,6 @@ export const Tasks = ({
     activeFilterState,
     filterAnchorEl,
     sortAnchorEl,
-    expandedTaskIds,
-    toggleTaskExpansion,
     updateTask,
     viewMode,
     setViewMode,
@@ -185,8 +183,6 @@ export const Tasks = ({
             isLoading={isLoading}
             tasks={tasks}
             filteredTasks={filteredTasks}
-            expandedTaskIds={expandedTaskIds}
-            toggleTaskExpansion={toggleTaskExpansion}
             handleTaskClick={handleTaskClick}
             updateTask={updateTask}
             deleteTasks={deleteTasks}
