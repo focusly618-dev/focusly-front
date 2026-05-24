@@ -244,7 +244,8 @@ export const WorkspaceLibrary = ({
             }}
           >
             {selectedFolderId
-              ? folders.find((f) => f.id === selectedFolderId)?.name || 'Folder'
+              ? folders.find((f: FolderTypes) => f.id === selectedFolderId)
+                  ?.name || 'Folder'
               : 'All Notes'}
           </Typography>
           <Typography
@@ -256,7 +257,7 @@ export const WorkspaceLibrary = ({
             }}
           >
             {selectedFolderId
-              ? `${folders.find((f) => f.id === selectedFolderId)?.workspaceCount || 0} notes`
+              ? `${folders.find((f: FolderTypes) => f.id === selectedFolderId)?.workspaceCount || 0} notes`
               : `${allWorkspaces.length} notes`}
           </Typography>
         </Box>

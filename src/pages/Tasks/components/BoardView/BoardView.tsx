@@ -16,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import type { Theme } from '@mui/material/styles';
 import {
   BoardContainer,
   ColumnTitle,
@@ -196,7 +197,7 @@ export const BoardView = ({
               </ColumnTitle>
               <TaskCountBadge
                 sx={{
-                  backgroundColor: (theme) =>
+                  backgroundColor: (theme: Theme) =>
                     theme.palette.mode === 'dark'
                       ? column.id === 'Todo'
                         ? 'rgba(59, 130, 246, 0.15)'
@@ -206,7 +207,7 @@ export const BoardView = ({
                             ? 'rgba(168, 85, 247, 0.15)'
                             : 'rgba(244, 63, 94, 0.15)'
                       : column.badge,
-                  color: (theme) =>
+                  color: (theme: Theme) =>
                     theme.palette.mode === 'dark' ? column.color : 'white',
                   borderRadius: '6px',
                   padding: '2px 8px',
