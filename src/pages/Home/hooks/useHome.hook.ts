@@ -3,10 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { useMutation } from '@apollo/client';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
-import {
-  GET_TASKS,
-  DELETE_TASK,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import { GET_TASKS, DELETE_TASK } from '@/pages/Tasks/Task.graphql';
 import {
   removeTask,
   upsertTask as upsertTaskRedux,
@@ -23,6 +20,7 @@ import {
   getBaseGoogleId,
 } from '@/api/Tasks/taskMapper';
 import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
+import { handleMutationError } from '@/utils/errorHandler';
 
 export const useHome = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -227,7 +225,7 @@ export const useHome = () => {
           dispatch(removeEvent({ id: taskDetailsTask.id }));
         }
       } catch (e) {
-        console.error('Failed to delete task', e);
+        handleMutationError(e, 'Error al eliminar la tarea');
       }
     }
     closeTaskDetails();

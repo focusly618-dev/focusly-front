@@ -6,7 +6,7 @@ import {
   UPDATE_TASK,
   DELETE_TASK,
   GET_TASKS,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+} from '@/pages/Tasks/Task.graphql';
 import {
   REMOVE_WORKSPACE,
   GET_WORKSPACES,
@@ -30,6 +30,7 @@ import type {
   TaskInput,
   UseTaskMutationsProps,
 } from '../types/CreateTaskModal.types';
+import { handleMutationError } from '@/utils/errorHandler';
 
 export const useTaskMutations = ({
   onSave,
@@ -171,7 +172,7 @@ export const useTaskMutations = ({
         onClose();
       }
     } catch (e) {
-      console.error(e);
+      handleMutationError(e, 'Error al crear la tarea');
     }
     setLoadingSave(false);
   };
@@ -248,7 +249,7 @@ export const useTaskMutations = ({
         if (shouldClose) onClose();
       }
     } catch (e) {
-      console.error(e);
+      handleMutationError(e, 'Error al actualizar la tarea');
     }
     setLoadingSave(false);
   };
@@ -274,7 +275,7 @@ export const useTaskMutations = ({
       }
       resetForm();
     } catch (e) {
-      console.error(e);
+      handleMutationError(e, 'Error al eliminar la tarea');
     }
   };
 
@@ -285,7 +286,10 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user?.id } }],
       });
     } catch (error) {
-      console.error(error);
+      handleMutationError(
+        error,
+        'Error al remover la tarea del espacio de trabajo',
+      );
     }
   };
 

@@ -10,8 +10,9 @@ import {
   UPDATE_TASK,
   GET_TASKS,
   GET_TASKS_TITLES,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+} from '@/pages/Tasks/Task.graphql';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
+import { handleMutationError } from '@/utils/errorHandler';
 
 interface UseFocusModeActionsProps {
   userId?: string;
@@ -55,11 +56,14 @@ export const useFocusModeActions = ({
       }
       onSessionComplete();
     } catch (error) {
-      console.error('Failed to complete task:', error);
+      handleMutationError(error, 'Error al completar la tarea');
     }
   };
 
-  const handleUpdateStatus = async (activeTask: Task, newStatus: TaskStatus) => {
+  const handleUpdateStatus = async (
+    activeTask: Task,
+    newStatus: TaskStatus,
+  ) => {
     try {
       const { data } = await updateTaskMutation({
         variables: {
@@ -78,7 +82,7 @@ export const useFocusModeActions = ({
         dispatch(upsertTask(mapResponseToTask(data.updateTask)));
       }
     } catch (error) {
-      console.error('Failed to update status:', error);
+      handleMutationError(error, 'Error al actualizar el estado de la tarea');
     }
   };
 
@@ -104,7 +108,10 @@ export const useFocusModeActions = ({
         dispatch(upsertTask(mapResponseToTask(data.updateTask)));
       }
     } catch (error) {
-      console.error('Failed to update priority:', error);
+      handleMutationError(
+        error,
+        'Error al actualizar la prioridad de la tarea',
+      );
     }
   };
 

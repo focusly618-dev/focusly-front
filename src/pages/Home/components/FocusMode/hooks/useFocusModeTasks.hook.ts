@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { useAppSelector } from '@/redux/hooks';
-import { GET_TASKS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import { GET_TASKS } from '@/pages/Tasks/Task.graphql';
 import type { Task } from '@/redux/tasks/task.types';
 
 interface UseFocusModeTasksProps {
@@ -10,7 +10,9 @@ interface UseFocusModeTasksProps {
 
 export const useFocusModeTasks = ({ initialTask }: UseFocusModeTasksProps) => {
   const { user } = useAppSelector((state) => state.auth);
-  const [activeTask, setActiveTask] = useState<Task | null>(initialTask ?? null);
+  const [activeTask, setActiveTask] = useState<Task | null>(
+    initialTask ?? null,
+  );
 
   const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, {
     variables: { userId: user?.id },

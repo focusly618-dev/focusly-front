@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '@/redux/hooks';
-import { GET_TAGS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import { GET_TAGS } from '@/pages/Tasks/Task.graphql';
 import { useTasksData } from '@/pages/Tasks/hooks/useTasksData.hook';
 import { useTasksFilters } from '@/pages/Tasks/hooks/useTasksFilters.hook';
 import { useTasksMutations } from '@/pages/Tasks/hooks/useTasksMutations.hook';

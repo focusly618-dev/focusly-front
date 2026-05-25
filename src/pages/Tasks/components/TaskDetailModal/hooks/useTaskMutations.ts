@@ -10,7 +10,7 @@ import {
   UPDATE_TASK,
   DELETE_TASK,
   GET_TASKS,
-} from '../tasks.graphql';
+} from '../../../Task.graphql';
 import { sileo } from 'sileo';
 import {
   createGoogleEvent,
@@ -31,6 +31,7 @@ import type {
 } from '../types/TaskDetailModal.types';
 import type { PriorityType } from '../TaskDetailModal.utils';
 import type { Task } from '@/redux/tasks/task.types';
+import { handleMutationError } from '@/utils/errorHandler';
 
 export const useTaskMutations = ({
   onSave,
@@ -178,7 +179,7 @@ export const useTaskMutations = ({
         onClose();
       }
     } catch (e) {
-      console.error(e);
+      handleMutationError(e, 'Error al crear la tarea');
     }
     setLoadingSave(false);
   };
@@ -327,7 +328,7 @@ export const useTaskMutations = ({
         if (shouldClose) onClose();
       }
     } catch (e) {
-      console.error(e);
+      handleMutationError(e, 'Error al actualizar la tarea');
     }
     setLoadingSave(false);
   };
@@ -364,7 +365,7 @@ export const useTaskMutations = ({
       resetForm();
       onClose();
     } catch (e) {
-      console.error(e);
+      handleMutationError(e, 'Error al eliminar la tarea');
     }
   };
 
@@ -386,10 +387,7 @@ export const useTaskMutations = ({
         fill: 'var(--sileo-update-bg)',
       });
     } catch (error) {
-      console.error(error);
-      sileo.error({
-        title: 'Error unlinking workspace',
-      });
+      handleMutationError(error, 'Error al desvincular el espacio de trabajo');
     }
   };
 

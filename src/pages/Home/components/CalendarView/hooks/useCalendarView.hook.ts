@@ -32,7 +32,7 @@ import {
   GET_TASKS,
   DELETE_TASK,
   UPDATE_TASK,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+} from '@/pages/Tasks/Task.graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { CalendarNavigateAction } from '../calendarView.types';
@@ -226,7 +226,15 @@ export const useCalendarView = () => {
           return null;
         }
       })
-      .filter((e): e is NonNullable<typeof e> => Boolean(e));
+      .filter((e): e is NonNullable<typeof e> => {
+        if (!e) return false;
+        const norm = normalizeGoogleId(e.id);
+        const base = getBaseGoogleId(e.id);
+        const isAlreadySynced =
+          (norm && syncedGoogleIds.has(norm)) ||
+          (base && syncedGoogleIds.has(base));
+        return !isAlreadySynced;
+      });
 
     // 2. Map Focusly Tasks (Native)
     const taskEvents = tasks.map((task: Task) => {

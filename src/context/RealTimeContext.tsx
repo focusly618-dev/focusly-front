@@ -5,7 +5,7 @@ import { useApolloClient } from '@apollo/client';
 import type { RootState } from '@/redux/store';
 import { incrementSyncVersion } from '@/redux/calendar/calendar.slice';
 import { API_BASE_URL } from '@/config/env.config';
-import { GET_TASKS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import { GET_TASKS } from '@/pages/Tasks/Task.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
 
 const RealTimeContext = createContext<Socket | null>(null);

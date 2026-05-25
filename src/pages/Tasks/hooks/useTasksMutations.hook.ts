@@ -4,7 +4,7 @@ import {
   GET_TASKS,
   GET_TASKS_TITLES,
   DELETE_TASKS,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+} from '@/pages/Tasks/Task.graphql';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import {
@@ -12,6 +12,7 @@ import {
   removeTasks,
 } from '@/redux/tasks/task.slice';
 import type { Task } from '@/redux/tasks/task.types';
+import { handleMutationError } from '@/utils/errorHandler';
 
 interface UseTasksMutationsProps {
   userId?: string;
@@ -109,7 +110,7 @@ export const useTasksMutations = ({
         'Your changes have been saved.',
       );
     } catch (error) {
-      console.error('Error updating task:', error);
+      handleMutationError(error, 'Error al actualizar la tarea');
     }
   };
 
@@ -131,7 +132,7 @@ export const useTasksMutations = ({
         );
       }
     } catch (error) {
-      console.error('Error deleting tasks:', error);
+      handleMutationError(error, 'Error al eliminar las tareas');
     }
   };
 

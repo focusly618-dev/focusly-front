@@ -1,13 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_TOTAL_WORKSPACES } from '../workspaces.graphql';
-import {
-  GET_TASKS_TITLES,
-  UPDATE_TASK,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/Task.graphql';
 import type { TaskSearchItems } from '../types/workspace.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
+import { handleMutationError } from '@/utils/errorHandler';
 
 interface UseWorkspaceTasksProps {
   userId?: string;
@@ -71,7 +69,7 @@ export const useWorkspaceTasks = ({
         ],
       });
     } catch (error) {
-      console.error('Error updating task:', error);
+      handleMutationError(error, 'Error al actualizar la tarea');
     }
   };
 
