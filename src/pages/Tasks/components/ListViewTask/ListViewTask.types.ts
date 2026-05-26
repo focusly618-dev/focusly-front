@@ -3,10 +3,6 @@ import type { Task } from '@/redux/tasks/task.types';
 
 export interface ListViewTaskProps {
   task: TaskResponse;
-  expandedTaskIds: Set<string>;
-  toggleTaskExpansion: (taskId: string) => void;
-  handleSubtaskToggle: (task: TaskResponse, index: number) => void;
-  handleOpenSubtaskModal: (task: TaskResponse, index?: number) => void;
   onTaskClick: (task: TaskResponse) => void;
   updateTask?: (taskId: string, updates: TaskResponse) => Promise<void>;
   isAIScheduleEnabled?: boolean;

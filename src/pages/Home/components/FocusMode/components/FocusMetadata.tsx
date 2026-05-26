@@ -333,23 +333,6 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
         ))}
       </Menu>
 
-      {activeItem?.isSubtask && (
-        <Box sx={{ mt: 1, display: 'inline-flex' }}>
-          <Typography
-            sx={{
-              color: '#3b82f6',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              bgcolor: 'rgba(59, 130, 246, 0.1)',
-              px: 1,
-              py: 0.5,
-              borderRadius: 1,
-            }}
-          >
-            SUBTASK
-          </Typography>
-        </Box>
-      )}
     </TaskTitleContainer>
   );
 };

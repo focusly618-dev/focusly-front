@@ -202,30 +202,3 @@ export const SendButton = styled(IconButton)(({ theme }) => ({
     color: theme.palette.text.disabled,
   },
 }));
-
-/* Helper Components for the Rich Content */
-export const SubtaskCard = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '12px',
-  padding: '12px',
-  marginTop: '8px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  transition: 'background-color 0.2s',
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-export const AddButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  width: '28px',
-  height: '28px',
-  borderRadius: '8px',
-  '&:hover': {
-    backgroundColor: theme.palette.primary.dark,
-  },
-}));

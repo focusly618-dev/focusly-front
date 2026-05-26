@@ -13,8 +13,6 @@ export const useCreateTaskModal = ({
   onDelete,
   initialStart,
   initialTask,
-  parentTask,
-  subtaskIndex,
 }: UseCreateTaskModalProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -47,32 +45,23 @@ export const useCreateTaskModal = ({
   } = useTaskFormState({ initialStart, initialTask });
   const [shouldGenerateMeet, setShouldGenerateMeet] = useState(false);
 
-  // Use a dummy resetForm for mutations initialization to avoid circular dependency
   const mutations = useTaskMutations({
     onSave,
     onClose,
     onDelete,
     initialTask,
-    parentTask,
-    subtaskIndex,
-    resetForm: () => {}, // Will be overwritten or handled below
+    resetForm: () => {},
   });
 
   const {
     tags,
     setTags,
-    subtasks,
-    setSubtasks,
     links,
     setLinks,
     newTag,
     setNewTag,
     isAddingTag,
     setIsAddingTag,
-    newSubtask,
-    setNewSubtask,
-    newSubtaskDuration,
-    setNewSubtaskDuration,
     newLinkTitle,
     setNewLinkTitle,
     newLinkUrl,
@@ -80,8 +69,6 @@ export const useCreateTaskModal = ({
     isAddingLink,
     setIsAddingLink,
     handleAddTag,
-    handleAddSubtask,
-    handleToggleSubtask,
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,
@@ -101,7 +88,6 @@ export const useCreateTaskModal = ({
             duration,
             realTime,
             tags,
-            subtasks,
             links: updatedLinks,
             color,
           },
@@ -122,7 +108,6 @@ export const useCreateTaskModal = ({
             duration,
             realTime,
             tags,
-            subtasks,
             links: updatedLinks,
             color,
           },
@@ -144,10 +129,7 @@ export const useCreateTaskModal = ({
     setStatus(initialState.status);
 
     setTags(initialCollections.tags);
-    setSubtasks(initialCollections.subtasks);
     setLinks(initialCollections.links);
-    setNewSubtask('');
-    setNewSubtaskDuration('');
     setNewTag('');
     setIsAddingTag(false);
     setIsAddingLink(false);
@@ -164,16 +146,12 @@ export const useCreateTaskModal = ({
     setRealTime,
     setStatus,
     setTags,
-    setSubtasks,
     setLinks,
-    setNewSubtask,
-    setNewSubtaskDuration,
     setNewTag,
     setIsAddingTag,
     setIsAddingLink,
   ]);
 
-  // Inject real resetForm into mutations (assuming useTaskMutations doesn't store it in a way that breaks this)
   const mutationsWithReset = { ...mutations, resetForm };
 
   const handleSaveWrapper = async () => {
@@ -188,7 +166,6 @@ export const useCreateTaskModal = ({
       duration,
       realTime,
       tags,
-      subtasks,
       links,
       color,
       shouldGenerateMeet,
@@ -207,7 +184,6 @@ export const useCreateTaskModal = ({
       duration,
       realTime,
       tags,
-      subtasks,
       links,
       color,
       shouldGenerateMeet,
@@ -276,7 +252,6 @@ export const useCreateTaskModal = ({
     setSuggestions(suggestions);
     setAnchor(suggestions.length > 0 ? target : null);
 
-    // Validate duration in real-time if this is the duration field
     if (setter === setDuration) {
       handleDurationChange(value);
     }
@@ -317,18 +292,12 @@ export const useCreateTaskModal = ({
     timeSlotDisplay,
     tags,
     setTags,
-    subtasks,
-    setSubtasks,
     links,
     setLinks,
     newTag,
     setNewTag,
     isAddingTag,
     setIsAddingTag,
-    newSubtask,
-    setNewSubtask,
-    newSubtaskDuration,
-    setNewSubtaskDuration,
     newLinkTitle,
     setNewLinkTitle,
     newLinkUrl,
@@ -336,8 +305,6 @@ export const useCreateTaskModal = ({
     isAddingLink,
     setIsAddingLink,
     handleAddTag,
-    handleAddSubtask,
-    handleToggleSubtask,
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,

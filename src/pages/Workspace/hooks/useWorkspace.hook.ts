@@ -22,10 +22,8 @@ export const useWorkspace = () => {
     tasksData,
     isLoading,
     selectTask,
-    selectedSubtaskIndex,
     handleSelectTask,
     handleUpdateTask,
-    handleToggleSubtask,
   } = useWorkspaceTasks({
     userId: user?.id,
     onTaskSelect: (taskId) => setValue('taskId', taskId),
@@ -60,9 +58,7 @@ export const useWorkspace = () => {
     isLoading,
     handleSelectTask,
     selectTask,
-    selectedSubtaskIndex,
     handleUpdateTask,
-    handleToggleSubtask,
 
     // Actions
     searchWorkspaces,

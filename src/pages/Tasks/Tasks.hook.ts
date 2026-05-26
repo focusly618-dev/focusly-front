@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '@/redux/hooks';
-import { GET_TAGS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import { GET_TAGS } from '@/pages/Tasks/Task.graphql';
 import { useTasksData } from '@/pages/Tasks/hooks/useTasksData.hook';
 import { useTasksFilters } from '@/pages/Tasks/hooks/useTasksFilters.hook';
 import { useTasksMutations } from '@/pages/Tasks/hooks/useTasksMutations.hook';
@@ -11,20 +11,12 @@ import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
 export const useTasks = () => {
   const { user } = useAppSelector((state) => state.auth);
-  const tasks = useAppSelector((state) => state.task.tasks);
   const [, setSearchParams] = useSearchParams();
 
   // ── View & UI local state ──────────────────────────────────────────
   const [viewMode, setViewMode] = useState<
     'list' | 'grid' | 'board' | 'workload'
   >('list');
-  const [activeParentTask, setActiveParentTask] = useState<TaskResponse | null>(
-    null,
-  );
-  const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
-  const [activeSubtaskIndex, setActiveSubtaskIndex] = useState<number | null>(
-    null,
-  );
   const [runOnboarding, setRunOnboarding] = useState(
     () => localStorage.getItem('onboarding_tasks_completed') !== 'true',
   );
@@ -136,31 +128,6 @@ export const useTasks = () => {
     localStorage.setItem('onboarding_tasks_completed', 'true');
   };
 
-  const handleOpenSubtaskModal = (task: TaskResponse, index?: number): void => {
-    // Get the task from Redux store to ensure we have the latest data with updated subtask colors
-    const updatedTask = tasks.find((t) => t.id === task.id) || task;
-    setActiveParentTask(updatedTask as TaskResponse);
-    setActiveSubtaskIndex(typeof index === 'number' ? index : null);
-    setIsSubtaskModalOpen(true);
-  };
-
-  const handleSaveSubtask = async (): Promise<void> => {
-    if (activeSubtaskIndex !== null) {
-      setIsSubtaskModalOpen(false);
-      setActiveParentTask(null);
-      setActiveSubtaskIndex(null);
-    }
-  };
-
-  const handleSubtaskToggle = (task: TaskResponse, index: number): void => {
-    const newSubtasks = [...(task.subtasks || [])];
-    newSubtasks[index] = {
-      ...newSubtasks[index],
-      completed: !newSubtasks[index].completed,
-    };
-    mutations.updateTask(task.id, { ...task, subtasks: newSubtasks });
-  };
-
   // ── Return ─────────────────────────────────────────────────────────
   return {
     // Data
@@ -203,18 +170,11 @@ export const useTasks = () => {
     // Mutations
 
     updateTask: mutations.updateTask,
-    handleAddSubtask: mutations.handleAddSubtask,
     deleteTasks: mutations.deleteTasks,
 
     // View & modal
     viewMode,
     setViewMode,
-    activeParentTask,
-    setActiveParentTask,
-    isSubtaskModalOpen,
-    setIsSubtaskModalOpen,
-    activeSubtaskIndex,
-    setActiveSubtaskIndex,
     runOnboarding,
     setRunOnboarding,
 
@@ -224,9 +184,6 @@ export const useTasks = () => {
     handleFilterClose: () => ui.setFilterAnchorEl(null),
     handleSortClose: () => ui.setSortAnchorEl(null),
     handleFinishOnboarding,
-    handleOpenSubtaskModal,
-    handleSaveSubtask,
-    handleSubtaskToggle,
     setPriorityFilter: filterLogic.setPriorityFilter,
     setStatusFilter: filterLogic.setStatusFilter,
     statusCounts,

@@ -18,14 +18,8 @@ interface EditorHeaderProps {
   searchTerm: string;
   setSearchTerm: (s: string) => void;
   filteredTasks: TaskSearchItems[];
-  filterTab: 'TASKS' | 'SUBTASKS';
-  setFilterTab: (t: 'TASKS' | 'SUBTASKS') => void;
   selectTask: TaskSearchItems | null;
-  selectedSubtaskIndex: number | null;
-  handleSelectTask: (
-    task: TaskSearchItems | null,
-    index: number | null,
-  ) => void;
+  handleSelectTask: (task: TaskSearchItems | null) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (field: any, value: any) => void;
 }
@@ -37,10 +31,7 @@ export const EditorHeader = ({
   searchTerm,
   setSearchTerm,
   filteredTasks,
-  filterTab,
-  setFilterTab,
   selectTask,
-  selectedSubtaskIndex,
   handleSelectTask,
   setValue,
 }: EditorHeaderProps) => {
@@ -65,10 +56,7 @@ export const EditorHeader = ({
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           filteredTasks={filteredTasks}
-          filterTab={filterTab}
-          setFilterTab={setFilterTab}
           selectTask={selectTask}
-          selectedSubtaskIndex={selectedSubtaskIndex}
           handleSelectTask={handleSelectTask}
           setValue={setValue}
         />

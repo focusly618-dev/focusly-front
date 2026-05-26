@@ -1,107 +1,51 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client';
-import moment from 'moment';
-import { GET_TASKS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
-import type { Task, TaskStatus } from '@/redux/tasks/task.types';
+import { useAppSelector } from '@/redux/hooks';
+import { GET_TASKS } from '@/pages/Tasks/Task.graphql';
+import type { Task } from '@/redux/tasks/task.types';
 
 interface UseFocusModeTasksProps {
   initialTask?: Task | null;
-  initialSubtaskIndex?: number | null;
-  userId?: string;
 }
 
-export const useFocusModeTasks = ({
-  initialTask,
-  initialSubtaskIndex,
-  userId,
-}: UseFocusModeTasksProps) => {
+export const useFocusModeTasks = ({ initialTask }: UseFocusModeTasksProps) => {
+  const { user } = useAppSelector((state) => state.auth);
   const [activeTask, setActiveTask] = useState<Task | null>(
-    initialTask || null,
-  );
-  const [activeSubtaskIndex, setActiveSubtaskIndex] = useState<number | null>(
-    initialSubtaskIndex ?? null,
+    initialTask ?? null,
   );
 
-  const { data: tasksData } = useQuery(GET_TASKS, {
-    variables: { userId: userId || '' },
-    skip: !userId,
-    fetchPolicy: 'cache-first',
+  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, {
+    variables: { userId: user?.id },
+    skip: !user?.id,
+    fetchPolicy: 'cache-and-network',
   });
 
   const activeItem = useMemo(() => {
-    if (
-      activeSubtaskIndex !== null &&
-      activeTask?.subtasks &&
-      activeTask.subtasks[activeSubtaskIndex as number]
-    ) {
-      const st = activeTask.subtasks[activeSubtaskIndex as number];
-      if (typeof st !== 'string') {
-        return {
-          id: `${activeTask.id}-sub-${activeSubtaskIndex}`,
-          title: st.title,
-          estimate_timer: st.estimate_timer || st.timer,
-          real_timer: st.timer,
-          category: st.category || activeTask.category,
-          status: st.status || ('Todo' as TaskStatus),
-          priority_level: st.priority_level || activeTask.priority_level,
-          isSubtask: true,
-          parentId: activeTask.id,
-          originalIndex: activeSubtaskIndex,
-          workspaces: activeTask.workspaces,
-        };
-      }
-    }
-    return activeTask ? { ...activeTask, isSubtask: false } : null;
-  }, [activeTask, activeSubtaskIndex]);
+    return activeTask ? { ...activeTask } : null;
+  }, [activeTask]);
 
   const todaysTasks = useMemo(() => {
-    const allTasks: Task[] = tasksData?.tasks || [];
-    if (!allTasks.length) return [];
+    const all: Task[] = tasksData?.tasks || [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const today = moment();
-    const flattened: (Task & {
-      isSubtask?: boolean;
-      parentId?: string;
-      originalIndex?: number;
-    })[] = [];
-
-    allTasks.forEach((t) => {
-      if (
-        !t.deadline ||
-        !moment(t.deadline).isSame(today, 'day') ||
-        t.status === 'Done'
-      )
-        return;
-
-      flattened.push(t);
-
-      if (t.subtasks && Array.isArray(t.subtasks)) {
-        t.subtasks.forEach((st, idx: number) => {
-          if (typeof st !== 'string' && !st.completed) {
-            flattened.push({
-              ...t,
-              id: `${t.id}-sub-${idx}`,
-              title: st.title,
-              estimate_timer: st.estimate_timer || st.timer,
-              category: st.category || t.category,
-              isSubtask: true,
-              parentId: t.id,
-              originalIndex: idx,
-            });
-          }
-        });
-      }
-    });
-    return flattened;
-  }, [tasksData]);
+    return all
+      .filter((t) => {
+        if (t.status === 'Done' || t.status === 'Archived') return false;
+        const deadline = new Date(t.deadline);
+        return deadline >= today && deadline < tomorrow;
+      })
+      .map((t) => ({ ...t }));
+  }, [tasksData?.tasks]);
 
   return {
     activeTask,
     setActiveTask,
-    activeSubtaskIndex,
-    setActiveSubtaskIndex,
     activeItem,
     todaysTasks,
     tasksData,
+    tasksLoading,
   };
 };

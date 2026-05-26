@@ -1,13 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_TOTAL_WORKSPACES } from '../workspaces.graphql';
-import {
-  GET_TASKS_TITLES,
-  UPDATE_TASK,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/Task.graphql';
 import type { TaskSearchItems } from '../types/workspace.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
+import { handleMutationError } from '@/utils/errorHandler';
 
 interface UseWorkspaceTasksProps {
   userId?: string;
@@ -19,9 +17,6 @@ export const useWorkspaceTasks = ({
   onTaskSelect,
 }: UseWorkspaceTasksProps) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [selectedSubtaskIndex, setSelectedSubtaskIndex] = useState<
-    number | null
-  >(null);
 
   const { data: rawTasksData, loading: isLoading } = useQuery(
     GET_TASKS_TITLES,
@@ -51,25 +46,9 @@ export const useWorkspaceTasks = ({
     );
   }, [tasksData, selectedTaskId]);
 
-  const handleSelectTask = (
-    selectedTask: TaskSearchItems | null,
-    subtaskIndex?: number | null,
-  ) => {
-    if (selectedTask?.id !== selectedTaskId) {
-      setSelectedSubtaskIndex(
-        typeof subtaskIndex === 'number' ? subtaskIndex : null,
-      );
-    } else {
-      setSelectedSubtaskIndex(
-        typeof subtaskIndex === 'number' ? subtaskIndex : null,
-      );
-    }
-
+  const handleSelectTask = (selectedTask: TaskSearchItems | null) => {
     setSelectedTaskId(selectedTask?.id || null);
     onTaskSelect?.(selectedTask?.id);
-    if (!selectedTask) {
-      setSelectedSubtaskIndex(null);
-    }
   };
 
   const handleUpdateTask = async (
@@ -90,30 +69,15 @@ export const useWorkspaceTasks = ({
         ],
       });
     } catch (error) {
-      console.error('Error updating task:', error);
+      handleMutationError(error, 'Error al actualizar la tarea');
     }
   };
-
-  const handleToggleSubtask = async (taskId: string, subtaskIndex: number) => {
-    if (!selectTask || !selectTask.subtasks) return;
-
-    const updatedSubtasks = [...selectTask.subtasks];
-    const subtask = { ...updatedSubtasks[subtaskIndex] };
-    subtask.completed = !subtask.completed;
-    updatedSubtasks[subtaskIndex] = subtask;
-
-    await handleUpdateTask(taskId, { subtasks: updatedSubtasks });
-  };
-
-  // Sync is no longer needed as selectTask is derived from useMemo using tasksData and selectedTaskId
 
   return {
     tasksData,
     isLoading,
     selectTask,
-    selectedSubtaskIndex,
     handleSelectTask,
     handleUpdateTask,
-    handleToggleSubtask,
   };
 };

@@ -32,7 +32,7 @@ import {
   GET_TASKS,
   DELETE_TASK,
   UPDATE_TASK,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+} from '@/pages/Tasks/Task.graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { CalendarNavigateAction } from '../calendarView.types';
@@ -47,6 +47,8 @@ export const useCalendarView = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const reduxEvents =
     useSelector((state: RootState) => state.calendar?.reduxEvents) || [];
+  const syncVersion =
+    useSelector((state: RootState) => state.calendar?.syncVersion) || 0;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const tasks = useSelector((state: RootState) => state.task?.tasks) || [];
   const [searchParams, setSearchParams] = useSearchParams();
@@ -69,6 +71,8 @@ export const useCalendarView = () => {
     }
     return new Date();
   });
+
+  const [scrollToTime, setScrollToTime] = useState<Date | undefined>(undefined);
 
   // Sync URL with state
   useEffect(() => {
@@ -180,7 +184,7 @@ export const useCalendarView = () => {
     return () => {
       isMounted = false;
     };
-  }, [dispatch, user?.id, user?.authProvider, dateRange]);
+  }, [dispatch, user?.id, user?.authProvider, dateRange, syncVersion]);
 
   const hasRenderableCalendarData =
     reduxEvents.length > 0 ||
@@ -222,7 +226,15 @@ export const useCalendarView = () => {
           return null;
         }
       })
-      .filter((e): e is NonNullable<typeof e> => Boolean(e));
+      .filter((e): e is NonNullable<typeof e> => {
+        if (!e) return false;
+        const norm = normalizeGoogleId(e.id);
+        const base = getBaseGoogleId(e.id);
+        const isAlreadySynced =
+          (norm && syncedGoogleIds.has(norm)) ||
+          (base && syncedGoogleIds.has(base));
+        return !isAlreadySynced;
+      });
 
     // 2. Map Focusly Tasks (Native)
     const taskEvents = tasks.map((task: Task) => {
@@ -331,6 +343,26 @@ export const useCalendarView = () => {
   const handleNavigateAction = (action: CalendarNavigateAction) => {
     if (action === 'TODAY') {
       setCurrentDate(new Date());
+      // Find the first task of the day to scroll to
+      const todayStart = startOfDay(new Date());
+      const todayEnd = endOfDay(new Date());
+
+      const todayTasks = events.filter((event) => {
+        const eventStart = event.start?.getTime() || 0;
+        return (
+          eventStart >= todayStart.getTime() && eventStart <= todayEnd.getTime()
+        );
+      });
+
+      if (todayTasks.length > 0) {
+        const firstTask = todayTasks.sort(
+          (a, b) => (a.start?.getTime() || 0) - (b.start?.getTime() || 0),
+        )[0];
+
+        if (firstTask.start) {
+          setScrollToTime(firstTask.start);
+        }
+      }
       return;
     }
 
@@ -344,6 +376,13 @@ export const useCalendarView = () => {
     if (currentView === Views.WEEK) {
       setCurrentDate((prev) =>
         action === 'NEXT' ? addWeeks(prev, 1) : subWeeks(prev, 1),
+      );
+      return;
+    }
+
+    if (currentView === Views.DAY) {
+      setCurrentDate((prev) =>
+        action === 'NEXT' ? addDays(prev, 1) : subDays(prev, 1),
       );
       return;
     }
@@ -606,5 +645,6 @@ export const useCalendarView = () => {
     slotContextMenu,
     handleSlotContextMenu,
     closeSlotContextMenu,
+    scrollToTime,
   };
 };

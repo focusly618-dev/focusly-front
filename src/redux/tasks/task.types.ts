@@ -36,23 +36,6 @@ export interface Task {
   /** Soft Delete (For Sync) */
   deleted_at?: string | null;
   tags?: string[] | { name: string }[];
-  subtasks?:
-    | string[]
-    | {
-        title: string;
-        completed: boolean;
-        timer: number;
-        notes_encrypted?: string;
-        estimate_timer?: number;
-        priority_level?: number;
-        status?: TaskStatus;
-        deadline?: string;
-        category?: string;
-        color?: string;
-        id?: string;
-        created_at?: string;
-        links?: { title: string; url: string }[];
-      }[];
   estimated_start_date?: string | null;
   estimated_end_date?: string | null;
   workspaces?: {
@@ -78,10 +61,6 @@ export interface Task {
   source?: 'google' | 'platform';
   sync_status?: 'synced' | 'pending' | 'error';
   use_ai?: boolean;
-  is_splitable?: boolean;
-  min_block_duration?: number;
-  preferred_time_of_day?: string;
-  is_locked?: boolean;
 }
 
 export interface TaskState {

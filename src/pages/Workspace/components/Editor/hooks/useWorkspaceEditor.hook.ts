@@ -26,18 +26,13 @@ export const useWorkspaceEditor = ({
   watch,
   tasksData,
 }: UseWorkspaceEditorProps) => {
-  // Form values
   const currentTitle = watch('title');
   const currentContent = watch('content');
   const currentFolder = watch('folder');
 
-  // UI State
   const [showPalette, setShowPalette] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [filterTab, setFilterTab] = useState<'TASKS' | 'SUBTASKS'>('TASKS');
-
-  // Onboarding
   const [runOnboarding, setRunOnboarding] = useState(() => {
     return (
       localStorage.getItem('onboarding_workspace_editor_completed') !== 'true'
@@ -56,41 +51,16 @@ export const useWorkspaceEditor = ({
     }
   }, [runOnboarding]);
 
-  // Filter tasks
   const filteredTasks = useMemo(() => {
     if (!tasksData?.tasks) return [];
 
     const lowerSearch = searchTerm.toLowerCase();
 
-    return tasksData.tasks
-      .map((task: TaskSearchItems) => {
-        const taskMatches = task.title.toLowerCase().includes(lowerSearch);
+    return tasksData.tasks.filter((task: TaskSearchItems) =>
+      task.title.toLowerCase().includes(lowerSearch),
+    );
+  }, [tasksData, searchTerm]);
 
-        const subtasks = task.subtasks || [];
-
-        const matchingSubtasks = subtasks.filter((subtask) =>
-          subtask.title.toLowerCase().includes(lowerSearch),
-        );
-
-        if (filterTab === 'TASKS') {
-          return taskMatches ? task : null;
-        }
-
-        if (filterTab === 'SUBTASKS') {
-          return matchingSubtasks.length > 0
-            ? {
-                ...task,
-                subtasks: matchingSubtasks,
-              }
-            : null;
-        }
-
-        return null;
-      })
-      .filter(Boolean) as TaskSearchItems[];
-  }, [tasksData, searchTerm, filterTab]);
-
-  // Initial editor content
   const initialContent = useMemo(() => {
     try {
       const parsed = currentContent ? JSON.parse(currentContent) : undefined;
@@ -106,7 +76,6 @@ export const useWorkspaceEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Editor
   const editor = useCreateBlockNote({
     schema,
 
@@ -118,12 +87,11 @@ export const useWorkspaceEditor = ({
     ],
   });
 
-  // Onboarding steps
   const onboardingSteps = [
     {
       target: '#joyride-editor-search',
       content:
-        'Use this search bar to quickly find and link specific tasks or subtasks to your document.',
+        'Use this search bar to quickly find and link tasks to your document.',
     },
     {
       target: '#joyride-editor-area',
@@ -152,9 +120,6 @@ export const useWorkspaceEditor = ({
 
     searchTerm,
     setSearchTerm,
-
-    filterTab,
-    setFilterTab,
 
     filteredTasks,
 

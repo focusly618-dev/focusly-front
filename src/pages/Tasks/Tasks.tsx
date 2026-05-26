@@ -12,7 +12,6 @@ import {
 import { TasksHeader } from './components/TasksHeader/TasksHeader';
 import { TasksControlsBar } from './components/TasksControlsBar/TasksControlsBar';
 import { TasksContentView } from './components/TasksContentView/TasksContentView';
-import { SubtaskModal } from './components/SubtaskModal/SubtaskModal';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import type { Step } from 'react-joyride';
 import type { Task } from '@/redux/tasks/task.types';
@@ -43,15 +42,9 @@ export const Tasks = ({
     activeFilterState,
     filterAnchorEl,
     sortAnchorEl,
-    expandedTaskIds,
-    toggleTaskExpansion,
     updateTask,
     viewMode,
     setViewMode,
-    activeParentTask,
-    isSubtaskModalOpen,
-    activeSubtaskIndex,
-    setIsSubtaskModalOpen,
     runOnboarding,
     handleTaskClick,
     handleFilterClick,
@@ -60,9 +53,6 @@ export const Tasks = ({
     handleSortClose,
     handleApplySort,
     handleFinishOnboarding,
-    handleOpenSubtaskModal,
-    handleSaveSubtask,
-    handleSubtaskToggle,
     deleteTasks,
   } = useTasks();
 
@@ -193,10 +183,6 @@ export const Tasks = ({
             isLoading={isLoading}
             tasks={tasks}
             filteredTasks={filteredTasks}
-            expandedTaskIds={expandedTaskIds}
-            toggleTaskExpansion={toggleTaskExpansion}
-            handleSubtaskToggle={handleSubtaskToggle}
-            handleOpenSubtaskModal={handleOpenSubtaskModal}
             handleTaskClick={handleTaskClick}
             updateTask={updateTask}
             deleteTasks={deleteTasks}
@@ -210,16 +196,6 @@ export const Tasks = ({
             dateRange={dateRange}
           />
         </MainContent>
-
-        <SubtaskModal
-          isOpen={isSubtaskModalOpen}
-          onClose={() => setIsSubtaskModalOpen(false)}
-          onSave={handleSaveSubtask}
-          activeParentTask={activeParentTask}
-          activeSubtaskIndex={activeSubtaskIndex}
-          isAIScheduleEnabled={isAIScheduleEnabled}
-          setIsAIScheduleEnabled={setIsAIScheduleEnabled}
-        />
 
         <OnboardingWrapper
           steps={onboardingSteps}

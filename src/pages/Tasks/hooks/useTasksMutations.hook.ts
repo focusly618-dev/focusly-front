@@ -4,7 +4,7 @@ import {
   GET_TASKS,
   GET_TASKS_TITLES,
   DELETE_TASKS,
-} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+} from '@/pages/Tasks/Task.graphql';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import {
@@ -12,6 +12,7 @@ import {
   removeTasks,
 } from '@/redux/tasks/task.slice';
 import type { Task } from '@/redux/tasks/task.types';
+import { handleMutationError } from '@/utils/errorHandler';
 
 interface UseTasksMutationsProps {
   userId?: string;
@@ -21,7 +22,6 @@ interface UseTasksMutationsProps {
 
 export const useTasksMutations = ({
   userId,
-  tasks,
   onSuccess,
 }: UseTasksMutationsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
@@ -42,7 +42,6 @@ export const useTasksMutations = ({
     updated_at: t.updated_at || new Date().toISOString(),
     completed_at: null,
     deleted_at: null,
-    subtasks: t.subtasks || [],
     links: t.links || [],
     real_timer: t.real_timer,
     google_event_id: t.google_event_id,
@@ -63,7 +62,6 @@ export const useTasksMutations = ({
         status,
         estimate_minutes,
         deadline,
-        subtasks,
         priority_level,
         category,
         tags,
@@ -87,17 +85,6 @@ export const useTasksMutations = ({
             priority_level,
             deadline,
             use_ai,
-            subtasks: subtasks?.map((st) => ({
-              title: st.title,
-              completed: st.completed,
-              timer: st.timer,
-              notes_encrypted: st.notes_encrypted,
-              estimate_timer: st.estimate_timer,
-              priority_level: st.priority_level,
-              status: st.status,
-              deadline: st.deadline,
-              category: st.category,
-            })),
             category,
             google_event_id,
             estimated_start_date,
@@ -123,70 +110,7 @@ export const useTasksMutations = ({
         'Your changes have been saved.',
       );
     } catch (error) {
-      console.error('Error updating task:', error);
-    }
-  };
-
-  const handleAddSubtask = async (
-    parentTaskId: string,
-    subtask: { title: string; timer: number },
-  ) => {
-    const parentTask = tasks.find((t) => t.id === parentTaskId);
-    if (!parentTask) return;
-
-    const newSubtasks = [
-      ...(parentTask.subtasks || []).map((s) => ({
-        title: s.title,
-        completed: s.completed,
-        timer: s.timer,
-      })),
-      {
-        title: subtask.title,
-        completed: false,
-        timer: subtask.timer,
-      },
-    ];
-
-    try {
-      const { data } = await updateTaskMutation({
-        variables: {
-          updateTaskInput: {
-            id: parentTaskId,
-            title: parentTask.title,
-            notes_encrypted: parentTask.notes_encrypted,
-            status: parentTask.status,
-            estimate_timer: parentTask.estimate_minutes,
-            duration: null,
-            priority_level: parentTask.priority_level,
-            deadline: parentTask.deadline,
-            subtasks: newSubtasks,
-            category: parentTask.category,
-            google_event_id: parentTask.google_event_id,
-            estimated_start_date: parentTask.estimated_start_date,
-            estimated_end_date: parentTask.estimated_end_date,
-            use_ai: parentTask.use_ai,
-            tags:
-              parentTask.tags?.map((t: string | { name: string }) =>
-                typeof t === 'string' ? t : t.name,
-              ) || [],
-          },
-        },
-        refetchQueries: [
-          { query: GET_TASKS, variables: { userId } },
-          { query: GET_TASKS_TITLES, variables: { userId } },
-        ],
-      });
-
-      if (data?.updateTask) {
-        dispatch(upsertTaskRedux(mapResponseToTask(data.updateTask)));
-      }
-
-      onSuccess?.(
-        'Subtask added successfully!',
-        'The subtask has been attached to the parent task.',
-      );
-    } catch (error) {
-      console.error('Error adding subtask:', error);
+      handleMutationError(error, 'Error al actualizar la tarea');
     }
   };
 
@@ -208,13 +132,12 @@ export const useTasksMutations = ({
         );
       }
     } catch (error) {
-      console.error('Error deleting tasks:', error);
+      handleMutationError(error, 'Error al eliminar las tareas');
     }
   };
 
   return {
     updateTask,
-    handleAddSubtask,
     deleteTasks,
   };
 };

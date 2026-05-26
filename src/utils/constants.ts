@@ -5,7 +5,6 @@ export const BASE_EMPTY_TASK: Partial<Task> = {
   notes_encrypted: '',
   status: 'Todo' as TaskStatus,
   priority_level: 2,
-  subtasks: [],
   category: 'Personal',
   real_timer: 0,
 };

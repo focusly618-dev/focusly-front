@@ -13,8 +13,6 @@ export const useTaskDetailModal = ({
   onDelete,
   initialStart,
   initialTask,
-  parentTask,
-  subtaskIndex,
 }: UseTaskDetailModalProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -37,14 +35,6 @@ export const useTaskDetailModal = ({
     setRealTime,
     color,
     setColor,
-    isSplitable,
-    setIsSplitable,
-    minBlockDuration,
-    setMinBlockDuration,
-    preferredTimeOfDay,
-    setPreferredTimeOfDay,
-    isLocked,
-    setIsLocked,
     errors,
     setErrors,
     handleTitleChange,
@@ -54,32 +44,23 @@ export const useTaskDetailModal = ({
   } = useTaskFormState({ initialStart, initialTask });
   const [shouldGenerateMeet, setShouldGenerateMeet] = useState(false);
 
-  // Use a dummy resetForm for mutations initialization to avoid circular dependency
   const mutations = useTaskMutations({
     onSave,
     onClose,
     onDelete,
     initialTask,
-    parentTask,
-    subtaskIndex,
-    resetForm: () => {}, // Will be overwritten or handled below
+    resetForm: () => {},
   });
 
   const {
     tags,
     setTags,
-    subtasks,
-    setSubtasks,
     links,
     setLinks,
     newTag,
     setNewTag,
     isAddingTag,
     setIsAddingTag,
-    newSubtask,
-    setNewSubtask,
-    newSubtaskDuration,
-    setNewSubtaskDuration,
     newLinkTitle,
     setNewLinkTitle,
     newLinkUrl,
@@ -87,8 +68,6 @@ export const useTaskDetailModal = ({
     isAddingLink,
     setIsAddingLink,
     handleAddTag,
-    handleAddSubtask,
-    handleToggleSubtask,
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,
@@ -112,13 +91,8 @@ export const useTaskDetailModal = ({
             duration,
             realTime,
             tags,
-            subtasks,
             links: updatedLinks,
             color,
-            is_splitable: isSplitable,
-            min_block_duration: minBlockDuration,
-            preferred_time_of_day: preferredTimeOfDay,
-            is_locked: isLocked,
           },
           false,
         );
@@ -137,13 +111,8 @@ export const useTaskDetailModal = ({
             duration,
             realTime,
             tags,
-            subtasks,
             links: updatedLinks,
             color,
-            is_splitable: isSplitable,
-            min_block_duration: minBlockDuration,
-            preferred_time_of_day: preferredTimeOfDay,
-            is_locked: isLocked,
           },
           false,
         );
@@ -162,17 +131,9 @@ export const useTaskDetailModal = ({
     setRealTime(initialState.realTime);
     setStatus(initialState.status);
 
-    setIsSplitable(initialState.isSplitable);
-    setMinBlockDuration(initialState.minBlockDuration);
-    setPreferredTimeOfDay(initialState.preferredTimeOfDay);
-    setIsLocked(initialState.isLocked);
-
     setTags(initialCollections.tags);
-    setSubtasks(initialCollections.subtasks);
     setLinks(initialCollections.links);
     setCollaborators(initialCollections.collaborators);
-    setNewSubtask('');
-    setNewSubtaskDuration('');
     setNewTag('');
     setIsAddingTag(false);
     setIsAddingLink(false);
@@ -188,22 +149,14 @@ export const useTaskDetailModal = ({
     setColor,
     setRealTime,
     setStatus,
-    setIsSplitable,
-    setMinBlockDuration,
-    setPreferredTimeOfDay,
-    setIsLocked,
     setTags,
-    setSubtasks,
     setLinks,
     setCollaborators,
-    setNewSubtask,
-    setNewSubtaskDuration,
     setNewTag,
     setIsAddingTag,
     setIsAddingLink,
   ]);
 
-  // Inject real resetForm into mutations (assuming useTaskMutations doesn't store it in a way that breaks this)
   const mutationsWithReset = { ...mutations, resetForm };
 
   const handleSaveWrapper = async (shouldClose = true) => {
@@ -218,15 +171,10 @@ export const useTaskDetailModal = ({
       duration,
       realTime,
       tags,
-      subtasks,
       links,
       collaborators,
       color,
       shouldGenerateMeet,
-      is_splitable: isSplitable,
-      min_block_duration: minBlockDuration,
-      preferred_time_of_day: preferredTimeOfDay,
-      is_locked: isLocked,
     });
     if (shouldClose) onClose();
   };
@@ -244,15 +192,10 @@ export const useTaskDetailModal = ({
         duration,
         realTime,
         tags,
-        subtasks,
         links,
         collaborators,
         color,
         shouldGenerateMeet,
-        is_splitable: isSplitable,
-        min_block_duration: minBlockDuration,
-        preferred_time_of_day: preferredTimeOfDay,
-        is_locked: isLocked,
       },
       shouldClose,
     );
@@ -281,8 +224,6 @@ export const useTaskDetailModal = ({
       });
       if (meetUrl) {
         handleAddLink('Google Meet', meetUrl);
-        // Only set shouldGenerateMeet if this is an existing task (has real ID)
-        // For new tasks/subtasks, the link is already added to state and will be saved
         if (initialTask?.id && !initialTask.id.startsWith('temp-')) {
           setShouldGenerateMeet(true);
         }
@@ -349,14 +290,6 @@ export const useTaskDetailModal = ({
     setRealTime,
     color,
     setColor,
-    isSplitable,
-    setIsSplitable,
-    minBlockDuration,
-    setMinBlockDuration,
-    preferredTimeOfDay,
-    setPreferredTimeOfDay,
-    isLocked,
-    setIsLocked,
     errors,
     setErrors,
     handleTitleChange,
@@ -364,18 +297,12 @@ export const useTaskDetailModal = ({
     timeSlotDisplay,
     tags,
     setTags,
-    subtasks,
-    setSubtasks,
     links,
     setLinks,
     newTag,
     setNewTag,
     isAddingTag,
     setIsAddingTag,
-    newSubtask,
-    setNewSubtask,
-    newSubtaskDuration,
-    setNewSubtaskDuration,
     newLinkTitle,
     setNewLinkTitle,
     newLinkUrl,
@@ -383,8 +310,6 @@ export const useTaskDetailModal = ({
     isAddingLink,
     setIsAddingLink,
     handleAddTag,
-    handleAddSubtask,
-    handleToggleSubtask,
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,

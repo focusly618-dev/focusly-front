@@ -33,7 +33,6 @@ export const Workspace = ({
     handleSelectTask,
     handleUpdateTask,
     tasksData,
-    selectedSubtaskIndex,
   } = useWorkspace();
 
   const [runOnboarding, setRunOnboarding] = useState((): boolean => {
@@ -241,7 +240,6 @@ export const Workspace = ({
             watch={watch}
             getValues={getValues}
             selectTask={selectTask}
-            selectedSubtaskIndex={selectedSubtaskIndex}
             handleSelectTask={handleSelectTask}
             handleUpdateTask={handleUpdateTask}
             tasksData={tasksData}

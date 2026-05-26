@@ -34,11 +34,6 @@ import {
   School as SchoolIcon,
   Person as PersonIcon,
   Add as AddIcon,
-  Lock as LockIcon,
-  LockOpen as LockOpenIcon,
-  CallSplit as CallSplitIcon,
-  HourglassTop as HourglassTopIcon,
-  Brightness4 as Brightness4Icon,
 } from '@mui/icons-material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { format } from 'date-fns';
@@ -104,14 +99,6 @@ interface TaskPropertiesProps {
     setAnchor: (el: HTMLDivElement | null) => void,
     target: HTMLDivElement,
   ) => void;
-  isSplitable?: boolean;
-  setIsSplitable?: (b: boolean) => void;
-  minBlockDuration?: number;
-  setMinBlockDuration?: (n: number) => void;
-  preferredTimeOfDay?: string;
-  setPreferredTimeOfDay?: (s: string) => void;
-  isLocked?: boolean;
-  setIsLocked?: (b: boolean) => void;
 }
 
 export const TaskProperties = ({
@@ -141,14 +128,6 @@ export const TaskProperties = ({
   isPureGoogleTask,
   timeSlotDisplay,
   handleTimerChange,
-  isSplitable = true,
-  setIsSplitable,
-  minBlockDuration = 30,
-  setMinBlockDuration,
-  preferredTimeOfDay = 'any',
-  setPreferredTimeOfDay,
-  isLocked = false,
-  setIsLocked,
 }: TaskPropertiesProps) => {
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(
@@ -684,191 +663,6 @@ export const TaskProperties = ({
             </Box>
           </Box>
         </Box>
-      )}
-
-      {/* Scheduling Options */}
-      {!isPureGoogleTask && (
-        <>
-          <Box
-            sx={{
-              mt: 3,
-              mb: 1,
-              borderTop: '1px solid',
-              borderColor: 'divider',
-              pt: 2,
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              fontWeight={600}
-              color="text.secondary"
-            >
-              Scheduling Configuration
-            </Typography>
-          </Box>
-
-          {/* Split Block Option */}
-          <Box sx={propertyRowSx}>
-            <Box sx={propertyLabelSx}>
-              <CallSplitIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-              <Typography
-                variant="caption"
-                sx={{ fontSize: '14px', fontWeight: 500 }}
-              >
-                Splitable
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                ...propertyValueSx,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-              }}
-            >
-              <Chip
-                label={isSplitable ? 'Allowed' : 'Keep Single Block'}
-                onClick={() => setIsSplitable?.(!isSplitable)}
-                color={isSplitable ? 'primary' : 'default'}
-                variant={isSplitable ? 'filled' : 'outlined'}
-                sx={{
-                  borderRadius: '8px',
-                  height: '32px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  '&:hover': {
-                    bgcolor: isSplitable ? 'primary.dark' : 'action.hover',
-                  },
-                }}
-              />
-              <Typography
-                variant="caption"
-                sx={{ color: 'text.secondary', ml: 1, fontStyle: 'italic' }}
-              >
-                Split task into multiple focus sessions if needed
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Min Block Size Option */}
-          {isSplitable && (
-            <Box sx={propertyRowSx}>
-              <Box sx={propertyLabelSx}>
-                <HourglassTopIcon
-                  sx={{ fontSize: 18, color: 'text.secondary' }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{ fontSize: '14px', fontWeight: 500 }}
-                >
-                  Min Block Size
-                </Typography>
-              </Box>
-              <Box sx={propertyValueSx}>
-                <TextField
-                  select
-                  value={minBlockDuration}
-                  onChange={(e) =>
-                    setMinBlockDuration?.(Number(e.target.value))
-                  }
-                  variant="standard"
-                  InputProps={{
-                    disableUnderline: true,
-                    sx: { fontSize: '14px', fontWeight: 500 },
-                  }}
-                >
-                  <MenuItem value={15}>15 minutes</MenuItem>
-                  <MenuItem value={30}>30 minutes</MenuItem>
-                  <MenuItem value={45}>45 minutes</MenuItem>
-                  <MenuItem value={60}>1 hour</MenuItem>
-                  <MenuItem value={90}>1.5 hours</MenuItem>
-                  <MenuItem value={120}>2 hours</MenuItem>
-                </TextField>
-              </Box>
-            </Box>
-          )}
-
-          {/* Preferred Time Option */}
-          <Box sx={propertyRowSx}>
-            <Box sx={propertyLabelSx}>
-              <Brightness4Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
-              <Typography
-                variant="caption"
-                sx={{ fontSize: '14px', fontWeight: 500 }}
-              >
-                Preferred Time
-              </Typography>
-            </Box>
-            <Box sx={propertyValueSx}>
-              <TextField
-                select
-                value={preferredTimeOfDay || 'any'}
-                onChange={(e) => setPreferredTimeOfDay?.(e.target.value)}
-                variant="standard"
-                InputProps={{
-                  disableUnderline: true,
-                  sx: { fontSize: '14px', fontWeight: 500 },
-                }}
-              >
-                <MenuItem value="any">Any Time</MenuItem>
-                <MenuItem value="morning">Morning (9 AM - 12 PM)</MenuItem>
-                <MenuItem value="afternoon">Afternoon (12 PM - 4 PM)</MenuItem>
-                <MenuItem value="evening">Evening (4 PM - 7 PM)</MenuItem>
-              </TextField>
-            </Box>
-          </Box>
-
-          {/* Lock Slot Option */}
-          <Box sx={propertyRowSx}>
-            <Box sx={propertyLabelSx}>
-              {isLocked ? (
-                <LockIcon sx={{ fontSize: 18, color: 'warning.main' }} />
-              ) : (
-                <LockOpenIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-              )}
-              <Typography
-                variant="caption"
-                sx={{ fontSize: '14px', fontWeight: 500 }}
-              >
-                Schedule State
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                ...propertyValueSx,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-              }}
-            >
-              <Chip
-                label={isLocked ? 'Locked (Fixed)' : 'Flexible (Auto)'}
-                onClick={() => setIsLocked?.(!isLocked)}
-                color={isLocked ? 'warning' : 'default'}
-                variant={isLocked ? 'filled' : 'outlined'}
-                sx={{
-                  borderRadius: '8px',
-                  height: '32px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  '&:hover': {
-                    bgcolor: isLocked ? 'warning.dark' : 'action.hover',
-                  },
-                }}
-              />
-              <Typography
-                variant="caption"
-                sx={{ color: 'text.secondary', ml: 1, fontStyle: 'italic' }}
-              >
-                {isLocked
-                  ? 'Task won’t be rescheduled by the AI engine'
-                  : 'Engine automatically schedules task around meetings'}
-              </Typography>
-            </Box>
-          </Box>
-        </>
       )}
 
       {/* Popovers */}

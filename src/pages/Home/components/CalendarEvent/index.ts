@@ -1,1 +1,2 @@
-export { CalendarEvent, type ICalendarEvent } from './CalendarEvent';
+export { CalendarEvent } from './CalendarEvent';
+export type { ICalendarEvent } from './CalendarEvent.types';

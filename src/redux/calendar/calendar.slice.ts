@@ -5,10 +5,12 @@ type CalendarEvent = GoogleCalendarEvent;
 
 interface CalendarState {
   reduxEvents: CalendarEvent[];
+  syncVersion: number;
 }
 
 const initialState: CalendarState = {
   reduxEvents: [],
+  syncVersion: 0,
 };
 
 export const calendarSlice = createSlice({
@@ -22,11 +24,17 @@ export const calendarSlice = createSlice({
       state.reduxEvents.push(action.payload);
     },
     removeEvent: (state, action: PayloadAction<{ id: string }>) => {
-      state.reduxEvents = state.reduxEvents.filter((e) => e.id !== action.payload.id);
+      state.reduxEvents = state.reduxEvents.filter(
+        (e) => e.id !== action.payload.id,
+      );
+    },
+    incrementSyncVersion: (state) => {
+      state.syncVersion = (state.syncVersion || 0) + 1;
     },
   },
 });
 
-export const { setEvents, addEvent, removeEvent } = calendarSlice.actions;
+export const { setEvents, addEvent, removeEvent, incrementSyncVersion } =
+  calendarSlice.actions;
 
 export default calendarSlice.reducer;

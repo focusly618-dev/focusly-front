@@ -12,7 +12,6 @@ import {
   Close as CloseIcon,
   Send as SendIcon,
   Bolt as EnergyIcon,
-  Add as AddIcon,
 } from '@mui/icons-material';
 import { CuteRobotIcon } from '@/components/ui';
 import {
@@ -27,37 +26,13 @@ import {
   StyledInput,
   RobotIconWrapper,
   SendButton,
-  SubtaskCard,
-  AddButton,
 } from './ChatAI.styles';
 
 interface Message {
   id: string;
   sender: 'user' | 'ai';
   text: string;
-  type?: 'text' | 'subtask-list';
 }
-
-const mockSubtasks = [
-  {
-    id: 1,
-    title: 'Market Research & Benchmarking',
-    duration: '4 hours',
-    energy: 'Low',
-  },
-  {
-    id: 2,
-    title: 'Draft GTM Strategy Document',
-    duration: '6 hours',
-    energy: 'High',
-  },
-  {
-    id: 3,
-    title: 'Stakeholder Feedback Round 1',
-    duration: '2 hours',
-    energy: 'Medium',
-  },
-];
 
 interface ChatAIProps {
   rightOffset?: number;
@@ -77,8 +52,7 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
     {
       id: '2',
       sender: 'ai',
-      text: "I've analyzed the Product Launch requirements. Here is a friendly breakdown of 3 recommended subtasks to get you moving:",
-      type: 'subtask-list',
+      text: "I've analyzed the Product Launch requirements. Here are 3 focused tasks to get you moving:\n\n1. Market Research & Benchmarking (4h, low energy)\n2. Draft GTM Strategy Document (6h, high energy)\n3. Stakeholder Feedback Round 1 (2h, medium energy)",
     },
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -266,34 +240,9 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
                   </Box>
                 )}
                 <MessageBubble isUser={msg.sender === 'user'}>
-                  <Typography variant="body2">{msg.text}</Typography>
-                  {msg.type === 'subtask-list' && (
-                    <Box mt={2}>
-                      {mockSubtasks.map((task) => (
-                        <SubtaskCard key={task.id}>
-                          <Box>
-                            <Typography
-                              variant="subtitle2"
-                              color="text.primary"
-                              fontSize="13px"
-                              fontWeight="600"
-                            >
-                              {task.title}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              Est. {task.duration} • {task.energy} energy
-                            </Typography>
-                          </Box>
-                          <AddButton size="small">
-                            <AddIcon fontSize="small" />
-                          </AddButton>
-                        </SubtaskCard>
-                      ))}
-                    </Box>
-                  )}
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                    {msg.text}
+                  </Typography>
                 </MessageBubble>
               </Box>
             ))}

@@ -50,30 +50,6 @@ export interface TaskResponse {
   updated_at: string;
   deleted_at?: string;
   tags: { name: string }[];
-  subtasks: {
-    title: string;
-    completed: boolean;
-    timer: number;
-    notes_encrypted?: string;
-    estimate_timer?: number;
-    priority_level?: number;
-    status?:
-      | 'Todo'
-      | 'Planning'
-      | 'Pending'
-      | 'On Hold'
-      | 'Review'
-      | 'Done'
-      | 'Backlog'
-      | 'Scheduled'
-      | 'Archived';
-    deadline?: string;
-    category?: string;
-    color?: string;
-    created_at?: string;
-    id?: string;
-    links?: { title: string; url: string }[];
-  }[];
   filters?: TaskFilterInput;
   sort?: TaskSortInput;
   links?: { title: string; url: string }[];
@@ -100,10 +76,6 @@ export interface TaskResponse {
     } | null;
   };
   use_ai?: boolean;
-  is_splitable?: boolean;
-  min_block_duration?: number;
-  preferred_time_of_day?: string;
-  is_locked?: boolean;
 }
 
 export interface updateTask {
@@ -123,7 +95,6 @@ export interface updateTask {
     | 'Backlog'
     | 'Scheduled'
     | 'Archived';
-  subtasks?: string[];
   estimated_start_date?: string;
   estimated_end_date?: string;
   use_ai?: boolean;
@@ -147,7 +118,6 @@ export interface CreateTaskRequest {
     | 'Scheduled'
     | 'Archived';
   tags: string[];
-  subtasks: string[];
   estimated_start_date?: string;
   estimated_end_date?: string;
   use_ai?: boolean;

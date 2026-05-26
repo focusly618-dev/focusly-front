@@ -55,12 +55,12 @@ export const GridViewTask = ({
   const statusColor = getStatusColor(task.status);
   const priorityColor = getPriorityColor(task.priority_level);
 
-  const subtaskCount = task.subtasks?.length || 0;
-  const completedSubtasks =
-    task.subtasks?.filter((s) => s.completed || s.status === 'Done')?.length ||
-    0;
   const progress =
-    subtaskCount > 0 ? (completedSubtasks / subtaskCount) * 100 : 0;
+    task.status === 'Done'
+      ? 100
+      : task.estimate_timer && task.real_timer
+        ? Math.min(100, Math.round((task.real_timer / task.estimate_timer) * 100))
+        : 0;
 
   return (
     <GridTaskCard onClick={() => onTaskClick(task)}>
@@ -180,7 +180,7 @@ export const GridViewTask = ({
               variant="caption"
               sx={{ color: 'text.secondary', fontSize: '11px' }}
             >
-              {completedSubtasks}/{subtaskCount} subtasks
+              {task.status === 'Done' ? 'Completed' : 'In progress'}
             </Typography>
             <Typography
               variant="caption"

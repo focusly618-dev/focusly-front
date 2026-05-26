@@ -426,22 +426,13 @@ export const QueueItemHeader = styled(Box)({
 });
 
 export const StatusBadge = styled(Box)<{
-  status: 'CURRENT' | 'NEXT' | 'LATER' | 'SUBTASK';
+  status: 'CURRENT' | 'NEXT' | 'LATER';
 }>(({ status }) => ({
   fontSize: '10px',
   fontWeight: 700,
   letterSpacing: 1,
-  color:
-    status === 'CURRENT'
-      ? '#3b82f6'
-      : status === 'SUBTASK'
-        ? '#8b5cf6'
-        : '#64748b',
+  color: status === 'CURRENT' ? '#3b82f6' : '#64748b',
   textTransform: 'uppercase',
-  backgroundColor:
-    status === 'SUBTASK' ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-  padding: status === 'SUBTASK' ? '2px 8px' : '0',
-  borderRadius: status === 'SUBTASK' ? '4px' : '0',
 }));
 
 export const QueueItemTime = styled(Typography)(({ theme }) => ({

@@ -19,17 +19,6 @@ export const GET_WORKSPACES = gql`
         real_timer
         duration
         priority_level
-        subtasks {
-          title
-          completed
-          timer
-          notes_encrypted
-          estimate_timer
-          priority_level
-          status
-          deadline
-          category
-        }
         links {
           title
           url
@@ -130,17 +119,6 @@ export const GET_WORKSPACE_BY_ID = gql`
         duration
         priority_level
         notes_encrypted
-        subtasks {
-          title
-          completed
-          timer
-          notes_encrypted
-          estimate_timer
-          priority_level
-          status
-          deadline
-          category
-        }
         links {
           title
           url

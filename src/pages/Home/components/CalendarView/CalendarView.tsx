@@ -1,5 +1,10 @@
 import React from 'react';
-import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
+import {
+  Calendar,
+  momentLocalizer,
+  Views,
+  type ToolbarProps,
+} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import moment from 'moment';
@@ -8,7 +13,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 // Components
 import { CalendarToolbar } from '../CalendarToolbar';
 import { CalendarHeader } from '../CalendarHeader';
-import { CalendarEvent } from '../CalendarEvent';
+import { CalendarEvent, type ICalendarEvent } from '../CalendarEvent';
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 
@@ -25,8 +30,6 @@ import {
 } from '../CalendarEvent/CalendarEvent.styles';
 
 // Types
-import type { ICalendarEvent } from '../CalendarEvent/CalendarEvent';
-import type { ToolbarProps } from 'react-big-calendar';
 import type { Task } from '@/redux/tasks/task.types';
 
 // Setup the localizer
@@ -55,6 +58,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     handleSlotContextMenu,
     closeSlotContextMenu,
     handleNavigateAction,
+    scrollToTime,
   } = useCalendarView();
 
   const handleCreateTaskAtSlot = (priority?: number) => {
@@ -132,6 +136,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           onSelectEvent={handleSelectEvent}
           onEventDrop={handleEventDrop}
           onEventResize={handleEventResize}
+          scrollToTime={scrollToTime}
           resizable
           selectable
           showAllEvents={false}

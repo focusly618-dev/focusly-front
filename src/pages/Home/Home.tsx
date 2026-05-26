@@ -42,7 +42,6 @@ export const Home = () => {
     isFocusModeActive,
     setIsFocusModeActive,
     activeFocusTask,
-    activeFocusSubtaskIndex,
     handleStartFocus,
     handleOpenTaskDetails,
     taskDetailsTask,
@@ -107,15 +106,10 @@ export const Home = () => {
       </LayoutContainer>
 
       <FocusMode
-        key={
-          activeFocusTask?.id
-            ? `${activeFocusTask.id}-${activeFocusSubtaskIndex ?? 'main'}`
-            : 'default-focus'
-        }
+        key={activeFocusTask?.id ?? 'default-focus'}
         open={isFocusModeOpen}
         onClose={() => setIsFocusModeOpen(false)}
         task={activeFocusTask}
-        subtaskIndex={activeFocusSubtaskIndex}
         onActiveChange={setIsFocusModeActive}
       />
 

@@ -7,7 +7,6 @@ export const useEditorSidebar = (props: EditorSidebarProps) => {
   const {
     isRightSidebarOpen,
     setIsRightSidebarOpen,
-    selectedSubtaskIndex,
     selectTask,
     handleUpdateTask,
   } = props;
@@ -53,34 +52,13 @@ export const useEditorSidebar = (props: EditorSidebarProps) => {
   const handlePrioritySelect = async (level: number) => {
     setPriorityAnchor(null);
     if (!selectTask || !handleUpdateTask) return;
-
-    if (selectedSubtaskIndex !== null) {
-      const updatedSubtasks = [...(selectTask.subtasks || [])];
-      updatedSubtasks[selectedSubtaskIndex] = {
-        ...updatedSubtasks[selectedSubtaskIndex],
-        priority_level: level,
-      };
-      await handleUpdateTask(selectTask.id, { subtasks: updatedSubtasks });
-    } else {
-      await handleUpdateTask(selectTask.id, { priority_level: level });
-    }
+    await handleUpdateTask(selectTask.id, { priority_level: level });
   };
 
   const handleStatusSelect = async (status: string) => {
     setStatusAnchor(null);
     if (!selectTask || !handleUpdateTask) return;
-
-    if (selectedSubtaskIndex !== null) {
-      const updatedSubtasks = [...(selectTask.subtasks || [])];
-      updatedSubtasks[selectedSubtaskIndex] = {
-        ...updatedSubtasks[selectedSubtaskIndex],
-        status,
-        completed: status === 'Done',
-      };
-      await handleUpdateTask(selectTask.id, { subtasks: updatedSubtasks });
-    } else {
-      await handleUpdateTask(selectTask.id, { status });
-    }
+    await handleUpdateTask(selectTask.id, { status });
   };
 
   const handleMarkDone = async () => {
@@ -88,18 +66,8 @@ export const useEditorSidebar = (props: EditorSidebarProps) => {
     await handleStatusSelect('Done');
   };
 
-  const currentStatus =
-    selectedSubtaskIndex !== null
-      ? selectTask?.subtasks?.[selectedSubtaskIndex]?.status ||
-        (selectTask?.subtasks?.[selectedSubtaskIndex]?.completed
-          ? 'Done'
-          : 'Todo')
-      : selectTask?.status || 'Todo';
-
-  const currentPriorityLevel =
-    selectedSubtaskIndex !== null
-      ? (selectTask?.subtasks?.[selectedSubtaskIndex]?.priority_level ?? 0)
-      : (selectTask?.priority_level ?? 0);
+  const currentStatus = selectTask?.status || 'Todo';
+  const currentPriorityLevel = selectTask?.priority_level ?? 0;
 
   const cleanDescription = (desc?: string): string => {
     if (!desc) return '';
@@ -112,7 +80,6 @@ export const useEditorSidebar = (props: EditorSidebarProps) => {
       )
       .trim();
 
-    // Check if there is actual text content inside the HTML
     const hasText =
       cleaned
         .replace(/<[^>]*>/g, '')

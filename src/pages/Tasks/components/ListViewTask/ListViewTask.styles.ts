@@ -7,7 +7,6 @@ import {
   linearProgressClasses,
   alpha,
 } from '@mui/material';
-import { SubdirectoryArrowRight as SubdirectoryArrowRightIcon } from '@mui/icons-material';
 
 // Motion-inspired professional design
 export const TaskCard = styled(Box, {
@@ -102,38 +101,6 @@ export const InteractiveMetaItem = styled(TaskMetaItem)(({ theme }) => ({
 
 export const LinkMetaItem = styled(TaskMetaItem)(({ theme }) => ({
   color: theme.palette.primary.main,
-}));
-
-export const SubtaskToggleBtn = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'hasSubtasks',
-})<{ hasSubtasks?: boolean }>(({ theme, hasSubtasks }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
-  cursor: 'pointer',
-  padding: '3px 8px',
-  borderRadius: '20px',
-  backgroundColor: hasSubtasks
-    ? theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.04)'
-      : 'rgba(0, 0, 0, 0.03)'
-    : 'transparent',
-  border: `1px solid ${hasSubtasks ? theme.palette.divider : 'transparent'}`,
-  '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.08)'
-        : 'rgba(0, 0, 0, 0.05)',
-  },
-}));
-
-export const SubtaskArrow = styled(SubdirectoryArrowRightIcon, {
-  shouldForwardProp: (prop) => prop !== 'isExpanded',
-})<{ isExpanded?: boolean }>(({ isExpanded }) => ({
-  fontSize: 13,
-  opacity: 0.7,
-  transform: isExpanded ? 'rotate(90deg)' : 'none',
-  transition: 'transform 0.2s',
 }));
 
 export const MetaText = styled(Typography)({
@@ -427,36 +394,6 @@ export const AIText = styled(Typography)({
   letterSpacing: '0.05em',
 });
 
-export const SubtasksContainer = styled(Box)(({ theme }) => ({
-  marginLeft: theme.spacing(6),
-  marginBottom: theme.spacing(2),
-  borderLeft: `1px solid ${theme.palette.divider}`,
-}));
-
-export const SubtaskRow = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing(1.5),
-  paddingTop: theme.spacing(0.5),
-  paddingBottom: theme.spacing(0.5),
-  paddingLeft: theme.spacing(2),
-  paddingRight: theme.spacing(2),
-  borderRadius: '8px',
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-export const SubtaskTitle = styled(Typography, {
-  shouldForwardProp: (prop) => prop !== 'completed',
-})<{ completed?: boolean }>(({ theme, completed }) => ({
-  color: completed ? theme.palette.text.secondary : theme.palette.text.primary,
-  flexGrow: 1,
-  fontSize: '13px',
-  textDecoration: completed ? 'line-through' : 'none',
-  cursor: 'pointer',
-}));
-
 // Table Styled Components
 export const TableWrapper = styled(Box)(({ theme }) => ({
   width: 'calc(100% + 48px)',
@@ -482,12 +419,13 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
       ? '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
       : '0 4px 20px rgba(0, 0, 0, 0.02)',
   marginBottom: '24px',
+  boxSizing: 'border-box',
 }));
 
 export const TableHeader = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns:
-    '45px 120px minmax(180px, 3fr) 110px 95px 110px 80px 95px 95px 90px 80px',
+    '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
   padding: '6px 40px 6px 24px',
   backgroundColor:
     theme.palette.mode === 'dark'
@@ -505,22 +443,23 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   gap: '12px',
   alignItems: 'center',
   zIndex: 2,
+  boxSizing: 'border-box',
 
   // Responsive hiding
   [theme.breakpoints.down('lg')]: {
     gridTemplateColumns:
-      '45px 120px minmax(180px, 3fr) 110px 95px 110px 80px 80px',
+      '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
     '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
       { display: 'none' },
   },
   [theme.breakpoints.down('md')]: {
-    gridTemplateColumns: '45px 120px minmax(180px, 3fr) 110px 95px 110px 80px',
-    '& .col-estimated, & .col-actual, & .col-subtasks, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-subtasks, & .cell-ai':
+    gridTemplateColumns: '55px minmax(1px, 3fr) 100px 117px 123px 80px',
+    '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
       { display: 'none' },
   },
   [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: '45px 120px minmax(120px, 2fr) 95px 110px 80px',
-    '& .col-estimated, & .col-actual, & .col-subtasks, & .col-category, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-subtasks, & .cell-category, & .cell-ai':
+    gridTemplateColumns: '55px minmax(1px, 2fr) 100px 117px 123px',
+    '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
       {
         display: 'none',
       },
@@ -596,7 +535,7 @@ export const TaskRow = styled(Box, {
 })<{ statusColor?: string }>(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns:
-    '45px 120px minmax(180px, 3fr) 110px 95px 110px 80px 95px 95px 90px 80px',
+    '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
   alignItems: 'center',
   padding: '5px 40px 5px 24px',
   backgroundColor: 'transparent',
@@ -607,6 +546,7 @@ export const TaskRow = styled(Box, {
   cursor: 'pointer',
   transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   gap: '12px',
+  boxSizing: 'border-box',
 
   '&:hover': {
     backgroundColor:
@@ -620,79 +560,26 @@ export const TaskRow = styled(Box, {
         : '0 2px 8px rgba(0, 0, 0, 0.01)',
   },
 
+  '&:hover .checkbox-cell': {
+    opacity: 1,
+  },
+
   // Responsive hiding
   [theme.breakpoints.down('lg')]: {
     gridTemplateColumns:
-      '45px 120px minmax(180px, 3fr) 110px 95px 110px 80px 80px',
-    '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
-      { display: 'none' },
+      '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
+    '& .cell-estimated, & .cell-actual, & .cell-ai': { display: 'none' },
   },
   [theme.breakpoints.down('md')]: {
-    gridTemplateColumns: '45px 120px minmax(180px, 3fr) 110px 95px 110px 80px',
-    '& .col-estimated, & .col-actual, & .col-subtasks, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-subtasks, & .cell-ai':
-      { display: 'none' },
+    gridTemplateColumns: '55px minmax(1px, 3fr) 100px 117px 123px 80px',
+    '& .cell-estimated, & .cell-actual, & .cell-ai': {
+      display: 'none',
+    },
   },
   [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: '45px 120px minmax(120px, 2fr) 95px 110px 80px',
-    '& .col-estimated, & .col-actual, & .col-subtasks, & .col-category, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-subtasks, & .cell-category, & .cell-ai':
-      {
-        display: 'none',
-      },
-  },
-}));
-
-export const CustomUncheckedIcon = styled(Box)(({ theme }) => ({
-  width: 15,
-  height: 15,
-  borderRadius: 4,
-  border:
-    theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.25)'
-      : '1px solid rgba(0, 0, 0, 0.2)',
-  backgroundColor: 'transparent',
-  transition: 'all 0.15s ease',
-  boxSizing: 'border-box',
-  '&:hover': {
-    borderColor: theme.palette.primary.main,
-  },
-}));
-
-export const CustomCheckedIcon = styled(Box)(({ theme }) => ({
-  width: 15,
-  height: 15,
-  borderRadius: 4,
-  border: `1px solid ${theme.palette.primary.main}`,
-  backgroundColor: theme.palette.primary.main,
-  position: 'relative',
-  boxSizing: 'border-box',
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    left: '4px',
-    top: '1px',
-    width: '3px',
-    height: '6px',
-    border: 'solid white',
-    borderWidth: '0 1.5px 1.5px 0',
-    transform: 'rotate(45deg)',
-  },
-}));
-
-export const CustomIndeterminateIcon = styled(Box)(({ theme }) => ({
-  width: 15,
-  height: 15,
-  borderRadius: 4,
-  border: `1px solid ${theme.palette.primary.main}`,
-  backgroundColor: theme.palette.primary.main,
-  position: 'relative',
-  boxSizing: 'border-box',
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    left: '3px',
-    top: '5px',
-    width: '7px',
-    height: '1.5px',
-    backgroundColor: 'white',
+    gridTemplateColumns: '55px minmax(1px, 2fr) 100px 117px 123px',
+    '& .cell-estimated, & .cell-actual, & .cell-ai': {
+      display: 'none',
+    },
   },
 }));

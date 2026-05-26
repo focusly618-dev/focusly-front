@@ -1,4 +1,4 @@
-import { styled, Box, Typography, Button, IconButton } from '@mui/material';
+import { styled, Box, Typography, Button } from '@mui/material';
 
 export const SidebarTopNav = styled(Box)({
   display: 'flex',
@@ -58,56 +58,6 @@ export const PropertyValue = styled(Box)(({ theme }) => ({
   gap: '8px',
 }));
 
-export const SidebarSubtaskList = styled(Box)({
-  marginBottom: '32px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-});
-
-export const SidebarSubtaskItem = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'completed',
-})<{ completed?: boolean }>(({ theme, completed }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '16px',
-  borderRadius: '8px',
-  backgroundColor: theme.palette.background.default,
-  border: `1px solid ${theme.palette.divider}`,
-  marginBottom: '8px',
-  transition: 'all 0.2s',
-  opacity: completed ? 0.5 : 1,
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-export const ProgressSection = styled(Box)({
-  marginBottom: '32px',
-});
-
-export const ProgressBar = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'value',
-})<{ value: number }>(({ theme, value }) => ({
-  height: '6px',
-  width: '100%',
-  backgroundColor: theme.palette.action.selected,
-  borderRadius: '3px',
-  marginTop: '12px',
-  position: 'relative',
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: `${value}%`,
-    backgroundColor: theme.palette.primary.main,
-    borderRadius: '3px',
-  },
-}));
-
 export const SidebarFooter = styled(Box)(({ theme }) => ({
   marginTop: 'auto',
   paddingTop: '24px',
@@ -118,7 +68,9 @@ export const SidebarFooter = styled(Box)(({ theme }) => ({
 
 export const ViewTaskButton = styled(Button)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.5)' : theme.palette.action.selected,
+    theme.palette.mode === 'dark'
+      ? 'rgba(30, 41, 59, 0.5)'
+      : theme.palette.action.selected,
   color: theme.palette.text.primary,
   flex: 1,
   fontWeight: 600,
@@ -151,36 +103,10 @@ export const DescriptionContainer = styled(Box)(({ theme }) => ({
   fontSize: '13px',
   lineHeight: 1.6,
   color: theme.palette.text.primary,
-  '& p': { margin: 0, marginBottom: '8px', '&:last-child': { marginBottom: 0 } },
+  '& p': {
+    margin: 0,
+    marginBottom: '8px',
+    '&:last-child': { marginBottom: 0 },
+  },
   '& ul, & ol': { margin: '8px 0', paddingLeft: '20px' },
-}));
-
-export const SubtaskCheck = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'completed',
-})<{ completed?: boolean }>(({ theme, completed }) => ({
-  width: 18,
-  height: 18,
-  borderRadius: '4px',
-  border: `2px solid ${completed ? theme.palette.primary.main : theme.palette.action.disabled}`,
-  backgroundColor: completed ? theme.palette.primary.main : 'transparent',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  '&:hover': {
-    borderColor: theme.palette.primary.main,
-    backgroundColor: completed ? theme.palette.primary.dark : 'rgba(56, 189, 248, 0.1)',
-  },
-}));
-
-export const FocusButton = styled(IconButton)(({ theme }) => ({
-  padding: '4px',
-  color: theme.palette.warning.main,
-  opacity: 0.6,
-  transition: 'all 0.2s',
-  '&:hover': {
-    opacity: 1,
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-  },
 }));

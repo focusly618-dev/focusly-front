@@ -8,7 +8,6 @@ export interface TaskData {
   category: string;
   deadline: Date | null;
   duration: string;
-  subtasks?: { title: string; completed: boolean; timer: number }[];
   tags: string[];
   links?: { title: string; url: string }[];
   google_event_id?: string;
@@ -26,12 +25,6 @@ export interface CreateTaskModalProps {
   initialTask?: Task | null;
   handleDelete?: (id: string) => Promise<void>;
   handleUpdate?: (task: Task) => Promise<void>;
-  parentTask?: {
-    id: string;
-    title: string;
-    subtasks?: { title: string; completed: boolean; timer: number }[];
-  };
-  subtaskIndex?: number;
 }
 
 export interface UseCreateTaskModalProps {
@@ -41,8 +34,6 @@ export interface UseCreateTaskModalProps {
   initialStart: Date | null;
   initialEnd?: Date | null;
   initialTask?: Task | null;
-  parentTask?: Task;
-  subtaskIndex?: number;
 }
 
 export interface TaskInput {
@@ -57,12 +48,6 @@ export interface TaskInput {
   color?: string;
   links: { title: string; url: string }[];
   status?: string;
-  subtasks?: {
-    title: string;
-    completed: boolean;
-    timer: number;
-    notes_encrypted?: string;
-  }[];
   google_event_id?: string;
   user_id?: string;
 }
@@ -83,7 +68,5 @@ export interface UseTaskMutationsProps {
   onClose: () => void;
   onDelete?: (id: string) => void;
   initialTask?: Task | null;
-  parentTask?: Task;
-  subtaskIndex?: number;
   resetForm: () => void;
 }

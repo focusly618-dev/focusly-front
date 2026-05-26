@@ -8,7 +8,6 @@ export interface TaskData {
   category: string;
   deadline: Date | null;
   duration: string;
-  subtasks?: { title: string; completed: boolean; timer: number }[];
   tags: string[];
   links?: { title: string; url: string }[];
   google_event_id?: string;
@@ -16,10 +15,6 @@ export interface TaskData {
   realTime?: string;
   shouldGenerateMeet?: boolean;
   collaborators?: { name: string; email: string; avatar?: string }[];
-  is_splitable?: boolean;
-  min_block_duration?: number;
-  preferred_time_of_day?: string;
-  is_locked?: boolean;
 }
 
 export interface TaskDetailModalProps {
@@ -31,12 +26,6 @@ export interface TaskDetailModalProps {
   initialTask?: Task | null;
   handleDelete?: (id: string) => Promise<void>;
   handleUpdate?: (task: Task) => Promise<void>;
-  parentTask?: {
-    id: string;
-    title: string;
-    subtasks?: { title: string; completed: boolean; timer: number }[];
-  };
-  subtaskIndex?: number;
   isAIScheduleEnabled?: boolean;
   setIsAIScheduleEnabled?: (enabled: boolean) => void;
 }
@@ -48,8 +37,6 @@ export interface UseTaskDetailModalProps {
   initialStart: Date | null;
   initialEnd?: Date | null;
   initialTask?: Task | null;
-  parentTask?: Task;
-  subtaskIndex?: number;
   isAIScheduleEnabled?: boolean;
   setIsAIScheduleEnabled?: (enabled: boolean) => void;
 }
@@ -66,19 +53,9 @@ export interface TaskInput {
   color?: string;
   links: { title: string; url: string }[];
   status?: string;
-  subtasks?: {
-    title: string;
-    completed: boolean;
-    timer: number;
-    notes_encrypted?: string;
-  }[];
   google_event_id?: string;
   user_id?: string;
   collaborators?: { name: string; email: string; avatar?: string }[];
-  is_splitable?: boolean;
-  min_block_duration?: number;
-  preferred_time_of_day?: string;
-  is_locked?: boolean;
 }
 
 export interface UseTaskCollectionsProps {
@@ -97,7 +74,5 @@ export interface UseTaskMutationsProps {
   onClose: () => void;
   onDelete?: (id: string) => void;
   initialTask?: Task | null;
-  parentTask?: Task;
-  subtaskIndex?: number;
   resetForm: () => void;
 }
