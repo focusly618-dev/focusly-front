@@ -32,7 +32,12 @@ export const WorkspaceEmptyState = ({ onCreate }: WorkspaceEmptyStateProps) => {
 
         <Typography
           variant="h4"
-          sx={{ fontWeight: 700, mb: 2, textAlign: 'center', color: 'text.primary' }}
+          sx={{
+            fontWeight: 700,
+            mb: 2,
+            textAlign: 'center',
+            color: 'text.primary',
+          }}
         >
           Start Your First Strategic Plan
         </Typography>
@@ -47,8 +52,8 @@ export const WorkspaceEmptyState = ({ onCreate }: WorkspaceEmptyStateProps) => {
             lineHeight: 1.6,
           }}
         >
-          Use headers, code blocks, and lists to document your thoughts. Link this page to a task to
-          sync with your schedule.
+          Use headers, code blocks, and lists to document your thoughts. Link
+          this page to a task to sync with your schedule.
         </Typography>
 
         <ButtonContainer>

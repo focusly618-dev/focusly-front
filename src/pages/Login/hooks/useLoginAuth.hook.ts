@@ -5,20 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/redux/hooks';
 import { login } from '@/redux/auth/auth.slice';
 import { AuthProviders } from '../types/Login.types';
-import {
-  sendSignInLinkToEmail,
-  isSignInWithEmailLink,
-  signInWithEmailLink,
-  updateProfile,
-} from 'firebase/auth';
-import { auth } from '@/context/firebase';
 
 interface UseLoginAuthProps {
   onAuthSuccess?: () => void;
   onAuthError?: (error: unknown, context: string) => void;
 }
 
-export const useLoginAuth = ({ onAuthSuccess, onAuthError }: UseLoginAuthProps = {}) => {
+export const useLoginAuth = ({
+  onAuthSuccess,
+  onAuthError,
+}: UseLoginAuthProps = {}) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,21 +22,10 @@ export const useLoginAuth = ({ onAuthSuccess, onAuthError }: UseLoginAuthProps =
   const sendMagicLink = async (email: string, fullName?: string) => {
     setIsLoading(true);
     try {
-      const actionCodeSettings = {
-        // La URL a la que redirigir tras el clic en el email.
-        // Asegúrate de que este dominio esté en la lista blanca de Firebase.
-        url: `${window.location.origin}/login`,
-        handleCodeInApp: true,
-      };
-      console.log('Sending magic link to:', email);
-      console.log('Action code settings:', actionCodeSettings);
-      console.log('Auth instance:', auth);
-      console.log('Full URL:', window.location.href);
-      console.log('Origin:', window.location.origin);
-      console.log('FullName', fullName);
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      console.log('Sending custom magic link to:', email);
+      await axios.post('/auth/magic-link', { email, fullName });
 
-      // Guardamos el email localmente para completar el sign-in al volver.
+      // Guardamos el email localmente para completar el sign-in al volver
       window.localStorage.setItem('emailForSignIn', email);
       if (fullName) {
         window.localStorage.setItem('fullNameForSignIn', fullName);
@@ -57,46 +42,30 @@ export const useLoginAuth = ({ onAuthSuccess, onAuthError }: UseLoginAuthProps =
   };
 
   const completeMagicLinkSignIn = async () => {
-    if (isSignInWithEmailLink(auth, window.location.href)) {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    if (token) {
       setIsLoading(true);
       try {
-        let email = window.localStorage.getItem('emailForSignIn');
-        if (!email) {
-          // Si el usuario abrió el link en otro dispositivo/navegador,
-          // le pedimos el email de nuevo.
-          email = window.prompt('Please provide your email for confirmation');
-        }
+        console.log('Verifying custom magic link token...');
+        const response = await axios.post('/auth/magic-link/verify', { token });
+        const data = response.data;
 
-        if (email) {
-          const result = await signInWithEmailLink(auth, email, window.location.href);
-          const user = result.user;
+        dispatch(
+          login({
+            isLogged: true,
+            user: data.user,
+            provider: AuthProviders.email,
+          }),
+        );
 
-          // Si es registro (nombre guardado), actualizamos el perfil
-          const savedFullName = window.localStorage.getItem('fullNameForSignIn');
-          if (savedFullName && !user.displayName) {
-            await updateProfile(user, { displayName: savedFullName });
-          }
+        // Limpiar storage
+        window.localStorage.removeItem('emailForSignIn');
+        window.localStorage.removeItem('fullNameForSignIn');
 
-          const token = await user.getIdToken();
-          const fullName = user.displayName || savedFullName || '';
-
-          const response = await axios.post('/auth/login', { token, fullName });
-          const data = response.data;
-
-          dispatch(
-            login({
-              isLogged: true,
-              user: data.user || { email: user.email, displayName: user.displayName },
-              provider: AuthProviders.email,
-            })
-          );
-
-          // Limpiar storage
-          window.localStorage.removeItem('emailForSignIn');
-          window.localStorage.removeItem('fullNameForSignIn');
-
-          navigate('/dashboard');
-        }
+        // Navegar a dashboard y remover token de la URL
+        navigate('/dashboard', { replace: true });
       } catch (error) {
         onAuthError?.(error, 'Magic Link sign-in failed');
       } finally {
@@ -120,7 +89,7 @@ export const useLoginAuth = ({ onAuthSuccess, onAuthError }: UseLoginAuthProps =
             isLogged: true,
             user: backendResponse.data.user,
             provider: AuthProviders.google,
-          })
+          }),
         );
         navigate('/dashboard');
       } catch (error) {

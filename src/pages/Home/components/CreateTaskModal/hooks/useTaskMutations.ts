@@ -262,17 +262,14 @@ export const useTaskMutations = ({
     }
 
     try {
-      // Removed Google delete sync to match one-way import strategy
-      if (initialTask.user_id !== 'google-user') {
-        await deleteTaskMutation({
-          variables: { id: initialTask.id },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user?.id } },
-            { query: GET_WORKSPACES, variables: { search: '' } },
-          ],
-        });
-        dispatch(removeTask({ id: initialTask.id }));
-      }
+      await deleteTaskMutation({
+        variables: { id: initialTask.id },
+        refetchQueries: [
+          { query: GET_TASKS, variables: { userId: user?.id } },
+          { query: GET_WORKSPACES, variables: { search: '' } },
+        ],
+      });
+      dispatch(removeTask({ id: initialTask.id }));
       resetForm();
     } catch (e) {
       handleMutationError(e, 'Error al eliminar la tarea');

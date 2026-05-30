@@ -30,7 +30,7 @@ import {
   CheckBox as CheckBoxIcon,
   FolderOpen as FolderOpenIcon,
 } from '@mui/icons-material';
-import { EmptyState } from '@/utils/EmptyState';
+import { EmptyState } from '@/components/ui';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
 import type { WorkspaceTypes, FolderTypes } from '../../types/workspace.types';
 import { CreateFolderModal } from './modals/CreateFolderModal';
