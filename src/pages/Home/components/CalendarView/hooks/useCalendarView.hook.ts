@@ -228,8 +228,9 @@ export const useCalendarView = () => {
       })
       .filter((e): e is NonNullable<typeof e> => {
         if (!e) return false;
-        const norm = normalizeGoogleId(e.id);
-        const base = getBaseGoogleId(e.id);
+        const googleEventId = e.resource.google_event_id || e.id;
+        const norm = normalizeGoogleId(googleEventId);
+        const base = getBaseGoogleId(googleEventId);
         const isAlreadySynced =
           (norm && syncedGoogleIds.has(norm)) ||
           (base && syncedGoogleIds.has(base));
@@ -436,23 +437,12 @@ export const useCalendarView = () => {
     dispatch(removeEvent({ id: taskId })); // Also remove from virtual state
 
     try {
-      // Identify if it's a persistent Platform Task or a virtual Google Event
       const persistentTask = tasks.find((t) => t.id === taskId);
       const virtualEvent = reduxEvents.find((e) => e.id === taskId);
 
       const isPlatformTask = !!persistentTask;
-      const isPureGoogleEvent = !!virtualEvent && !persistentTask;
 
       if (isPlatformTask) {
-        if (persistentTask.google_event_id) {
-          try {
-            await deleteGoogleEvent(persistentTask.google_event_id);
-            dispatch(removeEvent({ id: persistentTask.google_event_id }));
-          } catch (err) {
-            console.warn('Failed to delete Google event', err);
-          }
-        }
-
         await deleteTaskMutation({
           variables: { id: taskId },
           refetchQueries: [
@@ -466,9 +456,11 @@ export const useCalendarView = () => {
             { query: GET_WORKSPACES, variables: { search: '' } },
           ],
         });
-      } else if (isPureGoogleEvent || taskId.startsWith('_')) {
-        const eventId = virtualEvent?.id || taskId;
-        await deleteGoogleEvent(eventId);
+      } else {
+        const googleEventId =
+          virtualEvent?.google_event_id || virtualEvent?.id || taskId;
+        await deleteGoogleEvent(googleEventId);
+        dispatch(removeEvent({ id: googleEventId }));
       }
 
       handleModalClose();
@@ -539,8 +531,8 @@ export const useCalendarView = () => {
           updateTaskInput: {
             id: event.id,
             deadline: endDate.toISOString(),
-            estimated_start_date: startDate.toISOString(),
-            estimated_end_date: endDate.toISOString(),
+            estimatedStartDate: startDate.toISOString(),
+            estimatedEndDate: endDate.toISOString(),
           },
         },
         // We still refetch to ensure server sync, but optimistic update removes the "jump"
@@ -599,8 +591,8 @@ export const useCalendarView = () => {
           updateTaskInput: {
             id: event.id,
             deadline: endDate.toISOString(),
-            estimated_start_date: startDate.toISOString(),
-            estimated_end_date: endDate.toISOString(),
+            estimatedStartDate: startDate.toISOString(),
+            estimatedEndDate: endDate.toISOString(),
           },
         },
         refetchQueries: [

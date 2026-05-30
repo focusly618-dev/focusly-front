@@ -1,5 +1,11 @@
 import React from 'react';
-import { Box, Typography, Button, type SxProps, type Theme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
 import { SearchOff as SearchOffIcon } from '@mui/icons-material';
 
 interface EmptyStateProps {
@@ -56,14 +62,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         }}
       >
         {React.isValidElement(icon) ? (
-          React.cloneElement(icon as React.ReactElement<{ sx?: SxProps<Theme> }>, {
-            sx: {
-              fontSize: 40,
-              color: 'primary.main',
-              filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))',
-              ...((icon.props as { sx?: SxProps<Theme> }).sx || {}),
+          React.cloneElement(
+            icon as React.ReactElement<{ sx?: SxProps<Theme> }>,
+            {
+              sx: {
+                fontSize: 40,
+                color: 'primary.main',
+                filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))',
+                ...((icon.props as { sx?: SxProps<Theme> }).sx || {}),
+              },
             },
-          })
+          )
         ) : (
           <SearchOffIcon
             sx={{

@@ -17,7 +17,7 @@ import {
 } from '@mui/icons-material';
 import { styled as muiStyled } from '@mui/material/styles';
 import { AnimatedContainer, GridTaskContainer } from '../../Tasks.styles';
-import { EmptyState } from '@/utils/EmptyState';
+import { EmptyState } from '@/components/ui';
 import { BoardView } from '../BoardView/BoardView';
 import { WorkloadDashboard } from '../WorkloadDashboard/WorkloadDashboard';
 import { ListViewTask } from '../ListViewTask/ListViewTask';

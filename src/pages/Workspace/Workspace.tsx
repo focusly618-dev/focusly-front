@@ -1,4 +1,4 @@
-import { WorkspaceEmptyState } from '@/utils';
+import { WorkspaceEmptyState } from '@/components/ui';
 import { WorkspaceEditor } from './components/Editor/WorkspaceEditor';
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';

@@ -30,7 +30,6 @@ import type {
   UseTaskMutationsProps,
 } from '../types/TaskDetailModal.types';
 import type { PriorityType } from '../TaskDetailModal.utils';
-import type { Task } from '@/redux/tasks/task.types';
 import { handleMutationError } from '@/utils/errorHandler';
 
 export const useTaskMutations = ({
@@ -343,24 +342,13 @@ export const useTaskMutations = ({
     }
 
     try {
-      const isGoogleTask =
-        (initialTask as Task & { task_type?: string }).task_type ===
-        'GoogleTask';
-
-      if (isGoogleTask) {
-        // GoogleTask — delete via REST API directly
-        const eventId = initialTask.google_event_id || initialTask.id;
-        await deleteGoogleEvent(eventId);
-      } else {
-        // PlatformTask — delete via GraphQL (backend handles Google sync if needed)
-        await deleteTaskMutation({
-          variables: { id: initialTask.id },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user?.id } },
-            { query: GET_WORKSPACES, variables: { search: '' } },
-          ],
-        });
-      }
+      await deleteTaskMutation({
+        variables: { id: initialTask.id },
+        refetchQueries: [
+          { query: GET_TASKS, variables: { userId: user?.id } },
+          { query: GET_WORKSPACES, variables: { search: '' } },
+        ],
+      });
       dispatch(removeTask({ id: initialTask.id }));
       resetForm();
       onClose();

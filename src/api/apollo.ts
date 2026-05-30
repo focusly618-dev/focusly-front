@@ -30,7 +30,8 @@ const errorLink = onError(
       (graphQLErrors &&
         graphQLErrors.some(
           ({ message, extensions }) =>
-            message === 'Unauthorized' ||
+            message.includes('Unauthorized') ||
+            message.includes('not authenticated') ||
             extensions?.code === 'UNAUTHENTICATED' ||
             (extensions?.response as { statusCode?: number } | undefined)
               ?.statusCode === 401,
