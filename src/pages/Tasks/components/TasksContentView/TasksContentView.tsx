@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  TablePagination,
 } from '@mui/material';
 import {
   CheckBox as CheckBoxIcon,
@@ -275,6 +276,11 @@ export const TasksContentView = ({
   setSearchTerm,
   isAIScheduleEnabled,
   onStartFocus,
+  totalCount,
+  page,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
 }: TasksContentViewProps) => {
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(),
@@ -502,6 +508,7 @@ export const TasksContentView = ({
           ))}
         </GridTaskContainer>
       ) : (
+        <>
         <TableWrapper>
           <TableHeader>
             <TableHeaderCell sx={{ justifyContent: 'center' }} />
@@ -531,6 +538,34 @@ export const TasksContentView = ({
             ))}
           </TableBodyContainer>
         </TableWrapper>
+        <TablePagination
+          component="div"
+          count={totalCount}
+          page={page}
+          onPageChange={(_, newPage) => onPageChange(newPage)}
+          rowsPerPage={pageSize}
+          onRowsPerPageChange={(e) => onPageSizeChange(parseInt(e.target.value, 10))}
+          rowsPerPageOptions={[10, 25, 50, 100]}
+          labelRowsPerPage="Tasks per page:"
+          sx={{
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            '& .MuiTablePagination-toolbar': {
+              minHeight: '48px',
+              px: 2,
+            },
+            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+              fontSize: '12px',
+              fontWeight: 600,
+              color: 'text.secondary',
+            },
+            '& .MuiTablePagination-select': {
+              fontSize: '12px',
+              fontWeight: 600,
+            },
+          }}
+        />
+        </>
       )}
 
       {isListView && selectedTaskIds.size > 0 && (
