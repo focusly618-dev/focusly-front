@@ -13,6 +13,9 @@ export const useTasks = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [, setSearchParams] = useSearchParams();
 
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
   // ── View & UI local state ──────────────────────────────────────────
   const [viewMode, setViewMode] = useState<
     'list' | 'grid' | 'board' | 'workload'
@@ -30,6 +33,8 @@ export const useTasks = () => {
     userId: user?.id,
     filters: filterLogic.activeFilters,
     sort: filterLogic.activeSort,
+    offset: page * pageSize,
+    limit: pageSize,
   });
 
   const mutations = useTasksMutations({
@@ -132,11 +137,16 @@ export const useTasks = () => {
   return {
     // Data
     tasks: data.tasks,
+    totalCount: data.totalCount,
     isLoading: data.isLoading,
     completedTasksCount: data.completedTasksCount,
     pendingTasksCount: data.pendingTasksCount,
     filteredTasks,
     tags,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
 
     // Filters & search
     searchTerm: filterLogic.searchTerm,

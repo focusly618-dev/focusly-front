@@ -38,7 +38,6 @@ export const GET_TASKS = gql`
       task_type
       estimated_start_date
       estimated_end_date
-
       collaborators {
         name
         email
@@ -245,10 +244,6 @@ export const GET_TASKS_PAGINATED = gql`
         task_type
         estimated_start_date
         estimated_end_date
-        is_splitable
-        min_block_duration
-        preferred_time_of_day
-        is_locked
         collaborators {
           name
           email
