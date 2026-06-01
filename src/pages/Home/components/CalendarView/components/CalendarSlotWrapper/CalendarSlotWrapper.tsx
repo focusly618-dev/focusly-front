@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface CalendarSlotWrapperProps {
-  children: React.ReactElement;
+  children: React.ReactElement<{ onContextMenu?: React.MouseEventHandler }>;
   value?: Date;
   onContextMenu?: (e: React.MouseEvent, date: Date) => void;
 }
