@@ -21,7 +21,10 @@ export const CalendarContainer = styled(Box, {
   return {
     backgroundColor: bgDefault,
     height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
     flex: 1,
+    overflow: 'hidden',
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     //  BASE CALENDAR
@@ -40,6 +43,11 @@ export const CalendarContainer = styled(Box, {
     '& .rbc-time-view, & .rbc-month-view, & .rbc-agenda-view': {
       backgroundColor: `${bgDefault} !important`,
       border: `1px solid ${divider}`,
+    },
+    '& .rbc-time-view': {
+      [theme.breakpoints.down('sm')]: {
+        minWidth: isDayView ? '100%' : '640px',
+      },
     },
 
     // ── Time content (scrollable area with events) ──
@@ -63,12 +71,20 @@ export const CalendarContainer = styled(Box, {
     '& .rbc-day-bg': {
       backgroundColor: `${bgDefault} !important`,
       borderLeft: `1px solid ${divider}`,
+      transition: 'background-color 0.8s ease-out',
     },
     '& .rbc-day-bg + .rbc-day-bg': {
       borderLeft: `1px solid ${divider}`,
     },
+    '& .rbc-day-bg.flash-highlight-column': {
+      backgroundColor: `${isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.22)'} !important`,
+      transition: 'none !important',
+    },
+    '& .rbc-day-bg.selected-day-column': {
+      backgroundColor: `${isDark ? 'rgba(239, 68, 68, 0.12)' : 'rgba(239, 68, 68, 0.06)'} !important`,
+    },
     '& .rbc-day-slot': {
-      backgroundColor: `${bgDefault} !important`,
+      backgroundColor: 'transparent !important',
     },
     '& .rbc-time-column': {
       backgroundColor: `${bgDefault} !important`,
@@ -92,14 +108,17 @@ export const CalendarContainer = styled(Box, {
     //  TIME SLOTS (the grid lines)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     '& .rbc-timeslot-group': {
-      backgroundColor: `${bgDefault} !important`,
+      backgroundColor: 'transparent !important',
       borderBottom: `1px solid ${dividerStrong} !important`,
       minHeight: '56px',
       display: 'flex',
       flexDirection: 'column',
+      [theme.breakpoints.down('sm')]: {
+        minHeight: '48px',
+      },
     },
     '& .rbc-time-slot': {
-      backgroundColor: `${bgDefault} !important`,
+      backgroundColor: 'transparent !important',
       flex: 1,
       border: 'none !important',
       '&:not(:last-child)': {
@@ -146,6 +165,10 @@ export const CalendarContainer = styled(Box, {
       alignItems: 'center',
       justifyContent: 'center',
       color: textPrimary,
+      [theme.breakpoints.down('sm')]: {
+        fontSize: '10px',
+        padding: '6px 0',
+      },
     },
     '& .rbc-header + .rbc-header': {
       borderLeft: `1px solid ${divider}`,
@@ -244,6 +267,9 @@ export const CalendarContainer = styled(Box, {
       flex: 1,
       height: '100%',
       backgroundColor: `${bgDefault} !important`,
+      [theme.breakpoints.down('sm')]: {
+        minWidth: '750px',
+      },
     },
     '& .rbc-month-row': {
       backgroundColor: `${bgDefault} !important`,
@@ -260,6 +286,14 @@ export const CalendarContainer = styled(Box, {
       borderLeft: `1px solid ${divider} !important`,
       borderRight: `1px solid ${divider} !important`,
       backgroundColor: `${bgDefault} !important`,
+      transition: 'background-color 0.8s ease-out',
+    },
+    '& .rbc-month-row .rbc-row-bg > div.flash-highlight-column': {
+      backgroundColor: `${isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.22)'} !important`,
+      transition: 'none !important',
+    },
+    '& .rbc-month-row .rbc-row-bg > div.selected-day-column': {
+      backgroundColor: `${isDark ? 'rgba(239, 68, 68, 0.12)' : 'rgba(239, 68, 68, 0.06)'} !important`,
     },
     '& .rbc-off-range-bg': {
       backgroundColor: isDark

@@ -16,6 +16,7 @@ import {
   startOfDay,
   endOfDay,
   format,
+  isSameDay,
 } from 'date-fns';
 import { sileo } from 'sileo';
 import type { RootState } from '@/redux/store';
@@ -53,14 +54,14 @@ export const useCalendarView = () => {
   const tasks = useSelector((state: RootState) => state.task?.tasks) || [];
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Initialize state from URL if available
-  const [currentView, setCurrentView] = useState<View>(() => {
+  // Derive active view and date directly from URL parameters
+  const currentView = useMemo<View>(() => {
     const v = searchParams.get('v');
     const validViews: View[] = [Views.MONTH, Views.WEEK, Views.DAY];
     return validViews.includes(v as View) ? (v as View) : Views.DAY;
-  });
+  }, [searchParams]);
 
-  const [currentDate, setCurrentDate] = useState(() => {
+  const currentDate = useMemo<Date>(() => {
     const d = searchParams.get('d');
     if (d) {
       // Split YYYY-MM-DD and create a local Date at midnight
@@ -70,25 +71,50 @@ export const useCalendarView = () => {
       }
     }
     return new Date();
-  });
+  }, [searchParams]);
 
   const [scrollToTime, setScrollToTime] = useState<Date | undefined>(undefined);
+  const [flashingDate, setFlashingDate] = useState<Date | null>(null);
 
-  // Sync URL with state
+  // Trigger temporary column highlight (flash) when the selected date (d URL param) changes
   useEffect(() => {
+    const dStr = searchParams.get('d');
+    if (dStr) {
+      const [year, month, day] = dStr.split('-').map(Number);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        const dateObj = new Date(year, month - 1, day);
+        setFlashingDate(dateObj);
+        const timer = setTimeout(() => {
+          setFlashingDate(null);
+        }, 1500); // 1.5 seconds flash highlight
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [searchParams]);
+
+  // Helper to update the view and/or date URL search parameters
+  const updateUrlParams = (newView: View, newDate: Date) => {
     const newParams = new URLSearchParams(searchParams.toString());
-    const currentV = newParams.get('v');
-    const currentD = newParams.get('d');
+    newParams.set('v', newView as string);
+    newParams.set('d', format(newDate, 'yyyy-MM-dd'));
+    setSearchParams(newParams, { replace: true });
+  };
 
-    // Use local time date string for the URL to avoid timezone confusion in the calendar view
-    const dateStr = format(currentDate, 'yyyy-MM-dd');
-
-    if (currentV !== currentView || currentD !== dateStr) {
-      newParams.set('v', currentView as string);
-      newParams.set('d', dateStr);
+  // Initialize missing URL params so other components (e.g. Sidebar) can read them
+  useEffect(() => {
+    const hasV = searchParams.has('v');
+    const hasD = searchParams.has('d');
+    if (!hasV || !hasD) {
+      const newParams = new URLSearchParams(searchParams.toString());
+      if (!hasV) {
+        newParams.set('v', currentView as string);
+      }
+      if (!hasD) {
+        newParams.set('d', format(currentDate, 'yyyy-MM-dd'));
+      }
       setSearchParams(newParams, { replace: true });
     }
-  }, [currentView, currentDate, setSearchParams, searchParams]);
+  }, [searchParams, currentView, currentDate, setSearchParams]);
 
   const [slotContextMenu, setSlotContextMenu] = useState<{
     mouseX: number;
@@ -112,8 +138,8 @@ export const useCalendarView = () => {
       start = subDays(startOfMonth(currentDate), 7);
       end = addDays(endOfMonth(currentDate), 7);
     } else if (currentView === Views.WEEK) {
-      start = startOfWeek(currentDate);
-      end = endOfWeek(currentDate);
+      start = startOfWeek(currentDate, { weekStartsOn: 1 });
+      end = endOfWeek(currentDate, { weekStartsOn: 1 });
     } else {
       start = startOfDay(currentDate);
       end = endOfDay(currentDate);
@@ -334,19 +360,20 @@ export const useCalendarView = () => {
   }, [reduxEvents, tasks]);
 
   const handleOnChangeView = (selectedView: View) => {
-    setCurrentView(selectedView);
+    updateUrlParams(selectedView, currentDate);
   };
 
   const handleOnNavigate = (newDate: Date) => {
-    setCurrentDate(newDate);
+    updateUrlParams(currentView, newDate);
   };
 
   const handleNavigateAction = (action: CalendarNavigateAction) => {
     if (action === 'TODAY') {
-      setCurrentDate(new Date());
+      const today = new Date();
+      updateUrlParams(currentView, today);
       // Find the first task of the day to scroll to
-      const todayStart = startOfDay(new Date());
-      const todayEnd = endOfDay(new Date());
+      const todayStart = startOfDay(today);
+      const todayEnd = endOfDay(today);
 
       const todayTasks = events.filter((event) => {
         const eventStart = event.start?.getTime() || 0;
@@ -368,58 +395,61 @@ export const useCalendarView = () => {
     }
 
     if (currentView === Views.MONTH) {
-      setCurrentDate((prev) =>
-        action === 'NEXT' ? addMonths(prev, 1) : subMonths(prev, 1),
+      updateUrlParams(
+        currentView,
+        action === 'NEXT'
+          ? addMonths(currentDate, 1)
+          : subMonths(currentDate, 1),
       );
       return;
     }
 
     if (currentView === Views.WEEK) {
-      setCurrentDate((prev) =>
-        action === 'NEXT' ? addWeeks(prev, 1) : subWeeks(prev, 1),
+      updateUrlParams(
+        currentView,
+        action === 'NEXT' ? addWeeks(currentDate, 1) : subWeeks(currentDate, 1),
       );
       return;
     }
 
     if (currentView === Views.DAY) {
-      setCurrentDate((prev) =>
-        action === 'NEXT' ? addDays(prev, 1) : subDays(prev, 1),
+      updateUrlParams(
+        currentView,
+        action === 'NEXT' ? addDays(currentDate, 1) : subDays(currentDate, 1),
       );
       return;
     }
 
-    setCurrentDate((prev) =>
-      action === 'NEXT' ? addDays(prev, 1) : subDays(prev, 1),
+    updateUrlParams(
+      currentView,
+      action === 'NEXT' ? addDays(currentDate, 1) : subDays(currentDate, 1),
     );
   };
 
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
-    setSearchParams({
-      action: 'create',
-      start: start.toISOString(),
-      end: end.toISOString(),
-    });
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('action', 'create');
+    newParams.set('start', start.toISOString());
+    newParams.set('end', end.toISOString());
+    newParams.set('d', format(start, 'yyyy-MM-dd'));
+    setSearchParams(newParams);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSelectEvent = (event: ICalendarEvent | any) => {
     const activeTab = searchParams.get('tab') || 'DailyPlan';
-
-    if (event.type === 'task') {
-      const task =
-        tasks.find((t) => t.id === event.id) || (event.resource as Task);
-      if (task) {
-        setSearchParams({ tab: activeTab, taskId: task.id });
-      }
-    } else if (event.type === 'event') {
-      setSearchParams({ tab: activeTab, taskId: event.id });
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('tab', activeTab);
+    newParams.set('taskId', event.id);
+    if (event.start) {
+      newParams.set('d', format(event.start, 'yyyy-MM-dd'));
     }
+    setSearchParams(newParams);
   };
 
   // When clicking "+N más", navigate to day view for that date
   const handleShowMore = (_events: ICalendarEvent[], date: Date) => {
-    setCurrentView(Views.DAY);
-    setCurrentDate(date);
+    updateUrlParams(Views.DAY, date);
   };
 
   const handleModalClose = () => {
@@ -531,8 +561,8 @@ export const useCalendarView = () => {
           updateTaskInput: {
             id: event.id,
             deadline: endDate.toISOString(),
-            estimatedStartDate: startDate.toISOString(),
-            estimatedEndDate: endDate.toISOString(),
+            estimated_start_date: startDate.toISOString(),
+            estimated_end_date: endDate.toISOString(),
           },
         },
         // We still refetch to ensure server sync, but optimistic update removes the "jump"
@@ -591,8 +621,8 @@ export const useCalendarView = () => {
           updateTaskInput: {
             id: event.id,
             deadline: endDate.toISOString(),
-            estimatedStartDate: startDate.toISOString(),
-            estimatedEndDate: endDate.toISOString(),
+            estimated_start_date: startDate.toISOString(),
+            estimated_end_date: endDate.toISOString(),
           },
         },
         refetchQueries: [
@@ -612,6 +642,19 @@ export const useCalendarView = () => {
         dispatch(updateTask(originalTask));
       }
     }
+  };
+
+  const dayPropGetter = (date: Date) => {
+    const classes = [];
+    if (isSameDay(date, currentDate)) {
+      classes.push('selected-day-column');
+    }
+    if (flashingDate && isSameDay(date, flashingDate)) {
+      classes.push('flash-highlight-column');
+    }
+    return {
+      className: classes.join(' '),
+    };
   };
 
   return {
@@ -638,5 +681,6 @@ export const useCalendarView = () => {
     handleSlotContextMenu,
     closeSlotContextMenu,
     scrollToTime,
+    dayPropGetter,
   };
 };
