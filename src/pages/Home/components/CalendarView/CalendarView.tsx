@@ -14,7 +14,6 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { CalendarToolbar } from '../CalendarToolbar';
 import { CalendarHeader } from '../CalendarHeader';
 import { CalendarEvent, type ICalendarEvent } from '../CalendarEvent';
-import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 
 // Material UI
@@ -31,6 +30,14 @@ import {
 
 // Types
 import type { Task } from '@/redux/tasks/task.types';
+
+// Set Monday as the start of the week for moment (used by react-big-calendar localizer)
+moment.updateLocale('en', {
+  week: {
+    dow: 1, // Monday is the first day of the week
+    doy: 4, // The week that contains Jan 4th is the first week of the year
+  },
+});
 
 // Setup the localizer
 const localizer = momentLocalizer(moment);
@@ -59,6 +66,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     closeSlotContextMenu,
     handleNavigateAction,
     scrollToTime,
+    dayPropGetter,
   } = useCalendarView();
 
   const handleCreateTaskAtSlot = (priority?: number) => {
@@ -118,9 +126,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
+          height: 'calc(100% - 90px)', // Fill remaining height below header
           position: 'relative',
-          overflow: 'hidden',
+          overflowX: 'auto', // Allow horizontal scroll on small devices
+          overflowY: 'hidden', // Contain vertical overflow inside big-calendar
+          scrollbarWidth: 'none',
+          '&::-webkit-scrollbar': {
+            height: '6px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.15)'
+                : 'rgba(0, 0, 0, 0.1)',
+            borderRadius: '3px',
+          },
         }}
       >
         <DnDCalendar
@@ -137,6 +157,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           onEventDrop={handleEventDrop}
           onEventResize={handleEventResize}
           scrollToTime={scrollToTime}
+          dayPropGetter={dayPropGetter}
           resizable
           selectable
           showAllEvents={false}
@@ -239,10 +260,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           </Stack>
         </Box>
       </Menu>
-
-      <Box id="joyride-side-panel">
-        <CalendarSidePanel />
-      </Box>
     </CalendarContainer>
   );
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface CalendarSlotWrapperProps {
-  children: React.ReactNode;
+  children: React.ReactElement;
   value?: Date;
   onContextMenu?: (e: React.MouseEvent, date: Date) => void;
 }
@@ -10,7 +10,11 @@ interface CalendarSlotWrapperProps {
  * Custom wrapper for time slots in Day and Week views.
  * Captures right-clicks to trigger the slot context menu.
  */
-export const CalendarSlotWrapper: React.FC<CalendarSlotWrapperProps> = ({ children, value, onContextMenu }) => {
+export const CalendarSlotWrapper: React.FC<CalendarSlotWrapperProps> = ({
+  children,
+  value,
+  onContextMenu,
+}) => {
   const handleContextMenu = (e: React.MouseEvent) => {
     if (onContextMenu && value) {
       e.preventDefault();
@@ -18,12 +22,9 @@ export const CalendarSlotWrapper: React.FC<CalendarSlotWrapperProps> = ({ childr
     }
   };
 
-  return (
-    <div 
-      onContextMenu={handleContextMenu}
-      style={{ height: '100%', width: '100%' }}
-    >
-      {React.Children.only(children)}
-    </div>
-  );
+  // Clone the child element and attach the context menu handler directly to it.
+  // This avoids introducing an extra wrapper div that breaks CSS child combinators.
+  return React.cloneElement(children, {
+    onContextMenu: handleContextMenu,
+  });
 };

@@ -1,6 +1,4 @@
-import { Box, Paper, Typography, LinearProgress, styled } from '@mui/material';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { Box, Paper, Typography, styled } from '@mui/material';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
@@ -36,91 +34,6 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
 }));
 
 // Mock Components
-const QuickInsights = () => (
-  <Box>
-    <SectionTitle>Quick Insights</SectionTitle>
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <Card elevation={0}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-            }}
-          >
-            PRODUCTIVITY SCORE
-          </Typography>
-          <TrendingUpIcon sx={{ color: 'success.main', fontSize: 20 }} />
-        </Box>
-
-        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <Typography
-            variant="h3"
-            sx={{ color: 'text.primary', fontWeight: 700 }}
-          >
-            84
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: 'success.main', fontWeight: 600 }}
-          >
-            +12%
-          </Typography>
-        </Box>
-
-        <Typography
-          variant="caption"
-          sx={{ color: 'text.secondary', lineHeight: 1.5 }}
-        >
-          You&apos;re more productive than usual this month.
-        </Typography>
-      </Card>
-
-      <Card elevation={0}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <CheckCircleOutlineIcon sx={{ color: '#3b82f6', fontSize: 20 }} />
-          <Typography
-            variant="body1"
-            sx={{ color: 'text.primary', fontWeight: 600 }}
-          >
-            Habit Tracker
-          </Typography>
-        </Box>
-
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            Focus Consistency
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            18 / 20 days
-          </Typography>
-        </Box>
-
-        <LinearProgress
-          variant="determinate"
-          value={90}
-          sx={{
-            height: 6,
-            borderRadius: 3,
-            bgcolor: 'action.hover',
-            '& .MuiLinearProgress-bar': {
-              bgcolor: '#3b82f6',
-              borderRadius: 3,
-            },
-          }}
-        />
-      </Card>
-    </Box>
-  </Box>
-);
 
 const UpcomingTasks = () => (
   <Box>
@@ -261,7 +174,6 @@ export const CalendarSidePanel = () => {
           gap: '32px',
         }}
       >
-        <QuickInsights />
         <UpcomingTasks />
       </PerfectScrollbar>
     </PanelContainer>

@@ -17,6 +17,14 @@ import {
 } from '@mui/material';
 import { useMemo, useState } from 'react';
 import {
+  startOfWeek,
+  addDays,
+  format,
+  isSameDay,
+  isSameWeek,
+  startOfMonth,
+} from 'date-fns';
+import {
   Dashboard as DashboardIcon,
   CheckCircle as TasksIcon,
   BarChart as InsightsIcon,
@@ -77,6 +85,26 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     () => tasks.find((t) => t.id === taskId),
     [tasks, taskId],
   );
+  const currentView = searchParams.get('v') || 'day';
+  const currentDateStr = searchParams.get('d');
+
+  const currentDate = useMemo(() => {
+    if (currentDateStr) {
+      const [year, month, day] = currentDateStr.split('-').map(Number);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        return new Date(year, month - 1, day);
+      }
+    }
+    return new Date();
+  }, [currentDateStr]);
+
+  const showMiniCalendar = true;
+
+  const miniCalendarDays = useMemo(() => {
+    const startOfCurrentMonth = startOfMonth(currentDate);
+    const startOfGrid = startOfWeek(startOfCurrentMonth, { weekStartsOn: 1 }); // 1 = Monday
+    return Array.from({ length: 42 }, (_, i) => addDays(startOfGrid, i));
+  }, [currentDate]);
 
   return (
     <SidebarContainer>
@@ -298,6 +326,124 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
       >
         {activeURLTask ? activeURLTask.title : 'Add New Task'}
       </AddTaskButton>
+
+      {showMiniCalendar && (
+        <Box
+          sx={{
+            px: 2.5,
+            pb: 1.5,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              px: 0.5,
+            }}
+          >
+            <Typography
+              variant="caption"
+              fontWeight={700}
+              color="text.secondary"
+              sx={{
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                fontSize: '0.68rem',
+              }}
+            >
+              {format(currentDate, 'MMMM yyyy')}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(7, 1fr)',
+              gap: 0.3,
+              textAlign: 'center',
+            }}
+          >
+            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => (
+              <Typography
+                key={idx}
+                variant="caption"
+                sx={{
+                  fontSize: '0.62rem',
+                  fontWeight: 700,
+                  color: 'text.disabled',
+                  py: 0.5,
+                }}
+              >
+                {letter}
+              </Typography>
+            ))}
+            {miniCalendarDays.map((dayDate, idx) => {
+              const isSelected = isSameDay(dayDate, currentDate);
+              const isToday = isSameDay(dayDate, new Date());
+              const isCurrentMonth =
+                dayDate.getMonth() === currentDate.getMonth();
+              const isInSelectedWeek =
+                currentView === 'week' &&
+                isSameWeek(dayDate, currentDate, { weekStartsOn: 1 });
+
+              return (
+                <Box
+                  key={idx}
+                  onClick={() => {
+                    const newParams = new URLSearchParams(
+                      searchParams.toString(),
+                    );
+                    newParams.set('d', format(dayDate, 'yyyy-MM-dd'));
+                    setSearchParams(newParams);
+                  }}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    aspectRatio: '1',
+                    borderRadius: isSelected ? '50%' : '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.72rem',
+                    fontWeight: isSelected || isToday ? 700 : 500,
+                    transition: 'all 0.15s ease-in-out',
+                    bgcolor: isSelected
+                      ? '#ef4444'
+                      : isInSelectedWeek
+                        ? theme.palette.mode === 'dark'
+                          ? 'rgba(99, 102, 241, 0.12)'
+                          : 'rgba(59, 130, 246, 0.08)'
+                        : 'transparent',
+                    color: isSelected
+                      ? '#ffffff'
+                      : !isCurrentMonth
+                        ? 'text.disabled'
+                        : isToday
+                          ? '#3b82f6'
+                          : 'text.primary',
+                    border:
+                      isToday && !isSelected
+                        ? '1px solid rgba(59, 130, 246, 0.4)'
+                        : 'none',
+                    '&:hover': {
+                      bgcolor: isSelected
+                        ? '#ef4444'
+                        : theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(0, 0, 0, 0.04)',
+                    },
+                  }}
+                >
+                  {format(dayDate, 'd')}
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+      )}
+
       <List sx={{ padding: '16px' }}>
         <ListItem disablePadding>
           <NavItem
