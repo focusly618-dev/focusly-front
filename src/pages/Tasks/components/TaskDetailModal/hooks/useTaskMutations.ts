@@ -11,13 +11,14 @@ import {
   DELETE_TASK,
   GET_TASKS,
 } from '../../../Task.graphql';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 import {
   createGoogleEvent,
   updateGoogleEvent,
   deleteGoogleEvent,
 } from '@/api/GoogleCalendar/googleCalendarApi';
 import { removeTask } from '@/redux/tasks/task.slice';
+import { removeEvent } from '@/redux/calendar/calendar.slice';
 import {
   deduplicateLinks,
   parseDuration,
@@ -155,12 +156,21 @@ export const useTaskMutations = ({
       collaborators: state.collaborators,
     };
 
+    const deadlineISO = state.deadline
+      ? state.deadline.toISOString()
+      : new Date().toISOString();
+    const endDateISO = new Date(
+      (state.deadline?.getTime() || Date.now()) + (estimateTimer || 25) * 60000,
+    ).toISOString();
+
     const createInput: TaskInput = {
       ...commonInput,
       user_id: user.id || '',
       status: state.status || 'Backlog',
       google_event_id: (initialTask as { google_event_id?: string })
         ?.google_event_id,
+      estimated_start_date: deadlineISO,
+      estimated_end_date: endDateISO,
     };
 
     try {
@@ -200,21 +210,32 @@ export const useTaskMutations = ({
         ? parseRealTime(state.realTime)
         : initialTask.real_timer || 0;
 
-    // Task update (config-driven diffing)
     const taskColor =
       state.color ||
       (initialTask as { color?: string | undefined }).color ||
       '#3b82f6';
+
     const cleanDesc = (state.description || '')
       .replace(/\[COLOR:(.*?)\]/g, '')
       .replace(/\[START_DATE:(.*?)\]/g, '')
       .trim();
 
     const currentNotes = `${cleanDesc} [COLOR:${taskColor}]`;
+
     const currentDeadline =
       state.deadline instanceof Date
         ? state.deadline.toISOString()
         : state.deadline || initialTask.deadline || '';
+
+    const startDate = new Date(currentDeadline);
+    const estimatedStartISO = !isNaN(startDate.getTime())
+      ? startDate.toISOString()
+      : undefined;
+    const estimatedEndISO = !isNaN(startDate.getTime())
+      ? new Date(
+          startDate.getTime() + (estimateTimer || 30) * 60000,
+        ).toISOString()
+      : undefined;
 
     // Define which fields to compare and how
     const configs: Record<
@@ -294,6 +315,16 @@ export const useTaskMutations = ({
         initial: initialTask.collaborators || [],
         isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
       },
+      estimatedStartDate: {
+        key: 'estimated_start_date',
+        val: estimatedStartISO,
+        initial: initialTask.estimated_start_date,
+      },
+      estimatedEndDate: {
+        key: 'estimated_end_date',
+        val: estimatedEndISO,
+        initial: initialTask.estimated_end_date,
+      },
     };
 
     const updateInput: Record<string, unknown> = { id: initialTask.id };
@@ -335,21 +366,47 @@ export const useTaskMutations = ({
   const handleDelete = async () => {
     if (!initialTask?.id) return;
 
-    // Task deletion
     if (onDelete) {
       onDelete(initialTask.id);
       return;
     }
 
+    // 1. Optimistic Delete in Redux
+    dispatch(removeTask({ id: initialTask.id }));
+    dispatch(removeEvent({ id: initialTask.id }));
+    if (initialTask.google_event_id) {
+      dispatch(removeEvent({ id: initialTask.google_event_id }));
+    }
+
     try {
-      await deleteTaskMutation({
-        variables: { id: initialTask.id },
-        refetchQueries: [
-          { query: GET_TASKS, variables: { userId: user?.id } },
-          { query: GET_WORKSPACES, variables: { search: '' } },
-        ],
-      });
-      dispatch(removeTask({ id: initialTask.id }));
+      const isGoogleTask = initialTask.task_type === 'GoogleTask';
+
+      if (!isGoogleTask) {
+        // Platform Task — Delete from BOTH Google Calendar (if synced) and Platform DB
+        if (initialTask.google_event_id) {
+          try {
+            await deleteGoogleEvent(initialTask.google_event_id);
+          } catch (err) {
+            console.warn(
+              'Failed to delete synced Google event, proceeding with platform delete',
+              err,
+            );
+          }
+        }
+
+        await deleteTaskMutation({
+          variables: { id: initialTask.id },
+          refetchQueries: [
+            { query: GET_TASKS, variables: { userId: user?.id } },
+            { query: GET_WORKSPACES, variables: { search: '' } },
+          ],
+        });
+      } else {
+        // Pure Google Task
+        const eventId = initialTask.google_event_id || initialTask.id;
+        await deleteGoogleEvent(eventId);
+      }
+
       resetForm();
       onClose();
     } catch (e) {

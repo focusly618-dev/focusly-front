@@ -1,6 +1,6 @@
 import { client } from '@/api/apollo';
 import { REMOVE_WORKSPACE, GET_WORKSPACES } from '../workspaces.graphql';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 
 export const useWorkspaceActions = () => {
   const handleOpen = (id: string): void => {
@@ -28,7 +28,7 @@ export const useWorkspaceActions = () => {
               workspaces(existingWorkspaces = [], { readField }) {
                 return existingWorkspaces.filter(
                   (workspaceRef: import('@apollo/client').Reference) =>
-                    id !== readField('id', workspaceRef)
+                    id !== readField('id', workspaceRef),
                 );
               },
               totalWorkspaces(existingTotal = 0) {
@@ -38,16 +38,16 @@ export const useWorkspaceActions = () => {
           });
         },
       });
-      sileo.success({ 
-        title: 'Workspace deleted', 
-        fill: 'var(--sileo-delete-bg)', 
-        });
+      sileo.success({
+        title: 'Workspace deleted',
+        fill: 'var(--sileo-delete-bg)',
+      });
     } catch (error) {
       console.error('Error deleting workspace:', error);
-      sileo.error({ 
-        title: 'Error deleting workspace', 
-        fill: 'var(--sileo-error-bg)', 
-        });
+      sileo.error({
+        title: 'Error deleting workspace',
+        fill: 'var(--sileo-error-bg)',
+      });
     }
   };
 

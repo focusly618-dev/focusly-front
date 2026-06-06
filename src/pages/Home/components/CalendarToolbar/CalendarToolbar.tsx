@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ToolbarProps, View } from 'react-big-calendar';
+import type { ToolbarProps } from 'react-big-calendar';
 import type { ICalendarEvent } from '../CalendarEvent';
 import { Navigate } from 'react-big-calendar';
 import type { CalendarNavigateAction } from '../CalendarView/calendarView.types';
@@ -25,7 +25,7 @@ import {
   CalendarToday as CalendarTodayIcon,
 } from '@mui/icons-material';
 
-import { ToolbarContainer, ViewToggle } from './CalendarToolbar.styles';
+import { ToolbarContainer } from './CalendarToolbar.styles';
 
 interface Notification {
   id: string;
@@ -42,7 +42,7 @@ interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
 }
 
 export const CalendarToolbar = (props: CustomToolbarProps) => {
-  const { date, view, onView, onNavigate, label, onNavigateAction } = props;
+  const { date, onNavigate, label, onNavigateAction } = props;
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -76,7 +76,6 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
     onNavigateAction ? onNavigateAction('NEXT') : onNavigate(Navigate.NEXT);
   const goToToday = () =>
     onNavigateAction ? onNavigateAction('TODAY') : onNavigate(Navigate.TODAY);
-  const handleViewChange = (newView: View) => onView(newView);
 
   return (
     <ToolbarContainer
@@ -152,32 +151,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
         </Button>
       </Box>
 
-      {/* Right side: View Toggle + Date Range */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <ViewToggle
-          variant="contained"
-          aria-label="outlined primary button group"
-        >
-          <Button
-            onClick={() => handleViewChange('day')}
-            className={view === 'day' ? 'active' : ''}
-          >
-            Day
-          </Button>
-          <Button
-            onClick={() => handleViewChange('week')}
-            className={view === 'week' ? 'active' : ''}
-          >
-            Week
-          </Button>
-          <Button
-            onClick={() => handleViewChange('month')}
-            className={view === 'month' ? 'active' : ''}
-          >
-            Month
-          </Button>
-        </ViewToggle>
-      </Box>
+      {/* Right side: View Toggle removed (relocated to right sidebar) */}
 
       <Popover
         open={open}

@@ -11,14 +11,12 @@ import {
   subWeeks,
   startOfMonth,
   endOfMonth,
-  startOfWeek,
-  endOfWeek,
   startOfDay,
   endOfDay,
   format,
   isSameDay,
 } from 'date-fns';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
 import { setTasks, removeTask, updateTask } from '@/redux/tasks/task.slice';
@@ -41,6 +39,7 @@ import {
   mapResponseToTask,
   normalizeGoogleId,
   getBaseGoogleId,
+  safeISO,
 } from '@/api/Tasks/taskMapper';
 
 export const useCalendarView = () => {
@@ -130,26 +129,16 @@ export const useCalendarView = () => {
   const user = useSelector((state: RootState) => state.auth.user);
 
   const dateRange = useMemo(() => {
-    let start: Date;
-    let end: Date;
-
-    if (currentView === Views.MONTH) {
-      // Fetch some days before and after to cover the calendar grid overflow
-      start = subDays(startOfMonth(currentDate), 7);
-      end = addDays(endOfMonth(currentDate), 7);
-    } else if (currentView === Views.WEEK) {
-      start = startOfWeek(currentDate, { weekStartsOn: 1 });
-      end = endOfWeek(currentDate, { weekStartsOn: 1 });
-    } else {
-      start = startOfDay(currentDate);
-      end = endOfDay(currentDate);
-    }
+    // Always fetch a full month range (with safety margins) around the current date
+    // to avoid refetching on every day/week navigation.
+    const start = subDays(startOfMonth(currentDate), 7);
+    const end = addDays(endOfMonth(currentDate), 7);
 
     return {
       start: start.toISOString(),
       end: end.toISOString(),
     };
-  }, [currentDate, currentView]);
+  }, [currentDate]);
 
   const { data: tasksData, loading: isTasksQueryLoading } = useQuery(
     GET_TASKS,
@@ -210,7 +199,14 @@ export const useCalendarView = () => {
     return () => {
       isMounted = false;
     };
-  }, [dispatch, user?.id, user?.authProvider, dateRange, syncVersion]);
+  }, [
+    dispatch,
+    user?.id,
+    user?.authProvider,
+    dateRange.start,
+    dateRange.end,
+    syncVersion,
+  ]);
 
   const hasRenderableCalendarData =
     reduxEvents.length > 0 ||
@@ -237,11 +233,13 @@ export const useCalendarView = () => {
     const calendarEvents = reduxEvents
       .map((ge) => {
         try {
+          const startISO = safeISO(ge.estimated_start_date);
+          const endISO = safeISO(ge.deadline);
           return {
             id: ge.id,
             title: ge.title,
-            start: new Date(ge.estimated_start_date),
-            end: new Date(ge.deadline),
+            start: startISO ? new Date(startISO) : new Date(),
+            end: endISO ? new Date(endISO) : new Date(),
             allDay: ge.is_all_day,
             resource: ge,
             type: 'event' as const,
@@ -435,6 +433,12 @@ export const useCalendarView = () => {
     setSearchParams(newParams);
   };
 
+  const handleAddTaskClick = () => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('action', 'create');
+    setSearchParams(newParams);
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSelectEvent = (event: ICalendarEvent | any) => {
     const activeTab = searchParams.get('tab') || 'DailyPlan';
@@ -462,17 +466,65 @@ export const useCalendarView = () => {
   };
 
   const handleDeleteTask = async (taskId: string) => {
+    const taskObj = tasks.find((t) => t.id === taskId);
+    const virtualEvent = reduxEvents.find((e) => e.id === taskId);
+    const initialTask = taskObj || virtualEvent;
+
+    if (initialTask) {
+      const initialTaskTyped = initialTask as {
+        task_type?: string;
+        google_event_id?: string;
+        provider?: string;
+        organizer_email?: string;
+        user_id?: string;
+      };
+      const isGoogleTask =
+        initialTaskTyped.task_type === 'GoogleTask' ||
+        initialTaskTyped.google_event_id ||
+        initialTaskTyped.provider === 'google';
+      const organizerEmail = initialTaskTyped.organizer_email;
+      const userIdField = initialTaskTyped.user_id;
+
+      const isReadOnly =
+        user &&
+        ((isGoogleTask &&
+          organizerEmail &&
+          organizerEmail.toLowerCase() !== user.email?.toLowerCase()) ||
+          (!isGoogleTask && userIdField && userIdField !== user.id));
+
+      if (isReadOnly) {
+        sileo.error({
+          title: 'Acción no permitida',
+          description:
+            'No puedes eliminar una tarea o evento del cual no eres propietario.',
+          duration: 3000,
+        });
+        return;
+      }
+    }
+
     // 1. Optimistic Delete in Redux
     dispatch(removeTask({ id: taskId }));
     dispatch(removeEvent({ id: taskId })); // Also remove from virtual state
+    if (taskObj?.google_event_id) {
+      dispatch(removeEvent({ id: taskObj.google_event_id }));
+    }
 
     try {
-      const persistentTask = tasks.find((t) => t.id === taskId);
-      const virtualEvent = reduxEvents.find((e) => e.id === taskId);
-
-      const isPlatformTask = !!persistentTask;
+      const isPlatformTask = !!taskObj;
 
       if (isPlatformTask) {
+        if (taskObj.google_event_id) {
+          try {
+            await deleteGoogleEvent(taskObj.google_event_id);
+          } catch (err) {
+            console.warn(
+              'Failed to delete synced Google event, proceeding with platform delete',
+              err,
+            );
+          }
+        }
+
         await deleteTaskMutation({
           variables: { id: taskId },
           refetchQueries: [
@@ -490,7 +542,6 @@ export const useCalendarView = () => {
         const googleEventId =
           virtualEvent?.google_event_id || virtualEvent?.id || taskId;
         await deleteGoogleEvent(googleEventId);
-        dispatch(removeEvent({ id: googleEventId }));
       }
 
       handleModalClose();
@@ -502,8 +553,6 @@ export const useCalendarView = () => {
       });
     } catch (err) {
       console.error('Error deleting task:', err);
-      // We don't easily revert delete without refetching,
-      // but refetch will happen anyway on focus or next range change.
       sileo.error({
         title: 'Error deleting task',
         fill: 'var(--sileo-error-bg)',
@@ -539,11 +588,38 @@ export const useCalendarView = () => {
   const handleEventDrop = async ({ event, start, end }: CalendarDragEvent) => {
     if (event.type !== 'task') return;
 
+    const originalTask = tasks.find((t) => t.id === event.id);
+    if (originalTask) {
+      const isGoogleTask =
+        originalTask.task_type === 'GoogleTask' || originalTask.google_event_id;
+      const originalTaskTyped = originalTask as unknown as {
+        organizer_email?: string;
+      };
+      const isReadOnly =
+        user &&
+        ((isGoogleTask &&
+          originalTaskTyped.organizer_email &&
+          originalTaskTyped.organizer_email.toLowerCase() !==
+            user.email?.toLowerCase()) ||
+          (!isGoogleTask &&
+            originalTask.user_id &&
+            originalTask.user_id !== user.id));
+
+      if (isReadOnly) {
+        sileo.error({
+          title: 'Acción no permitida',
+          description:
+            'No puedes reprogramar una tarea o evento del cual no eres propietario.',
+          duration: 3000,
+        });
+        return;
+      }
+    }
+
     const startDate = typeof start === 'string' ? new Date(start) : start;
     const endDate = typeof end === 'string' ? new Date(end) : end;
 
     // 1. Optimistic Update in Redux
-    const originalTask = tasks.find((t) => t.id === event.id);
     if (originalTask) {
       dispatch(
         updateTask({
@@ -599,11 +675,38 @@ export const useCalendarView = () => {
   }: CalendarDragEvent) => {
     if (event.type !== 'task') return;
 
+    const originalTask = tasks.find((t) => t.id === event.id);
+    if (originalTask) {
+      const isGoogleTask =
+        originalTask.task_type === 'GoogleTask' || originalTask.google_event_id;
+      const originalTaskTyped = originalTask as unknown as {
+        organizer_email?: string;
+      };
+      const isReadOnly =
+        user &&
+        ((isGoogleTask &&
+          originalTaskTyped.organizer_email &&
+          originalTaskTyped.organizer_email.toLowerCase() !==
+            user.email?.toLowerCase()) ||
+          (!isGoogleTask &&
+            originalTask.user_id &&
+            originalTask.user_id !== user.id));
+
+      if (isReadOnly) {
+        sileo.error({
+          title: 'Acción no permitida',
+          description:
+            'No puedes redimensionar una tarea o evento del cual no eres propietario.',
+          duration: 3000,
+        });
+        return;
+      }
+    }
+
     const startDate = typeof start === 'string' ? new Date(start) : start;
     const endDate = typeof end === 'string' ? new Date(end) : end;
 
     // 1. Optimistic Update in Redux
-    const originalTask = tasks.find((t) => t.id === event.id);
     if (originalTask) {
       dispatch(
         updateTask({
@@ -682,5 +785,6 @@ export const useCalendarView = () => {
     closeSlotContextMenu,
     scrollToTime,
     dayPropGetter,
+    handleAddTaskClick,
   };
 };

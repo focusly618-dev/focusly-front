@@ -355,6 +355,266 @@ const colorPalette: { color: HeaderColor; gradient: string; label: string }[] =
     },
   ];
 
+const EMOJI_CATEGORIES = [
+  {
+    id: 'smileys',
+    label: 'Smileys & Emotion',
+    icon: '😊',
+    emojis: [
+      '😊',
+      '🥳',
+      '😎',
+      '🤔',
+      '💤',
+      '🥺',
+      '🤯',
+      '😍',
+      '😂',
+      '😴',
+      '🧠',
+      '❤️',
+      '✨',
+      '⚡',
+      '😇',
+      '😜',
+      '🤫',
+      '🤩',
+      '😡',
+      '😭',
+      '😱',
+      '💩',
+      '🤡',
+      '👽',
+      '👾',
+      '🤖',
+      '👋',
+      '👍',
+      '👊',
+      '🙌',
+      '👏',
+      '🙏',
+      '🙋',
+      '🧘',
+      '💃',
+      '🕺',
+    ],
+  },
+  {
+    id: 'nature',
+    label: 'Animals & Nature',
+    icon: '🌱',
+    emojis: [
+      '🌱',
+      '🌸',
+      '🍀',
+      '🌲',
+      '🍁',
+      '🌍',
+      '🌈',
+      '☀️',
+      '🐱',
+      '🐾',
+      '🦋',
+      '🦊',
+      '🦁',
+      '🦉',
+      '🐶',
+      '🐯',
+      '🐻',
+      '🐼',
+      '🐨',
+      '🐵',
+      '🐔',
+      '🐧',
+      '🦆',
+      '🐸',
+      '🐢',
+      '🐍',
+      '🐙',
+      '🦑',
+      '🐠',
+      '🐬',
+      '🐳',
+      '🐫',
+      '🐘',
+      '🐎',
+      '🌾',
+      '🍂',
+    ],
+  },
+  {
+    id: 'food',
+    label: 'Food & Drink',
+    icon: '🍎',
+    emojis: [
+      '🍎',
+      '🍕',
+      '☕',
+      '🧁',
+      '🍺',
+      '🥑',
+      '🍓',
+      '🍋',
+      '🍣',
+      '🍦',
+      '🍩',
+      '🍪',
+      '🥤',
+      '🍷',
+      '🍌',
+      '🍒',
+      '🍑',
+      '🍍',
+      '🥥',
+      '🥦',
+      '🥕',
+      '🌽',
+      '🍔',
+      '🍟',
+      '🌭',
+      '🌮',
+      '🍜',
+      '🍱',
+      '🍤',
+      '🥞',
+      '🍯',
+      '🍫',
+      '🍿',
+      '🥛',
+      '🍹',
+      '🍾',
+    ],
+  },
+  {
+    id: 'activities',
+    label: 'Activities',
+    icon: '🎮',
+    emojis: [
+      '🚀',
+      '🎯',
+      '🏆',
+      '🎨',
+      '🎮',
+      '⚽',
+      '🏀',
+      '🎸',
+      '🎧',
+      '🎬',
+      '🧩',
+      '🛹',
+      '🚴',
+      '✈️',
+      '🏈',
+      '⚾',
+      '🎾',
+      '🏐',
+      '🎳',
+      '🎯',
+      '🥊',
+      '🥋',
+      '🎿',
+      '🏋️',
+      '🏊',
+      '🚣',
+      '🎪',
+      '🎤',
+      '🎹',
+      '🎻',
+      '🎲',
+      '🎰',
+      '🏎️',
+      '🏍️',
+      '🚢',
+    ],
+  },
+  {
+    id: 'objects',
+    label: 'Objects & Symbols',
+    icon: '💼',
+    emojis: [
+      '📝',
+      '💻',
+      '💼',
+      '📌',
+      '🗓️',
+      '📈',
+      '🔑',
+      '🔒',
+      '🔨',
+      '📷',
+      '💡',
+      '⏰',
+      '🔋',
+      '🏷️',
+      '✉️',
+      '📁',
+      '🗑️',
+      '🛠️',
+      '🪛',
+      '⚙️',
+      '🧱',
+      '🔭',
+      '🔮',
+      '🎈',
+      '🎁',
+      '🔔',
+      '📢',
+      '🔎',
+      '💰',
+      '💳',
+      '🩹',
+      '🛡️',
+      '📦',
+      '🖊️',
+      '📐',
+      '🩺',
+    ],
+  },
+  {
+    id: 'flags',
+    label: 'Flags',
+    icon: '🏳️‍🌈',
+    emojis: [
+      '🇲🇽',
+      '🇺🇸',
+      '🇪🇸',
+      '🇯🇵',
+      '🇧🇷',
+      '🇨🇦',
+      '🇬🇧',
+      '🇫🇷',
+      '🇩🇪',
+      '🇮🇹',
+      '🇰🇷',
+      '🇦🇺',
+      '🏳️‍🌈',
+      '🏁',
+      '🇨🇳',
+      '🇷🇺',
+      '🇮🇳',
+      '🇦🇷',
+      '🇨🇱',
+      '🇨🇴',
+      '🇵🇪',
+      '🇵🇹',
+      '🇳🇱',
+      '🇨🇭',
+      '🇸🇪',
+      '🇳🇴',
+      '🇿🇦',
+      '🇪🇬',
+      '🇸🇦',
+      '🇹🇷',
+      '🇺🇦',
+      '🇵🇱',
+      '🇧🇪',
+      '🇮🇪',
+      '🇳🇿',
+      '🇯🇲',
+    ],
+  },
+];
+
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
   currentTitle: string;
@@ -394,6 +654,7 @@ export const EditorContent = ({
   const [selectedText, setSelectedText] = useState('');
   const [colorAnchor, setColorAnchor] = useState<null | HTMLElement>(null);
   const [iconAnchor, setIconAnchor] = useState<null | HTMLElement>(null);
+  const [activeCategory, setActiveCategory] = useState('smileys');
   const headerColor: HeaderColor =
     (persistedBg as HeaderColor | undefined) ?? 'none';
   const headerIcon: string = persistedEmoji ?? '';
@@ -544,7 +805,7 @@ export const EditorContent = ({
             mr: '-60px',
             mt: '-40px',
             position: 'relative',
-            mb: headerIcon && iconMap[headerIcon] ? '36px' : '16px',
+            mb: headerIcon ? '36px' : '16px',
           }}
         >
           {/* Gradient banner */}
@@ -573,18 +834,18 @@ export const EditorContent = ({
           <Box
             sx={{
               position: 'absolute',
-              bottom: headerIcon && iconMap[headerIcon] ? '-36px' : 0,
+              bottom: headerIcon ? '-36px' : 0,
               left: '60px',
               right: '60px',
               display: 'flex',
               alignItems: 'flex-end',
               justifyContent: 'space-between',
               px: 0,
-              pb: headerIcon && iconMap[headerIcon] ? 0 : 1.5,
+              pb: headerIcon ? 0 : 1.5,
             }}
           >
             {/* Large icon card — sits on top of the cover edge */}
-            {headerIcon && iconMap[headerIcon] ? (
+            {headerIcon ? (
               <Tooltip title="Change icon">
                 <Box
                   onClick={handleIconClick}
@@ -606,9 +867,15 @@ export const EditorContent = ({
                     '&:hover': { transform: 'scale(1.06)' },
                   }}
                 >
-                  {React.createElement(iconMap[headerIcon], {
-                    sx: { fontSize: 30, color: 'text.primary' },
-                  })}
+                  {iconMap[headerIcon] ? (
+                    React.createElement(iconMap[headerIcon], {
+                      sx: { fontSize: 30, color: 'text.primary' },
+                    })
+                  ) : (
+                    <span style={{ fontSize: '30px', lineHeight: 1 }}>
+                      {headerIcon}
+                    </span>
+                  )}
                 </Box>
               </Tooltip>
             ) : (
@@ -620,7 +887,7 @@ export const EditorContent = ({
                 display: 'flex',
                 gap: 1,
                 alignItems: 'center',
-                pb: headerIcon && iconMap[headerIcon] ? 1.5 : 0,
+                pb: headerIcon ? 1.5 : 0,
               }}
             >
               <Box onClick={handleIconClick} sx={ghostBtnSx(true)}>
@@ -651,7 +918,7 @@ export const EditorContent = ({
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            mb: headerIcon && iconMap[headerIcon] ? 1 : 1.5,
+            mb: headerIcon ? 1 : 1.5,
             transition: 'opacity 0.2s',
           }}
         >
@@ -677,7 +944,7 @@ export const EditorContent = ({
       )}
 
       {/* ── LARGE ICON when no cover ── */}
-      {!hasCover && headerIcon && iconMap[headerIcon] && (
+      {!hasCover && headerIcon && (
         <Tooltip title="Change icon">
           <Box
             onClick={handleIconClick}
@@ -705,9 +972,15 @@ export const EditorContent = ({
               },
             }}
           >
-            {React.createElement(iconMap[headerIcon], {
-              sx: { fontSize: 32, color: 'text.primary' },
-            })}
+            {iconMap[headerIcon] ? (
+              React.createElement(iconMap[headerIcon], {
+                sx: { fontSize: 32, color: 'text.primary' },
+              })
+            ) : (
+              <span style={{ fontSize: '32px', lineHeight: 1 }}>
+                {headerIcon}
+              </span>
+            )}
           </Box>
         </Tooltip>
       )}
@@ -890,62 +1163,160 @@ export const EditorContent = ({
           },
         }}
       >
-        <Typography
-          variant="caption"
-          sx={{
-            px: 0.5,
-            pb: 1,
-            display: 'block',
-            color: 'text.disabled',
-            fontWeight: 700,
-            letterSpacing: '0.8px',
-            textTransform: 'uppercase',
-          }}
-        >
-          Choose icon
-        </Typography>
         <Box
           sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(7, 1fr)',
-            gap: 0.5,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 1,
+            px: 0.5,
           }}
         >
-          {Object.keys(iconMap).map((iconName) => (
-            <Tooltip key={iconName} title={iconName} placement="top">
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.disabled',
+              fontWeight: 700,
+              letterSpacing: '0.8px',
+              textTransform: 'uppercase',
+            }}
+          >
+            Choose emoji
+          </Typography>
+          {headerIcon && (
+            <Typography
+              variant="caption"
+              onClick={() => handleIconSelect('')}
+              sx={{
+                color: 'error.main',
+                cursor: 'pointer',
+                fontWeight: 600,
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              Remove
+            </Typography>
+          )}
+        </Box>
+
+        {/* Category selector icons */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            pb: 1,
+            mb: 1.5,
+          }}
+        >
+          {EMOJI_CATEGORIES.map((cat) => (
+            <Tooltip key={cat.id} title={cat.label} placement="top">
               <Box
-                onClick={() => handleIconSelect(iconName)}
+                onClick={() => setActiveCategory(cat.id)}
                 sx={{
+                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: 34,
-                  height: 34,
-                  borderRadius: '9px',
-                  cursor: 'pointer',
+                  width: 32,
+                  height: 32,
+                  borderRadius: '8px',
+                  fontSize: '18px',
                   bgcolor:
-                    headerIcon === iconName ? 'primary.main' : 'transparent',
-                  color:
-                    headerIcon === iconName
-                      ? 'primary.contrastText'
-                      : 'text.secondary',
+                    activeCategory === cat.id
+                      ? theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.15)'
+                        : 'rgba(0,0,0,0.08)'
+                      : 'transparent',
                   border: '1px solid',
                   borderColor:
-                    headerIcon === iconName ? 'primary.main' : 'transparent',
+                    activeCategory === cat.id ? 'primary.main' : 'transparent',
                   transition: 'all 0.15s',
                   '&:hover': {
                     bgcolor: 'action.hover',
-                    color: 'text.primary',
-                    borderColor: 'divider',
+                    transform: 'scale(1.1)',
                   },
                 }}
               >
-                {React.createElement(iconMap[iconName], {
-                  sx: { fontSize: 18 },
-                })}
+                {cat.icon}
               </Box>
             </Tooltip>
           ))}
+        </Box>
+
+        <Box
+          sx={{
+            maxHeight: '220px',
+            overflowY: 'auto',
+            pr: 0.5,
+            mr: -0.5,
+            '&::-webkit-scrollbar': {
+              width: '6px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.15)'
+                  : 'rgba(0,0,0,0.15)',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.3)'
+                  : 'rgba(0,0,0,0.3)',
+            },
+          }}
+        >
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(7, 1fr)',
+              gap: 0.5,
+            }}
+          >
+            {(
+              EMOJI_CATEGORIES.find((cat) => cat.id === activeCategory)
+                ?.emojis || []
+            ).map((emoji) => (
+              <Tooltip key={emoji} title={emoji} placement="top">
+                <Box
+                  onClick={() => handleIconSelect(emoji)}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 34,
+                    height: 34,
+                    borderRadius: '9px',
+                    cursor: 'pointer',
+                    fontSize: '20px',
+                    bgcolor:
+                      headerIcon === emoji
+                        ? theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.15)'
+                          : 'rgba(0,0,0,0.08)'
+                        : 'transparent',
+                    border: '1px solid',
+                    borderColor:
+                      headerIcon === emoji ? 'primary.main' : 'transparent',
+                    transition: 'all 0.15s',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      transform: 'scale(1.15)',
+                      borderColor: 'divider',
+                    },
+                  }}
+                >
+                  {emoji}
+                </Box>
+              </Tooltip>
+            ))}
+          </Box>
         </Box>
       </Menu>
     </StyledEditorContent>

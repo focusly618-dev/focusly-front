@@ -12,7 +12,7 @@ import type {
   WorkspaceTypes,
   FolderTypes,
 } from '../../../types/workspace.types';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 
 export const useWorkspaceLibrary = () => {
   const [searchTerm, setSearchTerm] = useState('');

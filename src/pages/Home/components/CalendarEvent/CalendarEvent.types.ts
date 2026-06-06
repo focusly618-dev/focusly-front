@@ -1,5 +1,5 @@
-import type { GoogleCalendarEvent } from "@/redux/calendar/calendar.types";
-import type { Task } from "@/redux/tasks/task.types";
+import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
+import type { Task } from '@/redux/tasks/task.types';
 
 export interface ICalendarEvent {
   id: string;
@@ -27,7 +27,10 @@ export interface CalendarEventProps {
 
 export interface UseCalendarContextMenuReturn {
   handleDuplicateTask: (task: Task) => Promise<void>;
-  handleChangePriority: (taskId: string, priorityLevel: number) => Promise<void>;
+  handleChangePriority: (
+    taskId: string,
+    priorityLevel: number,
+  ) => Promise<void>;
   handleDeleteTask: (taskId: string) => Promise<void>;
   handleDeleteGoogleEvent: (eventId: string) => Promise<void>;
   handleContextMenu: (e: React.MouseEvent) => void;
@@ -42,4 +45,5 @@ export interface UseCalendarContextMenuReturn {
   currentPriority?: number;
   contextMenu: { mouseX: number; mouseY: number } | null;
   setContextMenu: (position: { mouseX: number; mouseY: number } | null) => void;
+  isReadOnly?: boolean;
 }

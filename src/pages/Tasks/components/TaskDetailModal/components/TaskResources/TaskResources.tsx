@@ -28,7 +28,7 @@ import {
   resourceIconContainerSx,
   resourceLinkButtonSx,
   resourceRemoveButtonSx,
-  addResourceFormSx
+  addResourceFormSx,
 } from './TaskResources.styles';
 
 interface Link {
@@ -51,6 +51,7 @@ interface TaskResourcesProps {
   setNewLinkUrl: (u: string) => void;
   handleAddLink: (title: string, url: string) => void;
   handleRemoveLink: (idx: number) => void;
+  isReadOnly?: boolean;
 }
 
 export const TaskResources = ({
@@ -68,19 +69,20 @@ export const TaskResources = ({
   setNewLinkUrl,
   handleAddLink,
   handleRemoveLink,
+  isReadOnly,
 }: TaskResourcesProps) => {
   const getLinkIcon = (url: string) => {
     try {
       const domain = new URL(url).hostname;
       return {
         src: `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
-        isImage: true
+        isImage: true,
       };
     } catch {
       return {
         icon: <LinkIcon sx={{ fontSize: 16 }} />,
         isImage: false,
-        color: 'primary.main'
+        color: 'primary.main',
       };
     }
   };
@@ -93,73 +95,90 @@ export const TaskResources = ({
       >
         <Box display="flex" alignItems="center" gap={1}>
           <LinkIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.5px' }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+            }}
+          >
             LINK AND RESOURCE
           </Typography>
           {!isLinksExpanded && links.length > 0 && (
-            <Box sx={resourceCountSx}>
-              {links.length}
-            </Box>
+            <Box sx={resourceCountSx}>{links.length}</Box>
           )}
         </Box>
         <Box display="flex" alignItems="center" gap={0.5}>
-          <IconButton 
-            size="small" 
+          <IconButton
+            size="small"
             sx={{ p: 0.5 }}
             onClick={(e) => {
               e.stopPropagation();
               setIsLinksExpanded(!isLinksExpanded);
             }}
           >
-            {isLinksExpanded ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
-          </IconButton>
-          <AnimatePresence>
-            {isLinksExpanded && (
-              <Box
-                component={motion.div}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                display="flex" 
-                alignItems="center" 
-                gap={1}
-              >
-                <Button
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleGenerateMeet();
-                  }}
-                  disabled={isGeneratingMeet || hasMeetLink}
-                  startIcon={isGeneratingMeet ? <CircularProgress size={14} color="inherit" /> : <VideoCallIcon sx={{ fontSize: 16 }} />}
-                  sx={addMeetButtonSx(hasMeetLink)}
-                >
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={hasMeetLink ? 'added' : 'add'}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      {hasMeetLink ? 'Meet Added' : 'Add Meet'}
-                    </motion.span>
-                  </AnimatePresence>
-                </Button>
-
-                <Button
-                  size="small"
-                  startIcon={<AddIcon sx={{ fontSize: 16 }} />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsAddingLink(true);
-                  }}
-                  sx={addResourceButtonSx}
-                >
-                  Add Resource
-                </Button>
-              </Box>
+            {isLinksExpanded ? (
+              <ExpandLessIcon sx={{ fontSize: 18 }} />
+            ) : (
+              <ExpandMoreIcon sx={{ fontSize: 18 }} />
             )}
-          </AnimatePresence>
+          </IconButton>
+          {!isReadOnly && (
+            <AnimatePresence>
+              {isLinksExpanded && (
+                <Box
+                  component={motion.div}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                >
+                  <Button
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleGenerateMeet();
+                    }}
+                    disabled={isGeneratingMeet || hasMeetLink}
+                    startIcon={
+                      isGeneratingMeet ? (
+                        <CircularProgress size={14} color="inherit" />
+                      ) : (
+                        <VideoCallIcon sx={{ fontSize: 16 }} />
+                      )
+                    }
+                    sx={addMeetButtonSx(hasMeetLink)}
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={hasMeetLink ? 'added' : 'add'}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                      >
+                        {hasMeetLink ? 'Meet Added' : 'Add Meet'}
+                      </motion.span>
+                    </AnimatePresence>
+                  </Button>
+
+                  <Button
+                    size="small"
+                    startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsAddingLink(true);
+                    }}
+                    sx={addResourceButtonSx}
+                  >
+                    Add Resource
+                  </Button>
+                </Box>
+              )}
+            </AnimatePresence>
+          )}
         </Box>
       </Box>
 
@@ -179,35 +198,78 @@ export const TaskResources = ({
                     {links.map((link, idx) => {
                       const iconInfo = getLinkIcon(link.url);
                       return (
-                        <Box 
-                          key={`${link.url}-${idx}`} 
+                        <Box
+                          key={`${link.url}-${idx}`}
                           component={motion.div}
                           layout
                           initial={{ opacity: 0, scale: 0.95, y: -10 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 400,
+                            damping: 30,
+                          }}
                           sx={resourceItemSx}
                         >
-                          <Box display="flex" alignItems="center" gap={1.5} sx={{ minWidth: 0, flex: 1 }}>
-                            <Box sx={resourceIconContainerSx(iconInfo.isImage, iconInfo.color)}>
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            gap={1.5}
+                            sx={{ minWidth: 0, flex: 1 }}
+                          >
+                            <Box
+                              sx={resourceIconContainerSx(
+                                iconInfo.isImage,
+                                iconInfo.color,
+                              )}
+                            >
                               {iconInfo.isImage ? (
-                                <Avatar 
-                                  src={iconInfo.src} 
+                                <Avatar
+                                  src={iconInfo.src}
                                   variant="rounded"
-                                  sx={{ width: 20, height: 20, bgcolor: 'transparent' }}
+                                  sx={{
+                                    width: 20,
+                                    height: 20,
+                                    bgcolor: 'transparent',
+                                  }}
                                 >
-                                  <LinkIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                  <LinkIcon
+                                    sx={{
+                                      fontSize: 16,
+                                      color: 'text.secondary',
+                                    }}
+                                  />
                                 </Avatar>
                               ) : (
                                 iconInfo.icon
                               )}
                             </Box>
                             <Box sx={{ minWidth: 0, flex: 1 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', mb: 0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 600,
+                                  color: 'text.primary',
+                                  mb: 0.2,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
                                 {link.title}
                               </Typography>
-                              <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 500, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: 'primary.main',
+                                  fontWeight: 500,
+                                  display: 'block',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
                                 {link.url}
                               </Typography>
                             </Box>
@@ -221,13 +283,15 @@ export const TaskResources = ({
                             >
                               <LaunchIcon sx={{ fontSize: 16 }} />
                             </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleRemoveLink(idx)}
-                              sx={resourceRemoveButtonSx}
-                            >
-                              <CloseIcon sx={{ fontSize: 16 }} />
-                            </IconButton>
+                            {!isReadOnly && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleRemoveLink(idx)}
+                                sx={resourceRemoveButtonSx}
+                              >
+                                <CloseIcon sx={{ fontSize: 16 }} />
+                              </IconButton>
+                            )}
                           </Box>
                         </Box>
                       );
@@ -239,7 +303,7 @@ export const TaskResources = ({
 
             <AnimatePresence>
               {isAddingLink && (
-                <Box 
+                <Box
                   component={motion.div}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -254,7 +318,10 @@ export const TaskResources = ({
                       onChange={(e) => setNewLinkTitle(e.target.value)}
                       fullWidth
                       variant="standard"
-                      InputProps={{ disableUnderline: true, sx: { fontSize: '14px', fontWeight: 500 } }}
+                      InputProps={{
+                        disableUnderline: true,
+                        sx: { fontSize: '14px', fontWeight: 500 },
+                      }}
                     />
                     <TextField
                       size="small"
@@ -263,9 +330,17 @@ export const TaskResources = ({
                       onChange={(e) => setNewLinkUrl(e.target.value)}
                       fullWidth
                       variant="standard"
-                      InputProps={{ disableUnderline: true, sx: { fontSize: '13px', color: 'primary.main' } }}
+                      InputProps={{
+                        disableUnderline: true,
+                        sx: { fontSize: '13px', color: 'primary.main' },
+                      }}
                     />
-                    <Box display="flex" justifyContent="flex-end" gap={1} mt={0.5}>
+                    <Box
+                      display="flex"
+                      justifyContent="flex-end"
+                      gap={1}
+                      mt={0.5}
+                    >
                       <Button
                         size="small"
                         onClick={() => {

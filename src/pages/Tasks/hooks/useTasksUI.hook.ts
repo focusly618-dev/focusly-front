@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 
 export const useTasksUI = () => {
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLElement | null>(null);
+  const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLElement | null>(
+    null,
+  );
   const [sortAnchorEl, setSortAnchorEl] = useState<HTMLElement | null>(null);
-  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
+  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastSubMessage, setToastSubMessage] = useState('');
@@ -37,9 +41,10 @@ export const useTasksUI = () => {
   const triggerToast = (
     message: string,
     subMessage: string,
-    type: 'success' | 'update' | 'delete' | 'warning' | 'error' = 'success'
+    type: 'success' | 'update' | 'delete' | 'warning' | 'error' = 'success',
   ) => {
-    const method = type === 'warning' ? 'warning' : type === 'error' ? 'error' : 'success';
+    const method =
+      type === 'warning' ? 'warning' : type === 'error' ? 'error' : 'success';
 
     sileo[method]({
       title: message,

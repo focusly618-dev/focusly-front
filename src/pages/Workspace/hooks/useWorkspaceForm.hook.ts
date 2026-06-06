@@ -9,7 +9,7 @@ import {
 } from '../workspaces.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 
 export const useWorkspaceForm = () => {
   const [createWorkspace] = useMutation(CREATE_WORKSPACE, {

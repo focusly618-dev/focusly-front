@@ -89,6 +89,7 @@ export const useInsights = () => {
   return {
     stats,
     loading,
+    hasData: !!data?.insights,
     error,
     filter,
     filters: FILTERS,

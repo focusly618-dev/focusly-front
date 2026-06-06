@@ -6,6 +6,8 @@ import {
   Tooltip,
   Checkbox,
 } from '@mui/material';
+import { useMemo } from 'react';
+import { useAppSelector } from '@/redux/hooks';
 import {
   CalendarToday as CalendarTodayIcon,
   AutoAwesome as AutoAwesomeIcon,
@@ -17,6 +19,7 @@ import {
   TaskRow,
   TaskTitle,
   StatusBadge,
+  StatusChip,
   FocusIconButton,
   AIBadge,
   AIText,
@@ -81,6 +84,29 @@ export const ListViewTask = ({
   isSelected,
   onToggleSelect,
 }: ListViewTaskProps) => {
+  const { user } = useAppSelector((state) => state.auth);
+
+  const isReadOnly = useMemo(() => {
+    if (!task) return false;
+    if (!user) return true;
+
+    // Check Google Calendar event ownership
+    if (task.task_type === 'GoogleTask' || task.google_event_id) {
+      const organizerEmail = (task as unknown as { organizer_email?: string })
+        .organizer_email;
+      if (organizerEmail) {
+        return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
+      }
+    }
+
+    // Check Focusly task ownership
+    if (task.user_id && task.user_id !== user.id) {
+      return true;
+    }
+
+    return false;
+  }, [task, user]);
+
   const {
     statusAnchor,
     setStatusAnchor,
@@ -112,16 +138,20 @@ export const ListViewTask = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            opacity: 0,
+            opacity: isReadOnly ? 0.35 : isSelected ? 1 : 0,
             transition: 'opacity 0.2s ease',
+            pointerEvents: isReadOnly ? 'none' : 'auto',
           }}
           onClick={(e) => {
             e.stopPropagation();
-            onToggleSelect?.(e);
+            if (!isReadOnly) {
+              onToggleSelect?.(e);
+            }
           }}
         >
           <Checkbox
             checked={isSelected || false}
+            disabled={isReadOnly}
             size="small"
             sx={{
               padding: 0,
@@ -132,7 +162,35 @@ export const ListViewTask = ({
           />
         </Box>
 
-        {/* Cell 2: Title */}
+        {/* Cell 2: Status */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <StatusChip
+            statusColor={statusColor}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isReadOnly) {
+                setStatusAnchor(e.currentTarget);
+              }
+            }}
+            sx={{
+              pointerEvents: isReadOnly ? 'none' : 'auto',
+              cursor: isReadOnly ? 'default' : 'pointer',
+              opacity: isReadOnly ? 0.8 : 1,
+            }}
+          >
+            <Box
+              sx={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: statusColor,
+              }}
+            />
+            {task.status || 'Todo'}
+          </StatusChip>
+        </Box>
+
+        {/* Cell 3: Title */}
         <Box sx={{ minWidth: 0, display: 'flex', alignItems: 'center' }}>
           <TaskTitle variant="body1" title={task.title}>
             {task.title}
@@ -145,7 +203,14 @@ export const ListViewTask = ({
             priorityColor={priorityColor}
             onClick={(e) => {
               e.stopPropagation();
-              setPriorityAnchor(e.currentTarget);
+              if (!isReadOnly) {
+                setPriorityAnchor(e.currentTarget);
+              }
+            }}
+            sx={{
+              pointerEvents: isReadOnly ? 'none' : 'auto',
+              cursor: isReadOnly ? 'default' : 'pointer',
+              opacity: isReadOnly ? 0.8 : 1,
             }}
           >
             <FlagIcon
@@ -178,7 +243,14 @@ export const ListViewTask = ({
             <DateChip
               onClick={(e) => {
                 e.stopPropagation();
-                setDateAnchor(e.currentTarget);
+                if (!isReadOnly) {
+                  setDateAnchor(e.currentTarget);
+                }
+              }}
+              sx={{
+                pointerEvents: isReadOnly ? 'none' : 'auto',
+                cursor: isReadOnly ? 'default' : 'pointer',
+                opacity: isReadOnly ? 0.8 : 1,
               }}
             >
               <CalendarTodayIcon sx={{ fontSize: 11, opacity: 0.7 }} />
@@ -253,7 +325,9 @@ export const ListViewTask = ({
           <StyledAISwitch
             size="small"
             checked={task.use_ai || false}
+            disabled={isReadOnly}
             onChange={async (e) => {
+              if (isReadOnly) return;
               if (updateTask) {
                 await updateTask(task.id, {
                   ...task,

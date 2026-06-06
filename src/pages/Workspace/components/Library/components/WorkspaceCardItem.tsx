@@ -90,9 +90,6 @@ export const WorkspaceCardItem = ({
   const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
   const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
 
-  const IconComponent =
-    (workspace.emoji && iconMap[workspace.emoji]) || iconMap.Article;
-
   const snippet = getSnippet(workspace.content);
 
   return (
@@ -119,17 +116,26 @@ export const WorkspaceCardItem = ({
             }),
           }}
         >
-          {createElement(IconComponent, {
-            sx: {
-              fontSize: 20,
-              color: isBackgroundActive
-                ? isLightBg
-                  ? '#000'
-                  : '#fff'
-                : 'text.primary',
-              opacity: 0.9,
-            },
-          })}
+          {workspace.emoji && !iconMap[workspace.emoji] ? (
+            <span style={{ fontSize: '20px', lineHeight: 1 }}>
+              {workspace.emoji}
+            </span>
+          ) : (
+            createElement(
+              (workspace.emoji && iconMap[workspace.emoji]) || iconMap.Article,
+              {
+                sx: {
+                  fontSize: 20,
+                  color: isBackgroundActive
+                    ? isLightBg
+                      ? '#000'
+                      : '#fff'
+                    : 'text.primary',
+                  opacity: 0.9,
+                },
+              },
+            )
+          )}
         </CardAvatarCircle>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

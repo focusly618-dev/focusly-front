@@ -43,20 +43,24 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
   };
 };
 
-export const mapResponseToTask = (t: TaskResponse): Task => {
-  const safeISO = (d: string | null | undefined): string | null => {
-    if (!d) return null;
-    try {
-      const date = new Date(d);
-      return isNaN(date.getTime()) ? null : date.toISOString();
-    } catch {
-      return null;
-    }
-  };
+export const safeISO = (d: string | null | undefined): string | null => {
+  if (!d) return null;
+  try {
+    // Backend stores naive UTC datetimes (no timezone suffix).
+    // If the string has no 'Z' or offset (+/-HH:MM), append 'Z' so the
+    // browser treats it as UTC instead of local time.
+    const normalized = /Z$|[+-]\d{2}:\d{2}$/.test(d) ? d : d + 'Z';
+    const date = new Date(normalized);
+    return isNaN(date.getTime()) ? null : date.toISOString();
+  } catch {
+    return null;
+  }
+};
 
+export const mapResponseToTask = (t: TaskResponse): Task => {
   return {
     id: t.id,
-    user_id: t.user_id,
+    user_id: t.user_id || '',
     title: t.title,
     notes_encrypted: t.notes_encrypted || '',
     estimate_timer: t.estimate_timer || 0,

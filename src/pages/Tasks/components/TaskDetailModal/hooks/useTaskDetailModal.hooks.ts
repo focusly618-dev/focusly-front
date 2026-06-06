@@ -1,11 +1,12 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import type { UseTaskDetailModalProps } from '../types/TaskDetailModal.types';
 import { useTaskFormState } from './useTaskFormState';
 import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../TaskDetailModal.utils';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
+import { useAppSelector } from '@/redux/hooks';
 
 export const useTaskDetailModal = ({
   onSave,
@@ -15,6 +16,40 @@ export const useTaskDetailModal = ({
   initialTask,
 }: UseTaskDetailModalProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAppSelector((state) => state.auth);
+
+  // DEBUG: Log what data the modal receives
+  console.log('[TaskDetailModal] initialTask:', {
+    id: initialTask?.id,
+    user_id: initialTask?.user_id,
+    tags: initialTask?.tags,
+    estimate_timer: initialTask?.estimate_timer,
+    task_type: initialTask?.task_type,
+    links: initialTask?.links,
+    isReadOnlyCheck: initialTask?.user_id && initialTask?.user_id !== user?.id,
+  });
+
+  const isReadOnly = useMemo(() => {
+    if (!initialTask) return false;
+    if (!user) return true;
+
+    // Check Google Calendar event ownership
+    if (initialTask.task_type === 'GoogleTask' || initialTask.google_event_id) {
+      const organizerEmail = (
+        initialTask as unknown as { organizer_email?: string }
+      ).organizer_email;
+      if (organizerEmail) {
+        return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
+      }
+    }
+
+    // Check Focusly task ownership
+    if (initialTask.user_id && initialTask.user_id !== user.id) {
+      return true;
+    }
+
+    return false;
+  }, [initialTask, user]);
 
   const {
     title,
@@ -272,6 +307,7 @@ export const useTaskDetailModal = ({
     );
 
   return {
+    isReadOnly,
     title,
     setTitle,
     description,

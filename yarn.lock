@@ -4202,7 +4202,6 @@ __metadata:
     react-router-dom: "npm:^7.11.0"
     recharts: "npm:^3.7.0"
     rxjs: "npm:^7.8.2"
-    sileo: "npm:^0.1.5"
     socket.io-client: "npm:^4.8.3"
     sweetalert2: "npm:^11.26.24"
     temporal-polyfill: "npm:^0.3.0"
@@ -5904,7 +5903,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion@npm:^12.34.0, motion@npm:^12.36.0":
+"motion@npm:^12.36.0":
   version: 12.36.0
   resolution: "motion@npm:12.36.0"
   dependencies:
@@ -7261,18 +7260,6 @@ __metadata:
   version: 4.1.0
   resolution: "signal-exit@npm:4.1.0"
   checksum: 10c0/41602dce540e46d599edba9d9860193398d135f7ff72cab629db5171516cfae628d21e7bfccde1bbfdf11c48726bc2a6d1a8fb8701125852fbfda7cf19c6aa83
-  languageName: node
-  linkType: hard
-
-"sileo@npm:^0.1.5":
-  version: 0.1.5
-  resolution: "sileo@npm:0.1.5"
-  dependencies:
-    motion: "npm:^12.34.0"
-  peerDependencies:
-    react: ">=18"
-    react-dom: ">=18"
-  checksum: 10c0/24e297c6700a8966d60836332efc947dc6062a107f68779c105399daafa05c0cbb4ef59f697a033b52884e848801e3c438a1e68844b7c55d3c64e57ebe58ecec
   languageName: node
   linkType: hard
 

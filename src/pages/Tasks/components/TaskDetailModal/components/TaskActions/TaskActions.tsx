@@ -12,11 +12,13 @@ import type { TaskActionsProps } from './TaskActions.types';
 
 export const TaskActions = ({
   initialTask,
+  onClose,
   handleUpdate,
   handleSave,
   loadingSave,
   isAIScheduleEnabled,
   setIsAIScheduleEnabled,
+  isReadOnly,
 }: TaskActionsProps) => {
   return (
     <DialogActions sx={dialogActionsSx}>
@@ -51,23 +53,39 @@ export const TaskActions = ({
               size="small"
               checked={isAIScheduleEnabled}
               onChange={(e) => setIsAIScheduleEnabled(e.target.checked)}
+              disabled={isReadOnly}
             />
           </AISwitchContainer>
         )}
       </Box>
-      <Button
-        onClick={initialTask ? handleUpdate : handleSave}
-        variant="contained"
-        sx={saveButtonSx}
-      >
-        {loadingSave ? (
-          <CircularProgress size={24} color="inherit" />
-        ) : initialTask ? (
-          'Edit Task'
-        ) : (
-          'Create Task'
-        )}
-      </Button>
+      {isReadOnly ? (
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          sx={{
+            textTransform: 'none',
+            borderRadius: '8px',
+            px: 3,
+            fontWeight: 600,
+          }}
+        >
+          Close
+        </Button>
+      ) : (
+        <Button
+          onClick={initialTask ? handleUpdate : handleSave}
+          variant="contained"
+          sx={saveButtonSx}
+        >
+          {loadingSave ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : initialTask ? (
+            'Edit Task'
+          ) : (
+            'Create Task'
+          )}
+        </Button>
+      )}
     </DialogActions>
   );
 };

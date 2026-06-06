@@ -50,6 +50,8 @@ export interface TaskInput {
   status?: string;
   google_event_id?: string;
   user_id?: string;
+  estimated_start_date?: string;
+  estimated_end_date?: string;
 }
 
 export interface UseTaskCollectionsProps {

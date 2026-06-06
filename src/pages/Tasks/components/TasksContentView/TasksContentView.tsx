@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import { useAppSelector } from '@/redux/hooks';
 import {
   Box,
   Typography,
@@ -8,12 +9,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  alpha,
+  Checkbox,
 } from '@mui/material';
 import {
   CheckBox as CheckBoxIcon,
   Delete as DeleteIcon,
   Close as CloseIcon,
-  ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { styled as muiStyled } from '@mui/material/styles';
 import { AnimatedContainer, GridTaskContainer } from '../../Tasks.styles';
@@ -27,12 +29,10 @@ import {
   TableWrapper,
   TableHeader,
   TableHeaderCell,
-  TableStatusGroupRow,
   TableBodyContainer,
 } from '../ListViewTask/ListViewTask.styles';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { TasksContentViewProps } from './TasksContentView.types';
-import type { Task } from '@/redux/tasks/task.types';
 
 const FloatingActionBar = muiStyled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -125,144 +125,91 @@ const STATUS_SECTIONS = [
   },
 ];
 
-const StatusTableGroup = ({
-  section,
-  tasks,
-  handleTaskClick,
-  updateTask,
-  isAIScheduleEnabled,
-  onStartFocus,
-  selectedTaskIds,
-  onToggleSelect,
-}: {
-  section: (typeof STATUS_SECTIONS)[number];
-  tasks: TaskResponse[];
-  handleTaskClick: (task: TaskResponse) => void;
-  updateTask: (taskId: string, updates: TaskResponse) => Promise<void>;
-  isAIScheduleEnabled?: boolean;
-  onStartFocus?: (task: Task) => void;
-  selectedTaskIds: Set<string>;
-  onToggleSelect: (taskId: string) => void;
-}) => {
-  const [limit, setLimit] = useState(24);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const StatusTabsContainer = muiStyled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '10px 24px',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(26, 31, 43, 0.4)' : '#ffffff',
+  overflowX: 'auto',
+  whiteSpace: 'nowrap',
+  msOverflowStyle: 'none',
+  scrollbarWidth: 'none',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+}));
 
-  const displayedTasks = useMemo(() => {
-    return tasks.filter(section.filter);
-  }, [tasks, section.filter]);
+interface StatusTabProps {
+  active: boolean;
+  tabColor: string;
+}
 
-  const paginatedTasks = useMemo(() => {
-    return displayedTasks.slice(0, limit);
-  }, [displayedTasks, limit]);
+const StatusTabButton = muiStyled(Button, {
+  shouldForwardProp: (prop) => prop !== 'active' && prop !== 'tabColor',
+})<StatusTabProps>(({ theme, active, tabColor }) => ({
+  textTransform: 'none',
+  fontSize: '12px',
+  fontWeight: active ? 700 : 500,
+  padding: '4px 14px',
+  borderRadius: '20px',
+  minWidth: 'auto',
+  whiteSpace: 'nowrap',
+  color: active
+    ? theme.palette.mode === 'dark'
+      ? '#ffffff'
+      : tabColor
+    : theme.palette.text.secondary,
+  backgroundColor: active
+    ? theme.palette.mode === 'dark'
+      ? tabColor
+      : `${tabColor}15`
+    : 'transparent',
+  border: `1px solid ${active ? tabColor : 'transparent'}`,
+  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:hover': {
+    backgroundColor: active
+      ? theme.palette.mode === 'dark'
+        ? tabColor
+        : `${tabColor}25`
+      : theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(0, 0, 0, 0.03)',
+    borderColor: active
+      ? tabColor
+      : theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.15)'
+        : 'rgba(0, 0, 0, 0.08)',
+  },
+}));
 
-  const totalCount = displayedTasks.length;
-
-  if (totalCount === 0) {
-    return null;
-  }
-
-  return (
-    <Box>
-      <TableStatusGroupRow
-        statusColor={section.color}
-        onClick={() => setIsCollapsed(!isCollapsed)}
-      >
-        <ChevronRightIcon
-          sx={{
-            fontSize: '14px',
-            color: section.color,
-            transform: isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)',
-            transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-            mr: '2px',
-          }}
-        />
-        <Box
-          sx={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: section.color,
-          }}
-        />
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 700,
-            fontSize: '11px',
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            color: section.color,
-          }}
-        >
-          {section.label}
-        </Typography>
-        <Box
-          component="span"
-          sx={{
-            fontSize: '10px',
-            backgroundColor: `${section.color}1a`,
-            color: section.color,
-            padding: '2px 8px',
-            borderRadius: '10px',
-            fontWeight: 700,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: '18px',
-          }}
-        >
-          {totalCount}
-        </Box>
-      </TableStatusGroupRow>
-      {!isCollapsed &&
-        paginatedTasks.map((task) => (
-          <ListViewTask
-            key={task.id}
-            task={task}
-            onTaskClick={handleTaskClick}
-            updateTask={updateTask}
-            isAIScheduleEnabled={isAIScheduleEnabled}
-            onStartFocus={onStartFocus}
-            isSelected={selectedTaskIds.has(task.id)}
-            onToggleSelect={() => onToggleSelect(task.id)}
-          />
-        ))}
-      {!isCollapsed && totalCount > paginatedTasks.length && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '12px 16px',
-            backgroundColor: 'transparent',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Button
-            size="small"
-            onClick={() => setLimit((prev) => prev + 24)}
-            sx={{
-              textTransform: 'none',
-              fontSize: '11px',
-              fontWeight: 700,
-              color: section.color,
-              backgroundColor: `${section.color}0a`,
-              borderRadius: '8px',
-              px: 3,
-              py: 0.5,
-              '&:hover': {
-                backgroundColor: `${section.color}15`,
-              },
-            }}
-          >
-            Show More ({totalCount - paginatedTasks.length} remaining)
-          </Button>
-        </Box>
-      )}
-    </Box>
-  );
-};
+const TabCountBadge = muiStyled(Box, {
+  shouldForwardProp: (prop) => prop !== 'active' && prop !== 'tabColor',
+})<{ active: boolean; tabColor: string }>(({ theme, active, tabColor }) => ({
+  marginLeft: '6px',
+  fontSize: '10px',
+  fontWeight: 700,
+  padding: '1px 6px',
+  borderRadius: '8px',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: active
+    ? theme.palette.mode === 'dark'
+      ? 'rgba(0, 0, 0, 0.25)'
+      : 'rgba(255, 255, 255, 0.45)'
+    : theme.palette.mode === 'dark'
+      ? alpha(tabColor, 0.15)
+      : alpha(tabColor, 0.1),
+  color: active
+    ? theme.palette.mode === 'dark'
+      ? '#ffffff'
+      : tabColor
+    : tabColor,
+  transition: 'all 0.2s ease',
+}));
 
 export const TasksContentView = ({
   viewMode,
@@ -276,16 +223,40 @@ export const TasksContentView = ({
   isAIScheduleEnabled,
   onStartFocus,
 }: TasksContentViewProps) => {
+  const { user } = useAppSelector((state) => state.auth);
+
+  const isTaskReadOnly = useCallback(
+    (t: TaskResponse) => {
+      if (!user) return true;
+      if (t.task_type === 'GoogleTask' || t.google_event_id) {
+        const organizerEmail = (t as unknown as { organizer_email?: string })
+          .organizer_email;
+        if (organizerEmail) {
+          return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
+        }
+      }
+      if (t.user_id && t.user_id !== user.id) {
+        return true;
+      }
+      return false;
+    },
+    [user],
+  );
+
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(),
   );
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [prevViewMode, setPrevViewMode] = useState(viewMode);
 
+  const [selectedStatus, setSelectedStatus] = useState<string>('All');
+  const [limit, setLimit] = useState(24);
+
   if (viewMode !== prevViewMode) {
     setPrevViewMode(viewMode);
     setSelectedTaskIds(new Set());
     setIsConfirmOpen(false);
+    setSelectedStatus('All');
   }
 
   const isListView =
@@ -301,6 +272,71 @@ export const TasksContentView = ({
       }
       return next;
     });
+  };
+
+  const tabs = useMemo(() => {
+    return [
+      {
+        id: 'All',
+        label: 'All',
+        color: '#6366f1',
+        filter: () => true,
+      },
+      ...STATUS_SECTIONS,
+    ];
+  }, []);
+
+  const tabCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      All: filteredTasks.length,
+    };
+    STATUS_SECTIONS.forEach((section) => {
+      counts[section.id] = filteredTasks.filter(section.filter).length;
+    });
+    return counts;
+  }, [filteredTasks]);
+
+  const activeTab = useMemo(() => {
+    return tabs.find((t) => t.id === selectedStatus) || tabs[0];
+  }, [selectedStatus, tabs]);
+
+  const displayedTasks = useMemo(() => {
+    return filteredTasks.filter(activeTab.filter);
+  }, [filteredTasks, activeTab]);
+
+  const selectableDisplayedTasks = useMemo(() => {
+    return displayedTasks.filter((t) => !isTaskReadOnly(t));
+  }, [displayedTasks, isTaskReadOnly]);
+
+  const isAllSelected = useMemo(() => {
+    if (selectableDisplayedTasks.length === 0) return false;
+    return selectableDisplayedTasks.every((task) =>
+      selectedTaskIds.has(task.id),
+    );
+  }, [selectableDisplayedTasks, selectedTaskIds]);
+
+  const isSomeSelected = useMemo(() => {
+    if (selectableDisplayedTasks.length === 0) return false;
+    const selectedCount = selectableDisplayedTasks.filter((task) =>
+      selectedTaskIds.has(task.id),
+    ).length;
+    return selectedCount > 0 && selectedCount < selectableDisplayedTasks.length;
+  }, [selectableDisplayedTasks, selectedTaskIds]);
+
+  const handleToggleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedTaskIds((prev) => {
+        const next = new Set(prev);
+        selectableDisplayedTasks.forEach((task) => next.delete(task.id));
+        return next;
+      });
+    } else {
+      setSelectedTaskIds((prev) => {
+        const next = new Set(prev);
+        selectableDisplayedTasks.forEach((task) => next.add(task.id));
+        return next;
+      });
+    }
   };
 
   const handleDeleteSelectedClick = () => {
@@ -400,7 +436,10 @@ export const TasksContentView = ({
         >
           <TableWrapper>
             <TableHeader>
-              <TableHeaderCell sx={{ justifyContent: 'center' }} />
+              <TableHeaderCell sx={{ justifyContent: 'center' }}>
+                <Checkbox disabled size="small" sx={{ padding: 0 }} />
+              </TableHeaderCell>
+              <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Task Name</TableHeaderCell>
               <TableHeaderCell>Priority</TableHeaderCell>
               <TableHeaderCell>Due Date</TableHeaderCell>
@@ -503,8 +542,50 @@ export const TasksContentView = ({
         </GridTaskContainer>
       ) : (
         <TableWrapper>
+          <StatusTabsContainer>
+            {tabs.map((tab) => {
+              const count = tabCounts[tab.id] || 0;
+              return (
+                <StatusTabButton
+                  key={tab.id}
+                  active={selectedStatus === tab.id}
+                  tabColor={tab.color}
+                  onClick={() => {
+                    setSelectedStatus(tab.id);
+                    setLimit(24);
+                  }}
+                >
+                  {tab.label}
+                  <TabCountBadge
+                    active={selectedStatus === tab.id}
+                    tabColor={tab.color}
+                  >
+                    {count}
+                  </TabCountBadge>
+                </StatusTabButton>
+              );
+            })}
+          </StatusTabsContainer>
           <TableHeader>
-            <TableHeaderCell sx={{ justifyContent: 'center' }} />
+            <TableHeaderCell sx={{ justifyContent: 'center' }}>
+              <Checkbox
+                checked={isAllSelected}
+                indeterminate={isSomeSelected}
+                onChange={handleToggleSelectAll}
+                size="small"
+                sx={{
+                  padding: 0,
+                  color: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.3)'
+                      : 'rgba(0, 0, 0, 0.25)',
+                  '&.Mui-checked, &.MuiCheckbox-indeterminate': {
+                    color: 'primary.main',
+                  },
+                }}
+              />
+            </TableHeaderCell>
+            <TableHeaderCell>Status</TableHeaderCell>
             <TableHeaderCell>Task Name</TableHeaderCell>
             <TableHeaderCell>Priority</TableHeaderCell>
             <TableHeaderCell>Due Date</TableHeaderCell>
@@ -516,19 +597,65 @@ export const TasksContentView = ({
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableHeader>
           <TableBodyContainer>
-            {STATUS_SECTIONS.map((section) => (
-              <StatusTableGroup
-                key={section.id}
-                section={section}
-                tasks={filteredTasks}
-                handleTaskClick={handleTaskClick}
+            {displayedTasks.slice(0, limit).map((task) => (
+              <ListViewTask
+                key={task.id}
+                task={task}
+                onTaskClick={handleTaskClick}
                 updateTask={updateTask}
                 isAIScheduleEnabled={isAIScheduleEnabled}
                 onStartFocus={onStartFocus}
-                selectedTaskIds={selectedTaskIds}
-                onToggleSelect={handleToggleSelect}
+                isSelected={selectedTaskIds.has(task.id)}
+                onToggleSelect={() => handleToggleSelect(task.id)}
               />
             ))}
+            {displayedTasks.length === 0 && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  py: 8,
+                  width: '100%',
+                }}
+              >
+                <EmptyState
+                  title={`No tasks in ${activeTab.label}`}
+                  description="Move a task here or change tabs to see tasks."
+                />
+              </Box>
+            )}
+            {displayedTasks.length > limit && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '16px',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                <Button
+                  size="small"
+                  onClick={() => setLimit((prev) => prev + 24)}
+                  sx={{
+                    textTransform: 'none',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: activeTab.color,
+                    backgroundColor: `${activeTab.color}0a`,
+                    borderRadius: '8px',
+                    px: 3,
+                    py: 0.5,
+                    '&:hover': {
+                      backgroundColor: `${activeTab.color}15`,
+                    },
+                  }}
+                >
+                  Show More ({displayedTasks.length - limit} remaining)
+                </Button>
+              </Box>
+            )}
           </TableBodyContainer>
         </TableWrapper>
       )}

@@ -57,7 +57,6 @@
     "react-router-dom": "^7.11.0",
     "recharts": "^3.7.0",
     "rxjs": "^7.8.2",
-    "sileo": "^0.1.5",
     "socket.io-client": "^4.8.3",
     "sweetalert2": "^11.26.24",
     "temporal-polyfill": "^0.3.0",

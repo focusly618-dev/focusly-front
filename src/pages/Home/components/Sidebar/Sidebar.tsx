@@ -28,7 +28,6 @@ import {
   Dashboard as DashboardIcon,
   CheckCircle as TasksIcon,
   BarChart as InsightsIcon,
-  Add as AddIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
   NotificationsNone as NotificationsNoneIcon,
@@ -37,12 +36,7 @@ import {
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
 } from '@mui/icons-material';
-import {
-  SidebarContainer,
-  Logo,
-  AddTaskButton,
-  NavItem,
-} from './Sidebar.styles';
+import { SidebarContainer, Logo, NavItem } from './Sidebar.styles';
 import { TaskBar, type SidebarProps } from './types/Sidebar.types';
 import { useAppSelector } from '@/redux/hooks';
 import { useSearchParams } from 'react-router-dom';
@@ -54,7 +48,6 @@ import { ColorModeContext } from '@/context/ColorModeContext';
 const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const colorMode = useContext(ColorModeContext);
   const theme = useTheme();
-  const { tasks } = useAppSelector((state) => state.task);
   const { user } = useAppSelector((state) => state.auth);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -80,11 +73,6 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const deleteNotif = (id: string) =>
     setNotifications((p) => p.filter((n) => n.id !== id));
 
-  const taskId = searchParams.get('taskId');
-  const activeURLTask = useMemo(
-    () => tasks.find((t) => t.id === taskId),
-    [tasks, taskId],
-  );
   const currentView = searchParams.get('v') || 'day';
   const currentDateStr = searchParams.get('d');
 
@@ -98,7 +86,7 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     return new Date();
   }, [currentDateStr]);
 
-  const showMiniCalendar = true;
+  const showMiniCalendar = false;
 
   const miniCalendarDays = useMemo(() => {
     const startOfCurrentMonth = startOfMonth(currentDate);
@@ -306,26 +294,6 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           </>
         )}
       </Popover>
-
-      <AddTaskButton
-        id="joyride-add-task"
-        onClick={() => {
-          const newParams = new URLSearchParams(searchParams);
-          newParams.set('action', 'create');
-          setSearchParams(newParams);
-        }}
-        startIcon={
-          <AddIcon
-            sx={{
-              color: 'white',
-              background: '#3b82f6',
-              borderRadius: '10px',
-            }}
-          />
-        }
-      >
-        {activeURLTask ? activeURLTask.title : 'Add New Task'}
-      </AddTaskButton>
 
       {showMiniCalendar && (
         <Box

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useAppSelector } from '@/redux/hooks';
 import {
   Box,
   Typography,
@@ -58,6 +59,37 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     activeFocusTaskId,
     onUnlinkTask,
   } = props;
+
+  const { user } = useAppSelector((state) => state.auth);
+
+  const isReadOnly = useMemo(() => {
+    if (!selectTask) return false;
+    if (!user) return true;
+
+    const selectTaskAny = selectTask as {
+      task_type?: string;
+      google_event_id?: string;
+      organizer_email?: string;
+      user_id?: string;
+    };
+    // Check Google Calendar event ownership
+    if (
+      selectTaskAny.task_type === 'GoogleTask' ||
+      selectTaskAny.google_event_id
+    ) {
+      const organizerEmail = selectTaskAny.organizer_email;
+      if (organizerEmail) {
+        return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
+      }
+    }
+
+    // Check Focusly task ownership
+    if (selectTaskAny.user_id && selectTaskAny.user_id !== user.id) {
+      return true;
+    }
+
+    return false;
+  }, [selectTask, user]);
 
   const {
     priorityAnchor,
@@ -209,7 +241,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                   >
                     {selectTask.title}
                   </Typography>
-                  {onUnlinkTask && (
+                  {onUnlinkTask && !isReadOnly && (
                     <IconButton
                       size="small"
                       onClick={onUnlinkTask}
@@ -233,14 +265,16 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                 <PropertyCard>
                   <PropertyLabel>STATUS</PropertyLabel>
                   <PropertyValue
-                    onClick={handleStatusClick}
+                    onClick={isReadOnly ? undefined : handleStatusClick}
                     sx={{
-                      cursor: 'pointer',
+                      cursor: isReadOnly ? 'default' : 'pointer',
                       px: 1,
                       py: 0.5,
                       borderRadius: '6px',
                       '&:hover': {
-                        bgcolor: theme.palette.action.hover,
+                        bgcolor: isReadOnly
+                          ? 'transparent'
+                          : theme.palette.action.hover,
                       },
                     }}
                   >
@@ -269,14 +303,16 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                 <PropertyCard>
                   <PropertyLabel>PRIORITY</PropertyLabel>
                   <PropertyValue
-                    onClick={handlePriorityClick}
+                    onClick={isReadOnly ? undefined : handlePriorityClick}
                     sx={{
-                      cursor: 'pointer',
+                      cursor: isReadOnly ? 'default' : 'pointer',
                       px: 1,
                       py: 0.5,
                       borderRadius: '6px',
                       '&:hover': {
-                        bgcolor: theme.palette.action.hover,
+                        bgcolor: isReadOnly
+                          ? 'transparent'
+                          : theme.palette.action.hover,
                       },
                     }}
                   >
@@ -524,7 +560,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                     </StartFocusButton>
                   )}
                   <MarkDoneButton
-                    disabled={!selectTask}
+                    disabled={!selectTask || isReadOnly}
                     onClick={handleMarkDone}
                     sx={{
                       py: 1.5,
