@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useSelector, useDispatch } from 'react-redux';
 import { useApolloClient } from '@apollo/client';
@@ -7,11 +7,7 @@ import { incrementSyncVersion } from '@/redux/calendar/calendar.slice';
 import { API_BASE_URL } from '@/config/env.config';
 import { GET_TASKS } from '@/pages/Tasks/Task.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
-
-const RealTimeContext = createContext<Socket | null>(null);
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const useRealTime = () => useContext(RealTimeContext);
+import { RealTimeContext } from './RealTimeContext';
 
 export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,

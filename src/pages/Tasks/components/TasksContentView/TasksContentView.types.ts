@@ -21,4 +21,9 @@ export interface TasksContentViewProps {
   searchTerm?: string;
   dateRange?: string;
   deleteTasks?: (ids: string[]) => Promise<void>;
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange: (newSize: number) => void;
 }

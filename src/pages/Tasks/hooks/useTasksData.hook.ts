@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_TASKS } from '@/pages/Tasks/Task.graphql';
+import { GET_TASKS_PAGINATED } from '@/pages/Tasks/Task.graphql';
 import type {
   TaskResponse,
   TaskFilterInput,
@@ -14,26 +14,37 @@ interface UseTasksDataProps {
   userId?: string;
   filters?: TaskFilterInput;
   sort?: TaskSortInput;
+  offset: number;
+  limit: number;
 }
 
-export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
+export const useTasksData = ({ userId, filters, sort, offset, limit }: UseTasksDataProps) => {
   const dispatch = useAppDispatch();
 
-  const { data, loading: isLoading } = useQuery(GET_TASKS, {
-    skip: !userId,
-    variables: {
+  const queryVariables = useMemo(
+    () => ({
       userId,
       filters: filters || null,
       sort: sort || null,
-    },
+      offset,
+      limit,
+    }),
+    [userId, filters, sort, offset, limit],
+  );
+
+  const { data, loading: isLoading } = useQuery(GET_TASKS_PAGINATED, {
+    skip: !userId,
+    variables: queryVariables,
     fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-first',
   });
 
-  const tasks: TaskResponse[] = useMemo(() => data?.tasks || [], [data]);
+  const tasks: TaskResponse[] = useMemo(() => data?.result?.tasks || [], [data]);
+  const totalCount: number = useMemo(() => data?.result?.totalCount || 0, [data]);
 
   useEffect(() => {
-    if (data?.tasks) {
-      const mappedTasks = data.tasks.map((t: TaskResponse) =>
+    if (data?.result?.tasks) {
+      const mappedTasks = data.result.tasks.map((t: TaskResponse) =>
         mapResponseToTask(t),
       );
       dispatch(setTasks(mappedTasks));
@@ -50,6 +61,7 @@ export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
 
   return {
     tasks,
+    totalCount,
     isLoading,
     completedTasksCount,
     pendingTasksCount,

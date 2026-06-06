@@ -29,6 +29,7 @@ export const Tasks = ({
 }: TasksProps) => {
   const {
     tasks,
+    totalCount,
     filteredTasks,
     isLoading,
     tags,
@@ -54,6 +55,10 @@ export const Tasks = ({
     handleApplySort,
     handleFinishOnboarding,
     deleteTasks,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
   } = useTasks();
 
   const isAIScheduleEnabled = isAIScheduleEnabledProp;
@@ -194,6 +199,14 @@ export const Tasks = ({
             activeSort={activeSort}
             searchTerm={searchTerm}
             dateRange={dateRange}
+            totalCount={totalCount}
+            page={page}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setPage(0);
+            }}
           />
         </MainContent>
 

@@ -13,7 +13,7 @@ import { Provider } from 'react-redux';
 import { store } from '@/redux/store.ts';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@/api/apollo';
-import { RealTimeProvider } from '@/context/RealTimeContext';
+import { RealTimeProvider } from '@/context/RealTimeProvider';
 
 import { NotificationToaster } from '@/components/Notification/NotificationToaster';
 import { BrowserRouter } from 'react-router-dom';
