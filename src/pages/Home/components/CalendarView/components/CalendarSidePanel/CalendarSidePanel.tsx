@@ -473,8 +473,8 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   }, [currentDate]);
 
   // Handler to change view parameter
-  const handleViewChange = (newView: string) => {
-    onViewChange(newView);
+  const handleViewChange = (newView: unknown) => {
+    onViewChange(newView as View);
   };
 
   // Handler to change date parameter
@@ -534,7 +534,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
             >
               Month
             </ToggleButton>
-          </ViewToggleContainer>
+            </ViewToggleContainer>
         </Box>
 
         {/* Mini Calendar Card */}
