@@ -425,7 +425,7 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
 export const TableHeader = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns:
-    '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
+    '55px 120px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
   padding: '6px 40px 6px 24px',
   backgroundColor:
     theme.palette.mode === 'dark'
@@ -448,17 +448,17 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   // Responsive hiding
   [theme.breakpoints.down('lg')]: {
     gridTemplateColumns:
-      '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
+      '55px 120px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
     '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
       { display: 'none' },
   },
   [theme.breakpoints.down('md')]: {
-    gridTemplateColumns: '55px minmax(1px, 3fr) 100px 117px 123px 80px',
+    gridTemplateColumns: '55px 120px minmax(1px, 3fr) 100px 117px 123px 80px',
     '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
       { display: 'none' },
   },
   [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: '55px minmax(1px, 2fr) 100px 117px 123px',
+    gridTemplateColumns: '55px 120px minmax(1px, 2fr) 100px 117px 123px',
     '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
       {
         display: 'none',
@@ -535,7 +535,7 @@ export const TaskRow = styled(Box, {
 })<{ statusColor?: string }>(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns:
-    '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
+    '55px 120px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
   alignItems: 'center',
   padding: '5px 40px 5px 24px',
   backgroundColor: 'transparent',
@@ -567,17 +567,17 @@ export const TaskRow = styled(Box, {
   // Responsive hiding
   [theme.breakpoints.down('lg')]: {
     gridTemplateColumns:
-      '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
+      '55px 120px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
     '& .cell-estimated, & .cell-actual, & .cell-ai': { display: 'none' },
   },
   [theme.breakpoints.down('md')]: {
-    gridTemplateColumns: '55px minmax(1px, 3fr) 100px 117px 123px 80px',
+    gridTemplateColumns: '55px 120px minmax(1px, 3fr) 100px 117px 123px 80px',
     '& .cell-estimated, & .cell-actual, & .cell-ai': {
       display: 'none',
     },
   },
   [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: '55px minmax(1px, 2fr) 100px 117px 123px',
+    gridTemplateColumns: '55px 120px minmax(1px, 2fr) 100px 117px 123px',
     '& .cell-estimated, & .cell-actual, & .cell-ai': {
       display: 'none',
     },

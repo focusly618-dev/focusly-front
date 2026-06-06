@@ -9,4 +9,5 @@ export interface TaskActionsProps {
   loadingSave: boolean;
   isAIScheduleEnabled?: boolean;
   setIsAIScheduleEnabled?: (enabled: boolean) => void;
+  isReadOnly?: boolean;
 }

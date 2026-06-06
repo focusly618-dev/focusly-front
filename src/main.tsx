@@ -15,13 +15,13 @@ import { ApolloProvider } from '@apollo/client';
 import { client } from '@/api/apollo';
 import { RealTimeProvider } from '@/context/RealTimeProvider';
 
-import { Toaster } from 'sileo';
+import { NotificationToaster } from '@/components/Notification/NotificationToaster';
 import { BrowserRouter } from 'react-router-dom';
 
 createRoot(document.getElementById('root')!).render(
   <AppThemeProvider>
     <CssBaseline />
-    <Toaster position="top-center" theme="light" options={{ duration: 4000 }} />
+    <NotificationToaster />
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <ApolloProvider client={client}>
         <Provider store={store}>

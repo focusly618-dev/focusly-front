@@ -191,6 +191,13 @@ export const useHome = () => {
 
   const deleteTask = async () => {
     if (taskDetailsTask?.id) {
+      // 1. Optimistic Delete in Redux
+      dispatch(removeTask({ id: taskDetailsTask.id }));
+      dispatch(removeEvent({ id: taskDetailsTask.id }));
+      if (taskDetailsTask.google_event_id) {
+        dispatch(removeEvent({ id: taskDetailsTask.google_event_id }));
+      }
+
       try {
         const isGoogleTask =
           (taskDetailsTask as Task).task_type === 'GoogleTask';
@@ -200,8 +207,6 @@ export const useHome = () => {
           if (taskDetailsTask.google_event_id) {
             try {
               await deleteGoogleEvent(taskDetailsTask.google_event_id);
-              // Also remove from virtual state
-              dispatch(removeEvent({ id: taskDetailsTask.google_event_id }));
             } catch (err) {
               console.warn(
                 'Failed to delete synced Google event, proceeding with platform delete',
@@ -217,12 +222,10 @@ export const useHome = () => {
               { query: GET_WORKSPACES, variables: { search: '' } },
             ],
           });
-          dispatch(removeTask({ id: taskDetailsTask.id }));
         } else {
           // Point 1: Pure Google Event — Delete only in Google Calendar
           const eventId = taskDetailsTask.google_event_id || taskDetailsTask.id;
           await deleteGoogleEvent(eventId);
-          dispatch(removeEvent({ id: taskDetailsTask.id }));
         }
       } catch (e) {
         handleMutationError(e, 'Error al eliminar la tarea');

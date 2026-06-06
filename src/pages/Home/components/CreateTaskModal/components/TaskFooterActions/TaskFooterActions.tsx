@@ -1,7 +1,12 @@
 import { Box, Button, CircularProgress, DialogActions } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { sileo } from 'sileo';
-import { dialogActionsSx, cancelButtonSx, saveButtonSx, deleteButtonSx } from '../../CreateTaskModal.styles';
+import { sileo } from '@/utils/sileo';
+import {
+  dialogActionsSx,
+  cancelButtonSx,
+  saveButtonSx,
+  deleteButtonSx,
+} from '../../CreateTaskModal.styles';
 import type { Task } from '@/redux/tasks/task.types';
 
 interface TaskFooterActionsProps {
@@ -22,7 +27,11 @@ export const TaskFooterActions = ({
   loadingSave,
 }: TaskFooterActionsProps) => (
   <DialogActions sx={dialogActionsSx}>
-    <Box display={initialTask ? 'flex' : 'none'} sx={{ flex: 1 }} justifyContent="flex-start">
+    <Box
+      display={initialTask ? 'flex' : 'none'}
+      sx={{ flex: 1 }}
+      justifyContent="flex-start"
+    >
       <Button
         onClick={() => {
           sileo.warning({
@@ -33,9 +42,19 @@ export const TaskFooterActions = ({
               title: 'Confirm',
               onClick: () => {
                 sileo.promise(handleDelete(), {
-                  loading: { title: 'Deleting...', fill: 'var(--sileo-update-bg)' },
-                  success: { title: 'Task deleted successfully!', duration: 4000, fill: 'var(--sileo-delete-bg)' },
-                  error: { title: 'Error deleting task', fill: 'var(--sileo-error-bg)' },
+                  loading: {
+                    title: 'Deleting...',
+                    fill: 'var(--sileo-update-bg)',
+                  },
+                  success: {
+                    title: 'Task deleted successfully!',
+                    duration: 4000,
+                    fill: 'var(--sileo-delete-bg)',
+                  },
+                  error: {
+                    title: 'Error deleting task',
+                    fill: 'var(--sileo-error-bg)',
+                  },
                 });
                 onClose();
               },

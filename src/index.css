@@ -92,33 +92,6 @@ body {
               opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-[data-sileo-viewport] {
-  z-index: 9999 !important;
-  padding-top: 80px !important;
-}
-
-[data-sileo-title] {
-  font-weight: 700 !important;
-  text-align: center !important;
-  width: 100% !important;
-  display: block !important;
-  font-size: 15px !important;
-}
-
-[data-sileo-description] {
-  color: var(--sileo-desc-text) !important;
-  text-align: center !important;
-  width: 100% !important;
-  display: block !important;
-  opacity: 0.9 !important;
-  font-size: 13px !important;
-}
-
-[data-sileo-button] {
-  font-weight: 700 !important;
-  border-radius: 8px !important;
-  text-transform: none !important;
-}
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {

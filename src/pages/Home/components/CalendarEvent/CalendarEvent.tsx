@@ -45,6 +45,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     startTime,
     currentPriority,
     contextMenu,
+    isReadOnly,
   } = useCalendarContextMenu(event, onStartFocus);
 
   const renderClassic = () => (
@@ -53,20 +54,62 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       isMeeting={isMeeting}
       onContextMenu={handleContextMenu}
     >
-      <Box sx={{ fontSize: '11px', fontWeight: 500, mb: 0.5 }}>
-        {isShortEvent ? startTime : timeRange}
-      </Box>
-      <Box
-        sx={{
-          fontSize: '12px',
-          fontWeight: 600,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {event.title}
-      </Box>
+      {isShortEvent ? (
+        /* ── Short event (< 40 min): time + title in one row ── */
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '4px',
+            overflow: 'hidden',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <Box
+            sx={{
+              fontSize: '10px',
+              fontWeight: 600,
+              opacity: 0.85,
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            {startTime}
+          </Box>
+          <Box
+            sx={{
+              fontSize: '11px',
+              fontWeight: 600,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              flexGrow: 1,
+            }}
+          >
+            {event.title}
+          </Box>
+        </Box>
+      ) : (
+        /* ── Normal event (≥ 40 min): time above, title below ── */
+        <>
+          <Box sx={{ fontSize: '11px', fontWeight: 500, mb: 0.5 }}>
+            {timeRange}
+          </Box>
+          <Box
+            sx={{
+              fontSize: '12px',
+              fontWeight: 600,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {event.title}
+          </Box>
+        </>
+      )}
     </EventContainer>
   );
 
@@ -110,8 +153,8 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           </MenuItem>
         )}
 
-        {event.type === 'task' && <Divider />}
-        {event.type === 'task' && (
+        {event.type === 'task' && !isReadOnly && <Divider />}
+        {event.type === 'task' && !isReadOnly && (
           <Box sx={{ px: 2, py: 1.5 }}>
             <Typography
               variant="caption"
@@ -178,18 +221,20 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           </Box>
         )}
 
-        <Divider />
+        {!isReadOnly && <Divider />}
 
-        <MenuItem
-          onClick={onDelete}
-          sx={{
-            color: '#ef4444',
-            '&:hover': { bgcolor: alpha('#ef4444', 0.08) },
-          }}
-        >
-          <DeleteIcon sx={{ mr: 1.5, color: '#ef4444' }} />
-          Delete {event.type === 'task' ? 'Task' : 'Event'}
-        </MenuItem>
+        {!isReadOnly && (
+          <MenuItem
+            onClick={onDelete}
+            sx={{
+              color: '#ef4444',
+              '&:hover': { bgcolor: alpha('#ef4444', 0.08) },
+            }}
+          >
+            <DeleteIcon sx={{ mr: 1.5, color: '#ef4444' }} />
+            Delete {event.type === 'task' ? 'Task' : 'Event'}
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

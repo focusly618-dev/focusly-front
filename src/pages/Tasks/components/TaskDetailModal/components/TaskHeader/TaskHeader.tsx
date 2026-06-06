@@ -7,7 +7,7 @@ import {
 } from '@mui/icons-material';
 import { TASK_COLORS } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 import { headerContainerSx, headerIconButtonSx } from './TaskHeader.styles';
 
 interface TaskHeaderProps {
@@ -18,6 +18,7 @@ interface TaskHeaderProps {
   onClose: () => void;
   initialTask?: Task | null;
   handleDelete: () => Promise<void>;
+  isReadOnly?: boolean;
 }
 
 export const TaskHeader = ({
@@ -27,6 +28,7 @@ export const TaskHeader = ({
   onClose,
   initialTask,
   handleDelete,
+  isReadOnly,
 }: TaskHeaderProps) => {
   const isCustomColor = TASK_COLORS.includes(color);
   const iconSx = headerIconButtonSx(isCustomColor);
@@ -50,7 +52,7 @@ export const TaskHeader = ({
         <IconButton size="small" onClick={onClose} sx={iconSx}>
           <CloseIcon sx={{ fontSize: 20 }} />
         </IconButton>
-        {initialTask && (
+        {!isReadOnly && initialTask && (
           <IconButton
             size="small"
             onClick={() => {

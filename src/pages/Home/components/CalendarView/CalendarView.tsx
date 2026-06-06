@@ -15,6 +15,7 @@ import { CalendarToolbar } from '../CalendarToolbar';
 import { CalendarHeader } from '../CalendarHeader';
 import { CalendarEvent, type ICalendarEvent } from '../CalendarEvent';
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
+import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
 
 // Material UI
 import { Box, Menu, Stack, Typography } from '@mui/material';
@@ -67,6 +68,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     handleNavigateAction,
     scrollToTime,
     dayPropGetter,
+    handleAddTaskClick,
   } = useCalendarView();
 
   const handleCreateTaskAtSlot = (priority?: number) => {
@@ -95,172 +97,200 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     }
   };
 
+  console.log(events);
   return (
-    <CalendarContainer isDayView={currentView === Views.DAY}>
-      {/* Top Header */}
-      <Box
-        sx={{
-          px: 3,
-          pt: 3,
-          pb: 1,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h4"
-            sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}
-          >
-            Calendar
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Stay Organized and On Track with Your Personalized Calendar
-          </Typography>
-        </Box>
-      </Box>
-
-      <Box
+    <Box
+      sx={{
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        overflow: 'hidden',
+      }}
+    >
+      <CalendarContainer
+        isDayView={currentView === Views.DAY}
         sx={{
           flexGrow: 1,
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          height: 'calc(100% - 90px)', // Fill remaining height below header
-          position: 'relative',
-          overflowX: 'auto', // Allow horizontal scroll on small devices
-          overflowY: 'hidden', // Contain vertical overflow inside big-calendar
-          scrollbarWidth: 'none',
-          '&::-webkit-scrollbar': {
-            height: '6px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.15)'
-                : 'rgba(0, 0, 0, 0.1)',
-            borderRadius: '3px',
-          },
         }}
       >
-        <DnDCalendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          view={currentView}
-          onView={handleOnChangeView}
-          date={currentDate}
-          onNavigate={(newDate) => handleOnNavigate(newDate as Date)}
-          onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectEvent}
-          onEventDrop={handleEventDrop}
-          onEventResize={handleEventResize}
-          scrollToTime={scrollToTime}
-          dayPropGetter={dayPropGetter}
-          resizable
-          selectable
-          showAllEvents={false}
-          doShowMoreDrillDown={false}
-          dayLayoutAlgorithm="overlap"
-          components={{
-            toolbar: (props: ToolbarProps<ICalendarEvent>) => (
-              <CalendarToolbar
-                {...props}
-                isSessionActive={isFocusSessionActive}
-                onNavigateAction={handleNavigateAction}
-              />
-            ),
-            header: CalendarHeader,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            event: (props: any) => (
-              <CalendarEvent
-                {...props}
-                onStartFocus={onStartFocus}
-                currentView={currentView}
-              />
-            ),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            timeSlotWrapper: (props: any) => (
-              <CalendarSlotWrapper
-                {...props}
-                onContextMenu={handleSlotContextMenu}
-              />
-            ),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            dateCellWrapper: (props: any) => (
-              <CalendarSlotWrapper
-                {...props}
-                onContextMenu={handleSlotContextMenu}
-              />
-            ),
+        {/* Top Header */}
+        <Box
+          sx={{
+            px: 3,
+            pt: 3,
+            pb: 1,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
           }}
-          step={5}
-          timeslots={12}
-          onShowMore={handleShowMore}
-          popup={false}
-          messages={{
-            showMore: (count: number) => `+${count} más`,
-          }}
-          formats={{
-            timeGutterFormat: (
-              date: Date,
-              culture?: string,
-              localizer?: {
-                format: (
-                  date: Date,
-                  format: string,
-                  culture?: string,
-                ) => string;
-              },
-            ) => (localizer ? localizer.format(date, 'h A', culture) : ''),
-          }}
-        />
-      </Box>
-
-      <Menu
-        open={slotContextMenu !== null}
-        onClose={closeSlotContextMenu}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          slotContextMenu !== null
-            ? { top: slotContextMenu.mouseY, left: slotContextMenu.mouseX }
-            : undefined
-        }
-        sx={contextMenuSx}
-      >
-        <Box sx={{ px: 2, py: 1.5 }}>
-          <Typography
-            variant="overline"
-            sx={{
-              fontWeight: 600,
-              color: 'text.secondary',
-              display: 'block',
-              mb: 0.5,
-              lineHeight: 1.2,
-              letterSpacing: '0.05em',
-              fontSize: '10px',
-            }}
-          >
-            Quick Create Task
-          </Typography>
-          <Stack
-            direction="row"
-            spacing={1.5}
-            justifyContent="center"
-            sx={{ mt: 1 }}
-          >
-            {[1, 2, 3, 4].map((level) => (
-              <Box
-                key={level}
-                onClick={() => handleCreateTaskAtSlot(level)}
-                sx={priorityCircleSx(PRIORITY_COLORS[level].main, false)}
-              />
-            ))}
-          </Stack>
+        >
+          <Box>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}
+            >
+              Calendar
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Stay Organized and On Track with Your Personalized Calendar
+            </Typography>
+          </Box>
         </Box>
-      </Menu>
-    </CalendarContainer>
+
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            height: 'calc(100% - 90px)', // Fill remaining height below header
+            position: 'relative',
+            overflowX: 'auto', // Allow horizontal scroll on small devices
+            overflowY: 'hidden', // Contain vertical overflow inside big-calendar
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': {
+              height: '6px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.15)'
+                  : 'rgba(0, 0, 0, 0.1)',
+              borderRadius: '3px',
+            },
+          }}
+        >
+          <DnDCalendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            view={currentView}
+            onView={handleOnChangeView}
+            date={currentDate}
+            onNavigate={(newDate) => handleOnNavigate(newDate as Date)}
+            onSelectSlot={handleSelectSlot}
+            onSelectEvent={handleSelectEvent}
+            onEventDrop={handleEventDrop}
+            onEventResize={handleEventResize}
+            scrollToTime={scrollToTime}
+            dayPropGetter={dayPropGetter}
+            resizable
+            selectable
+            showAllEvents={false}
+            doShowMoreDrillDown={false}
+            dayLayoutAlgorithm="overlap"
+            showMultiDayTimes={true}
+            components={{
+              toolbar: (props: ToolbarProps<ICalendarEvent>) => (
+                <CalendarToolbar
+                  {...props}
+                  isSessionActive={isFocusSessionActive}
+                  onNavigateAction={handleNavigateAction}
+                />
+              ),
+              header: CalendarHeader,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              event: (props: any) => (
+                <CalendarEvent
+                  {...props}
+                  onStartFocus={onStartFocus}
+                  currentView={currentView}
+                />
+              ),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              timeSlotWrapper: (props: any) => (
+                <CalendarSlotWrapper
+                  {...props}
+                  onContextMenu={handleSlotContextMenu}
+                />
+              ),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              dateCellWrapper: (props: any) => (
+                <CalendarSlotWrapper
+                  {...props}
+                  onContextMenu={handleSlotContextMenu}
+                />
+              ),
+            }}
+            step={5}
+            timeslots={12}
+            onShowMore={handleShowMore}
+            popup={false}
+            messages={{
+              showMore: (count: number) => `+${count} más`,
+            }}
+            formats={{
+              timeGutterFormat: (
+                date: Date,
+                culture?: string,
+                localizer?: {
+                  format: (
+                    date: Date,
+                    format: string,
+                    culture?: string,
+                  ) => string;
+                },
+              ) => (localizer ? localizer.format(date, 'h A', culture) : ''),
+            }}
+          />
+        </Box>
+
+        <Menu
+          open={slotContextMenu !== null}
+          onClose={closeSlotContextMenu}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            slotContextMenu !== null
+              ? { top: slotContextMenu.mouseY, left: slotContextMenu.mouseX }
+              : undefined
+          }
+          sx={contextMenuSx}
+        >
+          <Box sx={{ px: 2, py: 1.5 }}>
+            <Typography
+              variant="overline"
+              sx={{
+                fontWeight: 600,
+                color: 'text.secondary',
+                display: 'block',
+                mb: 0.5,
+                lineHeight: 1.2,
+                letterSpacing: '0.05em',
+                fontSize: '10px',
+              }}
+            >
+              Quick Create Task
+            </Typography>
+            <Stack
+              direction="row"
+              spacing={1.5}
+              justifyContent="center"
+              sx={{ mt: 1 }}
+            >
+              {[1, 2, 3, 4].map((level) => (
+                <Box
+                  key={level}
+                  onClick={() => handleCreateTaskAtSlot(level)}
+                  sx={priorityCircleSx(PRIORITY_COLORS[level].main, false)}
+                />
+              ))}
+            </Stack>
+          </Box>
+        </Menu>
+      </CalendarContainer>
+      <CalendarSidePanel
+        currentView={currentView}
+        currentDate={currentDate}
+        onDateChange={handleOnNavigate}
+        onViewChange={handleOnChangeView}
+        onAddTaskClick={handleAddTaskClick}
+        events={events}
+        onEventSelect={handleSelectEvent}
+      />
+    </Box>
   );
 };
 

@@ -128,107 +128,150 @@ export const AllFoldersModal = ({
             },
           }}
         >
-          <AnimatePresence mode="popLayout">
-            {filteredFolders.map((folder) => (
-              <Box
-                key={folder.id}
-                component={motion.div}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                onClick={() => onSelect(folder.id)}
+          {filteredFolders.length === 0 ? (
+            <Box
+              sx={{
+                gridColumn: '1 / -1',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                py: 8,
+                textAlign: 'center',
+                width: '100%',
+              }}
+            >
+              <FolderIcon
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  p: 2.5,
-                  borderRadius: '16px',
-                  bgcolor:
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.015)'
-                      : 'rgba(0,0,0,0.01)',
-                  border: `2px solid ${selectedId === folder.id ? '#00f5ff' : 'transparent'}`,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  position: 'relative',
-                  '&:hover': {
-                    bgcolor:
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.04)'
-                        : 'rgba(0,0,0,0.03)',
-                    boxShadow:
-                      selectedId === folder.id
-                        ? '0 0 20px rgba(0, 245, 255, 0.2)'
-                        : 'none',
-                    borderLeft: `10px solid ${folder.color || theme.palette.primary.main}`,
-                    pl: '17px', // Compensate for the 3px border
-                  },
+                  fontSize: 48,
+                  color: 'text.disabled',
+                  mb: 2,
+                  opacity: 0.5,
                 }}
+              />
+              <Typography
+                variant="h6"
+                fontWeight={750}
+                sx={{ color: 'text.secondary', mb: 1 }}
               >
+                {folders.length === 0
+                  ? 'No folders added yet'
+                  : 'No matching folders'}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.disabled', opacity: 0.7, maxWidth: 300 }}
+              >
+                {folders.length === 0
+                  ? 'Create a custom folder in the library to start grouping your plans.'
+                  : 'Try adjusting your search terms.'}
+              </Typography>
+            </Box>
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {filteredFolders.map((folder) => (
                 <Box
+                  key={folder.id}
+                  component={motion.div}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  onClick={() => onSelect(folder.id)}
                   sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '12px',
-                    bgcolor: `${folder.color || theme.palette.primary.main}1A`,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    mr: 2,
-                  }}
-                >
-                  <FolderIcon
-                    sx={{
-                      color: folder.color || theme.palette.primary.main,
-                      fontSize: 24,
-                    }}
-                  />
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight={700}
-                    noWrap
-                    sx={{ maxWidth: '100%' }}
-                  >
-                    {folder.name.length > 40
-                      ? `${folder.name.substring(0, 40)}...`
-                      : folder.name}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'text.secondary', opacity: 0.7 }}
-                  >
-                    {folder.workspaceCount || 0} Items
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    px: 1.5,
-                    py: 0.5,
-                    borderRadius: '12px',
+                    p: 2.5,
+                    borderRadius: '16px',
                     bgcolor:
-                      selectedId === folder.id
-                        ? 'rgba(0, 245, 255, 0.1)'
-                        : 'transparent',
-                    border: `1px solid ${selectedId === folder.id ? '#00f5ff' : 'transparent'}`,
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.015)'
+                        : 'rgba(0,0,0,0.01)',
+                    border: `2px solid ${selectedId === folder.id ? '#00f5ff' : 'transparent'}`,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    '&:hover': {
+                      bgcolor:
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.04)'
+                          : 'rgba(0,0,0,0.03)',
+                      boxShadow:
+                        selectedId === folder.id
+                          ? '0 0 20px rgba(0, 245, 255, 0.2)'
+                          : 'none',
+                      borderLeft: `10px solid ${folder.color || theme.palette.primary.main}`,
+                      pl: '17px', // Compensate for the 3px border
+                    },
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    fontWeight={800}
+                  <Box
                     sx={{
-                      color:
-                        selectedId === folder.id ? '#00f5ff' : 'text.secondary',
-                      fontSize: '10px',
+                      width: 48,
+                      height: 48,
+                      borderRadius: '12px',
+                      bgcolor: `${folder.color || theme.palette.primary.main}1A`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mr: 2,
                     }}
                   >
-                    {selectedId === folder.id ? 'VISIBLE' : 'SELECT'}
-                  </Typography>
+                    <FolderIcon
+                      sx={{
+                        color: folder.color || theme.palette.primary.main,
+                        fontSize: 24,
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={700}
+                      noWrap
+                      sx={{ maxWidth: '100%' }}
+                    >
+                      {folder.name.length > 40
+                        ? `${folder.name.substring(0, 40)}...`
+                        : folder.name}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'text.secondary', opacity: 0.7 }}
+                    >
+                      {folder.workspaceCount || 0} Items
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: '12px',
+                      bgcolor:
+                        selectedId === folder.id
+                          ? 'rgba(0, 245, 255, 0.1)'
+                          : 'transparent',
+                      border: `1px solid ${selectedId === folder.id ? '#00f5ff' : 'transparent'}`,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      fontWeight={800}
+                      sx={{
+                        color:
+                          selectedId === folder.id
+                            ? '#00f5ff'
+                            : 'text.secondary',
+                        fontSize: '10px',
+                      }}
+                    >
+                      {selectedId === folder.id ? 'VISIBLE' : 'SELECT'}
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-            ))}
-          </AnimatePresence>
+              ))}
+            </AnimatePresence>
+          )}
         </Box>
 
         <Box

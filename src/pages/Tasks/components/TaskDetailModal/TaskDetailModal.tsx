@@ -44,6 +44,7 @@ export const TaskDetailModal = ({
   setIsAIScheduleEnabled,
 }: TaskDetailModalProps) => {
   const {
+    isReadOnly,
     title,
     setTitle,
     description,
@@ -183,6 +184,7 @@ export const TaskDetailModal = ({
               onClose={onClose}
               initialTask={initialTask}
               handleDelete={handleDelete}
+              isReadOnly={isReadOnly}
             />
             <Box sx={{ p: 3, pt: 1.5 }}>
               <Box sx={{ px: 1, mb: 1 }}>
@@ -195,6 +197,7 @@ export const TaskDetailModal = ({
                   sx={titleInputPropsSx}
                   error={!!errors.title}
                   helperText={errors.title}
+                  disabled={isReadOnly}
                 />
               </Box>
 
@@ -225,6 +228,7 @@ export const TaskDetailModal = ({
                 isPureGoogleTask={isPureGoogleTask}
                 timeSlotDisplay={timeSlotDisplay}
                 handleTimerChange={handleTimerChange}
+                isReadOnly={isReadOnly}
               />
 
               <TaskResources
@@ -242,22 +246,26 @@ export const TaskDetailModal = ({
                 setNewLinkUrl={setNewLinkUrl}
                 handleAddLink={handleAddLink}
                 handleRemoveLink={handleRemoveLink}
+                isReadOnly={isReadOnly}
               />
 
               <Collaborators
                 collaborators={collaborators}
                 handleAddCollaborator={handleAddCollaborator}
+                isReadOnly={isReadOnly}
               />
 
               <TaskWorkspaces
                 workspaces={initialTask?.workspaces}
                 onNavigate={createURLWorkSpace}
                 onRemove={handleRemoveWorkspace}
+                isReadOnly={isReadOnly}
               />
 
               <TaskDescription
                 description={description}
                 setDescription={setDescription}
+                isReadOnly={isReadOnly}
               />
             </Box>
           </PerfectScrollbar>
@@ -272,6 +280,7 @@ export const TaskDetailModal = ({
           loadingSave={loadingSave}
           isAIScheduleEnabled={isAIScheduleEnabled}
           setIsAIScheduleEnabled={setIsAIScheduleEnabled}
+          isReadOnly={isReadOnly}
         />
       </Dialog>
     </LocalizationProvider>

@@ -62,11 +62,19 @@ export const GET_TASKS_TITLES = gql`
       status
       estimate_timer
       real_timer
+      duration
       priority_level
+      user_id
       category
       color
       notes_encrypted
       use_ai
+      tags {
+        name
+      }
+      deadline
+      created_at
+      updated_at
       links {
         title
         url
@@ -99,6 +107,7 @@ export const UPDATE_TASK = gql`
   mutation UpdateTask($updateTaskInput: UpdateTaskInput!) {
     updateTask(updateTaskInput: $updateTaskInput) {
       id
+      user_id
       title
       notes_encrypted
       status
@@ -112,6 +121,7 @@ export const UPDATE_TASK = gql`
         name
       }
       deadline
+      created_at
       updated_at
       links {
         title
@@ -137,6 +147,7 @@ export const CREATE_TASK = gql`
   mutation CreateTask($createTaskInput: CreateTaskInput!) {
     createTask(createTaskInput: $createTaskInput) {
       id
+      user_id
       title
       notes_encrypted
       status
@@ -151,6 +162,7 @@ export const CREATE_TASK = gql`
       }
       deadline
       created_at
+      updated_at
       links {
         title
         url

@@ -5,7 +5,8 @@ import { Box, Typography } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { Tag } from '../GridViewTask/GridViewTask.styles';
 import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
+import { useAppSelector } from '@/redux/hooks';
 
 interface SortableTaskCardProps {
   task: TaskResponse;
@@ -16,6 +17,29 @@ interface SortableTaskCardProps {
 
 export const SortableTaskCard = memo(
   ({ task, onClick, isOverlay, isDropTarget }: SortableTaskCardProps) => {
+    const { user } = useAppSelector((state) => state.auth);
+
+    const isReadOnly = useMemo(() => {
+      if (!task) return false;
+      if (!user) return true;
+
+      // Check Google Calendar event ownership
+      if (task.task_type === 'GoogleTask' || task.google_event_id) {
+        const organizerEmail = (task as unknown as { organizer_email?: string })
+          .organizer_email;
+        if (organizerEmail) {
+          return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
+        }
+      }
+
+      // Check Focusly task ownership
+      if (task.user_id && task.user_id !== user.id) {
+        return true;
+      }
+
+      return false;
+    }, [task, user]);
+
     const {
       attributes,
       listeners,
@@ -29,13 +53,14 @@ export const SortableTaskCard = memo(
         type: 'Task',
         task,
       },
+      disabled: isReadOnly,
     });
 
     const style = {
       transform: CSS.Transform.toString(transform),
       transition: transition || 'transform 0.15s ease, opacity 0.15s ease',
       opacity: isDragging ? 0.4 : 1,
-      cursor: isOverlay ? 'grabbing' : 'grab',
+      cursor: isReadOnly ? 'default' : isOverlay ? 'grabbing' : 'grab',
       zIndex: isOverlay ? 999 : isDragging ? 100 : 1,
       scale: isOverlay ? '1.02' : '1',
     };

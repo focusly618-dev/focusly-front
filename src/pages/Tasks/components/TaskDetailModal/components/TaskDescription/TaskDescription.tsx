@@ -3,20 +3,28 @@ import { Description as DescriptionIcon } from '@mui/icons-material';
 import {
   descriptionContainerSx,
   descriptionHeaderSx,
-  descriptionInputSx
+  descriptionInputSx,
 } from './TaskDescription.styles';
 
 interface TaskDescriptionProps {
   description: string;
   setDescription: (d: string) => void;
+  isReadOnly?: boolean;
 }
 
-export const TaskDescription = ({ description, setDescription }: TaskDescriptionProps) => {
+export const TaskDescription = ({
+  description,
+  setDescription,
+  isReadOnly,
+}: TaskDescriptionProps) => {
   return (
     <Box sx={descriptionContainerSx}>
       <Box sx={descriptionHeaderSx}>
         <DescriptionIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+        <Typography
+          variant="caption"
+          sx={{ color: 'text.secondary', fontWeight: 600 }}
+        >
           DESCRIPTION
         </Typography>
       </Box>
@@ -28,6 +36,7 @@ export const TaskDescription = ({ description, setDescription }: TaskDescription
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         sx={descriptionInputSx}
+        disabled={isReadOnly}
       />
     </Box>
   );

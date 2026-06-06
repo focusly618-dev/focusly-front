@@ -9,7 +9,7 @@ import {
 } from '@/pages/Tasks/Task.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 import type { Task } from '@/redux/tasks/task.types';
 import moment from 'moment';
 
@@ -17,7 +17,7 @@ import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
 import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { ICalendarEvent } from '../CalendarEvent.types';
 import type { UseCalendarContextMenuReturn } from '../CalendarEvent.types';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
@@ -28,6 +28,36 @@ export const useCalendarContextMenu = (
 ): UseCalendarContextMenuReturn => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+
+  const isReadOnly = useMemo(() => {
+    if (!event.resource) return false;
+    if (!user) return true;
+
+    const resourceAny = event.resource as {
+      task_type?: string;
+      google_event_id?: string;
+      organizer_email?: string;
+      user_id?: string;
+    };
+    // Check Google Calendar event ownership
+    if (
+      resourceAny.task_type === 'GoogleTask' ||
+      resourceAny.google_event_id ||
+      event.type === 'event'
+    ) {
+      const organizerEmail = resourceAny.organizer_email;
+      if (organizerEmail) {
+        return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
+      }
+    }
+
+    // Check Focusly task ownership
+    if (resourceAny.user_id && resourceAny.user_id !== user.id) {
+      return true;
+    }
+
+    return false;
+  }, [event.resource, event.type, user]);
 
   const [createTask] = useMutation(CREATE_TASK);
   const [updateTask] = useMutation(UPDATE_TASK);
@@ -104,7 +134,7 @@ export const useCalendarContextMenu = (
     taskId: string,
     priorityLevel: number,
   ) => {
-    if (!user) return;
+    if (!user || isReadOnly) return;
 
     try {
       const { data } = await updateTask({
@@ -135,7 +165,7 @@ export const useCalendarContextMenu = (
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    if (!user) return;
+    if (!user || isReadOnly) return;
 
     try {
       await deleteTask({
@@ -161,6 +191,7 @@ export const useCalendarContextMenu = (
   };
 
   const handleDeleteGoogleEvent = async (eventId: string) => {
+    if (isReadOnly) return;
     try {
       await deleteGoogleEvent(eventId);
       dispatch(removeEvent({ id: eventId }));
@@ -249,7 +280,7 @@ export const useCalendarContextMenu = (
     hasVideoLinkInTask;
 
   const durationMinutes = (event.end.getTime() - event.start.getTime()) / 60000;
-  const isShortEvent = durationMinutes <= 30;
+  const isShortEvent = durationMinutes < 40;
   const startTime = formatTime(event.start);
 
   const currentPriority =
@@ -274,5 +305,6 @@ export const useCalendarContextMenu = (
     currentPriority,
     contextMenu,
     setContextMenu,
+    isReadOnly,
   };
 };

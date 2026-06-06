@@ -92,13 +92,15 @@ export const Home = () => {
           {activeTab !== TaskBar.AskAI && (
             <ChatAI
               rightOffset={
-                activeTab === TaskBar.Workspace && isWorkspaceEditorOpen
-                  ? isWorkspaceSidebarOpen
-                    ? 352
-                    : 92
-                  : activeTab === TaskBar.Workspace
-                    ? 32
-                    : 92
+                activeTab === TaskBar.DailyPlan
+                  ? 340
+                  : activeTab === TaskBar.Workspace && isWorkspaceEditorOpen
+                    ? isWorkspaceSidebarOpen
+                      ? 352
+                      : 92
+                    : activeTab === TaskBar.Workspace
+                      ? 32
+                      : 92
               }
             />
           )}

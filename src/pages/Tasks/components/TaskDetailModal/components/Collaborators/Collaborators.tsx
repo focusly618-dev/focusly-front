@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Avatar, 
-  Box, 
-  Button, 
-  IconButton, 
-  Stack, 
-  TextField, 
-  Typography 
-} from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import {
   Groups as GroupsIcon,
   ExpandLess as ExpandLessIcon,
@@ -21,7 +21,7 @@ import {
   collaboratorsListSx,
   addCollaboratorFormSx,
   collaboratorItemSx,
-  avatarSx
+  avatarSx,
 } from './Collaborators.styles';
 
 interface Collaborator {
@@ -33,11 +33,12 @@ interface Collaborator {
 interface CollaboratorsProps {
   collaborators: Collaborator[];
   handleAddCollaborator: (name: string, email: string) => void;
+  isReadOnly?: boolean;
 }
 
-export const Collaborators = ({ 
-  collaborators, 
-  handleAddCollaborator 
+export const Collaborators = ({
+  collaborators,
+  handleAddCollaborator,
 }: CollaboratorsProps) => {
   const [isAddingCollaborator, setIsAddingCollaborator] = useState(false);
   const [isCollaboratorsExpanded, setIsCollaboratorsExpanded] = useState(() => {
@@ -63,18 +64,27 @@ export const Collaborators = ({
       >
         <Box display="flex" alignItems="center" gap={1}>
           <GroupsIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.5px' }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+            }}
+          >
             COLLABORATORS
           </Typography>
           {!isCollaboratorsExpanded && collaborators.length > 0 && (
-            <Box sx={collaboratorCountSx}>
-              {collaborators.length}
-            </Box>
+            <Box sx={collaboratorCountSx}>{collaborators.length}</Box>
           )}
         </Box>
         <Box display="flex" alignItems="center" gap={0.5}>
           <IconButton size="small" sx={{ p: 0.5 }}>
-            {isCollaboratorsExpanded ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+            {isCollaboratorsExpanded ? (
+              <ExpandLessIcon sx={{ fontSize: 18 }} />
+            ) : (
+              <ExpandMoreIcon sx={{ fontSize: 18 }} />
+            )}
           </IconButton>
         </Box>
       </Box>
@@ -92,7 +102,7 @@ export const Collaborators = ({
               <Stack gap={1}>
                 <AnimatePresence mode="popLayout" initial={false}>
                   {isAddingCollaborator && (
-                    <Box 
+                    <Box
                       key="add-collaborator-form"
                       component={motion.div}
                       layout
@@ -108,30 +118,42 @@ export const Collaborators = ({
                         placeholder="Name (Optional)"
                         value={newCollaboratorName}
                         onChange={(e) => setNewCollaboratorName(e.target.value)}
-                        sx={{ mb: 1.5, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                        sx={{
+                          mb: 1.5,
+                          '& .MuiOutlinedInput-root': { borderRadius: '8px' },
+                        }}
                       />
                       <TextField
                         size="small"
                         fullWidth
                         placeholder="Email"
                         value={newCollaboratorEmail}
-                        onChange={(e) => setNewCollaboratorEmail(e.target.value)}
-                        sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                        onChange={(e) =>
+                          setNewCollaboratorEmail(e.target.value)
+                        }
+                        sx={{
+                          mb: 2,
+                          '& .MuiOutlinedInput-root': { borderRadius: '8px' },
+                        }}
                       />
                       <Box display="flex" justifyContent="flex-end" gap={1}>
-                        <Button 
-                          size="small" 
+                        <Button
+                          size="small"
                           onClick={() => setIsAddingCollaborator(false)}
                           sx={{ textTransform: 'none', borderRadius: '8px' }}
                         >
                           Cancel
                         </Button>
-                        <Button 
-                          size="small" 
-                          variant="contained" 
+                        <Button
+                          size="small"
+                          variant="contained"
                           disabled={!newCollaboratorEmail.trim()}
                           onClick={onAdd}
-                          sx={{ textTransform: 'none', borderRadius: '8px', px: 3 }}
+                          sx={{
+                            textTransform: 'none',
+                            borderRadius: '8px',
+                            px: 3,
+                          }}
                         >
                           Add
                         </Button>
@@ -139,14 +161,18 @@ export const Collaborators = ({
                     </Box>
                   )}
                   {collaborators.map((collaborator, idx) => (
-                    <Box 
-                      key={`${collaborator.email}-${idx}`} 
+                    <Box
+                      key={`${collaborator.email}-${idx}`}
                       component={motion.div}
                       layout
                       initial={{ opacity: 0, scale: 0.95, y: -10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 400,
+                        damping: 30,
+                      }}
                       sx={collaboratorItemSx}
                     >
                       <Box display="flex" alignItems="center" gap={2}>
@@ -154,13 +180,27 @@ export const Collaborators = ({
                           src={collaborator.avatar || undefined}
                           sx={avatarSx(!!collaborator.avatar)}
                         >
-                          {collaborator.name?.charAt(0) || collaborator.email?.charAt(0) || '?'}
+                          {collaborator.name?.charAt(0) ||
+                            collaborator.email?.charAt(0) ||
+                            '?'}
                         </Avatar>
                         <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.2 }}>
-                            {collaborator?.name || collaborator?.email || 'Unknown Collaborator'}
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 700,
+                              color: 'text.primary',
+                              mb: 0.2,
+                            }}
+                          >
+                            {collaborator?.name ||
+                              collaborator?.email ||
+                              'Unknown Collaborator'}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'text.secondary', fontWeight: 500 }}
+                          >
                             {collaborator?.email || 'No email provided'}
                           </Typography>
                         </Box>

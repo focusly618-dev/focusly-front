@@ -11,7 +11,7 @@ import {
   REMOVE_WORKSPACE,
   GET_WORKSPACES,
 } from '@/pages/Workspace/workspaces.graphql';
-import { sileo } from 'sileo';
+import { sileo } from '@/utils/sileo';
 import {
   createGoogleEvent,
   updateGoogleEvent,
@@ -165,7 +165,9 @@ export const useTaskMutations = ({
       if (data?.createTask) {
         sileo.success({
           title: 'Task created',
+          description: 'The task has been created successfully',
           fill: 'var(--sileo-success-bg)',
+          duration: 2000,
         });
         onSave(data.createTask);
         resetForm();
@@ -210,6 +212,21 @@ export const useTaskMutations = ({
       .replace(/\[START_DATE:(.*?)\]/g, '')
       .trim();
 
+    const deadlineISO =
+      state.deadline instanceof Date
+        ? state.deadline.toISOString()
+        : state.deadline || initialTask.deadline || '';
+
+    const startDate = new Date(deadlineISO);
+    const estimatedStartISO = !isNaN(startDate.getTime())
+      ? startDate.toISOString()
+      : undefined;
+    const estimatedEndISO = !isNaN(startDate.getTime())
+      ? new Date(
+          startDate.getTime() + (estimateTimer || 30) * 60000,
+        ).toISOString()
+      : undefined;
+
     const updateInput: TaskInput = {
       title: state.title || initialTask.title,
       notes_encrypted: `${cleanDesc} [COLOR:${taskColor}]`,
@@ -218,10 +235,7 @@ export const useTaskMutations = ({
       color: taskColor,
       estimate_timer: estimateTimer,
       real_timer: realTimer,
-      deadline:
-        state.deadline instanceof Date
-          ? state.deadline.toISOString()
-          : state.deadline || initialTask.deadline || '',
+      deadline: deadlineISO,
       priority_level: priorityLevel,
       tags: state.tags || initialTask.tags,
       links: deduplicateLinks(state.links || initialTask.links || []).map(
@@ -233,6 +247,8 @@ export const useTaskMutations = ({
       google_event_id:
         (state as { google_event_id?: string }).google_event_id ||
         initialTask.google_event_id,
+      estimated_start_date: estimatedStartISO,
+      estimated_end_date: estimatedEndISO,
     };
 
     try {

@@ -18,12 +18,14 @@ interface TaskWorkspacesProps {
   }[];
   onNavigate: (id: string) => void;
   onRemove?: (id: string) => void;
+  isReadOnly?: boolean;
 }
 
 export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({
   workspaces,
   onNavigate,
   onRemove,
+  isReadOnly,
 }) => {
   const theme = useTheme();
 
@@ -106,7 +108,7 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({
               </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              {onRemove && (
+              {!isReadOnly && onRemove && (
                 <IconButton
                   size="small"
                   onClick={(e) => {

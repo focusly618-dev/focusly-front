@@ -11,13 +11,31 @@ export interface ActivitySectionProps {
   goldenWindowValue: string;
   heatmap: number[];
   heatmapLabels?: string[];
+  filter?: string;
 }
 
 export const BottomSection = ({
   goldenWindowValue,
   heatmap,
   heatmapLabels,
+  filter = 'Weekly',
 }: ActivitySectionProps) => {
+  const safeHeatmap = heatmap || [];
+  const defaultLength =
+    filter === 'Daily'
+      ? 24
+      : filter === 'Weekly'
+        ? 7
+        : filter === 'Monthly'
+          ? 30
+          : 7;
+  const displayHeatmap =
+    safeHeatmap.length > 0
+      ? safeHeatmap
+      : Array.from({ length: defaultLength }).map(() => 0);
+
+  const cols = displayHeatmap.length > 24 ? 14 : displayHeatmap.length || 7;
+
   return (
     <BottomRow>
       <ChartCard sx={{ height: 'auto', minHeight: '300px' }}>
@@ -97,19 +115,15 @@ export const BottomSection = ({
         </Box>
         <HeatmapGrid
           sx={{
-            gridTemplateColumns: `repeat(${heatmap.length > 24 ? 14 : heatmap.length || 7}, 1fr)`,
+            gridTemplateColumns: `repeat(${cols}, 1fr)`,
           }}
         >
-          {heatmap && heatmap.length > 0
-            ? heatmap.map((intensity: number, i: number) => (
-                <HeatmapCell key={i} intensity={intensity} />
-              ))
-            : Array.from({ length: 24 }).map((_, i) => (
-                <HeatmapCell key={i} intensity={0} />
-              ))}
+          {displayHeatmap.map((intensity: number, i: number) => (
+            <HeatmapCell key={i} intensity={intensity} />
+          ))}
         </HeatmapGrid>
         <Box display="flex" justifyContent="space-between" mt={1}>
-          {heatmapLabels?.map((label) => (
+          {(heatmapLabels || []).map((label) => (
             <Typography key={label} variant="caption" color="text.secondary">
               {label}
             </Typography>

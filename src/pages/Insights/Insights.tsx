@@ -8,9 +8,9 @@ import { TimeDistributionChart } from './components/TimeDistributionChart';
 import { BottomSection } from './components/BottomSection/BottomSection';
 
 export const Insights = () => {
-  const { stats, loading, filter, filters, setFilter } = useInsights();
+  const { stats, loading, hasData, filter, filters, setFilter } = useInsights();
 
-  if (loading) {
+  if (loading && !hasData) {
     return (
       <Box
         display="flex"
@@ -31,31 +31,43 @@ export const Insights = () => {
         onFilterChange={setFilter}
       />
 
-      <Box id="joyride-insights-stats">
-        <StatsCards
-          totalFocusHours={stats.totalFocusHours}
-          taskCompletion={stats.taskCompletion}
-          energyScore={stats.energyScore}
-          breakHours={stats.breakHours}
-          goldenWindow={stats.goldenWindow}
-        />
-      </Box>
-
-      <ChartsRow>
-        <Box id="joyride-insights-trends" sx={{ flex: 1 }}>
-          <ProductivityTrendsChart data={stats.productivityTrends} />
+      <Box
+        sx={{
+          opacity: loading ? 0.6 : 1,
+          transition: 'opacity 0.25s ease-in-out',
+          pointerEvents: loading ? 'none' : 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px',
+        }}
+      >
+        <Box id="joyride-insights-stats">
+          <StatsCards
+            totalFocusHours={stats.totalFocusHours}
+            taskCompletion={stats.taskCompletion}
+            energyScore={stats.energyScore}
+            breakHours={stats.breakHours}
+            goldenWindow={stats.goldenWindow}
+          />
         </Box>
-        <Box id="joyride-insights-distribution" sx={{ flex: 1 }}>
-          <TimeDistributionChart data={stats.timeDistribution} />
-        </Box>
-      </ChartsRow>
 
-      <Box id="joyride-insights-heatmap">
-        <BottomSection
-          goldenWindowValue={stats.goldenWindow.value}
-          heatmap={stats.heatmap}
-          heatmapLabels={stats.heatmapLabels}
-        />
+        <ChartsRow>
+          <Box id="joyride-insights-trends" sx={{ flex: 1 }}>
+            <ProductivityTrendsChart data={stats.productivityTrends} />
+          </Box>
+          <Box id="joyride-insights-distribution" sx={{ flex: 1 }}>
+            <TimeDistributionChart data={stats.timeDistribution} />
+          </Box>
+        </ChartsRow>
+
+        <Box id="joyride-insights-heatmap">
+          <BottomSection
+            goldenWindowValue={stats.goldenWindow.value}
+            heatmap={stats.heatmap}
+            heatmapLabels={stats.heatmapLabels}
+            filter={filter}
+          />
+        </Box>
       </Box>
     </PageContainer>
   );
