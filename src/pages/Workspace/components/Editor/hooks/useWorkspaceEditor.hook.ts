@@ -28,7 +28,7 @@ export const useWorkspaceEditor = ({
 }: UseWorkspaceEditorProps) => {
   const currentTitle = watch('title');
   const currentContent = watch('content');
-  const currentFolder = watch('folder');
+  const currentFolder = watch('project');
 
   const [showPalette, setShowPalette] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');

@@ -45,6 +45,7 @@ export const TaskDetailModal = ({
 }: TaskDetailModalProps) => {
   const {
     isReadOnly,
+    isDirty,
     title,
     setTitle,
     description,
@@ -229,6 +230,7 @@ export const TaskDetailModal = ({
                 timeSlotDisplay={timeSlotDisplay}
                 handleTimerChange={handleTimerChange}
                 isReadOnly={isReadOnly}
+                createdAt={initialTask?.created_at}
               />
 
               <TaskResources
@@ -273,6 +275,7 @@ export const TaskDetailModal = ({
 
         <TaskActions
           initialTask={initialTask}
+          isDirty={isDirty}
           handleDelete={handleDelete}
           onClose={onClose}
           handleUpdate={handleUpdate}

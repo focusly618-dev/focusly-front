@@ -14,28 +14,28 @@ import {
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button, TextField } from '@/components/ui';
-import type { FolderTypes } from '../../../types/workspace.types';
+import type { ProjectTypes } from '../../../types/workspace.types';
 
-interface AllFoldersModalProps {
+interface AllProjectsModalProps {
   open: boolean;
   onClose: () => void;
-  folders: FolderTypes[];
-  onSelect: (folderId: string) => void;
+  projects: ProjectTypes[];
+  onSelect: (projectId: string) => void;
   selectedId: string | null;
 }
 
-export const AllFoldersModal = ({
+export const AllProjectsModal = ({
   open,
   onClose,
-  folders,
+  projects,
   onSelect,
   selectedId,
-}: AllFoldersModalProps) => {
+}: AllProjectsModalProps) => {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredFolders = folders.filter((f) =>
-    f.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredProjects = projects.filter((p) =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -88,7 +88,7 @@ export const AllFoldersModal = ({
         <Box sx={{ position: 'relative', my: 3 }}>
           <TextField
             fullWidth
-            placeholder={`Search across ${folders.length} folders...`}
+            placeholder={`Search across ${projects.length} folders...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             slotProps={{
@@ -120,7 +120,6 @@ export const AllFoldersModal = ({
             maxHeight: '400px',
             overflowY: 'auto',
             pr: 1,
-            // Custom scrollbar
             '&::-webkit-scrollbar': { width: '6px' },
             '&::-webkit-scrollbar-thumb': {
               backgroundColor: theme.palette.divider,
@@ -128,7 +127,7 @@ export const AllFoldersModal = ({
             },
           }}
         >
-          {filteredFolders.length === 0 ? (
+          {filteredProjects.length === 0 ? (
             <Box
               sx={{
                 gridColumn: '1 / -1',
@@ -154,7 +153,7 @@ export const AllFoldersModal = ({
                 fontWeight={750}
                 sx={{ color: 'text.secondary', mb: 1 }}
               >
-                {folders.length === 0
+                {projects.length === 0
                   ? 'No folders added yet'
                   : 'No matching folders'}
               </Typography>
@@ -162,22 +161,22 @@ export const AllFoldersModal = ({
                 variant="body2"
                 sx={{ color: 'text.disabled', opacity: 0.7, maxWidth: 300 }}
               >
-                {folders.length === 0
-                  ? 'Create a custom folder in the library to start grouping your plans.'
+                {projects.length === 0
+                  ? 'Create a custom folder in the library or sidebar to start grouping your plans.'
                   : 'Try adjusting your search terms.'}
               </Typography>
             </Box>
           ) : (
             <AnimatePresence mode="popLayout">
-              {filteredFolders.map((folder) => (
+              {filteredProjects.map((project) => (
                 <Box
-                  key={folder.id}
+                  key={project.id}
                   component={motion.div}
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  onClick={() => onSelect(folder.id)}
+                  onClick={() => onSelect(project.id)}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -187,7 +186,7 @@ export const AllFoldersModal = ({
                       theme.palette.mode === 'dark'
                         ? 'rgba(255,255,255,0.015)'
                         : 'rgba(0,0,0,0.01)',
-                    border: `2px solid ${selectedId === folder.id ? '#00f5ff' : 'transparent'}`,
+                    border: `2px solid ${selectedId === project.id ? '#00f5ff' : 'transparent'}`,
                     cursor: 'pointer',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     position: 'relative',
@@ -197,11 +196,11 @@ export const AllFoldersModal = ({
                           ? 'rgba(255,255,255,0.04)'
                           : 'rgba(0,0,0,0.03)',
                       boxShadow:
-                        selectedId === folder.id
+                        selectedId === project.id
                           ? '0 0 20px rgba(0, 245, 255, 0.2)'
                           : 'none',
-                      borderLeft: `10px solid ${folder.color || theme.palette.primary.main}`,
-                      pl: '17px', // Compensate for the 3px border
+                      borderLeft: `10px solid ${project.color || theme.palette.primary.main}`,
+                      pl: '17px',
                     },
                   }}
                 >
@@ -210,7 +209,7 @@ export const AllFoldersModal = ({
                       width: 48,
                       height: 48,
                       borderRadius: '12px',
-                      bgcolor: `${folder.color || theme.palette.primary.main}1A`,
+                      bgcolor: `${project.color || theme.palette.primary.main}1A`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -219,7 +218,7 @@ export const AllFoldersModal = ({
                   >
                     <FolderIcon
                       sx={{
-                        color: folder.color || theme.palette.primary.main,
+                        color: project.color || theme.palette.primary.main,
                         fontSize: 24,
                       }}
                     />
@@ -231,15 +230,15 @@ export const AllFoldersModal = ({
                       noWrap
                       sx={{ maxWidth: '100%' }}
                     >
-                      {folder.name.length > 40
-                        ? `${folder.name.substring(0, 40)}...`
-                        : folder.name}
+                      {project.name.length > 40
+                        ? `${project.name.substring(0, 40)}...`
+                        : project.name}
                     </Typography>
                     <Typography
                       variant="caption"
                       sx={{ color: 'text.secondary', opacity: 0.7 }}
                     >
-                      {folder.workspaceCount || 0} Items
+                      {project.workspaceCount || 0} Items
                     </Typography>
                   </Box>
                   <Box
@@ -248,10 +247,10 @@ export const AllFoldersModal = ({
                       py: 0.5,
                       borderRadius: '12px',
                       bgcolor:
-                        selectedId === folder.id
+                        selectedId === project.id
                           ? 'rgba(0, 245, 255, 0.1)'
                           : 'transparent',
-                      border: `1px solid ${selectedId === folder.id ? '#00f5ff' : 'transparent'}`,
+                      border: `1px solid ${selectedId === project.id ? '#00f5ff' : 'transparent'}`,
                     }}
                   >
                     <Typography
@@ -259,13 +258,13 @@ export const AllFoldersModal = ({
                       fontWeight={800}
                       sx={{
                         color:
-                          selectedId === folder.id
+                          selectedId === project.id
                             ? '#00f5ff'
                             : 'text.secondary',
                         fontSize: '10px',
                       }}
                     >
-                      {selectedId === folder.id ? 'VISIBLE' : 'SELECT'}
+                      {selectedId === project.id ? 'VISIBLE' : 'SELECT'}
                     </Typography>
                   </Box>
                 </Box>

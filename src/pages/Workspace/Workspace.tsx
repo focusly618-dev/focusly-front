@@ -6,7 +6,7 @@ import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import type { Step } from 'react-joyride';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_WORKSPACE_BY_ID, GET_WORKSPACES } from './workspaces.graphql';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { WorkspaceProps, WorkspaceTypes } from './types/workspace.types';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
@@ -39,6 +39,9 @@ export const Workspace = ({
     return localStorage.getItem('onboarding_workspace_completed') !== 'true';
   });
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedProjectId = searchParams.get('projectId');
+
   const onboardingSteps: Step[] = [
     {
       target: 'body',
@@ -56,12 +59,7 @@ export const Workspace = ({
     },
     {
       target: '#joyride-workspace-search',
-      content: 'Quickly find your notes or folders using the search bar.',
-    },
-    {
-      target: '#joyride-workspace-folders',
-      content:
-        'Organize your notes into custom folders to keep everything structured.',
+      content: 'Quickly find your notes or projects using the search bar.',
     },
     {
       target: '#joyride-workspace-create-note',
@@ -74,6 +72,7 @@ export const Workspace = ({
     localStorage.setItem('onboarding_workspace_completed', 'true');
   };
 
+  // Queries
   const { data: workspacesData, loading: workspacesLoading } = useQuery(
     GET_WORKSPACES,
     {
@@ -82,42 +81,47 @@ export const Workspace = ({
   );
 
   const [getWorkspaceById] = useLazyQuery(GET_WORKSPACE_BY_ID);
-  const [searchParams, setSearchParams] = useSearchParams();
   const workspaceIdParam = searchParams.get('workspaceId');
 
   const hasWorkspaces = (workspacesData?.workspaces?.length ?? 0) > 0;
 
   useEffect(() => {
     const loadWorkspaceFromUrl = async () => {
-      if (workspaceIdParam && watch('id') !== workspaceIdParam) {
-        try {
-          const { data } = await getWorkspaceById({
-            variables: { id: workspaceIdParam },
-          });
-          const workspace = data?.workspace;
-          if (workspace) {
-            setValue('id', workspace.id);
-            setValue('title', workspace.title);
-            setValue('content', workspace.content);
-            setValue('taskId', workspace.taskId || null);
-            setValue('folderId', workspace.folderId);
-            setValue('folder', workspace.folder);
-            setValue('emoji', workspace.emoji);
-            setValue('background_color', workspace.background_color);
-            setValue('card_show_background', workspace.card_show_background);
-            setValue('saveStatus', true);
-            if (workspace.task) {
-              handleSelectTask(workspace.task);
-            } else {
-              handleSelectTask(null);
+      if (workspaceIdParam) {
+        if (watch('id') !== workspaceIdParam) {
+          try {
+            const { data } = await getWorkspaceById({
+              variables: { id: workspaceIdParam },
+            });
+            const workspace = data?.workspace;
+            if (workspace) {
+              setValue('id', workspace.id);
+              setValue('title', workspace.title);
+              setValue('content', workspace.content);
+              setValue('taskId', workspace.taskId || null);
+              setValue('projectId', workspace.projectId);
+              setValue('project', workspace.project);
+              setValue('emoji', workspace.emoji);
+              setValue('background_color', workspace.background_color);
+              setValue('card_show_background', workspace.card_show_background);
+              setValue('saveStatus', true);
+              if (workspace.task) {
+                handleSelectTask(workspace.task);
+              } else {
+                handleSelectTask(null);
+              }
+              onEditorChange(true);
             }
-            onEditorChange(true);
+          } catch (error) {
+            console.error('Error loading workspace from URL', error);
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('workspaceId');
+            setSearchParams(newParams);
           }
-        } catch (error) {
-          console.error('Error loading workspace from URL', error);
-          const newParams = new URLSearchParams(searchParams);
-          newParams.delete('workspaceId');
-          setSearchParams(newParams);
+        }
+      } else {
+        if (isEditorOpen) {
+          onEditorChange(false);
         }
       }
     };
@@ -143,8 +147,8 @@ export const Workspace = ({
     setValue('title', workspace.title);
     setValue('content', workspace.content);
     setValue('taskId', workspace.taskId || null);
-    setValue('folderId', workspace.folderId);
-    setValue('folder', workspace.folder);
+    setValue('projectId', workspace.projectId);
+    setValue('project', workspace.project);
     setValue('emoji', workspace.emoji);
     setValue('background_color', workspace.background_color);
     setValue('card_show_background', workspace.card_show_background);
@@ -163,6 +167,7 @@ export const Workspace = ({
       content: '[]',
       id: undefined,
       taskId: undefined,
+      projectId: selectedProjectId || undefined,
       emoji: undefined,
       background_color: undefined,
       card_show_background: false,
@@ -171,6 +176,42 @@ export const Workspace = ({
     handleSelectTask(null);
     onEditorChange(true);
   };
+
+  const handleCreateWorkspaceUnderProject = useCallback(
+    (projectId: string | null): void => {
+      reset({
+        title: 'Untitled Strategic Plan',
+        content: '[]',
+        id: undefined,
+        taskId: undefined,
+        projectId: projectId || undefined,
+        emoji: undefined,
+        background_color: undefined,
+        card_show_background: false,
+        saveStatus: true,
+      });
+      handleSelectTask(null);
+      onEditorChange(true);
+    },
+    [reset, handleSelectTask, onEditorChange],
+  );
+
+  const actionParam = searchParams.get('action');
+  useEffect(() => {
+    if (actionParam === 'createWorkspace') {
+      const pId = searchParams.get('projectId');
+      handleCreateWorkspaceUnderProject(pId);
+
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('action');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [
+    actionParam,
+    searchParams,
+    setSearchParams,
+    handleCreateWorkspaceUnderProject,
+  ]);
 
   const getCustomSlashMenuItems = (editor: BlockNoteEditor) => {
     const defaultItems = getDefaultReactSlashMenuItems(editor);
@@ -195,7 +236,7 @@ export const Workspace = ({
       title: w.title,
       icon: (
         <FolderIcon
-          sx={{ fontSize: 18, color: w.folder?.color || 'primary.main' }}
+          sx={{ fontSize: 18, color: w.project?.color || 'primary.main' }}
         />
       ),
       onItemClick: () => {
@@ -220,86 +261,95 @@ export const Workspace = ({
     setValue('taskId', null);
   };
 
-  if (isEditorOpen) {
-    return (
-      <>
-        <div
-          id="joyride-workspace-editor"
-          style={{ height: '100%', width: '100%' }}
-        >
-          <WorkspaceEditor
-            key={watch('id') || 'new-workspace'}
-            onBack={() => {
-              onEditorChange(false);
-              const newParams = new URLSearchParams(searchParams);
-              newParams.delete('workspaceId');
-              setSearchParams(newParams);
-            }}
-            register={register}
-            setValue={setValue}
-            watch={watch}
-            getValues={getValues}
-            selectTask={selectTask}
-            handleSelectTask={handleSelectTask}
-            handleUpdateTask={handleUpdateTask}
-            tasksData={tasksData}
-            onStartFocus={onStartFocus}
-            onOpenTaskDetails={onOpenTaskDetails}
-            isRightSidebarOpen={isSidebarOpen}
-            setIsRightSidebarOpen={onSidebarChange}
-            workspaces={workspacesData?.workspaces}
-            getCustomSlashMenuItems={getCustomSlashMenuItems}
-            getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
-            activeFocusTaskId={activeFocusTaskId}
-            onUnlinkTask={handleUnlinkTask}
-          />
-        </div>
-        <OnboardingWrapper
-          steps={onboardingSteps}
-          run={runOnboarding}
-          onFinish={handleFinishOnboarding}
-        />
-      </>
-    );
-  }
-
   if (workspacesLoading) return null;
 
-  if (hasWorkspaces) {
-    return (
-      <>
-        <div
-          id="joyride-workspace-library"
-          style={{ height: '100%', width: '100%' }}
-        >
-          <WorkspaceLibrary
-            onCreate={handleCreateNew}
-            onSelect={handleSelectWorkspace}
-          />
-        </div>
-        <OnboardingWrapper
-          steps={onboardingSteps}
-          run={runOnboarding}
-          onFinish={handleFinishOnboarding}
-        />
-      </>
-    );
-  }
-
   return (
-    <>
-      <div
-        id="joyride-workspace-empty"
-        style={{ height: '100%', width: '100%' }}
+    <Box
+      sx={{
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Main Workspace Workspace Content Area */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          height: '100%',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
-        <WorkspaceEmptyState onCreate={handleCreateNew} />
-      </div>
+        {isEditorOpen ? (
+          <div
+            id="joyride-workspace-editor"
+            style={{ height: '100%', width: '100%' }}
+          >
+            <WorkspaceEditor
+              key={watch('id') || 'new-workspace'}
+              onBack={() => {
+                onEditorChange(false);
+                const newParams = new URLSearchParams(searchParams);
+                newParams.delete('workspaceId');
+                setSearchParams(newParams);
+              }}
+              register={register}
+              setValue={setValue}
+              watch={watch}
+              getValues={getValues}
+              selectTask={selectTask}
+              handleSelectTask={handleSelectTask}
+              handleUpdateTask={handleUpdateTask}
+              tasksData={tasksData}
+              onStartFocus={onStartFocus}
+              onOpenTaskDetails={onOpenTaskDetails}
+              isRightSidebarOpen={isSidebarOpen}
+              setIsRightSidebarOpen={onSidebarChange}
+              workspaces={workspacesData?.workspaces}
+              getCustomSlashMenuItems={getCustomSlashMenuItems}
+              getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
+              activeFocusTaskId={activeFocusTaskId}
+              onUnlinkTask={handleUnlinkTask}
+            />
+          </div>
+        ) : hasWorkspaces ? (
+          <div
+            id="joyride-workspace-library"
+            style={{ height: '100%', width: '100%' }}
+          >
+            <WorkspaceLibrary
+              onCreate={handleCreateNew}
+              onSelect={handleSelectWorkspace}
+              selectedProjectId={selectedProjectId}
+              onSelectProject={(id) => {
+                const newParams = new URLSearchParams(searchParams);
+                if (id) {
+                  newParams.set('projectId', id);
+                } else {
+                  newParams.delete('projectId');
+                }
+                setSearchParams(newParams);
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            id="joyride-workspace-empty"
+            style={{ height: '100%', width: '100%' }}
+          >
+            <WorkspaceEmptyState onCreate={handleCreateNew} />
+          </div>
+        )}
+      </Box>
+
       <OnboardingWrapper
         steps={onboardingSteps}
         run={runOnboarding}
         onFinish={handleFinishOnboarding}
       />
-    </>
+    </Box>
   );
 };
 

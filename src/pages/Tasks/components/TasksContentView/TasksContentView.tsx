@@ -439,7 +439,6 @@ export const TasksContentView = ({
               <TableHeaderCell sx={{ justifyContent: 'center' }}>
                 <Checkbox disabled size="small" sx={{ padding: 0 }} />
               </TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Task Name</TableHeaderCell>
               <TableHeaderCell>Priority</TableHeaderCell>
               <TableHeaderCell>Due Date</TableHeaderCell>
@@ -585,7 +584,6 @@ export const TasksContentView = ({
                 }}
               />
             </TableHeaderCell>
-            <TableHeaderCell>Status</TableHeaderCell>
             <TableHeaderCell>Task Name</TableHeaderCell>
             <TableHeaderCell>Priority</TableHeaderCell>
             <TableHeaderCell>Due Date</TableHeaderCell>

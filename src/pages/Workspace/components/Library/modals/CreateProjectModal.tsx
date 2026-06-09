@@ -1,36 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Box, Typography, Tooltip } from '@mui/material';
-import { EditNote as EditNoteIcon } from '@mui/icons-material';
+import { CreateNewFolder as CreateNewFolderIcon } from '@mui/icons-material';
 import { BaseModal } from '@/components/modals';
 import { Button, TextField } from '@/components/ui';
-import type { FolderTypes } from '../../../types/workspace.types';
 
-interface UpdateFolderModalProps {
+interface CreateProjectModalProps {
   open: boolean;
   onClose: () => void;
-  onUpdate: (id: string, name: string, color: string) => void;
-  folder: FolderTypes | null;
+  onCreate: (name: string, color: string) => void;
 }
 
-export const UpdateFolderModal = ({
+export const CreateProjectModal = ({
   open,
   onClose,
-  onUpdate,
-  folder,
-}: UpdateFolderModalProps) => {
-  const [name, setName] = useState(folder?.name || '');
-  const [selectedColor, setSelectedColor] = useState(
-    folder?.color || '#3b82f6',
-  );
-
-  useEffect(() => {
-    if (folder) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setName(folder.name);
-
-      setSelectedColor(folder.color || '#3b82f6');
-    }
-  }, [folder, open]);
+  onCreate,
+}: CreateProjectModalProps) => {
+  const [name, setName] = useState('');
+  const [selectedColor, setSelectedColor] = useState('#3b82f6'); // Default blue
 
   const colors = [
     { name: 'Black', value: '#18181b' },
@@ -57,9 +43,10 @@ export const UpdateFolderModal = ({
     { name: 'Sky', value: '#0ea5e9' },
   ];
 
-  const handleUpdate = () => {
-    if (name.trim() && folder) {
-      onUpdate(folder.id, name.trim(), selectedColor);
+  const handleCreate = () => {
+    if (name.trim()) {
+      onCreate(name.trim(), selectedColor);
+      setName('');
       onClose();
     }
   };
@@ -70,7 +57,7 @@ export const UpdateFolderModal = ({
         Cancel
       </Button>
       <Button
-        onClick={handleUpdate}
+        onClick={handleCreate}
         variant="contained"
         disabled={!name.trim()}
         sx={{
@@ -83,7 +70,7 @@ export const UpdateFolderModal = ({
           boxShadow: `0 8px 16px ${selectedColor}33`,
         }}
       >
-        Update Folder
+        Create Folder
       </Button>
     </>
   );
@@ -92,9 +79,9 @@ export const UpdateFolderModal = ({
     <BaseModal
       open={open}
       onClose={onClose}
-      title="Update Folder"
-      subtitle="Modify the folder name and color to better organize your workspaces."
-      icon={<EditNoteIcon sx={{ fontSize: 28 }} />}
+      title="Create New Folder"
+      subtitle="Choose a name and color to keep your workspaces organized and beautiful."
+      icon={<CreateNewFolderIcon sx={{ fontSize: 28 }} />}
       iconBgColor={selectedColor}
       actions={modalActions}
     >
@@ -118,7 +105,7 @@ export const UpdateFolderModal = ({
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              handleUpdate();
+              handleCreate();
             }
           }}
           sx={{ mb: 4 }}

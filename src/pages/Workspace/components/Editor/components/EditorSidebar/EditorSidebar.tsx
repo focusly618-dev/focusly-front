@@ -377,6 +377,37 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                     </Typography>
                   </PropertyValue>
                 </PropertyCard>
+
+                {selectTask?.created_at && (
+                  <PropertyCard>
+                    <PropertyLabel>CREATED ON</PropertyLabel>
+                    <PropertyValue>
+                      <PlannedIcon
+                        sx={{
+                          fontSize: 14,
+                          color: theme.palette.text.secondary,
+                        }}
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: '13px',
+                          color: 'text.primary',
+                        }}
+                      >
+                        {new Date(selectTask.created_at).toLocaleDateString(
+                          undefined,
+                          {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          },
+                        )}
+                      </Typography>
+                    </PropertyValue>
+                  </PropertyCard>
+                )}
               </PropertyGrid>
 
               {selectTask.links && selectTask.links.length > 0 && (

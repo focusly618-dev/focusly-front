@@ -1,6 +1,6 @@
 import type {
   WorkspaceTypes,
-  FolderTypes,
+  ProjectTypes,
 } from '../../../types/workspace.types';
 
 export interface LibraryState {
@@ -11,7 +11,7 @@ export interface LibraryState {
   anchorEl: HTMLElement | null;
   folderAnchorEl: HTMLElement | null;
   selectedWorkspace: WorkspaceTypes | null;
-  selectedFolderToManage: FolderTypes | null;
+  selectedFolderToManage: ProjectTypes | null;
   isUpdateFolderModalOpen: boolean;
   isAllFoldersModalOpen: boolean;
   showPaletteInMenu: boolean;
@@ -33,7 +33,7 @@ export interface LibraryActions {
   handleRemoveBackground: () => void;
   handleFolderMenuOpen: (
     event: React.MouseEvent<HTMLElement>,
-    folder: FolderTypes,
+    folder: ProjectTypes,
   ) => void;
   handleFolderMenuClose: () => void;
   handleMoveToFolder: (
@@ -49,13 +49,13 @@ export interface LibraryActions {
   handleDeleteFolder: () => Promise<void>;
   handleUnlinkTask: (workspace: WorkspaceTypes) => Promise<void>;
   handleClearSearch: () => void;
-  setSelectedFolderToManage: (folder: FolderTypes | null) => void;
+  setSelectedFolderToManage: (folder: ProjectTypes | null) => void;
   setShowPaletteInMenu: (show: boolean) => void;
 }
 
 export interface LibraryData {
   workspaces: WorkspaceTypes[];
-  folders: FolderTypes[];
+  folders: ProjectTypes[];
   allWorkspaces: WorkspaceTypes[];
   loading: boolean;
   foldersLoading: boolean;

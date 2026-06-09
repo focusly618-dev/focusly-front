@@ -63,16 +63,16 @@ export const Collaborators = ({
         onClick={() => setIsCollaboratorsExpanded(!isCollaboratorsExpanded)}
       >
         <Box display="flex" alignItems="center" gap={1}>
-          <GroupsIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+          <GroupsIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{
               color: 'text.secondary',
-              fontWeight: 700,
-              letterSpacing: '0.5px',
+              fontSize: '13px',
+              fontWeight: 500,
             }}
           >
-            COLLABORATORS
+            Collaborators
           </Typography>
           {!isCollaboratorsExpanded && collaborators.length > 0 && (
             <Box sx={collaboratorCountSx}>{collaborators.length}</Box>
@@ -213,7 +213,6 @@ export const Collaborators = ({
           </Box>
         )}
       </AnimatePresence>
-      <Box sx={{ mt: 3, borderBottom: '1px solid', borderColor: 'divider' }} />
     </Box>
   );
 };

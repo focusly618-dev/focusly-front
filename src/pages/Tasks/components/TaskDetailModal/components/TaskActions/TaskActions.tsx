@@ -12,13 +12,13 @@ import type { TaskActionsProps } from './TaskActions.types';
 
 export const TaskActions = ({
   initialTask,
-  onClose,
   handleUpdate,
   handleSave,
   loadingSave,
   isAIScheduleEnabled,
   setIsAIScheduleEnabled,
   isReadOnly,
+  isDirty,
 }: TaskActionsProps) => {
   return (
     <DialogActions sx={dialogActionsSx}>
@@ -29,7 +29,14 @@ export const TaskActions = ({
               border: 'none',
               backgroundColor: 'transparent',
               p: 0,
-              gap: 0.5,
+              gap: 1,
+              transform: 'none !important',
+              boxShadow: 'none !important',
+              '&:hover': {
+                borderColor: 'transparent',
+                boxShadow: 'none',
+                transform: 'none',
+              },
             }}
           >
             <AutoAwesomeIcon
@@ -58,19 +65,8 @@ export const TaskActions = ({
           </AISwitchContainer>
         )}
       </Box>
-      {isReadOnly ? (
-        <Button
-          onClick={onClose}
-          variant="outlined"
-          sx={{
-            textTransform: 'none',
-            borderRadius: '8px',
-            px: 3,
-            fontWeight: 600,
-          }}
-        >
-          Close
-        </Button>
+      {isReadOnly || (initialTask && !isDirty) ? (
+        <></>
       ) : (
         <Button
           onClick={initialTask ? handleUpdate : handleSave}

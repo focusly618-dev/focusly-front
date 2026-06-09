@@ -306,8 +306,89 @@ export const useTaskDetailModal = ({
         l.url.includes('hangouts'),
     );
 
+  const isDirty = useMemo(() => {
+    if (!initialTask) return false;
+
+    const isTitleChanged = title !== initialState.title;
+    const isDescChanged = description !== initialState.description;
+    const isPriorityChanged = priority !== initialState.priority;
+    const isStatusChanged = status !== initialState.status;
+    const isCategoryChanged = category !== initialState.category;
+
+    const initialDateVal =
+      initialState.currentDate instanceof Date
+        ? initialState.currentDate.getTime()
+        : initialState.currentDate
+          ? new Date(initialState.currentDate).getTime()
+          : 0;
+    const currentDateVal =
+      currentDate instanceof Date
+        ? currentDate.getTime()
+        : currentDate
+          ? new Date(currentDate).getTime()
+          : 0;
+    const isDateChanged = initialDateVal !== currentDateVal;
+
+    const isDurationChanged = duration !== initialState.duration;
+    const isRealTimeChanged = realTime !== initialState.realTime;
+    const isColorChanged = color !== initialState.color;
+
+    const initialTagsSorted = [...initialCollections.tags].sort();
+    const currentTagsSorted = [...tags].sort();
+    const isTagsChanged =
+      JSON.stringify(initialTagsSorted) !== JSON.stringify(currentTagsSorted);
+
+    const isLinksChanged =
+      links.length !== initialCollections.links.length ||
+      links.some(
+        (l, i) =>
+          l.title !== initialCollections.links[i]?.title ||
+          l.url !== initialCollections.links[i]?.url,
+      );
+
+    const isCollaboratorsChanged =
+      collaborators.length !== initialCollections.collaborators.length ||
+      collaborators.some(
+        (c, i) =>
+          c.email !== initialCollections.collaborators[i]?.email ||
+          c.name !== initialCollections.collaborators[i]?.name,
+      );
+
+    return (
+      isTitleChanged ||
+      isDescChanged ||
+      isPriorityChanged ||
+      isStatusChanged ||
+      isCategoryChanged ||
+      isDateChanged ||
+      isDurationChanged ||
+      isRealTimeChanged ||
+      isColorChanged ||
+      isTagsChanged ||
+      isLinksChanged ||
+      isCollaboratorsChanged
+    );
+  }, [
+    initialTask,
+    title,
+    initialState,
+    description,
+    priority,
+    status,
+    category,
+    currentDate,
+    duration,
+    realTime,
+    color,
+    tags,
+    initialCollections,
+    links,
+    collaborators,
+  ]);
+
   return {
     isReadOnly,
+    isDirty,
     title,
     setTitle,
     description,

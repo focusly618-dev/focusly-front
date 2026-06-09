@@ -39,6 +39,7 @@ export const useWorkspaceForm = () => {
                 emoji: data.emoji ?? undefined,
                 background_color: data.background_color ?? undefined,
                 card_show_background: data.card_show_background ?? undefined,
+                projectId: data.projectId ?? null,
               },
             },
           });
@@ -57,6 +58,7 @@ export const useWorkspaceForm = () => {
                 content: data.content,
                 taskId: data.taskId,
                 saveStatus: data.saveStatus ?? true,
+                projectId: data.projectId ?? null,
               },
             },
           });
@@ -90,6 +92,7 @@ export const useWorkspaceForm = () => {
       title: values.title,
       content: values.content,
       taskId: values.taskId ?? null,
+      projectId: values.projectId ?? null,
       emoji: values.emoji ?? null,
       background_color: values.background_color ?? null,
       card_show_background: values.card_show_background ?? false,
@@ -101,6 +104,7 @@ export const useWorkspaceForm = () => {
       title: values.title,
       content: values.content,
       taskId: values.taskId ?? null,
+      projectId: values.projectId ?? null,
       emoji: values.emoji ?? null,
       background_color: values.background_color ?? null,
       card_show_background: values.card_show_background ?? false,

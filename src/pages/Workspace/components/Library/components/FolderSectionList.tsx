@@ -7,17 +7,17 @@ import {
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'motion/react';
 import { FolderTabsContainer, FolderTabItem } from '../WorkspaceLibrary.styles';
-import type { FolderTypes } from '../../../types/workspace.types';
+import type { ProjectTypes } from '../../../types/workspace.types';
 
 interface FolderSectionListProps {
   selectedFolderId: string | null;
   onFolderSelect: (id: string | null) => void;
   allWorkspacesCount: number;
-  folders: FolderTypes[];
+  folders: ProjectTypes[];
   foldersLoading: boolean;
   onFolderMenuOpen: (
     event: React.MouseEvent<HTMLElement>,
-    folder: FolderTypes,
+    folder: ProjectTypes,
   ) => void;
   onAllFoldersOpen: () => void;
   onAddFolderOpen: () => void;
@@ -97,7 +97,7 @@ export const FolderSectionList = ({
                 />
               </Box>
             ))
-          : folders.map((folder: FolderTypes) => {
+          : folders.map((folder: ProjectTypes) => {
               const isActive = selectedFolderId === folder.id;
               const folderColor = folder.color || theme.palette.primary.main;
               return (

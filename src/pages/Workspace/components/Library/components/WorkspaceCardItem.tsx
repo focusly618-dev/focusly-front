@@ -85,8 +85,8 @@ export const WorkspaceCardItem = ({
     workspace.background_color !== 'none';
 
   const isDark = theme.palette.mode === 'dark';
-  const folderName = workspace.folder?.name || 'All Notes';
-  const baseColor = workspace.folder?.color || theme.palette.primary.main;
+  const folderName = workspace.project?.name || 'All Notes';
+  const baseColor = workspace.project?.color || theme.palette.primary.main;
   const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
   const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
 

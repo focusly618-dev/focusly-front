@@ -34,12 +34,16 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({
   return (
     <Box sx={{ px: 4, mb: 4 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-        <WorkspaceIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+        <WorkspaceIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
         <Typography
           variant="caption"
-          sx={{ color: 'text.secondary', fontWeight: 600, letterSpacing: 1 }}
+          sx={{
+            color: 'text.secondary',
+            fontSize: '13px',
+            fontWeight: 500,
+          }}
         >
-          LINKED {workspaces.length > 1 ? 'WORKSPACES' : 'WORKSPACE'}
+          {workspaces.length > 1 ? 'Linked workspaces' : 'Linked workspace'}
         </Typography>
       </Box>
 

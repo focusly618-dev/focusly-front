@@ -1,22 +1,27 @@
 import { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Tooltip,
-} from '@mui/material';
-import { CreateNewFolder as CreateNewFolderIcon } from '@mui/icons-material';
+import { Box, Typography, Tooltip } from '@mui/material';
+import { EditNote as EditNoteIcon } from '@mui/icons-material';
 import { BaseModal } from '@/components/modals';
 import { Button, TextField } from '@/components/ui';
+import type { ProjectTypes } from '../../../types/workspace.types';
 
-interface CreateFolderModalProps {
+interface UpdateProjectModalProps {
   open: boolean;
   onClose: () => void;
-  onCreate: (name: string, color: string) => void;
+  onUpdate: (id: string, name: string, color: string) => void;
+  project: ProjectTypes | null;
 }
 
-export const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModalProps) => {
-  const [name, setName] = useState('');
-  const [selectedColor, setSelectedColor] = useState('#3b82f6'); // Default blue
+export const UpdateProjectModal = ({
+  open,
+  onClose,
+  onUpdate,
+  project,
+}: UpdateProjectModalProps) => {
+  const [name, setName] = useState(project?.name || '');
+  const [selectedColor, setSelectedColor] = useState(
+    project?.color || '#3b82f6',
+  );
 
   const colors = [
     { name: 'Black', value: '#18181b' },
@@ -43,10 +48,9 @@ export const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModal
     { name: 'Sky', value: '#0ea5e9' },
   ];
 
-  const handleCreate = () => {
-    if (name.trim()) {
-      onCreate(name.trim(), selectedColor);
-      setName('');
+  const handleUpdate = () => {
+    if (name.trim() && project) {
+      onUpdate(project.id, name.trim(), selectedColor);
       onClose();
     }
   };
@@ -57,7 +61,7 @@ export const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModal
         Cancel
       </Button>
       <Button
-        onClick={handleCreate}
+        onClick={handleUpdate}
         variant="contained"
         disabled={!name.trim()}
         sx={{
@@ -70,7 +74,7 @@ export const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModal
           boxShadow: `0 8px 16px ${selectedColor}33`,
         }}
       >
-        Create Folder
+        Update Folder
       </Button>
     </>
   );
@@ -79,9 +83,9 @@ export const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModal
     <BaseModal
       open={open}
       onClose={onClose}
-      title="Create Folder"
-      subtitle="Choose a name and color to keep your workspace organized and beautiful."
-      icon={<CreateNewFolderIcon sx={{ fontSize: 28 }} />}
+      title="Edit Folder"
+      subtitle="Modify the folder name and color to better organize your workspaces."
+      icon={<EditNoteIcon sx={{ fontSize: 28 }} />}
       iconBgColor={selectedColor}
       actions={modalActions}
     >
@@ -105,7 +109,7 @@ export const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModal
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              handleCreate();
+              handleUpdate();
             }
           }}
           sx={{ mb: 4 }}
@@ -136,8 +140,12 @@ export const CreateFolderModal = ({ open, onClose, onCreate }: CreateFolderModal
                   bgcolor: color.value,
                   cursor: 'pointer',
                   border: '3px solid',
-                  borderColor: selectedColor === color.value ? 'white' : 'transparent',
-                  boxShadow: selectedColor === color.value ? `0 0 0 2px ${color.value}` : 'none',
+                  borderColor:
+                    selectedColor === color.value ? 'white' : 'transparent',
+                  boxShadow:
+                    selectedColor === color.value
+                      ? `0 0 0 2px ${color.value}`
+                      : 'none',
                   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
                     transform: 'scale(1.15)',

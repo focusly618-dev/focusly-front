@@ -68,9 +68,7 @@ export const SearchPalette = ({
             <CommandInput
               placeholder="Search tasks to link..."
               autoFocus
-              value={
-                showPalette && selectTask ? selectTask.title : searchTerm
-              }
+              value={showPalette && selectTask ? selectTask.title : searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               readOnly={!!selectTask}
             />
@@ -137,6 +135,26 @@ export const SearchPalette = ({
                         </StyledBadge>
                         {task.category && (
                           <StyledCategory>{task.category}</StyledCategory>
+                        )}
+                        {task.created_at && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: '11px',
+                              opacity: 0.8,
+                            }}
+                          >
+                            • Created{' '}
+                            {new Date(task.created_at).toLocaleDateString(
+                              undefined,
+                              {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              },
+                            )}
+                          </Typography>
                         )}
                       </Box>
                     </Box>

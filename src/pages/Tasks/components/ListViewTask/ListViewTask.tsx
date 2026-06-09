@@ -19,7 +19,6 @@ import {
   TaskRow,
   TaskTitle,
   StatusBadge,
-  StatusChip,
   FocusIconButton,
   AIBadge,
   AIText,
@@ -160,34 +159,6 @@ export const ListViewTask = ({
               },
             }}
           />
-        </Box>
-
-        {/* Cell 2: Status */}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <StatusChip
-            statusColor={statusColor}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!isReadOnly) {
-                setStatusAnchor(e.currentTarget);
-              }
-            }}
-            sx={{
-              pointerEvents: isReadOnly ? 'none' : 'auto',
-              cursor: isReadOnly ? 'default' : 'pointer',
-              opacity: isReadOnly ? 0.8 : 1,
-            }}
-          >
-            <Box
-              sx={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: statusColor,
-              }}
-            />
-            {task.status || 'Todo'}
-          </StatusChip>
         </Box>
 
         {/* Cell 3: Title */}

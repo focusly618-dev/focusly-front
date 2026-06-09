@@ -123,9 +123,7 @@ export const labelSx = {
 
 export const paperPropsSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'rgba(17, 24, 39, 0.85)'
-      : 'background.paper',
+    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.85)' : '#ffffff',
   backgroundImage: 'none',
   color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#e0e2e9' : '#000'),
   borderRadius: '16px',
@@ -171,9 +169,7 @@ export const dialogTitleSx = {
   padding: '16px 24px',
   color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'rgba(17, 24, 39, 0.4)'
-      : 'background.paper',
+    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.4)' : '#ffffff',
 };
 
 export const iconBoxSx = {
@@ -253,39 +249,44 @@ export const propertyValueSx = {
 
 export const titleInputPropsSx = {
   '& .MuiOutlinedInput-root': {
-    backgroundColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
-    borderRadius: '12px',
-    padding: '4px 8px',
-    fontSize: '1.5rem',
+    backgroundColor: 'transparent',
+    borderRadius: '0px',
+    padding: 0,
+    fontSize: '1.625rem',
     fontWeight: 700,
-    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
-    '& fieldset': { borderColor: 'transparent' },
-    '&:hover fieldset': {
-      borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a',
+    borderBottom: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? '1px solid rgba(255, 255, 255, 0.12)'
+        : '1px solid rgba(0, 0, 0, 0.08)',
+    transition: 'border-bottom-color 0.2s ease, border-bottom-width 0.1s ease',
+    '& fieldset': { display: 'none' },
+    '&:hover': {
+      borderBottom: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? '1px solid rgba(255, 255, 255, 0.25)'
+          : '1px solid rgba(0, 0, 0, 0.18)',
     },
     '&.Mui-focused': {
-      backgroundColor: (theme: Theme) =>
+      backgroundColor: 'transparent',
+      boxShadow: 'none',
+      borderBottom: (theme: Theme) =>
         theme.palette.mode === 'dark'
-          ? 'rgba(26, 31, 43, 0.9)'
-          : 'background.default',
-      boxShadow: (theme: Theme) =>
-        theme.palette.mode === 'dark'
-          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : 'none',
+          ? '2px solid #a78bfa'
+          : '2px solid #7c3aed',
+      paddingBottom: '0px',
     },
     '& input': {
       color: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#fff' : '#000',
-      padding: '8px 12px',
+        theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a',
+      padding: '8px 0px',
       '&::placeholder': {
-        color: 'text.secondary',
-        opacity: 0.5,
+        color: (theme: Theme) =>
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.35)'
+            : 'rgba(0, 0, 0, 0.35)',
+        opacity: 1,
       },
     },
   },
@@ -346,9 +347,7 @@ export const menuPaperPropsSx = {
 export const dialogActionsSx = {
   padding: '16px 24px',
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'rgba(17, 24, 39, 0.4)'
-      : 'background.paper',
+    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.4)' : '#ffffff',
   borderTop: '1px solid',
   borderColor: 'divider',
   display: 'flex',

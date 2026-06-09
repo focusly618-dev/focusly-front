@@ -94,16 +94,16 @@ export const TaskResources = ({
         onClick={() => setIsLinksExpanded(!isLinksExpanded)}
       >
         <Box display="flex" alignItems="center" gap={1}>
-          <LinkIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+          <LinkIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{
               color: 'text.secondary',
-              fontWeight: 700,
-              letterSpacing: '0.5px',
+              fontSize: '13px',
+              fontWeight: 500,
             }}
           >
-            LINK AND RESOURCE
+            Links and resources
           </Typography>
           {!isLinksExpanded && links.length > 0 && (
             <Box sx={resourceCountSx}>{links.length}</Box>
@@ -373,7 +373,6 @@ export const TaskResources = ({
           </Box>
         )}
       </AnimatePresence>
-      <Box sx={{ mt: 1, borderBottom: '1px solid', borderColor: 'divider' }} />
     </Box>
   );
 };

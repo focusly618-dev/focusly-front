@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  useTheme,
-} from '@mui/material';
+import { Box, Typography, Button, useTheme } from '@mui/material';
 import {
   FlashOn as FlashOnIcon,
   AccessTime as AccessTimeIcon,
@@ -241,6 +236,21 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
             {task.estimate_timer ? formatDuration(task.estimate_timer) : '0h'}
           </PropertyValue>
         </PropertyCard>
+        {task.created_at && (
+          <PropertyCard sx={{ bgcolor: theme.palette.background.default }}>
+            <PropertyLabel>CREATED ON</PropertyLabel>
+            <PropertyValue>
+              <AccessTimeIcon
+                sx={{ fontSize: 12, color: theme.palette.text.secondary }}
+              />
+              {new Date(task.created_at).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </PropertyValue>
+          </PropertyCard>
+        )}
       </PropertyGrid>
 
       {task.links && task.links.length > 0 && (
