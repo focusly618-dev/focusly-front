@@ -133,8 +133,10 @@ export const useHome = () => {
     setTempTask(null);
   };
 
-  const changeStatusTab = (active: TaskBar) => {
-    setSearchParams({ tab: active });
+  const changeStatusTab = (active: TaskBar, extraParams?: URLSearchParams) => {
+    const params = extraParams || new URLSearchParams();
+    params.set('tab', active);
+    setSearchParams(params);
     if (active !== TaskBar.Workspace) {
       setIsWorkspaceEditorOpen(false);
     }
@@ -199,8 +201,7 @@ export const useHome = () => {
       }
 
       try {
-        const isGoogleTask =
-          (taskDetailsTask as Task).task_type === 'GoogleTask';
+        const isGoogleTask = (taskDetailsTask as Task).source === 'google';
 
         if (!isGoogleTask) {
           // Point 2: Platform Task — Delete from BOTH Google (if synced) and Platform

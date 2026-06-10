@@ -99,7 +99,8 @@ interface TaskPropertiesProps {
     setAnchor: (el: HTMLDivElement | null) => void,
     target: HTMLDivElement,
   ) => void;
-  isReadOnly?: boolean;
+  isOwner?: boolean;
+  createdAt?: string;
 }
 
 export const TaskProperties = ({
@@ -128,7 +129,8 @@ export const TaskProperties = ({
   setRealTime,
   timeSlotDisplay,
   handleTimerChange,
-  isReadOnly,
+  isOwner,
+  createdAt,
 }: TaskPropertiesProps) => {
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(
@@ -149,30 +151,10 @@ export const TaskProperties = ({
     null,
   );
 
-  const getStatusColor = (s: string) => {
-    if (s === 'Done') return '#22c55e';
-    if (s === 'On Hold') return '#ef4444';
-    if (s === 'Pending') return '#f59e0b';
-    if (s === 'Planning') return '#3b82f6';
-    if (s === 'Scheduled') return '#8b5cf6';
-    if (s === 'Review') return '#06b6d4';
-    if (s === 'Archived') return '#4b5563';
-    return '#6b7280';
-  };
-
   const getPriorityColor = (p: string) => {
     if (p === 'High') return '#ef4444';
     if (p === 'Med') return '#f59e0b';
     if (p === 'Low') return '#22c55e';
-    return '#6b7280';
-  };
-
-  const getCategoryColor = (c: string) => {
-    if (c === 'Deep Work' || c === 'Research') return '#8b5cf6';
-    if (c === 'Meeting' || c === 'Planning') return '#3b82f6';
-    if (c === 'Design' || c === 'Learning') return '#f59e0b';
-    if (c === 'Development') return '#2563eb';
-    if (c === 'Marketing') return '#ef4444';
     return '#6b7280';
   };
 
@@ -187,29 +169,27 @@ export const TaskProperties = ({
                 {status === 'Todo' && <TodoIcon sx={{ fontSize: 16 }} />}
                 {status === 'Planning' && <PlannedIcon sx={{ fontSize: 16 }} />}
                 {status === 'Scheduled' && (
-                  <PlannedIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />
+                  <PlannedIcon sx={{ fontSize: 16 }} />
                 )}
                 {status === 'Pending' && (
                   <AccessTimeIcon sx={{ fontSize: 16 }} />
                 )}
                 {status === 'On Hold' && <OnHoldIcon sx={{ fontSize: 16 }} />}
                 {status === 'Review' && (
-                  <VisibilityIcon sx={{ fontSize: 16, color: '#06b6d4' }} />
+                  <VisibilityIcon sx={{ fontSize: 16 }} />
                 )}
                 {status === 'Done' && (
                   <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
                 )}
                 {status === 'Backlog' && <HistoryIcon sx={{ fontSize: 16 }} />}
-                {status === 'Archived' && (
-                  <HistoryIcon sx={{ fontSize: 16, color: '#4b5563' }} />
-                )}
+                {status === 'Archived' && <HistoryIcon sx={{ fontSize: 16 }} />}
               </>
             }
             label={status}
             onClick={(e) => setStatusAnchor(e.currentTarget)}
             sx={{
-              ...metadataChipSx(getStatusColor(status)),
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              ...metadataChipSx(false),
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           />
         </Box>
@@ -217,16 +197,12 @@ export const TaskProperties = ({
         {/* Priority */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Chip
-            icon={
-              <FlagIcon
-                sx={{ fontSize: 16, color: getPriorityColor(priority) }}
-              />
-            }
+            icon={<FlagIcon sx={{ fontSize: 16 }} />}
             label={priority === 'No priority' ? 'No priority' : priority}
             onClick={(e) => setPriorityAnchor(e.currentTarget)}
             sx={{
-              ...metadataChipSx(getPriorityColor(priority)),
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              ...metadataChipSx(priority === 'High'),
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           />
         </Box>
@@ -270,8 +246,8 @@ export const TaskProperties = ({
             label={category || 'General'}
             onClick={(e) => setCategoryAnchor(e.currentTarget)}
             sx={{
-              ...metadataChipSx(getCategoryColor(category)),
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              ...metadataChipSx(false),
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           />
         </Box>
@@ -282,7 +258,7 @@ export const TaskProperties = ({
             onClick={(e) => setColorAnchor(e.currentTarget)}
             sx={{
               ...colorCircleSx(color),
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           />
         </Box>
@@ -291,7 +267,7 @@ export const TaskProperties = ({
       {/* Date Property */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <PlannedIcon sx={{ fontSize: 18 }} />
+          <PlannedIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -300,22 +276,25 @@ export const TaskProperties = ({
           </Typography>
         </Box>
         <Box sx={{ ...propertyValueSx, position: 'relative' }}>
-          <Chip
-            label={currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
-            onClick={() => setDatePickerOpen(true)}
-            variant="outlined"
+          <Box
+            onClick={() => isOwner && setDatePickerOpen(true)}
             sx={{
-              borderRadius: '8px',
-              height: '32px',
+              cursor: !isOwner ? 'default' : 'pointer',
               fontSize: '14px',
               fontWeight: 500,
-              cursor: isReadOnly ? 'default' : 'pointer',
+              color: 'text.primary',
+              py: 0.5,
+              px: 1,
+              borderRadius: '4px',
+              transition: 'background-color 0.2s',
               '&:hover': {
-                bgcolor: isReadOnly ? 'transparent' : 'action.hover',
+                bgcolor: !isOwner ? 'transparent' : 'action.hover',
               },
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
-          />
+          >
+            {currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
+          </Box>
           <DatePicker
             open={datePickerOpen}
             onClose={() => setDatePickerOpen(false)}
@@ -351,7 +330,7 @@ export const TaskProperties = ({
       {/* Time Property */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <AccessTimeIcon sx={{ fontSize: 18 }} />
+          <AccessTimeIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -359,23 +338,32 @@ export const TaskProperties = ({
             Time
           </Typography>
         </Box>
-        <Box sx={{ ...propertyValueSx, position: 'relative' }}>
-          <Chip
-            label={currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
-            onClick={() => setTimePickerOpen(true)}
-            variant="outlined"
+        <Box
+          sx={{
+            ...propertyValueSx,
+            position: 'relative',
+            alignItems: 'center',
+          }}
+        >
+          <Box
+            onClick={() => isOwner && setTimePickerOpen(true)}
             sx={{
-              borderRadius: '8px',
-              height: '32px',
+              cursor: !isOwner ? 'default' : 'pointer',
               fontSize: '14px',
               fontWeight: 500,
-              cursor: isReadOnly ? 'default' : 'pointer',
+              color: 'text.primary',
+              py: 0.5,
+              px: 1,
+              borderRadius: '4px',
+              transition: 'background-color 0.2s',
               '&:hover': {
-                bgcolor: isReadOnly ? 'transparent' : 'action.hover',
+                bgcolor: !isOwner ? 'transparent' : 'action.hover',
               },
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
-          />
+          >
+            {currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
+          </Box>
           <TimePicker
             open={timePickerOpen}
             onClose={() => setTimePickerOpen(false)}
@@ -417,10 +405,51 @@ export const TaskProperties = ({
         </Box>
       </Box>
 
+      {/* Created At Property */}
+      {createdAt && (
+        <Box sx={propertyRowSx}>
+          <Box sx={propertyLabelSx}>
+            <PlannedIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '14px', fontWeight: 500 }}
+            >
+              Created on
+            </Typography>
+          </Box>
+          <Box sx={propertyValueSx}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: '14px',
+                fontWeight: 500,
+                color: 'text.secondary',
+                py: 0.5,
+                px: 1,
+              }}
+            >
+              {new Date(createdAt).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Typography>
+          </Box>
+        </Box>
+      )}
+
       {/* Tags Property */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <DescriptionIcon sx={{ fontSize: 18, transform: 'rotate(180deg)' }} />
+          <DescriptionIcon
+            sx={{
+              fontSize: 16,
+              color: 'text.disabled',
+              transform: 'rotate(180deg)',
+            }}
+          />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -457,7 +486,7 @@ export const TaskProperties = ({
                   <Chip
                     label={tag}
                     onDelete={
-                      isReadOnly
+                      !isOwner
                         ? undefined
                         : () => setTags(tags.filter((t) => t !== tag))
                     }
@@ -481,7 +510,7 @@ export const TaskProperties = ({
                 </Box>
               );
             })}
-            {!isReadOnly &&
+            {isOwner &&
               (isAddingTag ? (
                 <Box
                   key="add-tag-input"
@@ -536,7 +565,7 @@ export const TaskProperties = ({
       {/* Time Tracking Section */}
       <Box sx={{ ...propertyRowSx, alignItems: 'center' }}>
         <Box sx={propertyLabelSx}>
-          <AccessTimeIcon sx={{ fontSize: 18 }} />
+          <AccessTimeIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -544,145 +573,143 @@ export const TaskProperties = ({
             Time Tracking
           </Typography>
         </Box>
-        <Box sx={{ ...propertyValueSx, gap: 6 }}>
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-                <TimerIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'text.secondary',
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  ESTIMATED
-                </Typography>
-              </Box>
-              <TextField
-                variant="standard"
-                value={duration}
-                disabled={isReadOnly}
-                onChange={(e) =>
-                  handleTimerChange(
-                    e.target.value,
-                    setDuration,
-                    setDurationSuggestions,
-                    setDurationAnchor,
-                    e.currentTarget.parentElement as HTMLDivElement,
-                  )
-                }
-                onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
-                placeholder="2h 00m"
-                InputProps={{
-                  disableUnderline: true,
-                  readOnly: isReadOnly,
-                }}
-                sx={timerInputSx(false)}
-              />
-              <Popover
-                open={Boolean(durationAnchor)}
-                anchorEl={durationAnchor}
-                onClose={() => setDurationAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                disableAutoFocus
-                disableEnforceFocus
-                slotProps={{ paper: { sx: timerPopoverPaperSx } }}
-              >
-                <List dense sx={{ py: 0 }}>
-                  {durationSuggestions.map((s) => (
-                    <MenuItem
-                      key={s}
-                      onClick={() => {
-                        setDuration(s);
-                        setDurationAnchor(null);
+        <Box
+          sx={{
+            ...propertyValueSx,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          {/* Estimated */}
+          <Box display="flex" alignItems="center" gap={1}>
+            <TimerIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              Estimated
+            </Typography>
+            <TextField
+              variant="standard"
+              value={duration}
+              disabled={!isOwner}
+              onChange={(e) =>
+                handleTimerChange(
+                  e.target.value,
+                  setDuration,
+                  setDurationSuggestions,
+                  setDurationAnchor,
+                  e.currentTarget.parentElement as HTMLDivElement,
+                )
+              }
+              onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
+              placeholder="2h 00m"
+              InputProps={{
+                disableUnderline: true,
+                readOnly: !isOwner,
+              }}
+              sx={timerInputSx()}
+            />
+            <Popover
+              open={Boolean(durationAnchor)}
+              anchorEl={durationAnchor}
+              onClose={() => setDurationAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              disableAutoFocus
+              disableEnforceFocus
+              slotProps={{ paper: { sx: timerPopoverPaperSx } }}
+            >
+              <List dense sx={{ py: 0 }}>
+                {durationSuggestions.map((s) => (
+                  <MenuItem
+                    key={s}
+                    onClick={() => {
+                      setDuration(s);
+                      setDurationAnchor(null);
+                    }}
+                  >
+                    <ListItemText
+                      primary={s}
+                      primaryTypographyProps={{
+                        fontSize: '13px',
+                        fontWeight: 600,
                       }}
-                    >
-                      <ListItemText
-                        primary={s}
-                        primaryTypographyProps={{
-                          fontSize: '13px',
-                          fontWeight: 600,
-                        }}
-                      />
-                    </MenuItem>
-                  ))}
-                </List>
-              </Popover>
-            </Box>
+                    />
+                  </MenuItem>
+                ))}
+              </List>
+            </Popover>
           </Box>
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-                <HistoryIcon sx={{ fontSize: 14, color: 'info.main' }} />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'info.main',
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  REAL
-                </Typography>
-              </Box>
-              <TextField
-                variant="standard"
-                value={realTime}
-                disabled={isReadOnly}
-                onChange={(e) =>
-                  handleTimerChange(
-                    e.target.value,
-                    setRealTime,
-                    setRealTimeSuggestions,
-                    setRealTimeAnchor,
-                    e.currentTarget.parentElement as HTMLDivElement,
-                  )
-                }
-                onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
-                placeholder="1h 30m"
-                InputProps={{
-                  disableUnderline: true,
-                  readOnly: isReadOnly,
-                }}
-                sx={timerInputSx(true)}
-              />
-              <Popover
-                open={Boolean(realTimeAnchor)}
-                anchorEl={realTimeAnchor}
-                onClose={() => setRealTimeAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                disableAutoFocus
-                disableEnforceFocus
-                slotProps={{ paper: { sx: timerPopoverPaperSx } }}
-              >
-                <List dense sx={{ py: 0 }}>
-                  {realTimeSuggestions.map((s) => (
-                    <MenuItem
-                      key={s}
-                      onClick={() => {
-                        setRealTime(s);
-                        setRealTimeAnchor(null);
+          {/* Real */}
+          <Box display="flex" alignItems="center" gap={1}>
+            <HistoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              Real
+            </Typography>
+            <TextField
+              variant="standard"
+              value={realTime}
+              disabled={!isOwner}
+              onChange={(e) =>
+                handleTimerChange(
+                  e.target.value,
+                  setRealTime,
+                  setRealTimeSuggestions,
+                  setRealTimeAnchor,
+                  e.currentTarget.parentElement as HTMLDivElement,
+                )
+              }
+              onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
+              placeholder="1h 30m"
+              InputProps={{
+                disableUnderline: true,
+                readOnly: !isOwner,
+              }}
+              sx={timerInputSx()}
+            />
+            <Popover
+              open={Boolean(realTimeAnchor)}
+              anchorEl={realTimeAnchor}
+              onClose={() => setRealTimeAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              disableAutoFocus
+              disableEnforceFocus
+              slotProps={{ paper: { sx: timerPopoverPaperSx } }}
+            >
+              <List dense sx={{ py: 0 }}>
+                {realTimeSuggestions.map((s) => (
+                  <MenuItem
+                    key={s}
+                    onClick={() => {
+                      setRealTime(s);
+                      setRealTimeAnchor(null);
+                    }}
+                  >
+                    <ListItemText
+                      primary={s}
+                      primaryTypographyProps={{
+                        fontSize: '13px',
+                        fontWeight: 600,
                       }}
-                    >
-                      <ListItemText
-                        primary={s}
-                        primaryTypographyProps={{
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          color: 'info.main',
-                        }}
-                      />
-                    </MenuItem>
-                  ))}
-                </List>
-              </Popover>
-            </Box>
+                    />
+                  </MenuItem>
+                ))}
+              </List>
+            </Popover>
           </Box>
         </Box>
       </Box>
@@ -894,8 +921,6 @@ export const TaskProperties = ({
           ))}
         </Box>
       </Popover>
-
-      <Box sx={{ mt: 2, borderBottom: '1px solid', borderColor: 'divider' }} />
     </Box>
   );
 };

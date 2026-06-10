@@ -28,7 +28,7 @@ export const useWorkspaceEditor = ({
 }: UseWorkspaceEditorProps) => {
   const currentTitle = watch('title');
   const currentContent = watch('content');
-  const currentFolder = watch('folder');
+  const currentFolder = watch('project');
 
   const [showPalette, setShowPalette] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,9 +56,11 @@ export const useWorkspaceEditor = ({
 
     const lowerSearch = searchTerm.toLowerCase();
 
-    return tasksData.tasks.filter((task: TaskSearchItems) =>
-      task.title.toLowerCase().includes(lowerSearch),
-    );
+    return tasksData.tasks.filter((task: TaskSearchItems) => {
+      const isPlatformTask = task.source === 'platform';
+      if (!isPlatformTask) return false;
+      return task.title.toLowerCase().includes(lowerSearch);
+    });
   }, [tasksData, searchTerm]);
 
   const initialContent = useMemo(() => {

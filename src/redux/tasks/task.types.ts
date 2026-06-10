@@ -61,6 +61,7 @@ export interface Task {
   source?: 'google' | 'platform';
   sync_status?: 'synced' | 'pending' | 'error';
   use_ai?: boolean;
+  is_owner?: boolean;
 }
 
 export interface TaskState {

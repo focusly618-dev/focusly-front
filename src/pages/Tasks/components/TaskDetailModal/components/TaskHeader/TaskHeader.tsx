@@ -1,9 +1,10 @@
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import {
   Close as CloseIcon,
   OpenInFull as OpenInFullIcon,
   CloseFullscreen as CloseFullscreenIcon,
   Delete as DeleteIcon,
+  InfoOutlined as InfoIcon,
 } from '@mui/icons-material';
 import { TASK_COLORS } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { Task } from '@/redux/tasks/task.types';
@@ -49,6 +50,13 @@ export const TaskHeader = ({
         </IconButton>
       </Box>
       <Box display="flex" alignItems="center" gap={1}>
+        {initialTask && !initialTask.is_owner && (
+          <Tooltip title="This task cannot be modified because you are not the owner">
+            <IconButton size="small" sx={headerIconButtonSx(isCustomColor)}>
+              <InfoIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Tooltip>
+        )}
         <IconButton size="small" onClick={onClose} sx={iconSx}>
           <CloseIcon sx={{ fontSize: 20 }} />
         </IconButton>

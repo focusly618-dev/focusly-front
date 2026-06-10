@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -46,6 +47,7 @@ export const SearchPalette = ({
   handleSelectTask,
   setValue,
 }: SearchPaletteProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleBlur = (e: React.FocusEvent) => {
@@ -66,11 +68,11 @@ export const SearchPalette = ({
           <CommandInputWrapper>
             <SearchIcon sx={{ color: 'info.main', fontSize: 20 }} />
             <CommandInput
+              id="search-tasks-input"
+              name="search-tasks-input"
               placeholder="Search tasks to link..."
               autoFocus
-              value={
-                showPalette && selectTask ? selectTask.title : searchTerm
-              }
+              value={showPalette && selectTask ? selectTask.title : searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               readOnly={!!selectTask}
             />
@@ -138,6 +140,26 @@ export const SearchPalette = ({
                         {task.category && (
                           <StyledCategory>{task.category}</StyledCategory>
                         )}
+                        {task.created_at && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: '11px',
+                              opacity: 0.8,
+                            }}
+                          >
+                            • Created{' '}
+                            {new Date(task.created_at).toLocaleDateString(
+                              undefined,
+                              {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              },
+                            )}
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
                     <RadioCircle selected={isSelected} color={statusColor} />
@@ -165,8 +187,16 @@ export const SearchPalette = ({
                 to link selection
               </Typography>
             </Box>
-            <AddTaskButton onMouseDown={(e) => e.preventDefault()}>
-              + Create New Parent Task
+            <AddTaskButton
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                const newParams = new URLSearchParams(searchParams);
+                newParams.set('action', 'create');
+                setSearchParams(newParams);
+                setShowPalette(false);
+              }}
+            >
+              + Create New Task
             </AddTaskButton>
           </PaletteFooter>
         </CommandPaletteContainer>

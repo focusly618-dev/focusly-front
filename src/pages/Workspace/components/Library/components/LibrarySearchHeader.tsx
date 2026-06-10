@@ -11,15 +11,15 @@ interface LibrarySearchHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
-  searchMode: 'workspace' | 'folder';
-  onSearchModeChange: (mode: 'workspace' | 'folder') => void;
+  searchMode?: 'workspace' | 'folder';
+  onSearchModeChange?: (mode: 'workspace' | 'folder') => void;
 }
 
 export const LibrarySearchHeader = ({
   searchTerm,
   onSearchChange,
   onClearSearch,
-  searchMode,
+  searchMode = 'workspace',
   onSearchModeChange,
 }: LibrarySearchHeaderProps) => {
   const theme = useTheme();
@@ -82,7 +82,7 @@ export const LibrarySearchHeader = ({
         size="small"
         onClick={() => {
           const nextMode = searchMode === 'workspace' ? 'folder' : 'workspace';
-          onSearchModeChange(nextMode);
+          onSearchModeChange?.(nextMode);
           if (searchMode !== nextMode) onClearSearch();
         }}
         startIcon={<FilterListIcon sx={{ fontSize: 16 }} />}

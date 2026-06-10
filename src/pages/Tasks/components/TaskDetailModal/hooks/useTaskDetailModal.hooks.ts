@@ -18,29 +18,12 @@ export const useTaskDetailModal = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAppSelector((state) => state.auth);
 
-  // DEBUG: Log what data the modal receives
-  console.log('[TaskDetailModal] initialTask:', {
-    id: initialTask?.id,
-    user_id: initialTask?.user_id,
-    tags: initialTask?.tags,
-    estimate_timer: initialTask?.estimate_timer,
-    task_type: initialTask?.task_type,
-    links: initialTask?.links,
-    isReadOnlyCheck: initialTask?.user_id && initialTask?.user_id !== user?.id,
-  });
-
   const isReadOnly = useMemo(() => {
     if (!initialTask) return false;
     if (!user) return true;
 
-    // Check Google Calendar event ownership
-    if (initialTask.task_type === 'GoogleTask' || initialTask.google_event_id) {
-      const organizerEmail = (
-        initialTask as unknown as { organizer_email?: string }
-      ).organizer_email;
-      if (organizerEmail) {
-        return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
-      }
+    if (initialTask.is_owner !== undefined) {
+      return !initialTask.is_owner;
     }
 
     // Check Focusly task ownership
@@ -306,8 +289,89 @@ export const useTaskDetailModal = ({
         l.url.includes('hangouts'),
     );
 
+  const isDirty = useMemo(() => {
+    if (!initialTask) return false;
+
+    const isTitleChanged = title !== initialState.title;
+    const isDescChanged = description !== initialState.description;
+    const isPriorityChanged = priority !== initialState.priority;
+    const isStatusChanged = status !== initialState.status;
+    const isCategoryChanged = category !== initialState.category;
+
+    const initialDateVal =
+      initialState.currentDate instanceof Date
+        ? initialState.currentDate.getTime()
+        : initialState.currentDate
+          ? new Date(initialState.currentDate).getTime()
+          : 0;
+    const currentDateVal =
+      currentDate instanceof Date
+        ? currentDate.getTime()
+        : currentDate
+          ? new Date(currentDate).getTime()
+          : 0;
+    const isDateChanged = initialDateVal !== currentDateVal;
+
+    const isDurationChanged = duration !== initialState.duration;
+    const isRealTimeChanged = realTime !== initialState.realTime;
+    const isColorChanged = color !== initialState.color;
+
+    const initialTagsSorted = [...initialCollections.tags].sort();
+    const currentTagsSorted = [...tags].sort();
+    const isTagsChanged =
+      JSON.stringify(initialTagsSorted) !== JSON.stringify(currentTagsSorted);
+
+    const isLinksChanged =
+      links.length !== initialCollections.links.length ||
+      links.some(
+        (l, i) =>
+          l.title !== initialCollections.links[i]?.title ||
+          l.url !== initialCollections.links[i]?.url,
+      );
+
+    const isCollaboratorsChanged =
+      collaborators.length !== initialCollections.collaborators.length ||
+      collaborators.some(
+        (c, i) =>
+          c.email !== initialCollections.collaborators[i]?.email ||
+          c.name !== initialCollections.collaborators[i]?.name,
+      );
+
+    return (
+      isTitleChanged ||
+      isDescChanged ||
+      isPriorityChanged ||
+      isStatusChanged ||
+      isCategoryChanged ||
+      isDateChanged ||
+      isDurationChanged ||
+      isRealTimeChanged ||
+      isColorChanged ||
+      isTagsChanged ||
+      isLinksChanged ||
+      isCollaboratorsChanged
+    );
+  }, [
+    initialTask,
+    title,
+    initialState,
+    description,
+    priority,
+    status,
+    category,
+    currentDate,
+    duration,
+    realTime,
+    color,
+    tags,
+    initialCollections,
+    links,
+    collaborators,
+  ]);
+
   return {
     isReadOnly,
+    isDirty,
     title,
     setTitle,
     description,

@@ -16,7 +16,6 @@ import {
   RadioButtonUnchecked as TodoIcon,
   CalendarToday as PlannedIcon,
   AutoFixHigh as AutoFixHighIcon,
-  AttachFile as AttachFileIcon,
   Description as DescriptionIcon,
   Flag as FlagIcon,
   Add as AddIcon,
@@ -40,13 +39,7 @@ import {
   timePickerLayoutSx,
 } from '../../CreateTaskModal.styles';
 import { getTagColors } from '../../CreateTaskModal.utils';
-import {
-  getStatusIcon,
-  getStatusColor,
-  getCategoryIcon,
-  getCategoryColor,
-  getPriorityIconColor,
-} from '../TaskIcons';
+import { getStatusIcon, getCategoryIcon } from '../TaskIcons';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 
 interface TaskPropertiesProps {
@@ -125,7 +118,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
 
-  const getChipSx = (colorCode: string) => ({
+  const getChipSx = (isHighPriority = false) => ({
     borderRadius: '20px',
     px: 1.5,
     height: '28px',
@@ -133,22 +126,42 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
     fontWeight: 600,
     cursor: 'pointer',
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-    bgcolor: (theme: Theme) =>
-      theme.palette.mode === 'dark'
-        ? alpha(colorCode, 0.12)
-        : alpha(colorCode, 0.08),
+    bgcolor: (theme: Theme) => {
+      if (isHighPriority) {
+        return theme.palette.mode === 'dark'
+          ? alpha('#ef4444', 0.15)
+          : alpha('#ef4444', 0.08);
+      }
+      return theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(0, 0, 0, 0.04)';
+    },
     border: '1px solid',
-    borderColor: (theme: Theme) =>
-      theme.palette.mode === 'dark'
-        ? alpha(colorCode, 0.2)
-        : alpha(colorCode, 0.15),
-    color: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? alpha(colorCode, 0.9) : colorCode,
+    borderColor: (theme: Theme) => {
+      if (isHighPriority) {
+        return theme.palette.mode === 'dark'
+          ? alpha('#ef4444', 0.25)
+          : alpha('#ef4444', 0.15);
+      }
+      return 'divider';
+    },
+    color: (theme: Theme) => {
+      if (isHighPriority) {
+        return '#ef4444';
+      }
+      return theme.palette.text.secondary;
+    },
     '&:hover': {
-      bgcolor: (theme: Theme) =>
-        theme.palette.mode === 'dark'
-          ? alpha(colorCode, 0.18)
-          : alpha(colorCode, 0.12),
+      bgcolor: (theme: Theme) => {
+        if (isHighPriority) {
+          return theme.palette.mode === 'dark'
+            ? alpha('#ef4444', 0.25)
+            : alpha('#ef4444', 0.12);
+        }
+        return theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.08)';
+      },
       transform: 'translateY(-0.5px)',
     },
     '& .MuiChip-icon': {
@@ -164,7 +177,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       {/* Status */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <TodoIcon sx={{ fontSize: 18 }} />
+          <TodoIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -177,7 +190,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             icon={getStatusIcon(status)}
             label={status || 'Todo'}
             onClick={(e) => setStatusAnchor(e.currentTarget)}
-            sx={getChipSx(getStatusColor(status))}
+            sx={getChipSx(false)}
           />
         </Box>
       </Box>
@@ -185,7 +198,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       {/* Priority */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <AttachFileIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
+          <FlagIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -198,7 +211,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             icon={<FlagIcon sx={{ fontSize: 16 }} />}
             label={priority || 'No priority'}
             onClick={(e) => setPriorityAnchor(e.currentTarget)}
-            sx={getChipSx(getPriorityIconColor(priority))}
+            sx={getChipSx(priority === 'High')}
           />
         </Box>
       </Box>
@@ -206,7 +219,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       {/* Category */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <AutoFixHighIcon sx={{ fontSize: 18 }} />
+          <AutoFixHighIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -219,7 +232,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             icon={getCategoryIcon(category)}
             label={category || 'General'}
             onClick={(e) => setCategoryAnchor(e.currentTarget)}
-            sx={getChipSx(getCategoryColor(category))}
+            sx={getChipSx(false)}
           />
         </Box>
       </Box>
@@ -227,7 +240,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       {/* Date */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <PlannedIcon sx={{ fontSize: 18 }} />
+          <PlannedIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -236,19 +249,24 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
           </Typography>
         </Box>
         <Box sx={{ ...propertyValueSx, position: 'relative' }}>
-          <Chip
-            label={currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
+          <Box
             onClick={() => setDatePickerOpen(true)}
-            variant="outlined"
             sx={{
-              borderRadius: '8px',
-              height: '32px',
+              cursor: 'pointer',
               fontSize: '14px',
               fontWeight: 500,
-              cursor: 'pointer',
-              '&:hover': { bgcolor: 'action.hover' },
+              color: 'text.primary',
+              py: 0.5,
+              px: 1,
+              borderRadius: '4px',
+              transition: 'background-color 0.2s',
+              '&:hover': {
+                bgcolor: 'action.hover',
+              },
             }}
-          />
+          >
+            {currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
+          </Box>
           <DatePicker
             open={datePickerOpen}
             onClose={() => setDatePickerOpen(false)}
@@ -279,7 +297,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       {/* Time */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <AccessTimeIcon sx={{ fontSize: 18 }} />
+          <AccessTimeIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -287,20 +305,31 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             Time
           </Typography>
         </Box>
-        <Box sx={{ ...propertyValueSx, position: 'relative' }}>
-          <Chip
-            label={currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
+        <Box
+          sx={{
+            ...propertyValueSx,
+            position: 'relative',
+            alignItems: 'center',
+          }}
+        >
+          <Box
             onClick={() => setTimePickerOpen(true)}
-            variant="outlined"
             sx={{
-              borderRadius: '8px',
-              height: '32px',
+              cursor: 'pointer',
               fontSize: '14px',
               fontWeight: 500,
-              cursor: 'pointer',
-              '&:hover': { bgcolor: 'action.hover' },
+              color: 'text.primary',
+              py: 0.5,
+              px: 1,
+              borderRadius: '4px',
+              transition: 'background-color 0.2s',
+              '&:hover': {
+                bgcolor: 'action.hover',
+              },
             }}
-          />
+          >
+            {currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
+          </Box>
           <TimePicker
             open={timePickerOpen}
             onClose={() => setTimePickerOpen(false)}
@@ -338,7 +367,13 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       {/* Tags */}
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
-          <DescriptionIcon sx={{ fontSize: 18, transform: 'rotate(180deg)' }} />
+          <DescriptionIcon
+            sx={{
+              fontSize: 16,
+              color: 'text.disabled',
+              transform: 'rotate(180deg)',
+            }}
+          />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -409,7 +444,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       {/* Time Tracking */}
       <Box sx={{ ...propertyRowSx, alignItems: 'center' }}>
         <Box sx={propertyLabelSx}>
-          <AccessTimeIcon sx={{ fontSize: 18 }} />
+          <AccessTimeIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -417,195 +452,199 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             Time Tracking
           </Typography>
         </Box>
-        <Box sx={{ ...propertyValueSx, gap: 6 }}>
+        <Box
+          sx={{
+            ...propertyValueSx,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
           {/* Estimated */}
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-                <TimerIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'text.secondary',
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  ESTIMATED
-                </Typography>
-              </Box>
-              <TextField
-                variant="standard"
-                value={duration}
-                onChange={(e) =>
-                  handleTimerChange(
-                    e.target.value,
-                    setDuration,
-                    setDurationSuggestions,
-                    setDurationAnchor,
-                    e.currentTarget.parentElement as HTMLDivElement,
-                  )
-                }
-                onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
-                placeholder="2h 00m"
-                error={!!errors?.duration}
-                InputProps={{
-                  disableUnderline: true,
-                  sx: {
-                    fontSize: '15px',
-                    fontWeight: 700,
-                    color: 'text.primary',
-                  },
-                }}
+          <Box display="flex" alignItems="center" gap={1}>
+            <TimerIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              Estimated
+            </Typography>
+            <TextField
+              variant="standard"
+              value={duration}
+              onChange={(e) =>
+                handleTimerChange(
+                  e.target.value,
+                  setDuration,
+                  setDurationSuggestions,
+                  setDurationAnchor,
+                  e.currentTarget.parentElement as HTMLDivElement,
+                )
+              }
+              onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
+              placeholder="2h 00m"
+              error={!!errors?.duration}
+              InputProps={{
+                disableUnderline: true,
+                sx: {
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'text.primary',
+                  p: 0,
+                },
+              }}
+              sx={{
+                width: '70px',
+                bgcolor: 'transparent',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
+                borderRadius: '4px',
+                px: 0.5,
+              }}
+            />
+            {errors?.duration && (
+              <Typography
+                variant="caption"
                 sx={{
-                  width: '80px',
-                  bgcolor: 'background.default',
-                  borderRadius: '10px',
-                  px: 1,
-                }}
-              />
-              {errors?.duration && (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'error.main',
-                    fontSize: '10px',
-                    mt: 0.5,
-                    display: 'block',
-                    textAlign: 'center',
-                  }}
-                >
-                  {errors.duration}
-                </Typography>
-              )}
-              <Popover
-                open={Boolean(durationAnchor)}
-                anchorEl={durationAnchor}
-                onClose={() => setDurationAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                disableAutoFocus
-                disableEnforceFocus
-                slotProps={{
-                  paper: {
-                    sx: {
-                      minWidth: 80,
-                      borderRadius: '12px',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                    },
-                  },
+                  color: 'error.main',
+                  fontSize: '10px',
+                  ml: 0.5,
                 }}
               >
-                <List dense sx={{ py: 0 }}>
-                  {durationSuggestions.map((s) => (
-                    <MenuItem
-                      key={s}
-                      onClick={() => {
-                        setDuration(s);
-                        setDurationAnchor(null);
+                {errors.duration}
+              </Typography>
+            )}
+            <Popover
+              open={Boolean(durationAnchor)}
+              anchorEl={durationAnchor}
+              onClose={() => setDurationAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              disableAutoFocus
+              disableEnforceFocus
+              slotProps={{
+                paper: {
+                  sx: {
+                    minWidth: 80,
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                  },
+                },
+              }}
+            >
+              <List dense sx={{ py: 0 }}>
+                {durationSuggestions.map((s) => (
+                  <MenuItem
+                    key={s}
+                    onClick={() => {
+                      setDuration(s);
+                      setDurationAnchor(null);
+                    }}
+                  >
+                    <ListItemText
+                      primary={s}
+                      primaryTypographyProps={{
+                        fontSize: '13px',
+                        fontWeight: 600,
                       }}
-                    >
-                      <ListItemText
-                        primary={s}
-                        primaryTypographyProps={{
-                          fontSize: '13px',
-                          fontWeight: 600,
-                        }}
-                      />
-                    </MenuItem>
-                  ))}
-                </List>
-              </Popover>
-            </Box>
+                    />
+                  </MenuItem>
+                ))}
+              </List>
+            </Popover>
           </Box>
           {/* Real */}
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-                <HistoryIcon sx={{ fontSize: 14, color: 'info.main' }} />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'info.main',
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  REAL
-                </Typography>
-              </Box>
-              <TextField
-                variant="standard"
-                value={realTime}
-                onChange={(e) =>
-                  handleTimerChange(
-                    e.target.value,
-                    setRealTime,
-                    setRealTimeSuggestions,
-                    setRealTimeAnchor,
-                    e.currentTarget.parentElement as HTMLDivElement,
-                  )
-                }
-                onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
-                placeholder="1h 30m"
-                InputProps={{
-                  disableUnderline: true,
-                  sx: { fontSize: '15px', color: 'info.main', fontWeight: 700 },
-                }}
-                sx={{
-                  width: '80px',
-                  bgcolor: 'background.default',
-                  borderRadius: '10px',
-                  px: 1,
-                }}
-              />
-              <Popover
-                open={Boolean(realTimeAnchor)}
-                anchorEl={realTimeAnchor}
-                onClose={() => setRealTimeAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                disableAutoFocus
-                disableEnforceFocus
-                slotProps={{
-                  paper: {
-                    sx: {
-                      minWidth: 80,
-                      borderRadius: '12px',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                    },
+          <Box display="flex" alignItems="center" gap={1}>
+            <HistoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              Real
+            </Typography>
+            <TextField
+              variant="standard"
+              value={realTime}
+              onChange={(e) =>
+                handleTimerChange(
+                  e.target.value,
+                  setRealTime,
+                  setRealTimeSuggestions,
+                  setRealTimeAnchor,
+                  e.currentTarget.parentElement as HTMLDivElement,
+                )
+              }
+              onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
+              placeholder="1h 30m"
+              InputProps={{
+                disableUnderline: true,
+                sx: {
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'text.primary',
+                  p: 0,
+                },
+              }}
+              sx={{
+                width: '70px',
+                bgcolor: 'transparent',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
+                borderRadius: '4px',
+                px: 0.5,
+              }}
+            />
+            <Popover
+              open={Boolean(realTimeAnchor)}
+              anchorEl={realTimeAnchor}
+              onClose={() => setRealTimeAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              disableAutoFocus
+              disableEnforceFocus
+              slotProps={{
+                paper: {
+                  sx: {
+                    minWidth: 80,
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
                   },
-                }}
-              >
-                <List dense sx={{ py: 0 }}>
-                  {realTimeSuggestions.map((s) => (
-                    <MenuItem
-                      key={s}
-                      onClick={() => {
-                        setRealTime(s);
-                        setRealTimeAnchor(null);
+                },
+              }}
+            >
+              <List dense sx={{ py: 0 }}>
+                {realTimeSuggestions.map((s) => (
+                  <MenuItem
+                    key={s}
+                    onClick={() => {
+                      setRealTime(s);
+                      setRealTimeAnchor(null);
+                    }}
+                  >
+                    <ListItemText
+                      primary={s}
+                      primaryTypographyProps={{
+                        fontSize: '13px',
+                        fontWeight: 600,
                       }}
-                    >
-                      <ListItemText
-                        primary={s}
-                        primaryTypographyProps={{
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          color: 'info.main',
-                        }}
-                      />
-                    </MenuItem>
-                  ))}
-                </List>
-              </Popover>
-            </Box>
+                    />
+                  </MenuItem>
+                ))}
+              </List>
+            </Popover>
           </Box>
         </Box>
       </Box>
-
-      <Box sx={{ mt: 2, borderBottom: '1px solid', borderColor: 'divider' }} />
     </Box>
   );
 };

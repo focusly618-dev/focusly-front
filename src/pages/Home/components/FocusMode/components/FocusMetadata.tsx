@@ -39,6 +39,11 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
     null,
   );
 
+  const folder =
+    activeItem?.workspace?.project ||
+    activeItem?.workspace?.folder ||
+    activeItem?.workspaces?.[0]?.folder;
+
   return (
     <TaskTitleContainer>
       <CurrentTaskBadge>
@@ -72,7 +77,7 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
         {activeItem?.title || 'Select a task'}
       </Typography>
       <TaskMetadataContainer>
-        {activeItem?.workspace?.folder && (
+        {folder && (
           <>
             <Box
               sx={{
@@ -88,17 +93,17 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
               <FolderIcon
                 sx={{
                   fontSize: 16,
-                  color: activeItem.workspace.folder.color || 'primary.main',
+                  color: folder.color || 'primary.main',
                 }}
               />
               <Typography
                 variant="body2"
                 sx={{
                   fontWeight: 600,
-                  color: activeItem.workspace.folder.color || 'primary.main',
+                  color: folder.color || 'primary.main',
                 }}
               >
-                {activeItem.workspace.folder.name}
+                {folder.name}
               </Typography>
             </Box>
             <Typography variant="body2" sx={{ mx: 0.5, opacity: 0.5 }}>
@@ -332,7 +337,6 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
           </MenuItem>
         ))}
       </Menu>
-
     </TaskTitleContainer>
   );
 };

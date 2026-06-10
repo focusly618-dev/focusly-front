@@ -7,12 +7,18 @@ interface TaskDescriptionProps {
   setDescription: (v: string) => void;
 }
 
-export const TaskDescription = ({ description, setDescription }: TaskDescriptionProps) => (
+export const TaskDescription = ({
+  description,
+  setDescription,
+}: TaskDescriptionProps) => (
   <Box sx={{ px: 4, mb: 4 }}>
-    <Box display="flex" alignItems="center" gap={1} mb={1}>
-      <DescriptionIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-        DESCRIPTION
+    <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+      <DescriptionIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+      <Typography
+        variant="caption"
+        sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}
+      >
+        Description
       </Typography>
     </Box>
     <TextField

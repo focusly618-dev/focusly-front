@@ -20,12 +20,16 @@ export const TaskDescription = ({
   return (
     <Box sx={descriptionContainerSx}>
       <Box sx={descriptionHeaderSx}>
-        <DescriptionIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+        <DescriptionIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
         <Typography
           variant="caption"
-          sx={{ color: 'text.secondary', fontWeight: 600 }}
+          sx={{
+            color: 'text.secondary',
+            fontSize: '13px',
+            fontWeight: 500,
+          }}
         >
-          DESCRIPTION
+          Description
         </Typography>
       </Box>
       <TextField

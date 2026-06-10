@@ -107,3 +107,104 @@ export const EnergyCard = styled(Box)(({ theme }) => ({
   textAlign: 'center',
   margin: '16px',
 }));
+
+export const ProjectsList = styled(Box)({
+  flexGrow: 1,
+  overflowY: 'auto',
+  padding: '0 8px 16px 8px',
+  '&::-webkit-scrollbar': {
+    width: '4px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    borderRadius: '4px',
+  },
+  '&:hover::-webkit-scrollbar-thumb': {
+    backgroundColor: 'rgba(0,0,0,0.15)',
+  },
+});
+
+export const ProjectItemRow = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isActive',
+})<{ isActive?: boolean }>(({ theme, isActive }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: '6px 8px',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  transition: 'all 0.15s ease-in-out',
+  position: 'relative',
+  backgroundColor: isActive
+    ? theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,0.04)'
+      : 'rgba(0,0,0,0.03)'
+    : 'transparent',
+  color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
+  '&:hover': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.03)'
+        : 'rgba(0,0,0,0.02)',
+    color: theme.palette.text.primary,
+    '& .hover-actions': {
+      opacity: 1,
+    },
+  },
+}));
+
+export const WorkspaceItemRow = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isActive',
+})<{ isActive?: boolean }>(({ theme, isActive }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: '6px 8px 6px 28px',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  transition: 'all 0.15s ease-in-out',
+  position: 'relative',
+  backgroundColor: isActive
+    ? theme.palette.mode === 'dark'
+      ? 'rgba(59, 130, 246, 0.12)'
+      : 'rgba(59, 130, 246, 0.08)'
+    : 'transparent',
+  color: isActive
+    ? theme.palette.mode === 'dark'
+      ? '#93c5fd'
+      : '#1d4ed8'
+    : theme.palette.text.secondary,
+  fontWeight: isActive ? 600 : 400,
+  fontSize: '0.85rem',
+  '&:hover': {
+    backgroundColor: isActive
+      ? theme.palette.mode === 'dark'
+        ? 'rgba(59, 130, 246, 0.16)'
+        : 'rgba(59, 130, 246, 0.12)'
+      : theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.03)'
+        : 'rgba(0, 0, 0, 0.02)',
+    color: theme.palette.text.primary,
+    '& .hover-actions': {
+      opacity: 1,
+    },
+  },
+}));
+
+export const ColorDot = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'color',
+})<{ color?: string }>(({ color }) => ({
+  width: 8,
+  height: 8,
+  borderRadius: '50%',
+  backgroundColor: color || '#3b82f6',
+  flexShrink: 0,
+}));
+
+export const ActionButtonContainer = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '2px',
+  marginLeft: 'auto',
+  opacity: 0,
+  transition: 'opacity 0.15s ease-in-out',
+  zIndex: 2,
+});

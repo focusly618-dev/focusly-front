@@ -16,26 +16,32 @@ export const metadataRowSx = {
   mb: 1,
 };
 
-export const metadataChipSx = (colorCode?: string) => {
+export const metadataChipSx = (isHighPriority = false) => {
   return {
     bgcolor: (theme: Theme) => {
-      const defaultColor = colorCode || '#6b7280';
+      if (isHighPriority) {
+        return theme.palette.mode === 'dark'
+          ? alpha('#ef4444', 0.15)
+          : alpha('#ef4444', 0.08);
+      }
       return theme.palette.mode === 'dark'
-        ? alpha(defaultColor, 0.12)
-        : alpha(defaultColor, 0.08);
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(0, 0, 0, 0.04)';
     },
     border: '1px solid',
     borderColor: (theme: Theme) => {
-      const defaultColor = colorCode || '#6b7280';
-      return theme.palette.mode === 'dark'
-        ? alpha(defaultColor, 0.2)
-        : alpha(defaultColor, 0.15);
+      if (isHighPriority) {
+        return theme.palette.mode === 'dark'
+          ? alpha('#ef4444', 0.25)
+          : alpha('#ef4444', 0.15);
+      }
+      return 'divider';
     },
     color: (theme: Theme) => {
-      const defaultColor = colorCode || '#6b7280';
-      return theme.palette.mode === 'dark'
-        ? alpha(defaultColor, 0.9)
-        : defaultColor;
+      if (isHighPriority) {
+        return '#ef4444';
+      }
+      return theme.palette.text.secondary;
     },
     borderRadius: '20px',
     px: 1.5,
@@ -46,10 +52,14 @@ export const metadataChipSx = (colorCode?: string) => {
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
     '&:hover': {
       bgcolor: (theme: Theme) => {
-        const defaultColor = colorCode || '#6b7280';
+        if (isHighPriority) {
+          return theme.palette.mode === 'dark'
+            ? alpha('#ef4444', 0.25)
+            : alpha('#ef4444', 0.12);
+        }
         return theme.palette.mode === 'dark'
-          ? alpha(defaultColor, 0.18)
-          : alpha(defaultColor, 0.12);
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.08)';
       },
       transform: 'translateY(-0.5px)',
     },
@@ -73,15 +83,19 @@ export const colorCircleSx = (color: string) => ({
   '&:hover': { transform: 'scale(1.1)' },
 });
 
-export const timerInputSx = (isReal?: boolean) => ({
-  width: '80px',
-  bgcolor: 'background.default',
-  borderRadius: '10px',
-  px: 1,
+export const timerInputSx = () => ({
+  width: '70px',
+  bgcolor: 'transparent',
+  '&:hover': {
+    bgcolor: 'action.hover',
+  },
+  borderRadius: '4px',
+  px: 0.5,
   '& .MuiInputBase-input': {
-    fontSize: '15px',
-    fontWeight: 700,
-    color: isReal ? 'info.main' : 'text.primary',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: 'text.primary',
+    padding: 0,
   },
 });
 

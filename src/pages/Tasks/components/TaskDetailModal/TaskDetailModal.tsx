@@ -45,6 +45,7 @@ export const TaskDetailModal = ({
 }: TaskDetailModalProps) => {
   const {
     isReadOnly,
+    isDirty,
     title,
     setTitle,
     description,
@@ -107,7 +108,7 @@ export const TaskDetailModal = ({
   const [isLinksExpanded, setIsLinksExpanded] = useState(true);
   const [colorAnchor, setColorAnchor] = useState<HTMLElement | null>(null);
 
-  const isPureGoogleTask = initialTask?.task_type === 'GoogleTask';
+  const isPureGoogleTask = initialTask?.source === 'google';
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -202,6 +203,7 @@ export const TaskDetailModal = ({
               </Box>
 
               <TaskProperties
+                isOwner={initialTask ? initialTask.is_owner : true}
                 status={status}
                 setStatus={setStatus}
                 priority={priority}
@@ -228,7 +230,7 @@ export const TaskDetailModal = ({
                 isPureGoogleTask={isPureGoogleTask}
                 timeSlotDisplay={timeSlotDisplay}
                 handleTimerChange={handleTimerChange}
-                isReadOnly={isReadOnly}
+                createdAt={initialTask?.created_at}
               />
 
               <TaskResources
@@ -273,6 +275,7 @@ export const TaskDetailModal = ({
 
         <TaskActions
           initialTask={initialTask}
+          isDirty={isDirty}
           handleDelete={handleDelete}
           onClose={onClose}
           handleUpdate={handleUpdate}

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/redux/store';
 import {
   Avatar,
   Box,
@@ -40,6 +42,7 @@ export const Collaborators = ({
   collaborators,
   handleAddCollaborator,
 }: CollaboratorsProps) => {
+  const currentUser = useSelector((state: RootState) => state.auth.user);
   const [isAddingCollaborator, setIsAddingCollaborator] = useState(false);
   const [isCollaboratorsExpanded, setIsCollaboratorsExpanded] = useState(() => {
     return (collaborators && collaborators.length > 0) || false;
@@ -63,16 +66,16 @@ export const Collaborators = ({
         onClick={() => setIsCollaboratorsExpanded(!isCollaboratorsExpanded)}
       >
         <Box display="flex" alignItems="center" gap={1}>
-          <GroupsIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+          <GroupsIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
           <Typography
             variant="caption"
             sx={{
               color: 'text.secondary',
-              fontWeight: 700,
-              letterSpacing: '0.5px',
+              fontSize: '13px',
+              fontWeight: 500,
             }}
           >
-            COLLABORATORS
+            Collaborators
           </Typography>
           {!isCollaboratorsExpanded && collaborators.length > 0 && (
             <Box sx={collaboratorCountSx}>{collaborators.length}</Box>
@@ -160,60 +163,70 @@ export const Collaborators = ({
                       </Box>
                     </Box>
                   )}
-                  {collaborators.map((collaborator, idx) => (
-                    <Box
-                      key={`${collaborator.email}-${idx}`}
-                      component={motion.div}
-                      layout
-                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 400,
-                        damping: 30,
-                      }}
-                      sx={collaboratorItemSx}
-                    >
-                      <Box display="flex" alignItems="center" gap={2}>
-                        <Avatar
-                          src={collaborator.avatar || undefined}
-                          sx={avatarSx(!!collaborator.avatar)}
-                        >
-                          {collaborator.name?.charAt(0) ||
-                            collaborator.email?.charAt(0) ||
-                            '?'}
-                        </Avatar>
-                        <Box>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 700,
-                              color: 'text.primary',
-                              mb: 0.2,
-                            }}
+                  {collaborators.map((collaborator, idx) => {
+                    const isCurrentUser =
+                      currentUser &&
+                      collaborator.email &&
+                      collaborator.email.toLowerCase() ===
+                        currentUser.email?.toLowerCase();
+                    const avatarUrl = isCurrentUser
+                      ? currentUser.picture || collaborator.avatar
+                      : collaborator.avatar;
+
+                    return (
+                      <Box
+                        key={`${collaborator.email}-${idx}`}
+                        component={motion.div}
+                        layout
+                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        transition={{
+                          type: 'spring',
+                          stiffness: 400,
+                          damping: 30,
+                        }}
+                        sx={collaboratorItemSx}
+                      >
+                        <Box display="flex" alignItems="center" gap={2}>
+                          <Avatar
+                            src={avatarUrl || undefined}
+                            sx={avatarSx(!!avatarUrl)}
                           >
-                            {collaborator?.name ||
-                              collaborator?.email ||
-                              'Unknown Collaborator'}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: 'text.secondary', fontWeight: 500 }}
-                          >
-                            {collaborator?.email || 'No email provided'}
-                          </Typography>
+                            {collaborator.name?.charAt(0) ||
+                              collaborator.email?.charAt(0) ||
+                              '?'}
+                          </Avatar>
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: 700,
+                                color: 'text.primary',
+                                mb: 0.2,
+                              }}
+                            >
+                              {collaborator?.name ||
+                                collaborator?.email ||
+                                'Unknown Collaborator'}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: 'text.secondary', fontWeight: 500 }}
+                            >
+                              {collaborator?.email || 'No email provided'}
+                            </Typography>
+                          </Box>
                         </Box>
                       </Box>
-                    </Box>
-                  ))}
+                    );
+                  })}
                 </AnimatePresence>
               </Stack>
             </Box>
           </Box>
         )}
       </AnimatePresence>
-      <Box sx={{ mt: 3, borderBottom: '1px solid', borderColor: 'divider' }} />
     </Box>
   );
 };

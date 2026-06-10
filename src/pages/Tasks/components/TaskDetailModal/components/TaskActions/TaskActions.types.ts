@@ -10,4 +10,5 @@ export interface TaskActionsProps {
   isAIScheduleEnabled?: boolean;
   setIsAIScheduleEnabled?: (enabled: boolean) => void;
   isReadOnly?: boolean;
+  isDirty?: boolean;
 }

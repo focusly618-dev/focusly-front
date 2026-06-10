@@ -5,11 +5,25 @@ import type {
   UseFormWatch,
 } from 'react-hook-form';
 
-export interface FolderTypes {
+export interface ProjectGroupTypes {
   id: string;
   name: string;
   userId: string;
   color?: string;
+  emoji?: string;
+  folders?: ProjectTypes[];
+  generalWorkspaces?: WorkspaceTypes[];
+  folderCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProjectTypes {
+  id: string;
+  name: string;
+  userId: string;
+  color?: string;
+  groupId?: string;
   workspaceCount: number;
   createdAt: string;
   updatedAt: string;
@@ -20,8 +34,9 @@ export interface WorkspaceTypes {
   userId: string;
   taskId?: string;
   task?: TaskSearchItems;
-  folderId?: string;
-  folder?: FolderTypes;
+  projectId?: string;
+  groupId?: string;
+  project?: ProjectTypes;
   title: string;
   saveStatus: boolean;
   content: string;
@@ -37,8 +52,9 @@ export interface WorkspaceFormData {
   title: string;
   content: string;
   taskId?: string | null;
-  folderId?: string;
-  folder?: FolderTypes;
+  projectId?: string;
+  groupId?: string;
+  project?: ProjectTypes;
   saveStatus: boolean;
   emoji?: string;
   background_color?: string;
@@ -91,9 +107,12 @@ export interface TaskSearchItems {
   priority_level: number;
   category?: string;
   deadline: string;
+  created_at?: string;
   notes_encrypted?: string;
   links?: { title: string; url: string }[];
   google_event_id?: string;
+  task_type?: 'PlatformTask' | 'GoogleTask';
+  source?: 'google' | 'platform';
   workspaces?: {
     id: string;
     title: string;

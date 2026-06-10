@@ -12,9 +12,6 @@ export const CalendarContainer = styled(Box, {
   const dividerStrong = isDark
     ? 'rgba(255, 255, 255, 0.1)'
     : 'rgba(0, 0, 0, 0.08)';
-  const dividerSubtle = isDark
-    ? 'rgba(255, 255, 255, 0.03)'
-    : 'rgba(0, 0, 0, 0.03)';
   const textPrimary = theme.palette.text.primary;
   const textSecondary = theme.palette.text.secondary;
 
@@ -122,10 +119,9 @@ export const CalendarContainer = styled(Box, {
       flex: 1,
       border: 'none !important',
       '&:not(:last-child)': {
-        borderBottom: `1px solid ${dividerSubtle} !important`,
+        borderBottom: '1px solid transparent !important',
       },
     },
-
     // ── Hide all-day row ──
     '& .rbc-time-view .rbc-allday-cell': {
       display: 'none',

@@ -13,29 +13,33 @@ import {
   Menu,
   MenuItem,
   Divider,
-  ListItemIcon,
-  ListItemText,
   Button,
   useTheme,
   alpha,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   PushPin as PushPinIcon,
   Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
   DeleteForever as DeleteForeverIcon,
   FolderSpecial as FolderSpecialIcon,
   Folder as FolderIcon,
   CheckBox as CheckBoxIcon,
   FolderOpen as FolderOpenIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { EmptyState } from '@/components/ui';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
-import type { WorkspaceTypes, FolderTypes } from '../../types/workspace.types';
-import { CreateFolderModal } from './modals/CreateFolderModal';
-import { UpdateFolderModal } from './modals/UpdateFolderModal';
-import { AllFoldersModal } from './modals/AllFoldersModal';
+import type {
+  WorkspaceTypes,
+  ProjectTypes,
+  ProjectGroupTypes,
+} from '../../types/workspace.types';
+import { CreateProjectModal } from './modals/CreateProjectModal';
+import { UpdateProjectModal } from './modals/UpdateProjectModal';
+import { AllProjectsModal } from './modals/AllProjectsModal';
 import {
   LibrarySearchHeader,
   FolderSectionList,
@@ -46,52 +50,73 @@ import { useWorkspaceLibrary } from './hooks/useWorkspaceLibrary.hook';
 interface WorkspaceLibraryProps {
   onCreate: () => void;
   onSelect: (workspace: WorkspaceTypes) => void;
+  selectedGroupId: string | null;
+  selectedProjectId: string | null;
+  onSelectProject: (projectId: string | null) => void;
 }
 
 export const WorkspaceLibrary = ({
   onCreate,
   onSelect,
+  selectedGroupId,
+  selectedProjectId,
+  onSelectProject,
 }: WorkspaceLibraryProps) => {
-  const { state, actions, data } = useWorkspaceLibrary();
+  const { state, actions, data } = useWorkspaceLibrary(
+    selectedProjectId,
+    onSelectProject,
+    selectedGroupId,
+  );
   const { handleOpen: handleDeleteConfirm } = useWorkspace();
 
   const {
     searchTerm,
-    selectedFolderId,
-    isFolderModalOpen,
+    isProjectModalOpen,
     searchMode,
     anchorEl,
-    folderAnchorEl,
+    projectAnchorEl,
     selectedWorkspace,
-    selectedFolderToManage,
-    isUpdateFolderModalOpen,
-    isAllFoldersModalOpen,
+    selectedProjectToManage,
+    isUpdateProjectModalOpen,
+    isAllProjectsModalOpen,
   } = state;
 
   const {
     setSearchTerm,
-    setSelectedFolderId,
-    setIsFolderModalOpen,
+    setIsProjectModalOpen,
     setSearchMode,
-    setIsUpdateFolderModalOpen,
-    setIsAllFoldersModalOpen,
+    setIsUpdateProjectModalOpen,
+    setIsAllProjectsModalOpen,
     handleMenuOpen,
     handleMenuClose,
-    handleFolderMenuOpen,
-    handleFolderMenuClose,
-    handleMoveToFolder,
-    handleCreateFolder,
-    handleUpdateFolder,
-    handleDeleteFolder,
+    handleProjectMenuOpen,
+    handleProjectMenuClose,
+    handleMoveToProject,
+    handleCreateProject,
+    handleUpdateProject,
+    handleDeleteProject,
     handleUnlinkTask,
     handleClearSearch,
-    setSelectedFolderToManage,
+    setSelectedProjectToManage,
   } = actions;
 
-  const { workspaces, folders, allWorkspaces, loading, foldersLoading, error } =
-    data;
+  const {
+    workspaces,
+    projects,
+    allWorkspaces,
+    projectGroups,
+    loading,
+    projectsLoading,
+    error,
+  } = data;
 
   const theme = useTheme();
+  const activeGroup = selectedGroupId
+    ? projectGroups.find((g: ProjectGroupTypes) => g.id === selectedGroupId)
+    : null;
+  const activeProject = selectedProjectId
+    ? projects.find((p: ProjectTypes) => p.id === selectedProjectId)
+    : null;
 
   return (
     <LibraryContainer sx={{ position: 'relative' }}>
@@ -115,9 +140,19 @@ export const WorkspaceLibrary = ({
       {/* Top Page Header: Title & Action Buttons */}
       <LibraryHeader>
         <Box>
-          <HeaderTitle variant="h4">Workspace Library</HeaderTitle>
+          <HeaderTitle variant="h4">
+            {selectedProjectId && activeProject
+              ? activeProject.name
+              : activeGroup
+                ? activeGroup.name
+                : 'Workspace Library'}
+          </HeaderTitle>
           <HeaderSubtitle variant="body2">
-            Organize your notes, ideas, and strategic plan docs
+            {selectedProjectId && activeProject
+              ? `View and manage workspaces inside this folder`
+              : activeGroup
+                ? `View and manage folders and workspaces inside the "${activeGroup.name}" project`
+                : 'Organize your notes, ideas, and strategic plan docs'}
           </HeaderSubtitle>
         </Box>
 
@@ -126,7 +161,7 @@ export const WorkspaceLibrary = ({
             variant="outlined"
             size="small"
             startIcon={<AddIcon />}
-            onClick={() => setIsFolderModalOpen(true)}
+            onClick={() => setIsProjectModalOpen(true)}
             sx={{
               borderRadius: '8px',
               textTransform: 'none',
@@ -150,7 +185,7 @@ export const WorkspaceLibrary = ({
             variant="outlined"
             size="small"
             startIcon={<FolderOpenIcon />}
-            onClick={() => setIsAllFoldersModalOpen(true)}
+            onClick={() => setIsAllProjectsModalOpen(true)}
             sx={{
               borderRadius: '8px',
               textTransform: 'none',
@@ -201,7 +236,7 @@ export const WorkspaceLibrary = ({
         </Box>
       </LibraryHeader>
 
-      {/* Second Row: Horizontal folder tabs spanning full width */}
+      {/* Second Row: Horizontal project tabs spanning full width */}
       <Box
         sx={{
           borderBottom: `1px solid ${theme.palette.divider}`,
@@ -210,18 +245,18 @@ export const WorkspaceLibrary = ({
         }}
       >
         <FolderSectionList
-          selectedFolderId={selectedFolderId}
-          onFolderSelect={setSelectedFolderId}
+          selectedFolderId={selectedProjectId}
+          onFolderSelect={onSelectProject}
           allWorkspacesCount={allWorkspaces.length}
-          folders={folders}
-          foldersLoading={foldersLoading}
-          onFolderMenuOpen={handleFolderMenuOpen}
-          onAllFoldersOpen={() => setIsAllFoldersModalOpen(true)}
-          onAddFolderOpen={() => setIsFolderModalOpen(true)}
+          folders={projects}
+          foldersLoading={projectsLoading}
+          onFolderMenuOpen={handleProjectMenuOpen}
+          onAllFoldersOpen={() => setIsAllProjectsModalOpen(true)}
+          onAddFolderOpen={() => setIsProjectModalOpen(true)}
         />
       </Box>
 
-      {/* Third Row: Toolbar Row with Folder Title & Search/Filter Controls */}
+      {/* Toolbar Row with Group Title & Search/Filter Controls */}
       <Box
         sx={{
           display: 'flex',
@@ -230,9 +265,10 @@ export const WorkspaceLibrary = ({
           mb: 3,
           gap: 2,
           flexWrap: 'wrap',
+          mt: 2,
         }}
       >
-        {/* Left: Active Folder Name & Notes Count */}
+        {/* Left: Active Group/Folder Name & Notes Count */}
         <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
           <Typography
             variant="h5"
@@ -243,10 +279,11 @@ export const WorkspaceLibrary = ({
               letterSpacing: '-0.3px',
             }}
           >
-            {selectedFolderId
-              ? folders.find((f: FolderTypes) => f.id === selectedFolderId)
-                  ?.name || 'Folder'
-              : 'All Notes'}
+            {selectedProjectId && activeProject
+              ? activeProject.name
+              : activeGroup
+                ? activeGroup.name
+                : 'All Notes'}
           </Typography>
           <Typography
             variant="caption"
@@ -256,19 +293,21 @@ export const WorkspaceLibrary = ({
               fontWeight: 500,
             }}
           >
-            {selectedFolderId
-              ? `${folders.find((f: FolderTypes) => f.id === selectedFolderId)?.workspaceCount || 0} notes`
-              : `${allWorkspaces.length} notes`}
+            {selectedProjectId
+              ? `${activeProject?.workspaceCount || 0} notes`
+              : `${workspaces.length} notes`}
           </Typography>
         </Box>
 
-        {/* Right: Compounded search, filter, and layout toggles */}
+        {/* Right: Search and Layout control */}
         <LibrarySearchHeader
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           onClearSearch={handleClearSearch}
-          searchMode={searchMode}
-          onSearchModeChange={setSearchMode}
+          searchMode={searchMode === 'project' ? 'folder' : 'workspace'}
+          onSearchModeChange={(mode) =>
+            setSearchMode(mode === 'folder' ? 'project' : 'workspace')
+          }
         />
       </Box>
 
@@ -398,6 +437,7 @@ export const WorkspaceLibrary = ({
               ))}
         </GridContainer>
       )}
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -434,13 +474,13 @@ export const WorkspaceLibrary = ({
 
         <MenuItem
           onClick={() => {
-            if (selectedWorkspace) handleMoveToFolder(selectedWorkspace, null);
+            if (selectedWorkspace) handleMoveToProject(selectedWorkspace, null);
           }}
           sx={{
             fontSize: '13px',
             py: 1.2,
-            fontWeight: !selectedWorkspace?.folderId ? 700 : 500,
-            bgcolor: !selectedWorkspace?.folderId
+            fontWeight: !selectedWorkspace?.projectId ? 700 : 500,
+            bgcolor: !selectedWorkspace?.projectId
               ? 'action.selected'
               : 'transparent',
           }}
@@ -449,23 +489,23 @@ export const WorkspaceLibrary = ({
             sx={{
               fontSize: 18,
               mr: 1.5,
-              opacity: !selectedWorkspace?.folderId ? 1 : 0.7,
+              opacity: !selectedWorkspace?.projectId ? 1 : 0.7,
             }}
           />
           <Box sx={{ flex: 1 }}>All Notes (Default)</Box>
-          {!selectedWorkspace?.folderId && (
+          {!selectedWorkspace?.projectId && (
             <CheckBoxIcon sx={{ fontSize: 16, color: 'primary.main' }} />
           )}
         </MenuItem>
 
-        {folders.map((folder: FolderTypes) => {
-          const isCurrent = selectedWorkspace?.folderId === folder.id;
+        {projects.map((project: ProjectTypes) => {
+          const isCurrent = selectedWorkspace?.projectId === project.id;
           return (
             <MenuItem
-              key={folder.id}
+              key={project.id}
               onClick={() => {
                 if (selectedWorkspace)
-                  handleMoveToFolder(selectedWorkspace, folder.id);
+                  handleMoveToProject(selectedWorkspace, project.id);
               }}
               sx={{
                 fontSize: '13px',
@@ -478,16 +518,16 @@ export const WorkspaceLibrary = ({
                 sx={{
                   fontSize: 18,
                   mr: 1.5,
-                  color: folder.color || 'primary.main',
+                  color: project.color || 'primary.main',
                   opacity: isCurrent ? 1 : 0.7,
                 }}
               />
-              <Box sx={{ flex: 1 }}>{folder.name}</Box>
+              <Box sx={{ flex: 1 }}>{project.name}</Box>
               {isCurrent && (
                 <CheckBoxIcon
                   sx={{
                     fontSize: 16,
-                    color: folder.color || 'primary.main',
+                    color: project.color || 'primary.main',
                   }}
                 />
               )}
@@ -500,16 +540,13 @@ export const WorkspaceLibrary = ({
         <MenuItem
           onClick={() => {
             if (selectedWorkspace) {
-              console.log('Deleting workspace:', selectedWorkspace.id);
               handleDeleteConfirm(selectedWorkspace.id);
               handleMenuClose();
-            } else {
-              console.warn('No selected workspace to delete');
             }
           }}
           sx={{
             fontSize: '13px',
-            py: 1,
+            py: 1.5,
             fontWeight: 500,
             color: 'error.main',
             '&:hover': {
@@ -524,38 +561,11 @@ export const WorkspaceLibrary = ({
         </MenuItem>
       </Menu>
 
-      <CreateFolderModal
-        open={isFolderModalOpen}
-        onClose={() => setIsFolderModalOpen(false)}
-        onCreate={handleCreateFolder}
-      />
-
-      <UpdateFolderModal
-        key={selectedFolderToManage?.id || 'new'}
-        open={isUpdateFolderModalOpen}
-        onClose={() => {
-          setIsUpdateFolderModalOpen(false);
-          setSelectedFolderToManage(null);
-        }}
-        onUpdate={handleUpdateFolder}
-        folder={selectedFolderToManage}
-      />
-
-      <AllFoldersModal
-        open={isAllFoldersModalOpen}
-        onClose={() => setIsAllFoldersModalOpen(false)}
-        folders={folders}
-        selectedId={selectedFolderId}
-        onSelect={(id) => {
-          setSelectedFolderId(id);
-          setIsAllFoldersModalOpen(false);
-        }}
-      />
-
+      {/* Folder Menu */}
       <Menu
-        anchorEl={folderAnchorEl}
-        open={Boolean(folderAnchorEl)}
-        onClose={handleFolderMenuClose}
+        anchorEl={projectAnchorEl}
+        open={Boolean(projectAnchorEl)}
+        onClose={handleProjectMenuClose}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         PaperProps={{
@@ -571,8 +581,8 @@ export const WorkspaceLibrary = ({
       >
         <MenuItem
           onClick={() => {
-            setIsUpdateFolderModalOpen(true);
-            handleFolderMenuClose();
+            setIsUpdateProjectModalOpen(true);
+            handleProjectMenuClose();
           }}
           sx={{ fontSize: '13px', py: 1 }}
         >
@@ -582,7 +592,7 @@ export const WorkspaceLibrary = ({
           <ListItemText>Edit Folder</ListItemText>
         </MenuItem>
         <MenuItem
-          onClick={handleDeleteFolder}
+          onClick={handleDeleteProject}
           sx={{ fontSize: '13px', py: 1, color: 'error.main' }}
         >
           <ListItemIcon sx={{ minWidth: 32 }}>
@@ -591,6 +601,34 @@ export const WorkspaceLibrary = ({
           <ListItemText>Delete Folder</ListItemText>
         </MenuItem>
       </Menu>
+
+      <CreateProjectModal
+        open={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+        onCreate={handleCreateProject}
+      />
+
+      <UpdateProjectModal
+        key={selectedProjectToManage?.id || 'new'}
+        open={isUpdateProjectModalOpen}
+        onClose={() => {
+          setIsUpdateProjectModalOpen(false);
+          setSelectedProjectToManage(null);
+        }}
+        onUpdate={handleUpdateProject}
+        project={selectedProjectToManage}
+      />
+
+      <AllProjectsModal
+        open={isAllProjectsModalOpen}
+        onClose={() => setIsAllProjectsModalOpen(false)}
+        projects={projects}
+        selectedId={selectedProjectId}
+        onSelect={(id) => {
+          onSelectProject(id);
+          setIsAllProjectsModalOpen(false);
+        }}
+      />
     </LibraryContainer>
   );
 };

@@ -7,58 +7,70 @@ import {
   UPDATE_WORKSPACE,
   UPDATE_FOLDER,
   DELETE_FOLDER,
+  GET_PROJECT_GROUPS,
 } from '../../../workspaces.graphql';
 import type {
   WorkspaceTypes,
-  FolderTypes,
+  ProjectTypes,
 } from '../../../types/workspace.types';
 import { sileo } from '@/utils/sileo';
 
-export const useWorkspaceLibrary = () => {
+export const useWorkspaceLibrary = (
+  selectedProjectId: string | null,
+  setSelectedProjectId: (id: string | null) => void,
+  selectedGroupId: string | null = null,
+) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
-  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
-  const [searchMode, setSearchMode] = useState<'workspace' | 'folder'>(
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [searchMode, setSearchMode] = useState<'workspace' | 'project'>(
     'workspace',
   );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [folderAnchorEl, setFolderAnchorEl] = useState<null | HTMLElement>(
+  const [projectAnchorEl, setProjectAnchorEl] = useState<null | HTMLElement>(
     null,
   );
   const [selectedWorkspace, setSelectedWorkspace] =
     useState<WorkspaceTypes | null>(null);
-  const [selectedFolderToManage, setSelectedFolderToManage] =
-    useState<FolderTypes | null>(null);
-  const [isUpdateFolderModalOpen, setIsUpdateFolderModalOpen] = useState(false);
-  const [isAllFoldersModalOpen, setIsAllFoldersModalOpen] = useState(false);
+  const [selectedProjectToManage, setSelectedProjectToManage] =
+    useState<ProjectTypes | null>(null);
+  const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] =
+    useState(false);
+  const [isAllProjectsModalOpen, setIsAllProjectsModalOpen] = useState(false);
   const [showPaletteInMenu, setShowPaletteInMenu] = useState(false);
 
   // Queries
   const { data, loading, error } = useQuery(GET_WORKSPACES, {
-    variables: { search: searchMode === 'workspace' ? searchTerm : '' },
+    variables: {
+      search: searchMode === 'workspace' ? searchTerm : '',
+      groupId: selectedGroupId || undefined,
+    },
   });
 
   const {
-    data: foldersData,
-    loading: foldersLoading,
-    error: foldersError,
-  } = useQuery(GET_FOLDERS);
+    data: projectsData,
+    loading: projectsLoading,
+    error: projectsError,
+  } = useQuery(GET_FOLDERS, {
+    variables: { groupId: selectedGroupId },
+  });
+
+  const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS);
 
   // Mutations
-  const [createFolder] = useMutation(CREATE_FOLDER, {
-    refetchQueries: [{ query: GET_FOLDERS }],
+  const [createProject] = useMutation(CREATE_FOLDER, {
+    refetchQueries: ['GetProjects'],
   });
 
-  const [updateFolder] = useMutation(UPDATE_FOLDER, {
-    refetchQueries: [{ query: GET_FOLDERS }, { query: GET_WORKSPACES }],
+  const [updateProject] = useMutation(UPDATE_FOLDER, {
+    refetchQueries: ['GetProjects', 'GetWorkspaces'],
   });
 
-  const [deleteFolder] = useMutation(DELETE_FOLDER, {
-    refetchQueries: [{ query: GET_FOLDERS }, { query: GET_WORKSPACES }],
+  const [deleteProject] = useMutation(DELETE_FOLDER, {
+    refetchQueries: ['GetProjects', 'GetWorkspaces'],
   });
 
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
-    refetchQueries: [{ query: GET_WORKSPACES }, { query: GET_FOLDERS }],
+    refetchQueries: ['GetWorkspaces', 'GetProjects'],
   });
 
   // Handlers
@@ -126,22 +138,22 @@ export const useWorkspaceLibrary = () => {
     handleMenuClose();
   };
 
-  const handleFolderMenuOpen = (
+  const handleProjectMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
-    folder: FolderTypes,
+    project: ProjectTypes,
   ) => {
     event.stopPropagation();
-    setFolderAnchorEl(event.currentTarget);
-    setSelectedFolderToManage(folder);
+    setProjectAnchorEl(event.currentTarget);
+    setSelectedProjectToManage(project);
   };
 
-  const handleFolderMenuClose = () => {
-    setFolderAnchorEl(null);
+  const handleProjectMenuClose = () => {
+    setProjectAnchorEl(null);
   };
 
-  const handleMoveToFolder = async (
+  const handleMoveToProject = async (
     workspace: WorkspaceTypes,
-    folderId: string | null,
+    projectId: string | null,
   ) => {
     if (!workspace) return;
     sileo.info({
@@ -153,13 +165,13 @@ export const useWorkspaceLibrary = () => {
         variables: {
           updateWorkspaceInput: {
             id: workspace.id,
-            folderId: folderId,
+            projectId: projectId,
           },
         },
       });
       sileo.success({
         title: 'Workspace moved',
-        description: folderId
+        description: projectId
           ? 'Workspace moved to folder'
           : 'Workspace moved to All Notes',
         fill: 'var(--sileo-success-bg)',
@@ -176,14 +188,14 @@ export const useWorkspaceLibrary = () => {
     handleMenuClose();
   };
 
-  const handleCreateFolder = async (name: string, color: string) => {
+  const handleCreateProject = async (name: string, color: string) => {
     try {
-      await createFolder({
+      await createProject({
         variables: {
-          createFolderInput: { name, color },
+          createProjectInput: { name, color, groupId: selectedGroupId },
         },
       });
-      setIsFolderModalOpen(false);
+      setIsProjectModalOpen(false);
       sileo.success({
         title: 'Folder created',
         description: `Folder "${name}" has been created.`,
@@ -195,19 +207,19 @@ export const useWorkspaceLibrary = () => {
     }
   };
 
-  const handleUpdateFolder = async (
+  const handleUpdateProject = async (
     id: string,
     name: string,
     color: string,
   ) => {
     try {
-      await updateFolder({
+      await updateProject({
         variables: {
-          updateFolderInput: { id, name, color },
+          updateProjectInput: { id, name, color, groupId: selectedGroupId },
         },
       });
       sileo.success({
-        title: 'Workspace updated',
+        title: 'Folder updated',
         description: 'Changes saved successfully',
         fill: 'var(--sileo-update-bg)',
         duration: 3000,
@@ -217,26 +229,36 @@ export const useWorkspaceLibrary = () => {
     }
   };
 
-  const handleDeleteFolder = async () => {
-    if (!selectedFolderToManage) return;
-    try {
-      await deleteFolder({
-        variables: { id: selectedFolderToManage.id },
-      });
-      if (selectedFolderId === selectedFolderToManage.id) {
-        setSelectedFolderId(null);
-      }
-      sileo.success({
-        title: 'Folder deleted',
-        description:
-          'Folder has been removed. All workspaces were moved to All Notes.',
-        fill: 'var(--sileo-delete-bg)',
-        duration: 4000,
-      });
-    } catch (err) {
-      console.error('Error deleting folder:', err);
-    }
-    handleFolderMenuClose();
+  const handleDeleteProject = async () => {
+    if (!selectedProjectToManage) return;
+    sileo.warning({
+      title: 'Remove Folder',
+      description:
+        'Are you sure you want to remove this folder? Linked workspaces will be kept as general notes.',
+      fill: 'var(--sileo-warning-bg)',
+      button: {
+        title: 'Delete',
+        onClick: async () => {
+          try {
+            await deleteProject({
+              variables: { id: selectedProjectToManage.id },
+            });
+            if (selectedProjectId === selectedProjectToManage.id) {
+              setSelectedProjectId(null);
+            }
+            sileo.success({
+              title: 'Folder deleted',
+              description: 'Folder has been removed.',
+              fill: 'var(--sileo-delete-bg)',
+              duration: 4000,
+            });
+          } catch (err) {
+            console.error('Error deleting folder:', err);
+          }
+          handleProjectMenuClose();
+        },
+      },
+    });
   };
 
   const handleUnlinkTask = async (workspace: WorkspaceTypes) => {
@@ -265,63 +287,77 @@ export const useWorkspaceLibrary = () => {
   };
 
   // Derived data
-  const folders = (foldersData?.folders || []).filter((f: FolderTypes) =>
-    searchMode === 'folder'
-      ? f.name.toLowerCase().includes(searchTerm.toLowerCase())
-      : true,
-  );
+  const projects = (projectsData?.projects || [])
+    .filter(
+      (p: ProjectTypes) => !selectedGroupId || p.groupId === selectedGroupId,
+    )
+    .filter((p: ProjectTypes) =>
+      searchMode === 'project'
+        ? p.name.toLowerCase().includes(searchTerm.toLowerCase())
+        : true,
+    );
 
   const allWorkspaces = data?.workspaces || [];
-  const workspaces = allWorkspaces.filter(
-    (w: WorkspaceTypes) => !selectedFolderId || w.folderId === selectedFolderId,
-  );
+  const workspaces = allWorkspaces.filter((w: WorkspaceTypes) => {
+    if (selectedProjectId) {
+      return w.projectId === selectedProjectId;
+    }
+    if (selectedGroupId) {
+      return (
+        w.groupId === selectedGroupId || w.project?.groupId === selectedGroupId
+      );
+    }
+    return true;
+  });
 
-  if (foldersError) {
-    console.error('Error fetching folders:', foldersError);
+  if (projectsError) {
+    console.error('Error fetching folders:', projectsError);
   }
 
   return {
     state: {
       searchTerm,
-      selectedFolderId,
-      isFolderModalOpen,
+      selectedProjectId,
+      selectedGroupId,
+      isProjectModalOpen,
       searchMode,
       anchorEl,
-      folderAnchorEl,
+      projectAnchorEl,
       selectedWorkspace,
-      selectedFolderToManage,
-      isUpdateFolderModalOpen,
-      isAllFoldersModalOpen,
+      selectedProjectToManage,
+      isUpdateProjectModalOpen,
+      isAllProjectsModalOpen,
       showPaletteInMenu,
     },
     actions: {
       setSearchTerm,
-      setSelectedFolderId,
-      setIsFolderModalOpen,
+      setSelectedProjectId,
+      setIsProjectModalOpen,
       setSearchMode,
-      setIsUpdateFolderModalOpen,
-      setIsAllFoldersModalOpen,
+      setIsUpdateProjectModalOpen,
+      setIsAllProjectsModalOpen,
       handleMenuOpen,
       handleMenuClose,
       handleSetBackground,
       handleRemoveBackground,
-      handleFolderMenuOpen,
-      handleFolderMenuClose,
-      handleMoveToFolder,
-      handleCreateFolder,
-      handleUpdateFolder,
-      handleDeleteFolder,
+      handleProjectMenuOpen,
+      handleProjectMenuClose,
+      handleMoveToProject,
+      handleCreateProject,
+      handleUpdateProject,
+      handleDeleteProject,
       handleUnlinkTask,
       handleClearSearch,
-      setSelectedFolderToManage,
+      setSelectedProjectToManage,
       setShowPaletteInMenu,
     },
     data: {
       workspaces,
-      folders,
+      projects,
       allWorkspaces,
+      projectGroups: projectGroupsData?.projectGroups || [],
       loading,
-      foldersLoading,
+      projectsLoading,
       error,
     },
   };

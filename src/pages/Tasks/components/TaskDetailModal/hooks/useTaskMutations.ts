@@ -379,7 +379,7 @@ export const useTaskMutations = ({
     }
 
     try {
-      const isGoogleTask = initialTask.task_type === 'GoogleTask';
+      const isGoogleTask = initialTask.source === 'google';
 
       if (!isGoogleTask) {
         // Platform Task — Delete from BOTH Google Calendar (if synced) and Platform DB

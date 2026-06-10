@@ -25,6 +25,7 @@ export interface TaskSortInput {
 export interface TaskResponse {
   id: string;
   user_id: string;
+  is_owner?: boolean;
   title: string;
   notes_encrypted: string;
   estimate_timer: number;
@@ -70,6 +71,11 @@ export interface TaskResponse {
     content?: string;
     updatedAt?: string;
     folder?: {
+      id: string;
+      name: string;
+      color?: string;
+    } | null;
+    project?: {
       id: string;
       name: string;
       color?: string;

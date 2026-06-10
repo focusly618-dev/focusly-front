@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_WORKSPACES = gql`
-  query GetWorkspaces($search: String) {
-    workspaces(search: $search) {
+  query GetWorkspaces($search: String, $groupId: String) {
+    workspaces(search: $search, groupId: $groupId) {
       id
       title
       content
@@ -24,12 +24,16 @@ export const GET_WORKSPACES = gql`
           url
         }
         google_event_id
+        source
+        created_at
       }
-      folderId
-      folder {
+      projectId
+      groupId
+      project {
         id
         name
         color
+        groupId
       }
     }
   }
@@ -41,9 +45,13 @@ export const CREATE_WORKSPACE = gql`
       id
       title
       content
+      emoji
+      background_color
+      card_show_background
       updatedAt
       taskId
-      folderId
+      projectId
+      groupId
       saveStatus
       task {
         id
@@ -53,6 +61,8 @@ export const CREATE_WORKSPACE = gql`
         real_timer
         duration
         priority_level
+        source
+        created_at
       }
     }
   }
@@ -69,8 +79,9 @@ export const UPDATE_WORKSPACE = gql`
       card_show_background
       updatedAt
       taskId
-      folderId
-      folder {
+      projectId
+      groupId
+      project {
         id
         name
         color
@@ -83,6 +94,8 @@ export const UPDATE_WORKSPACE = gql`
         real_timer
         duration
         priority_level
+        source
+        created_at
       }
     }
   }
@@ -124,17 +137,20 @@ export const GET_WORKSPACE_BY_ID = gql`
           url
         }
         google_event_id
+        source
+        created_at
       }
     }
   }
 `;
 
 export const GET_FOLDERS = gql`
-  query GetFolders {
-    folders {
+  query GetProjects($groupId: String) {
+    projects(groupId: $groupId) {
       id
       name
       color
+      groupId
       workspaceCount
       createdAt
       updatedAt
@@ -143,8 +159,8 @@ export const GET_FOLDERS = gql`
 `;
 
 export const CREATE_FOLDER = gql`
-  mutation CreateFolder($createFolderInput: CreateFolderInput!) {
-    createFolder(createFolderInput: $createFolderInput) {
+  mutation CreateProject($createProjectInput: CreateProjectInput!) {
+    createProject(createProjectInput: $createProjectInput) {
       id
       name
       color
@@ -153,8 +169,8 @@ export const CREATE_FOLDER = gql`
 `;
 
 export const UPDATE_FOLDER = gql`
-  mutation UpdateFolder($updateFolderInput: UpdateFolderInput!) {
-    updateFolder(updateFolderInput: $updateFolderInput) {
+  mutation UpdateProject($updateProjectInput: UpdateProjectInput!) {
+    updateProject(updateProjectInput: $updateProjectInput) {
       id
       name
       color
@@ -163,7 +179,53 @@ export const UPDATE_FOLDER = gql`
 `;
 
 export const DELETE_FOLDER = gql`
-  mutation DeleteFolder($id: ID!) {
-    removeFolder(id: $id)
+  mutation DeleteProject($id: ID!) {
+    removeProject(id: $id)
+  }
+`;
+
+// Project Group operations
+export const GET_PROJECT_GROUPS = gql`
+  query GetProjectGroups {
+    projectGroups {
+      id
+      name
+      color
+      emoji
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_PROJECT_GROUP = gql`
+  mutation CreateProjectGroup($input: CreateProjectGroupInput!) {
+    createProjectGroup(input: $input) {
+      id
+      name
+      color
+      emoji
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const UPDATE_PROJECT_GROUP = gql`
+  mutation UpdateProjectGroup($input: UpdateProjectGroupInput!) {
+    updateProjectGroup(input: $input) {
+      id
+      name
+      color
+      emoji
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_PROJECT_GROUP = gql`
+  mutation DeleteProjectGroup($id: ID!) {
+    removeProjectGroup(id: $id)
   }
 `;

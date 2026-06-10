@@ -471,32 +471,13 @@ export const useCalendarView = () => {
     const initialTask = taskObj || virtualEvent;
 
     if (initialTask) {
-      const initialTaskTyped = initialTask as {
-        task_type?: string;
-        google_event_id?: string;
-        provider?: string;
-        organizer_email?: string;
-        user_id?: string;
-      };
-      const isGoogleTask =
-        initialTaskTyped.task_type === 'GoogleTask' ||
-        initialTaskTyped.google_event_id ||
-        initialTaskTyped.provider === 'google';
-      const organizerEmail = initialTaskTyped.organizer_email;
-      const userIdField = initialTaskTyped.user_id;
-
-      const isReadOnly =
-        user &&
-        ((isGoogleTask &&
-          organizerEmail &&
-          organizerEmail.toLowerCase() !== user.email?.toLowerCase()) ||
-          (!isGoogleTask && userIdField && userIdField !== user.id));
+      const isReadOnly = initialTask.is_owner === false;
 
       if (isReadOnly) {
         sileo.error({
-          title: 'Acción no permitida',
+          title: 'Action not allowed',
           description:
-            'No puedes eliminar una tarea o evento del cual no eres propietario.',
+            "You can't delete the task because you are not the owner",
           duration: 3000,
         });
         return;
@@ -590,26 +571,12 @@ export const useCalendarView = () => {
 
     const originalTask = tasks.find((t) => t.id === event.id);
     if (originalTask) {
-      const isGoogleTask =
-        originalTask.task_type === 'GoogleTask' || originalTask.google_event_id;
-      const originalTaskTyped = originalTask as unknown as {
-        organizer_email?: string;
-      };
-      const isReadOnly =
-        user &&
-        ((isGoogleTask &&
-          originalTaskTyped.organizer_email &&
-          originalTaskTyped.organizer_email.toLowerCase() !==
-            user.email?.toLowerCase()) ||
-          (!isGoogleTask &&
-            originalTask.user_id &&
-            originalTask.user_id !== user.id));
+      const isReadOnly = originalTask.is_owner === false;
 
       if (isReadOnly) {
         sileo.error({
-          title: 'Acción no permitida',
-          description:
-            'No puedes reprogramar una tarea o evento del cual no eres propietario.',
+          title: 'Action not allowed',
+          description: "You can't move the task because you are not the owner",
           duration: 3000,
         });
         return;
@@ -677,26 +644,12 @@ export const useCalendarView = () => {
 
     const originalTask = tasks.find((t) => t.id === event.id);
     if (originalTask) {
-      const isGoogleTask =
-        originalTask.task_type === 'GoogleTask' || originalTask.google_event_id;
-      const originalTaskTyped = originalTask as unknown as {
-        organizer_email?: string;
-      };
-      const isReadOnly =
-        user &&
-        ((isGoogleTask &&
-          originalTaskTyped.organizer_email &&
-          originalTaskTyped.organizer_email.toLowerCase() !==
-            user.email?.toLowerCase()) ||
-          (!isGoogleTask &&
-            originalTask.user_id &&
-            originalTask.user_id !== user.id));
+      const isReadOnly = originalTask.is_owner === false;
 
       if (isReadOnly) {
         sileo.error({
-          title: 'Acción no permitida',
-          description:
-            'No puedes redimensionar una tarea o evento del cual no eres propietario.',
+          title: 'Action not allowed',
+          description: "You can't move the task because you are not the owner",
           duration: 3000,
         });
         return;
