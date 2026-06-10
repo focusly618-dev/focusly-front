@@ -8,5 +8,5 @@ export enum TaskBar {
 }
 export interface SidebarProps {
   activeTab: TaskBar;
-  changeStatusTab: (active: TaskBar) => void;
+  changeStatusTab: (active: TaskBar, extraParams?: URLSearchParams) => void;
 }

@@ -8,6 +8,7 @@ import {
 import {
   EditOutlined as EditIcon,
   DeleteOutline as DeleteIcon,
+  Add as AddIcon,
 } from '@mui/icons-material';
 import { CreateProjectModal } from '@/pages/Workspace/components/Library/modals/CreateProjectModal';
 import { UpdateProjectModal } from '@/pages/Workspace/components/Library/modals/UpdateProjectModal';
@@ -37,6 +38,9 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
     setSelectedProjectToManage,
     handleCreateProject,
     handleUpdateProject,
+    setCreatingWorkspaceInFolderId,
+    setCreatingWorkspaceInGroupId,
+    setExpandedGroups,
   } = sidebar;
 
   return (
@@ -111,6 +115,24 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
           <>
             <MenuItem
               onClick={() => {
+                setCreatingWorkspaceInFolderId(`general-${activeGroupItem.id}`);
+                setCreatingWorkspaceInGroupId(activeGroupItem.id);
+                setExpandedGroups((prev) => ({
+                  ...prev,
+                  [activeGroupItem.id]: true,
+                }));
+                handleCloseMenu();
+              }}
+              sx={{ fontSize: '13px', py: 0.8 }}
+            >
+              <ListItemIcon sx={{ minWidth: 28 }}>
+                <AddIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+              </ListItemIcon>
+              <ListItemText>New Note</ListItemText>
+            </MenuItem>
+            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
+            <MenuItem
+              onClick={() => {
                 handleRenameGroupPrompt(activeGroupItem);
                 handleCloseMenu();
               }}
@@ -119,7 +141,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <EditIcon fontSize="small" sx={{ color: 'text.secondary' }} />
               </ListItemIcon>
-              <ListItemText>Rename Group</ListItemText>
+              <ListItemText>Rename Project</ListItemText>
             </MenuItem>
             <Divider sx={{ my: 0.5, opacity: 0.1 }} />
             <MenuItem
@@ -132,7 +154,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
               </ListItemIcon>
-              <ListItemText>Delete Group</ListItemText>
+              <ListItemText>Delete Project</ListItemText>
             </MenuItem>
           </>
         )}

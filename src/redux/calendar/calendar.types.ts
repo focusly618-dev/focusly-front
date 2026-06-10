@@ -29,6 +29,7 @@ export interface GoogleCalendarEvent {
   is_all_day: boolean;
   created_at: string;
   updated_at: string;
+  is_owner?: boolean;
 }
 
 /**

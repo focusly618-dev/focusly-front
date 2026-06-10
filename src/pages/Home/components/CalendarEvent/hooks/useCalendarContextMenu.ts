@@ -38,10 +38,11 @@ export const useCalendarContextMenu = (
       google_event_id?: string;
       organizer_email?: string;
       user_id?: string;
+      source?: string;
     };
     // Check Google Calendar event ownership
     if (
-      resourceAny.task_type === 'GoogleTask' ||
+      resourceAny.source === 'google' ||
       resourceAny.google_event_id ||
       event.type === 'event'
     ) {
@@ -76,7 +77,7 @@ export const useCalendarContextMenu = (
     if (!user) return;
 
     // Check if it's a Google event mirrored task - we probably shouldn't duplicate these directly via Focusly API or they lose sync
-    if (task.task_type === 'GoogleTask') {
+    if (task.source === 'google') {
       sileo.error({ title: 'Cannot duplicate Google events via context menu' });
       return;
     }
@@ -168,6 +169,20 @@ export const useCalendarContextMenu = (
     if (!user || isReadOnly) return;
 
     try {
+      // Platform Task — Delete from BOTH Google Calendar (if synced) and Platform DB
+      const taskObj = event.resource as Task | undefined;
+      if (taskObj?.google_event_id) {
+        try {
+          await deleteGoogleEvent(taskObj.google_event_id);
+          dispatch(removeEvent({ id: taskObj.google_event_id }));
+        } catch (err) {
+          console.warn(
+            'Failed to delete synced Google event, proceeding with platform delete',
+            err,
+          );
+        }
+      }
+
       await deleteTask({
         variables: { id: taskId },
         refetchQueries: [
@@ -176,6 +191,7 @@ export const useCalendarContextMenu = (
         ],
       });
       dispatch(removeTask({ id: taskId }));
+      dispatch(removeEvent({ id: taskId }));
       sileo.success({
         title: 'Task deleted',
         fill: 'var(--sileo-delete-bg)',

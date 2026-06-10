@@ -7,6 +7,7 @@ import {
   UPDATE_WORKSPACE,
   UPDATE_FOLDER,
   DELETE_FOLDER,
+  GET_PROJECT_GROUPS,
 } from '../../../workspaces.graphql';
 import type {
   WorkspaceTypes,
@@ -17,6 +18,7 @@ import { sileo } from '@/utils/sileo';
 export const useWorkspaceLibrary = (
   selectedProjectId: string | null,
   setSelectedProjectId: (id: string | null) => void,
+  selectedGroupId: string | null = null,
 ) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -38,30 +40,37 @@ export const useWorkspaceLibrary = (
 
   // Queries
   const { data, loading, error } = useQuery(GET_WORKSPACES, {
-    variables: { search: searchMode === 'workspace' ? searchTerm : '' },
+    variables: {
+      search: searchMode === 'workspace' ? searchTerm : '',
+      groupId: selectedGroupId || undefined,
+    },
   });
 
   const {
     data: projectsData,
     loading: projectsLoading,
     error: projectsError,
-  } = useQuery(GET_FOLDERS);
+  } = useQuery(GET_FOLDERS, {
+    variables: { groupId: selectedGroupId },
+  });
+
+  const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS);
 
   // Mutations
   const [createProject] = useMutation(CREATE_FOLDER, {
-    refetchQueries: [{ query: GET_FOLDERS }],
+    refetchQueries: ['GetProjects'],
   });
 
   const [updateProject] = useMutation(UPDATE_FOLDER, {
-    refetchQueries: [{ query: GET_FOLDERS }, { query: GET_WORKSPACES }],
+    refetchQueries: ['GetProjects', 'GetWorkspaces'],
   });
 
   const [deleteProject] = useMutation(DELETE_FOLDER, {
-    refetchQueries: [{ query: GET_FOLDERS }, { query: GET_WORKSPACES }],
+    refetchQueries: ['GetProjects', 'GetWorkspaces'],
   });
 
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
-    refetchQueries: [{ query: GET_WORKSPACES }, { query: GET_FOLDERS }],
+    refetchQueries: ['GetWorkspaces', 'GetProjects'],
   });
 
   // Handlers
@@ -149,7 +158,7 @@ export const useWorkspaceLibrary = (
     if (!workspace) return;
     sileo.info({
       title: 'Moving...',
-      description: 'Updating workspace project',
+      description: 'Updating workspace folder',
     });
     try {
       await updateWorkspace({
@@ -163,7 +172,7 @@ export const useWorkspaceLibrary = (
       sileo.success({
         title: 'Workspace moved',
         description: projectId
-          ? 'Workspace moved to project'
+          ? 'Workspace moved to folder'
           : 'Workspace moved to All Notes',
         fill: 'var(--sileo-success-bg)',
         duration: 3000,
@@ -183,18 +192,18 @@ export const useWorkspaceLibrary = (
     try {
       await createProject({
         variables: {
-          createProjectInput: { name, color },
+          createProjectInput: { name, color, groupId: selectedGroupId },
         },
       });
       setIsProjectModalOpen(false);
       sileo.success({
-        title: 'Project created',
-        description: `Project "${name}" has been created.`,
+        title: 'Folder created',
+        description: `Folder "${name}" has been created.`,
         fill: 'var(--sileo-success-bg)',
         duration: 4000,
       });
     } catch (err) {
-      console.error('Error creating project:', err);
+      console.error('Error creating folder:', err);
     }
   };
 
@@ -206,26 +215,26 @@ export const useWorkspaceLibrary = (
     try {
       await updateProject({
         variables: {
-          updateProjectInput: { id, name, color },
+          updateProjectInput: { id, name, color, groupId: selectedGroupId },
         },
       });
       sileo.success({
-        title: 'Project updated',
+        title: 'Folder updated',
         description: 'Changes saved successfully',
         fill: 'var(--sileo-update-bg)',
         duration: 3000,
       });
     } catch (err) {
-      console.error('Error updating project:', err);
+      console.error('Error updating folder:', err);
     }
   };
 
   const handleDeleteProject = async () => {
     if (!selectedProjectToManage) return;
     sileo.warning({
-      title: 'Remove Project',
+      title: 'Remove Folder',
       description:
-        'Are you sure you want to remove this project? Linked workspaces will be kept as general notes.',
+        'Are you sure you want to remove this folder? Linked workspaces will be kept as general notes.',
       fill: 'var(--sileo-warning-bg)',
       button: {
         title: 'Delete',
@@ -238,13 +247,13 @@ export const useWorkspaceLibrary = (
               setSelectedProjectId(null);
             }
             sileo.success({
-              title: 'Project deleted',
-              description: 'Project has been removed.',
+              title: 'Folder deleted',
+              description: 'Folder has been removed.',
               fill: 'var(--sileo-delete-bg)',
               duration: 4000,
             });
           } catch (err) {
-            console.error('Error deleting project:', err);
+            console.error('Error deleting folder:', err);
           }
           handleProjectMenuClose();
         },
@@ -278,26 +287,38 @@ export const useWorkspaceLibrary = (
   };
 
   // Derived data
-  const projects = (projectsData?.projects || []).filter((p: ProjectTypes) =>
-    searchMode === 'project'
-      ? p.name.toLowerCase().includes(searchTerm.toLowerCase())
-      : true,
-  );
+  const projects = (projectsData?.projects || [])
+    .filter(
+      (p: ProjectTypes) => !selectedGroupId || p.groupId === selectedGroupId,
+    )
+    .filter((p: ProjectTypes) =>
+      searchMode === 'project'
+        ? p.name.toLowerCase().includes(searchTerm.toLowerCase())
+        : true,
+    );
 
   const allWorkspaces = data?.workspaces || [];
-  const workspaces = allWorkspaces.filter(
-    (w: WorkspaceTypes) =>
-      !selectedProjectId || w.projectId === selectedProjectId,
-  );
+  const workspaces = allWorkspaces.filter((w: WorkspaceTypes) => {
+    if (selectedProjectId) {
+      return w.projectId === selectedProjectId;
+    }
+    if (selectedGroupId) {
+      return (
+        w.groupId === selectedGroupId || w.project?.groupId === selectedGroupId
+      );
+    }
+    return true;
+  });
 
   if (projectsError) {
-    console.error('Error fetching projects:', projectsError);
+    console.error('Error fetching folders:', projectsError);
   }
 
   return {
     state: {
       searchTerm,
       selectedProjectId,
+      selectedGroupId,
       isProjectModalOpen,
       searchMode,
       anchorEl,
@@ -334,6 +355,7 @@ export const useWorkspaceLibrary = (
       workspaces,
       projects,
       allWorkspaces,
+      projectGroups: projectGroupsData?.projectGroups || [],
       loading,
       projectsLoading,
       error,

@@ -99,7 +99,7 @@ interface TaskPropertiesProps {
     setAnchor: (el: HTMLDivElement | null) => void,
     target: HTMLDivElement,
   ) => void;
-  isReadOnly?: boolean;
+  isOwner?: boolean;
   createdAt?: string;
 }
 
@@ -129,7 +129,7 @@ export const TaskProperties = ({
   setRealTime,
   timeSlotDisplay,
   handleTimerChange,
-  isReadOnly,
+  isOwner,
   createdAt,
 }: TaskPropertiesProps) => {
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
@@ -189,7 +189,7 @@ export const TaskProperties = ({
             onClick={(e) => setStatusAnchor(e.currentTarget)}
             sx={{
               ...metadataChipSx(false),
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           />
         </Box>
@@ -202,7 +202,7 @@ export const TaskProperties = ({
             onClick={(e) => setPriorityAnchor(e.currentTarget)}
             sx={{
               ...metadataChipSx(priority === 'High'),
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           />
         </Box>
@@ -247,7 +247,7 @@ export const TaskProperties = ({
             onClick={(e) => setCategoryAnchor(e.currentTarget)}
             sx={{
               ...metadataChipSx(false),
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           />
         </Box>
@@ -258,7 +258,7 @@ export const TaskProperties = ({
             onClick={(e) => setColorAnchor(e.currentTarget)}
             sx={{
               ...colorCircleSx(color),
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           />
         </Box>
@@ -277,9 +277,9 @@ export const TaskProperties = ({
         </Box>
         <Box sx={{ ...propertyValueSx, position: 'relative' }}>
           <Box
-            onClick={() => !isReadOnly && setDatePickerOpen(true)}
+            onClick={() => isOwner && setDatePickerOpen(true)}
             sx={{
-              cursor: isReadOnly ? 'default' : 'pointer',
+              cursor: !isOwner ? 'default' : 'pointer',
               fontSize: '14px',
               fontWeight: 500,
               color: 'text.primary',
@@ -288,9 +288,9 @@ export const TaskProperties = ({
               borderRadius: '4px',
               transition: 'background-color 0.2s',
               '&:hover': {
-                bgcolor: isReadOnly ? 'transparent' : 'action.hover',
+                bgcolor: !isOwner ? 'transparent' : 'action.hover',
               },
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           >
             {currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
@@ -346,9 +346,9 @@ export const TaskProperties = ({
           }}
         >
           <Box
-            onClick={() => !isReadOnly && setTimePickerOpen(true)}
+            onClick={() => isOwner && setTimePickerOpen(true)}
             sx={{
-              cursor: isReadOnly ? 'default' : 'pointer',
+              cursor: !isOwner ? 'default' : 'pointer',
               fontSize: '14px',
               fontWeight: 500,
               color: 'text.primary',
@@ -357,9 +357,9 @@ export const TaskProperties = ({
               borderRadius: '4px',
               transition: 'background-color 0.2s',
               '&:hover': {
-                bgcolor: isReadOnly ? 'transparent' : 'action.hover',
+                bgcolor: !isOwner ? 'transparent' : 'action.hover',
               },
-              pointerEvents: isReadOnly ? 'none' : 'auto',
+              pointerEvents: !isOwner ? 'none' : 'auto',
             }}
           >
             {currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
@@ -486,7 +486,7 @@ export const TaskProperties = ({
                   <Chip
                     label={tag}
                     onDelete={
-                      isReadOnly
+                      !isOwner
                         ? undefined
                         : () => setTags(tags.filter((t) => t !== tag))
                     }
@@ -510,7 +510,7 @@ export const TaskProperties = ({
                 </Box>
               );
             })}
-            {!isReadOnly &&
+            {isOwner &&
               (isAddingTag ? (
                 <Box
                   key="add-tag-input"
@@ -597,7 +597,7 @@ export const TaskProperties = ({
             <TextField
               variant="standard"
               value={duration}
-              disabled={isReadOnly}
+              disabled={!isOwner}
               onChange={(e) =>
                 handleTimerChange(
                   e.target.value,
@@ -611,7 +611,7 @@ export const TaskProperties = ({
               placeholder="2h 00m"
               InputProps={{
                 disableUnderline: true,
-                readOnly: isReadOnly,
+                readOnly: !isOwner,
               }}
               sx={timerInputSx()}
             />
@@ -662,7 +662,7 @@ export const TaskProperties = ({
             <TextField
               variant="standard"
               value={realTime}
-              disabled={isReadOnly}
+              disabled={!isOwner}
               onChange={(e) =>
                 handleTimerChange(
                   e.target.value,
@@ -676,7 +676,7 @@ export const TaskProperties = ({
               placeholder="1h 30m"
               InputProps={{
                 disableUnderline: true,
-                readOnly: isReadOnly,
+                readOnly: !isOwner,
               }}
               sx={timerInputSx()}
             />

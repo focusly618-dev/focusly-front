@@ -16,6 +16,7 @@ export const GET_TASKS = gql`
       duration
       priority_level
       user_id
+      is_owner
       category
       color
       use_ai
@@ -36,6 +37,7 @@ export const GET_TASKS = gql`
       }
       google_event_id
       task_type
+      source
       estimated_start_date
       estimated_end_date
       collaborators {
@@ -65,6 +67,7 @@ export const GET_TASKS_TITLES = gql`
       duration
       priority_level
       user_id
+      is_owner
       category
       color
       notes_encrypted
@@ -81,6 +84,7 @@ export const GET_TASKS_TITLES = gql`
       }
       google_event_id
       task_type
+      source
       estimated_start_date
       estimated_end_date
 
@@ -93,7 +97,7 @@ export const GET_TASKS_TITLES = gql`
       workspace {
         id
         title
-        folder {
+        project {
           id
           name
           color
@@ -108,6 +112,7 @@ export const UPDATE_TASK = gql`
     updateTask(updateTaskInput: $updateTaskInput) {
       id
       user_id
+      is_owner
       title
       notes_encrypted
       status
@@ -129,6 +134,7 @@ export const UPDATE_TASK = gql`
       }
       google_event_id
       task_type
+      source
       estimated_start_date
       estimated_end_date
 
@@ -148,6 +154,7 @@ export const CREATE_TASK = gql`
     createTask(createTaskInput: $createTaskInput) {
       id
       user_id
+      is_owner
       title
       notes_encrypted
       status
@@ -169,6 +176,7 @@ export const CREATE_TASK = gql`
       }
       google_event_id
       task_type
+      source
       estimated_start_date
       estimated_end_date
 
@@ -234,6 +242,7 @@ export const GET_TASKS_PAGINATED = gql`
         duration
         priority_level
         user_id
+        is_owner
         category
         color
         use_ai
@@ -254,6 +263,7 @@ export const GET_TASKS_PAGINATED = gql`
         }
         google_event_id
         task_type
+        source
         estimated_start_date
         estimated_end_date
         collaborators {

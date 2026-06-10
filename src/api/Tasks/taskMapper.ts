@@ -28,9 +28,11 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     links: event.links || [],
     task_type: 'GoogleTask',
     google_event_id: normalizeGoogleId(event.id),
+    source: 'google',
     tags: event.tags || [],
     estimated_start_date: event.estimated_start_date,
     estimated_end_date: event.deadline,
+    is_owner: event.is_owner !== undefined ? event.is_owner : true,
     collaborators: (event.collaborators || []).map(
       (c: { name?: string; email?: string; avatar?: string }) => ({
         name: c.name || '',
@@ -78,7 +80,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     links: t.links || [],
     task_type: (t.task_type || 'PlatformTask') as 'GoogleTask' | 'PlatformTask',
     google_event_id: normalizeGoogleId(t.google_event_id),
-    source: 'platform',
+    source: (t.source || 'platform') as 'google' | 'platform',
     collaborators: (t.collaborators || []).map((c) => ({
       ...c,
       name: c.name || '',
@@ -93,6 +95,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     estimated_start_date: safeISO(t.estimated_start_date),
     estimated_end_date: safeISO(t.estimated_end_date),
     use_ai: t.use_ai,
+    is_owner: t.is_owner,
     workspaces: t.workspace
       ? [
           {
@@ -100,7 +103,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
             title: t.workspace.title,
             content: t.workspace.content || '',
             updatedAt: t.workspace.updatedAt || '',
-            folder: t.workspace.folder,
+            folder: t.workspace.project || t.workspace.folder,
           },
         ]
       : [],

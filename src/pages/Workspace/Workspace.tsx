@@ -6,7 +6,7 @@ import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import type { Step } from 'react-joyride';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_WORKSPACE_BY_ID, GET_WORKSPACES } from './workspaces.graphql';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import type { WorkspaceProps, WorkspaceTypes } from './types/workspace.types';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
@@ -40,7 +40,18 @@ export const Workspace = ({
   });
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const selectedGroupId = searchParams.get('groupId');
   const selectedProjectId = searchParams.get('projectId');
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
+
+  const [prevGroupId, setPrevGroupId] = useState(selectedGroupId);
+  const [prevProjectId, setPrevProjectId] = useState(selectedProjectId);
+
+  if (selectedGroupId !== prevGroupId || selectedProjectId !== prevProjectId) {
+    setPrevGroupId(selectedGroupId);
+    setPrevProjectId(selectedProjectId);
+    setIsCreatingNew(false);
+  }
 
   const onboardingSteps: Step[] = [
     {
@@ -88,6 +99,7 @@ export const Workspace = ({
   useEffect(() => {
     const loadWorkspaceFromUrl = async () => {
       if (workspaceIdParam) {
+        setIsCreatingNew(false);
         if (watch('id') !== workspaceIdParam) {
           try {
             const { data } = await getWorkspaceById({
@@ -95,22 +107,29 @@ export const Workspace = ({
             });
             const workspace = data?.workspace;
             if (workspace) {
-              setValue('id', workspace.id);
-              setValue('title', workspace.title);
-              setValue('content', workspace.content);
-              setValue('taskId', workspace.taskId || null);
-              setValue('projectId', workspace.projectId);
-              setValue('project', workspace.project);
-              setValue('emoji', workspace.emoji);
-              setValue('background_color', workspace.background_color);
-              setValue('card_show_background', workspace.card_show_background);
-              setValue('saveStatus', true);
+              reset({
+                id: workspace.id,
+                title: workspace.title,
+                content: workspace.content,
+                taskId: workspace.taskId || null,
+                projectId: workspace.projectId,
+                groupId: workspace.groupId,
+                project: workspace.project,
+                emoji: workspace.emoji,
+                background_color: workspace.background_color,
+                card_show_background: workspace.card_show_background,
+                saveStatus: true,
+              });
               if (workspace.task) {
                 handleSelectTask(workspace.task);
               } else {
                 handleSelectTask(null);
               }
               onEditorChange(true);
+            } else {
+              const newParams = new URLSearchParams(searchParams);
+              newParams.delete('workspaceId');
+              setSearchParams(newParams);
             }
           } catch (error) {
             console.error('Error loading workspace from URL', error);
@@ -120,7 +139,7 @@ export const Workspace = ({
           }
         }
       } else {
-        if (isEditorOpen) {
+        if (isEditorOpen && !isCreatingNew) {
           onEditorChange(false);
         }
       }
@@ -129,6 +148,7 @@ export const Workspace = ({
   }, [
     workspaceIdParam,
     isEditorOpen,
+    isCreatingNew,
     getWorkspaceById,
     onEditorChange,
     setValue,
@@ -136,23 +156,44 @@ export const Workspace = ({
     searchParams,
     setSearchParams,
     watch,
+    reset,
+  ]);
+
+  const workspaceId = watch('id');
+
+  useEffect(() => {
+    if (isEditorOpen && workspaceId && !workspaceIdParam) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('workspaceId', workspaceId);
+      setSearchParams(newParams);
+    }
+  }, [
+    isEditorOpen,
+    workspaceId,
+    workspaceIdParam,
+    searchParams,
+    setSearchParams,
   ]);
 
   const handleSelectWorkspace = (workspace: WorkspaceTypes): void => {
+    setIsCreatingNew(false);
     const newParams = new URLSearchParams(searchParams);
     newParams.set('workspaceId', workspace.id);
     setSearchParams(newParams);
 
-    setValue('id', workspace.id);
-    setValue('title', workspace.title);
-    setValue('content', workspace.content);
-    setValue('taskId', workspace.taskId || null);
-    setValue('projectId', workspace.projectId);
-    setValue('project', workspace.project);
-    setValue('emoji', workspace.emoji);
-    setValue('background_color', workspace.background_color);
-    setValue('card_show_background', workspace.card_show_background);
-    setValue('saveStatus', true);
+    reset({
+      id: workspace.id,
+      title: workspace.title,
+      content: workspace.content,
+      taskId: workspace.taskId || null,
+      projectId: workspace.projectId,
+      groupId: workspace.groupId,
+      project: workspace.project,
+      emoji: workspace.emoji,
+      background_color: workspace.background_color,
+      card_show_background: workspace.card_show_background,
+      saveStatus: true,
+    });
     if (workspace.task) {
       handleSelectTask(workspace.task);
     } else {
@@ -162,12 +203,14 @@ export const Workspace = ({
   };
 
   const handleCreateNew = (): void => {
+    setIsCreatingNew(true);
     reset({
       title: 'Untitled Strategic Plan',
       content: '[]',
       id: undefined,
       taskId: undefined,
       projectId: selectedProjectId || undefined,
+      groupId: selectedGroupId || undefined,
       emoji: undefined,
       background_color: undefined,
       card_show_background: false,
@@ -176,42 +219,6 @@ export const Workspace = ({
     handleSelectTask(null);
     onEditorChange(true);
   };
-
-  const handleCreateWorkspaceUnderProject = useCallback(
-    (projectId: string | null): void => {
-      reset({
-        title: 'Untitled Strategic Plan',
-        content: '[]',
-        id: undefined,
-        taskId: undefined,
-        projectId: projectId || undefined,
-        emoji: undefined,
-        background_color: undefined,
-        card_show_background: false,
-        saveStatus: true,
-      });
-      handleSelectTask(null);
-      onEditorChange(true);
-    },
-    [reset, handleSelectTask, onEditorChange],
-  );
-
-  const actionParam = searchParams.get('action');
-  useEffect(() => {
-    if (actionParam === 'createWorkspace') {
-      const pId = searchParams.get('projectId');
-      handleCreateWorkspaceUnderProject(pId);
-
-      const newParams = new URLSearchParams(searchParams);
-      newParams.delete('action');
-      setSearchParams(newParams, { replace: true });
-    }
-  }, [
-    actionParam,
-    searchParams,
-    setSearchParams,
-    handleCreateWorkspaceUnderProject,
-  ]);
 
   const getCustomSlashMenuItems = (editor: BlockNoteEditor) => {
     const defaultItems = getDefaultReactSlashMenuItems(editor);
@@ -322,6 +329,7 @@ export const Workspace = ({
             <WorkspaceLibrary
               onCreate={handleCreateNew}
               onSelect={handleSelectWorkspace}
+              selectedGroupId={selectedGroupId}
               selectedProjectId={selectedProjectId}
               onSelectProject={(id) => {
                 const newParams = new URLSearchParams(searchParams);

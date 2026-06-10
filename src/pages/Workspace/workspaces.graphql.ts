@@ -24,6 +24,7 @@ export const GET_WORKSPACES = gql`
           url
         }
         google_event_id
+        source
         created_at
       }
       projectId
@@ -32,6 +33,7 @@ export const GET_WORKSPACES = gql`
         id
         name
         color
+        groupId
       }
     }
   }
@@ -43,6 +45,9 @@ export const CREATE_WORKSPACE = gql`
       id
       title
       content
+      emoji
+      background_color
+      card_show_background
       updatedAt
       taskId
       projectId
@@ -56,6 +61,7 @@ export const CREATE_WORKSPACE = gql`
         real_timer
         duration
         priority_level
+        source
         created_at
       }
     }
@@ -74,6 +80,7 @@ export const UPDATE_WORKSPACE = gql`
       updatedAt
       taskId
       projectId
+      groupId
       project {
         id
         name
@@ -87,6 +94,7 @@ export const UPDATE_WORKSPACE = gql`
         real_timer
         duration
         priority_level
+        source
         created_at
       }
     }
@@ -129,6 +137,7 @@ export const GET_WORKSPACE_BY_ID = gql`
           url
         }
         google_event_id
+        source
         created_at
       }
     }

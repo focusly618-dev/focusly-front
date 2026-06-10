@@ -53,6 +53,7 @@ export interface WorkspaceFormData {
   content: string;
   taskId?: string | null;
   projectId?: string;
+  groupId?: string;
   project?: ProjectTypes;
   saveStatus: boolean;
   emoji?: string;
@@ -110,6 +111,8 @@ export interface TaskSearchItems {
   notes_encrypted?: string;
   links?: { title: string; url: string }[];
   google_event_id?: string;
+  task_type?: 'PlatformTask' | 'GoogleTask';
+  source?: 'google' | 'platform';
   workspaces?: {
     id: string;
     title: string;

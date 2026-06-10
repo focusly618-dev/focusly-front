@@ -78,6 +78,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   // State from URL Search Params
   const selectedWorkspaceId = searchParams.get('workspaceId') || undefined;
   const selectedProjectId = searchParams.get('projectId');
+  const selectedGroupId = searchParams.get('groupId');
   const isWorkspaceTab = activeTab === TaskBar.Workspace;
 
   // Tree expanded states
@@ -182,8 +183,21 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     }
     newParams.delete('workspaceId');
     newParams.delete('action');
-    setSearchParams(newParams);
-    changeStatusTab(TaskBar.Workspace);
+    changeStatusTab(TaskBar.Workspace, newParams);
+  };
+
+  const handleSelectGroup = (groupId: string | null) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tab', TaskBar.Workspace);
+    if (groupId) {
+      newParams.set('groupId', groupId);
+    } else {
+      newParams.delete('groupId');
+    }
+    newParams.delete('projectId');
+    newParams.delete('workspaceId');
+    newParams.delete('action');
+    changeStatusTab(TaskBar.Workspace, newParams);
   };
 
   const handleSelectWorkspace = (workspace: WorkspaceTypes) => {
@@ -196,8 +210,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
       newParams.delete('projectId');
     }
     newParams.delete('action');
-    setSearchParams(newParams);
-    changeStatusTab(TaskBar.Workspace);
+    changeStatusTab(TaskBar.Workspace, newParams);
   };
 
   const handleCreateProject = async (name: string, color: string) => {
@@ -301,19 +314,19 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
       setNewGroupName('');
       setIsCreatingGroupInline(false);
       sileo.success({
-        title: 'Project group created',
+        title: 'Project created',
         description: `"${name}" has been created.`,
         fill: 'var(--sileo-success-bg)',
         duration: 2000,
       });
     } catch (err) {
-      console.error('Error creating project group:', err);
+      console.error('Error creating project:', err);
     }
   };
 
   const handleDeleteGroup = async (id: string) => {
     sileo.warning({
-      title: 'Remove Project Group',
+      title: 'Remove Project',
       description:
         'Are you sure? Folders and workspaces inside will be unlinked but not deleted.',
       fill: 'var(--sileo-warning-bg)',
@@ -323,12 +336,12 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           try {
             await deleteProjectGroup({ variables: { id } });
             sileo.success({
-              title: 'Project group deleted',
+              title: 'Project deleted',
               fill: 'var(--sileo-delete-bg)',
               duration: 4000,
             });
           } catch (err) {
-            console.error('Error deleting project group:', err);
+            console.error('Error deleting project:', err);
           }
         },
       },
@@ -514,6 +527,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     projectGroups,
     selectedWorkspaceId,
     selectedProjectId,
+    selectedGroupId,
     isWorkspaceTab,
     expandedProjects,
     setExpandedProjects,
@@ -554,6 +568,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     handleOpenMenu,
     handleCloseMenu,
     handleSelectProject,
+    handleSelectGroup,
     handleSelectWorkspace,
     handleCreateProject,
     handleCreateFolderInline,

@@ -56,9 +56,11 @@ export const useWorkspaceEditor = ({
 
     const lowerSearch = searchTerm.toLowerCase();
 
-    return tasksData.tasks.filter((task: TaskSearchItems) =>
-      task.title.toLowerCase().includes(lowerSearch),
-    );
+    return tasksData.tasks.filter((task: TaskSearchItems) => {
+      const isPlatformTask = task.source === 'platform';
+      if (!isPlatformTask) return false;
+      return task.title.toLowerCase().includes(lowerSearch);
+    });
   }, [tasksData, searchTerm]);
 
   const initialContent = useMemo(() => {

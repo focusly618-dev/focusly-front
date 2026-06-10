@@ -13,26 +13,30 @@ import {
   Menu,
   MenuItem,
   Divider,
-  ListItemIcon,
-  ListItemText,
   Button,
   useTheme,
   alpha,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   PushPin as PushPinIcon,
   Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
   DeleteForever as DeleteForeverIcon,
   FolderSpecial as FolderSpecialIcon,
   Folder as FolderIcon,
   CheckBox as CheckBoxIcon,
   FolderOpen as FolderOpenIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { EmptyState } from '@/components/ui';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
-import type { WorkspaceTypes, ProjectTypes } from '../../types/workspace.types';
+import type {
+  WorkspaceTypes,
+  ProjectTypes,
+  ProjectGroupTypes,
+} from '../../types/workspace.types';
 import { CreateProjectModal } from './modals/CreateProjectModal';
 import { UpdateProjectModal } from './modals/UpdateProjectModal';
 import { AllProjectsModal } from './modals/AllProjectsModal';
@@ -46,6 +50,7 @@ import { useWorkspaceLibrary } from './hooks/useWorkspaceLibrary.hook';
 interface WorkspaceLibraryProps {
   onCreate: () => void;
   onSelect: (workspace: WorkspaceTypes) => void;
+  selectedGroupId: string | null;
   selectedProjectId: string | null;
   onSelectProject: (projectId: string | null) => void;
 }
@@ -53,12 +58,14 @@ interface WorkspaceLibraryProps {
 export const WorkspaceLibrary = ({
   onCreate,
   onSelect,
+  selectedGroupId,
   selectedProjectId,
   onSelectProject,
 }: WorkspaceLibraryProps) => {
   const { state, actions, data } = useWorkspaceLibrary(
     selectedProjectId,
     onSelectProject,
+    selectedGroupId,
   );
   const { handleOpen: handleDeleteConfirm } = useWorkspace();
 
@@ -97,12 +104,19 @@ export const WorkspaceLibrary = ({
     workspaces,
     projects,
     allWorkspaces,
+    projectGroups,
     loading,
     projectsLoading,
     error,
   } = data;
 
   const theme = useTheme();
+  const activeGroup = selectedGroupId
+    ? projectGroups.find((g: ProjectGroupTypes) => g.id === selectedGroupId)
+    : null;
+  const activeProject = selectedProjectId
+    ? projects.find((p: ProjectTypes) => p.id === selectedProjectId)
+    : null;
 
   return (
     <LibraryContainer sx={{ position: 'relative' }}>
@@ -126,9 +140,19 @@ export const WorkspaceLibrary = ({
       {/* Top Page Header: Title & Action Buttons */}
       <LibraryHeader>
         <Box>
-          <HeaderTitle variant="h4">Workspace Library</HeaderTitle>
+          <HeaderTitle variant="h4">
+            {selectedProjectId && activeProject
+              ? activeProject.name
+              : activeGroup
+                ? activeGroup.name
+                : 'Workspace Library'}
+          </HeaderTitle>
           <HeaderSubtitle variant="body2">
-            Organize your notes, ideas, and strategic plan docs
+            {selectedProjectId && activeProject
+              ? `View and manage workspaces inside this folder`
+              : activeGroup
+                ? `View and manage folders and workspaces inside the "${activeGroup.name}" project`
+                : 'Organize your notes, ideas, and strategic plan docs'}
           </HeaderSubtitle>
         </Box>
 
@@ -232,7 +256,7 @@ export const WorkspaceLibrary = ({
         />
       </Box>
 
-      {/* Third Row: Toolbar Row with Project Title & Search/Filter Controls */}
+      {/* Toolbar Row with Group Title & Search/Filter Controls */}
       <Box
         sx={{
           display: 'flex',
@@ -241,9 +265,10 @@ export const WorkspaceLibrary = ({
           mb: 3,
           gap: 2,
           flexWrap: 'wrap',
+          mt: 2,
         }}
       >
-        {/* Left: Active Project Name & Notes Count */}
+        {/* Left: Active Group/Folder Name & Notes Count */}
         <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
           <Typography
             variant="h5"
@@ -254,10 +279,11 @@ export const WorkspaceLibrary = ({
               letterSpacing: '-0.3px',
             }}
           >
-            {selectedProjectId
-              ? projects.find((p: ProjectTypes) => p.id === selectedProjectId)
-                  ?.name || 'Folder'
-              : 'All Notes'}
+            {selectedProjectId && activeProject
+              ? activeProject.name
+              : activeGroup
+                ? activeGroup.name
+                : 'All Notes'}
           </Typography>
           <Typography
             variant="caption"
@@ -268,12 +294,12 @@ export const WorkspaceLibrary = ({
             }}
           >
             {selectedProjectId
-              ? `${projects.find((p: ProjectTypes) => p.id === selectedProjectId)?.workspaceCount || 0} notes`
-              : `${allWorkspaces.length} notes`}
+              ? `${activeProject?.workspaceCount || 0} notes`
+              : `${workspaces.length} notes`}
           </Typography>
         </Box>
 
-        {/* Right: Compounded search, filter, and layout toggles */}
+        {/* Right: Search and Layout control */}
         <LibrarySearchHeader
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
@@ -411,6 +437,7 @@ export const WorkspaceLibrary = ({
               ))}
         </GridContainer>
       )}
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -519,7 +546,7 @@ export const WorkspaceLibrary = ({
           }}
           sx={{
             fontSize: '13px',
-            py: 1,
+            py: 1.5,
             fontWeight: 500,
             color: 'error.main',
             '&:hover': {
@@ -534,34 +561,7 @@ export const WorkspaceLibrary = ({
         </MenuItem>
       </Menu>
 
-      <CreateProjectModal
-        open={isProjectModalOpen}
-        onClose={() => setIsProjectModalOpen(false)}
-        onCreate={handleCreateProject}
-      />
-
-      <UpdateProjectModal
-        key={selectedProjectToManage?.id || 'new'}
-        open={isUpdateProjectModalOpen}
-        onClose={() => {
-          setIsUpdateProjectModalOpen(false);
-          setSelectedProjectToManage(null);
-        }}
-        onUpdate={handleUpdateProject}
-        project={selectedProjectToManage}
-      />
-
-      <AllProjectsModal
-        open={isAllProjectsModalOpen}
-        onClose={() => setIsAllProjectsModalOpen(false)}
-        projects={projects}
-        selectedId={selectedProjectId}
-        onSelect={(id) => {
-          onSelectProject(id);
-          setIsAllProjectsModalOpen(false);
-        }}
-      />
-
+      {/* Folder Menu */}
       <Menu
         anchorEl={projectAnchorEl}
         open={Boolean(projectAnchorEl)}
@@ -601,6 +601,34 @@ export const WorkspaceLibrary = ({
           <ListItemText>Delete Folder</ListItemText>
         </MenuItem>
       </Menu>
+
+      <CreateProjectModal
+        open={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+        onCreate={handleCreateProject}
+      />
+
+      <UpdateProjectModal
+        key={selectedProjectToManage?.id || 'new'}
+        open={isUpdateProjectModalOpen}
+        onClose={() => {
+          setIsUpdateProjectModalOpen(false);
+          setSelectedProjectToManage(null);
+        }}
+        onUpdate={handleUpdateProject}
+        project={selectedProjectToManage}
+      />
+
+      <AllProjectsModal
+        open={isAllProjectsModalOpen}
+        onClose={() => setIsAllProjectsModalOpen(false)}
+        projects={projects}
+        selectedId={selectedProjectId}
+        onSelect={(id) => {
+          onSelectProject(id);
+          setIsAllProjectsModalOpen(false);
+        }}
+      />
     </LibraryContainer>
   );
 };
