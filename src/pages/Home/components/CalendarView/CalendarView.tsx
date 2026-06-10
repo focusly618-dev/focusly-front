@@ -1,13 +1,14 @@
 import React from 'react';
 import {
   Calendar,
-  momentLocalizer,
+  dateFnsLocalizer,
   Views,
   type ToolbarProps,
 } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import moment from 'moment';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Components
@@ -32,16 +33,18 @@ import {
 // Types
 import type { Task } from '@/redux/tasks/task.types';
 
-// Set Monday as the start of the week for moment (used by react-big-calendar localizer)
-moment.updateLocale('en', {
-  week: {
-    dow: 1, // Monday is the first day of the week
-    doy: 4, // The week that contains Jan 4th is the first week of the year
-  },
-});
+const locales = {
+  'en-US': enUS,
+};
 
-// Setup the localizer
-const localizer = momentLocalizer(moment);
+// Setup the localizer with Monday as first day of week
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
+  getDay,
+  locales,
+});
 
 const DnDCalendar = withDragAndDrop<ICalendarEvent, object>(Calendar);
 
@@ -233,7 +236,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                     culture?: string,
                   ) => string;
                 },
-              ) => (localizer ? localizer.format(date, 'h A', culture) : ''),
+              ) => (localizer ? localizer.format(date, 'h a', culture) : ''),
             }}
           />
         </Box>

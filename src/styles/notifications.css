@@ -31,32 +31,88 @@
 }
 
 
+/* Color Tokens for Theme Adaptation */
+:root {
+  --sileo-bg: rgba(255, 255, 255, 0.85);
+  --sileo-border: rgba(0, 0, 0, 0.08);
+  --sileo-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  --sileo-title-color: #1C1C1A;
+  --sileo-body-color: rgba(28, 28, 26, 0.7);
+  --sileo-icon-bg: rgba(0, 0, 0, 0.04);
+  --sileo-icon-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
+  --sileo-close-color: rgba(28, 28, 26, 0.45);
+  --sileo-close-hover-color: rgba(28, 28, 26, 0.8);
+  --sileo-btn-bg: rgba(0, 0, 0, 0.06);
+  --sileo-btn-hover-bg: rgba(0, 0, 0, 0.1);
+  --sileo-btn-color: #1C1C1A;
+  --sileo-spinner-color: #137fec;
+}
+
+html.dark {
+  --sileo-bg: rgba(20, 21, 24, 0.95);
+  --sileo-border: rgba(255, 255, 255, 0.08);
+  --sileo-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+  --sileo-title-color: #ffffff;
+  --sileo-body-color: rgba(255, 255, 255, 0.7);
+  --sileo-icon-bg: rgba(255, 255, 255, 0.06);
+  --sileo-icon-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --sileo-close-color: rgba(255, 255, 255, 0.5);
+  --sileo-close-hover-color: rgba(255, 255, 255, 0.85);
+  --sileo-btn-bg: rgba(255, 255, 255, 0.2);
+  --sileo-btn-hover-bg: rgba(255, 255, 255, 0.3);
+  --sileo-btn-color: #ffffff;
+  --sileo-spinner-color: #ffffff;
+}
+
+/* Fallback for OS color scheme when class isn't parsed or loaded yet */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --sileo-bg: rgba(20, 21, 24, 0.95);
+    --sileo-border: rgba(255, 255, 255, 0.08);
+    --sileo-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+    --sileo-title-color: #ffffff;
+    --sileo-body-color: rgba(255, 255, 255, 0.7);
+    --sileo-icon-bg: rgba(255, 255, 255, 0.06);
+    --sileo-icon-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    --sileo-close-color: rgba(255, 255, 255, 0.5);
+    --sileo-close-hover-color: rgba(255, 255, 255, 0.85);
+    --sileo-btn-bg: rgba(255, 255, 255, 0.2);
+    --sileo-btn-hover-bg: rgba(255, 255, 255, 0.3);
+    --sileo-btn-color: #ffffff;
+    --sileo-spinner-color: #ffffff;
+  }
+}
+
 /* Premium Notification Styles */
 .motion-notification {
   border-radius: 14px !important;
   padding: 16px 20px !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2), 0 4px 12px -2px rgba(0, 0, 0, 0.1) !important;
   min-width: 340px !important;
   max-width: 420px !important;
+  background: var(--sileo-bg) !important;
+  border: 1px solid var(--sileo-border) !important;
+  box-shadow: var(--sileo-shadow) !important;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 /* Base text styles for the notification */
 .motion-notification-title {
   font-size: 15px !important;
   font-weight: 600 !important;
-  color: #ffffff !important; /* Always white as requested */
+  color: var(--sileo-title-color) !important;
   margin-bottom: 3px !important;
   letter-spacing: -0.01em !important;
+  transition: color 0.3s ease !important;
 }
 
 .motion-notification-body {
   font-size: 13px !important;
-  color: rgba(255, 255, 255, 0.7) !important; /* Soft white/gray as requested */
+  color: var(--sileo-body-color) !important;
   line-height: 1.4 !important;
   font-weight: 400 !important;
+  transition: color 0.3s ease !important;
 }
 
 .motion-notification-icon-wrapper {
@@ -68,31 +124,27 @@
   justify-content: center !important;
   font-size: 20px !important;
   flex-shrink: 0 !important;
+  background: var(--sileo-icon-bg) !important;
+  box-shadow: var(--sileo-icon-box-shadow) !important;
+  transition: all 0.3s ease !important;
+}
+
+.motion-notification-close-btn {
+  color: var(--sileo-close-color) !important;
+  transition: color 0.2s ease, background-color 0.2s ease !important;
+}
+
+.motion-notification-close-btn:hover {
+  color: var(--sileo-close-hover-color) !important;
+  background-color: var(--sileo-icon-bg) !important;
+}
+
+.motion-notification-action-btn {
+  background-color: var(--sileo-btn-bg) !important;
+  color: var(--sileo-btn-color) !important;
   transition: all 0.2s ease !important;
 }
 
-/* Light Mode: "Tono blanco y gris" but with white text (Darker Gray background to support it) */
-@media (prefers-color-scheme: light) {
-  .motion-notification {
-    background: rgba(45, 47, 54, 0.9) !important; /* Sleek Dark Gray/Navy */
-    border-color: rgba(255, 255, 255, 0.1) !important;
-  }
-  
-  .motion-notification-icon-wrapper {
-    background: rgba(255, 255, 255, 0.12) !important; /* Aesthetic white/gray icon bg */
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-  }
-}
-
-/* Dark Mode: Deep black/gray */
-@media (prefers-color-scheme: dark) {
-  .motion-notification {
-    background: rgba(20, 21, 24, 0.95) !important; /* Deep Dark */
-    border-color: rgba(255, 255, 255, 0.08) !important;
-  }
-  
-  .motion-notification-icon-wrapper {
-    background: rgba(255, 255, 255, 0.06) !important; /* Even softer for dark mode */
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
-  }
+.motion-notification-action-btn:hover {
+  background-color: var(--sileo-btn-hover-bg) !important;
 }

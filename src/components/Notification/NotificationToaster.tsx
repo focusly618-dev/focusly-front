@@ -40,7 +40,12 @@ export const NotificationToaster: React.FC = () => {
           <InfoRoundedIcon style={{ color: '#3b82f6', fontSize: '22px' }} />
         );
       case 'loading':
-        return <CircularProgress size={20} style={{ color: '#ffffff' }} />;
+        return (
+          <CircularProgress
+            size={20}
+            style={{ color: 'var(--sileo-spinner-color)' }}
+          />
+        );
     }
   };
 
@@ -118,13 +123,12 @@ export const NotificationToaster: React.FC = () => {
                 <Button
                   variant="contained"
                   size="small"
+                  className="motion-notification-action-btn"
                   onClick={() => {
                     notification.button?.onClick();
                     sileo.dismiss(notification.id);
                   }}
                   style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                    color: '#ffffff',
                     fontWeight: 600,
                     fontSize: '12px',
                     textTransform: 'none',
@@ -141,9 +145,9 @@ export const NotificationToaster: React.FC = () => {
           {notification.type !== 'loading' && (
             <IconButton
               size="small"
+              className="motion-notification-close-btn"
               onClick={() => sileo.dismiss(notification.id)}
               style={{
-                color: 'rgba(255, 255, 255, 0.5)',
                 padding: '4px',
                 marginLeft: '4px',
                 marginTop: '2px',

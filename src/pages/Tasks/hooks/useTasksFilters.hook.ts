@@ -1,5 +1,12 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import moment from 'moment';
+import {
+  isToday,
+  isWithinInterval,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+} from 'date-fns';
 import type {
   TaskResponse,
   TaskFilterInput,
@@ -45,23 +52,23 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
 
           if (!dateToUse) return false;
 
-          const taskDate = moment(dateToUse);
-          const now = moment();
+          const taskDate = new Date(dateToUse);
+          const now = new Date();
 
           if (dateRange === 'today') {
-            return taskDate.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
+            return isToday(taskDate);
           }
 
           if (dateRange === 'this_week') {
-            const startOfWeek = now.clone().startOf('week');
-            const endOfWeek = now.clone().endOf('week');
-            return taskDate.isBetween(startOfWeek, endOfWeek, null, '[]');
+            const start = startOfWeek(now, { weekStartsOn: 1 });
+            const end = endOfWeek(now, { weekStartsOn: 1 });
+            return isWithinInterval(taskDate, { start, end });
           }
 
           if (dateRange === 'this_month') {
-            const startOfMonth = now.clone().startOf('month');
-            const endOfMonth = now.clone().endOf('month');
-            return taskDate.isBetween(startOfMonth, endOfMonth, null, '[]');
+            const start = startOfMonth(now);
+            const end = endOfMonth(now);
+            return isWithinInterval(taskDate, { start, end });
           }
 
           return true;

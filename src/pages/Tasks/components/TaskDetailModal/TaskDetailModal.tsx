@@ -109,7 +109,6 @@ export const TaskDetailModal = ({
   const [colorAnchor, setColorAnchor] = useState<HTMLElement | null>(null);
 
   const isPureGoogleTask = initialTask?.source === 'google';
-
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Dialog
