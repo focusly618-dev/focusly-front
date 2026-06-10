@@ -1,13 +1,18 @@
 import { WorkspaceEmptyState } from '@/components/ui';
-import { WorkspaceEditor } from './components/Editor/WorkspaceEditor';
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import type { Step } from 'react-joyride';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_WORKSPACE_BY_ID, GET_WORKSPACES } from './workspaces.graphql';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import type { WorkspaceProps, WorkspaceTypes } from './types/workspace.types';
+
+const WorkspaceEditor = lazy(() =>
+  import('./components/Editor/WorkspaceEditor').then((m) => ({
+    default: m.WorkspaceEditor,
+  })),
+);
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { BlockNoteEditor } from '@blocknote/core';
@@ -294,32 +299,52 @@ export const Workspace = ({
             id="joyride-workspace-editor"
             style={{ height: '100%', width: '100%' }}
           >
-            <WorkspaceEditor
-              key={watch('id') || 'new-workspace'}
-              onBack={() => {
-                onEditorChange(false);
-                const newParams = new URLSearchParams(searchParams);
-                newParams.delete('workspaceId');
-                setSearchParams(newParams);
-              }}
-              register={register}
-              setValue={setValue}
-              watch={watch}
-              getValues={getValues}
-              selectTask={selectTask}
-              handleSelectTask={handleSelectTask}
-              handleUpdateTask={handleUpdateTask}
-              tasksData={tasksData}
-              onStartFocus={onStartFocus}
-              onOpenTaskDetails={onOpenTaskDetails}
-              isRightSidebarOpen={isSidebarOpen}
-              setIsRightSidebarOpen={onSidebarChange}
-              workspaces={workspacesData?.workspaces}
-              getCustomSlashMenuItems={getCustomSlashMenuItems}
-              getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
-              activeFocusTaskId={activeFocusTaskId}
-              onUnlinkTask={handleUnlinkTask}
-            />
+            <Suspense
+              fallback={
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    width: '100%',
+                    color: 'text.secondary',
+                    bgcolor: 'background.paper',
+                  }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                    Loading Strategic Editor...
+                  </Typography>
+                </Box>
+              }
+            >
+              <WorkspaceEditor
+                key={watch('id') || 'new-workspace'}
+                onBack={() => {
+                  onEditorChange(false);
+                  const newParams = new URLSearchParams(searchParams);
+                  newParams.delete('workspaceId');
+                  setSearchParams(newParams);
+                }}
+                register={register}
+                setValue={setValue}
+                watch={watch}
+                getValues={getValues}
+                selectTask={selectTask}
+                handleSelectTask={handleSelectTask}
+                handleUpdateTask={handleUpdateTask}
+                tasksData={tasksData}
+                onStartFocus={onStartFocus}
+                onOpenTaskDetails={onOpenTaskDetails}
+                isRightSidebarOpen={isSidebarOpen}
+                setIsRightSidebarOpen={onSidebarChange}
+                workspaces={workspacesData?.workspaces}
+                getCustomSlashMenuItems={getCustomSlashMenuItems}
+                getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
+                activeFocusTaskId={activeFocusTaskId}
+                onUnlinkTask={handleUnlinkTask}
+              />
+            </Suspense>
           </div>
         ) : hasWorkspaces ? (
           <div

@@ -4,12 +4,9 @@ import {
   Close as CloseIcon,
   EventNote as EventNoteIcon,
 } from '@mui/icons-material';
-import moment from 'moment';
-import { momentLocalizer } from 'react-big-calendar';
+import { format } from 'date-fns';
 import type { ICalendarEvent } from '../../../CalendarEvent';
 import { CalendarEvent } from '../../../CalendarEvent';
-
-const localizer = momentLocalizer(moment);
 
 interface DailyEventsModalProps {
   open: boolean;
@@ -28,7 +25,7 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
   onSelectEvent,
   anchorEl,
 }) => {
-  const formattedDate = date ? moment(date).format('MMMM D, YYYY') : '';
+  const formattedDate = date ? format(date, 'MMMM d, yyyy') : '';
 
   return (
     <Popover
@@ -160,7 +157,6 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
               title={event.title}
               continuesPrior={false}
               continuesAfter={false}
-              localizer={localizer}
               slotStart={event.start}
               slotEnd={event.end}
             />

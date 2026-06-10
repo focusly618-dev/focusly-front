@@ -11,7 +11,7 @@ import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
 import { sileo } from '@/utils/sileo';
 import type { Task } from '@/redux/tasks/task.types';
-import moment from 'moment';
+import { format } from 'date-fns';
 
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
@@ -69,8 +69,7 @@ export const useCalendarContextMenu = (
   } | null>(null);
 
   const formatTime = (date: Date) => {
-    const m = moment(date);
-    return m.format('h:mm A');
+    return format(date, 'h:mm a');
   };
 
   const handleDuplicateTask = async (task: Task) => {

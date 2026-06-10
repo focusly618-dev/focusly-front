@@ -14,7 +14,7 @@ import {
 } from '@mui/icons-material';
 
 import type { CalendarEventProps } from './CalendarEvent.types';
-import moment from 'moment';
+import { format, getMinutes } from 'date-fns';
 import { useCalendarContextMenu } from './hooks/useCalendarContextMenu';
 
 import {
@@ -28,8 +28,9 @@ export const CalendarEvent = (props: CalendarEventProps) => {
   const { event, onStartFocus } = props;
   const variant = getEventColor(event as { id?: string });
   const formatTime = (date: Date) => {
-    const m = moment(date);
-    return m.minutes() === 0 ? m.format('h A') : m.format('h.mm A');
+    return getMinutes(date) === 0
+      ? format(date, 'h a')
+      : format(date, 'h.mm a');
   };
   const timeRange = `${formatTime(event.start)} - ${formatTime(event.end)}`;
 
