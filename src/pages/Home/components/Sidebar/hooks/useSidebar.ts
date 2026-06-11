@@ -33,16 +33,28 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Projects & Workspaces Queries
-  const { data: workspacesData } = useQuery(GET_WORKSPACES, {
-    variables: { search: '' },
-    fetchPolicy: 'cache-and-network',
-  });
-  const { data: projectsData } = useQuery(GET_FOLDERS, {
-    fetchPolicy: 'cache-and-network',
-  });
-  const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
-    fetchPolicy: 'cache-and-network',
-  });
+  const { data: workspacesData, loading: workspacesLoading } = useQuery(
+    GET_WORKSPACES,
+    {
+      variables: { search: '' },
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+  const { data: projectsData, loading: projectsLoading } = useQuery(
+    GET_FOLDERS,
+    {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+  const { data: projectGroupsData, loading: projectGroupsLoading } = useQuery(
+    GET_PROJECT_GROUPS,
+    {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+
+  const isProjectsLoading =
+    workspacesLoading || projectsLoading || projectGroupsLoading;
 
   // Projects & Workspaces Mutations
   const refetchAll = [
@@ -525,6 +537,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     projectsData,
     projectGroupsData,
     projectGroups,
+    isProjectsLoading,
     selectedWorkspaceId,
     selectedProjectId,
     selectedGroupId,

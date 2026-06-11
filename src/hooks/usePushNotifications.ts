@@ -22,7 +22,20 @@ export const usePushNotifications = () => {
           await axios.patch(`/users/${user.id}`, { fcmToken: token });
         }
       } catch (error) {
-        console.error('Error in setupNotifications:', error);
+        // Silently ignore Firebase Installations permission errors (403).
+        // This occurs when the Installations API is not enabled for the project
+        // or the current domain is not authorized in Firebase Console.
+        const isInstallationsError =
+          error instanceof Error &&
+          (error.message.includes('installations/request-failed') ||
+            error.message.includes('PERMISSION_DENIED') ||
+            ('code' in error &&
+              (error as { code: string }).code ===
+                'installations/request-failed'));
+
+        if (!isInstallationsError) {
+          console.error('Error in setupNotifications:', error);
+        }
       }
     };
 

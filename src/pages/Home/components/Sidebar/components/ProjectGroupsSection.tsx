@@ -1,4 +1,12 @@
-import { Box, Typography, IconButton, Tooltip, Divider } from '@mui/material';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Divider,
+  Skeleton,
+  CircularProgress,
+} from '@mui/material';
 import {
   ChevronRight,
   ExpandMore,
@@ -28,6 +36,7 @@ export const ProjectGroupsSection = ({
   const {
     theme,
     projectGroups,
+    isProjectsLoading,
     workspacesData,
     isWorkspaceTab,
     selectedWorkspaceId,
@@ -72,9 +81,19 @@ export const ProjectGroupsSection = ({
             textTransform: 'uppercase',
             fontSize: '0.75rem',
             letterSpacing: '0.08em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.75,
           }}
         >
           Projects & Docs
+          {isProjectsLoading && (
+            <CircularProgress
+              size={10}
+              thickness={5}
+              sx={{ color: 'text.disabled', opacity: 0.6 }}
+            />
+          )}
         </Typography>
         <Tooltip title="New Project" arrow>
           <IconButton
@@ -142,18 +161,87 @@ export const ProjectGroupsSection = ({
           </Box>
         )}
 
-        {/* Dynamic Project Groups */}
-        {projectGroups.length === 0 && !isCreatingGroupInline && (
-          <Box sx={{ p: 2, textAlign: 'center' }}>
-            <Typography
-              variant="caption"
-              color="text.disabled"
-              sx={{ fontStyle: 'italic' }}
-            >
-              No projects yet. Click + to create one.
-            </Typography>
+        {/* Loading Skeletons */}
+        {isProjectsLoading && projectGroups.length === 0 && (
+          <Box sx={{ px: 1, py: 0.5 }}>
+            {[1, 2, 3].map((i) => (
+              <Box key={i} sx={{ mb: 1.5 }}>
+                {/* Group header skeleton */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    px: 1,
+                    py: 0.75,
+                    borderRadius: '8px',
+                  }}
+                >
+                  <Skeleton variant="circular" width={14} height={14} />
+                  <Skeleton
+                    variant="rectangular"
+                    width={14}
+                    height={14}
+                    sx={{ borderRadius: '4px' }}
+                  />
+                  <Skeleton
+                    variant="text"
+                    width={`${55 + i * 15}%`}
+                    height={16}
+                    sx={{ borderRadius: '4px', flex: 1 }}
+                  />
+                </Box>
+                {/* Workspace item skeletons inside group */}
+                {i < 3 && (
+                  <Box sx={{ pl: 3, mt: 0.25 }}>
+                    {Array.from({ length: i }).map((_, j) => (
+                      <Box
+                        key={j}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: '6px',
+                        }}
+                      >
+                        <Skeleton
+                          variant="circular"
+                          width={18}
+                          height={18}
+                          sx={{ flexShrink: 0 }}
+                        />
+                        <Skeleton
+                          variant="text"
+                          width={`${45 + j * 20}%`}
+                          height={14}
+                          sx={{ borderRadius: '4px' }}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+                <Divider sx={{ mt: 1, opacity: 0.15 }} />
+              </Box>
+            ))}
           </Box>
         )}
+
+        {/* Dynamic Project Groups */}
+        {!isProjectsLoading &&
+          projectGroups.length === 0 &&
+          !isCreatingGroupInline && (
+            <Box sx={{ p: 2, textAlign: 'center' }}>
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                sx={{ fontStyle: 'italic' }}
+              >
+                No projects yet. Click + to create one.
+              </Typography>
+            </Box>
+          )}
 
         {projectGroups.map((group: ProjectGroupTypes) => {
           const isGroupExpanded = expandedGroups[group.id] !== false;
