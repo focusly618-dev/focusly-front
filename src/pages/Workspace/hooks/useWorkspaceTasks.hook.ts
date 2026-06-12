@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_TOTAL_WORKSPACES } from '../workspaces.graphql';
 import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/Task.graphql';
@@ -18,14 +18,21 @@ export const useWorkspaceTasks = ({
 }: UseWorkspaceTasksProps) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
-  const { data: rawTasksData, loading: isLoading } = useQuery(
-    GET_TASKS_TITLES,
-    {
-      skip: !userId,
-      variables: { userId },
-      fetchPolicy: 'cache-and-network',
-    },
-  );
+  const {
+    data: rawTasksData,
+    loading: isLoading,
+    error,
+  } = useQuery(GET_TASKS_TITLES, {
+    skip: !userId,
+    variables: { userId },
+    fetchPolicy: 'cache-and-network',
+  });
+
+  useEffect(() => {
+    if (error) {
+      handleMutationError(error, 'Error al obtener las tareas');
+    }
+  }, [error]);
 
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
 

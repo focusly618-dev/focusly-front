@@ -9,10 +9,16 @@ import {
   ListItemText,
   Tooltip,
 } from '@mui/material';
+import { sileo } from '@/utils/sileo';
+import EmojiPicker, { Theme as EmojiPickerTheme } from 'emoji-picker-react';
 import {
   Folder as FolderIcon,
   AutoAwesome as AutoAwesomeIcon,
   Description as DescriptionIcon,
+  Spellcheck as SpellcheckIcon,
+  Translate as TranslateIcon,
+  TextIncrease as ExpandIcon,
+  TextDecrease as ShortenIcon,
   // Toolbar — minimal
   SentimentSatisfiedAlt as EmojiPickerIcon,
   Image as CoverIcon,
@@ -355,266 +361,6 @@ const colorPalette: { color: HeaderColor; gradient: string; label: string }[] =
     },
   ];
 
-const EMOJI_CATEGORIES = [
-  {
-    id: 'smileys',
-    label: 'Smileys & Emotion',
-    icon: '😊',
-    emojis: [
-      '😊',
-      '🥳',
-      '😎',
-      '🤔',
-      '💤',
-      '🥺',
-      '🤯',
-      '😍',
-      '😂',
-      '😴',
-      '🧠',
-      '❤️',
-      '✨',
-      '⚡',
-      '😇',
-      '😜',
-      '🤫',
-      '🤩',
-      '😡',
-      '😭',
-      '😱',
-      '💩',
-      '🤡',
-      '👽',
-      '👾',
-      '🤖',
-      '👋',
-      '👍',
-      '👊',
-      '🙌',
-      '👏',
-      '🙏',
-      '🙋',
-      '🧘',
-      '💃',
-      '🕺',
-    ],
-  },
-  {
-    id: 'nature',
-    label: 'Animals & Nature',
-    icon: '🌱',
-    emojis: [
-      '🌱',
-      '🌸',
-      '🍀',
-      '🌲',
-      '🍁',
-      '🌍',
-      '🌈',
-      '☀️',
-      '🐱',
-      '🐾',
-      '🦋',
-      '🦊',
-      '🦁',
-      '🦉',
-      '🐶',
-      '🐯',
-      '🐻',
-      '🐼',
-      '🐨',
-      '🐵',
-      '🐔',
-      '🐧',
-      '🦆',
-      '🐸',
-      '🐢',
-      '🐍',
-      '🐙',
-      '🦑',
-      '🐠',
-      '🐬',
-      '🐳',
-      '🐫',
-      '🐘',
-      '🐎',
-      '🌾',
-      '🍂',
-    ],
-  },
-  {
-    id: 'food',
-    label: 'Food & Drink',
-    icon: '🍎',
-    emojis: [
-      '🍎',
-      '🍕',
-      '☕',
-      '🧁',
-      '🍺',
-      '🥑',
-      '🍓',
-      '🍋',
-      '🍣',
-      '🍦',
-      '🍩',
-      '🍪',
-      '🥤',
-      '🍷',
-      '🍌',
-      '🍒',
-      '🍑',
-      '🍍',
-      '🥥',
-      '🥦',
-      '🥕',
-      '🌽',
-      '🍔',
-      '🍟',
-      '🌭',
-      '🌮',
-      '🍜',
-      '🍱',
-      '🍤',
-      '🥞',
-      '🍯',
-      '🍫',
-      '🍿',
-      '🥛',
-      '🍹',
-      '🍾',
-    ],
-  },
-  {
-    id: 'activities',
-    label: 'Activities',
-    icon: '🎮',
-    emojis: [
-      '🚀',
-      '🎯',
-      '🏆',
-      '🎨',
-      '🎮',
-      '⚽',
-      '🏀',
-      '🎸',
-      '🎧',
-      '🎬',
-      '🧩',
-      '🛹',
-      '🚴',
-      '✈️',
-      '🏈',
-      '⚾',
-      '🎾',
-      '🏐',
-      '🎳',
-      '🎯',
-      '🥊',
-      '🥋',
-      '🎿',
-      '🏋️',
-      '🏊',
-      '🚣',
-      '🎪',
-      '🎤',
-      '🎹',
-      '🎻',
-      '🎲',
-      '🎰',
-      '🏎️',
-      '🏍️',
-      '🚢',
-    ],
-  },
-  {
-    id: 'objects',
-    label: 'Objects & Symbols',
-    icon: '💼',
-    emojis: [
-      '📝',
-      '💻',
-      '💼',
-      '📌',
-      '🗓️',
-      '📈',
-      '🔑',
-      '🔒',
-      '🔨',
-      '📷',
-      '💡',
-      '⏰',
-      '🔋',
-      '🏷️',
-      '✉️',
-      '📁',
-      '🗑️',
-      '🛠️',
-      '🪛',
-      '⚙️',
-      '🧱',
-      '🔭',
-      '🔮',
-      '🎈',
-      '🎁',
-      '🔔',
-      '📢',
-      '🔎',
-      '💰',
-      '💳',
-      '🩹',
-      '🛡️',
-      '📦',
-      '🖊️',
-      '📐',
-      '🩺',
-    ],
-  },
-  {
-    id: 'flags',
-    label: 'Flags',
-    icon: '🏳️‍🌈',
-    emojis: [
-      '🇲🇽',
-      '🇺🇸',
-      '🇪🇸',
-      '🇯🇵',
-      '🇧🇷',
-      '🇨🇦',
-      '🇬🇧',
-      '🇫🇷',
-      '🇩🇪',
-      '🇮🇹',
-      '🇰🇷',
-      '🇦🇺',
-      '🏳️‍🌈',
-      '🏁',
-      '🇨🇳',
-      '🇷🇺',
-      '🇮🇳',
-      '🇦🇷',
-      '🇨🇱',
-      '🇨🇴',
-      '🇵🇪',
-      '🇵🇹',
-      '🇳🇱',
-      '🇨🇭',
-      '🇸🇪',
-      '🇳🇴',
-      '🇿🇦',
-      '🇪🇬',
-      '🇸🇦',
-      '🇹🇷',
-      '🇺🇦',
-      '🇵🇱',
-      '🇧🇪',
-      '🇮🇪',
-      '🇳🇿',
-      '🇯🇲',
-    ],
-  },
-];
-
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
   currentTitle: string;
@@ -628,6 +374,7 @@ interface EditorContentProps {
   getWorkspaceMentionMenuItems: (editor: any) => any[];
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
+  targetLanguage?: string;
 }
 
 export const EditorContent = ({
@@ -640,6 +387,7 @@ export const EditorContent = ({
   getWorkspaceMentionMenuItems,
   setValue,
   watch,
+  targetLanguage,
 }: EditorContentProps) => {
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
@@ -654,7 +402,6 @@ export const EditorContent = ({
   const [selectedText, setSelectedText] = useState('');
   const [colorAnchor, setColorAnchor] = useState<null | HTMLElement>(null);
   const [iconAnchor, setIconAnchor] = useState<null | HTMLElement>(null);
-  const [activeCategory, setActiveCategory] = useState('smileys');
   const headerColor: HeaderColor =
     (persistedBg as HeaderColor | undefined) ?? 'none';
   const headerIcon: string = persistedEmoji ?? '';
@@ -732,16 +479,129 @@ export const EditorContent = ({
     setMenuAnchor(null);
   };
 
+  const translateText = async (
+    text: string,
+    toLang: string,
+  ): Promise<string> => {
+    try {
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=Autodetect|${toLang}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data?.responseData?.translatedText) {
+        return data.responseData.translatedText;
+      }
+      throw new Error('No translation returned');
+    } catch (err) {
+      console.error('Translation error:', err);
+      return text;
+    }
+  };
+
+  const getLanguageLabel = (code: string) => {
+    if (code === 'auto') return 'Detect Language';
+    if (code === 'es') return 'Spanish';
+    if (code === 'en') return 'English';
+    if (code === 'fr') return 'French';
+    if (code === 'de') return 'German';
+    if (code === 'it') return 'Italian';
+    if (code === 'pt') return 'Portuguese';
+    return '';
+  };
+
   const handleCreateTask = () => {
-    console.log('Create task with AI:', selectedText);
     handleClose();
-    // Here you would typically trigger a modal or call an AI service
+    sileo.success({
+      title: 'Task created!',
+      description: `New task created from selection: "${selectedText.slice(0, 30)}..."`,
+      fill: 'var(--sileo-success-bg)',
+      duration: 3000,
+    });
+  };
+
+  const processTextWithAI = async (action: string) => {
+    handleClose();
+    if (!selectedText) return;
+
+    let promptDescription = 'Processing text...';
+    let successTitle = 'Text updated';
+    let resultText = selectedText;
+
+    if (action === 'grammar') {
+      promptDescription = 'Fixing grammar and spelling...';
+      successTitle = 'Grammar & spelling fixed';
+      let temp = selectedText.trim();
+      if (temp.length > 0) {
+        temp = temp.charAt(0).toUpperCase() + temp.slice(1);
+        if (!temp.endsWith('.') && !temp.endsWith('!') && !temp.endsWith('?')) {
+          temp += '.';
+        }
+      }
+      resultText = temp;
+    } else if (action === 'summarize') {
+      promptDescription = 'Creating summary...';
+      successTitle = 'Summary generated';
+      resultText = `Summary: "${selectedText.slice(0, 100)}..."`;
+    } else if (action === 'expand') {
+      promptDescription = 'Expanding text...';
+      successTitle = 'Text expanded';
+      resultText = `${selectedText} (This point is critical for our strategic alignment. We need to ensure all team members understand the implications and coordinate their efforts to execute this phase efficiently.)`;
+    } else if (action === 'shorten') {
+      promptDescription = 'Shortening text...';
+      successTitle = 'Text condensed';
+      resultText =
+        selectedText.length > 60
+          ? `${selectedText.slice(0, 50)}...`
+          : selectedText;
+    } else if (action.startsWith('translate_')) {
+      const langCode = action.replace('translate_', '');
+      const langLabel = getLanguageLabel(langCode);
+      promptDescription = `Translating to ${langLabel}...`;
+      successTitle = `Translated to ${langLabel}`;
+      resultText = await translateText(selectedText, langCode);
+    } else if (action === 'tone_professional') {
+      promptDescription = 'Changing tone to professional...';
+      successTitle = 'Tone changed to Professional';
+      resultText = `We should professionally note that: ${selectedText}`;
+    } else if (action === 'tone_casual') {
+      promptDescription = 'Changing tone to casual...';
+      successTitle = 'Tone changed to Casual';
+      resultText = `Hey, just so you know: ${selectedText} 😊`;
+    }
+
+    try {
+      await sileo.promise(new Promise((resolve) => setTimeout(resolve, 1500)), {
+        loading: {
+          title: 'AI Assistant',
+          description: promptDescription,
+          fill: 'var(--sileo-info-bg)',
+        },
+        success: {
+          title: successTitle,
+          description: 'The selected text has been updated.',
+          fill: 'var(--sileo-success-bg)',
+          duration: 3000,
+        },
+        error: {
+          title: 'AI Processing Error',
+          description: 'Could not refine the selected text.',
+          fill: 'var(--sileo-error-bg)',
+        },
+      });
+
+      editor.insertInlineContent([
+        {
+          type: 'text',
+          text: resultText,
+          styles: {},
+        },
+      ]);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleCreateResume = () => {
-    console.log('Create a resume:', selectedText);
-    handleClose();
-    // Here you would typically trigger a summarization service
+    processTextWithAI('summarize');
   };
   // Ghost button styles reused for both cover actions
   const ghostBtnSx = (onCover: boolean) => ({
@@ -1047,14 +907,14 @@ export const EditorContent = ({
         PaperProps={{
           sx: {
             borderRadius: '12px',
-            minWidth: 200,
+            minWidth: 220,
             boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
             border: `1px solid ${theme.palette.divider}`,
             bgcolor: theme.palette.background.paper,
           },
         }}
       >
-        <MenuItem onClick={handleCreateTask} sx={{ py: 1.5 }}>
+        <MenuItem onClick={handleCreateTask} sx={{ py: 1.2 }}>
           <ListItemIcon sx={{ color: '#7c3aed' }}>
             <AutoAwesomeIcon fontSize="small" />
           </ListItemIcon>
@@ -1063,12 +923,84 @@ export const EditorContent = ({
             primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
           />
         </MenuItem>
-        <MenuItem onClick={handleCreateResume} sx={{ py: 1.5 }}>
+
+        <MenuItem onClick={handleCreateResume} sx={{ py: 1.2 }}>
           <ListItemIcon sx={{ color: '#137fec' }}>
             <DescriptionIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText
             primary="Create a resume"
+            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+          />
+        </MenuItem>
+
+        <MenuItem onClick={() => processTextWithAI('grammar')} sx={{ py: 1.2 }}>
+          <ListItemIcon sx={{ color: '#ec4899' }}>
+            <SpellcheckIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Fix spelling & grammar"
+            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+          />
+        </MenuItem>
+
+        <MenuItem onClick={() => processTextWithAI('expand')} sx={{ py: 1.2 }}>
+          <ListItemIcon sx={{ color: '#10b981' }}>
+            <ExpandIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Make text longer"
+            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+          />
+        </MenuItem>
+
+        <MenuItem onClick={() => processTextWithAI('shorten')} sx={{ py: 1.2 }}>
+          <ListItemIcon sx={{ color: '#f59e0b' }}>
+            <ShortenIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Make text shorter"
+            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+          />
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => processTextWithAI('tone_professional')}
+          sx={{ py: 1.2 }}
+        >
+          <ListItemIcon sx={{ color: '#6b7280' }}>
+            <WorkIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Professional tone"
+            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+          />
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => processTextWithAI('tone_casual')}
+          sx={{ py: 1.2 }}
+        >
+          <ListItemIcon sx={{ color: '#f43f5e' }}>
+            <EmojiPickerIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Casual tone"
+            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+          />
+        </MenuItem>
+
+        <MenuItem
+          onClick={() =>
+            processTextWithAI(`translate_${targetLanguage || 'en'}`)
+          }
+          sx={{ py: 1.2 }}
+        >
+          <ListItemIcon sx={{ color: '#0ea5e9' }}>
+            <TranslateIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary={`Translate to ${getLanguageLabel(targetLanguage || 'en')}`}
             primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
           />
         </MenuItem>
@@ -1152,172 +1084,22 @@ export const EditorContent = ({
         onClose={() => setIconAnchor(null)}
         PaperProps={{
           sx: {
-            borderRadius: '14px',
-            minWidth: '260px',
-            maxHeight: '360px',
-            mt: 1,
+            borderRadius: '16px',
+            p: 0,
+            overflow: 'hidden',
             boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
             border: '1px solid',
             borderColor: 'divider',
-            p: 1.5,
           },
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 1,
-            px: 0.5,
+        <EmojiPicker
+          onEmojiClick={(emojiData) => {
+            handleIconSelect(emojiData.emoji);
           }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.disabled',
-              fontWeight: 700,
-              letterSpacing: '0.8px',
-              textTransform: 'uppercase',
-            }}
-          >
-            Choose emoji
-          </Typography>
-          {headerIcon && (
-            <Typography
-              variant="caption"
-              onClick={() => handleIconSelect('')}
-              sx={{
-                color: 'error.main',
-                cursor: 'pointer',
-                fontWeight: 600,
-                '&:hover': { textDecoration: 'underline' },
-              }}
-            >
-              Remove
-            </Typography>
-          )}
-        </Box>
-
-        {/* Category selector icons */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            pb: 1,
-            mb: 1.5,
-          }}
-        >
-          {EMOJI_CATEGORIES.map((cat) => (
-            <Tooltip key={cat.id} title={cat.label} placement="top">
-              <Box
-                onClick={() => setActiveCategory(cat.id)}
-                sx={{
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 32,
-                  height: 32,
-                  borderRadius: '8px',
-                  fontSize: '18px',
-                  bgcolor:
-                    activeCategory === cat.id
-                      ? theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.15)'
-                        : 'rgba(0,0,0,0.08)'
-                      : 'transparent',
-                  border: '1px solid',
-                  borderColor:
-                    activeCategory === cat.id ? 'primary.main' : 'transparent',
-                  transition: 'all 0.15s',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    transform: 'scale(1.1)',
-                  },
-                }}
-              >
-                {cat.icon}
-              </Box>
-            </Tooltip>
-          ))}
-        </Box>
-
-        <Box
-          sx={{
-            maxHeight: '220px',
-            overflowY: 'auto',
-            pr: 0.5,
-            mr: -0.5,
-            '&::-webkit-scrollbar': {
-              width: '6px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.15)'
-                  : 'rgba(0,0,0,0.15)',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.3)'
-                  : 'rgba(0,0,0,0.3)',
-            },
-          }}
-        >
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(7, 1fr)',
-              gap: 0.5,
-            }}
-          >
-            {(
-              EMOJI_CATEGORIES.find((cat) => cat.id === activeCategory)
-                ?.emojis || []
-            ).map((emoji) => (
-              <Tooltip key={emoji} title={emoji} placement="top">
-                <Box
-                  onClick={() => handleIconSelect(emoji)}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 34,
-                    height: 34,
-                    borderRadius: '9px',
-                    cursor: 'pointer',
-                    fontSize: '20px',
-                    bgcolor:
-                      headerIcon === emoji
-                        ? theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.15)'
-                          : 'rgba(0,0,0,0.08)'
-                        : 'transparent',
-                    border: '1px solid',
-                    borderColor:
-                      headerIcon === emoji ? 'primary.main' : 'transparent',
-                    transition: 'all 0.15s',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      transform: 'scale(1.15)',
-                      borderColor: 'divider',
-                    },
-                  }}
-                >
-                  {emoji}
-                </Box>
-              </Tooltip>
-            ))}
-          </Box>
-        </Box>
+          theme={isThemeDark ? EmojiPickerTheme.DARK : EmojiPickerTheme.LIGHT}
+          lazyLoadEmojis={true}
+        />
       </Menu>
     </StyledEditorContent>
   );

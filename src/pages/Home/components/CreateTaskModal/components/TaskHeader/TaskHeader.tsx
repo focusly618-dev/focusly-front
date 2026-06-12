@@ -3,7 +3,6 @@ import {
   Close as CloseIcon,
   OpenInFull as OpenInFullIcon,
   CloseFullscreen as CloseFullscreenIcon,
-  Palette as PaletteIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { headerIconSx } from '../../CreateTaskModal.styles';
@@ -15,7 +14,6 @@ interface TaskHeaderProps {
   color: string;
   isFullScreen: boolean;
   setIsFullScreen: (v: boolean) => void;
-  setColorAnchor: (el: HTMLElement) => void;
   onClose: () => void;
   initialTask?: Task | null;
   handleDelete: () => Promise<void>;
@@ -25,7 +23,6 @@ export const TaskHeader = ({
   color,
   isFullScreen,
   setIsFullScreen,
-  setColorAnchor,
   onClose,
   handleDelete,
   initialTask,
@@ -65,15 +62,6 @@ export const TaskHeader = ({
           ) : (
             <OpenInFullIcon sx={{ fontSize: 18 }} />
           )}
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={(e) => setColorAnchor(e.currentTarget)}
-          sx={iconSx}
-        >
-          <PaletteIcon
-            sx={{ fontSize: 18, color: hasColor ? '#fff' : 'text.secondary' }}
-          />
         </IconButton>
       </Box>
       <Box display="flex" alignItems="center" gap={1}>

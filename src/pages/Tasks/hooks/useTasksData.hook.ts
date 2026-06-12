@@ -9,6 +9,7 @@ import type {
 import { useAppDispatch } from '@/redux/hooks';
 import { setTasks } from '@/redux/tasks/task.slice';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
+import { handleMutationError } from '@/utils/errorHandler';
 
 interface UseTasksDataProps {
   userId?: string;
@@ -30,12 +31,22 @@ export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
     [userId, filters, sort],
   );
 
-  const { data, loading: isLoading } = useQuery(GET_TASKS, {
+  const {
+    data,
+    loading: isLoading,
+    error,
+  } = useQuery(GET_TASKS, {
     skip: !userId,
     variables: queryVariables,
     fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
   });
+
+  useEffect(() => {
+    if (error) {
+      handleMutationError(error, 'Error al cargar las tareas');
+    }
+  }, [error]);
 
   const tasks: TaskResponse[] = useMemo(() => {
     const rawTasks = data?.tasks || [];

@@ -194,10 +194,42 @@ export const TaskDetailModal = ({
                   placeholder="Give your task a clear name..."
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  sx={titleInputPropsSx}
+                  sx={{
+                    ...titleInputPropsSx,
+                    '& .MuiOutlinedInput-root': {
+                      ...titleInputPropsSx['& .MuiOutlinedInput-root'],
+                      paddingRight: '12px',
+                    },
+                  }}
                   error={!!errors.title}
                   helperText={errors.title}
                   disabled={isReadOnly}
+                  InputProps={{
+                    endAdornment: (
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', pr: 1 }}
+                      >
+                        <Box
+                          onClick={(e) =>
+                            !isReadOnly && setColorAnchor(e.currentTarget)
+                          }
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: '50%',
+                            bgcolor: color || '#1e293b',
+                            cursor: isReadOnly ? 'default' : 'pointer',
+                            border: '2px solid white',
+                            boxShadow: '0 0 0 1px rgba(0,0,0,0.1)',
+                            transition: 'transform 0.2s',
+                            '&:hover': {
+                              transform: isReadOnly ? 'none' : 'scale(1.1)',
+                            },
+                          }}
+                        />
+                      </Box>
+                    ),
+                  }}
                 />
               </Box>
 
