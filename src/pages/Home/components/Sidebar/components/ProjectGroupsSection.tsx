@@ -1,7 +1,9 @@
-import { Box, Typography, IconButton, Tooltip, Divider } from '@mui/material';
+import { useState } from 'react';
+import { Box, Typography, IconButton, Tooltip, Divider, Collapse } from '@mui/material';
 import {
   ChevronRight,
   ExpandMore,
+  ExpandLess,
   Add as AddIcon,
   MoreHoriz as MoreHorizIcon,
   NotesOutlined as NotesIcon,
@@ -20,10 +22,12 @@ import type {
 
 interface ProjectGroupsSectionProps {
   sidebar: UseSidebarReturn;
+  hideHeader?: boolean;
 }
 
 export const ProjectGroupsSection = ({
   sidebar,
+  hideHeader = false,
 }: ProjectGroupsSectionProps) => {
   const {
     theme,
@@ -51,46 +55,10 @@ export const ProjectGroupsSection = ({
     selectedGroupId,
   } = sidebar;
 
-  return (
-    <>
-      <Box
-        sx={{
-          px: 3,
-          pt: 1,
-          pb: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexShrink: 0,
-        }}
-      >
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 700,
-            color: 'text.secondary',
-            textTransform: 'uppercase',
-            fontSize: '0.75rem',
-            letterSpacing: '0.08em',
-          }}
-        >
-          Projects & Docs
-        </Typography>
-        <Tooltip title="New Project" arrow>
-          <IconButton
-            size="small"
-            onClick={() => setIsCreatingGroupInline((prev) => !prev)}
-            sx={{
-              color: 'text.secondary',
-              '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
-            }}
-          >
-            <AddIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-        </Tooltip>
-      </Box>
+  const [isSectionExpanded, setIsSectionExpanded] = useState(true);
 
-      <ProjectsList>
+  const projectsListContent = (
+    <ProjectsList>
         {/* Inline Group Creation */}
         {isCreatingGroupInline && (
           <Box
@@ -350,7 +318,76 @@ export const ProjectGroupsSection = ({
             </Box>
           );
         })}
-      </ProjectsList>
+    </ProjectsList>
+  );
+
+  if (hideHeader) {
+    return projectsListContent;
+  }
+
+  return (
+    <>
+      <Box
+        sx={{
+          px: 3,
+          pt: 1,
+          pb: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+        }}
+      >
+        <Box
+          onClick={() => setIsSectionExpanded((prev) => !prev)}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            userSelect: 'none',
+            gap: 0.5,
+            '&:hover': {
+              opacity: 0.8,
+            },
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 700,
+              color: 'text.secondary',
+              textTransform: 'uppercase',
+              fontSize: '0.75rem',
+              letterSpacing: '0.08em',
+            }}
+          >
+            Projects & Docs
+          </Typography>
+          <IconButton size="small" sx={{ p: 0.2, color: 'text.secondary' }}>
+            {isSectionExpanded ? (
+              <ExpandLess sx={{ fontSize: 16 }} />
+            ) : (
+              <ExpandMore sx={{ fontSize: 16 }} />
+            )}
+          </IconButton>
+        </Box>
+        <Tooltip title="New Project" arrow>
+          <IconButton
+            size="small"
+            onClick={() => setIsCreatingGroupInline((prev) => !prev)}
+            sx={{
+              color: 'text.secondary',
+              '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
+            }}
+          >
+            <AddIcon sx={{ fontSize: 16 }} />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      <Collapse in={isSectionExpanded}>
+        {projectsListContent}
+      </Collapse>
     </>
   );
 };

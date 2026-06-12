@@ -375,15 +375,6 @@ export const EditorHeader = ({
   };
   return (
     <StyledEditorHeader>
-      <HeaderLeft>
-        <BackButton
-          startIcon={<ArrowBackIcon sx={{ fontSize: 14 }} />}
-          onClick={onBack}
-        >
-          BACK TO WORKSPACES
-        </BackButton>
-      </HeaderLeft>
-
       <HeaderCenter
         id="joyride-editor-search"
         sx={{ position: 'relative', zIndex: 50, mx: 2 }}
