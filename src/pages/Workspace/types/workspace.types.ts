@@ -78,7 +78,7 @@ export interface WorkspaceEditorProps {
   onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   isRightSidebarOpen: boolean;
   setIsRightSidebarOpen: (isOpen: boolean) => void;
-  saveStatus?: 'idle' | 'saving' | 'saved';
+  saveState?: 'idle' | 'saving' | 'saved';
   workspaces?: WorkspaceTypes[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getCustomSlashMenuItems: (editor: any) => any[];

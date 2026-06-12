@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { EditorContainer, MainEditorArea } from './WorkspaceEditor.styles';
 
 import type { WorkspaceEditorProps } from '../../types/workspace.types';
@@ -28,7 +29,11 @@ export const WorkspaceEditor = ({
   getWorkspaceMentionMenuItems,
   activeFocusTaskId,
   onUnlinkTask,
+  saveState,
 }: WorkspaceEditorProps) => {
+  const [sourceLanguage, setSourceLanguage] = useState('auto');
+  const [targetLanguage, setTargetLanguage] = useState('en');
+
   const {
     currentTitle,
     currentFolder,
@@ -65,6 +70,12 @@ export const WorkspaceEditor = ({
             selectTask={selectTask}
             handleSelectTask={handleSelectTask}
             setValue={setValue}
+            saveState={saveState}
+            editor={editor}
+            sourceLanguage={sourceLanguage}
+            setSourceLanguage={setSourceLanguage}
+            targetLanguage={targetLanguage}
+            setTargetLanguage={setTargetLanguage}
           />
 
           <EditorContent
@@ -79,6 +90,7 @@ export const WorkspaceEditor = ({
             getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
             setValue={setValue}
             watch={watch}
+            targetLanguage={targetLanguage}
           />
         </MainEditorArea>
 

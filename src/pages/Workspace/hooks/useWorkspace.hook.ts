@@ -11,11 +11,26 @@ export const useWorkspace = () => {
   const { user } = useAppSelector((state) => state.auth);
 
   // 1. Actions Hook (Delete, Search)
-  const { open, handleOpen, handleClose, onConfirm, deleteWorkspace, searchWorkspaces } =
-    useWorkspaceActions();
+  const {
+    open,
+    handleOpen,
+    handleClose,
+    onConfirm,
+    deleteWorkspace,
+    searchWorkspaces,
+  } = useWorkspaceActions();
 
   // 2. Form Hook (useForm, Auto-save)
-  const { register, watch, setValue, getValues, reset, control, saveStatus } = useWorkspaceForm();
+  const {
+    register,
+    watch,
+    setValue,
+    getValues,
+    reset,
+    control,
+    saveStatus,
+    saveState,
+  } = useWorkspaceForm();
 
   // 3. Tasks Hook (Selection, Sync, Updates)
   const {
@@ -50,6 +65,7 @@ export const useWorkspace = () => {
     reset,
     control,
     saveStatus,
+    saveState,
     data,
     loading,
 

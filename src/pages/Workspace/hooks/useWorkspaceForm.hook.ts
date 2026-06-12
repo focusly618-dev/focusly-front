@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect, useRef } from 'react';
+import { useCallback, useMemo, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm, useWatch } from 'react-hook-form';
 import debounce from 'lodash.debounce';
@@ -9,13 +9,34 @@ import {
 } from '../workspaces.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
-import { sileo } from '@/utils/sileo';
 
 export const useWorkspaceForm = () => {
   const [createWorkspace] = useMutation(CREATE_WORKSPACE, {
     refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
   });
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE);
+
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>(
+    'idle',
+  );
+  const isMountedRef = useRef(true);
+  const savedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (savedTimeoutRef.current) {
+        clearTimeout(savedTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const safeSetSaveState = useCallback((state: 'idle' | 'saving' | 'saved') => {
+    if (isMountedRef.current) {
+      setSaveState(state);
+    }
+  }, []);
 
   const { register, watch, setValue, getValues, reset, control } =
     useForm<WorkspaceFormData>({
@@ -26,7 +47,8 @@ export const useWorkspaceForm = () => {
 
   const saveToBackend = useCallback(
     async (data: WorkspaceFormData) => {
-      const savePromise = async () => {
+      safeSetSaveState('saving');
+      try {
         if (data.id) {
           await updateWorkspace({
             variables: {
@@ -49,6 +71,7 @@ export const useWorkspaceForm = () => {
             data.title === 'Untitled Strategic Plan' &&
             data.content === '[]'
           ) {
+            safeSetSaveState('idle');
             return;
           }
 
@@ -68,23 +91,30 @@ export const useWorkspaceForm = () => {
             },
           });
 
-          if (result.data?.createWorkspace?.id) {
+          if (result.data?.createWorkspace?.id && isMountedRef.current) {
             setValue('id', result.data.createWorkspace.id);
           }
         }
-      };
 
-      await sileo.promise(savePromise(), {
-        loading: { title: 'Saving...', fill: 'var(--sileo-update-bg)' },
-        success: { title: 'Saved!', fill: 'var(--sileo-success-bg)' },
-        error: { title: 'Error saving', fill: 'var(--sileo-error-bg)' },
-      });
+        safeSetSaveState('saved');
+
+        if (savedTimeoutRef.current) {
+          clearTimeout(savedTimeoutRef.current);
+        }
+        savedTimeoutRef.current = setTimeout(() => {
+          safeSetSaveState('idle');
+        }, 2000);
+      } catch (err) {
+        console.error('Error saving workspace:', err);
+        safeSetSaveState('idle');
+      }
     },
-    [createWorkspace, updateWorkspace, setValue],
+    [createWorkspace, updateWorkspace, setValue, safeSetSaveState],
   );
 
   const debouncedSave = useMemo(
     () =>
+      // eslint-disable-next-line react-hooks/refs
       debounce((data: WorkspaceFormData) => {
         saveToBackend(data);
       }, 1000),
@@ -121,12 +151,19 @@ export const useWorkspaceForm = () => {
     if (values.id !== lastId.current) {
       lastId.current = values.id;
       lastSavedValues.current = currentValues;
+      safeSetSaveState('idle');
       return;
     }
 
     if (currentValues !== lastSavedValues.current) {
       const parsedCurrent = JSON.parse(currentValues);
       const parsedLast = JSON.parse(lastSavedValues.current);
+
+      // Immediately set saveState to 'saving' so the spinner shows up during debounce delay
+      safeSetSaveState('saving');
+      if (savedTimeoutRef.current) {
+        clearTimeout(savedTimeoutRef.current);
+      }
 
       // If ONLY or ALSO the taskId changed, save immediately
       if (parsedCurrent.taskId !== parsedLast.taskId) {
@@ -137,7 +174,7 @@ export const useWorkspaceForm = () => {
 
       lastSavedValues.current = currentValues;
     }
-  }, [values, debouncedSave, saveToBackend]);
+  }, [values, debouncedSave, saveToBackend, safeSetSaveState]);
 
   useEffect(() => {
     return () => {
@@ -154,5 +191,6 @@ export const useWorkspaceForm = () => {
     control,
     values,
     saveStatus: values.saveStatus || false,
+    saveState,
   };
 };

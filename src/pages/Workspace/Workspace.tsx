@@ -17,7 +17,12 @@ import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { BlockNoteEditor } from '@blocknote/core';
 import { getDefaultReactSlashMenuItems } from '@blocknote/react';
-import { Folder as FolderIcon } from '@mui/icons-material';
+import {
+  Folder as FolderIcon,
+  InfoOutlined as InfoIcon,
+  CalendarTodayOutlined as CalendarIcon,
+  SpeedOutlined as SpeedIcon,
+} from '@mui/icons-material';
 
 export const Workspace = ({
   isEditorOpen,
@@ -38,6 +43,7 @@ export const Workspace = ({
     handleSelectTask,
     handleUpdateTask,
     tasksData,
+    saveState,
   } = useWorkspace();
 
   const [runOnboarding, setRunOnboarding] = useState((): boolean => {
@@ -227,13 +233,118 @@ export const Workspace = ({
 
   const getCustomSlashMenuItems = (editor: BlockNoteEditor) => {
     const defaultItems = getDefaultReactSlashMenuItems(editor);
-    return defaultItems.filter(
-      (item) =>
-        item.title !== 'Image' &&
-        item.title !== 'Video' &&
-        item.title !== 'Audio' &&
-        item.title !== 'File',
+    const filtered = defaultItems.filter(
+      (item) => item.title !== 'Audio' && item.title !== 'File',
     );
+
+    const customItems = [
+      {
+        title: 'Callout block',
+        onItemClick: () => {
+          editor.insertBlocks(
+            [
+              {
+                type: 'paragraph',
+                content: '⚠️ Callout: Write something important here...',
+              },
+            ],
+            editor.getTextCursorPosition().block,
+            'after',
+          );
+        },
+        aliases: ['alert', 'warning', 'info', 'note'],
+        groupName: 'Advanced',
+        icon: <InfoIcon sx={{ color: 'info.main', fontSize: 18 }} />,
+        subtext: 'Insert a highlighted note or alert box',
+      },
+      {
+        title: 'Meeting Notes template',
+        onItemClick: () => {
+          editor.insertBlocks(
+            [
+              {
+                type: 'heading',
+                content:
+                  '📅 Meeting Notes - ' + new Date().toLocaleDateString(),
+                props: { level: 2 },
+              },
+              {
+                type: 'paragraph',
+                content: '**Attendees:** [List participants]',
+              },
+              {
+                type: 'heading',
+                content: '🎯 Objectives',
+                props: { level: 3 },
+              },
+              {
+                type: 'bulletListItem',
+                content: 'Discuss project milestones',
+              },
+              {
+                type: 'bulletListItem',
+                content: 'Align on next design iterations',
+              },
+              {
+                type: 'heading',
+                content: '✅ Action Items',
+                props: { level: 3 },
+              },
+              {
+                type: 'checkListItem',
+                content: 'Create high-fidelity mockups',
+              },
+            ],
+            editor.getTextCursorPosition().block,
+            'after',
+          );
+        },
+        aliases: ['template', 'meeting', 'agenda'],
+        groupName: 'Templates',
+        icon: <CalendarIcon sx={{ color: 'primary.main', fontSize: 18 }} />,
+        subtext: 'Insert a pre-structured meeting outline',
+      },
+      {
+        title: 'Sprint Plan template',
+        onItemClick: () => {
+          editor.insertBlocks(
+            [
+              {
+                type: 'heading',
+                content: '🚀 Sprint Planning',
+                props: { level: 2 },
+              },
+              {
+                type: 'paragraph',
+                content:
+                  '**Sprint Goals:** Deliver the core features & design refinements.',
+              },
+              {
+                type: 'heading',
+                content: '📋 Backlog Items',
+                props: { level: 3 },
+              },
+              {
+                type: 'checkListItem',
+                content: 'Build auto-save status indicator in workspace editor',
+              },
+              {
+                type: 'checkListItem',
+                content: 'Enable image and video blocks inside documents',
+              },
+            ],
+            editor.getTextCursorPosition().block,
+            'after',
+          );
+        },
+        aliases: ['sprint', 'scrum', 'agile'],
+        groupName: 'Templates',
+        icon: <SpeedIcon sx={{ color: 'success.main', fontSize: 18 }} />,
+        subtext: 'Insert a detailed sprint planning layout',
+      },
+    ];
+
+    return [...filtered, ...customItems];
   };
 
   const getWorkspaceMentionMenuItems = (editor: BlockNoteEditor) => {
@@ -343,6 +454,7 @@ export const Workspace = ({
                 getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
                 activeFocusTaskId={activeFocusTaskId}
                 onUnlinkTask={handleUnlinkTask}
+                saveState={saveState}
               />
             </Suspense>
           </div>

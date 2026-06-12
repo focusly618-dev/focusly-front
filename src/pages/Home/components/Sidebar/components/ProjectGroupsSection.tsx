@@ -265,7 +265,7 @@ export const ProjectGroupsSection = ({
                           isWorkspaceTab && selectedWorkspaceId === w.id
                         }
                         onClick={() => handleSelectWorkspace(w)}
-                        sx={{ pl: 2 }}
+                        sx={{ pl: 4 }}
                       >
                         <Typography
                           sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}
@@ -296,7 +296,7 @@ export const ProjectGroupsSection = ({
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
-                          padding: '6px 8px 6px 28px',
+                          padding: '6px 8px 6px 32px',
                           borderRadius: '6px',
                           mb: 0.5,
                           backgroundColor:

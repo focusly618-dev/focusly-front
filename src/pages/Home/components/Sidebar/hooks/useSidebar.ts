@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useMemo, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTheme } from '@mui/material';
 import { useQuery, useMutation } from '@apollo/client';
@@ -370,23 +370,6 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   // Derive project groups list
   const projectGroups: ProjectGroupTypes[] =
     projectGroupsData?.projectGroups || [];
-
-  // Auto-create default project group "Projects & Docs" if none exist
-  useEffect(() => {
-    if (
-      projectGroupsData &&
-      projectGroupsData.projectGroups &&
-      projectGroupsData.projectGroups.length === 0
-    ) {
-      createProjectGroup({
-        variables: {
-          input: { name: 'Projects & Docs' },
-        },
-      }).catch((err) => {
-        console.error('Error auto-creating default project group:', err);
-      });
-    }
-  }, [projectGroupsData, createProjectGroup]);
 
   const handleUpdateProject = async (
     id: string,
