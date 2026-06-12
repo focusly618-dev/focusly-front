@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
+import type { BlockNoteEditor } from '@blocknote/core';
+import { useEditorContent } from './useEditorContent.hook';
 import {
   Box,
   Typography,
@@ -9,7 +11,6 @@ import {
   ListItemText,
   Tooltip,
 } from '@mui/material';
-import { sileo } from '@/utils/sileo';
 import EmojiPicker, { Theme as EmojiPickerTheme } from 'emoji-picker-react';
 import {
   Folder as FolderIcon,
@@ -63,315 +64,18 @@ import {
   TitleInput,
   BlockNoteWrapper,
 } from './EditorContent.styles';
-
-type HeaderColor =
-  | 'aurora'
-  | 'sunset'
-  | 'ocean'
-  | 'forest'
-  | 'midnight'
-  | 'rose'
-  | 'golden'
-  | 'cosmic'
-  | 'ember'
-  | 'dusk'
-  | 'arctic'
-  | 'spring'
-  | 'candy'
-  | 'neon'
-  | 'borealis'
-  | 'royal'
-  | 'grape'
-  | 'kyoto'
-  | 'aqua'
-  | 'mauve'
-  | 'shore'
-  | 'peach'
-  | 'indigo'
-  | 'nebula'
-  | 'mint'
-  | 'blood'
-  | 'silver'
-  | 'obsidian'
-  | 'pastel_pink'
-  | 'pastel_rose'
-  | 'pastel_coral'
-  | 'pastel_peach'
-  | 'pastel_orange'
-  | 'pastel_yellow'
-  | 'pastel_lime'
-  | 'pastel_green'
-  | 'pastel_mint'
-  | 'pastel_teal'
-  | 'pastel_cyan'
-  | 'pastel_sky'
-  | 'pastel_blue'
-  | 'pastel_indigo'
-  | 'pastel_violet'
-  | 'pastel_purple'
-  | 'pastel_magenta'
-  | 'pastel_lavender'
-  | 'pastel_gray'
-  | 'pastel_slate'
-  | 'none';
-
-const colorPalette: { color: HeaderColor; gradient: string; label: string }[] =
-  [
-    { color: 'none', gradient: 'none', label: 'None' },
-    {
-      color: 'aurora',
-      gradient: 'linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%)',
-      label: 'Aurora',
-    },
-    {
-      color: 'sunset',
-      gradient: 'linear-gradient(135deg, #fbcfe8 0%, #fda4af 100%)',
-      label: 'Sunset',
-    },
-    {
-      color: 'ocean',
-      gradient: 'linear-gradient(135deg, #7dd3fc 0%, #67e8f9 100%)',
-      label: 'Ocean',
-    },
-    {
-      color: 'forest',
-      gradient: 'linear-gradient(135deg, #99f6e4 0%, #86efac 100%)',
-      label: 'Forest',
-    },
-    {
-      color: 'midnight',
-      gradient: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-      label: 'Midnight',
-    },
-    {
-      color: 'rose',
-      gradient: 'linear-gradient(135deg, #fecdd3 0%, #f9a8d4 100%)',
-      label: 'Rose',
-    },
-    {
-      color: 'golden',
-      gradient: 'linear-gradient(135deg, #fef08a 0%, #fde047 100%)',
-      label: 'Golden',
-    },
-    {
-      color: 'cosmic',
-      gradient: 'linear-gradient(135deg, #c4b5fd 0%, #a5b4fc 100%)',
-      label: 'Cosmic',
-    },
-    {
-      color: 'ember',
-      gradient: 'linear-gradient(135deg, #fca5a5 0%, #f87171 100%)',
-      label: 'Ember',
-    },
-    {
-      color: 'dusk',
-      gradient: 'linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%)',
-      label: 'Dusk',
-    },
-    {
-      color: 'arctic',
-      gradient: 'linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%)',
-      label: 'Arctic',
-    },
-    {
-      color: 'spring',
-      gradient: 'linear-gradient(135deg, #bef264 0%, #d9f99d 100%)',
-      label: 'Spring',
-    },
-    {
-      color: 'candy',
-      gradient: 'linear-gradient(135deg, #f5d0fe 0%, #e9d5ff 100%)',
-      label: 'Candy',
-    },
-    {
-      color: 'neon',
-      gradient: 'linear-gradient(135deg, #67e8f9 0%, #c084fc 100%)',
-      label: 'Neon',
-    },
-    {
-      color: 'borealis',
-      gradient: 'linear-gradient(135deg, #86efac 0%, #5eead4 100%)',
-      label: 'Borealis',
-    },
-    {
-      color: 'royal',
-      gradient: 'linear-gradient(135deg, #475569 0%, #64748b 100%)',
-      label: 'Royal',
-    },
-    {
-      color: 'grape',
-      gradient: 'linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%)',
-      label: 'Grape',
-    },
-    {
-      color: 'kyoto',
-      gradient: 'linear-gradient(135deg, #fecaca 0%, #fef08a 100%)',
-      label: 'Kyoto',
-    },
-    {
-      color: 'aqua',
-      gradient: 'linear-gradient(135deg, #99f6e4 0%, #a5f3fc 100%)',
-      label: 'Aqua',
-    },
-    {
-      color: 'mauve',
-      gradient: 'linear-gradient(135deg, #d8b4fe 0%, #c084fc 100%)',
-      label: 'Mauve',
-    },
-    {
-      color: 'shore',
-      gradient: 'linear-gradient(135deg, #bae6fd 0%, #fef3c7 100%)',
-      label: 'Shore',
-    },
-    {
-      color: 'peach',
-      gradient: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%)',
-      label: 'Peach',
-    },
-    {
-      color: 'indigo',
-      gradient: 'linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%)',
-      label: 'Indigo',
-    },
-    {
-      color: 'nebula',
-      gradient: 'linear-gradient(135deg, #e9d5ff 0%, #fbcfe8 100%)',
-      label: 'Nebula',
-    },
-    {
-      color: 'mint',
-      gradient: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)',
-      label: 'Mint',
-    },
-    {
-      color: 'blood',
-      gradient: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-      label: 'Blood',
-    },
-    {
-      color: 'silver',
-      gradient: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      label: 'Silver',
-    },
-    {
-      color: 'obsidian',
-      gradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-      label: 'Obsidian',
-    },
-    // Solid pastel colors
-    {
-      color: 'pastel_pink',
-      gradient: '#fecdd3',
-      label: 'Pastel Pink',
-    },
-    {
-      color: 'pastel_rose',
-      gradient: '#fda4af',
-      label: 'Pastel Rose',
-    },
-    {
-      color: 'pastel_coral',
-      gradient: '#fca5a5',
-      label: 'Pastel Coral',
-    },
-    {
-      color: 'pastel_peach',
-      gradient: '#ffedd5',
-      label: 'Pastel Peach',
-    },
-    {
-      color: 'pastel_orange',
-      gradient: '#fed7aa',
-      label: 'Pastel Orange',
-    },
-    {
-      color: 'pastel_yellow',
-      gradient: '#fef08a',
-      label: 'Pastel Yellow',
-    },
-    {
-      color: 'pastel_lime',
-      gradient: '#bef264',
-      label: 'Pastel Lime',
-    },
-    {
-      color: 'pastel_green',
-      gradient: '#86efac',
-      label: 'Pastel Green',
-    },
-    {
-      color: 'pastel_mint',
-      gradient: '#99f6e4',
-      label: 'Pastel Mint',
-    },
-    {
-      color: 'pastel_teal',
-      gradient: '#5eead4',
-      label: 'Pastel Teal',
-    },
-    {
-      color: 'pastel_cyan',
-      gradient: '#67e8f9',
-      label: 'Pastel Cyan',
-    },
-    {
-      color: 'pastel_sky',
-      gradient: '#7dd3fc',
-      label: 'Pastel Sky',
-    },
-    {
-      color: 'pastel_blue',
-      gradient: '#a5b4fc',
-      label: 'Pastel Blue',
-    },
-    {
-      color: 'pastel_indigo',
-      gradient: '#c7d2fe',
-      label: 'Pastel Indigo',
-    },
-    {
-      color: 'pastel_violet',
-      gradient: '#c4b5fd',
-      label: 'Pastel Violet',
-    },
-    {
-      color: 'pastel_purple',
-      gradient: '#d8b4fe',
-      label: 'Pastel Purple',
-    },
-    {
-      color: 'pastel_magenta',
-      gradient: '#f5d0fe',
-      label: 'Pastel Magenta',
-    },
-    {
-      color: 'pastel_lavender',
-      gradient: '#e9d5ff',
-      label: 'Pastel Lavender',
-    },
-    {
-      color: 'pastel_gray',
-      gradient: '#e2e8f0',
-      label: 'Pastel Gray',
-    },
-    {
-      color: 'pastel_slate',
-      gradient: '#cbd5e1',
-      label: 'Pastel Slate',
-    },
-  ];
+import { colorPalette } from '@/utils/colors';
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
   currentTitle: string;
   setTitle: (t: string) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  editor: any;
+  editor: BlockNoteEditor;
   onContentChange: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getCustomSlashMenuItems: (editor: any) => any[];
+  getCustomSlashMenuItems: (editor: BlockNoteEditor) => any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getWorkspaceMentionMenuItems: (editor: any) => any[];
+  getWorkspaceMentionMenuItems: (editor: BlockNoteEditor) => any[];
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
   targetLanguage?: string;
@@ -392,19 +96,30 @@ export const EditorContent = ({
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
 
-  const persistedEmoji = watch?.('emoji');
-  const persistedBg = watch?.('background_color');
-
-  const [menuAnchor, setMenuAnchor] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
-  const [selectedText, setSelectedText] = useState('');
-  const [colorAnchor, setColorAnchor] = useState<null | HTMLElement>(null);
-  const [iconAnchor, setIconAnchor] = useState<null | HTMLElement>(null);
-  const headerColor: HeaderColor =
-    (persistedBg as HeaderColor | undefined) ?? 'none';
-  const headerIcon: string = persistedEmoji ?? '';
+  const {
+    menuAnchor,
+    colorAnchor,
+    setColorAnchor,
+    iconAnchor,
+    setIconAnchor,
+    headerColor,
+    headerIcon,
+    currentBgGradient,
+    hasCover,
+    handleColorClick,
+    handleIconClick,
+    handleColorSelect,
+    handleIconSelect,
+    handleContextMenu,
+    handleClose,
+    getLanguageLabel,
+    handleCreateTask,
+    processTextWithAI,
+  } = useEditorContent({
+    setValue,
+    watch,
+    editor,
+  });
 
   // Use derived values directly - no need for useEffect sync
   // (persistedBg and persistedEmoji from watch() are already reactive)
@@ -439,165 +154,6 @@ export const EditorContent = ({
     Hub: HubIcon,
     Magic: MagicIcon,
     Tag: TagIcon,
-  };
-
-  const currentBgGradient =
-    colorPalette.find((c) => c.color === headerColor)?.gradient || 'none';
-  const hasCover = headerColor !== 'none';
-
-  const handleColorClick = (event: React.MouseEvent<HTMLElement>) => {
-    setColorAnchor(event.currentTarget);
-  };
-
-  const handleIconClick = (event: React.MouseEvent<HTMLElement>) => {
-    setIconAnchor(event.currentTarget);
-  };
-
-  const handleColorSelect = (color: HeaderColor) => {
-    setValue?.('background_color', color === 'none' ? undefined : color);
-    setColorAnchor(null);
-  };
-
-  const handleIconSelect = (iconName: string) => {
-    setValue?.('emoji', iconName || undefined);
-    setIconAnchor(null);
-  };
-
-  const handleContextMenu = (event: React.MouseEvent) => {
-    const selection = window.getSelection()?.toString();
-    if (selection && selection.trim().length > 0) {
-      event.preventDefault();
-      setSelectedText(selection);
-      setMenuAnchor({
-        mouseX: event.clientX - 2,
-        mouseY: event.clientY - 4,
-      });
-    }
-  };
-
-  const handleClose = () => {
-    setMenuAnchor(null);
-  };
-
-  const translateText = async (
-    text: string,
-    toLang: string,
-  ): Promise<string> => {
-    try {
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=Autodetect|${toLang}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data?.responseData?.translatedText) {
-        return data.responseData.translatedText;
-      }
-      throw new Error('No translation returned');
-    } catch (err) {
-      console.error('Translation error:', err);
-      return text;
-    }
-  };
-
-  const getLanguageLabel = (code: string) => {
-    if (code === 'auto') return 'Detect Language';
-    if (code === 'es') return 'Spanish';
-    if (code === 'en') return 'English';
-    if (code === 'fr') return 'French';
-    if (code === 'de') return 'German';
-    if (code === 'it') return 'Italian';
-    if (code === 'pt') return 'Portuguese';
-    return '';
-  };
-
-  const handleCreateTask = () => {
-    handleClose();
-    sileo.success({
-      title: 'Task created!',
-      description: `New task created from selection: "${selectedText.slice(0, 30)}..."`,
-      fill: 'var(--sileo-success-bg)',
-      duration: 3000,
-    });
-  };
-
-  const processTextWithAI = async (action: string) => {
-    handleClose();
-    if (!selectedText) return;
-
-    let promptDescription = 'Processing text...';
-    let successTitle = 'Text updated';
-    let resultText = selectedText;
-
-    if (action === 'grammar') {
-      promptDescription = 'Fixing grammar and spelling...';
-      successTitle = 'Grammar & spelling fixed';
-      let temp = selectedText.trim();
-      if (temp.length > 0) {
-        temp = temp.charAt(0).toUpperCase() + temp.slice(1);
-        if (!temp.endsWith('.') && !temp.endsWith('!') && !temp.endsWith('?')) {
-          temp += '.';
-        }
-      }
-      resultText = temp;
-    } else if (action === 'summarize') {
-      promptDescription = 'Creating summary...';
-      successTitle = 'Summary generated';
-      resultText = `Summary: "${selectedText.slice(0, 100)}..."`;
-    } else if (action === 'expand') {
-      promptDescription = 'Expanding text...';
-      successTitle = 'Text expanded';
-      resultText = `${selectedText} (This point is critical for our strategic alignment. We need to ensure all team members understand the implications and coordinate their efforts to execute this phase efficiently.)`;
-    } else if (action === 'shorten') {
-      promptDescription = 'Shortening text...';
-      successTitle = 'Text condensed';
-      resultText =
-        selectedText.length > 60
-          ? `${selectedText.slice(0, 50)}...`
-          : selectedText;
-    } else if (action.startsWith('translate_')) {
-      const langCode = action.replace('translate_', '');
-      const langLabel = getLanguageLabel(langCode);
-      promptDescription = `Translating to ${langLabel}...`;
-      successTitle = `Translated to ${langLabel}`;
-      resultText = await translateText(selectedText, langCode);
-    } else if (action === 'tone_professional') {
-      promptDescription = 'Changing tone to professional...';
-      successTitle = 'Tone changed to Professional';
-      resultText = `We should professionally note that: ${selectedText}`;
-    } else if (action === 'tone_casual') {
-      promptDescription = 'Changing tone to casual...';
-      successTitle = 'Tone changed to Casual';
-      resultText = `Hey, just so you know: ${selectedText} 😊`;
-    }
-
-    try {
-      await sileo.promise(new Promise((resolve) => setTimeout(resolve, 1500)), {
-        loading: {
-          title: 'AI Assistant',
-          description: promptDescription,
-          fill: 'var(--sileo-info-bg)',
-        },
-        success: {
-          title: successTitle,
-          description: 'The selected text has been updated.',
-          fill: 'var(--sileo-success-bg)',
-          duration: 3000,
-        },
-        error: {
-          title: 'AI Processing Error',
-          description: 'Could not refine the selected text.',
-          fill: 'var(--sileo-error-bg)',
-        },
-      });
-
-      editor.insertInlineContent([
-        {
-          type: 'text',
-          text: resultText,
-          styles: {},
-        },
-      ]);
-    } catch (e) {
-      console.error(e);
-    }
   };
 
   const handleCreateResume = () => {

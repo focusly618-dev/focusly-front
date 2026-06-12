@@ -22,7 +22,6 @@ import {
   DeleteOutline as DeleteIcon,
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
-  CalendarToday as CalendarTodayIcon,
 } from '@mui/icons-material';
 
 import { ToolbarContainer } from './CalendarToolbar.styles';
@@ -42,7 +41,7 @@ interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
 }
 
 export const CalendarToolbar = (props: CustomToolbarProps) => {
-  const { date, onNavigate, label, onNavigateAction } = props;
+  const { date, onNavigate, onNavigateAction } = props;
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -74,8 +73,6 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
     onNavigateAction ? onNavigateAction('PREV') : onNavigate(Navigate.PREVIOUS);
   const goToNext = () =>
     onNavigateAction ? onNavigateAction('NEXT') : onNavigate(Navigate.NEXT);
-  const goToToday = () =>
-    onNavigateAction ? onNavigateAction('TODAY') : onNavigate(Navigate.TODAY);
 
   return (
     <ToolbarContainer
@@ -129,29 +126,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
         >
           {format(date, 'MMMM yyyy')}
         </Typography>
-
-        <Button
-          variant="outlined"
-          onClick={goToToday}
-          startIcon={<CalendarTodayIcon sx={{ fontSize: 16 }} />}
-          sx={{
-            borderRadius: '16px',
-            textTransform: 'none',
-            fontWeight: 600,
-            color: 'text.primary',
-            borderColor: 'divider',
-            px: 2,
-          }}
-        >
-          {(() => {
-            const today = new Date();
-            const isToday = date.toDateString() === today.toDateString();
-            return isToday ? 'Today' : label;
-          })()}
-        </Button>
       </Box>
-
-      {/* Right side: View Toggle removed (relocated to right sidebar) */}
 
       <Popover
         open={open}
