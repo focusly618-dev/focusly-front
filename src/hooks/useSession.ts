@@ -1,27 +1,18 @@
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import {
-  logout as logoutThunk,
-  clearAuth,
-  setSessionExpiredNotice,
-} from '@/redux/auth/auth.slice';
-import { useEffect, useCallback, useRef } from 'react';
+import { logout as logoutThunk, clearAuth } from '@/redux/auth/auth.slice';
+import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sileo } from '@/utils/sileo';
-import { auth as firebaseAuth } from '@/context/firebase';
-import { onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
 
 /**
  * useSession Hook
  *
  * Provides session management, authentication status, and cross-tab synchronization.
- * Listens to Firebase auth state changes in real-time to detect session expiration
- * without waiting for an API call to fail.
  */
 export const useSession = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const auth = useAppSelector((state) => state.auth);
-  const wasLoggedIn = useRef(false);
 
   const logout = useCallback(
     async (isExternal = false) => {
@@ -66,33 +57,6 @@ export const useSession = () => {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [logout]);
-
-  // Real-time Firebase auth state detection
-  useEffect(() => {
-    const unsubAuth = onAuthStateChanged(firebaseAuth, (user) => {
-      if (!user && wasLoggedIn.current) {
-        // Firebase user became null while we were logged in → session expired
-        dispatch(setSessionExpiredNotice(true));
-        dispatch(clearAuth());
-        navigate('/login');
-      }
-      wasLoggedIn.current = !!user;
-    });
-
-    const unsubToken = onIdTokenChanged(firebaseAuth, (user) => {
-      if (!user && wasLoggedIn.current) {
-        // Token was revoked or expired and couldn't be refreshed
-        dispatch(setSessionExpiredNotice(true));
-        dispatch(clearAuth());
-        navigate('/login');
-      }
-    });
-
-    return () => {
-      unsubAuth();
-      unsubToken();
-    };
-  }, [dispatch, navigate]);
 
   return {
     isLogged: auth.isLogged,

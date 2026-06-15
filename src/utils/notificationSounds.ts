@@ -67,7 +67,7 @@ class NotificationSoundPlayer {
     if (!this.audioContext) return;
 
     // If there is a preferred sound in localStorage, we play that instead
-    // but only if this is the "default" call (from firebase.ts)
+    // but only if this is the "default" call
     const preferred = this.getPreferredSound();
     if (preferred !== 'taskUpcoming' && !options.duration) {
       this.play(preferred, options);
