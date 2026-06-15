@@ -1,11 +1,7 @@
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
-import {
-  Search as SearchIcon,
-  Add as AddIcon,
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
 import {
   CommandPaletteContainer,
   CommandInputWrapper,

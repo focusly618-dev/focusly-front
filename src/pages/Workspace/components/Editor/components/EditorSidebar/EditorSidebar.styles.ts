@@ -220,7 +220,7 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-export const EmptyStateContainer = styled(Box)(({ theme }) => ({
+export const EmptyStateContainer = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',

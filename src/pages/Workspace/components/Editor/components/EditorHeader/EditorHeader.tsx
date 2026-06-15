@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect } from 'react';
 import {
   CheckCircleOutline as CheckCircleIcon,
   Mic as MicIcon,
@@ -17,13 +16,8 @@ import {
   ListItemText,
 } from '@mui/material';
 import { SearchPalette } from '../SearchPalette/SearchPalette';
-import {
-  HeaderCenter,
-  HeaderRight,
-} from '@/pages/Workspace/Workspace.styles';
-import {
-  EditorHeader as StyledEditorHeader,
-} from './EditorHeader.styles';
+import { HeaderCenter, HeaderRight } from '@/pages/Workspace/Workspace.styles';
+import { EditorHeader as StyledEditorHeader } from './EditorHeader.styles';
 import type { EditorHeaderProps } from './EditorHeader.types';
 import { useEditorHeader } from './useEditorHeader.hook';
 
