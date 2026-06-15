@@ -11,8 +11,7 @@ import {
 } from '../Dashboard.styles';
 
 import { useAppSelector } from '@/redux/hooks';
-import { UserUpdate } from '@/api/User/apiUser';
-import type { UserResponse } from '@/api/User/apiUserType';
+import { UserUpdate, type UserResponse } from '@/api/User/apiUser';
 
 interface FocusBlocksStepProps {
   onNext: () => void;
@@ -28,11 +27,17 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
     setFocusLength(newValue as number);
   };
 
-  const handleShortBreakChange = (_event: Event, newValue: number | number[]) => {
+  const handleShortBreakChange = (
+    _event: Event,
+    newValue: number | number[],
+  ) => {
     setShortBreak(newValue as number);
   };
 
-  const handleLongBreakChange = (_event: Event, newValue: number | number[]) => {
+  const handleLongBreakChange = (
+    _event: Event,
+    newValue: number | number[],
+  ) => {
     setLongBreak(newValue as number);
   };
 
@@ -45,7 +50,10 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
   const handleSave = async () => {
     if (user?.id) {
       try {
-        const currentSettings = (user.settings ?? {}) as Record<string, unknown>;
+        const currentSettings = (user.settings ?? {}) as Record<
+          string,
+          unknown
+        >;
         await UserUpdate(user.id, {
           settings: {
             ...currentSettings,
@@ -95,11 +103,36 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
           >
             <Tune sx={{ fontSize: 40, color: 'primary.main' }} />
             <Stack direction="row" spacing={0.5} alignItems="center">
-              <Box width={24} height={8} borderRadius={1} bgcolor="primary.main" />
-              <Box width={8} height={8} borderRadius={1} bgcolor="rgba(19, 127, 236, 0.3)" />
-              <Box width={24} height={8} borderRadius={1} bgcolor="primary.main" />
-              <Box width={8} height={8} borderRadius={1} bgcolor="rgba(19, 127, 236, 0.3)" />
-              <Box width={24} height={8} borderRadius={1} bgcolor="primary.main" />
+              <Box
+                width={24}
+                height={8}
+                borderRadius={1}
+                bgcolor="primary.main"
+              />
+              <Box
+                width={8}
+                height={8}
+                borderRadius={1}
+                bgcolor="rgba(19, 127, 236, 0.3)"
+              />
+              <Box
+                width={24}
+                height={8}
+                borderRadius={1}
+                bgcolor="primary.main"
+              />
+              <Box
+                width={8}
+                height={8}
+                borderRadius={1}
+                bgcolor="rgba(19, 127, 236, 0.3)"
+              />
+              <Box
+                width={24}
+                height={8}
+                borderRadius={1}
+                bgcolor="primary.main"
+              />
             </Stack>
           </Box>
         </HeroContainer>
@@ -114,8 +147,8 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
             Customize Focus Blocks
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Set your preferred duration for deep work sessions and breaks. We'll structure your
-            intelligent calendar around your rhythm.
+            Set your preferred duration for deep work sessions and breaks. We'll
+            structure your intelligent calendar around your rhythm.
           </Typography>
         </Box>
 
@@ -127,7 +160,10 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
             border="1px solid"
             borderColor="divider"
             boxShadow="0 1px 2px 0 rgba(0, 0, 0, 0.05)"
-            sx={{ transition: 'all 0.2s', '&:hover': { borderColor: 'rgba(19, 127, 236, 0.3)' } }}
+            sx={{
+              transition: 'all 0.2s',
+              '&:hover': { borderColor: 'rgba(19, 127, 236, 0.3)' },
+            }}
           >
             <Box display="flex" alignItems="center" gap={2} mb={3}>
               <Box
@@ -153,8 +189,16 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
             </Box>
 
             <Box display="flex" flexDirection="column" gap={2}>
-              <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2" fontWeight="500" color="text.secondary">
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography
+                  variant="body2"
+                  fontWeight="500"
+                  color="text.secondary"
+                >
                   Length
                 </Typography>
                 <Box
@@ -180,10 +224,18 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   onChange={handleFocusChange}
                 />
                 <Box display="flex" justifyContent="space-between" mt={1}>
-                  <Typography variant="caption" color="text.secondary" fontWeight="500">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    fontWeight="500"
+                  >
                     15M
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" fontWeight="500">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    fontWeight="500"
+                  >
                     90M
                   </Typography>
                 </Box>
@@ -198,7 +250,10 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
             border="1px solid"
             borderColor="divider"
             boxShadow="0 1px 2px 0 rgba(0, 0, 0, 0.05)"
-            sx={{ transition: 'all 0.2s', '&:hover': { borderColor: 'rgba(19, 127, 236, 0.3)' } }}
+            sx={{
+              transition: 'all 0.2s',
+              '&:hover': { borderColor: 'rgba(19, 127, 236, 0.3)' },
+            }}
           >
             <Box display="flex" alignItems="center" gap={2} mb={3}>
               <Box
@@ -225,7 +280,12 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
 
             <Stack spacing={3}>
               <Box>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={1}
+                >
                   <Typography variant="body2" fontWeight="500">
                     Short Break
                   </Typography>
@@ -249,7 +309,12 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   step={1}
                   onChange={handleShortBreakChange}
                 />
-                <Typography variant="caption" color="text.secondary" mt={1} display="block">
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  mt={1}
+                  display="block"
+                >
                   Taken after every focus session.
                 </Typography>
               </Box>
@@ -257,7 +322,12 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
               <Divider />
 
               <Box>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={1}
+                >
                   <Typography variant="body2" fontWeight="500">
                     Long Break
                   </Typography>
@@ -281,7 +351,12 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   step={5}
                   onChange={handleLongBreakChange}
                 />
-                <Typography variant="caption" color="text.secondary" mt={1} display="block">
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  mt={1}
+                  display="block"
+                >
                   Taken after 4 consecutive sessions.
                 </Typography>
               </Box>
@@ -301,8 +376,9 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
               <Box component="span" fontWeight="600" color="primary.main">
                 How this affects your day:{' '}
               </Box>
-              We will look for available slots in your calendar and fill them with these focus
-              blocks, ensuring you never overwork without a break.
+              We will look for available slots in your calendar and fill them
+              with these focus blocks, ensuring you never overwork without a
+              break.
             </Typography>
           </Box>
         </Stack>

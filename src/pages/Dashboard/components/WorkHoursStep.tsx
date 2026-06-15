@@ -13,8 +13,7 @@ import {
 } from '../Dashboard.styles';
 
 import { useAppSelector } from '@/redux/hooks';
-import { UserUpdate } from '@/api/User/apiUser';
-import type { UserResponse } from '@/api/User/apiUserType';
+import { UserUpdate, type UserResponse } from '@/api/User/apiUser';
 
 interface WorkHoursStepProps {
   onNext: () => void;
@@ -32,20 +31,29 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
     { label: 'S', value: 'Sun' },
   ];
 
-  const [selectedDays, setSelectedDays] = useState<string[]>(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
+  const [selectedDays, setSelectedDays] = useState<string[]>([
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+  ]);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
     );
   };
 
   const handleSave = async () => {
     if (user?.id) {
       try {
-        const currentSettings = (user.settings ?? {}) as Record<string, unknown>;
+        const currentSettings = (user.settings ?? {}) as Record<
+          string,
+          unknown
+        >;
         await UserUpdate(user.id, {
           settings: {
             ...currentSettings,
@@ -98,8 +106,18 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
           >
             <Schedule sx={{ fontSize: 40, color: 'primary.main' }} />
             <Stack direction="row" spacing={1}>
-              <Box width={6} height={6} borderRadius="50%" bgcolor="rgba(19, 127, 236, 0.4)" />
-              <Box width={6} height={6} borderRadius="50%" bgcolor="rgba(19, 127, 236, 0.6)" />
+              <Box
+                width={6}
+                height={6}
+                borderRadius="50%"
+                bgcolor="rgba(19, 127, 236, 0.4)"
+              />
+              <Box
+                width={6}
+                height={6}
+                borderRadius="50%"
+                bgcolor="rgba(19, 127, 236, 0.6)"
+              />
               <Box width={6} height={6} borderRadius="50%" bgcolor="#137fec" />
             </Stack>
           </Box>
@@ -115,8 +133,8 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
             Set Your Work Hours
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Define your typical schedule so we can plan tasks during your most productive hours
-            without encroaching on personal time.
+            Define your typical schedule so we can plan tasks during your most
+            productive hours without encroaching on personal time.
           </Typography>
         </Box>
 
@@ -131,7 +149,12 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
         >
           <Box display="flex" flexDirection="column" gap={3}>
             <Box>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1.5}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={1.5}
+              >
                 <Typography variant="body2" fontWeight="bold">
                   Work Days
                 </Typography>
@@ -161,7 +184,11 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
               <Box display="flex" gap={2}>
                 <Box width="50%">
                   <Box display="flex" flexDirection="column" gap={0.5}>
-                    <Typography variant="caption" color="text.secondary" fontWeight="500">
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight="500"
+                    >
                       Start Time
                     </Typography>
                     <TimeInputContainer>
@@ -183,7 +210,11 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
                 </Box>
                 <Box width="50%">
                   <Box display="flex" flexDirection="column" gap={0.5}>
-                    <Typography variant="caption" color="text.secondary" fontWeight="500">
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight="500"
+                    >
                       End Time
                     </Typography>
                     <TimeInputContainer>
@@ -232,7 +263,13 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
           Save & Continue
         </Button>
 
-        <Box display="flex" flexDirection="column" alignItems="center" gap={2} mt={3}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={2}
+          mt={3}
+        >
           <Typography
             variant="body2"
             color="text.secondary"

@@ -1,6 +1,10 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  createAsyncThunk,
+  type PayloadAction,
+} from '@reduxjs/toolkit';
 import { auth } from '@/context/firebase';
-import { API_BASE_URL } from '@/config/env.config';
+import { logoutUser } from '@/api/Auth/authApi';
 import { AuthProviders } from '@/pages/Login/types/Login.types';
 
 interface User {
@@ -24,7 +28,8 @@ type LogoutReason = 'manual' | 'expired';
 const getInitialState = (): AuthState => {
   const user = localStorage.getItem('user');
   const authProvider = localStorage.getItem('authProvider');
-  const onboardingCompleted = localStorage.getItem('onboardingCompleted') === 'true';
+  const onboardingCompleted =
+    localStorage.getItem('onboardingCompleted') === 'true';
 
   if (user) {
     try {
@@ -37,7 +42,10 @@ const getInitialState = (): AuthState => {
         sessionExpiredNotice: false,
       };
     } catch (e) {
-      console.error('[DEBUG] authSlice: Error parsing user from localStorage', e);
+      console.error(
+        '[DEBUG] authSlice: Error parsing user from localStorage',
+        e,
+      );
     }
   }
 
@@ -57,11 +65,7 @@ export const logout = createAsyncThunk<void, LogoutReason | undefined>(
       const state = getState() as { auth: AuthState };
       const userId = state.auth.user?.id;
 
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      });
+      await logoutUser(userId);
       await auth.signOut();
     } catch (error) {
       console.error('Logout error:', error);
@@ -69,7 +73,7 @@ export const logout = createAsyncThunk<void, LogoutReason | undefined>(
       dispatch(setSessionExpiredNotice(reason === 'expired'));
       dispatch(clearAuth());
     }
-  }
+  },
 );
 
 const initialState: AuthState = getInitialState();
@@ -84,7 +88,7 @@ export const authSlice = createSlice({
         user: User;
         provider: AuthProviders;
         isLogged: boolean;
-      }>
+      }>,
     ) => {
       state.isLogged = action.payload.isLogged;
       state.user = action.payload.user;

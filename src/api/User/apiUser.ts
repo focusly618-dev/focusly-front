@@ -1,31 +1,46 @@
-import { API_BASE_URL } from '@/config/env.config';
-import type { UserResponse } from './apiUserType';
+import axios from '@/api/axiosInstance';
 
-export const UserPost = async (userResponse: UserResponse): Promise<UserResponse> => {
-  const response = await fetch(`${API_BASE_URL}/users`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(userResponse),
-  });
+export interface Timestamp {
+  _seconds: number;
+  _nanoseconds: number;
+}
 
-  return response.json();
+export interface UserSettings {
+  breakDurationPref: number;
+  workHoursConfig: Record<string, unknown>;
+  notificationsEnabled: boolean;
+  blockedAppsList: string[];
+  focusDurationPref: number;
+}
+
+export interface UserResponse {
+  id: string;
+  email: string;
+  passwordHash?: string;
+  authProvider: string;
+  subscriptionStatus: 'active' | 'inactive';
+  settings: UserSettings;
+  createdAt: Timestamp;
+  lastSyncAt: Timestamp;
+  [key: string]: unknown;
+}
+
+export const UserPost = async (
+  userResponse: UserResponse,
+): Promise<UserResponse> => {
+  const response = await axios.post('/users', userResponse);
+  return response.data;
 };
 
 export const UserGet = async (id: string): Promise<UserResponse> => {
-  const response = await fetch(`${API_BASE_URL}/users/${id}`);
-  return response.json();
+  const response = await axios.get(`/users/${id}`);
+  return response.data;
 };
 
-export const UserUpdate = async (id: string, userData: Partial<UserResponse>): Promise<UserResponse> => {
-  const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(userData),
-  });
-
-  return response.json();
+export const UserUpdate = async (
+  id: string,
+  userData: Partial<UserResponse>,
+): Promise<UserResponse> => {
+  const response = await axios.patch(`/users/${id}`, userData);
+  return response.data;
 };
