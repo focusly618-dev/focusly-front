@@ -24,6 +24,9 @@ import {
   Link as LinkIcon,
   Launch as LaunchIcon,
   AccessTime as AccessTimeIcon,
+  AssignmentOutlined as AssignmentIcon,
+  LightbulbOutlined as TipIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
 import {
   getPriorityFromLevel,
@@ -46,6 +49,9 @@ import {
   SectionSubtitle,
   ResourceItem,
   PulseIndicator,
+  EmptyStateContainer,
+  EmptyStateIconWrapper,
+  EmptyStateTipCard,
 } from './EditorSidebar.styles';
 import type { EditorSidebarProps } from './EditorSidebar.type';
 import { useEditorSidebar } from './EditorSidebar.hook';
@@ -58,6 +64,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     onStartFocus,
     activeFocusTaskId,
     onUnlinkTask,
+    setShowPalette,
   } = props;
 
   const { user } = useAppSelector((state) => state.auth);
@@ -525,13 +532,95 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
               </Box>
             </MetadataSection>
           ) : (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ textAlign: 'center', py: 8 }}
-            >
-              Select a task to see details
-            </Typography>
+            <EmptyStateContainer>
+              <EmptyStateIconWrapper>
+                <AssignmentIcon
+                  sx={{
+                    fontSize: 32,
+                    color: theme.palette.primary.main,
+                    filter: `drop-shadow(0 0 8px ${theme.palette.primary.main}50)`,
+                  }}
+                />
+              </EmptyStateIconWrapper>
+
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 800,
+                  color: 'text.primary',
+                  mb: 1,
+                  fontSize: '15px',
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                No Task Linked
+              </Typography>
+
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: '12.5px',
+                  lineHeight: 1.5,
+                  maxWidth: '240px',
+                  mb: 3,
+                }}
+              >
+                Link a task to track estimate vs actual time, update status, and manage its description or resources.
+              </Typography>
+
+              {setShowPalette && (
+                <Button
+                  variant="contained"
+                  onClick={() => setShowPalette(true)}
+                  startIcon={<SearchIcon sx={{ fontSize: 16 }} />}
+                  sx={{
+                    textTransform: 'none',
+                    bgcolor: theme.palette.primary.main,
+                    color: '#ffffff',
+                    px: 3,
+                    py: 1,
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '12px',
+                    boxShadow: `0 4px 12px ${theme.palette.primary.main}30`,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      bgcolor: theme.palette.primary.dark,
+                      transform: 'translateY(-1.5px)',
+                      boxShadow: `0 6px 16px ${theme.palette.primary.main}45`,
+                    },
+                  }}
+                >
+                  Link a Task
+                </Button>
+              )}
+
+              <EmptyStateTipCard>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <TipIcon sx={{ fontSize: 14, color: 'warning.main' }} />
+                  <Typography
+                    variant="caption"
+                    fontWeight={750}
+                    color="warning.main"
+                    letterSpacing={0.5}
+                  >
+                    QUICK TIP
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    textAlign: 'left',
+                    fontSize: '11px',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Use the search bar at the top of this editor to quickly search and link tasks from your workspaces.
+                </Typography>
+              </EmptyStateTipCard>
+            </EmptyStateContainer>
           )}
 
           <Box sx={{ flexGrow: 1, minHeight: '20px' }} />

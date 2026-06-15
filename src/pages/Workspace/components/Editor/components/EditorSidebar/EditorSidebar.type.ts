@@ -12,4 +12,6 @@ export interface EditorSidebarProps {
   onStartFocus?: (task: TaskSearchItems) => void;
   activeFocusTaskId?: string | null;
   onUnlinkTask?: () => void;
+  setShowPalette?: (b: boolean) => void;
 }
+

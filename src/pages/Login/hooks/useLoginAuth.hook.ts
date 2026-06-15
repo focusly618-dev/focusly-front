@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
-import axios from '@/api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/redux/hooks';
 import { login } from '@/redux/auth/auth.slice';
 import { AuthProviders } from '../types/Login.types';
+import {
+  requestMagicLink,
+  verifyMagicLink,
+  loginWithGoogle,
+} from '@/api/Auth/authApi';
 
 interface UseLoginAuthProps {
   onAuthSuccess?: () => void;
@@ -23,7 +27,7 @@ export const useLoginAuth = ({
     setIsLoading(true);
     try {
       console.log('Sending custom magic link to:', email);
-      await axios.post('/auth/magic-link', { email, fullName });
+      await requestMagicLink(email, fullName);
 
       // Guardamos el email localmente para completar el sign-in al volver
       window.localStorage.setItem('emailForSignIn', email);
@@ -49,13 +53,12 @@ export const useLoginAuth = ({
       setIsLoading(true);
       try {
         console.log('Verifying custom magic link token...');
-        const response = await axios.post('/auth/magic-link/verify', { token });
-        const data = response.data;
+        const responseData = await verifyMagicLink(token);
 
         dispatch(
           login({
             isLogged: true,
-            user: data.user,
+            user: responseData.user,
             provider: AuthProviders.email,
           }),
         );
@@ -81,13 +84,14 @@ export const useLoginAuth = ({
     onSuccess: async (codeResponse) => {
       setIsLoading(true);
       try {
-        const backendResponse = await axios.post('/auth/google', {
-          code: codeResponse.code,
-        });
+        const responseData = await loginWithGoogle(
+          codeResponse.code,
+          window.location.origin,
+        );
         dispatch(
           login({
             isLogged: true,
-            user: backendResponse.data.user,
+            user: responseData.user,
             provider: AuthProviders.google,
           }),
         );

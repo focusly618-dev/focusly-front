@@ -214,3 +214,63 @@ export const PulseIndicator = styled(Box)(({ theme }) => ({
   boxShadow: `0 0 8px ${theme.palette.primary.main}`,
   animation: `${pulse} 2s infinite ease-in-out`,
 }));
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+export const EmptyStateContainer = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '48px 16px',
+  textAlign: 'center',
+  animation: `${fadeIn} 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+}));
+
+export const EmptyStateIconWrapper = styled(Box)(({ theme }) => ({
+  width: '68px',
+  height: '68px',
+  borderRadius: '20px',
+  background:
+    theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 100%)'
+      : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.02) 100%)',
+  border: `1px solid ${theme.palette.primary.main}20`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: '20px',
+  position: 'relative',
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? '0 8px 24px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.02)'
+      : '0 8px 24px rgba(99, 102, 241, 0.06)',
+  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    borderColor: theme.palette.primary.main,
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? `0 12px 28px rgba(99, 102, 241, 0.15), 0 0 12px ${theme.palette.primary.main}30`
+        : `0 12px 28px rgba(99, 102, 241, 0.1), 0 0 12px ${theme.palette.primary.main}20`,
+  },
+}));
+
+export const EmptyStateTipCard = styled(Box)(({ theme }) => ({
+  marginTop: '28px',
+  padding: '14px 16px',
+  borderRadius: '12px',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.015)'
+      : 'rgba(0, 0, 0, 0.01)',
+  border: `1px dashed ${theme.palette.divider}`,
+  width: '100%',
+  maxWidth: '280px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '6px',
+}));

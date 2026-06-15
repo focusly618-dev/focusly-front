@@ -1,11 +1,7 @@
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
-import {
-  Search as SearchIcon,
-  Add as AddIcon,
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
 import {
   CommandPaletteContainer,
   CommandInputWrapper,
@@ -72,9 +68,8 @@ export const SearchPalette = ({
               name="search-tasks-input"
               placeholder="Search tasks to link..."
               autoFocus
-              value={showPalette && selectTask ? selectTask.title : searchTerm}
+              value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              readOnly={!!selectTask}
             />
           </CommandInputWrapper>
           <ResultList>
@@ -200,44 +195,6 @@ export const SearchPalette = ({
             </AddTaskButton>
           </PaletteFooter>
         </CommandPaletteContainer>
-      ) : selectTask ? (
-        <Box display="flex" alignItems="center" gap={2}>
-          <CollapsedSearchContainer
-            onClick={() => setShowPalette(true)}
-            sx={{
-              flex: 1,
-              borderColor: 'action.selected',
-              '&:hover': { borderColor: 'info.main' },
-            }}
-          >
-            <AddIcon sx={{ color: 'text.secondary', fontSize: 20, mr: 1 }} />
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'info.main',
-                fontWeight: 500,
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              {selectTask.title}
-            </Typography>
-            <CloseIcon
-              sx={{
-                color: 'text.secondary',
-                fontSize: 20,
-                cursor: 'pointer',
-                '&:hover': { color: 'error.main' },
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSelectTask(null);
-                setValue('taskId', undefined);
-              }}
-            />
-          </CollapsedSearchContainer>
-        </Box>
       ) : (
         <CollapsedSearchContainer onClick={() => setShowPalette(true)}>
           <SearchIcon sx={{ color: 'text.secondary', fontSize: 20, mr: 1 }} />

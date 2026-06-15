@@ -103,6 +103,7 @@ export const WorkspaceEditor = ({
           onStartFocus={onStartFocus}
           activeFocusTaskId={activeFocusTaskId}
           onUnlinkTask={onUnlinkTask}
+          setShowPalette={setShowPalette}
         />
       </EditorContainer>
 
