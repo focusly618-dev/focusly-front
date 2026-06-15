@@ -3,7 +3,6 @@ import {
   createAsyncThunk,
   type PayloadAction,
 } from '@reduxjs/toolkit';
-import { auth } from '@/context/firebase';
 import { logoutUser } from '@/api/Auth/authApi';
 import { AuthProviders } from '@/pages/Login/types/Login.types';
 
@@ -66,7 +65,6 @@ export const logout = createAsyncThunk<void, LogoutReason | undefined>(
       const userId = state.auth.user?.id;
 
       await logoutUser(userId);
-      await auth.signOut();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
