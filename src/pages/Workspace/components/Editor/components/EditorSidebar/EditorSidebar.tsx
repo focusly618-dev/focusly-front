@@ -224,7 +224,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           {isRightSidebarOpen ? <ChevronRight /> : <ChevronLeft />}
         </IconButton>
       </Box>
-
+      {console.log(selectTask)}
       {isRightSidebarOpen && (
         <>
           {selectTask ? (
@@ -566,7 +566,8 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                   mb: 3,
                 }}
               >
-                Link a task to track estimate vs actual time, update status, and manage its description or resources.
+                Link a task to track estimate vs actual time, update status, and
+                manage its description or resources.
               </Typography>
 
               {setShowPalette && (
@@ -617,7 +618,8 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                     lineHeight: 1.4,
                   }}
                 >
-                  Use the search bar at the top of this editor to quickly search and link tasks from your workspaces.
+                  Use the search bar at the top of this editor to quickly search
+                  and link tasks from your workspaces.
                 </Typography>
               </EmptyStateTipCard>
             </EmptyStateContainer>

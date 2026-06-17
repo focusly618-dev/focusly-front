@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -31,13 +32,15 @@ const initialNotifications: Notification[] = [];
 
 export const Notifications = () => {
   const theme = useTheme();
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+  const { t } = useTranslation();
+  const [notifications, setNotifications] =
+    useState<Notification[]>(initialNotifications);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = (id: string) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
   };
 
@@ -84,19 +87,21 @@ export const Notifications = () => {
                 justifyContent: 'center',
               }}
             >
-              <NotificationsNoneIcon sx={{ color: theme.palette.primary.main, fontSize: 26 }} />
+              <NotificationsNoneIcon
+                sx={{ color: theme.palette.primary.main, fontSize: 26 }}
+              />
             </Box>
             <Box>
               <Typography variant="h5" fontWeight={700}>
-                Notifications
+                {t('Notifications')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Stay updated with your latest activity
+                {t('Stay updated with your latest activity')}
               </Typography>
             </Box>
             {unreadCount > 0 && (
               <Chip
-                label={`${unreadCount} NEW`}
+                label={t('{{unreadCount}} NEW', { unreadCount })}
                 size="small"
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.15),
@@ -123,7 +128,7 @@ export const Notifications = () => {
                   color: theme.palette.primary.main,
                 }}
               >
-                Mark all read
+                {t('Mark all read')}
               </Button>
               <Button
                 variant="text"
@@ -136,7 +141,7 @@ export const Notifications = () => {
                   color: '#ef4444',
                 }}
               >
-                Clear all
+                {t('Clear all')}
               </Button>
             </Box>
           )}
@@ -166,10 +171,15 @@ export const Notifications = () => {
                   justifyContent: 'center',
                 }}
               >
-                <InboxIcon sx={{ fontSize: 48, color: alpha(theme.palette.text.primary, 0.2) }} />
+                <InboxIcon
+                  sx={{
+                    fontSize: 48,
+                    color: alpha(theme.palette.text.primary, 0.2),
+                  }}
+                />
               </Box>
               <Typography variant="h6" fontWeight={700} color="text.secondary">
-                No notifications yet
+                {t('No notifications yet')}
               </Typography>
               <Typography
                 variant="body2"
@@ -177,8 +187,9 @@ export const Notifications = () => {
                 textAlign="center"
                 maxWidth={320}
               >
-                When you receive notifications about your tasks, focus sessions, or AI
-                recommendations, they will appear here.
+                {t(
+                  'When you receive notifications about your tasks, focus sessions, or AI recommendations, they will appear here.',
+                )}
               </Typography>
             </Box>
           </Fade>
@@ -228,7 +239,10 @@ export const Notifications = () => {
                   )}
 
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="subtitle2" fontWeight={notification.read ? 500 : 700}>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={notification.read ? 500 : 700}
+                    >
                       {notification.title}
                     </Typography>
                     <Typography
@@ -254,7 +268,9 @@ export const Notifications = () => {
                         onClick={() => markAsRead(notification.id)}
                         sx={{
                           color: theme.palette.primary.main,
-                          '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) },
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                          },
                         }}
                       >
                         <CheckIcon fontSize="small" />
@@ -265,7 +281,10 @@ export const Notifications = () => {
                       onClick={() => deleteNotification(notification.id)}
                       sx={{
                         color: alpha(theme.palette.text.primary, 0.4),
-                        '&:hover': { bgcolor: alpha('#ef4444', 0.1), color: '#ef4444' },
+                        '&:hover': {
+                          bgcolor: alpha('#ef4444', 0.1),
+                          color: '#ef4444',
+                        },
                       }}
                     >
                       <DeleteIcon fontSize="small" />

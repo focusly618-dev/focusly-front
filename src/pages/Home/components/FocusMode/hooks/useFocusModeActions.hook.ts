@@ -26,14 +26,9 @@ export const useFocusModeActions = ({
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
   const dispatch = useAppDispatch();
 
-  const handleCompleteTask = async (
-    activeTask: Task,
-    timeSpentMinutes: number,
-  ) => {
+  const handleCompleteTask = async (activeTask: Task) => {
     try {
-      const totalRealTimer = Math.round(
-        (activeTask.real_timer || 0) + timeSpentMinutes,
-      );
+      const totalRealTimer = activeTask.real_timer || 0;
       const { data } = await updateTaskMutation({
         variables: {
           updateTaskInput: {

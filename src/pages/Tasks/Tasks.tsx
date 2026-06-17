@@ -1,4 +1,5 @@
 import { Typography, Box, LinearProgress } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -27,6 +28,7 @@ export const Tasks = ({
   setIsAIScheduleEnabled: setIsAIScheduleEnabledProp,
   onStartFocus,
 }: TasksProps) => {
+  const { t } = useTranslation();
   const {
     tasks,
     totalCount,
@@ -71,11 +73,12 @@ export const Tasks = ({
       content: (
         <Box>
           <Typography variant="h6" fontWeight={700} gutterBottom>
-            Welcome to Your Tasks! 🚀
+            {t('Welcome to Your Tasks! 🚀')}
           </Typography>
           <Typography variant="body2">
-            This is where you manage and prioritize your work. Let's take a
-            quick tour!
+            {t(
+              "This is where you manage and prioritize your work. Let's take a quick tour!",
+            )}
           </Typography>
         </Box>
       ),
@@ -83,23 +86,27 @@ export const Tasks = ({
     },
     {
       target: '#joyride-tasks-view-toggle',
-      content:
+      content: t(
         'Switch between List, Grid, Board, and Workload views to find what works best for you.',
+      ),
     },
     {
       target: '#joyride-tasks-search',
-      content:
+      content: t(
         'Quickly find any task by searching for its title, tags, or projects.',
+      ),
     },
     {
       target: '#joyride-tasks-filters',
-      content:
+      content: t(
         'Use filters and sorting to stay focused on what matters most right now.',
+      ),
     },
     {
       target: '#joyride-tasks-completed',
-      content:
+      content: t(
         'Toggle completed tasks to review your progress or clear your workspace.',
+      ),
     },
   ];
 
@@ -151,7 +158,7 @@ export const Tasks = ({
                   transition: 'color 0.3s ease',
                 }}
               >
-                Schedule with AI
+                {t('Schedule with AI')}
               </Typography>
               <StyledAISwitch
                 checked={isAIScheduleEnabled}

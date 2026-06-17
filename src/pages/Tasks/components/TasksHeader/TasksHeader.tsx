@@ -11,6 +11,7 @@ import {
   ViewToggleGroup,
   ViewToggleButton,
 } from '../../Tasks.styles';
+import { useTranslation } from 'react-i18next';
 import type { DateRangeFilter } from '../../hooks/useTasksFilters.hook';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
@@ -31,14 +32,20 @@ export const TasksHeader = ({
   setViewMode,
   children,
 }: TasksHeaderProps) => {
-  console.log(dateRange);
+  const { t } = useTranslation();
+
+  const pendingCount = filteredTasks.filter((t) => t.status !== 'Done').length;
+  const completedCount = filteredTasks.filter(
+    (t) => t.status === 'Done',
+  ).length;
+
   return (
     <Header>
       <Box>
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          Manage and prioritize your work
+          {t('Manage and prioritize your work')}
         </Typography>
-        <Title>My Tasks</Title>
+        <Title>{t('My Tasks')}</Title>
       </Box>
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
         {children}
@@ -55,13 +62,13 @@ export const TasksHeader = ({
           }}
         >
           <Typography variant="body2" sx={{ color: 'text.primary' }}>
-            {filteredTasks.filter((t) => t.status !== 'Done').length} Pending
+            {t('{{count}} Pending', { count: pendingCount })}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             •
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {filteredTasks.filter((t) => t.status === 'Done').length} Completed
+            {t('{{count}} Completed', { count: completedCount })}
           </Typography>
         </Box>
 
@@ -79,9 +86,9 @@ export const TasksHeader = ({
             },
           }}
         >
-          <MenuItem value="today">Today</MenuItem>
-          <MenuItem value="this_week">This Week</MenuItem>
-          <MenuItem value="this_month">This Month</MenuItem>
+          <MenuItem value="today">{t('Today')}</MenuItem>
+          <MenuItem value="this_week">{t('This Week')}</MenuItem>
+          <MenuItem value="this_month">{t('This Month')}</MenuItem>
         </Select>
 
         <ViewToggleGroup id="joyride-tasks-view-toggle">

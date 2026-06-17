@@ -5,8 +5,20 @@ import {
   EventNote as EventNoteIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
+import { enUS, es, fr, pt, de, it } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import type { ICalendarEvent } from '../../../CalendarEvent';
 import { CalendarEvent } from '../../../CalendarEvent';
+
+const localeMap: Record<string, typeof enUS> = {
+  'en-US': enUS,
+  en: enUS,
+  es: es,
+  fr: fr,
+  pt: pt,
+  de: de,
+  it: it,
+};
 
 interface DailyEventsModalProps {
   open: boolean;
@@ -25,7 +37,11 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
   onSelectEvent,
   anchorEl,
 }) => {
-  const formattedDate = date ? format(date, 'MMMM d, yyyy') : '';
+  const { t, i18n } = useTranslation();
+  const activeLocale = localeMap[i18n.language] || enUS;
+  const formattedDate = date
+    ? format(date, 'MMMM d, yyyy', { locale: activeLocale })
+    : '';
 
   return (
     <Popover
@@ -84,7 +100,7 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
               variant="caption"
               sx={{ color: '#ffffff', fontWeight: 600, fontSize: '10px' }}
             >
-              {events.length} {events.length === 1 ? 'Task' : 'Tasks'}
+              {events.length} {events.length === 1 ? t('Task') : t('Tasks')}
             </Typography>
           </Box>
         </Box>

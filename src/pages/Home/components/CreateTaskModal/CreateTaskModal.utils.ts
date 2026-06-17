@@ -11,12 +11,18 @@ export const parseDuration = (d: string | undefined | null): number => {
 };
 
 export const formatDuration = (minutes?: number): string => {
-  if (!minutes) return '';
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h > 0 && m > 0) return `${h}h ${m}m`;
-  if (h > 0) return `${h}h`;
-  return `${m}m`;
+  if (!minutes || minutes <= 0) return '';
+  const totalSeconds = Math.round(minutes * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+
+  const parts: string[] = [];
+  if (h > 0) parts.push(`${h}h`);
+  if (m > 0) parts.push(`${m}m`);
+  if (s > 0) parts.push(`${s}s`);
+
+  return parts.join(' ');
 };
 
 export const parseRealTime = (time: string): number => {
@@ -24,25 +30,25 @@ export const parseRealTime = (time: string): number => {
 };
 
 export const TASK_COLORS = [
-    '#f44336',
-    '#e91e63',
-    '#9c27b0',
-    '#673ab7',
-    '#3f51b5',
-    '#2196f3',
-    '#03a9f4',
-    '#00bcd4',
-    '#009688',
-    '#4caf50',
-    '#8bc34a',
-    '#cddc39',
-    '#ffeb3b',
-    '#ffc107',
-    '#ff9800',
-    '#ff5722',
-    '#795548',
-    '#607d8b',
-  ];
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#3f51b5',
+  '#2196f3',
+  '#03a9f4',
+  '#00bcd4',
+  '#009688',
+  '#4caf50',
+  '#8bc34a',
+  '#cddc39',
+  '#ffeb3b',
+  '#ffc107',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#607d8b',
+];
 
 export type PriorityType = 'High' | 'Med' | 'Low' | 'No priority';
 
@@ -90,7 +96,8 @@ export const getTagColors = (tagName: string = 'General') => {
     borderColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.4)`,
   };
 };
-export const normalizeUrl = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+export const normalizeUrl = (url: string) =>
+  url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
 export const deduplicateLinks = (links: { title: string; url: string }[]) => {
   const seen = new Set();
@@ -114,7 +121,8 @@ export const getTimerSuggestions = (val: string) => {
     const hmMatch = clean.match(/^(\d+h)\s*(\d+)$/);
     if (hmMatch) {
       suggestions.push(`${hmMatch[1]} ${hmMatch[2]}m`);
-      if (hmMatch[2].length === 1) suggestions.push(`${hmMatch[1]} ${hmMatch[2]}0m`);
+      if (hmMatch[2].length === 1)
+        suggestions.push(`${hmMatch[1]} ${hmMatch[2]}0m`);
     }
   }
   return suggestions;

@@ -12,6 +12,18 @@ import {
   CheckBox as CheckBoxIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
+import { enUS, es, fr, pt, de, it } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
+
+const localeMap: Record<string, typeof enUS> = {
+  'en-US': enUS,
+  en: enUS,
+  es: es,
+  fr: fr,
+  pt: pt,
+  de: de,
+  it: it,
+};
 import {
   WorkspaceCard,
   CardAvatarCircle,
@@ -72,6 +84,8 @@ export const WorkspaceCardItem = ({
   onUnlinkTask,
 }: WorkspaceCardItemProps) => {
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
+  const currentLocale = localeMap[i18n.language] || enUS;
 
   const paletteEntry = workspace.background_color
     ? colorPaletteMap[workspace.background_color]
@@ -85,12 +99,14 @@ export const WorkspaceCardItem = ({
     workspace.background_color !== 'none';
 
   const isDark = theme.palette.mode === 'dark';
-  const folderName = workspace.project?.name || 'All Notes';
+  const folderName = workspace.project?.name || t('All Notes');
   const baseColor = workspace.project?.color || theme.palette.primary.main;
   const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
   const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
 
-  const snippet = getSnippet(workspace.content);
+  const snippetRaw = getSnippet(workspace.content);
+  const snippet =
+    snippetRaw === 'No content yet' ? t('No content yet') : snippetRaw;
 
   return (
     <WorkspaceCard
@@ -103,7 +119,7 @@ export const WorkspaceCardItem = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          mb: 2,
+          mb: 1.25,
         }}
       >
         <CardAvatarCircle
@@ -117,7 +133,7 @@ export const WorkspaceCardItem = ({
           }}
         >
           {workspace.emoji && !iconMap[workspace.emoji] ? (
-            <span style={{ fontSize: '20px', lineHeight: 1 }}>
+            <span style={{ fontSize: '16px', lineHeight: 1 }}>
               {workspace.emoji}
             </span>
           ) : (
@@ -125,7 +141,7 @@ export const WorkspaceCardItem = ({
               (workspace.emoji && iconMap[workspace.emoji]) || iconMap.Article,
               {
                 sx: {
-                  fontSize: 20,
+                  fontSize: 16,
                   color: isBackgroundActive
                     ? isLightBg
                       ? '#000'
@@ -181,14 +197,14 @@ export const WorkspaceCardItem = ({
       </Box>
 
       {/* Middle Section: Workspace Title and Snippet Description */}
-      <Box sx={{ mb: 1 }}>
+      <Box sx={{ mb: 0.75 }}>
         <Typography
           variant="h6"
           sx={{
             fontWeight: 600,
-            fontSize: '1.05rem',
+            fontSize: '0.95rem',
             lineHeight: 1.3,
-            mb: 0.5,
+            mb: 0.25,
             color: isBackgroundActive
               ? isLightBg
                 ? '#000'
@@ -209,7 +225,7 @@ export const WorkspaceCardItem = ({
         <Typography
           variant="body2"
           sx={{
-            fontSize: '0.85rem',
+            fontSize: '0.8rem',
             color: isBackgroundActive
               ? isLightBg
                 ? 'rgba(0, 0, 0, 0.6)'
@@ -220,8 +236,8 @@ export const WorkspaceCardItem = ({
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
-            minHeight: '38px',
-            lineHeight: 1.4,
+            minHeight: '34px',
+            lineHeight: 1.35,
           }}
         >
           {snippet}
@@ -248,7 +264,7 @@ export const WorkspaceCardItem = ({
                 : 'text.secondary',
             }}
           >
-            Folder
+            {t('Folder')}
           </PropertyLabel>
           <PropertyValue
             sx={{
@@ -273,7 +289,7 @@ export const WorkspaceCardItem = ({
                 : 'text.secondary',
             }}
           >
-            Created
+            {t('Created')}
           </PropertyLabel>
           <PropertyValue
             sx={{
@@ -284,7 +300,9 @@ export const WorkspaceCardItem = ({
                 : 'text.primary',
             }}
           >
-            {format(new Date(workspace.createdAt), 'MMM dd, yyyy')}
+            {format(new Date(workspace.createdAt), 'MMM dd, yyyy', {
+              locale: currentLocale,
+            })}
           </PropertyValue>
         </PropertyItem>
 
@@ -298,7 +316,7 @@ export const WorkspaceCardItem = ({
                 : 'text.secondary',
             }}
           >
-            Task Status
+            {t('Task Status')}
           </PropertyLabel>
           <PropertyValue
             sx={{
@@ -311,8 +329,12 @@ export const WorkspaceCardItem = ({
             }}
           >
             {workspace.task
-              ? workspace.task.status.toLowerCase().replace('_', ' ')
-              : 'None'}
+              ? t(
+                  workspace.task.status === 'Todo'
+                    ? 'To Do'
+                    : workspace.task.status,
+                )
+              : t('None')}
           </PropertyValue>
         </PropertyItem>
 
@@ -326,7 +348,7 @@ export const WorkspaceCardItem = ({
                 : 'text.secondary',
             }}
           >
-            Time Est/Act
+            {t('Time Est/Act')}
           </PropertyLabel>
           <PropertyValue
             sx={{
@@ -351,7 +373,7 @@ export const WorkspaceCardItem = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           mt: 'auto',
-          pt: 1,
+          pt: 0.75,
         }}
       >
         {workspace.task ? (
@@ -376,19 +398,19 @@ export const WorkspaceCardItem = ({
               onUnlinkTask(workspace);
             }}
           >
-            <CheckBoxIcon sx={{ fontSize: 18 }} />
+            <CheckBoxIcon sx={{ fontSize: 16 }} />
             <Typography
               variant="caption"
               sx={{
                 fontWeight: 700,
-                fontSize: '11px',
+                fontSize: '10px',
                 maxWidth: '180px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
-              Linked: {workspace.task.title}
+              {t('Linked')}: {workspace.task.title}
             </Typography>
           </Box>
         ) : (
@@ -401,16 +423,16 @@ export const WorkspaceCardItem = ({
                   : 'rgba(255, 255, 255, 0.5)'
                 : 'text.secondary',
               fontStyle: 'italic',
-              fontSize: '11px',
+              fontSize: '10px',
             }}
           >
-            No task linked
+            {t('No task linked')}
           </Typography>
         )}
         <HoverArrowButton
           className="arrow-button"
           sx={{
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: 500,
             color: isBackgroundActive
               ? isLightBg

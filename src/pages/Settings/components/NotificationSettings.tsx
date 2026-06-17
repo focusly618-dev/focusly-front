@@ -12,6 +12,7 @@ import {
   useTheme,
   type Theme,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   Campaign as CampaignIcon,
   Timer as TimerIcon,
@@ -41,6 +42,7 @@ type AlertType = 'sessionStart' | 'breakReminder' | 'sessionEnd';
 
 export const NotificationSettings = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const themeSwitchStyles = switchStyles(theme);
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -77,7 +79,9 @@ export const NotificationSettings = () => {
   const handlePushToggle = async () => {
     if (permissionStatus === 'denied') {
       alert(
-        'Las notificaciones están bloqueadas en tu navegador. Por favor, actívalas en la configuración del sitio (icono del candado).',
+        t(
+          'Las notificaciones están bloqueadas en tu navegador. Por favor, actívalas en la configuración del sitio (icono del candado).',
+        ),
       );
       return;
     }
@@ -107,15 +111,15 @@ export const NotificationSettings = () => {
             <Box className="icon-wrapper">
               <CampaignIcon />
             </Box>
-            <Typography>Delivery Channels</Typography>
+            <Typography>{t('Delivery Channels')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
         <SettingItem>
           <SettingInfo>
-            <SettingLabel>In-App Notifications</SettingLabel>
+            <SettingLabel>{t('In-App Notifications')}</SettingLabel>
             <SettingSublabel>
-              Receive alerts directly within the browser while you work.
+              {t('Receive alerts directly within the browser while you work.')}
             </SettingSublabel>
           </SettingInfo>
           <Switch defaultChecked sx={themeSwitchStyles} />
@@ -123,9 +127,9 @@ export const NotificationSettings = () => {
 
         <SettingItem>
           <SettingInfo>
-            <SettingLabel>Email Summaries</SettingLabel>
+            <SettingLabel>{t('Email Summaries')}</SettingLabel>
             <SettingSublabel>
-              Get daily and weekly productivity reports sent to{' '}
+              {t('Get daily and weekly productivity reports sent to')}{' '}
               <strong>{user?.email}</strong>
             </SettingSublabel>
           </SettingInfo>
@@ -134,16 +138,16 @@ export const NotificationSettings = () => {
 
         <SettingItem>
           <SettingInfo>
-            <SettingLabel>Desktop Push Notifications</SettingLabel>
+            <SettingLabel>{t('Desktop Push Notifications')}</SettingLabel>
             <SettingSublabel>
-              Native OS notifications even when the browser is minimized.
+              {t('Native OS notifications even when the browser is minimized.')}
               {permissionStatus === 'denied' && (
                 <Typography
                   variant="caption"
                   color="error"
                   sx={{ display: 'block', mt: 0.5, fontWeight: 600 }}
                 >
-                  ⚠️ Notifications are blocked in your browser.
+                  {t('⚠️ Notifications are blocked in your browser.')}
                 </Typography>
               )}
             </SettingSublabel>
@@ -166,13 +170,14 @@ export const NotificationSettings = () => {
             >
               <NotificationsActiveIcon />
             </Box>
-            <Typography>Notification Sound</Typography>
+            <Typography>{t('Notification Sound')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-          Select the sound that will play when a task is about to start. This
-          choice is saved locally on your device.
+          {t(
+            'Select the sound that will play when a task is about to start. This choice is saved locally on your device.',
+          )}
         </Typography>
 
         <AlertGrid sx={{ mb: 2 }}>
@@ -185,10 +190,10 @@ export const NotificationSettings = () => {
             ] as SoundType[]
           ).map((type) => {
             const labels: Record<SoundType, string> = {
-              taskUpcoming: 'Classic Chime',
-              sessionStart: 'Digital Tone',
-              breakReminder: 'Soft Bell',
-              sessionEnd: 'Success Arpeggio',
+              taskUpcoming: t('Classic Chime'),
+              sessionStart: t('Digital Tone'),
+              breakReminder: t('Soft Bell'),
+              sessionEnd: t('Success Arpeggio'),
             };
 
             const icons: Record<SoundType, React.ElementType> = {
@@ -229,10 +234,12 @@ export const NotificationSettings = () => {
                     variant="caption"
                     sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
                   >
-                    {isActive ? 'Current Selection' : 'Click to select'}
+                    {isActive ? t('Current Selection') : t('Click to select')}
                   </Typography>
                 </Box>
-                {isActive && <Badge sx={{ alignSelf: 'center' }}>Active</Badge>}
+                {isActive && (
+                  <Badge sx={{ alignSelf: 'center' }}>{t('Active')}</Badge>
+                )}
               </AlertCard>
             );
           })}
@@ -249,7 +256,7 @@ export const NotificationSettings = () => {
             >
               <TimerIcon />
             </Box>
-            <Typography>Session & Break Alerts</Typography>
+            <Typography>{t('Session & Break Alerts')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
@@ -274,7 +281,7 @@ export const NotificationSettings = () => {
                     variant="subtitle1"
                     sx={{ fontWeight: 700, color: theme.palette.text.primary }}
                   >
-                    Session Start
+                    {t('Session Start')}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -284,8 +291,9 @@ export const NotificationSettings = () => {
                       mt: 0.5,
                     }}
                   >
-                    Get notified 5 minutes before a scheduled deep work session
-                    begins.
+                    {t(
+                      'Get notified 5 minutes before a scheduled deep work session begins.',
+                    )}
                   </Typography>
                 </Box>
                 <Switch
@@ -297,7 +305,7 @@ export const NotificationSettings = () => {
               </Box>
               <SoundSelector onClick={() => playSound('sessionStart')}>
                 <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography>Preview Sound</Typography>
+                <Typography>{t('Preview Sound')}</Typography>
                 <KeyboardArrowDownIcon />
               </SoundSelector>
             </Box>
@@ -323,7 +331,7 @@ export const NotificationSettings = () => {
                     variant="subtitle1"
                     sx={{ fontWeight: 700, color: theme.palette.text.primary }}
                   >
-                    Break Reminders
+                    {t('Break Reminders')}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -333,8 +341,9 @@ export const NotificationSettings = () => {
                       mt: 0.5,
                     }}
                   >
-                    Reminders to take a break when energy levels drop or session
-                    ends.
+                    {t(
+                      'Reminders to take a break when energy levels drop or session ends.',
+                    )}
                   </Typography>
                 </Box>
                 <Switch
@@ -346,7 +355,7 @@ export const NotificationSettings = () => {
               </Box>
               <SoundSelector onClick={() => playSound('breakReminder')}>
                 <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography>Preview Sound</Typography>
+                <Typography>{t('Preview Sound')}</Typography>
                 <KeyboardArrowDownIcon />
               </SoundSelector>
             </Box>
@@ -372,7 +381,7 @@ export const NotificationSettings = () => {
                     variant="subtitle1"
                     sx={{ fontWeight: 700, color: theme.palette.text.primary }}
                   >
-                    Session End
+                    {t('Session End')}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -382,7 +391,7 @@ export const NotificationSettings = () => {
                       mt: 0.5,
                     }}
                   >
-                    Notification when your focus timer hits zero.
+                    {t('Notification when your focus timer hits zero.')}
                   </Typography>
                 </Box>
                 <Switch
@@ -394,7 +403,7 @@ export const NotificationSettings = () => {
               </Box>
               <SoundSelector onClick={() => playSound('sessionEnd')}>
                 <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography>Preview Sound</Typography>
+                <Typography>{t('Preview Sound')}</Typography>
                 <KeyboardArrowDownIcon />
               </SoundSelector>
             </Box>

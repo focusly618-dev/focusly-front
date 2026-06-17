@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, useTheme, Tooltip } from '@mui/material';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { ChartCard } from '../../Insights.styles';
 import type {
   TimeDistributionChartProps,
@@ -18,6 +19,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
   data,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
   const [hoveredData, setHoveredData] =
     React.useState<DistributionEntry | null>(null);
@@ -47,10 +49,12 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
     <ChartCard>
       <Box display="flex" alignItems="center" gap={0.5}>
         <Typography variant="h6" fontWeight="bold">
-          Time Distribution
+          {t('Time Distribution')}
         </Typography>
         <Tooltip
-          title="Shows which types of activities you spend the most time on, classifying your tasks into categories like Deep Work, Meetings, or Admin."
+          title={t(
+            'Shows which types of activities you spend the most time on, classifying your tasks into categories like Deep Work, Meetings, or Admin.',
+          )}
           arrow
         >
           <InfoIcon
@@ -104,7 +108,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
                 }}
               />
               <Typography variant="body2" fontWeight="800">
-                {hoveredData.name}
+                {t(hoveredData.name)}
               </Typography>
             </Box>
             <Typography
@@ -112,7 +116,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               color="text.secondary"
               sx={{ ml: 2.5 }}
             >
-              Time:{' '}
+              {t('Time:')}{' '}
               <b style={{ color: 'var(--mui-palette-text-primary)' }}>
                 {formatMinutes(hoveredData.value)}
               </b>
@@ -173,9 +177,9 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               lineHeight: 1.2,
             }}
           >
-            FOCUS
+            {t('FOCUS')}
             <br />
-            ACTIVITY
+            {t('ACTIVITY')}
           </Typography>
         </Box>
       </Box>
@@ -202,7 +206,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
                 fontWeight="600"
                 color="text.primary"
               >
-                {item.name}
+                {t(item.name)}
               </Typography>
             </Box>
             <Typography variant="caption" fontWeight="700" color="text.primary">

@@ -3,10 +3,24 @@ import { format, isToday, isSameDay } from 'date-fns';
 import { Typography } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { enUS, es, fr, pt, de, it } from 'date-fns/locale';
+
+const localeMap: Record<string, typeof enUS> = {
+  'en-US': enUS,
+  en: enUS,
+  es: es,
+  fr: fr,
+  pt: pt,
+  de: de,
+  it: it,
+};
 
 export const CalendarHeader = (props: HeaderProps) => {
   const { date } = props;
-  const dayName = format(date, 'EEE').toUpperCase();
+  const { i18n } = useTranslation();
+  const activeLocale = localeMap[i18n.language] || enUS;
+  const dayName = format(date, 'EEE', { locale: activeLocale }).toUpperCase();
   const dayNumber = format(date, 'd');
   const active = isToday(date);
   const [searchParams, setSearchParams] = useSearchParams();

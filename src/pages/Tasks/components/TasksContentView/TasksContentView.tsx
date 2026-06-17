@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useAppSelector } from '@/redux/hooks';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -223,6 +224,7 @@ export const TasksContentView = ({
   isAIScheduleEnabled,
   onStartFocus,
 }: TasksContentViewProps) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
 
   const isTaskReadOnly = useCallback(
@@ -410,8 +412,10 @@ export const TasksContentView = ({
       >
         <EmptyState
           icon={<CheckBoxIcon />}
-          title="No tasks yet"
-          description="Plan your day and boost your productivity. Create your first task to see it here."
+          title={t('No tasks yet')}
+          description={t(
+            'Plan your day and boost your productivity. Create your first task to see it here.',
+          )}
         />
       </AnimatedContainer>
     );
@@ -439,16 +443,20 @@ export const TasksContentView = ({
               <TableHeaderCell sx={{ justifyContent: 'center' }}>
                 <Checkbox disabled size="small" sx={{ padding: 0 }} />
               </TableHeaderCell>
-              <TableHeaderCell>Task Name</TableHeaderCell>
-              <TableHeaderCell>Priority</TableHeaderCell>
-              <TableHeaderCell>Due Date</TableHeaderCell>
+              <TableHeaderCell>{t('Task Name')}</TableHeaderCell>
+              <TableHeaderCell>{t('Priority')}</TableHeaderCell>
+              <TableHeaderCell>{t('Due Date')}</TableHeaderCell>
               <TableHeaderCell className="col-estimated">
-                Estimated
+                {t('Estimated')}
               </TableHeaderCell>
-              <TableHeaderCell className="col-actual">Actual</TableHeaderCell>
-              <TableHeaderCell className="col-ai">AI Schedule</TableHeaderCell>
+              <TableHeaderCell className="col-actual">
+                {t('Actual')}
+              </TableHeaderCell>
+              <TableHeaderCell className="col-ai">
+                {t('AI Schedule')}
+              </TableHeaderCell>
               <TableHeaderCell sx={{ justifyContent: 'center' }}>
-                Actions
+                {t('Actions')}
               </TableHeaderCell>
             </TableHeader>
             <TableBodyContainer
@@ -460,9 +468,11 @@ export const TasksContentView = ({
               }}
             >
               <EmptyState
-                title="No tasks match your search"
-                description="Try a different keyword or filter to find what you're looking for, or create a new task above."
-                actionText="Clear all filters"
+                title={t('No tasks match your search')}
+                description={t(
+                  "Try a different keyword or filter to find what you're looking for, or create a new task above.",
+                )}
+                actionText={t('Clear all filters')}
                 onAction={() => setSearchTerm('')}
               />
             </TableBodyContainer>
@@ -491,9 +501,11 @@ export const TasksContentView = ({
         }
       >
         <EmptyState
-          title="No tasks match your search"
-          description="Try a different keyword or filter to find what you're looking for, or create a new task above."
-          actionText="Clear all filters"
+          title={t('No tasks match your search')}
+          description={t(
+            "Try a different keyword or filter to find what you're looking for, or create a new task above.",
+          )}
+          actionText={t('Clear all filters')}
           onAction={() => setSearchTerm('')}
         />
       </AnimatedContainer>
@@ -554,7 +566,7 @@ export const TasksContentView = ({
                     setLimit(24);
                   }}
                 >
-                  {tab.label}
+                  {t(tab.label)}
                   <TabCountBadge
                     active={selectedStatus === tab.id}
                     tabColor={tab.color}
@@ -584,15 +596,19 @@ export const TasksContentView = ({
                 }}
               />
             </TableHeaderCell>
-            <TableHeaderCell>Task Name</TableHeaderCell>
-            <TableHeaderCell>Priority</TableHeaderCell>
-            <TableHeaderCell>Due Date</TableHeaderCell>
+            <TableHeaderCell>{t('Task Name')}</TableHeaderCell>
+            <TableHeaderCell>{t('Priority')}</TableHeaderCell>
+            <TableHeaderCell>{t('Due Date')}</TableHeaderCell>
             <TableHeaderCell className="col-estimated">
-              Estimated
+              {t('Estimated')}
             </TableHeaderCell>
-            <TableHeaderCell className="col-actual">Actual</TableHeaderCell>
-            <TableHeaderCell className="col-ai">AI Schedule</TableHeaderCell>
-            <TableHeaderCell>Actions</TableHeaderCell>
+            <TableHeaderCell className="col-actual">
+              {t('Actual')}
+            </TableHeaderCell>
+            <TableHeaderCell className="col-ai">
+              {t('AI Schedule')}
+            </TableHeaderCell>
+            <TableHeaderCell>{t('Actions')}</TableHeaderCell>
           </TableHeader>
           <TableBodyContainer>
             {displayedTasks.slice(0, limit).map((task) => (
@@ -618,8 +634,12 @@ export const TasksContentView = ({
                 }}
               >
                 <EmptyState
-                  title={`No tasks in ${activeTab.label}`}
-                  description="Move a task here or change tabs to see tasks."
+                  title={t('No tasks in {{category}}', {
+                    category: t(activeTab.label),
+                  })}
+                  description={t(
+                    'Move a task here or change tabs to see tasks.',
+                  )}
                 />
               </Box>
             )}
@@ -650,7 +670,9 @@ export const TasksContentView = ({
                     },
                   }}
                 >
-                  Show More ({displayedTasks.length - limit} remaining)
+                  {t('Show More ({{count}} remaining)', {
+                    count: displayedTasks.length - limit,
+                  })}
                 </Button>
               </Box>
             )}
@@ -665,8 +687,11 @@ export const TasksContentView = ({
               variant="body2"
               sx={{ fontWeight: 700, color: 'text.primary' }}
             >
-              {selectedTaskIds.size}{' '}
-              {selectedTaskIds.size === 1 ? 'task' : 'tasks'} selected
+              {selectedTaskIds.size === 1
+                ? t('{{count}} task selected', { count: selectedTaskIds.size })
+                : t('{{count}} tasks selected', {
+                    count: selectedTaskIds.size,
+                  })}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -682,7 +707,7 @@ export const TasksContentView = ({
                 '&:hover': { color: 'text.primary' },
               }}
             >
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button
               variant="contained"
@@ -697,7 +722,7 @@ export const TasksContentView = ({
                 px: 2,
               }}
             >
-              Delete Selected
+              {t('Delete Selected')}
             </Button>
           </Box>
         </FloatingActionBar>
@@ -714,18 +739,24 @@ export const TasksContentView = ({
             maxWidth: '400px',
             backgroundColor: (theme) =>
               theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
-            boxShadow: '0 24px 48px rgba(0, 0, 0, 0.2)',
+            boxShadow: '0 24px 48 rgba(0, 0, 0, 0.2)',
           },
         }}
       >
         <DialogTitle sx={{ fontWeight: 700, px: 2, py: 1 }}>
-          Confirm Delete
+          {t('Confirm Delete')}
         </DialogTitle>
         <DialogContent sx={{ px: 2, py: 1 }}>
           <DialogContentText sx={{ color: 'text.secondary', fontSize: '14px' }}>
-            Are you sure you want to delete {selectedTaskIds.size} selected{' '}
-            {selectedTaskIds.size === 1 ? 'task' : 'tasks'}? This action cannot
-            be undone.
+            {selectedTaskIds.size === 1
+              ? t(
+                  'Are you sure you want to delete {{count}} selected task? This action cannot be undone.',
+                  { count: selectedTaskIds.size },
+                )
+              : t(
+                  'Are you sure you want to delete {{count}} selected tasks? This action cannot be undone.',
+                  { count: selectedTaskIds.size },
+                )}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 2, py: 1.5, gap: 1 }}>
@@ -737,7 +768,7 @@ export const TasksContentView = ({
               color: 'text.secondary',
             }}
           >
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button
             onClick={handleConfirmDelete}
@@ -751,7 +782,7 @@ export const TasksContentView = ({
               px: 2.5,
             }}
           >
-            Delete
+            {t('Delete')}
           </Button>
         </DialogActions>
       </Dialog>

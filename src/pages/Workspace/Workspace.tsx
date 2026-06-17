@@ -7,6 +7,7 @@ import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_WORKSPACE_BY_ID, GET_WORKSPACES } from './workspaces.graphql';
 import { useEffect, useState, lazy, Suspense } from 'react';
 import type { WorkspaceProps, WorkspaceTypes } from './types/workspace.types';
+import { useTranslation } from 'react-i18next';
 
 const WorkspaceEditor = lazy(() =>
   import('./components/Editor/WorkspaceEditor').then((m) => ({
@@ -33,6 +34,7 @@ export const Workspace = ({
   onSidebarChange,
   activeFocusTaskId,
 }: WorkspaceProps) => {
+  const { t, i18n } = useTranslation();
   const {
     register,
     setValue,
@@ -71,21 +73,23 @@ export const Workspace = ({
       content: (
         <Box>
           <Typography variant="h6" fontWeight={700} gutterBottom>
-            Welcome to Your Workspace! 🧠
+            {t('Welcome to Your Workspace! 🧠')}
           </Typography>
           <Typography variant="body2">
-            This is where you plan your strategy and organize your thoughts.
+            {t(
+              'This is where you plan your strategy and organize your thoughts.',
+            )}
           </Typography>
         </Box>
       ),
     },
     {
       target: '#joyride-workspace-search',
-      content: 'Quickly find your notes or projects using the search bar.',
+      content: t('Quickly find your notes or projects using the search bar.'),
     },
     {
       target: '#joyride-workspace-create-note',
-      content: 'Start a new strategic note to capture your next big idea.',
+      content: t('Start a new strategic note to capture your next big idea.'),
     },
   ];
 
@@ -216,7 +220,7 @@ export const Workspace = ({
   const handleCreateNew = (): void => {
     setIsCreatingNew(true);
     reset({
-      title: 'Untitled Strategic Plan',
+      title: t('Untitled Strategic Plan'),
       content: '[]',
       id: undefined,
       taskId: undefined,
@@ -239,13 +243,14 @@ export const Workspace = ({
 
     const customItems = [
       {
-        title: 'Callout block',
+        title: t('Callout block'),
         onItemClick: () => {
           editor.insertBlocks(
             [
               {
                 type: 'paragraph',
-                content: '⚠️ Callout: Write something important here...',
+                content:
+                  '⚠️ ' + t('Callout: Write something important here...'),
               },
             ],
             editor.getTextCursorPosition().block,
@@ -253,46 +258,49 @@ export const Workspace = ({
           );
         },
         aliases: ['alert', 'warning', 'info', 'note'],
-        groupName: 'Advanced',
+        groupName: t('Advanced'),
         icon: <InfoIcon sx={{ color: 'info.main', fontSize: 18 }} />,
-        subtext: 'Insert a highlighted note or alert box',
+        subtext: t('Insert a highlighted note or alert box'),
       },
       {
-        title: 'Meeting Notes template',
+        title: t('Meeting Notes template'),
         onItemClick: () => {
           editor.insertBlocks(
             [
               {
                 type: 'heading',
                 content:
-                  '📅 Meeting Notes - ' + new Date().toLocaleDateString(),
+                  '📅 ' +
+                  t('Meeting Notes') +
+                  ' - ' +
+                  new Date().toLocaleDateString(i18n.language),
                 props: { level: 2 },
               },
               {
                 type: 'paragraph',
-                content: '**Attendees:** [List participants]',
+                content: t('**Attendees:** [List participants]'),
               },
               {
                 type: 'heading',
-                content: '🎯 Objectives',
+                content: '🎯 ' + t('Objectives'),
                 props: { level: 3 },
               },
               {
                 type: 'bulletListItem',
-                content: 'Discuss project milestones',
+                content: t('Discuss project milestones'),
               },
               {
                 type: 'bulletListItem',
-                content: 'Align on next design iterations',
+                content: t('Align on next design iterations'),
               },
               {
                 type: 'heading',
-                content: '✅ Action Items',
+                content: '✅ ' + t('Action Items'),
                 props: { level: 3 },
               },
               {
                 type: 'checkListItem',
-                content: 'Create high-fidelity mockups',
+                content: t('Create high-fidelity mockups'),
               },
             ],
             editor.getTextCursorPosition().block,
@@ -300,37 +308,40 @@ export const Workspace = ({
           );
         },
         aliases: ['template', 'meeting', 'agenda'],
-        groupName: 'Templates',
+        groupName: t('Templates'),
         icon: <CalendarIcon sx={{ color: 'primary.main', fontSize: 18 }} />,
-        subtext: 'Insert a pre-structured meeting outline',
+        subtext: t('Insert a pre-structured meeting outline'),
       },
       {
-        title: 'Sprint Plan template',
+        title: t('Sprint Plan template'),
         onItemClick: () => {
           editor.insertBlocks(
             [
               {
                 type: 'heading',
-                content: '🚀 Sprint Planning',
+                content: '🚀 ' + t('Sprint Planning'),
                 props: { level: 2 },
               },
               {
                 type: 'paragraph',
-                content:
+                content: t(
                   '**Sprint Goals:** Deliver the core features & design refinements.',
+                ),
               },
               {
                 type: 'heading',
-                content: '📋 Backlog Items',
+                content: '📋 ' + t('Backlog Items'),
                 props: { level: 3 },
               },
               {
                 type: 'checkListItem',
-                content: 'Build auto-save status indicator in workspace editor',
+                content: t(
+                  'Build auto-save status indicator in workspace editor',
+                ),
               },
               {
                 type: 'checkListItem',
-                content: 'Enable image and video blocks inside documents',
+                content: t('Enable image and video blocks inside documents'),
               },
             ],
             editor.getTextCursorPosition().block,
@@ -338,9 +349,9 @@ export const Workspace = ({
           );
         },
         aliases: ['sprint', 'scrum', 'agile'],
-        groupName: 'Templates',
+        groupName: t('Templates'),
         icon: <SpeedIcon sx={{ color: 'success.main', fontSize: 18 }} />,
-        subtext: 'Insert a detailed sprint planning layout',
+        subtext: t('Insert a detailed sprint planning layout'),
       },
     ];
 
@@ -424,7 +435,7 @@ export const Workspace = ({
                   }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    Loading Strategic Editor...
+                    {t('Loading Strategic Editor...')}
                   </Typography>
                 </Box>
               }

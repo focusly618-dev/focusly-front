@@ -13,6 +13,7 @@ import {
   Send as SendIcon,
   Bolt as EnergyIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { CuteRobotIcon } from '@/components/ui';
 import {
   ChatContainer,
@@ -39,20 +40,23 @@ interface ChatAIProps {
 }
 
 export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(
     () => localStorage.getItem('focusly_energy_notif_seen') !== 'true',
   );
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState<Message[]>(() => [
     {
       id: '1',
       sender: 'user',
-      text: 'Break this big project into smaller tasks',
+      text: t('Break this big project into smaller tasks'),
     },
     {
       id: '2',
       sender: 'ai',
-      text: "I've analyzed the Product Launch requirements. Here are 3 focused tasks to get you moving:\n\n1. Market Research & Benchmarking (4h, low energy)\n2. Draft GTM Strategy Document (6h, high energy)\n3. Stakeholder Feedback Round 1 (2h, medium energy)",
+      text: t(
+        "I've analyzed the Product Launch requirements. Here are 3 focused tasks to get you moving:\n\n1. Market Research & Benchmarking (4h, low energy)\n2. Draft GTM Strategy Document (6h, high energy)\n3. Stakeholder Feedback Round 1 (2h, medium energy)",
+      ),
     },
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -108,7 +112,7 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
                   color="text.primary"
                   fontWeight="bold"
                 >
-                  Energy Optimization
+                  {t('Energy Optimization')}
                 </Typography>
               </Box>
               <Typography
@@ -117,8 +121,9 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
                 fontSize="13px"
                 sx={{ mb: 1.5 }}
               >
-                Energy dip predicted at 2 PM. Consider scheduling lighter admin
-                tasks.
+                {t(
+                  'Energy dip predicted at 2 PM. Consider scheduling lighter admin tasks.',
+                )}
               </Typography>
               <Button
                 size="small"
@@ -135,7 +140,7 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
                   },
                 }}
               >
-                Auto-Reschedule
+                {t('Auto-Reschedule')}
               </Button>
             </Box>
             <Box
@@ -194,7 +199,7 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
                   Lumina
                 </Typography>
                 <Typography variant="caption" color="rgba(255,255,255,0.7)">
-                  AI Productivity Buddy
+                  {t('AI Productivity Buddy')}
                 </Typography>
               </Box>
             </Box>
@@ -252,7 +257,7 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
           {/* Input */}
           <InputArea>
             <StyledInput
-              placeholder="Tell Lumina what's on your mind..."
+              placeholder={t("Tell Lumina what's on your mind...")}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}

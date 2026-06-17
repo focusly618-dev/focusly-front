@@ -7,6 +7,8 @@ import {
   HeatmapGrid,
   HeatmapCell,
 } from '../../Insights.styles';
+import { useTranslation } from 'react-i18next';
+
 export interface ActivitySectionProps {
   goldenWindowValue: string;
   heatmap: number[];
@@ -20,6 +22,7 @@ export const BottomSection = ({
   heatmapLabels,
   filter = 'Weekly',
 }: ActivitySectionProps) => {
+  const { t } = useTranslation();
   const safeHeatmap = heatmap || [];
   const defaultLength =
     filter === 'Daily'
@@ -42,10 +45,12 @@ export const BottomSection = ({
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center" gap={0.5}>
             <Typography variant="h6" fontWeight="bold">
-              Golden Hours
+              {t('Golden Hours')}
             </Typography>
             <Tooltip
-              title="We identify your peak concentration moments by analyzing what time of day you usually accumulate the most real focus minutes."
+              title={t(
+                'We identify your peak concentration moments by analyzing what time of day you usually accumulate the most real focus minutes.',
+              )}
               arrow
             >
               <InfoIcon
@@ -53,7 +58,7 @@ export const BottomSection = ({
               />
             </Tooltip>
           </Box>
-          <ActionButton>VIEW DETAILS</ActionButton>
+          <ActionButton>{t('VIEW DETAILS')}</ActionButton>
         </Box>
         <Box
           p={2}
@@ -66,12 +71,12 @@ export const BottomSection = ({
           <WbSunny sx={{ color: 'warning.main', mt: 0.5 }} />
           <Box>
             <Typography variant="body2" color="warning.main">
-              You are most productive between <b>{goldenWindowValue}</b>
+              {t('You are most productive between')} <b>{goldenWindowValue}</b>
             </Typography>
           </Box>
         </Box>
         <Typography variant="caption" color="text.secondary" mt={2}>
-          PRODUCTIVITY SCORE (LAST 7 DAYS)
+          {t('PRODUCTIVITY SCORE (LAST 7 DAYS)')}
         </Typography>
       </ChartCard>
 
@@ -79,10 +84,12 @@ export const BottomSection = ({
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center" gap={0.5}>
             <Typography variant="h6" fontWeight="bold">
-              Activity Map
+              {t('Activity Map')}
             </Typography>
             <Tooltip
-              title="This map shows your intensity level per day. Darker squares indicate days where you had more focus sessions or dedicated more real time to your tasks."
+              title={t(
+                'This map shows your intensity level per day. Darker squares indicate days where you had more focus sessions or dedicated more real time to your tasks.',
+              )}
               arrow
             >
               <InfoIcon
@@ -92,7 +99,7 @@ export const BottomSection = ({
           </Box>
           <Box display="flex" gap={1} alignItems="center">
             <Typography variant="caption" color="text.secondary">
-              Less
+              {t('Less')}
             </Typography>
             <Box display="flex" gap={0.5}>
               {[1, 2, 3, 4].map((i) => (
@@ -109,7 +116,7 @@ export const BottomSection = ({
               ))}
             </Box>
             <Typography variant="caption" color="text.secondary">
-              More
+              {t('More')}
             </Typography>
           </Box>
         </Box>
@@ -125,7 +132,7 @@ export const BottomSection = ({
         <Box display="flex" justifyContent="space-between" mt={1}>
           {(heatmapLabels || []).map((label) => (
             <Typography key={label} variant="caption" color="text.secondary">
-              {label}
+              {t(label)}
             </Typography>
           ))}
         </Box>

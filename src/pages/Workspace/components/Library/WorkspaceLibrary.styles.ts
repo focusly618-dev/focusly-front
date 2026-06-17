@@ -371,8 +371,8 @@ export const FilterButton = styled(Box, {
 
 export const GridContainer = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-  gap: '20px',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+  gap: '16px',
   overflowY: 'auto',
   paddingBottom: '24px',
   paddingTop: '16px',
@@ -411,10 +411,10 @@ export const WorkspaceCard = styled(Card, {
     backgroundSize: 'cover',
     backdropFilter: isGradient ? 'none' : 'blur(12px)',
     borderRadius: '12px',
-    padding: theme.spacing(2),
+    padding: theme.spacing(1.5),
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '180px',
+    minHeight: '145px',
     height: '100%',
     cursor: 'pointer',
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -525,7 +525,7 @@ export const CreateCard = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: '180px',
+  minHeight: '145px',
   height: '100%',
   cursor: 'pointer',
   transition: 'all 0.2s',
@@ -573,8 +573,8 @@ export const FolderTabItem = styled(Box, {
 });
 
 export const CardAvatarCircle = styled(Box)(({ theme }) => ({
-  width: '42px',
-  height: '42px',
+  width: '34px',
+  height: '34px',
   borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',
@@ -584,7 +584,7 @@ export const CardAvatarCircle = styled(Box)(({ theme }) => ({
       ? 'rgba(255, 255, 255, 0.05)'
       : 'rgba(0, 0, 0, 0.04)',
   border: `1px solid ${theme.palette.divider}`,
-  fontSize: '20px',
+  fontSize: '16px',
   boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
   flexShrink: 0,
 }));
@@ -592,9 +592,9 @@ export const CardAvatarCircle = styled(Box)(({ theme }) => ({
 export const BadgeChip = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'color' && prop !== 'bgColor',
 })<{ color?: string; bgColor?: string }>(({ theme, color, bgColor }) => ({
-  padding: '3px 8px',
+  padding: '2px 6px',
   borderRadius: '6px',
-  fontSize: '11px',
+  fontSize: '10px',
   fontWeight: 700,
   textTransform: 'capitalize',
   color: color || theme.palette.text.primary,
@@ -607,9 +607,9 @@ export const BadgeChip = styled(Box, {
 export const PropertyGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
-  gap: theme.spacing(1.5),
-  marginTop: theme.spacing(1.5),
-  marginBottom: theme.spacing(1.5),
+  gap: theme.spacing(1),
+  marginTop: theme.spacing(1),
+  marginBottom: theme.spacing(1),
 }));
 
 export const PropertyItem = styled(Box)({
@@ -619,7 +619,7 @@ export const PropertyItem = styled(Box)({
 });
 
 export const PropertyLabel = styled(Typography)(({ theme }) => ({
-  fontSize: '10px',
+  fontSize: '9px',
   fontWeight: 700,
   color: theme.palette.text.secondary,
   textTransform: 'uppercase',
@@ -628,7 +628,7 @@ export const PropertyLabel = styled(Typography)(({ theme }) => ({
 }));
 
 export const PropertyValue = styled(Typography)(({ theme }) => ({
-  fontSize: '12px',
+  fontSize: '11px',
   fontWeight: 600,
   color: theme.palette.text.primary,
   overflow: 'hidden',

@@ -1,10 +1,19 @@
-import { Box, Switch, alpha, Typography, useTheme, Slider, type Theme } from '@mui/material';
+import {
+  Box,
+  Switch,
+  alpha,
+  Typography,
+  useTheme,
+  Slider,
+  type Theme,
+} from '@mui/material';
 import {
   PrecisionManufacturing as PrecisionManufacturingIcon,
   Block as BlockIcon,
   OpenInNew as OpenInNewIcon,
-  CalendarMonth as CalendarMonthIcon
+  CalendarMonth as CalendarMonthIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import {
   SectionCard,
   SectionHeader,
@@ -18,7 +27,8 @@ import {
 
 export const FocusEngineSettings = () => {
   const theme = useTheme();
-  
+  const { t } = useTranslation();
+
   const themeSwitchStyles = (theme: Theme) => ({
     '& .MuiSwitch-switchBase.Mui-checked': {
       color: theme.palette.primary.main,
@@ -83,50 +93,108 @@ export const FocusEngineSettings = () => {
             <Box className="icon-wrapper">
               <PrecisionManufacturingIcon />
             </Box>
-            <Typography>Session Duration</Typography>
+            <Typography>{t('Session Duration')}</Typography>
           </SectionTitle>
           <Badge>RFU-15</Badge>
         </SectionHeader>
 
         <Box sx={{ mt: 2, mb: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
-              Focus Block Length
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 1,
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+            >
+              {t('Focus Block Length')}
             </Typography>
-            <Typography variant="h6" sx={{ color: theme.palette.primary.main, fontWeight: 800 }}>
-              50 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: theme.palette.text.secondary }}>min</span>
+            <Typography
+              variant="h6"
+              sx={{ color: theme.palette.primary.main, fontWeight: 800 }}
+            >
+              50{' '}
+              <span
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                {t('min')}
+              </span>
             </Typography>
           </Box>
-          <Slider
-            defaultValue={50}
-            min={25}
-            max={90}
-            sx={sliderStyles}
-          />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
-            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>25m</Typography>
-            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>90m</Typography>
+          <Slider defaultValue={50} min={25} max={90} sx={sliderStyles} />
+          <Box
+            sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}
+          >
+            <Typography
+              variant="caption"
+              sx={{ color: theme.palette.text.secondary }}
+            >
+              25m
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ color: theme.palette.text.secondary }}
+            >
+              90m
+            </Typography>
           </Box>
         </Box>
 
         <Box sx={{ mb: 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
-              Short Break Duration
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 1,
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+            >
+              {t('Short Break Duration')}
             </Typography>
-            <Typography variant="h6" sx={{ color: theme.palette.primary.main, fontWeight: 800 }}>
-              5 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: theme.palette.text.secondary }}>min</span>
+            <Typography
+              variant="h6"
+              sx={{ color: theme.palette.primary.main, fontWeight: 800 }}
+            >
+              5{' '}
+              <span
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                {t('min')}
+              </span>
             </Typography>
           </Box>
-          <Slider
-            defaultValue={5}
-            min={3}
-            max={15}
-            sx={sliderStyles}
-          />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
-            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>3m</Typography>
-            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>15m</Typography>
+          <Slider defaultValue={5} min={3} max={15} sx={sliderStyles} />
+          <Box
+            sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}
+          >
+            <Typography
+              variant="caption"
+              sx={{ color: theme.palette.text.secondary }}
+            >
+              3m
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ color: theme.palette.text.secondary }}
+            >
+              15m
+            </Typography>
           </Box>
         </Box>
       </SectionCard>
@@ -138,40 +206,76 @@ export const FocusEngineSettings = () => {
             <Box className="icon-wrapper" sx={{ color: '#ef4444' }}>
               <BlockIcon />
             </Box>
-            <Typography>Distraction Blocking</Typography>
+            <Typography>{t('Distraction Blocking')}</Typography>
           </SectionTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-             <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#22c55e' }} />
-             <Typography variant="caption" sx={{ fontWeight: 700, color: theme.palette.text.secondary }}>Active</Typography>
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                backgroundColor: '#22c55e',
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{ fontWeight: 700, color: theme.palette.text.secondary }}
+            >
+              {t('Active')}
+            </Typography>
           </Box>
         </SectionHeader>
 
         <SettingItem>
           <SettingInfo>
-            <SettingLabel>Block Social Media</SettingLabel>
-            <SettingSublabel>Prevents access to Twitter, Facebook, Instagram during focus sessions.</SettingSublabel>
+            <SettingLabel>{t('Block Social Media')}</SettingLabel>
+            <SettingSublabel>
+              {t(
+                'Prevents access to Twitter, Facebook, Instagram during focus sessions.',
+              )}
+            </SettingSublabel>
           </SettingInfo>
           <Switch defaultChecked sx={themeSwitchStyles(theme)} />
         </SettingItem>
 
         <SettingItem>
           <SettingInfo>
-            <SettingLabel>Block News & Entertainment</SettingLabel>
-            <SettingSublabel>Restricts access to major news outlets and streaming services. </SettingSublabel>
+            <SettingLabel>{t('Block News & Entertainment')}</SettingLabel>
+            <SettingSublabel>
+              {t(
+                'Restricts access to major news outlets and streaming services.',
+              )}
+            </SettingSublabel>
           </SettingInfo>
           <Switch defaultChecked sx={themeSwitchStyles(theme)} />
         </SettingItem>
 
         <SettingItem>
           <SettingInfo>
-            <SettingLabel>Strict Mode</SettingLabel>
-            <SettingSublabel>Cannot cancel a focus session once started. Use with caution.</SettingSublabel>
+            <SettingLabel>{t('Strict Mode')}</SettingLabel>
+            <SettingSublabel>
+              {t(
+                'Cannot cancel a focus session once started. Use with caution.',
+              )}
+            </SettingSublabel>
           </SettingInfo>
           <Switch sx={themeSwitchStyles(theme)} />
         </SettingItem>
 
-        <Box sx={{ mt: 3, display: 'flex', alignItems: 'center', gap: 1, color: theme.palette.primary.main, cursor: 'pointer', '&:hover': { opacity: 0.8 } }}>
-          <Typography sx={{ fontSize: '0.9rem', fontWeight: 700 }}>Manage Blocklist</Typography>
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            color: theme.palette.primary.main,
+            cursor: 'pointer',
+            '&:hover': { opacity: 0.8 },
+          }}
+        >
+          <Typography sx={{ fontSize: '0.9rem', fontWeight: 700 }}>
+            {t('Manage Blocklist')}
+          </Typography>
           <OpenInNewIcon sx={{ fontSize: 16 }} />
         </Box>
       </SectionCard>
@@ -183,11 +287,16 @@ export const FocusEngineSettings = () => {
             <Box className="icon-wrapper" sx={{ color: '#3b82f6' }}>
               <CalendarMonthIcon />
             </Box>
-            <Typography>Calendar Sync</Typography>
+            <Typography>{t('Calendar Sync')}</Typography>
           </SectionTitle>
         </SectionHeader>
-        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 2 }}>
-          We write your focus blocks to these calendars to prevent interruptions.
+        <Typography
+          variant="body2"
+          sx={{ color: theme.palette.text.secondary, mb: 2 }}
+        >
+          {t(
+            'We write your focus blocks to these calendars to prevent interruptions.',
+          )}
         </Typography>
         {/* Additional calendar sync settings could go here */}
       </SectionCard>

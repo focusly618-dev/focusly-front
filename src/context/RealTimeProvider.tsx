@@ -28,8 +28,6 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
       socketUrl = window.location.origin;
     }
 
-    console.log('[REALTIME] Connecting WebSocket to URL:', socketUrl);
-
     const newSocket = io(`${socketUrl}/realtime`, {
       query: { userId },
       transports: ['websocket', 'polling'],
@@ -39,35 +37,13 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSocket(newSocket);
 
-    newSocket.on('connect', () => {
-      console.log(
-        '[REALTIME] Connected to server successfully. Socket ID:',
-        newSocket.id,
-      );
-    });
-
-    newSocket.on('disconnect', (reason) => {
-      console.log('[REALTIME] Socket disconnected. Reason:', reason);
-    });
-
-    newSocket.on('connect_error', (error) => {
-      console.error('[REALTIME] Connection error:', error);
-    });
-
-    newSocket.on('schedule_updated', (data) => {
-      console.log('[REALTIME] Received schedule_updated event:', data);
-
+    newSocket.on('schedule_updated', () => {
       // 1. Refetch current active tasks and workspaces queries
       apolloClient
         .refetchQueries({
           include: [GET_TASKS, GET_WORKSPACES],
         })
-        .catch((err) => {
-          console.error(
-            '[REALTIME] Failed to refetch queries via Apollo:',
-            err,
-          );
-        });
+        .catch(() => {});
 
       // 2. Trigger Google Calendar refetch by incrementing version
       dispatch(incrementSyncVersion());
@@ -76,7 +52,6 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       newSocket.disconnect();
       setSocket(null);
-      console.log('[REALTIME] Cleaned up socket connection');
     };
   }, [userId, apolloClient, dispatch]);
 

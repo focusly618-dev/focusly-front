@@ -17,6 +17,7 @@ import { RealTimeProvider } from '@/context/RealTimeProvider';
 
 import { NotificationToaster } from '@/components/Notification/NotificationToaster';
 import { BrowserRouter } from 'react-router-dom';
+import './i18n';
 
 createRoot(document.getElementById('root')!).render(
   <AppThemeProvider>

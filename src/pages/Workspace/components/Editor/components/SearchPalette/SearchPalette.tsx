@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import {
   CommandPaletteContainer,
   CommandInputWrapper,
@@ -45,6 +46,7 @@ export const SearchPalette = ({
 }: SearchPaletteProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const containerRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const handleBlur = (e: React.FocusEvent) => {
     if (containerRef.current?.contains(e.relatedTarget as Node)) {
@@ -66,7 +68,7 @@ export const SearchPalette = ({
             <CommandInput
               id="search-tasks-input"
               name="search-tasks-input"
-              placeholder="Search tasks to link..."
+              placeholder={t('Search task...')}
               autoFocus
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -132,6 +134,30 @@ export const SearchPalette = ({
                         <StyledBadge color={statusColor} bgColor={statusBg}>
                           {task.status}
                         </StyledBadge>
+                        {task.workspaces && task.workspaces.length > 0 && (
+                          <Box
+                            component="span"
+                            sx={{
+                              color: 'warning.main',
+                              bgcolor: (theme) =>
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(245, 158, 11, 0.15)'
+                                  : 'rgba(245, 158, 11, 0.08)',
+                              border: '1px solid rgba(245, 158, 11, 0.3)',
+                              fontSize: '9px',
+                              fontWeight: 700,
+                              px: 0.75,
+                              py: 0.25,
+                              borderRadius: '4px',
+                              textTransform: 'uppercase',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {t('Assigned')}
+                          </Box>
+                        )}
                         {task.category && (
                           <StyledCategory>{task.category}</StyledCategory>
                         )}
@@ -199,7 +225,7 @@ export const SearchPalette = ({
         <CollapsedSearchContainer onClick={() => setShowPalette(true)}>
           <SearchIcon sx={{ color: 'text.secondary', fontSize: 20, mr: 1 }} />
           <Typography variant="body2" color="text.secondary">
-            Search tasks to link...
+            {t('Search task...')}
           </Typography>
         </CollapsedSearchContainer>
       )}
