@@ -15,6 +15,18 @@ import {
   useTheme,
 } from '@mui/material';
 import { format } from 'date-fns';
+import { enUS, es, fr, pt, de, it } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
+
+const localeMap: Record<string, typeof enUS> = {
+  'en-US': enUS,
+  en: enUS,
+  es: es,
+  fr: fr,
+  pt: pt,
+  de: de,
+  it: it,
+};
 import {
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
@@ -43,6 +55,8 @@ interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
 export const CalendarToolbar = (props: CustomToolbarProps) => {
   const { date, onNavigate, onNavigateAction } = props;
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
+  const activeLocale = localeMap[i18n.language] || enUS;
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [notifications, setNotifications] =
@@ -124,7 +138,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
           variant="h6"
           sx={{ fontWeight: 600, color: 'text.primary', minWidth: '120px' }}
         >
-          {format(date, 'MMMM yyyy')}
+          {format(date, 'MMMM yyyy', { locale: activeLocale })}
         </Typography>
       </Box>
 
@@ -161,7 +175,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
           }}
         >
           <Typography variant="subtitle1" fontWeight={700}>
-            Notifications
+            {t('Notifications')}
           </Typography>
           {unreadCount > 0 && (
             <Box
@@ -175,7 +189,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
                 borderRadius: '6px',
               }}
             >
-              {unreadCount} NEW
+              {t('{{count}} NEW', { count: unreadCount })}
             </Box>
           )}
         </Box>
@@ -206,15 +220,16 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
                 fontWeight={600}
                 color="text.secondary"
               >
-                No notifications yet
+                {t('No notifications yet')}
               </Typography>
               <Typography
                 variant="caption"
                 color="text.disabled"
                 textAlign="center"
               >
-                You&apos;re all caught up! Notifications about tasks and focus
-                sessions will appear here.
+                {t(
+                  "You're all caught up! Notifications about tasks and focus sessions will appear here.",
+                )}
               </Typography>
             </Box>
           ) : (
@@ -300,7 +315,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
                   fontSize: '0.75rem',
                 }}
               >
-                Mark all read
+                {t('Mark all read')}
               </Button>
             </Box>
           </>

@@ -24,12 +24,17 @@ interface CompletesSessionModalProps {
 
 const formatHumanDuration = (minutes?: number) => {
   if (!minutes || minutes <= 0) return '0m';
-  const h = Math.floor(minutes / 60);
-  const m = Math.round(minutes % 60);
+  const totalSeconds = Math.round(minutes * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
 
-  if (h > 0 && m > 0) return `${h}h ${m}m`;
-  if (h > 0) return `${h}h`;
-  return `${m}m`;
+  const parts: string[] = [];
+  if (h > 0) parts.push(`${h}h`);
+  if (m > 0) parts.push(`${m}m`);
+  if (s > 0) parts.push(`${s}s`);
+
+  return parts.join(' ') || '0m';
 };
 
 export const CompletesSessionModal: React.FC<CompletesSessionModalProps> = ({

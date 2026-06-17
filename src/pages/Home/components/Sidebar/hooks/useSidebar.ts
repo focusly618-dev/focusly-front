@@ -110,6 +110,10 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const [isCreatingGroupInline, setIsCreatingGroupInline] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
 
+  // Inline Project Group renaming state
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+  const [editingGroupName, setEditingGroupName] = useState('');
+
   // Inline Workspace Creation state
   const [creatingWorkspaceInFolderId, setCreatingWorkspaceInFolderId] =
     useState<string | null>(null);
@@ -360,11 +364,11 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     }
   };
 
-  const handleRenameGroupPrompt = async (group: ProjectGroupTypes) => {
-    const newName = window.prompt('Enter new group name:', group.name);
-    if (newName && newName.trim() && newName.trim() !== group.name) {
-      await handleRenameGroup(group.id, newName.trim());
-    }
+  const handleRenameGroupPrompt = (group: ProjectGroupTypes) => {
+    setTimeout(() => {
+      setEditingGroupId(group.id);
+      setEditingGroupName(group.name);
+    }, 150);
   };
 
   // Derive project groups list
@@ -530,6 +534,10 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     setIsCreatingGroupInline,
     newGroupName,
     setNewGroupName,
+    editingGroupId,
+    setEditingGroupId,
+    editingGroupName,
+    setEditingGroupName,
     creatingWorkspaceInFolderId,
     setCreatingWorkspaceInFolderId,
     creatingWorkspaceInGroupId,

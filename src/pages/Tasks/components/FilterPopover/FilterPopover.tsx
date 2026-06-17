@@ -6,7 +6,7 @@ import {
   CheckCircleOutline as CheckCircleOutlineIcon,
   History as HistoryIcon,
 } from '@mui/icons-material';
-
+import { useTranslation } from 'react-i18next';
 import {
   StyledPopover,
   Section,
@@ -50,6 +50,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
   tags,
   activeFilterState,
 }) => {
+  const { t } = useTranslation();
   const [selectedPriorities, setSelectedPriorities] = useState<string[]>(
     activeFilterState?.priorities || [],
   );
@@ -106,7 +107,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
     >
       {/* BY PRIORITY */}
       <Section>
-        <SectionTitle>By Priority</SectionTitle>
+        <SectionTitle>{t('By Priority')}</SectionTitle>
         <ItemRow
           onClick={() =>
             toggleSelection('High', selectedPriorities, setSelectedPriorities)
@@ -115,7 +116,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <FlagIcon sx={{ color: 'error.main', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              High Priority
+              {t('High Priority')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedPriorities.includes('High')} />
@@ -128,7 +129,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <FlagIcon sx={{ color: 'warning.main', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Medium Priority
+              {t('Medium Priority')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedPriorities.includes('Medium')} />
@@ -141,14 +142,14 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <FlagIcon sx={{ color: 'primary.main', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Low Priority
+              {t('Low Priority')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedPriorities.includes('Low')} />
         </ItemRow>
       </Section>
       <Section>
-        <SectionTitle>By Tags</SectionTitle>
+        <SectionTitle>{t('By Tags')}</SectionTitle>
         <CategoryRow>
           {tags.map((tag: string) => (
             <CategoryItem
@@ -160,7 +161,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
             >
               <Dot color={getTagColors(tag).color} />
               <Typography variant="body2" sx={{ fontSize: '13px' }}>
-                {tag}
+                {t(tag)}
               </Typography>
             </CategoryItem>
           ))}
@@ -169,7 +170,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
 
       {/* BY STATUS */}
       <Section>
-        <SectionTitle>By Status</SectionTitle>
+        <SectionTitle>{t('By Status')}</SectionTitle>
         <ItemRow
           onClick={() =>
             toggleSelection('Todo', selectedStatuses, setSelectedStatuses)
@@ -178,7 +179,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <CircleOutlinedIcon sx={{ color: '#94a3b8', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              To Do
+              {t('To Do')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Todo')} />
@@ -191,7 +192,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <AccessTimeIcon sx={{ color: '#3b82f6', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Planning
+              {t('Planning')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Planning')} />
@@ -204,7 +205,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <AccessTimeIcon sx={{ color: '#8b5cf6', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Scheduled
+              {t('Scheduled')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Scheduled')} />
@@ -217,7 +218,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <HistoryIcon sx={{ color: '#06b6d4', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Review
+              {t('Review')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Review')} />
@@ -230,7 +231,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <HistoryIcon sx={{ color: '#f59e0b', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Pending
+              {t('Pending')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Pending')} />
@@ -243,7 +244,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <HistoryIcon sx={{ color: '#ef4444', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              On Hold
+              {t('On Hold')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('On Hold')} />
@@ -256,7 +257,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <CheckCircleOutlineIcon sx={{ color: '#10b981', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Done
+              {t('Done')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Done')} />
@@ -269,7 +270,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <HistoryIcon sx={{ color: '#64748b', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Backlog
+              {t('Backlog')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Backlog')} />
@@ -282,7 +283,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
           <ItemLabel>
             <HistoryIcon sx={{ color: '#4b5563', fontSize: 16 }} />
             <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Archived
+              {t('Archived')}
             </Typography>
           </ItemLabel>
           <RadioCircle selected={selectedStatuses.includes('Archived')} />
@@ -291,7 +292,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
 
       {/* FOOTER */}
       <Footer>
-        <ClearButton onClick={handleClear}>Clear All</ClearButton>
+        <ClearButton onClick={handleClear}>{t('Clear All')}</ClearButton>
         <ApplyButton
           onClick={() => {
             if (onApply)
@@ -303,7 +304,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
             onClose();
           }}
         >
-          Apply Filters
+          {t('Apply Filters')}
         </ApplyButton>
       </Footer>
     </StyledPopover>

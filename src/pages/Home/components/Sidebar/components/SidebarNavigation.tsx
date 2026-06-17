@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { List, ListItem, ListItemIcon, ListItemText, Box, Collapse, IconButton, Tooltip } from '@mui/material';
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  Collapse,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   CheckCircle as TasksIcon,
@@ -13,12 +22,14 @@ import { TaskBar } from '../types/Sidebar.types';
 import { CuteRobotIcon } from '@/components/ui';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 import { ProjectGroupsSection } from './ProjectGroupsSection';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarNavigationProps {
   sidebar: UseSidebarReturn;
 }
 
 export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
+  const { t } = useTranslation();
   const { activeTab, changeStatusTab, theme } = sidebar;
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
@@ -43,7 +54,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <DashboardIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Daily Plan"
+            primary={t('Daily Plan')}
             primaryTypographyProps={{ fontWeight: 600 }}
           />
         </NavItem>
@@ -58,7 +69,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <TasksIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Tasks"
+            primary={t('Tasks')}
             primaryTypographyProps={{ fontWeight: 500 }}
           />
         </NavItem>
@@ -113,7 +124,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             </Box>
           </ListItemIcon>
           <ListItemText
-            primary="Ask AI"
+            primary={t('Ask AI')}
             primaryTypographyProps={{
               fontWeight: activeTab === TaskBar.AskAI ? 700 : 500,
               sx: {
@@ -140,12 +151,15 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <InsightsIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Insights"
+            primary={t('Insights')}
             primaryTypographyProps={{ fontWeight: 500 }}
           />
         </NavItem>
       </ListItem>
-      <ListItem disablePadding sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
+      <ListItem
+        disablePadding
+        sx={{ flexDirection: 'column', alignItems: 'stretch' }}
+      >
         <NavItem
           id="joyride-workspace"
           active={activeTab === TaskBar.Workspace}
@@ -188,7 +202,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             </Box>
           </ListItemIcon>
           <ListItemText
-            primary="Projects"
+            primary={t('Projects')}
             primaryTypographyProps={{ fontWeight: 500 }}
           />
 
@@ -204,7 +218,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             }}
           >
             {activeTab === TaskBar.Workspace && (
-              <Tooltip title="New Project" arrow>
+              <Tooltip title={t('New Project')} arrow>
                 <IconButton
                   size="small"
                   onClick={(e) => {

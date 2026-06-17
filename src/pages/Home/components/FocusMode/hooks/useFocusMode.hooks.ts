@@ -90,16 +90,15 @@ export const useFocusMode = ({
 
   const handleCompleteTask = async () => {
     if (!tasks.activeTask) return;
-    const timeSpentSeconds = initialMinutes * 60 - timer.timeLeft;
-    const timeSpentMinutes = Math.max(1, Math.round(timeSpentSeconds / 60));
-
-    await actions.handleCompleteTask(tasks.activeTask, timeSpentMinutes);
+    await actions.handleCompleteTask(tasks.activeTask);
   };
 
   const handleUpdateStatus = (newStatus: TaskStatus) => {
     if (!tasks.activeTask) return;
     actions.handleUpdateStatus(tasks.activeTask, newStatus);
-    tasks.setActiveTask((prev) => (prev ? { ...prev, status: newStatus } : null));
+    tasks.setActiveTask((prev) =>
+      prev ? { ...prev, status: newStatus } : null,
+    );
   };
 
   const handleUpdatePriority = (newPriority: number) => {

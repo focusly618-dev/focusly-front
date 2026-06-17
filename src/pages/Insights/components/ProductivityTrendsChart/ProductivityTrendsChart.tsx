@@ -15,6 +15,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { ChartCard } from '../../Insights.styles';
 import type {
   CustomTooltipProps,
@@ -32,6 +33,7 @@ const formatValue = (value: number) => {
 };
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  const { t } = useTranslation();
   if (active && payload && payload.length) {
     return (
       <Box
@@ -64,7 +66,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
               variant="caption"
               sx={{ color: 'text.secondary', flex: 1 }}
             >
-              {item.name === 'actual' ? 'Actual Time' : 'Estimated Goal'}:
+              {item.name === 'actual' ? t('Actual Time') : t('Estimated Goal')}:
             </Typography>
             <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
               {formatValue(item.value)}
@@ -81,6 +83,7 @@ export const ProductivityTrendsChart: React.FC<
   ProductivityTrendsChartProps
 > = ({ data }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
   return (
@@ -94,10 +97,12 @@ export const ProductivityTrendsChart: React.FC<
         <Box>
           <Box display="flex" alignItems="center" gap={0.5}>
             <Typography variant="h6" fontWeight="bold">
-              Focus Performance
+              {t('Focus Performance')}
             </Typography>
             <MuiTooltip
-              title="We compare your Estimated Goal (the sum of time you planned for tasks due today) against your Actual Time (the total minutes recorded by the timer for those same tasks)."
+              title={t(
+                'We compare your Estimated Goal (the sum of time you planned for tasks due today) against your Actual Time (the total minutes recorded by the timer for those same tasks).',
+              )}
               arrow
             >
               <InfoIcon
@@ -106,7 +111,7 @@ export const ProductivityTrendsChart: React.FC<
             </MuiTooltip>
           </Box>
           <Typography variant="caption" color="text.secondary">
-            Estimated Goal vs. Actual Time
+            {t('Estimated Goal vs. Actual Time')}
           </Typography>
         </Box>
         <Box display="flex" gap={2}>
@@ -119,7 +124,7 @@ export const ProductivityTrendsChart: React.FC<
                 bgcolor: 'primary.main',
               }}
             />
-            <Typography variant="caption">Actual Time</Typography>
+            <Typography variant="caption">{t('Actual Time')}</Typography>
           </Box>
           <Box display="flex" alignItems="center" gap={1}>
             <Box
@@ -130,7 +135,7 @@ export const ProductivityTrendsChart: React.FC<
                 bgcolor: 'text.disabled',
               }}
             />
-            <Typography variant="caption">Estimated Goal</Typography>
+            <Typography variant="caption">{t('Estimated Goal')}</Typography>
           </Box>
         </Box>
       </Box>

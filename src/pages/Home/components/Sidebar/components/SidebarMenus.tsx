@@ -13,12 +13,14 @@ import {
 import { CreateProjectModal } from '@/pages/Workspace/components/Library/modals/CreateProjectModal';
 import { UpdateProjectModal } from '@/pages/Workspace/components/Library/modals/UpdateProjectModal';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarMenusProps {
   sidebar: UseSidebarReturn;
 }
 
 export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
+  const { t } = useTranslation();
   const {
     menuAnchor,
     activeMenuType,
@@ -76,7 +78,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <EditIcon fontSize="small" sx={{ color: 'text.secondary' }} />
               </ListItemIcon>
-              <ListItemText>Edit Folder</ListItemText>
+              <ListItemText>{t('Edit Folder')}</ListItemText>
             </MenuItem>
             <Divider sx={{ my: 0.5, opacity: 0.1 }} />
             <MenuItem
@@ -89,7 +91,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
               </ListItemIcon>
-              <ListItemText>Delete Folder</ListItemText>
+              <ListItemText>{t('Delete Folder')}</ListItemText>
             </MenuItem>
           </>
         )}
@@ -106,7 +108,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
               </ListItemIcon>
-              <ListItemText>Delete note</ListItemText>
+              <ListItemText>{t('Delete note')}</ListItemText>
             </MenuItem>
           </>
         )}
@@ -128,7 +130,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <AddIcon fontSize="small" sx={{ color: 'text.secondary' }} />
               </ListItemIcon>
-              <ListItemText>New Note</ListItemText>
+              <ListItemText>{t('New Note')}</ListItemText>
             </MenuItem>
             <Divider sx={{ my: 0.5, opacity: 0.1 }} />
             <MenuItem
@@ -141,7 +143,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <EditIcon fontSize="small" sx={{ color: 'text.secondary' }} />
               </ListItemIcon>
-              <ListItemText>Rename Project</ListItemText>
+              <ListItemText>{t('Rename Project')}</ListItemText>
             </MenuItem>
             <Divider sx={{ my: 0.5, opacity: 0.1 }} />
             <MenuItem
@@ -154,7 +156,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
               </ListItemIcon>
-              <ListItemText>Delete Project</ListItemText>
+              <ListItemText>{t('Delete Project')}</ListItemText>
             </MenuItem>
           </>
         )}

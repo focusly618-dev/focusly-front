@@ -5,12 +5,14 @@ import {
 } from '@mui/icons-material';
 import { TaskBar } from '../types/Sidebar.types';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
+import { useTranslation } from 'react-i18next';
 
 interface UserProfileProps {
   sidebar: UseSidebarReturn;
 }
 
 export const UserProfile = ({ sidebar }: UserProfileProps) => {
+  const { t } = useTranslation();
   const { user, theme, colorMode, changeStatusTab } = sidebar;
 
   return (
@@ -27,7 +29,10 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
         gap: 1.5,
         cursor: 'pointer',
         border: '1px solid',
-        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+        borderColor:
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.08)'
+            : 'rgba(0, 0, 0, 0.06)',
         backgroundColor:
           theme.palette.mode === 'dark'
             ? 'rgba(30, 41, 59, 0.3)'
@@ -65,7 +70,10 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
           width: 36,
           height: 36,
           border: '2px solid',
-          borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+          borderColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.12)'
+              : 'rgba(0, 0, 0, 0.08)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
@@ -95,7 +103,7 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
             opacity: 0.8,
           }}
         >
-          View Profile
+          {t('View Profile')}
         </Typography>
       </Box>
       <IconButton

@@ -7,36 +7,38 @@ import {
   ActionButton,
 } from '../../Insights.styles';
 import type { InsightsHeaderProps } from './InsightsHeader.types';
+import { useTranslation } from 'react-i18next';
 
 export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
   filter,
   filters,
   onFilterChange,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <HeaderContainer>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           <Typography variant="h4" fontWeight="bold">
             {filter === 'Daily'
-              ? "Today's"
+              ? t("Today's Insights")
               : filter === 'Weekly'
-                ? 'Weekly'
-                : 'Monthly'}{' '}
-            Insights
+                ? t('Weekly Insights')
+                : t('Monthly Insights')}
           </Typography>
           <Typography variant="body1" color="text.secondary" mt={1}>
-            Productivity Summary
+            {t('Productivity Summary')}
           </Typography>
         </Box>
         <Box display="flex" gap={2}>
           <ActionButton>
             <FileDownloadOutlined fontSize="small" />
-            Export
+            {t('Export')}
           </ActionButton>
           <ActionButton primary>
             <Add fontSize="small" />
-            Create Report
+            {t('Create Report')}
           </ActionButton>
         </Box>
       </Box>
@@ -48,7 +50,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             active={filter === f}
             onClick={() => onFilterChange(f)}
           >
-            {f}
+            {t(f)}
           </FilterButton>
         ))}
       </Box>

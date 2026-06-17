@@ -12,6 +12,7 @@ import {
   CompletedButton,
   StyledTextField,
 } from '../../Tasks.styles';
+import { useTranslation } from 'react-i18next';
 import { FilterPopover } from '../FilterPopover/FilterPopover';
 import { SortPopover } from '../SortPopover/SortPopover';
 import type { TasksControlsBarProps } from './TasksControlsBar.types';
@@ -32,6 +33,8 @@ export const TasksControlsBar = ({
   handleSortClose,
   handleApplySort,
 }: TasksControlsBarProps) => {
+  const { t } = useTranslation();
+
   if (viewMode === 'board' || viewMode === 'workload') {
     return <ControlsBar id="joyride-tasks-filters" />;
   }
@@ -40,7 +43,7 @@ export const TasksControlsBar = ({
     <ControlsBar id="joyride-tasks-filters">
       <StyledTextField
         id="joyride-tasks-search"
-        placeholder="Search tasks, tags, or projects..."
+        placeholder={t('Search tasks, tags, or projects...')}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         InputProps={{
@@ -57,7 +60,7 @@ export const TasksControlsBar = ({
         >
           <FilterListIcon sx={{ fontSize: 20 }} />
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Filter
+            {t('Filter')}
           </Typography>
         </FilterButton>
         <FilterPopover
@@ -74,7 +77,7 @@ export const TasksControlsBar = ({
         >
           <SortIcon sx={{ fontSize: 20 }} />
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Sort
+            {t('Sort')}
           </Typography>
         </SortButton>
         <SortPopover
@@ -91,7 +94,7 @@ export const TasksControlsBar = ({
         >
           <CheckCircleIcon sx={{ fontSize: 20 }} />
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Completed
+            {t('Completed')}
           </Typography>
         </CompletedButton>
       </Box>

@@ -7,6 +7,7 @@ import {
   Stack,
   InputAdornment,
   SvgIcon,
+  MenuItem,
   type SvgIconProps,
 } from '@mui/material';
 import {
@@ -30,8 +31,10 @@ import {
   WorkOutline as JobIcon,
 } from '@mui/icons-material';
 import { useProfile } from './hooks/useProfile.hook';
+import { useTranslation } from 'react-i18next';
 
 const Profile: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const {
     user,
     fullName,
@@ -66,15 +69,19 @@ const Profile: React.FC = () => {
             <BoltIcon sx={{ color: 'primary.contrastText' }} />
           </Box>
           <Typography variant="h6" fontWeight="bold">
-            Intelligent Focus
+            {t('Intelligent Focus')}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button
-            sx={{ color: 'text.secondary', textTransform: 'none', fontWeight: 600 }}
+            sx={{
+              color: 'text.secondary',
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
             onClick={cancelEdit}
           >
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button
             variant="contained"
@@ -87,12 +94,17 @@ const Profile: React.FC = () => {
               '&:hover': { bgcolor: 'primary.dark' },
             }}
           >
-            Save Changes
+            {t('Save Changes')}
           </Button>
           <Avatar
             src={user?.picture}
             alt={user?.name}
-            sx={{ width: 32, height: 32, border: '2px solid', borderColor: 'divider' }}
+            sx={{
+              width: 32,
+              height: 32,
+              border: '2px solid',
+              borderColor: 'divider',
+            }}
           >
             {getInitials(user?.name)}
           </Avatar>
@@ -105,7 +117,12 @@ const Profile: React.FC = () => {
           <UserCard>
             <Avatar
               src={user?.picture}
-              sx={{ width: 40, height: 40, bgcolor: 'warning.main', color: 'warning.contrastText' }}
+              sx={{
+                width: 40,
+                height: 40,
+                bgcolor: 'warning.main',
+                color: 'warning.contrastText',
+              }}
             >
               {getInitials(user?.name)}
             </Avatar>
@@ -114,19 +131,29 @@ const Profile: React.FC = () => {
                 {user?.name || 'Alex Morgan'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Free Plan
+                {t('Free Plan')}
               </Typography>
             </Box>
           </UserCard>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flex: 1 }}>
+          <Box
+            sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flex: 1 }}
+          >
             <MenuButton active startIcon={<PersonIcon />}>
-              General Profile
+              {t('General Profile')}
             </MenuButton>
-            <MenuButton startIcon={<ScheduleIcon />}>Schedule & Energy</MenuButton>
-            <MenuButton startIcon={<BoltIcon />}>Focus Engine</MenuButton>
-            <MenuButton startIcon={<ExtensionIcon />}>Integrations</MenuButton>
-            <MenuButton startIcon={<NotificationsIcon />}>Notifications</MenuButton>
+            <MenuButton startIcon={<ScheduleIcon />}>
+              {t('Schedule & Energy')}
+            </MenuButton>
+            <MenuButton startIcon={<BoltIcon />}>
+              {t('Focus Engine')}
+            </MenuButton>
+            <MenuButton startIcon={<ExtensionIcon />}>
+              {t('Integrations')}
+            </MenuButton>
+            <MenuButton startIcon={<NotificationsIcon />}>
+              {t('Notifications')}
+            </MenuButton>
           </Box>
 
           <Button
@@ -140,7 +167,7 @@ const Profile: React.FC = () => {
             }}
             onClick={handleLogout}
           >
-            Log Out
+            {t('Log Out')}
           </Button>
         </Sidebar>
 
@@ -148,10 +175,12 @@ const Profile: React.FC = () => {
         <MainContent>
           <Box mb={4}>
             <Typography variant="h4" fontWeight="bold" gutterBottom>
-              General Profile
+              {t('General Profile')}
             </Typography>
             <Typography color="text.secondary">
-              Manage your personal information, account security, and basic preferences.
+              {t(
+                'Manage your personal information, account security, and basic preferences.',
+              )}
             </Typography>
           </Box>
 
@@ -160,7 +189,7 @@ const Profile: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
               <PersonIcon sx={{ color: 'primary.main' }} />
               <Typography variant="h6" fontWeight="bold">
-                Profile Picture
+                {t('Profile Picture')}
               </Typography>
             </Box>
 
@@ -183,10 +212,17 @@ const Profile: React.FC = () => {
               </Avatar>
               <Box>
                 <Typography variant="subtitle1" fontWeight="bold">
-                  Your Avatar
+                  {t('Your Avatar')}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" display="block" mb={2}>
-                  This will be displayed on your profile and in team spaces.
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  display="block"
+                  mb={2}
+                >
+                  {t(
+                    'This will be displayed on your profile and in team spaces.',
+                  )}
                 </Typography>
                 <Stack direction="row" spacing={2}>
                   <Button
@@ -196,12 +232,17 @@ const Profile: React.FC = () => {
                       borderColor: 'divider',
                       textTransform: 'none',
                       bgcolor: 'action.hover',
-                      '&:hover': { borderColor: 'text.primary', bgcolor: 'action.selected' },
+                      '&:hover': {
+                        borderColor: 'text.primary',
+                        bgcolor: 'action.selected',
+                      },
                     }}
                   >
-                    Upload New
+                    {t('Upload New')}
                   </Button>
-                  <Button sx={{ color: 'error.main', textTransform: 'none' }}>Remove</Button>
+                  <Button sx={{ color: 'error.main', textTransform: 'none' }}>
+                    {t('Remove')}
+                  </Button>
                 </Stack>
               </Box>
             </Box>
@@ -212,15 +253,20 @@ const Profile: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
               <PersonIcon sx={{ color: 'primary.main' }} />
               <Typography variant="h6" fontWeight="bold">
-                Personal Information
+                {t('Personal Information')}
               </Typography>
             </Box>
 
             <Stack spacing={3}>
               <Stack direction="row" spacing={3}>
                 <Box flex={1}>
-                  <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                    Full Name
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    mb={1}
+                    display="block"
+                  >
+                    {t('Full Name')}
                   </Typography>
                   <DarkInput
                     fullWidth
@@ -229,8 +275,13 @@ const Profile: React.FC = () => {
                   />
                 </Box>
                 <Box flex={1}>
-                  <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                    Job Title
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    mb={1}
+                    display="block"
+                  >
+                    {t('Job Title')}
                   </Typography>
                   <DarkInput
                     fullWidth
@@ -239,7 +290,9 @@ const Profile: React.FC = () => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <JobIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                          <JobIcon
+                            sx={{ color: 'text.secondary', fontSize: 20 }}
+                          />
                         </InputAdornment>
                       ),
                     }}
@@ -247,27 +300,68 @@ const Profile: React.FC = () => {
                 </Box>
               </Stack>
 
-              <Box>
-                <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                  Email Address
-                </Typography>
-                <DarkInput
-                  fullWidth
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Box>
+              <Stack direction="row" spacing={3}>
+                <Box flex={1}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    mb={1}
+                    display="block"
+                  >
+                    {t('Email Address')}
+                  </Typography>
+                  <DarkInput
+                    fullWidth
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <EmailIcon
+                            sx={{ color: 'text.secondary', fontSize: 20 }}
+                          />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Box>
+                <Box flex={1}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    mb={1}
+                    display="block"
+                  >
+                    {t('Select Language')}
+                  </Typography>
+                  <DarkInput
+                    select
+                    fullWidth
+                    value={i18n.language}
+                    onChange={(e) => {
+                      const lang = e.target.value;
+                      i18n.changeLanguage(lang);
+                      localStorage.setItem('language', lang);
+                    }}
+                  >
+                    <MenuItem value="en">English</MenuItem>
+                    <MenuItem value="es">Español</MenuItem>
+                    <MenuItem value="pt">Português</MenuItem>
+                    <MenuItem value="fr">Français</MenuItem>
+                    <MenuItem value="de">Deutsch</MenuItem>
+                    <MenuItem value="it">Italiano</MenuItem>
+                  </DarkInput>
+                </Box>
+              </Stack>
 
               <Box>
-                <Typography variant="caption" color="text.secondary" mb={1} display="block">
-                  Bio
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  mb={1}
+                  display="block"
+                >
+                  {t('Bio')}
                 </Typography>
                 <DarkInput
                   fullWidth
@@ -276,15 +370,17 @@ const Profile: React.FC = () => {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   helperText={
-                    <Typography variant="caption" sx={{ color: 'text.secondary', float: 'right' }}>
-                      {bio.length} / 250 characters
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'text.secondary', float: 'right' }}
+                    >
+                      {bio.length} / 250 {t('characters')}
                     </Typography>
                   }
                 />
               </Box>
             </Stack>
           </SectionCard>
-
         </MainContent>
       </ContentContainer>
     </ProfilePageContainer>
@@ -292,7 +388,10 @@ const Profile: React.FC = () => {
 };
 
 const BoltIcon = (props: SvgIconProps) => (
-  <SvgIcon {...props} sx={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, ...props.sx }}>
+  <SvgIcon
+    {...props}
+    sx={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, ...props.sx }}
+  >
     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
   </SvgIcon>
 );

@@ -32,6 +32,7 @@ import {
 } from '@mui/icons-material';
 import { EmptyState } from '@/components/ui';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
+import { useTranslation } from 'react-i18next';
 import type {
   WorkspaceTypes,
   ProjectTypes,
@@ -62,6 +63,7 @@ export const WorkspaceLibrary = ({
   selectedProjectId,
   onSelectProject,
 }: WorkspaceLibraryProps) => {
+  const { t } = useTranslation();
   const { state, actions, data } = useWorkspaceLibrary(
     selectedProjectId,
     onSelectProject,
@@ -145,14 +147,17 @@ export const WorkspaceLibrary = ({
               ? activeProject.name
               : activeGroup
                 ? activeGroup.name
-                : 'Workspace Library'}
+                : t('Workspace Library')}
           </HeaderTitle>
           <HeaderSubtitle variant="body2">
             {selectedProjectId && activeProject
-              ? `View and manage workspaces inside this folder`
+              ? t('View and manage workspaces inside this folder')
               : activeGroup
-                ? `View and manage folders and workspaces inside the "${activeGroup.name}" project`
-                : 'Organize your notes, ideas, and strategic plan docs'}
+                ? t(
+                    'View and manage folders and workspaces inside the "{{name}}" project',
+                    { name: activeGroup.name },
+                  )
+                : t('Organize your notes, ideas, and strategic plan docs')}
           </HeaderSubtitle>
         </Box>
 
@@ -179,7 +184,7 @@ export const WorkspaceLibrary = ({
               },
             }}
           >
-            New Folder
+            {t('New Folder')}
           </Button>
           <Button
             variant="outlined"
@@ -203,7 +208,7 @@ export const WorkspaceLibrary = ({
               },
             }}
           >
-            All Folders
+            {t('All Folders')}
           </Button>
           <Button
             variant="contained"
@@ -231,7 +236,7 @@ export const WorkspaceLibrary = ({
               },
             }}
           >
-            New Note
+            {t('New Note')}
           </Button>
         </Box>
       </LibraryHeader>
@@ -283,7 +288,7 @@ export const WorkspaceLibrary = ({
               ? activeProject.name
               : activeGroup
                 ? activeGroup.name
-                : 'All Notes'}
+                : t('All Notes')}
           </Typography>
           <Typography
             variant="caption"
@@ -294,8 +299,10 @@ export const WorkspaceLibrary = ({
             }}
           >
             {selectedProjectId
-              ? `${activeProject?.workspaceCount || 0} notes`
-              : `${workspaces.length} notes`}
+              ? t('{{count}} notes', {
+                  count: activeProject?.workspaceCount || 0,
+                })
+              : t('{{count}} notes', { count: workspaces.length })}
           </Typography>
         </Box>
 
@@ -316,15 +323,17 @@ export const WorkspaceLibrary = ({
       {error ? (
         <Box sx={{ p: 4, textAlign: 'center' }}>
           <Typography color="error">
-            Error loading workspaces. Please try again.
+            {t('Error loading workspaces. Please try again.')}
           </Typography>
         </Box>
       ) : (
         <GridContainer>
           {searchTerm && !workspaces.length && !loading && (
             <EmptyState
-              title="No results found"
-              description="No workspaces match your search term. Try a different keyword or create a new one."
+              title={t('No results found')}
+              description={t(
+                'No workspaces match your search term. Try a different keyword or create a new one.',
+              )}
               sx={{ gridColumn: '1 / -1', py: 8 }}
             />
           )}
@@ -332,9 +341,11 @@ export const WorkspaceLibrary = ({
           {!searchTerm && !workspaces.length && !loading && !error && (
             <EmptyState
               icon={<PushPinIcon />}
-              title="No workspaces yet"
-              description="Lightweight notes to organize your strategic planning. Create your first workspace to get started."
-              actionText="Create Workspace"
+              title={t('No workspaces yet')}
+              description={t(
+                'Lightweight notes to organize your strategic planning. Create your first workspace to get started.',
+              )}
+              actionText={t('Create Workspace')}
               onAction={onCreate}
               sx={{ gridColumn: '1 / -1', py: 10 }}
             />
@@ -350,21 +361,21 @@ export const WorkspaceLibrary = ({
                     sx={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      mb: 2,
+                      mb: 1.25,
                     }}
                   >
                     <Box
                       sx={{
                         width: '30%',
-                        height: 20,
+                        height: 16,
                         bgcolor: 'action.hover',
                         borderRadius: 1,
                       }}
                     />
                     <Box
                       sx={{
-                        width: 24,
-                        height: 24,
+                        width: 20,
+                        height: 20,
                         bgcolor: 'action.hover',
                         borderRadius: '50%',
                       }}
@@ -373,16 +384,16 @@ export const WorkspaceLibrary = ({
                   <Box
                     sx={{
                       width: '80%',
-                      height: 24,
+                      height: 18,
                       bgcolor: 'action.hover',
-                      mb: 1.5,
+                      mb: 1,
                       borderRadius: 1,
                     }}
                   />
                   <Box
                     sx={{
                       width: '100%',
-                      height: 16,
+                      height: 14,
                       bgcolor: 'action.hover',
                       mb: 0.5,
                       borderRadius: 1,
@@ -391,7 +402,7 @@ export const WorkspaceLibrary = ({
                   <Box
                     sx={{
                       width: '90%',
-                      height: 16,
+                      height: 14,
                       bgcolor: 'action.hover',
                       mb: 0.5,
                       borderRadius: 1,
@@ -403,7 +414,7 @@ export const WorkspaceLibrary = ({
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        pt: 1,
+                        pt: 0.75,
                       }}
                     >
                       <Box
@@ -469,7 +480,7 @@ export const WorkspaceLibrary = ({
             opacity: 0.8,
           }}
         >
-          Organize
+          {t('Organize')}
         </Typography>
 
         <MenuItem
@@ -492,7 +503,7 @@ export const WorkspaceLibrary = ({
               opacity: !selectedWorkspace?.projectId ? 1 : 0.7,
             }}
           />
-          <Box sx={{ flex: 1 }}>All Notes (Default)</Box>
+          <Box sx={{ flex: 1 }}>{t('All Notes (Default)')}</Box>
           {!selectedWorkspace?.projectId && (
             <CheckBoxIcon sx={{ fontSize: 16, color: 'primary.main' }} />
           )}
@@ -557,7 +568,7 @@ export const WorkspaceLibrary = ({
           <DeleteForeverIcon
             sx={{ fontSize: 18, mr: 1.5, color: 'error.main' }}
           />
-          Delete Workspace
+          {t('Delete Workspace')}
         </MenuItem>
       </Menu>
 
@@ -589,7 +600,7 @@ export const WorkspaceLibrary = ({
           <ListItemIcon sx={{ minWidth: 32 }}>
             <EditIcon fontSize="small" sx={{ color: 'primary.main' }} />
           </ListItemIcon>
-          <ListItemText>Edit Folder</ListItemText>
+          <ListItemText>{t('Edit Folder')}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={handleDeleteProject}
@@ -598,7 +609,7 @@ export const WorkspaceLibrary = ({
           <ListItemIcon sx={{ minWidth: 32 }}>
             <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
           </ListItemIcon>
-          <ListItemText>Delete Folder</ListItemText>
+          <ListItemText>{t('Delete Folder')}</ListItemText>
         </MenuItem>
       </Menu>
 

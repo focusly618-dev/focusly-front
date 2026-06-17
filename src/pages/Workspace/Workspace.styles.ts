@@ -173,22 +173,31 @@ export const CollapsedSearchContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   backgroundColor:
     theme.palette.mode === 'dark'
-      ? theme.palette.background.paper
-      : theme.palette.background.default,
+      ? 'rgba(255, 255, 255, 0.06)'
+      : 'rgba(0, 0, 0, 0.03)',
   borderRadius: '8px',
-  padding: '12px 16px',
+  padding: '10px 16px',
   cursor: 'text',
-  border: '1px solid transparent',
+  border: `1px solid ${theme.palette.divider}`,
+  transition: 'all 0.2s ease-in-out',
   animation: `${fadeIn} 0.2s ease-out`,
   '&:hover': {
     borderColor: theme.palette.primary.main,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.1)'
+        : 'rgba(0, 0, 0, 0.05)',
   },
 }));
 
 export const CommandInputWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '8px 16px',
+  padding: '10px 16px',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.03)'
+      : 'rgba(0, 0, 0, 0.015)',
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 

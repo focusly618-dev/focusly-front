@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import type { View } from 'react-big-calendar';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
+import { useTranslation } from 'react-i18next';
+import { enUS, es, fr, pt, de, it } from 'date-fns/locale';
 import {
   Box,
   Button,
@@ -13,6 +15,16 @@ import {
   alpha,
   Chip,
 } from '@mui/material';
+
+const localeMap: Record<string, typeof enUS> = {
+  'en-US': enUS,
+  en: enUS,
+  es: es,
+  fr: fr,
+  pt: pt,
+  de: de,
+  it: it,
+};
 import {
   Add as AddIcon,
   ChevronLeft,
@@ -274,6 +286,9 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
   currentDate,
   onEventSelect,
 }) => {
+  const { t, i18n } = useTranslation();
+  const activeLocale = localeMap[i18n.language] || enUS;
+
   const dayEvents = useMemo(() => {
     const dayStart = startOfDay(currentDate);
     const dayEnd = endOfDay(currentDate);
@@ -302,7 +317,7 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
           mb: 2,
         }}
       >
-        <SectionTitle sx={{ mb: 0 }}>Upcoming Insights</SectionTitle>
+        <SectionTitle sx={{ mb: 0 }}>{t('Upcoming Insights')}</SectionTitle>
         <Typography
           variant="caption"
           sx={{
@@ -311,7 +326,7 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
           }}
         >
           {sortedDayEvents.length}{' '}
-          {sortedDayEvents.length === 1 ? 'Item' : 'Items'}
+          {sortedDayEvents.length === 1 ? t('Item') : t('Items')}
         </Typography>
       </Box>
 
@@ -335,7 +350,7 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
             variant="body2"
             sx={{ color: 'text.secondary', fontWeight: 600, mb: 0.5 }}
           >
-            No events scheduled
+            {t('No events scheduled')}
           </Typography>
           <Typography
             variant="caption"
@@ -345,8 +360,9 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
               maxWidth: '220px',
             }}
           >
-            Select another day or click "Add New Task" to schedule items for
-            today.
+            {t(
+              'Select another day or click "Add New Task" to schedule items for today.',
+            )}
           </Typography>
         </Card>
       ) : (
@@ -378,6 +394,7 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
                 theme.palette.mode === 'dark'
                   ? 'rgba(255, 255, 255, 0.22)'
                   : 'rgba(0, 0, 0, 0.15)',
+              borderRadius: '10px',
             },
           }}
         >
@@ -392,7 +409,7 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
             const statusColor = getStatusColor(status);
 
             const formatTime = (date: Date) => {
-              return format(new Date(date), 'h:mm a');
+              return format(new Date(date), 'h:mm a', { locale: activeLocale });
             };
             const timeString = `${formatTime(event.start)} - ${formatTime(event.end)}`;
 
@@ -418,11 +435,11 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
                     noWrap
                     sx={{ color: 'text.secondary', display: 'block' }}
                   >
-                    {timeString} • {category}
+                    {timeString} • {t(category)}
                   </Typography>
                 </Box>
                 <Chip
-                  label={status}
+                  label={t(status)}
                   size="small"
                   sx={{
                     height: '18px',
@@ -465,6 +482,8 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   onEventSelect,
 }) => {
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
+  const activeLocale = localeMap[i18n.language] || enUS;
 
   const miniCalendarDays = useMemo(() => {
     const startOfCurrentMonth = startOfMonth(currentDate);
@@ -509,32 +528,32 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
       >
         {/* Add New Task Button */}
         <AddTaskButton onClick={handleAddTaskClick} startIcon={<AddIcon />}>
-          Add New Task
+          {t('Add New Task')}
         </AddTaskButton>
 
         {/* View Toggle Group */}
         <Box>
-          <SectionTitle>Calendar View</SectionTitle>
+          <SectionTitle>{t('Calendar View')}</SectionTitle>
           <ViewToggleContainer>
             <ToggleButton
               onClick={() => handleViewChange('day')}
               className={currentView === 'day' ? 'active' : ''}
             >
-              Day
+              {t('Day')}
             </ToggleButton>
             <ToggleButton
               onClick={() => handleViewChange('week')}
               className={currentView === 'week' ? 'active' : ''}
             >
-              Week
+              {t('Week')}
             </ToggleButton>
             <ToggleButton
               onClick={() => handleViewChange('month')}
               className={currentView === 'month' ? 'active' : ''}
             >
-              Month
+              {t('Month')}
             </ToggleButton>
-            </ViewToggleContainer>
+          </ViewToggleContainer>
         </Box>
 
         {/* Mini Calendar Card */}
@@ -563,7 +582,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 fontWeight={700}
                 sx={{ textTransform: 'capitalize' }}
               >
-                {format(currentDate, 'MMMM yyyy')}
+                {format(currentDate, 'MMMM yyyy', { locale: activeLocale })}
               </Typography>
               <Stack direction="row" spacing={0.5}>
                 <IconButton size="small" onClick={handlePrevMonth}>
@@ -585,7 +604,15 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 mb: 1,
               }}
             >
-              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => (
+              {[
+                t('Mon_Initial', 'M'),
+                t('Tue_Initial', 'T'),
+                t('Wed_Initial', 'W'),
+                t('Thu_Initial', 'T'),
+                t('Fri_Initial', 'F'),
+                t('Sat_Initial', 'S'),
+                t('Sun_Initial', 'S'),
+              ].map((letter, idx) => (
                 <Typography
                   key={idx}
                   variant="caption"

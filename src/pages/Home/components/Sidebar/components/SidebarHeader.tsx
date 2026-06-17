@@ -19,12 +19,14 @@ import {
 import { Logo } from '../Sidebar.styles';
 import { FocuslyLogo } from '@/components/ui';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarHeaderProps {
   sidebar: UseSidebarReturn;
 }
 
 export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
+  const { t } = useTranslation();
   const {
     theme,
     unreadCount,
@@ -96,7 +98,7 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
           }}
         >
           <Typography variant="subtitle1" fontWeight={700}>
-            Notifications
+            {t('Notifications')}
           </Typography>
           {unreadCount > 0 && (
             <Box
@@ -110,7 +112,7 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
                 borderRadius: '6px',
               }}
             >
-              {unreadCount} NEW
+              {t('{{unreadCount}} NEW', { unreadCount })}
             </Box>
           )}
         </Box>
@@ -138,14 +140,16 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
                 fontWeight={600}
                 color="text.secondary"
               >
-                No notifications yet
+                {t('No notifications yet')}
               </Typography>
               <Typography
                 variant="caption"
                 color="text.disabled"
                 textAlign="center"
               >
-                Notifications about tasks and focus sessions will appear here.
+                {t(
+                  'When you receive notifications about your tasks, focus sessions, or AI recommendations, they will appear here.',
+                )}
               </Typography>
             </Box>
           ) : (
@@ -227,7 +231,7 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
                   fontSize: '0.75rem',
                 }}
               >
-                Mark all read
+                {t('Mark all read')}
               </Button>
             </Box>
           </>

@@ -8,8 +8,9 @@ import {
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { enUS, es, fr, pt, de, it } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { useTranslation } from 'react-i18next';
 
 // Components
 import { CalendarToolbar } from '../CalendarToolbar';
@@ -35,6 +36,12 @@ import type { Task } from '@/redux/tasks/task.types';
 
 const locales = {
   'en-US': enUS,
+  en: enUS,
+  es: es,
+  fr: fr,
+  pt: pt,
+  de: de,
+  it: it,
 };
 
 // Setup the localizer with Monday as first day of week
@@ -53,6 +60,7 @@ interface CalendarViewProps {
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
+  const { t, i18n } = useTranslation();
   const {
     events,
     currentView,
@@ -100,7 +108,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     }
   };
 
-  console.log(events);
   return (
     <Box
       sx={{
@@ -135,10 +142,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               variant="h4"
               sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}
             >
-              Calendar
+              {t('Calendar')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Stay Organized and On Track with Your Personalized Calendar
+              {t('Stay Organized and On Track with Your Personalized Calendar')}
             </Typography>
           </Box>
         </Box>
@@ -173,6 +180,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             view={currentView}
             onView={handleOnChangeView}
             date={currentDate}
+            culture={i18n.language}
             onNavigate={(newDate) => handleOnNavigate(newDate as Date)}
             onSelectSlot={handleSelectSlot}
             onSelectEvent={handleSelectEvent}
@@ -223,7 +231,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             onShowMore={handleShowMore}
             popup={false}
             messages={{
-              showMore: (count: number) => `+${count} más`,
+              showMore: (count: number) => t('+{{count}} more', { count }),
             }}
             formats={{
               timeGutterFormat: (
@@ -265,7 +273,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                 fontSize: '10px',
               }}
             >
-              Quick Create Task
+              {t('Quick Create Task')}
             </Typography>
             <Stack
               direction="row"
