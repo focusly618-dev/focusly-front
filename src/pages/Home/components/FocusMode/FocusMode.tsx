@@ -71,7 +71,6 @@ export const FocusMode: React.FC<FocusModeProps> = ({
 
   const theme = useTheme();
 
-  // Update browser tab title with remaining time only when timer is running
   useEffect(() => {
     if (isActive) {
       const formatted = formatTime(timeLeft);
@@ -80,7 +79,6 @@ export const FocusMode: React.FC<FocusModeProps> = ({
       document.title = 'Focusly';
     }
 
-    // Cleanup title when component unmounts
     return () => {
       document.title = 'Focusly';
     };
