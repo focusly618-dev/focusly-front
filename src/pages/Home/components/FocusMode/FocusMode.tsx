@@ -79,6 +79,7 @@ export const FocusMode: React.FC<FocusModeProps> = ({
       document.title = 'Focusly';
     }
 
+    // Cleanup title when component unmounts
     return () => {
       document.title = 'Focusly';
     };
