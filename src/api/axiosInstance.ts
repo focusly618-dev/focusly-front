@@ -1,7 +1,5 @@
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/env.config';
-import { store } from '@/redux/store';
-import { logout } from '@/redux/auth/auth.slice';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -44,6 +42,10 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
+      // Lazy load store and actions to prevent circular dependencies at bundle startup
+      const { store } = await import('@/redux/store');
+      const { logout } = await import('@/redux/auth/auth.slice');
+
       const user = store.getState().auth.user;
 
       if (!user) {
@@ -52,7 +54,11 @@ axiosInstance.interceptors.response.use(
       }
 
       try {
-        await axios.post(`${API_BASE_URL}/auth/refresh`, { userId: user.id }, { withCredentials: true });
+        await axios.post(
+          `${API_BASE_URL}/auth/refresh`,
+          { userId: user.id },
+          { withCredentials: true },
+        );
         processQueue(null);
         return axiosInstance(originalRequest);
       } catch (refreshError) {
@@ -65,7 +71,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;
