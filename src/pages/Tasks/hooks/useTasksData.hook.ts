@@ -50,7 +50,7 @@ export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
 
   const tasks: TaskResponse[] = useMemo(() => {
     const rawTasks = data?.tasks || [];
-    return rawTasks.filter((t: TaskResponse) => t.source === 'platform');
+    return rawTasks;
   }, [data]);
   const totalCount: number = useMemo(() => tasks.length, [tasks]);
 

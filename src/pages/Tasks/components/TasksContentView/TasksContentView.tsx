@@ -1,5 +1,3 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useAppSelector } from '@/redux/hooks';
 import {
   Box,
   Typography,
@@ -9,7 +7,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  alpha,
   Checkbox,
 } from '@mui/material';
 import {
@@ -17,7 +14,7 @@ import {
   Delete as DeleteIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
-import { styled as muiStyled } from '@mui/material/styles';
+
 import { AnimatedContainer, GridTaskContainer } from '../../Tasks.styles';
 import { EmptyState } from '@/components/ui';
 import { BoardView } from '../BoardView/BoardView';
@@ -31,185 +28,15 @@ import {
   TableHeaderCell,
   TableBodyContainer,
 } from '../ListViewTask/ListViewTask.styles';
-import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+
 import type { TasksContentViewProps } from './TasksContentView.types';
-
-const FloatingActionBar = muiStyled(Box)(({ theme }) => ({
-  position: 'fixed',
-  bottom: '24px',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '24px',
-  padding: '12px 24px',
-  borderRadius: '16px',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(35, 37, 42, 0.85)'
-      : 'rgba(255, 255, 255, 0.85)',
-  border: `1px solid ${theme.palette.divider}`,
-  backdropFilter: 'blur(20px)',
-  boxShadow: '0 20px 40px 0 rgba(0, 0, 0, 0.25)',
-  zIndex: 1000,
-  minWidth: '380px',
-  animation: 'slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-
-  '@keyframes slideUp': {
-    '0%': {
-      transform: 'translate(-50%, 100px)',
-      opacity: 0,
-    },
-    '100%': {
-      transform: 'translate(-50%, 0)',
-      opacity: 1,
-    },
-  },
-}));
-
-const STATUS_SECTIONS = [
-  {
-    id: 'Todo',
-    label: 'To Do',
-    color: '#64748b',
-    filter: (t: TaskResponse) => t.status === 'Todo' || !t.status,
-  },
-  {
-    id: 'Planning',
-    label: 'Planning',
-    color: '#3b82f6',
-    filter: (t: TaskResponse) => t.status === 'Planning',
-  },
-  {
-    id: 'Scheduled',
-    label: 'Scheduled',
-    color: '#8b5cf6',
-    filter: (t: TaskResponse) => t.status === 'Scheduled',
-  },
-  {
-    id: 'Review',
-    label: 'Review',
-    color: '#06b6d4',
-    filter: (t: TaskResponse) => t.status === 'Review',
-  },
-  {
-    id: 'Pending',
-    label: 'Pending',
-    color: '#f59e0b',
-    filter: (t: TaskResponse) => t.status === 'Pending',
-  },
-  {
-    id: 'On Hold',
-    label: 'On Hold',
-    color: '#ef4444',
-    filter: (t: TaskResponse) => t.status === 'On Hold',
-  },
-  {
-    id: 'Done',
-    label: 'Done',
-    color: '#10b981',
-    filter: (t: TaskResponse) => t.status === 'Done',
-  },
-  {
-    id: 'Backlog',
-    label: 'Backlog',
-    color: '#94a3b8',
-    filter: (t: TaskResponse) => t.status === 'Backlog',
-  },
-  {
-    id: 'Archived',
-    label: 'Archived',
-    color: '#4b5563',
-    filter: (t: TaskResponse) => t.status === 'Archived',
-  },
-];
-
-const StatusTabsContainer = muiStyled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '10px 24px',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(26, 31, 43, 0.4)' : '#ffffff',
-  overflowX: 'auto',
-  whiteSpace: 'nowrap',
-  msOverflowStyle: 'none',
-  scrollbarWidth: 'none',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-}));
-
-interface StatusTabProps {
-  active: boolean;
-  tabColor: string;
-}
-
-const StatusTabButton = muiStyled(Button, {
-  shouldForwardProp: (prop) => prop !== 'active' && prop !== 'tabColor',
-})<StatusTabProps>(({ theme, active, tabColor }) => ({
-  textTransform: 'none',
-  fontSize: '12px',
-  fontWeight: active ? 700 : 500,
-  padding: '4px 14px',
-  borderRadius: '20px',
-  minWidth: 'auto',
-  whiteSpace: 'nowrap',
-  color: active
-    ? theme.palette.mode === 'dark'
-      ? '#ffffff'
-      : tabColor
-    : theme.palette.text.secondary,
-  backgroundColor: active
-    ? theme.palette.mode === 'dark'
-      ? tabColor
-      : `${tabColor}15`
-    : 'transparent',
-  border: `1px solid ${active ? tabColor : 'transparent'}`,
-  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-  '&:hover': {
-    backgroundColor: active
-      ? theme.palette.mode === 'dark'
-        ? tabColor
-        : `${tabColor}25`
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
-        : 'rgba(0, 0, 0, 0.03)',
-    borderColor: active
-      ? tabColor
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.15)'
-        : 'rgba(0, 0, 0, 0.08)',
-  },
-}));
-
-const TabCountBadge = muiStyled(Box, {
-  shouldForwardProp: (prop) => prop !== 'active' && prop !== 'tabColor',
-})<{ active: boolean; tabColor: string }>(({ theme, active, tabColor }) => ({
-  marginLeft: '6px',
-  fontSize: '10px',
-  fontWeight: 700,
-  padding: '1px 6px',
-  borderRadius: '8px',
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: active
-    ? theme.palette.mode === 'dark'
-      ? 'rgba(0, 0, 0, 0.25)'
-      : 'rgba(255, 255, 255, 0.45)'
-    : theme.palette.mode === 'dark'
-      ? alpha(tabColor, 0.15)
-      : alpha(tabColor, 0.1),
-  color: active
-    ? theme.palette.mode === 'dark'
-      ? '#ffffff'
-      : tabColor
-    : tabColor,
-  transition: 'all 0.2s ease',
-}));
+import { useTasksContentView } from './useTasksContentView.hook';
+import {
+  FloatingActionBar,
+  StatusTabsContainer,
+  StatusTabButton,
+  TabCountBadge,
+} from './TasksContentView.styles';
 
 export const TasksContentView = ({
   viewMode,
@@ -223,141 +50,31 @@ export const TasksContentView = ({
   isAIScheduleEnabled,
   onStartFocus,
 }: TasksContentViewProps) => {
-  const { user } = useAppSelector((state) => state.auth);
-
-  const isTaskReadOnly = useCallback(
-    (t: TaskResponse) => {
-      if (!user) return true;
-      if (t.task_type === 'GoogleTask' || t.google_event_id) {
-        const organizerEmail = (t as unknown as { organizer_email?: string })
-          .organizer_email;
-        if (organizerEmail) {
-          return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
-        }
-      }
-      if (t.user_id && t.user_id !== user.id) {
-        return true;
-      }
-      return false;
-    },
-    [user],
-  );
-
-  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
-    new Set(),
-  );
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [prevViewMode, setPrevViewMode] = useState(viewMode);
-
-  const [selectedStatus, setSelectedStatus] = useState<string>('All');
-  const [limit, setLimit] = useState(24);
-
-  if (viewMode !== prevViewMode) {
-    setPrevViewMode(viewMode);
-    setSelectedTaskIds(new Set());
-    setIsConfirmOpen(false);
-    setSelectedStatus('All');
-  }
-
-  const isListView =
-    viewMode !== 'grid' && viewMode !== 'board' && viewMode !== 'workload';
-
-  const handleToggleSelect = (taskId: string) => {
-    setSelectedTaskIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(taskId)) {
-        next.delete(taskId);
-      } else {
-        next.add(taskId);
-      }
-      return next;
-    });
-  };
-
-  const tabs = useMemo(() => {
-    return [
-      {
-        id: 'All',
-        label: 'All',
-        color: '#6366f1',
-        filter: () => true,
-      },
-      ...STATUS_SECTIONS,
-    ];
-  }, []);
-
-  const tabCounts = useMemo(() => {
-    const counts: Record<string, number> = {
-      All: filteredTasks.length,
-    };
-    STATUS_SECTIONS.forEach((section) => {
-      counts[section.id] = filteredTasks.filter(section.filter).length;
-    });
-    return counts;
-  }, [filteredTasks]);
-
-  const activeTab = useMemo(() => {
-    return tabs.find((t) => t.id === selectedStatus) || tabs[0];
-  }, [selectedStatus, tabs]);
-
-  const displayedTasks = useMemo(() => {
-    return filteredTasks.filter(activeTab.filter);
-  }, [filteredTasks, activeTab]);
-
-  const selectableDisplayedTasks = useMemo(() => {
-    return displayedTasks.filter((t) => !isTaskReadOnly(t));
-  }, [displayedTasks, isTaskReadOnly]);
-
-  const isAllSelected = useMemo(() => {
-    if (selectableDisplayedTasks.length === 0) return false;
-    return selectableDisplayedTasks.every((task) =>
-      selectedTaskIds.has(task.id),
-    );
-  }, [selectableDisplayedTasks, selectedTaskIds]);
-
-  const isSomeSelected = useMemo(() => {
-    if (selectableDisplayedTasks.length === 0) return false;
-    const selectedCount = selectableDisplayedTasks.filter((task) =>
-      selectedTaskIds.has(task.id),
-    ).length;
-    return selectedCount > 0 && selectedCount < selectableDisplayedTasks.length;
-  }, [selectableDisplayedTasks, selectedTaskIds]);
-
-  const handleToggleSelectAll = () => {
-    if (isAllSelected) {
-      setSelectedTaskIds((prev) => {
-        const next = new Set(prev);
-        selectableDisplayedTasks.forEach((task) => next.delete(task.id));
-        return next;
-      });
-    } else {
-      setSelectedTaskIds((prev) => {
-        const next = new Set(prev);
-        selectableDisplayedTasks.forEach((task) => next.add(task.id));
-        return next;
-      });
-    }
-  };
-
-  const handleDeleteSelectedClick = () => {
-    setIsConfirmOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    setIsConfirmOpen(false);
-    if (deleteTasks) {
-      await deleteTasks(Array.from(selectedTaskIds));
-      setSelectedTaskIds(new Set());
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setIsConfirmOpen(false);
-  };
-
-  const handleClearSelection = () => {
-    setSelectedTaskIds(new Set());
-  };
+  const {
+    selectedTaskIds,
+    isConfirmOpen,
+    selectedStatus,
+    setSelectedStatus,
+    limit,
+    setLimit,
+    isListView,
+    handleToggleSelect,
+    tabs,
+    tabCounts,
+    activeTab,
+    displayedTasks,
+    isAllSelected,
+    isSomeSelected,
+    handleToggleSelectAll,
+    handleDeleteSelectedClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+    handleClearSelection,
+  } = useTasksContentView({
+    filteredTasks,
+    viewMode,
+    deleteTasks,
+  });
 
   // Loading skeletons
   if (isLoading && filteredTasks.length === 0) {
