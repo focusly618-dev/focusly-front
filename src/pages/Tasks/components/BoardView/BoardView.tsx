@@ -180,6 +180,8 @@ export const BoardView = ({
     [activeId, optimisticTasks],
   );
 
+  console.log(COLUMNS);
+
   return (
     <DndContext
       sensors={sensors}
