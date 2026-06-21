@@ -4,44 +4,38 @@ import type { RootState } from '@/redux/store';
 import { updateUser } from '@/redux/auth/auth.slice';
 import { useNotificationSounds } from '@/hooks/useNotificationSounds';
 import { soundPlayer, type SoundType } from '@/utils/notificationSounds';
+import { Box, Switch, Typography, Stack } from '@mui/material';
 import {
-  Box,
-  Switch,
-  alpha,
-  Typography,
-  useTheme,
-  type Theme,
-} from '@mui/material';
-import {
-  Campaign as CampaignIcon,
-  Timer as TimerIcon,
+  CampaignOutlined as CampaignIcon,
+  TimerOutlined as TimerIcon,
   PlayArrow as PlayArrowIcon,
   Coffee as CoffeeIcon,
   Check as CheckIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
   VolumeUp as VolumeUpIcon,
-  NotificationsActive as NotificationsActiveIcon,
+  NotificationsActiveOutlined as NotificationsActiveIcon,
+  NotificationsNoneOutlined as InAppIcon,
+  EmailOutlined as EmailIcon,
+  MessageOutlined as PushIcon,
 } from '@mui/icons-material';
 import {
   SectionCard,
   SectionHeader,
   SectionTitle,
-  SettingItem,
-  SettingInfo,
-  SettingLabel,
-  SettingSublabel,
+  SoundGrid,
+  SoundCard,
+  SoundCardHeader,
+  SoundCardIcon,
+  SoundCardTitle,
+  AlertCardGrid,
+  AlertCardItem,
+  AlertCardIconBox,
+  SoundPreviewButton,
   Badge,
-  AlertGrid,
-  AlertCard,
-  AlertIconBox,
-  SoundSelector,
 } from '../Settings.styles';
 
 type AlertType = 'sessionStart' | 'breakReminder' | 'sessionEnd';
 
 export const NotificationSettings = () => {
-  const theme = useTheme();
-  const themeSwitchStyles = switchStyles(theme);
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
   const { playSound } = useNotificationSounds(0.5);
@@ -51,39 +45,42 @@ export const NotificationSettings = () => {
     soundPlayer.getPreferredSound(),
   );
 
-  // La preferencia guardada en el perfil del usuario (o true por defecto)
+  // User push preferences
   const savedPreference = user?.pushEnabled !== false;
-
   const [pushEnabled, setPushEnabled] = useState(
     Notification.permission === 'granted' && savedPreference,
   );
   const [permissionStatus, setPermissionStatus] =
     useState<NotificationPermission>(Notification.permission);
 
-  // Mutually exclusive alert selection - only one can be active
-  const [selectedAlert, setSelectedAlert] = useState<AlertType>('sessionStart');
+  const [activeAlerts, setActiveAlerts] = useState<Record<AlertType, boolean>>({
+    sessionStart: true,
+    breakReminder: true,
+    sessionEnd: true,
+  });
 
-  const handleAlertToggle = (alertType: AlertType) => {
-    setSelectedAlert(alertType);
+  const toggleAlert = (alertType: AlertType) => {
+    setActiveAlerts((prev) => ({
+      ...prev,
+      [alertType]: !prev[alertType],
+    }));
   };
 
   const handlePreferredSoundChange = (type: SoundType) => {
     setPreferredSound(type);
     soundPlayer.setPreferredSound(type);
-    // Play a preview
     playSound(type);
   };
 
   const handlePushToggle = async () => {
     if (permissionStatus === 'denied') {
       alert(
-        'Las notificaciones están bloqueadas en tu navegador. Por favor, actívalas en la configuración del sitio (icono del candado).',
+        'Notifications are blocked in your browser. Please enable them in your browser site settings.',
       );
       return;
     }
 
     if (!pushEnabled) {
-      // Intentar activar
       const permission = await Notification.requestPermission();
       setPermissionStatus(permission);
 
@@ -92,10 +89,21 @@ export const NotificationSettings = () => {
         dispatch(updateUser({ pushEnabled: true }));
       }
     } else {
-      // Desactivar manualmente en la app
       setPushEnabled(false);
       dispatch(updateUser({ pushEnabled: false }));
     }
+  };
+
+  const switchStyles = {
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      color: '#6366F1',
+      '&:hover': {
+        backgroundColor: 'rgba(99, 102, 241, 0.08)',
+      },
+    },
+    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+      backgroundColor: '#6366F1',
+    },
   };
 
   return (
@@ -111,59 +119,121 @@ export const NotificationSettings = () => {
           </SectionTitle>
         </SectionHeader>
 
-        <SettingItem>
-          <SettingInfo>
-            <SettingLabel>In-App Notifications</SettingLabel>
-            <SettingSublabel>
-              Receive alerts directly within the browser while you work.
-            </SettingSublabel>
-          </SettingInfo>
-          <Switch defaultChecked sx={themeSwitchStyles} />
-        </SettingItem>
-
-        <SettingItem>
-          <SettingInfo>
-            <SettingLabel>Email Summaries</SettingLabel>
-            <SettingSublabel>
-              Get daily and weekly productivity reports sent to{' '}
-              <strong>{user?.email}</strong>
-            </SettingSublabel>
-          </SettingInfo>
-          <Switch defaultChecked sx={themeSwitchStyles} />
-        </SettingItem>
-
-        <SettingItem>
-          <SettingInfo>
-            <SettingLabel>Desktop Push Notifications</SettingLabel>
-            <SettingSublabel>
-              Native OS notifications even when the browser is minimized.
-              {permissionStatus === 'denied' && (
+        <Stack spacing={2.5}>
+          {/* In-App */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+              <InAppIcon sx={{ color: 'text.secondary', mt: 0.5 }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: '0.925rem',
+                    fontWeight: 700,
+                    color: 'text.primary',
+                  }}
+                >
+                  In-App Notifications
+                </Typography>
                 <Typography
                   variant="caption"
-                  color="error"
-                  sx={{ display: 'block', mt: 0.5, fontWeight: 600 }}
+                  sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
                 >
-                  ⚠️ Notifications are blocked in your browser.
+                  Receive focus session alerts directly in the app.
                 </Typography>
-              )}
-            </SettingSublabel>
-          </SettingInfo>
-          <Switch
-            checked={pushEnabled}
-            onChange={handlePushToggle}
-            sx={themeSwitchStyles}
-          />
-        </SettingItem>
+              </Box>
+            </Box>
+            <Switch defaultChecked sx={switchStyles} />
+          </Box>
+
+          {/* Email summaries */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+              <EmailIcon sx={{ color: 'text.secondary', mt: 0.5 }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: '0.925rem',
+                    fontWeight: 700,
+                    color: 'text.primary',
+                  }}
+                >
+                  Email Summary
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
+                >
+                  Daily and weekly summaries sent to{' '}
+                  {user?.email || 'alex@email.com'}
+                </Typography>
+              </Box>
+            </Box>
+            <Switch defaultChecked sx={switchStyles} />
+          </Box>
+
+          {/* Desktop Push */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+              <PushIcon sx={{ color: 'text.secondary', mt: 0.5 }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: '0.925rem',
+                    fontWeight: 700,
+                    color: 'text.primary',
+                  }}
+                >
+                  Desktop Push Notifications
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
+                >
+                  OS-native notifications when the browser is minimized.
+                </Typography>
+                {permissionStatus === 'denied' && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ display: 'block', mt: 0.5, fontWeight: 700 }}
+                  >
+                    ⚠️ Push notifications are blocked by your browser.
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+            <Switch
+              checked={pushEnabled}
+              onChange={handlePushToggle}
+              sx={switchStyles}
+            />
+          </Box>
+        </Stack>
       </SectionCard>
 
-      {/* Notification Sound Selection */}
+      {/* Sound Selection Card */}
       <SectionCard>
         <SectionHeader>
           <SectionTitle>
-            <Box
-              className="icon-wrapper"
-              sx={{ color: theme.palette.warning.main }}
-            >
+            <Box className="icon-wrapper">
               <NotificationsActiveIcon />
             </Box>
             <Typography>Notification Sound</Typography>
@@ -171,248 +241,192 @@ export const NotificationSettings = () => {
         </SectionHeader>
 
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-          Select the sound that will play when a task is about to start. This
-          choice is saved locally on your device.
+          Pick a notification chime. Click a card to preview and set it.
         </Typography>
 
-        <AlertGrid sx={{ mb: 2 }}>
+        <SoundGrid>
           {(
             [
-              'taskUpcoming',
-              'sessionStart',
-              'breakReminder',
-              'sessionEnd',
-            ] as SoundType[]
-          ).map((type) => {
-            const labels: Record<SoundType, string> = {
-              taskUpcoming: 'Classic Chime',
-              sessionStart: 'Digital Tone',
-              breakReminder: 'Soft Bell',
-              sessionEnd: 'Success Arpeggio',
-            };
-
-            const icons: Record<SoundType, React.ElementType> = {
-              taskUpcoming: NotificationsActiveIcon,
-              sessionStart: PlayArrowIcon,
-              breakReminder: CoffeeIcon,
-              sessionEnd: CheckIcon,
-            };
-
-            const Icon = icons[type];
-            const isActive = preferredSound === type;
-
+              {
+                id: 'taskUpcoming',
+                label: 'Classic Chime',
+                icon: <NotificationsActiveIcon />,
+              },
+              {
+                id: 'sessionStart',
+                label: 'Digital Tone',
+                icon: <PlayArrowIcon />,
+              },
+              { id: 'breakReminder', label: 'Soft Bell', icon: <CoffeeIcon /> },
+              {
+                id: 'sessionEnd',
+                label: 'Success Arpeggio',
+                icon: <CheckIcon />,
+              },
+            ] as { id: SoundType; label: string; icon: React.ReactNode }[]
+          ).map((snd) => {
+            const isActive = preferredSound === snd.id;
             return (
-              <AlertCard
-                key={type}
+              <SoundCard
+                key={snd.id}
                 active={isActive}
-                onClick={() => handlePreferredSoundChange(type)}
-                sx={{ cursor: 'pointer' }}
+                onClick={() => handlePreferredSoundChange(snd.id)}
               >
-                <AlertIconBox
-                  active={isActive}
-                  type={
-                    type === 'taskUpcoming'
-                      ? 'sessionStart'
-                      : (type as
-                          | 'sessionStart'
-                          | 'breakReminder'
-                          | 'sessionEnd')
-                  }
-                >
-                  <Icon />
-                </AlertIconBox>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                    {labels[type]}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
-                  >
-                    {isActive ? 'Current Selection' : 'Click to select'}
-                  </Typography>
-                </Box>
-                {isActive && <Badge sx={{ alignSelf: 'center' }}>Active</Badge>}
-              </AlertCard>
+                <SoundCardHeader>
+                  <SoundCardIcon active={isActive}>{snd.icon}</SoundCardIcon>
+                  {isActive && (
+                    <Badge sx={{ fontSize: '8px', px: 1, py: 0.1 }}>
+                      Active
+                    </Badge>
+                  )}
+                </SoundCardHeader>
+                <SoundCardTitle>{snd.label}</SoundCardTitle>
+              </SoundCard>
             );
           })}
-        </AlertGrid>
+        </SoundGrid>
       </SectionCard>
 
-      {/* Session & Break Alerts */}
+      {/* Session Alerts */}
       <SectionCard>
         <SectionHeader>
           <SectionTitle>
-            <Box
-              className="icon-wrapper"
-              sx={{ color: theme.palette.primary.main }}
-            >
+            <Box className="icon-wrapper">
               <TimerIcon />
             </Box>
             <Typography>Session & Break Alerts</Typography>
           </SectionTitle>
         </SectionHeader>
 
-        <AlertGrid>
-          <AlertCard active={selectedAlert === 'sessionStart'}>
-            <AlertIconBox
-              active={selectedAlert === 'sessionStart'}
-              type="sessionStart"
-            >
+        <AlertCardGrid>
+          {/* Session Start */}
+          <AlertCardItem>
+            <AlertCardIconBox>
               <PlayArrowIcon />
-            </AlertIconBox>
+            </AlertCardIconBox>
             <Box sx={{ flex: 1 }}>
               <Box
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
                 }}
               >
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 700, color: theme.palette.text.primary }}
-                  >
-                    Session Start
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      display: 'block',
-                      mt: 0.5,
-                    }}
-                  >
-                    Get notified 5 minutes before a scheduled deep work session
-                    begins.
-                  </Typography>
-                </Box>
+                <Typography
+                  sx={{
+                    fontSize: '0.925rem',
+                    fontWeight: 700,
+                    color: 'text.primary',
+                  }}
+                >
+                  Session Start
+                </Typography>
                 <Switch
-                  checked={selectedAlert === 'sessionStart'}
-                  onChange={() => handleAlertToggle('sessionStart')}
+                  checked={activeAlerts.sessionStart}
+                  onChange={() => toggleAlert('sessionStart')}
                   size="small"
-                  sx={themeSwitchStyles}
+                  sx={switchStyles}
                 />
               </Box>
-              <SoundSelector onClick={() => playSound('sessionStart')}>
-                <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography>Preview Sound</Typography>
-                <KeyboardArrowDownIcon />
-              </SoundSelector>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
+              >
+                Alert triggered 5 minutes before your scheduled deep work block.
+              </Typography>
+              <SoundPreviewButton onClick={() => playSound('sessionStart')}>
+                <VolumeUpIcon />
+                <Typography variant="caption">Preview Sound</Typography>
+              </SoundPreviewButton>
             </Box>
-          </AlertCard>
+          </AlertCardItem>
 
-          <AlertCard active={selectedAlert === 'breakReminder'}>
-            <AlertIconBox
-              active={selectedAlert === 'breakReminder'}
-              type="breakReminder"
-            >
+          {/* Break Reminder */}
+          <AlertCardItem>
+            <AlertCardIconBox>
               <CoffeeIcon />
-            </AlertIconBox>
+            </AlertCardIconBox>
             <Box sx={{ flex: 1 }}>
               <Box
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
                 }}
               >
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 700, color: theme.palette.text.primary }}
-                  >
-                    Break Reminders
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      display: 'block',
-                      mt: 0.5,
-                    }}
-                  >
-                    Reminders to take a break when energy levels drop or session
-                    ends.
-                  </Typography>
-                </Box>
+                <Typography
+                  sx={{
+                    fontSize: '0.925rem',
+                    fontWeight: 700,
+                    color: 'text.primary',
+                  }}
+                >
+                  Break Reminder
+                </Typography>
                 <Switch
-                  checked={selectedAlert === 'breakReminder'}
-                  onChange={() => handleAlertToggle('breakReminder')}
+                  checked={activeAlerts.breakReminder}
+                  onChange={() => toggleAlert('breakReminder')}
                   size="small"
-                  sx={themeSwitchStyles}
+                  sx={switchStyles}
                 />
               </Box>
-              <SoundSelector onClick={() => playSound('breakReminder')}>
-                <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography>Preview Sound</Typography>
-                <KeyboardArrowDownIcon />
-              </SoundSelector>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
+              >
+                Notification when energy blocks drop or a focus block is
+                complete.
+              </Typography>
+              <SoundPreviewButton onClick={() => playSound('breakReminder')}>
+                <VolumeUpIcon />
+                <Typography variant="caption">Preview Sound</Typography>
+              </SoundPreviewButton>
             </Box>
-          </AlertCard>
+          </AlertCardItem>
 
-          <AlertCard active={selectedAlert === 'sessionEnd'}>
-            <AlertIconBox
-              active={selectedAlert === 'sessionEnd'}
-              type="sessionEnd"
-            >
+          {/* Session End */}
+          <AlertCardItem>
+            <AlertCardIconBox>
               <CheckIcon />
-            </AlertIconBox>
+            </AlertCardIconBox>
             <Box sx={{ flex: 1 }}>
               <Box
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
                 }}
               >
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 700, color: theme.palette.text.primary }}
-                  >
-                    Session End
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      display: 'block',
-                      mt: 0.5,
-                    }}
-                  >
-                    Notification when your focus timer hits zero.
-                  </Typography>
-                </Box>
+                <Typography
+                  sx={{
+                    fontSize: '0.925rem',
+                    fontWeight: 700,
+                    color: 'text.primary',
+                  }}
+                >
+                  Session End
+                </Typography>
                 <Switch
-                  checked={selectedAlert === 'sessionEnd'}
-                  onChange={() => handleAlertToggle('sessionEnd')}
+                  checked={activeAlerts.sessionEnd}
+                  onChange={() => toggleAlert('sessionEnd')}
                   size="small"
-                  sx={themeSwitchStyles}
+                  sx={switchStyles}
                 />
               </Box>
-              <SoundSelector onClick={() => playSound('sessionEnd')}>
-                <VolumeUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography>Preview Sound</Typography>
-                <KeyboardArrowDownIcon />
-              </SoundSelector>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
+              >
+                Alert triggered immediately when focus timer hits zero.
+              </Typography>
+              <SoundPreviewButton onClick={() => playSound('sessionEnd')}>
+                <VolumeUpIcon />
+                <Typography variant="caption">Preview Sound</Typography>
+              </SoundPreviewButton>
             </Box>
-          </AlertCard>
-        </AlertGrid>
+          </AlertCardItem>
+        </AlertCardGrid>
       </SectionCard>
     </Box>
   );
 };
-
-const switchStyles = (theme: Theme) => ({
-  '& .MuiSwitch-switchBase.Mui-checked': {
-    color: theme.palette.primary.main,
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.primary.main, 0.08),
-    },
-  },
-  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-    backgroundColor: theme.palette.primary.main,
-  },
-});
