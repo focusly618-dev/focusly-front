@@ -129,15 +129,15 @@ export const ProjectItemRow = styled(Box, {
 })<{ isActive?: boolean }>(({ theme, isActive }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '6px 8px',
-  borderRadius: '6px',
+  padding: '7px 10px',
+  borderRadius: '8px',
   cursor: 'pointer',
   transition: 'all 0.15s ease-in-out',
   position: 'relative',
   backgroundColor: isActive
     ? theme.palette.mode === 'dark'
-      ? 'rgba(255,255,255,0.04)'
-      : 'rgba(0,0,0,0.03)'
+      ? 'rgba(255,255,255,0.05)'
+      : 'rgba(0,0,0,0.04)'
     : 'transparent',
   color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
   '&:hover': {
@@ -157,11 +157,12 @@ export const WorkspaceItemRow = styled(Box, {
 })<{ isActive?: boolean }>(({ theme, isActive }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '6px 8px 6px 28px',
+  padding: '7px 10px 7px 18px',
   borderRadius: '6px',
   cursor: 'pointer',
   transition: 'all 0.15s ease-in-out',
   position: 'relative',
+  margin: '2px 0',
   backgroundColor: isActive
     ? theme.palette.mode === 'dark'
       ? 'rgba(59, 130, 246, 0.12)'
@@ -174,6 +175,18 @@ export const WorkspaceItemRow = styled(Box, {
     : theme.palette.text.secondary,
   fontWeight: isActive ? 600 : 400,
   fontSize: '0.85rem',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    left: 0,
+    top: '50%',
+    width: 12,
+    height: 1,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.08)'
+        : 'rgba(0, 0, 0, 0.08)',
+  },
   '&:hover': {
     backgroundColor: isActive
       ? theme.palette.mode === 'dark'
@@ -185,6 +198,9 @@ export const WorkspaceItemRow = styled(Box, {
     color: theme.palette.text.primary,
     '& .hover-actions': {
       opacity: 1,
+    },
+    '&::before': {
+      backgroundColor: theme.palette.primary.main,
     },
   },
 }));
