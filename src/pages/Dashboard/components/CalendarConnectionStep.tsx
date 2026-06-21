@@ -21,17 +21,21 @@ interface CalendarConnectionStepProps {
 
 import { useDispatch } from 'react-redux';
 import { login } from '@/redux/auth/auth.slice';
-import { AuthProviders } from '@/pages/Login/types/Login.types';
+import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 import { setEvents } from '@/redux/calendar/calendar.slice';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 import { fetchGoogleEvents } from '@/api/GoogleCalendar/googleCalendarApi';
 
-const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({ onNext }) => {
+const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
+  onNext,
+}) => {
   // token no longer needed here as we use useGoogleLogin for the specific scope
   const [events, setEventsLocal] = useState<GoogleCalendarEvent[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [connectingProvider, setConnectingProvider] = useState<string | null>(null);
+  const [connectingProvider, setConnectingProvider] = useState<string | null>(
+    null,
+  );
   const dispatch = useDispatch();
 
   const getCalendarEvents = async () => {
@@ -76,7 +80,7 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({ onNext 
             user: response.data.user,
             isLogged: true,
             provider: AuthProviders.google,
-          })
+          }),
         );
 
         // After successful link, fetch events via proxy
@@ -88,7 +92,9 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({ onNext 
         setConnectingProvider(null);
       }
     },
-    onError: (error: unknown) => {console.error(error);},
+    onError: (error: unknown) => {
+      console.error(error);
+    },
   });
 
   const calendars = [
@@ -171,7 +177,12 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({ onNext 
               ))}
             </Stack>
 
-            <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap={2}
+            >
               <Typography
                 variant="body2"
                 color="text.secondary"
@@ -190,9 +201,24 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({ onNext 
               <HeroIconCard>
                 <EventAvailable sx={{ fontSize: 40, color: 'primary.main' }} />
                 <Stack direction="row" spacing={1}>
-                  <Box width={8} height={8} borderRadius="50%" bgcolor="#f87171" />
-                  <Box width={8} height={8} borderRadius="50%" bgcolor="#facc15" />
-                  <Box width={8} height={8} borderRadius="50%" bgcolor="#4ade80" />
+                  <Box
+                    width={8}
+                    height={8}
+                    borderRadius="50%"
+                    bgcolor="#f87171"
+                  />
+                  <Box
+                    width={8}
+                    height={8}
+                    borderRadius="50%"
+                    bgcolor="#facc15"
+                  />
+                  <Box
+                    width={8}
+                    height={8}
+                    borderRadius="50%"
+                    bgcolor="#4ade80"
+                  />
                 </Stack>
               </HeroIconCard>
             </HeroContainer>
@@ -207,17 +233,27 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({ onNext 
                 Calendar Connected!
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                We successfully retrieved {events.length} events from your calendar.
+                We successfully retrieved {events.length} events from your
+                calendar.
               </Typography>
             </Box>
 
             <Box display="flex" justifyContent="flex-end" px={2}>
-              <ConnectButton onClick={onNext} style={{ width: 'auto', padding: '10px 40px' }}>
+              <ConnectButton
+                onClick={onNext}
+                style={{ width: 'auto', padding: '10px 40px' }}
+              >
                 Continue
               </ConnectButton>
             </Box>
 
-            <Box display="flex" justifyContent="center" mt={3} gap={1} sx={{ opacity: 0.7 }}>
+            <Box
+              display="flex"
+              justifyContent="center"
+              mt={3}
+              gap={1}
+              sx={{ opacity: 0.7 }}
+            >
               <Lock sx={{ fontSize: 16, color: 'text.secondary' }} />
               <Typography variant="caption" color="text.secondary">
                 Your data is encrypted and private.

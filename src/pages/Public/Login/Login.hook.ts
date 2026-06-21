@@ -28,7 +28,7 @@ export const useLogin = () => {
 
     const success = await auth.sendMagicLink(
       form.email,
-      form.isRegistering ? form.fullName : undefined
+      form.isRegistering ? form.fullName : undefined,
     );
 
     if (success) {

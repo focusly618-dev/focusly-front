@@ -4,7 +4,7 @@ import {
   type PayloadAction,
 } from '@reduxjs/toolkit';
 import { logoutUser } from '@/api/Auth/authApi';
-import { AuthProviders } from '@/pages/Login/types/Login.types';
+import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 
 interface User {
   id: string;

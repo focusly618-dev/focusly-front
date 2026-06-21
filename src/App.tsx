@@ -1,10 +1,10 @@
 import { Box } from '@mui/material';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import LandingPage from '@/pages/LandingPage/LandingPage';
-import HowItWorksPage from '@/pages/HowItWorks/HowItWorksPage';
-import PricingPage from '@/pages/Pricing/PricingPage';
-import AboutPage from '@/pages/About/AboutPage';
-import { Login } from '@/pages/Login/Login';
+import LandingPage from '@/pages/Public/LandingPage/LandingPage';
+import HowItWorksPage from '@/pages/Public/HowItWorks/HowItWorksPage';
+import PricingPage from '@/pages/Public/Pricing/PricingPage';
+import AboutPage from '@/pages/Public/About/AboutPage';
+import { Login } from '@/pages/Public/Login/Login';
 import Profile from '@/pages/Profile/Profile';
 import NotFoundPage from '@/pages/NotFound/page_not_found';
 import Dashboard from '@/pages/Dashboard/Dashboard';

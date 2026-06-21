@@ -10,7 +10,10 @@ interface ServerErrorScreenProps {
   onRetry: () => void;
 }
 
-export const ServerErrorScreen: React.FC<ServerErrorScreenProps> = ({ errorDetails, onRetry }) => {
+export const ServerErrorScreen: React.FC<ServerErrorScreenProps> = ({
+  errorDetails,
+  onRetry,
+}) => {
   return (
     <div
       style={{
