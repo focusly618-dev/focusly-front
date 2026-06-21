@@ -1,8 +1,8 @@
 import React from 'react';
 import { Container, Stack, Avatar, Box, Grid } from '@mui/material';
-import { 
-  ArrowForward as ArrowForwardIcon, 
-  PlayCircleOutline as PlayCircleOutlineIcon 
+import {
+  ArrowForward as ArrowForwardIcon,
+  PlayCircleOutline as PlayCircleOutlineIcon,
 } from '@mui/icons-material';
 import {
   PageWrapper,
@@ -63,7 +63,7 @@ import {
   CTATitle,
   CTADescription,
   CTASecondaryButton,
-} from '@/pages/HowItWorks/HowItWorksPage.styles';
+} from '@/pages/Public/HowItWorks/HowItWorksPage.styles';
 import Navbar from '@/components/layout/Navbar';
 
 const LandingPage: React.FC = () => {
@@ -135,7 +135,9 @@ const LandingPage: React.FC = () => {
                       <StatusDotPulse />
                       <StatusDotCenter />
                     </StatusDotWrapper>
-                    <HeroBadgeText variant="caption">AI Powered Productivity</HeroBadgeText>
+                    <HeroBadgeText variant="caption">
+                      AI Powered Productivity
+                    </HeroBadgeText>
                   </HeroBadge>
 
                   <HeroTitle variant="h1">
@@ -144,8 +146,8 @@ const LandingPage: React.FC = () => {
                   </HeroTitle>
 
                   <HeroDescription variant="body1">
-                    Focusly learns your habits and energy levels to build the perfect schedule for
-                    you. Stop planning, start doing.
+                    Focusly learns your habits and energy levels to build the
+                    perfect schedule for you. Stop planning, start doing.
                   </HeroDescription>
 
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -188,7 +190,11 @@ const LandingPage: React.FC = () => {
                   />
 
                   <OverlayCard>
-                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                    <Stack
+                      direction="row"
+                      spacing={1.5}
+                      alignItems="flex-start"
+                    >
                       <BadgeIconBox>
                         <StatusIndicatorIcon />
                       </BadgeIconBox>
@@ -204,7 +210,9 @@ const LandingPage: React.FC = () => {
                       <EnergyIconBox>
                         <EnergyIcon />
                       </EnergyIconBox>
-                      <EnergyLabel variant="caption">High Energy Block</EnergyLabel>
+                      <EnergyLabel variant="caption">
+                        High Energy Block
+                      </EnergyLabel>
                     </Stack>
                     <ProgressBarWrapper>
                       <ProgressBarFill />
@@ -221,12 +229,15 @@ const LandingPage: React.FC = () => {
           <Container maxWidth="lg">
             <SectionHeader>
               <SectionBadge>
-                <SectionBadgeText variant="caption">System Overview</SectionBadgeText>
+                <SectionBadgeText variant="caption">
+                  System Overview
+                </SectionBadgeText>
               </SectionBadge>
               <SectionTitle variant="h2">How Focusly Works</SectionTitle>
               <SectionDescription variant="body1" color="text.secondary">
-                A smart productivity platform that combines calendar, tasks, automatic planning, and
-                focus sessions, optimizing your time based on your energy and real habits.
+                A smart productivity platform that combines calendar, tasks,
+                automatic planning, and focus sessions, optimizing your time
+                based on your energy and real habits.
               </SectionDescription>
             </SectionHeader>
 
@@ -234,13 +245,22 @@ const LandingPage: React.FC = () => {
               {steps.map((step) => (
                 <Grid size={{ xs: 12, md: 6, lg: 4 }} key={step.number}>
                   <StepCard>
-                    <StepNumber className="step-number">{step.number}</StepNumber>
+                    <StepNumber className="step-number">
+                      {step.number}
+                    </StepNumber>
                     <StepContent>
-                      <StepIconContainer color={step.color} className="step-icon">
-                        <span className="material-symbols-outlined">{step.icon}</span>
+                      <StepIconContainer
+                        color={step.color}
+                        className="step-icon"
+                      >
+                        <span className="material-symbols-outlined">
+                          {step.icon}
+                        </span>
                       </StepIconContainer>
                       <FeatureTitle variant="h6">{step.title}</FeatureTitle>
-                      <FeatureDescription variant="body2">{step.description}</FeatureDescription>
+                      <FeatureDescription variant="body2">
+                        {step.description}
+                      </FeatureDescription>
                     </StepContent>
                   </StepCard>
                 </Grid>
@@ -256,14 +276,23 @@ const LandingPage: React.FC = () => {
               <CTAContent>
                 <CTATitle variant="h3">Ready to reclaim your time?</CTATitle>
                 <CTADescription variant="body1">
-                  Join thousands of professionals who have automated their schedule and multiplied
-                  their focus.
+                  Join thousands of professionals who have automated their
+                  schedule and multiplied their focus.
                 </CTADescription>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} pt={4}>
-                  <HeroPrimaryButton variant="contained" endIcon={<ArrowForwardIcon />}>
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={2}
+                  pt={4}
+                >
+                  <HeroPrimaryButton
+                    variant="contained"
+                    endIcon={<ArrowForwardIcon />}
+                  >
                     Start Free Trial
                   </HeroPrimaryButton>
-                  <CTASecondaryButton variant="outlined">View Pricing</CTASecondaryButton>
+                  <CTASecondaryButton variant="outlined">
+                    View Pricing
+                  </CTASecondaryButton>
                 </Stack>
               </CTAContent>
             </CTAContainer>
@@ -278,10 +307,12 @@ const LandingPage: React.FC = () => {
                   <FeatureIconBox>
                     <EnergyIcon />
                   </FeatureIconBox>
-                  <FeatureTitle variant="h6">Energy-based Scheduling</FeatureTitle>
+                  <FeatureTitle variant="h6">
+                    Energy-based Scheduling
+                  </FeatureTitle>
                   <FeatureDescription variant="body2">
-                    AI analyzes your peak performance hours to schedule complex tasks when you're
-                    most alert.
+                    AI analyzes your peak performance hours to schedule complex
+                    tasks when you're most alert.
                   </FeatureDescription>
                 </FeatureCard>
               </Grid>
@@ -297,8 +328,8 @@ const LandingPage: React.FC = () => {
                   </FeatureIconBox>
                   <FeatureTitle variant="h6">Smart Calendar Sync</FeatureTitle>
                   <FeatureDescription variant="body2">
-                    Seamlessly integrates with Google & Outlook to protect your time and prevent
-                    double-booking.
+                    Seamlessly integrates with Google & Outlook to protect your
+                    time and prevent double-booking.
                   </FeatureDescription>
                 </FeatureCard>
               </Grid>
@@ -314,8 +345,8 @@ const LandingPage: React.FC = () => {
                   </FeatureIconBox>
                   <FeatureTitle variant="h6">Deep Focus Sessions</FeatureTitle>
                   <FeatureDescription variant="body2">
-                    Automatically blocks notifications and sets strict boundaries during your
-                    critical work blocks.
+                    Automatically blocks notifications and sets strict
+                    boundaries during your critical work blocks.
                   </FeatureDescription>
                 </FeatureCard>
               </Grid>
@@ -325,7 +356,9 @@ const LandingPage: React.FC = () => {
       </MainWrapper>
 
       <Footer>
-        <FooterText variant="body2">© 2024 Focusly. All rights reserved.</FooterText>
+        <FooterText variant="body2">
+          © 2024 Focusly. All rights reserved.
+        </FooterText>
       </Footer>
     </PageWrapper>
   );

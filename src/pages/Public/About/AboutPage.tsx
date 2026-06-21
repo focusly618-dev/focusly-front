@@ -15,7 +15,7 @@ import {
   FooterText,
   PageWrapper,
   MainContent,
-} from '@/pages/LandingPage/LandingPage.styles';
+} from '@/pages/Public/LandingPage/LandingPage.styles';
 import {
   HeroSection,
   HeroBgGradient,
@@ -110,17 +110,19 @@ const AboutPage: React.FC = () => {
                 </MissionBadge>
 
                 <HeroTitle variant="h1">
-                  Helping you find <GradientText>flow in the chaos.</GradientText>
+                  Helping you find{' '}
+                  <GradientText>flow in the chaos.</GradientText>
                 </HeroTitle>
 
                 <HeroDescription>
-                  We believe that productivity isn't about squeezing more hours into your day—it's
-                  about matching your work to your energy.
+                  We believe that productivity isn't about squeezing more hours
+                  into your day—it's about matching your work to your energy.
                   <br />
                   <br />
-                  Focusly was built to solve the disconnect between rigid calendars and human
-                  biology. By combining tasks, scheduling, and habit tracking, we provide a system
-                  that adapts to you, not the other way around.
+                  Focusly was built to solve the disconnect between rigid
+                  calendars and human biology. By combining tasks, scheduling,
+                  and habit tracking, we provide a system that adapts to you,
+                  not the other way around.
                 </HeroDescription>
 
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -140,7 +142,10 @@ const AboutPage: React.FC = () => {
                     variant="text"
                     size="large"
                     endIcon={
-                      <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                      <span
+                        className="material-symbols-outlined"
+                        style={{ fontSize: 18 }}
+                      >
                         arrow_forward
                       </span>
                     }
@@ -150,10 +155,22 @@ const AboutPage: React.FC = () => {
                   </Button>
                 </Stack>
 
-                <Box sx={{ mt: 8, pt: 4, borderTop: '1px solid', borderColor: 'divider' }}>
+                <Box
+                  sx={{
+                    mt: 8,
+                    pt: 4,
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
                   <Typography
                     variant="overline"
-                    sx={{ color: 'text.secondary', fontWeight: 700, display: 'block', mb: 2 }}
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 700,
+                      display: 'block',
+                      mb: 2,
+                    }}
                   >
                     Trusted by teams at
                   </Typography>
@@ -174,13 +191,17 @@ const AboutPage: React.FC = () => {
                       </Typography>
                     </Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
-                      <span className="material-symbols-outlined">change_history</span>
+                      <span className="material-symbols-outlined">
+                        change_history
+                      </span>
                       <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         Vertex
                       </Typography>
                     </Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
-                      <span className="material-symbols-outlined">all_inclusive</span>
+                      <span className="material-symbols-outlined">
+                        all_inclusive
+                      </span>
                       <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         Flow
                       </Typography>
@@ -220,11 +241,17 @@ const AboutPage: React.FC = () => {
                           display: 'flex',
                         }}
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                        <span
+                          className="material-symbols-outlined"
+                          style={{ fontSize: 18 }}
+                        >
                           warning
                         </span>
                       </Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, alignSelf: 'center' }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 700, alignSelf: 'center' }}
+                      >
                         The Problem
                       </Typography>
                     </Stack>
@@ -233,8 +260,8 @@ const AboutPage: React.FC = () => {
                       color="text.secondary"
                       sx={{ lineHeight: 1.4, display: 'block' }}
                     >
-                      Overwhelmed schedules, scattered tasks, and constant context switching
-                      draining mental energy.
+                      Overwhelmed schedules, scattered tasks, and constant
+                      context switching draining mental energy.
                     </Typography>
                   </ProblemCard>
 
@@ -248,7 +275,10 @@ const AboutPage: React.FC = () => {
                           color: '#137fec',
                         }}
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                        <span
+                          className="material-symbols-outlined"
+                          style={{ fontSize: 20 }}
+                        >
                           auto_awesome
                         </span>
                       </Box>
@@ -264,7 +294,10 @@ const AboutPage: React.FC = () => {
                         >
                           The Solution
                         </Typography>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 700 }}
+                        >
                           Adaptive Planning
                         </Typography>
                       </Box>
@@ -306,9 +339,14 @@ const AboutPage: React.FC = () => {
               <Typography variant="h3" sx={{ fontWeight: 700, mb: 2 }}>
                 Designed to change how you feel about work.
               </Typography>
-              <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400 }}>
-                We don't just organize your calendar. We engineer a state of mind. Every feature in
-                Focusly is crafted to generate a specific feeling.
+              <Typography
+                variant="h6"
+                color="text.secondary"
+                sx={{ fontWeight: 400 }}
+              >
+                We don't just organize your calendar. We engineer a state of
+                mind. Every feature in Focusly is crafted to generate a specific
+                feeling.
               </Typography>
             </Box>
 
@@ -344,12 +382,18 @@ const AboutPage: React.FC = () => {
                 The Vision
               </Typography>
               <VisionQuote>
-                "We envision a world where technology doesn't just demand your attention, but
-                protects it. Where your calendar acts as a compassionate assistant, understanding
-                that you are human, not a machine."
+                "We envision a world where technology doesn't just demand your
+                attention, but protects it. Where your calendar acts as a
+                compassionate assistant, understanding that you are human, not a
+                machine."
               </VisionQuote>
 
-              <Stack direction="row" alignItems="center" spacing={4} sx={{ mt: 4 }}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={4}
+                sx={{ mt: 4 }}
+              >
                 <AvatarGroup max={4}>
                   <Avatar src="https://lh3.googleusercontent.com/aida-public/AB6AXuASvp08irYPQnxkzbjjLwJyRG7en12csWr8DYSXylHoWBTrL8UykeXCAA-iGmI4sAtu4PAqvnR9IXgY8-d3JJkRPiP6sBMpjUgBp7IqW-eElWCam725z38w9k7BP4DDcyfynSyeJqIXJd8n4yxtAZApsZtbZg6Ztm-RVNPWh0B_wdzlL_VXARvbB744jKYMqC4g5eXrdTpP_V4k5vtADFibcesvGXVhf5188drmS1llcWWuEcbfI1jpx2vBBRa23f7DvAU4_f2wbCk" />
                   <Avatar src="https://lh3.googleusercontent.com/aida-public/AB6AXuA55VmqkCP_oPHKHMJMC6gFyEjJVlAyOqObWU0VwCQEYQbzemo62ZA50tW59qDr0qom-ggc-0PIO_6vD0I512AQjo5XrD5aDCyCmbNatiiSi80IcNhkwcGTdnJ2RDLF8PXOsc6DVoLyv22IVsXXEyYpzwBxiEqId0Xv1lyKzos4hG-NeU55kFW5ivXF_2GtZjs81THCIfVsfsGWJ6nCyxPgxays05axMLC5BQ6tBOQF7mwzUSUDGC-lSHRiBP8yxHAPH_IrJ-qgZs" />
@@ -377,14 +421,22 @@ const AboutPage: React.FC = () => {
           spacing={1}
           sx={{ mb: 2 }}
         >
-          <span className="material-symbols-outlined" style={{ color: '#137fec' }}>
+          <span
+            className="material-symbols-outlined"
+            style={{ color: '#137fec' }}
+          >
             auto_awesome
           </span>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             Focusly
           </Typography>
         </Stack>
-        <Stack direction="row" justifyContent="center" spacing={3} sx={{ mb: 4 }}>
+        <Stack
+          direction="row"
+          justifyContent="center"
+          spacing={3}
+          sx={{ mb: 4 }}
+        >
           {['Twitter', 'LinkedIn', 'Contact'].map((item) => (
             <Typography
               key={item}
@@ -399,7 +451,9 @@ const AboutPage: React.FC = () => {
             </Typography>
           ))}
         </Stack>
-        <FooterText variant="body2">© 2024 Focusly. All rights reserved.</FooterText>
+        <FooterText variant="body2">
+          © 2024 Focusly. All rights reserved.
+        </FooterText>
       </Footer>
     </PageWrapper>
   );

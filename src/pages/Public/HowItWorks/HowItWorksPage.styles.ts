@@ -1,5 +1,5 @@
 import { styled, Box, Typography, Stack, Grid } from '@mui/material';
-import { HeroSecondaryButton } from '@/pages/LandingPage/LandingPage.styles';
+import { HeroSecondaryButton } from '@/pages/Public/LandingPage/LandingPage.styles';
 
 // --- How It Works Section ---
 export const HowItWorksSection = styled(Box)(({ theme }) => ({

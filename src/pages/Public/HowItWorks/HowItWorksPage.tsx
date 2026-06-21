@@ -6,7 +6,7 @@ import {
   MainContent as MainWrapper,
   Footer,
   FooterText,
-} from '@/pages/LandingPage/LandingPage.styles';
+} from '@/pages/Public/LandingPage/LandingPage.styles';
 import {
   HowItWorksSection,
   SectionHeader,
@@ -31,7 +31,7 @@ import {
   HeroPrimaryButton,
   FeatureTitle,
   FeatureDescription,
-} from '@/pages/LandingPage/LandingPage.styles';
+} from '@/pages/Public/LandingPage/LandingPage.styles';
 import Navbar from '@/components/layout/Navbar';
 
 const HowItWorksPage: React.FC = () => {
@@ -95,9 +95,14 @@ const HowItWorksPage: React.FC = () => {
           <Container maxWidth="lg">
             <SectionHeader>
               <SectionBadge>
-                <SectionBadgeText variant="caption">System Overview</SectionBadgeText>
+                <SectionBadgeText variant="caption">
+                  System Overview
+                </SectionBadgeText>
               </SectionBadge>
-              <SectionTitle variant="h1" sx={{ fontSize: { xs: '2.5rem', md: '4rem' } }}>
+              <SectionTitle
+                variant="h1"
+                sx={{ fontSize: { xs: '2.5rem', md: '4rem' } }}
+              >
                 How Focusly Works
               </SectionTitle>
               <SectionDescription
@@ -105,9 +110,9 @@ const HowItWorksPage: React.FC = () => {
                 color="text.secondary"
                 sx={{ fontSize: '1.2rem' }}
               >
-                A smart productivity platform that combines calendar, tasks, automatic planning, and
-                focus sessions, optimizing your time based on your energy, availability, and real
-                habits.
+                A smart productivity platform that combines calendar, tasks,
+                automatic planning, and focus sessions, optimizing your time
+                based on your energy, availability, and real habits.
               </SectionDescription>
             </SectionHeader>
 
@@ -115,13 +120,22 @@ const HowItWorksPage: React.FC = () => {
               {steps.map((step) => (
                 <Grid size={{ xs: 12, md: 6, lg: 4 }} key={step.number}>
                   <StepCard>
-                    <StepNumber className="step-number">{step.number}</StepNumber>
+                    <StepNumber className="step-number">
+                      {step.number}
+                    </StepNumber>
                     <StepContent>
-                      <StepIconContainer color={step.color} className="step-icon">
-                        <span className="material-symbols-outlined">{step.icon}</span>
+                      <StepIconContainer
+                        color={step.color}
+                        className="step-icon"
+                      >
+                        <span className="material-symbols-outlined">
+                          {step.icon}
+                        </span>
                       </StepIconContainer>
                       <FeatureTitle variant="h6">{step.title}</FeatureTitle>
-                      <FeatureDescription variant="body2">{step.description}</FeatureDescription>
+                      <FeatureDescription variant="body2">
+                        {step.description}
+                      </FeatureDescription>
                     </StepContent>
                   </StepCard>
                 </Grid>
@@ -137,8 +151,8 @@ const HowItWorksPage: React.FC = () => {
               <CTAContent>
                 <CTATitle variant="h3">Ready to reclaim your time?</CTATitle>
                 <CTADescription variant="body1">
-                  Join thousands of professionals who have automated their schedule and multiplied
-                  their focus.
+                  Join thousands of professionals who have automated their
+                  schedule and multiplied their focus.
                 </CTADescription>
                 <Box
                   sx={{
@@ -148,10 +162,15 @@ const HowItWorksPage: React.FC = () => {
                     pt: 4,
                   }}
                 >
-                  <HeroPrimaryButton variant="contained" endIcon={<ArrowForwardIcon />}>
+                  <HeroPrimaryButton
+                    variant="contained"
+                    endIcon={<ArrowForwardIcon />}
+                  >
                     Start Free Trial
                   </HeroPrimaryButton>
-                  <CTASecondaryButton variant="outlined">View Pricing</CTASecondaryButton>
+                  <CTASecondaryButton variant="outlined">
+                    View Pricing
+                  </CTASecondaryButton>
                 </Box>
               </CTAContent>
             </CTAContainer>
@@ -160,7 +179,9 @@ const HowItWorksPage: React.FC = () => {
       </MainWrapper>
 
       <Footer>
-        <FooterText variant="body2">© 2024 Focusly. All rights reserved.</FooterText>
+        <FooterText variant="body2">
+          © 2024 Focusly. All rights reserved.
+        </FooterText>
       </Footer>
     </PageWrapper>
   );

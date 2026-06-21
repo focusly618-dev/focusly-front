@@ -6,7 +6,7 @@ import {
   FooterText,
   PageWrapper,
   MainContent,
-} from '@/pages/LandingPage/LandingPage.styles';
+} from '@/pages/Public/LandingPage/LandingPage.styles';
 import {
   PricingSection,
   BackgroundDecoration,
@@ -44,7 +44,8 @@ const PricingPage: React.FC = () => {
                 Simple, transparent <GradientText>pricing</GradientText>
               </PricingTitle>
               <Typography variant="body1" color="text.secondary">
-                Unlock your full potential with Focusly. Choose the plan that fits your workflow.
+                Unlock your full potential with Focusly. Choose the plan that
+                fits your workflow.
               </Typography>
             </SectionHeader>
 
@@ -115,15 +116,21 @@ const PricingPage: React.FC = () => {
 
                   <FeatureList>
                     <FeatureItemPro>
-                      <span className="material-symbols-outlined">check_circle</span>
+                      <span className="material-symbols-outlined">
+                        check_circle
+                      </span>
                       <span>Unlimited Focus Sessions</span>
                     </FeatureItemPro>
                     <FeatureItemPro>
-                      <span className="material-symbols-outlined">auto_awesome</span>
+                      <span className="material-symbols-outlined">
+                        auto_awesome
+                      </span>
                       <span>AI Automatic Planning</span>
                     </FeatureItemPro>
                     <FeatureItemPro>
-                      <span className="material-symbols-outlined">check_circle</span>
+                      <span className="material-symbols-outlined">
+                        check_circle
+                      </span>
                       <span>Energy-based Auto-scheduling</span>
                     </FeatureItemPro>
                     <FeatureItemPro>
@@ -131,12 +138,16 @@ const PricingPage: React.FC = () => {
                       <span>Google & Outlook Sync</span>
                     </FeatureItemPro>
                     <FeatureItemPro>
-                      <span className="material-symbols-outlined">bar_chart</span>
+                      <span className="material-symbols-outlined">
+                        bar_chart
+                      </span>
                       <span>Advanced Analytics</span>
                     </FeatureItemPro>
                   </FeatureList>
 
-                  <PricingButton variant="contained">Upgrade to Pro</PricingButton>
+                  <PricingButton variant="contained">
+                    Upgrade to Pro
+                  </PricingButton>
                 </PricingCard>
               </Grid>
             </Grid>
@@ -174,7 +185,9 @@ const PricingPage: React.FC = () => {
       </MainContent>
 
       <Footer>
-        <FooterText variant="body2">© 2024 Focusly. All rights reserved.</FooterText>
+        <FooterText variant="body2">
+          © 2024 Focusly. All rights reserved.
+        </FooterText>
       </Footer>
     </PageWrapper>
   );
