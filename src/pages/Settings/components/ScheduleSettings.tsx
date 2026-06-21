@@ -1,225 +1,296 @@
-import { Box, Switch, alpha, Typography, useTheme, type Theme } from '@mui/material';
+import { useState } from 'react';
+import { Box, Switch, Typography } from '@mui/material';
 import {
-  WorkOutline as WorkOutlineIcon,
-  Bolt as BoltIcon,
-  AccessTime as AccessTimeIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  TrendingUp as TrendingUpIcon
+  CalendarMonthOutlined as CalendarIcon,
+  BoltOutlined as EnergyIcon,
 } from '@mui/icons-material';
 import {
   SectionCard,
+  AICard,
   SectionHeader,
   SectionTitle,
   Badge,
+  WeeklyContainer,
+  DayPill,
+  SmartToggleCard,
+  SmartCardTitle,
+  SmartCardDesc,
+  SliderHeader,
+  SliderLabel,
+  SliderValue,
+  PremiumSlider,
 } from '../Settings.styles';
 
 export const ScheduleSettings = () => {
-  const theme = useTheme();
-  
-  const themeSwitchStyles = (theme: Theme) => ({
+  // Work Rhythm States
+  const [activeDays, setActiveDays] = useState<string[]>([
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+  ]);
+  const [workHours, setWorkHours] = useState<number[]>([9, 17]);
+  const [lunchProtected, setLunchProtected] = useState(true);
+  const [protectGoldenHours, setProtectGoldenHours] = useState(true);
+
+  const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  const toggleDay = (day: string) => {
+    setActiveDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+    );
+  };
+
+  const handleHoursChange = (_e: Event, newValue: number | number[]) => {
+    setWorkHours(newValue as number[]);
+  };
+
+  const formatHour = (hourVal: number) => {
+    const period = hourVal >= 12 ? 'PM' : 'AM';
+    let displayHour = hourVal % 12;
+    if (displayHour === 0) displayHour = 12;
+    return `${displayHour.toString().padStart(2, '0')}:00 ${period}`;
+  };
+
+  const switchStyles = {
     '& .MuiSwitch-switchBase.Mui-checked': {
-      color: theme.palette.primary.main,
+      color: '#6366F1',
       '&:hover': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.08),
+        backgroundColor: 'rgba(99, 102, 241, 0.08)',
       },
     },
     '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-      backgroundColor: theme.palette.primary.main,
+      backgroundColor: '#6366F1',
     },
-  });
-
-  const days = [
-    { label: 'S', active: false },
-    { label: 'M', active: true },
-    { label: 'T', active: true },
-    { label: 'W', active: true },
-    { label: 'T', active: true },
-    { label: 'F', active: true },
-    { label: 'S', active: false },
-  ];
+  };
 
   return (
     <Box>
-      {/* Work Hours */}
+      {/* Work Rhythm Card */}
       <SectionCard>
         <SectionHeader>
           <SectionTitle>
             <Box className="icon-wrapper">
-              <WorkOutlineIcon />
+              <CalendarIcon />
             </Box>
-            <Typography>Work Hours</Typography>
+            <Typography>Your Work Rhythm</Typography>
           </SectionTitle>
-          <Badge>RFU-14</Badge>
+        </SectionHeader>
+
+        {/* Work Days Pill Selector */}
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5 }}
+          >
+            Work Days
+          </Typography>
+          <WeeklyContainer>
+            {daysOfWeek.map((day) => {
+              const isActive = activeDays.includes(day);
+              return (
+                <DayPill
+                  key={day}
+                  active={isActive}
+                  onClick={() => toggleDay(day)}
+                >
+                  {day}
+                </DayPill>
+              );
+            })}
+          </WeeklyContainer>
+        </Box>
+
+        {/* Daily Schedule Timeline Slider */}
+        <Box sx={{ mb: 4 }}>
+          <SliderHeader>
+            <SliderLabel>Daily Schedule</SliderLabel>
+            <SliderValue>
+              {formatHour(workHours[0])} — {formatHour(workHours[1])}
+            </SliderValue>
+          </SliderHeader>
+          <PremiumSlider
+            value={workHours}
+            onChange={handleHoursChange}
+            min={5}
+            max={22}
+            step={1}
+            valueLabelDisplay="off"
+          />
+          <Box
+            sx={{ display: 'flex', justifyContent: 'space-between', mt: -0.5 }}
+          >
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              05:00 AM
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              10:00 PM
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Lunch Protection */}
+        <SmartToggleCard>
+          <Box>
+            <SmartCardTitle>Protect recovery time</SmartCardTitle>
+            <SmartCardDesc>Smart flexible 45 min lunch window</SmartCardDesc>
+          </Box>
+          <Switch
+            checked={lunchProtected}
+            onChange={(e) => setLunchProtected(e.target.checked)}
+            sx={switchStyles}
+          />
+        </SmartToggleCard>
+      </SectionCard>
+
+      {/* Energy Section - AI Golden Hours */}
+      <AICard>
+        <SectionHeader>
+          <SectionTitle>
+            <Box className="icon-wrapper" sx={{ color: '#F59E0B' }}>
+              <EnergyIcon />
+            </Box>
+            <Typography>Your Golden Hours</Typography>
+          </SectionTitle>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Badge
+              sx={{ bgcolor: 'rgba(99, 102, 241, 0.08)', color: '#6366F1' }}
+            >
+              AI BETA
+            </Badge>
+            <Badge
+              sx={{ bgcolor: 'rgba(34, 197, 94, 0.08)', color: '#22C55E' }}
+            >
+              High Confidence
+            </Badge>
+          </Box>
         </SectionHeader>
 
         <Box sx={{ mb: 4 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, color: theme.palette.text.primary }}>
-            Work Days
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: 'text.primary',
+              letterSpacing: '-0.02em',
+              mb: 1,
+            }}
+          >
+            09:00 AM - 11:30 AM
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1.5 }}>
-            {days.map((day, index) => (
-              <Box
-                key={index}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: day.active ? theme.palette.primary.main : alpha(theme.palette.text.primary, 0.05),
-                  color: day.active ? '#fff' : theme.palette.text.secondary,
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    backgroundColor: day.active ? alpha(theme.palette.primary.main, 0.8) : alpha(theme.palette.text.primary, 0.1),
-                  },
-                }}
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+            This is your highest energy window. Focusly schedules deep focus
+            work during this period.
+          </Typography>
+
+          {/* Custom SVG Curve representing energy peaks */}
+          <Box
+            sx={{
+              height: 120,
+              width: '100%',
+              bgcolor: 'rgba(99, 102, 241, 0.01)',
+              borderRadius: '16px',
+              border: '1px solid rgba(99, 102, 241, 0.04)',
+              p: 2,
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 500 80"
+              preserveAspectRatio="none"
+              style={{ display: 'block', overflow: 'visible' }}
+            >
+              <defs>
+                <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(99, 102, 241, 0.25)" />
+                  <stop offset="100%" stopColor="rgba(99, 102, 241, 0.00)" />
+                </linearGradient>
+              </defs>
+
+              {/* Energy peak path filled */}
+              <path
+                d="M0,80 Q70,75 120,20 T200,80 T300,75 T420,40 Q460,78 500,80 L500,80 L0,80 Z"
+                fill="url(#curveGradient)"
+              />
+
+              {/* Peak energy curve line */}
+              <path
+                d="M0,80 Q70,75 120,20 T200,80 T300,75 T420,40 Q460,78 500,80"
+                fill="none"
+                stroke="#6366F1"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+
+              {/* Dotted indicator for Golden Hours */}
+              <line
+                x1="120"
+                y1="20"
+                x2="120"
+                y2="80"
+                stroke="#6366F1"
+                strokeWidth="1"
+                strokeDasharray="3,3"
+              />
+              <circle cx="120" cy="20" r="4" fill="#6366F1" />
+            </svg>
+
+            {/* Labels overlay */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 15,
+                left: '25%',
+                transform: 'translateX(-50%)',
+                textAlign: 'center',
+              }}
+            >
+              <Typography
+                sx={{ fontSize: '9px', fontWeight: 800, color: '#6366F1' }}
               >
-                {day.label}
-              </Box>
-            ))}
-          </Box>
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-          <Box sx={{ flex: 1, minWidth: '200px' }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, color: theme.palette.text.primary }}>
-              Daily Schedule
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ 
-                    flex: 1, 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    p: '10px 16px', 
-                    borderRadius: '12px', 
-                    bgcolor: alpha(theme.palette.text.primary, 0.03),
-                    border: `1px solid ${theme.palette.divider}`
-                }}>
-                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 600 }}>09:00 AM</Typography>
-                    <AccessTimeIcon sx={{ fontSize: 16, color: theme.palette.text.secondary }} />
-                </Box>
-                <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>to</Typography>
-                <Box sx={{ 
-                    flex: 1, 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    p: '10px 16px', 
-                    borderRadius: '12px', 
-                    bgcolor: alpha(theme.palette.text.primary, 0.03),
-                    border: `1px solid ${theme.palette.divider}`
-                }}>
-                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 600 }}>05:00 PM</Typography>
-                    <AccessTimeIcon sx={{ fontSize: 16, color: theme.palette.text.secondary }} />
-                </Box>
+                ENERGY PEAK
+              </Typography>
             </Box>
-          </Box>
-
-          <Box sx={{ flex: 1, minWidth: '200px' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
-                  Lunch Protection
-                </Typography>
-                <Switch defaultChecked size="small" sx={themeSwitchStyles(theme)} />
-            </Box>
-            <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                p: '10px 16px', 
-                borderRadius: '12px', 
-                bgcolor: alpha(theme.palette.text.primary, 0.03),
-                border: `1px solid ${theme.palette.divider}`,
-                cursor: 'pointer'
-            }}>
-                <Typography sx={{ fontSize: '0.9rem', fontWeight: 600 }}>45 Minutes (Smart Flexible)</Typography>
-                <KeyboardArrowDownIcon sx={{ fontSize: 18, color: theme.palette.text.secondary }} />
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}
+            >
+              <Typography sx={{ fontSize: '10px', color: 'text.secondary' }}>
+                09:00 AM
+              </Typography>
+              <Typography sx={{ fontSize: '10px', color: 'text.secondary' }}>
+                01:00 PM
+              </Typography>
+              <Typography sx={{ fontSize: '10px', color: 'text.secondary' }}>
+                05:00 PM
+              </Typography>
             </Box>
           </Box>
         </Box>
-      </SectionCard>
 
-      {/* Energy & Golden Hours */}
-      <SectionCard>
-        <SectionHeader>
-          <SectionTitle>
-            <Box className="icon-wrapper" sx={{ color: '#fbbf24' }}>
-              <BoltIcon />
-            </Box>
-            <Typography>Energy & Golden Hours</Typography>
-          </SectionTitle>
-          <Badge sx={{ bgcolor: alpha('#fbbf24', 0.1), color: '#fbbf24' }}>FR-16</Badge>
-        </SectionHeader>
-
-        <Box sx={{ 
-            p: 3, 
-            borderRadius: '16px', 
-            bgcolor: alpha(theme.palette.text.primary, 0.02),
-            border: `1px solid ${alpha(theme.palette.text.primary, 0.05)}`,
-            mb: 4
-        }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Smart Energy Detection</Typography>
-                    <Box sx={{ 
-                        fontSize: '9px', 
-                        fontWeight: 800, 
-                        px: 1, 
-                        py: 0.2, 
-                        borderRadius: '4px', 
-                        bgcolor: alpha(theme.palette.primary.main, 0.1), 
-                        color: theme.palette.primary.main 
-                    }}>AI BETA</Box>
-                </Box>
-                <Switch defaultChecked size="small" sx={themeSwitchStyles(theme)} />
-            </Box>
-            <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block' }}>
-                Automatically identify your peak productivity times based on task completion history.
-            </Typography>
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-            <Box sx={{ flex: 1, minWidth: '250px' }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5 }}>Current Golden Hours</Typography>
-                <Box sx={{ 
-                    p: 2.5, 
-                    borderRadius: '16px', 
-                    bgcolor: alpha(theme.palette.primary.main, 0.03),
-                    border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <TrendingUpIcon sx={{ color: theme.palette.primary.main, fontSize: 20 }} />
-                        <Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>09:00 AM - 11:30 AM</Typography>
-                    </Box>
-                    <Typography variant="caption" sx={{ color: '#22c55e', fontWeight: 800, fontSize: '10px', textTransform: 'uppercase' }}>High Confidence</Typography>
-                </Box>
-                <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block', mt: 1.5 }}>
-                    We try to schedule your most demanding tasks during this window.
-                </Typography>
-            </Box>
-
-            <Box sx={{ flex: 1, minWidth: '200px' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Protect Golden Hours</Typography>
-                    <Switch defaultChecked size="small" sx={themeSwitchStyles(theme)} />
-                </Box>
-                <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block' }}>
-                    When enabled, the scheduler will aggressively decline meetings and low-priority tasks during peak times.
-                </Typography>
-            </Box>
-        </Box>
-      </SectionCard>
-
-      {/* Reusing existing Focus Session Length slider if needed, 
-          but as per image it seems to be in a session of its own "Focus Block & Break Duration" */}
+        {/* Protect Golden Hours Toggle Card */}
+        <SmartToggleCard
+          sx={{
+            bgcolor: 'rgba(99, 102, 241, 0.02)',
+            borderColor: 'rgba(99, 102, 241, 0.08)',
+          }}
+        >
+          <Box>
+            <SmartCardTitle>Auto-protect Golden Hours</SmartCardTitle>
+            <SmartCardDesc>
+              Focusly will automatically protect your highest performance hours.
+            </SmartCardDesc>
+          </Box>
+          <Switch
+            checked={protectGoldenHours}
+            onChange={(e) => setProtectGoldenHours(e.target.checked)}
+            sx={switchStyles}
+          />
+        </SmartToggleCard>
+      </AICard>
     </Box>
   );
 };

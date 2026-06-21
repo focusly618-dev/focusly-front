@@ -1,54 +1,64 @@
 import { useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Typography, Avatar, Stack } from '@mui/material';
 import {
-  SettingsContainer,
-  SettingsHeader,
+  SettingsLayout,
+  SettingsSidebar,
+  SidebarItem,
+  ContentArea,
+  ProfileHeader,
   SettingsTitle,
   SettingsDescription,
-  TabsContainer,
-  TabItem,
+  UserProfileSummary,
+  Badge,
 } from './Settings.styles';
 import {
-  PersonOutline as PersonOutlineIcon,
   AccessTime as AccessTimeIcon,
   PrecisionManufacturing as PrecisionManufacturingIcon,
-  NotificationsNone as NotificationsNoneIcon
+  NotificationsNone as NotificationsNoneIcon,
+  ShieldOutlined as SecurityIcon,
 } from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/redux/store';
 import { NotificationSettings } from './components/NotificationSettings';
 import { FocusEngineSettings } from './components/FocusEngineSettings';
 import { ScheduleSettings } from './components/ScheduleSettings';
-import { ProfileSettings } from './components/ProfileSettings';
+import { SecuritySettings } from './components/SecuritySettings';
 import { SettingsTab } from './Settings.types';
 
 export const Settings = () => {
-  const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.Profile);
+  const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.Schedule);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const getHeaderContent = () => {
     switch (activeTab) {
-      case SettingsTab.Profile:
-        return {
-          title: 'General Profile',
-          description: 'Manage your personal information, account security, and basic preferences.',
-        };
-      case SettingsTab.Notifications:
-        return {
-          title: 'Notification Preferences',
-          description: 'Manage how and when you receive alerts for your focus sessions, breaks, and productivity insights.',
-        };
       case SettingsTab.Schedule:
         return {
-          title: 'Schedule & Energy Settings',
-          description: 'Define your availability, work rhythm, and let our AI detect your peak productivity windows to optimize your calendar.',
+          title: 'Schedule & Energy Rhythm',
+          description:
+            'Configure your availability, work rhythm, and let our AI optimize your peak productivity windows.',
         };
       case SettingsTab.Focus:
         return {
-          title: 'Focus Engine Configuration',
-          description: 'Customize how our AI optimizes your deep work sessions, manages your breaks, and shields you from distractions based on your energy levels.',
+          title: 'Focus Control Center',
+          description:
+            'Define your focus and break block duration and manage distraction shield parameters.',
+        };
+      case SettingsTab.Notifications:
+        return {
+          title: 'Notification Channels',
+          description:
+            'Control how and when you receive alerts for focus sessions, breaks, and digests.',
+        };
+      case SettingsTab.Security:
+        return {
+          title: 'Security & Account',
+          description:
+            'Manage your authentication sessions and delete or sign out of your account.',
         };
       default:
         return {
-          title: 'Settings',
-          description: 'Manage your application preferences and personal information.',
+          title: 'Productivity Profile',
+          description: 'Manage your focus system and identity preferences.',
         };
     }
   };
@@ -56,50 +66,104 @@ export const Settings = () => {
   const header = getHeaderContent();
 
   const tabs = [
-    { id: SettingsTab.Profile, label: 'General Profile', icon: <PersonOutlineIcon fontSize="small" /> },
-    { id: SettingsTab.Schedule, label: 'Schedule & Energy', icon: <AccessTimeIcon fontSize="small" /> },
-    { id: SettingsTab.Focus, label: 'Focus Engine', icon: <PrecisionManufacturingIcon fontSize="small" /> },
-    { id: SettingsTab.Notifications, label: 'Notifications', icon: <NotificationsNoneIcon fontSize="small" /> },
+    {
+      id: SettingsTab.Schedule,
+      label: 'Schedule & Energy',
+      icon: <AccessTimeIcon />,
+    },
+    {
+      id: SettingsTab.Focus,
+      label: 'Focus Engine',
+      icon: <PrecisionManufacturingIcon />,
+    },
+    {
+      id: SettingsTab.Notifications,
+      label: 'Notifications',
+      icon: <NotificationsNoneIcon />,
+    },
+    { id: SettingsTab.Security, label: 'Security', icon: <SecurityIcon /> },
   ];
-  console.log(activeTab)
 
   return (
-    <SettingsContainer>
-      <SettingsHeader>
-        <SettingsTitle>{header.title}</SettingsTitle>
-        <SettingsDescription>
-          {header.description}
-        </SettingsDescription>
+    <SettingsLayout>
+      {/* Left Sidebar */}
+      <SettingsSidebar>
+        {tabs.map((tab) => (
+          <SidebarItem
+            key={tab.id}
+            active={activeTab === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.icon}
+            {tab.label}
+          </SidebarItem>
+        ))}
+      </SettingsSidebar>
 
-        <TabsContainer>
-          {tabs.map((tab) => (
-            <TabItem
-              key={tab.id}
-              active={activeTab === tab.id}
-              onClick={() => setActiveTab(tab.id)}
+      {/* Right Content Area */}
+      <ContentArea>
+        {/* Large Header */}
+        <ProfileHeader>
+          <SettingsTitle variant="h1">{header.title}</SettingsTitle>
+          <SettingsDescription>{header.description}</SettingsDescription>
+        </ProfileHeader>
+
+        {/* Profile Summary Card at the top */}
+        <UserProfileSummary>
+          <Avatar
+            src={user?.picture || ''}
+            alt={user?.name || 'User'}
+            sx={{
+              width: 56,
+              height: 56,
+              border: '2px solid rgba(99, 102, 241, 0.2)',
+            }}
+          />
+          <Box>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: 800, color: 'text.primary' }}
             >
-              {tab.icon}
-              {tab.label}
-            </TabItem>
-          ))}
-        </TabsContainer>
-      </SettingsHeader>
-
-      <Box sx={{ mt: 2 }}>
-        {activeTab === SettingsTab.Profile && <ProfileSettings />}
-        {activeTab === SettingsTab.Notifications && <NotificationSettings />}
-        {activeTab === SettingsTab.Focus && <FocusEngineSettings />}
-        {activeTab === SettingsTab.Schedule && <ScheduleSettings />}
-        {activeTab !== SettingsTab.Profile && 
-         activeTab !== SettingsTab.Notifications && 
-         activeTab !== SettingsTab.Focus && 
-         activeTab !== SettingsTab.Schedule && (
-          <Box sx={{ p: 4, textAlign: 'center', opacity: 0.5 }}>
-            {activeTab} settings coming soon.
+              {user?.name || 'Alex Morgan'}
+            </Typography>
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{ mt: 0.5 }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', fontWeight: 500 }}
+              >
+                {user?.email || 'alex@email.com'}
+              </Typography>
+              <Box
+                sx={{
+                  width: 3,
+                  height: 3,
+                  borderRadius: '50%',
+                  bgcolor: 'text.disabled',
+                }}
+              />
+              <Badge
+                sx={{ bgcolor: 'rgba(34, 197, 94, 0.08)', color: '#22C55E' }}
+              >
+                Focus Style: Deep Work Creator
+              </Badge>
+            </Stack>
           </Box>
-        )}
-      </Box>
-    </SettingsContainer>
+        </UserProfileSummary>
+
+        {/* Active Tab Panel */}
+        <Box>
+          {activeTab === SettingsTab.Schedule && <ScheduleSettings />}
+          {activeTab === SettingsTab.Focus && <FocusEngineSettings />}
+          {activeTab === SettingsTab.Notifications && <NotificationSettings />}
+          {activeTab === SettingsTab.Security && <SecuritySettings />}
+        </Box>
+      </ContentArea>
+    </SettingsLayout>
   );
 };
 
