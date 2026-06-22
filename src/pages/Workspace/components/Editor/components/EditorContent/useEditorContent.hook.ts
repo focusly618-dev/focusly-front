@@ -1,16 +1,28 @@
 import { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { useAppSelector } from '@/redux/hooks';
 import type {
   UseEditorContentProps,
   UseEditorContentReturn,
 } from './useEditorContent.types';
 import { colorPalette, type HeaderColor } from '@/utils/colors';
 import { sileo } from '@/utils/sileo';
+import { fetchEditResult } from '@/api/AI/apiAI';
+import {
+  CREATE_TASK,
+  GET_TASKS,
+  GET_TASKS_TITLES,
+} from '@/pages/Tasks/Task.graphql';
+import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
 
 export const useEditorContent = ({
   setValue,
   watch,
   editor,
 }: UseEditorContentProps): UseEditorContentReturn => {
+  const [createTaskMutation] = useMutation(CREATE_TASK);
+  const { user } = useAppSelector((state) => state.auth);
+
   const persistedEmoji = watch?.('emoji');
   const persistedBg = watch?.('background_color');
 
@@ -21,6 +33,7 @@ export const useEditorContent = ({
   const [selectedText, setSelectedText] = useState('');
   const [colorAnchor, setColorAnchor] = useState<null | HTMLElement>(null);
   const [iconAnchor, setIconAnchor] = useState<null | HTMLElement>(null);
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
 
   const headerColor: HeaderColor =
     (persistedBg as HeaderColor | undefined) ?? 'none';
@@ -64,24 +77,6 @@ export const useEditorContent = ({
     setMenuAnchor(null);
   };
 
-  const translateText = async (
-    text: string,
-    toLang: string,
-  ): Promise<string> => {
-    try {
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=Autodetect|${toLang}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data?.responseData?.translatedText) {
-        return data.responseData.translatedText;
-      }
-      throw new Error('No translation returned');
-    } catch (err) {
-      console.error('Translation error:', err);
-      return text;
-    }
-  };
-
   const getLanguageLabel = (code: string) => {
     if (code === 'auto') return 'Detect Language';
     if (code === 'es') return 'Spanish';
@@ -93,68 +88,175 @@ export const useEditorContent = ({
     return '';
   };
 
-  const handleCreateTask = () => {
+  const handleCreateTask = async () => {
     handleClose();
-    sileo.success({
-      title: 'Task created!',
-      description: `New task created from selection: "${selectedText.slice(0, 30)}..."`,
-      fill: 'var(--sileo-success-bg)',
-      duration: 3000,
-    });
+    if (!selectedText) {
+      sileo.error({
+        title: 'Error',
+        description: 'Please select some text in the editor to create a task.',
+        fill: 'var(--sileo-error-bg)',
+        duration: 3000,
+      });
+      return;
+    }
+
+    setIsAIProcessing(true);
+
+    const aiPrompt = `You are a task details generator. Analyze the text below and extract a task from it.
+Response MUST be a single raw JSON object (with no conversational preamble, quotes, markdown formatting, or introductory text) matching this schema:
+{
+  "title": "Action-oriented task title",
+  "description": "Short explanation or context extracted from the text",
+  "priority": "High" | "Medium" | "Low",
+  "duration": "15m" | "30m" | "1h" | "2h"
+}
+
+Text: "${selectedText}"`;
+
+    const createProcess = async () => {
+      if (!user) throw new Error('User not logged in');
+
+      const rawResult = await fetchEditResult(aiPrompt);
+      let parsed: {
+        title: string;
+        description: string;
+        priority?: 'High' | 'Medium' | 'Low';
+        duration?: string;
+      };
+
+      try {
+        let cleanText = rawResult.trim();
+        if (cleanText.startsWith('```json')) {
+          cleanText = cleanText.substring(7);
+        } else if (cleanText.startsWith('```')) {
+          cleanText = cleanText.substring(3);
+        }
+        if (cleanText.endsWith('```')) {
+          cleanText = cleanText.substring(0, cleanText.length - 3);
+        }
+        parsed = JSON.parse(cleanText.trim());
+      } catch (e) {
+        console.warn(
+          'AI returned non-JSON task formatting, falling back to manual mapping',
+          e,
+        );
+        parsed = {
+          title:
+            selectedText.length > 50
+              ? selectedText.slice(0, 50) + '...'
+              : selectedText,
+          description: selectedText,
+          priority: 'Medium',
+          duration: '30m',
+        };
+      }
+
+      const estimateTimer = parseDuration(parsed.duration || '30m');
+      const priorityLevel =
+        parsed.priority === 'High' ? 4 : parsed.priority === 'Low' ? 1 : 2;
+
+      const createTaskInput = {
+        title: parsed.title || 'AI Task',
+        notes_encrypted: `${parsed.description || ''} [COLOR:#3b82f6]`,
+        estimate_timer: estimateTimer,
+        real_timer: 0,
+        tags: [],
+        deadline: new Date().toISOString(),
+        priority_level: priorityLevel,
+        category: 'General',
+        color: '#3b82f6',
+        links: [],
+        user_id: user.id || '',
+        status: 'Backlog',
+      };
+
+      const { data } = await createTaskMutation({
+        variables: { createTaskInput },
+        refetchQueries: [
+          { query: GET_TASKS, variables: { userId: user.id || '' } },
+          { query: GET_TASKS_TITLES, variables: { userId: user.id || '' } },
+        ],
+      });
+
+      if (!data?.createTask) {
+        throw new Error('Task creation returned empty data');
+      }
+
+      return data.createTask;
+    };
+
+    try {
+      await sileo.promise(createProcess(), {
+        loading: {
+          title: 'AI Task Creator',
+          description: 'Analyzing text and creating task...',
+          fill: 'var(--sileo-info-bg)',
+        },
+        success: {
+          title: 'Task created!',
+          description: 'New task has been added to your task list.',
+          fill: 'var(--sileo-success-bg)',
+          duration: 3000,
+        },
+        error: {
+          title: 'Error creating task',
+          description: 'Could not create task with AI.',
+          fill: 'var(--sileo-error-bg)',
+        },
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsAIProcessing(false);
+    }
   };
 
   const processTextWithAI = async (action: string) => {
     handleClose();
-    if (!selectedText) return;
+    if (!selectedText || !editor) return;
+
+    setIsAIProcessing(true);
 
     let promptDescription = 'Processing text...';
     let successTitle = 'Text updated';
-    let resultText = selectedText;
+    let aiPrompt = '';
 
     if (action === 'grammar') {
       promptDescription = 'Fixing grammar and spelling...';
       successTitle = 'Grammar & spelling fixed';
-      let temp = selectedText.trim();
-      if (temp.length > 0) {
-        temp = temp.charAt(0).toUpperCase() + temp.slice(1);
-        if (!temp.endsWith('.') && !temp.endsWith('!') && !temp.endsWith('?')) {
-          temp += '.';
-        }
-      }
-      resultText = temp;
+      aiPrompt = `Fix spelling and grammar in this text. Correct any typos and punctuation errors. Return ONLY the corrected text, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
     } else if (action === 'summarize') {
       promptDescription = 'Creating summary...';
       successTitle = 'Summary generated';
-      resultText = `Summary: "${selectedText.slice(0, 100)}..."`;
+      aiPrompt = `Summarize this text concisely. Return ONLY the summarized text, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
     } else if (action === 'expand') {
       promptDescription = 'Expanding text...';
       successTitle = 'Text expanded';
-      resultText = `${selectedText} (This point is critical for our strategic alignment. We need to ensure all team members understand the implications and coordinate their efforts to execute this phase efficiently.)`;
+      aiPrompt = `Expand this text by adding relevant detail and context while preserving the style. Return ONLY the expanded text, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
     } else if (action === 'shorten') {
       promptDescription = 'Shortening text...';
       successTitle = 'Text condensed';
-      resultText =
-        selectedText.length > 60
-          ? `${selectedText.slice(0, 50)}...`
-          : selectedText;
+      aiPrompt = `Condense this text, making it short and punchy. Return ONLY the shortened text, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
     } else if (action.startsWith('translate_')) {
       const langCode = action.replace('translate_', '');
       const langLabel = getLanguageLabel(langCode);
       promptDescription = `Translating to ${langLabel}...`;
       successTitle = `Translated to ${langLabel}`;
-      resultText = await translateText(selectedText, langCode);
+      aiPrompt = `Translate this text to ${langLabel}. Return ONLY the translated text, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
     } else if (action === 'tone_professional') {
       promptDescription = 'Changing tone to professional...';
       successTitle = 'Tone changed to Professional';
-      resultText = `We should professionally note that: ${selectedText}`;
+      aiPrompt = `Rewrite this text in a professional, clear, and business-appropriate tone. Return ONLY the rewritten text, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
     } else if (action === 'tone_casual') {
       promptDescription = 'Changing tone to casual...';
       successTitle = 'Tone changed to Casual';
-      resultText = `Hey, just so you know: ${selectedText} 😊`;
+      aiPrompt = `Rewrite this text in a friendly, casual, and conversational tone. Return ONLY the rewritten text, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
     }
 
     try {
-      await sileo.promise(new Promise((resolve) => setTimeout(resolve, 1500)), {
+      const fetchPromise = fetchEditResult(aiPrompt);
+
+      await sileo.promise(fetchPromise, {
         loading: {
           title: 'AI Assistant',
           description: promptDescription,
@@ -173,15 +275,19 @@ export const useEditorContent = ({
         },
       });
 
+      const refinedText = await fetchPromise;
+
       editor.insertInlineContent([
         {
           type: 'text',
-          text: resultText,
+          text: refinedText,
           styles: {},
         },
       ]);
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsAIProcessing(false);
     }
   };
 
@@ -207,5 +313,6 @@ export const useEditorContent = ({
     getLanguageLabel,
     handleCreateTask,
     processTextWithAI,
+    isAIProcessing,
   };
 };

@@ -1,4 +1,4 @@
-import { styled, Box, Typography, Button } from '@mui/material';
+import { styled, Box, Typography, Button, IconButton } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import {
   SidebarHeader as BaseSidebarHeader,
@@ -273,4 +273,235 @@ export const EmptyStateTipCard = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: '6px',
+}));
+
+export const SidebarTabs = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  marginBottom: '20px',
+  gap: '16px',
+}));
+
+export const TabItem = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active: boolean }>(({ theme, active }) => ({
+  flex: 1,
+  padding: '10px 0',
+  borderRadius: 0,
+  borderBottom: `2px solid ${active ? theme.palette.primary.main : 'transparent'}`,
+  color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+  fontWeight: active ? 700 : 500,
+  fontSize: '13px',
+  letterSpacing: '0.5px',
+  minWidth: 0,
+  '&:hover': {
+    backgroundColor: 'transparent',
+    color: theme.palette.text.primary,
+  },
+}));
+
+export const ChatContainer = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+  position: 'relative',
+});
+
+export const ChatViewport = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  overflowY: 'auto',
+  paddingRight: '4px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '16px',
+  marginBottom: '16px',
+  // Custom scrollbar
+  '&::-webkit-scrollbar': {
+    width: '4px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.08)'
+        : 'rgba(0, 0, 0, 0.06)',
+    borderRadius: '10px',
+  },
+}));
+
+export const MessageRow = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isUser',
+})<{ isUser: boolean }>(({ isUser }) => ({
+  display: 'flex',
+  width: '100%',
+  justifyContent: isUser ? 'flex-end' : 'flex-start',
+  alignItems: 'flex-start',
+  gap: '10px',
+}));
+
+export const AIAvatar = styled(Box)(({ theme }) => ({
+  width: '28px',
+  height: '28px',
+  borderRadius: '8px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  background:
+    theme.palette.mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)'
+      : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)',
+  border: `1px solid ${theme.palette.primary.main}30`,
+  boxShadow: `0 0 10px ${theme.palette.primary.main}15`,
+  color: theme.palette.primary.main,
+}));
+
+export const MessageBubble = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isUser',
+})<{ isUser: boolean }>(({ theme, isUser }) => ({
+  maxWidth: '85%',
+  padding: '12px 16px',
+  borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+  fontSize: '13.5px',
+  lineHeight: 1.5,
+  wordBreak: 'break-word',
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? '0 4px 12px rgba(0, 0, 0, 0.15)'
+      : '0 2px 8px rgba(0, 0, 0, 0.04)',
+  ...(isUser
+    ? {
+        background: 'linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%)',
+        color: '#ffffff',
+        border: 'none',
+      }
+    : {
+        backgroundColor:
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.03)'
+            : 'rgba(0, 0, 0, 0.02)',
+        color: theme.palette.text.primary,
+        border: `1px solid ${theme.palette.divider}`,
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        '& p': { margin: 0, marginBottom: '8px' },
+        '& p:last-child': { marginBottom: 0 },
+        '& ul, & ol': { margin: '8px 0', paddingLeft: '20px' },
+        '& li': { marginBottom: '4px' },
+        '& a': {
+          color: theme.palette.primary.light,
+          textDecoration: 'underline',
+          fontWeight: 600,
+        },
+        '& code': {
+          fontFamily: 'monospace',
+          backgroundColor: 'rgba(255,255,255,0.06)',
+          padding: '2px 4px',
+          borderRadius: '4px',
+          fontSize: '12px',
+        },
+        '& pre': {
+          fontFamily: 'monospace',
+          backgroundColor: 'rgba(0,0,0,0.2)',
+          padding: '10px',
+          borderRadius: '8px',
+          overflowX: 'auto',
+          fontSize: '12px',
+          margin: '8px 0',
+        },
+      }),
+}));
+
+export const SuggestionGrid = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px',
+  marginBottom: '16px',
+});
+
+export const SuggestionChip = styled(Button)(({ theme }) => ({
+  justifyContent: 'flex-start',
+  textAlign: 'left',
+  padding: '10px 14px',
+  borderRadius: '10px',
+  fontSize: '12.5px',
+  textTransform: 'none',
+  fontWeight: 500,
+  color: theme.palette.text.primary,
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.02)'
+      : 'rgba(0, 0, 0, 0.01)',
+  border: `1px solid ${theme.palette.divider}`,
+  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+  '&:hover': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(99, 102, 241, 0.08)'
+        : 'rgba(19, 127, 236, 0.05)',
+    borderColor: theme.palette.primary.main,
+    transform: 'translateY(-1px)',
+    boxShadow: `0 4px 12px ${theme.palette.primary.main}15`,
+  },
+}));
+
+export const ChatInputWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'flex-end',
+  gap: '8px',
+  padding: '10px 12px',
+  borderRadius: '12px',
+  backgroundColor:
+    theme.palette.mode === 'dark' ? '#1A1F2B' : 'rgba(0,0,0,0.015)',
+  border: `1px solid ${theme.palette.divider}`,
+  transition: 'all 0.2s ease-in-out',
+  '&:focus-within': {
+    borderColor: theme.palette.primary.main,
+    boxShadow: `0 0 0 3px ${theme.palette.primary.main}25`,
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(26, 31, 43, 0.95)' : undefined,
+  },
+}));
+
+export const ChatTextArea = styled('textarea')(({ theme }) => ({
+  flexGrow: 1,
+  border: 'none',
+  resize: 'none',
+  outline: 'none',
+  background: 'transparent',
+  color: theme.palette.text.primary,
+  fontFamily: 'inherit',
+  fontSize: '13px',
+  lineHeight: 1.5,
+  maxHeight: '120px',
+  minHeight: '24px',
+  padding: '4px 0',
+  '&::placeholder': {
+    color: theme.palette.text.secondary,
+    opacity: 0.8,
+  },
+}));
+
+export const SendButton = styled(IconButton)(({ theme }) => ({
+  color: '#ffffff',
+  backgroundColor: theme.palette.primary.main,
+  borderRadius: '8px',
+  width: '30px',
+  height: '30px',
+  padding: 0,
+  flexShrink: 0,
+  transition: 'all 0.2s ease',
+  boxShadow: `0 2px 8px ${theme.palette.primary.main}30`,
+  '&:hover': {
+    backgroundColor: theme.palette.primary.dark,
+    transform: 'translateY(-1px)',
+    boxShadow: `0 4px 12px ${theme.palette.primary.main}45`,
+  },
+  '&:disabled': {
+    backgroundColor: theme.palette.action.disabledBackground,
+    color: theme.palette.action.disabled,
+    boxShadow: 'none',
+  },
 }));

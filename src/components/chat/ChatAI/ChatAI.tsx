@@ -1,38 +1,430 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import {
   Box,
   Typography,
   Slide,
   Grow,
   Zoom,
-  Button,
   IconButton,
+  Menu,
+  MenuItem,
+  Button,
 } from '@mui/material';
 import {
   Close as CloseIcon,
   Send as SendIcon,
-  Bolt as EnergyIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  KeyboardArrowDown as ArrowDownIcon,
+  RadioButtonChecked as TokenIcon,
 } from '@mui/icons-material';
 import { CuteRobotIcon } from '@/components/ui';
+import {
+  useLocalRuntime,
+  AssistantRuntimeProvider,
+  useAuiState,
+  useThreadRuntime,
+} from '@assistant-ui/react';
+import type { ChatModelAdapter } from '@assistant-ui/react';
+import { fetchChatStreamResponse } from '@/api/AI/apiAI';
 import {
   ChatContainer,
   FloatingButton,
   NotificationCard,
   ChatWindow,
   Header,
+  ModelBadgeButton,
+  TokenCounterBadge,
   MessageList,
+  MessageRow,
   MessageBubble,
-  InputArea,
-  StyledInput,
+  AIAvatar,
   RobotIconWrapper,
+  SuggestionGrid,
+  SuggestionChip,
+  InputArea,
+  ChatInputWrapper,
+  ChatTextArea,
   SendButton,
 } from './ChatAI.styles';
 
-interface Message {
-  id: string;
-  sender: 'user' | 'ai';
-  text: string;
+const renderMarkdown = (text: string) => {
+  if (!text) return '';
+
+  // 1. Escape HTML
+  let html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // 2. Bold: **text** -> <strong>text</strong>
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  // 3. Inline code: `code` -> <code>code</code>
+  html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+
+  // 4. Links: [text](url) -> <a href="$2" target="_blank" rel="noopener noreferrer">$1</a>
+  html = html.replace(
+    /\[(.*?)\]\((.*?)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">$1</a>',
+  );
+
+  // 5. Lists: lines starting with "- " or "* " -> <li>...</li>
+  const lines = html.split('\n');
+  let inList = false;
+  const processedLines = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      if (!inList) {
+        processedLines.push('<ul style="margin: 6px 0; padding-left: 20px;">');
+        inList = true;
+      }
+      processedLines.push(
+        `<li style="margin-bottom: 4px;">${trimmed.substring(2)}</li>`,
+      );
+    } else {
+      if (inList) {
+        processedLines.push('</ul>');
+        inList = false;
+      }
+      if (trimmed === '') {
+        processedLines.push('<p style="margin: 0; min-height: 8px;"></p>');
+      } else {
+        processedLines.push(
+          `<p style="margin: 0; margin-bottom: 6px;">${line}</p>`,
+        );
+      }
+    }
+  }
+  if (inList) {
+    processedLines.push('</ul>');
+  }
+
+  return processedLines.join('\n');
+};
+
+const getModelLabel = (model: string) => {
+  switch (model) {
+    case 'gemini-2.5-flash-lite':
+      return 'Flash Lite';
+    case 'gemini-2.5-flash':
+      return 'Flash 2.5';
+    case 'gemini-1.5-flash':
+      return 'Flash 1.5';
+    default:
+      return 'AI Model';
+  }
+};
+
+interface ChatAIInnerProps {
+  setIsOpen: (open: boolean) => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
 }
+
+const ChatAIInner = ({
+  setIsOpen,
+  selectedModel,
+  setSelectedModel,
+}: ChatAIInnerProps) => {
+  const messages = useAuiState((s) => s.thread.messages);
+  const isRunning = useAuiState((s) => s.thread.isRunning);
+  const thread = useThreadRuntime();
+  const [chatInput, setChatInput] = useState('');
+  const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    if (endRef.current) {
+      endRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages.length, isRunning, scrollToBottom]);
+
+  const handleSend = () => {
+    if (!chatInput.trim() || isRunning) return;
+    const content = chatInput;
+    setChatInput('');
+    thread.append({
+      role: 'user',
+      content: [{ type: 'text', text: content }],
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleSuggestionClick = (prompt: string) => {
+    thread.append({
+      role: 'user',
+      content: [{ type: 'text', text: prompt }],
+    });
+  };
+
+  // Real-time token tracking based on message characters (1 token ≈ 4 characters) + 150 prompt base overhead
+  const tokensSpent = useMemo(() => {
+    let total = 0;
+    messages.forEach((msg) => {
+      const m = msg as { content: Array<{ type: string; text?: string }> };
+      const textContent = m.content
+        .filter((p) => p.type === 'text')
+        .map((p) => p.text || '')
+        .join('\n');
+      total += Math.ceil(textContent.length / 4);
+    });
+    if (messages.length > 0) {
+      total += 150;
+    }
+    return total;
+  }, [messages]);
+
+  return (
+    <ChatWindow elevation={0}>
+      {/* Header */}
+      <Header>
+        <Box display="flex" alignItems="center" gap={1.5}>
+          <RobotIconWrapper>
+            <CuteRobotIcon
+              size={20}
+              variant="mini"
+              primaryColor="#137fec"
+              eyeColor="#22d3ee"
+            />
+          </RobotIconWrapper>
+          <Box>
+            <Typography
+              variant="subtitle2"
+              color="text.primary"
+              fontWeight={800}
+              lineHeight={1.2}
+            >
+              Lumina
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+            >
+              AI Buddy
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box display="flex" alignItems="center" gap={1}>
+          {/* Model Selector Badge */}
+          <ModelBadgeButton
+            size="small"
+            onClick={(e) => setModelAnchor(e.currentTarget)}
+            endIcon={<ArrowDownIcon sx={{ fontSize: 12 }} />}
+          >
+            {getModelLabel(selectedModel)}
+          </ModelBadgeButton>
+          <Menu
+            anchorEl={modelAnchor}
+            open={Boolean(modelAnchor)}
+            onClose={() => setModelAnchor(null)}
+            PaperProps={{
+              sx: {
+                borderRadius: '10px',
+                minWidth: '150px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                border: '1px solid',
+                borderColor: 'divider',
+              },
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                setSelectedModel('gemini-2.5-flash-lite');
+                setModelAnchor(null);
+              }}
+              selected={selectedModel === 'gemini-2.5-flash-lite'}
+              sx={{ fontSize: '12px', fontWeight: 600 }}
+            >
+              Gemini 2.5 Flash Lite (Fast)
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setSelectedModel('gemini-2.5-flash');
+                setModelAnchor(null);
+              }}
+              selected={selectedModel === 'gemini-2.5-flash'}
+              sx={{ fontSize: '12px', fontWeight: 600 }}
+            >
+              Gemini 2.5 Flash
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setSelectedModel('gemini-1.5-flash');
+                setModelAnchor(null);
+              }}
+              selected={selectedModel === 'gemini-1.5-flash'}
+              sx={{ fontSize: '12px', fontWeight: 600 }}
+            >
+              Gemini 1.5 Flash
+            </MenuItem>
+          </Menu>
+
+          {/* Token Counter */}
+          {tokensSpent > 0 && (
+            <TokenCounterBadge>
+              <TokenIcon sx={{ fontSize: 10 }} />
+              <span>{tokensSpent.toLocaleString()} tkn</span>
+            </TokenCounterBadge>
+          )}
+
+          <IconButton
+            onClick={() => setIsOpen(false)}
+            size="small"
+            sx={{ color: 'text.secondary' }}
+          >
+            <CloseIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+      </Header>
+
+      {/* Messages */}
+      <MessageList>
+        {messages.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexGrow: 1,
+              py: 4,
+              px: 2,
+              textAlign: 'center',
+              gap: 2,
+            }}
+          >
+            <RobotIconWrapper
+              sx={{ width: 44, height: 44, borderRadius: '12px' }}
+            >
+              <AutoAwesomeIcon sx={{ fontSize: 22 }} />
+            </RobotIconWrapper>
+            <Box>
+              <Typography
+                variant="subtitle2"
+                fontWeight={850}
+                color="text.primary"
+                sx={{ mb: 0.5 }}
+              >
+                Meet Lumina AI
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ maxWidth: '240px', display: 'block', mx: 'auto' }}
+              >
+                Ask me tips to boost focus, request summaries, or let me
+                organize your task workloads!
+              </Typography>
+            </Box>
+          </Box>
+        ) : (
+          messages.map((msg) => {
+            const m = msg as {
+              id: string;
+              role: string;
+              content: Array<{ type: string; text?: string }>;
+            };
+            const isUser = m.role === 'user';
+            const textContent = m.content
+              .filter((p) => p.type === 'text')
+              .map((p) => p.text || '')
+              .join('\n');
+
+            return (
+              <MessageRow key={msg.id} isUser={isUser}>
+                {!isUser && (
+                  <AIAvatar>
+                    <CuteRobotIcon
+                      size={16}
+                      variant="mini"
+                      primaryColor="#137fec"
+                      eyeColor="#22d3ee"
+                    />
+                  </AIAvatar>
+                )}
+                <MessageBubble
+                  isUser={isUser}
+                  dangerouslySetInnerHTML={{
+                    __html: isUser ? textContent : renderMarkdown(textContent),
+                  }}
+                />
+              </MessageRow>
+            );
+          })
+        )}
+        <div ref={endRef} />
+      </MessageList>
+
+      {/* Suggestions */}
+      {messages.length === 0 && (
+        <SuggestionGrid>
+          <SuggestionChip
+            onClick={() =>
+              handleSuggestionClick(
+                'Suggest 3 ways to boost my productivity today',
+              )
+            }
+          >
+            ⚡ 3 tips to boost my focus
+          </SuggestionChip>
+          <SuggestionChip
+            onClick={() =>
+              handleSuggestionClick('Help me organize a deep work session')
+            }
+          >
+            🧘 Schedule a deep work session
+          </SuggestionChip>
+          <SuggestionChip
+            onClick={() =>
+              handleSuggestionClick('Explain the Pomodoro technique benefits')
+            }
+          >
+            🍅 Explain Pomodoro benefits
+          </SuggestionChip>
+        </SuggestionGrid>
+      )}
+
+      {/* Input */}
+      <InputArea>
+        <ChatInputWrapper>
+          <ChatTextArea
+            placeholder="Ask Lumina anything..."
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            rows={1}
+          />
+        </ChatInputWrapper>
+        <SendButton
+          onClick={handleSend}
+          disabled={!chatInput.trim() || isRunning}
+        >
+          <SendIcon sx={{ fontSize: 16 }} />
+        </SendButton>
+      </InputArea>
+    </ChatWindow>
+  );
+};
 
 interface ChatAIProps {
   rightOffset?: number;
@@ -43,42 +435,65 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
   const [showNotification, setShowNotification] = useState(
     () => localStorage.getItem('focusly_energy_notif_seen') !== 'true',
   );
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      sender: 'user',
-      text: 'Break this big project into smaller tasks',
-    },
-    {
-      id: '2',
-      sender: 'ai',
-      text: "I've analyzed the Product Launch requirements. Here are 3 focused tasks to get you moving:\n\n1. Market Research & Benchmarking (4h, low energy)\n2. Draft GTM Strategy Document (6h, high energy)\n3. Stakeholder Feedback Round 1 (2h, medium energy)",
-    },
-  ]);
-  const [inputValue, setInputValue] = useState('');
-  const endRef = useRef<HTMLDivElement>(null);
 
+  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash-lite');
+  const modelRef = useRef(selectedModel);
   useEffect(() => {
-    if (endRef.current) {
-      endRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, isOpen]);
+    modelRef.current = selectedModel;
+  }, [selectedModel]);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now().toString(), sender: 'user', text: inputValue },
-    ]);
-    setInputValue('');
-  };
+  const adapter = useMemo<ChatModelAdapter>(() => {
+    return {
+      async *run({ messages, abortSignal }) {
+        const mappedMessages = messages.map((msg) => {
+          const m = msg as {
+            role: string;
+            content: Array<{ type: string; text?: string }>;
+          };
+          const textContent = m.content
+            .filter((part) => part.type === 'text')
+            .map((part) => part.text || '')
+            .join('\n');
+          return {
+            role: m.role as 'user' | 'assistant' | 'system',
+            content: textContent,
+          };
+        });
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
+        let stream: ReadableStream<Uint8Array>;
+        try {
+          stream = await fetchChatStreamResponse(
+            mappedMessages,
+            null, // no task context for global chat buddy
+            abortSignal,
+            modelRef.current, // Dynamic model selection!
+          );
+        } catch (e: unknown) {
+          const errMsg = e instanceof Error ? e.message : String(e);
+          yield {
+            content: [{ type: 'text' as const, text: `Error: ${errMsg}` }],
+          };
+          return;
+        }
+
+        const reader = stream.getReader();
+        if (!reader) return;
+
+        const decoder = new TextDecoder();
+        let text = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          text += decoder.decode(value, { stream: true });
+          yield {
+            content: [{ type: 'text' as const, text }],
+          };
+        }
+      },
+    };
+  }, []);
+
+  const runtime = useLocalRuntime(adapter);
 
   return (
     <ChatContainer rightOffset={rightOffset}>
@@ -102,7 +517,12 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
             />
             <Box flex={1}>
               <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                <EnergyIcon sx={{ color: 'warning.main', fontSize: 16 }} />
+                <CuteRobotIcon
+                  size={16}
+                  variant="mini"
+                  primaryColor="#137fec"
+                  eyeColor="#22d3ee"
+                />
                 <Typography
                   variant="subtitle2"
                   color="text.primary"
@@ -120,150 +540,65 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
                 Energy dip predicted at 2 PM. Consider scheduling lighter admin
                 tasks.
               </Typography>
-              <Button
-                size="small"
-                variant="outlined"
-                sx={{
-                  color: 'text.secondary',
-                  borderColor: 'divider',
-                  textTransform: 'none',
-                  fontSize: '12px',
-                  padding: '4px 12px',
-                  '&:hover': {
-                    borderColor: 'text.primary',
-                    color: 'text.primary',
-                  },
-                }}
-              >
-                Auto-Reschedule
-              </Button>
+              <Box display="flex" gap={1}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => setIsOpen(true)}
+                  sx={{
+                    color: 'primary.main',
+                    borderColor: 'primary.main',
+                    textTransform: 'none',
+                    fontSize: '11px',
+                    padding: '4px 12px',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                  }}
+                >
+                  Ask Lumina
+                </Button>
+                <Button
+                  size="small"
+                  variant="text"
+                  onClick={() => {
+                    localStorage.setItem('focusly_energy_notif_seen', 'true');
+                    setShowNotification(false);
+                  }}
+                  sx={{
+                    color: 'text.secondary',
+                    textTransform: 'none',
+                    fontSize: '11px',
+                    padding: '4px 12px',
+                  }}
+                >
+                  Dismiss
+                </Button>
+              </Box>
             </Box>
-            <Box
-              sx={{
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.1)'
-                    : 'rgba(0,0,0,0.05)',
-                borderRadius: '50%',
-                width: '30px',
-                height: '30px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                display: 'flex',
-                cursor: 'pointer',
-                '&:hover': {
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.2)'
-                      : 'rgba(0,0,0,0.1)',
-                },
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
+            <IconButton
+              size="small"
+              onClick={() => {
                 localStorage.setItem('focusly_energy_notif_seen', 'true');
                 setShowNotification(false);
               }}
             >
-              <CloseIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-            </Box>
+              <CloseIcon sx={{ fontSize: 14 }} />
+            </IconButton>
           </Box>
         </NotificationCard>
       </Slide>
 
       {/* Main Chat Window */}
       <Grow in={isOpen} mountOnEnter unmountOnExit>
-        <ChatWindow elevation={0}>
-          {/* Header */}
-          <Header>
-            <Box display="flex" alignItems="center" gap={2}>
-              <RobotIconWrapper>
-                <CuteRobotIcon
-                  size={26}
-                  variant="mini"
-                  primaryColor="#137fec"
-                  eyeColor="#22d3ee"
-                />
-              </RobotIconWrapper>
-              <Box>
-                <Typography
-                  variant="subtitle1"
-                  color="white"
-                  fontWeight="bold"
-                  lineHeight={1.2}
-                >
-                  Lumina
-                </Typography>
-                <Typography variant="caption" color="rgba(255,255,255,0.7)">
-                  AI Productivity Buddy
-                </Typography>
-              </Box>
-            </Box>
-            <IconButton
-              onClick={() => setIsOpen(false)}
-              sx={{ color: 'white' }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Header>
-
-          {/* Messages */}
-          <MessageList>
-            {messages.map((msg) => (
-              <Box
-                key={msg.id}
-                display="flex"
-                flexDirection="column"
-                alignItems={msg.sender === 'user' ? 'flex-end' : 'flex-start'}
-              >
-                {msg.sender === 'ai' && (
-                  <Box
-                    sx={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: '50%',
-                      bgcolor: '#0a1628',
-                      border: '1.5px solid rgba(34,211,238,0.3)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mb: 0.5,
-                      ml: 1,
-                      flexShrink: 0,
-                    }}
-                  >
-                    <CuteRobotIcon
-                      size={18}
-                      variant="mini"
-                      primaryColor="#137fec"
-                      eyeColor="#22d3ee"
-                    />
-                  </Box>
-                )}
-                <MessageBubble isUser={msg.sender === 'user'}>
-                  <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
-                    {msg.text}
-                  </Typography>
-                </MessageBubble>
-              </Box>
-            ))}
-            <div ref={endRef} />
-          </MessageList>
-
-          {/* Input */}
-          <InputArea>
-            <StyledInput
-              placeholder="Tell Lumina what's on your mind..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              fullWidth
-              autoComplete="off"
+        <Box>
+          <AssistantRuntimeProvider runtime={runtime}>
+            <ChatAIInner
+              setIsOpen={setIsOpen}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
             />
-            <SendButton onClick={handleSend} disabled={!inputValue.trim()}>
-              <SendIcon fontSize="small" />
-            </SendButton>
-          </InputArea>
-        </ChatWindow>
+          </AssistantRuntimeProvider>
+        </Box>
       </Grow>
 
       {/* Floating Toggle Button */}
