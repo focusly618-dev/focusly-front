@@ -179,7 +179,9 @@ const ChatAIInner = ({
   const tokensSpent = useMemo(() => {
     let total = 0;
     messages.forEach((msg) => {
-      const m = msg as { content: Array<{ type: string; text?: string }> };
+      const m = msg as unknown as {
+        content: Array<{ type: string; text?: string }>;
+      };
       const textContent = m.content
         .filter((p) => p.type === 'text')
         .map((p) => p.text || '')
@@ -339,7 +341,7 @@ const ChatAIInner = ({
           </Box>
         ) : (
           messages.map((msg) => {
-            const m = msg as {
+            const m = msg as unknown as {
               id: string;
               role: string;
               content: Array<{ type: string; text?: string }>;
@@ -446,7 +448,7 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
     return {
       async *run({ messages, abortSignal }) {
         const mappedMessages = messages.map((msg) => {
-          const m = msg as {
+          const m = msg as unknown as {
             role: string;
             content: Array<{ type: string; text?: string }>;
           };

@@ -221,7 +221,7 @@ const EditorSidebarChat = ({
           </Box>
         ) : (
           messages.map((msg) => {
-            const m = msg as {
+            const m = msg as unknown as {
               id: string;
               role: string;
               content: Array<{ type: string; text?: string }>;
@@ -375,7 +375,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     return {
       async *run({ messages, abortSignal }) {
         const mappedMessages = messages.map((msg) => {
-          const m = msg as {
+          const m = msg as unknown as {
             role: string;
             content: Array<{ type: string; text?: string }>;
           };
