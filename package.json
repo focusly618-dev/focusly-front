@@ -17,7 +17,9 @@
     ]
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.210",
     "@apollo/client": "3.13.0",
+    "@assistant-ui/react": "^0.14.23",
     "@blocknote/core": "^0.46.2",
     "@blocknote/mantine": "^0.46.2",
     "@blocknote/react": "^0.46.2",
@@ -34,6 +36,7 @@
     "@mui/x-date-pickers": "^8.25.0",
     "@react-oauth/google": "^0.13.4",
     "@reduxjs/toolkit": "^2.11.2",
+    "ai": "^6.0.208",
     "animate.css": "^4.1.1",
     "axios": "^1.13.2",
     "canvas-confetti": "^1.9.4",

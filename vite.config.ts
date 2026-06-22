@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
   // Cargar variables de entorno según el modo (development, production, etc.)
   // El tercer parámetro '' carga todas las variables sin importar el prefijo VITE_
   const env = loadEnv(mode, process.cwd(), '');
-  
+
   const BACKEND_TARGET = env.VITE_API_URL || 'http://localhost:3000';
   const IS_SECURE = BACKEND_TARGET.startsWith('https');
 

@@ -31,4 +31,5 @@ export interface UseEditorContentReturn {
   getLanguageLabel: (code: string) => string;
   handleCreateTask: () => void;
   processTextWithAI: (action: string) => Promise<void>;
+  isAIProcessing: boolean;
 }

@@ -1,5 +1,5 @@
-import type { TaskSearchItems } from "@/pages/Workspace/types/workspace.types";
-import type { BlockNoteEditor } from "@blocknote/core";
+import type { TaskSearchItems } from '@/pages/Workspace/types/workspace.types';
+import type { BlockNoteEditor } from '@blocknote/core';
 
 export interface SpeechRecognitionEvent {
   resultIndex: number;
@@ -26,7 +26,7 @@ export interface ISpeechRecognition {
   stop: () => void;
 }
 
-export interface SpeechRecognitionWindow extends Window {
+export interface SpeechRecognitionWindow {
   SpeechRecognition?: new () => ISpeechRecognition;
   webkitSpeechRecognition?: new () => ISpeechRecognition;
 }

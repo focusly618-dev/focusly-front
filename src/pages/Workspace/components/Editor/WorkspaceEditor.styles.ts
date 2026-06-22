@@ -341,6 +341,9 @@ export const TitleInput = styled('input')(({ theme }) => ({
 
 export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
   flex: 1,
+  '& ul, & li': {
+    listStyleType: 'circle !important',
+  },
   '& .bn-editor': {
     backgroundColor: 'transparent',
     padding: '0 16px 100px 16px', // Extra padding at bottom

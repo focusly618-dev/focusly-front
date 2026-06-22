@@ -65,6 +65,7 @@ import {
   BlockNoteWrapper,
 } from './EditorContent.styles';
 import { colorPalette } from '@/utils/colors';
+import { CuteRobotIcon } from '@/components/ui';
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
@@ -115,6 +116,7 @@ export const EditorContent = ({
     getLanguageLabel,
     handleCreateTask,
     processTextWithAI,
+    isAIProcessing,
   } = useEditorContent({
     setValue,
     watch,
@@ -424,6 +426,7 @@ export const EditorContent = ({
       <BlockNoteWrapper
         id="joyride-editor-area"
         onContextMenu={handleContextMenu}
+        style={{ position: 'relative' }}
       >
         <BlockNoteView
           editor={editor}
@@ -449,6 +452,73 @@ export const EditorContent = ({
             }
           />
         </BlockNoteView>
+
+        {isAIProcessing && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              bgcolor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(15, 23, 42, 0.45)'
+                  : 'rgba(255, 255, 255, 0.45)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10,
+              borderRadius: '12px',
+              animation: 'fadeIn 0.25s ease-out',
+              '@keyframes fadeIn': {
+                from: { opacity: 0 },
+                to: { opacity: 1 },
+              },
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                px: 3,
+                py: 1.5,
+                borderRadius: '99px',
+                bgcolor: theme.palette.mode === 'dark' ? '#1e1b4b' : '#e0f2fe',
+                border: `1px solid ${theme.palette.primary.main}30`,
+                boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
+                animation: 'pulseGlow 2s infinite ease-in-out',
+                '@keyframes pulseGlow': {
+                  '0%, 100%': {
+                    transform: 'scale(1)',
+                    boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
+                  },
+                  '50%': {
+                    transform: 'scale(1.02)',
+                    boxShadow: `0 8px 32px rgba(15, 23, 76, 0.35), 0 0 24px ${theme.palette.primary.main}30`,
+                  },
+                },
+              }}
+            >
+              <CuteRobotIcon
+                size={22}
+                variant="mini"
+                primaryColor="#137fec"
+                eyeColor="#22d3ee"
+              />
+              <Typography
+                variant="body2"
+                fontWeight={750}
+                color="text.primary"
+                sx={{ letterSpacing: '0.2px' }}
+              >
+                Lumina AI is writing...
+              </Typography>
+            </Box>
+          </Box>
+        )}
       </BlockNoteWrapper>
 
       <Menu
