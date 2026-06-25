@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '@/config/env.config';
+
 export interface AIMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -15,11 +17,12 @@ export interface AITaskContext {
 }
 
 export const fetchEditResult = async (prompt: string): Promise<string> => {
-  const response = await fetch('/ai/chat', {
+  const response = await fetch(`${API_BASE_URL}/ai/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({
       messages: [{ role: 'user', content: prompt }],
     }),
@@ -50,11 +53,12 @@ export const fetchChatStreamResponse = async (
   abortSignal?: AbortSignal,
   model?: string,
 ): Promise<ReadableStream<Uint8Array>> => {
-  const response = await fetch('/ai/chat', {
+  const response = await fetch(`${API_BASE_URL}/ai/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({
       messages,
       task,
