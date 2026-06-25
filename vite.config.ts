@@ -43,6 +43,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: IS_SECURE,
         },
+        '/ai': {
+          target: BACKEND_TARGET,
+          changeOrigin: true,
+          secure: IS_SECURE,
+        },
       },
     },
   };
