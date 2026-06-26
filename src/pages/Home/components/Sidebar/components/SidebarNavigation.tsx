@@ -22,13 +22,26 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
   const { activeTab, changeStatusTab, theme } = sidebar;
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
+  const expandAll = () => {
+    // Expand all groups (projects)
+    const newExpandedGroups: Record<string, boolean> = {};
+    const groups = sidebar.projectGroups || [];
+    groups.forEach((g) => {
+      newExpandedGroups[g.id] = true;
+    });
+    newExpandedGroups['ungrouped'] = true;
+    sidebar.setExpandedGroups(newExpandedGroups);
+  };
+
   const handleProjectsTabClick = () => {
-    if (activeTab !== TaskBar.Workspace) {
-      changeStatusTab(TaskBar.Workspace);
-      setIsProjectsExpanded(true);
-    } else {
-      setIsProjectsExpanded((prev) => !prev);
-    }
+    // Reset search params to show all workspaces in the main component
+    const newParams = new URLSearchParams();
+    newParams.set('tab', TaskBar.Workspace);
+    sidebar.setSearchParams(newParams);
+
+    changeStatusTab(TaskBar.Workspace, newParams);
+    setIsProjectsExpanded(true);
+    expandAll();
   };
 
   return (
@@ -188,7 +201,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             </Box>
           </ListItemIcon>
           <ListItemText
-            primary="Projects"
+            primary="Project"
             primaryTypographyProps={{ fontWeight: 500 }}
           />
 
@@ -227,7 +240,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             size="small"
             onClick={(e) => {
               e.stopPropagation();
-              handleProjectsTabClick();
+              setIsProjectsExpanded((prev) => !prev);
             }}
             sx={{
               p: 0.2,

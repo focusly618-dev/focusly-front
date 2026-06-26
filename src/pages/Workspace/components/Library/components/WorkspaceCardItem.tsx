@@ -34,6 +34,8 @@ interface WorkspaceCardItemProps {
     workspace: WorkspaceTypes,
   ) => void;
   onUnlinkTask: (workspace: WorkspaceTypes) => void;
+  groupName?: string;
+  groupColor?: string;
 }
 
 // Safely parse the document content to get a plain text preview snippet
@@ -70,6 +72,8 @@ export const WorkspaceCardItem = ({
   onSelect,
   onMenuOpen,
   onUnlinkTask,
+  groupName,
+  groupColor,
 }: WorkspaceCardItemProps) => {
   const theme = useTheme();
 
@@ -85,8 +89,8 @@ export const WorkspaceCardItem = ({
     workspace.background_color !== 'none';
 
   const isDark = theme.palette.mode === 'dark';
-  const folderName = workspace.project?.name || 'All Notes';
-  const baseColor = workspace.project?.color || theme.palette.primary.main;
+  const folderName = groupName || 'All Notes';
+  const baseColor = groupColor || theme.palette.primary.main;
   const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
   const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
 
@@ -248,7 +252,7 @@ export const WorkspaceCardItem = ({
                 : 'text.secondary',
             }}
           >
-            Folder
+            Project
           </PropertyLabel>
           <PropertyValue
             sx={{

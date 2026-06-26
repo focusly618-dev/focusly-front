@@ -10,8 +10,6 @@ import {
   DeleteOutline as DeleteIcon,
   Add as AddIcon,
 } from '@mui/icons-material';
-import { CreateProjectModal } from '@/pages/Workspace/components/Library/modals/CreateProjectModal';
-import { UpdateProjectModal } from '@/pages/Workspace/components/Library/modals/UpdateProjectModal';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 
 interface SidebarMenusProps {
@@ -22,30 +20,19 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
   const {
     menuAnchor,
     activeMenuType,
-    activeProjectItem,
     activeWorkspaceItem,
     activeGroupItem,
-    isCreateProjectModalOpen,
-    isUpdateProjectModalOpen,
-    selectedProjectToManage,
     handleCloseMenu,
-    handleDeleteProject,
     handleDeleteWorkspace,
     handleDeleteGroup,
     handleRenameGroupPrompt,
-    setIsCreateProjectModalOpen,
-    setIsUpdateProjectModalOpen,
-    setSelectedProjectToManage,
-    handleCreateProject,
-    handleUpdateProject,
-    setCreatingWorkspaceInFolderId,
     setCreatingWorkspaceInGroupId,
     setExpandedGroups,
   } = sidebar;
 
   return (
     <>
-      {/* Context Menu for Project, Workspace or Group options */}
+      {/* Context Menu for Workspace or Group options */}
       <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
@@ -63,37 +50,6 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
           },
         }}
       >
-        {activeMenuType === 'project' && activeProjectItem && (
-          <>
-            <MenuItem
-              onClick={() => {
-                setSelectedProjectToManage(activeProjectItem);
-                setIsUpdateProjectModalOpen(true);
-                handleCloseMenu();
-              }}
-              sx={{ fontSize: '13px', py: 0.8 }}
-            >
-              <ListItemIcon sx={{ minWidth: 28 }}>
-                <EditIcon fontSize="small" sx={{ color: 'text.secondary' }} />
-              </ListItemIcon>
-              <ListItemText>Edit Folder</ListItemText>
-            </MenuItem>
-            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
-            <MenuItem
-              onClick={() => {
-                handleDeleteProject(activeProjectItem.id);
-                handleCloseMenu();
-              }}
-              sx={{ fontSize: '13px', py: 0.8, color: 'error.main' }}
-            >
-              <ListItemIcon sx={{ minWidth: 28 }}>
-                <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
-              </ListItemIcon>
-              <ListItemText>Delete Folder</ListItemText>
-            </MenuItem>
-          </>
-        )}
-
         {activeMenuType === 'workspace' && activeWorkspaceItem && (
           <>
             <MenuItem
@@ -115,7 +71,6 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
           <>
             <MenuItem
               onClick={() => {
-                setCreatingWorkspaceInFolderId(`general-${activeGroupItem.id}`);
                 setCreatingWorkspaceInGroupId(activeGroupItem.id);
                 setExpandedGroups((prev) => ({
                   ...prev,
@@ -159,24 +114,6 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
           </>
         )}
       </Menu>
-
-      {/* Project Modals */}
-      <CreateProjectModal
-        open={isCreateProjectModalOpen}
-        onClose={() => setIsCreateProjectModalOpen(false)}
-        onCreate={handleCreateProject}
-      />
-
-      <UpdateProjectModal
-        key={selectedProjectToManage?.id || 'new'}
-        open={isUpdateProjectModalOpen}
-        onClose={() => {
-          setIsUpdateProjectModalOpen(false);
-          setSelectedProjectToManage(null);
-        }}
-        onUpdate={handleUpdateProject}
-        project={selectedProjectToManage}
-      />
     </>
   );
 };

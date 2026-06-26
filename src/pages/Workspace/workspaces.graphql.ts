@@ -27,14 +27,7 @@ export const GET_WORKSPACES = gql`
         source
         created_at
       }
-      projectId
       groupId
-      project {
-        id
-        name
-        color
-        groupId
-      }
     }
   }
 `;
@@ -50,7 +43,6 @@ export const CREATE_WORKSPACE = gql`
       card_show_background
       updatedAt
       taskId
-      projectId
       groupId
       saveStatus
       task {
@@ -79,13 +71,7 @@ export const UPDATE_WORKSPACE = gql`
       card_show_background
       updatedAt
       taskId
-      projectId
       groupId
-      project {
-        id
-        name
-        color
-      }
       task {
         id
         title
@@ -144,45 +130,6 @@ export const GET_WORKSPACE_BY_ID = gql`
   }
 `;
 
-export const GET_FOLDERS = gql`
-  query GetProjects($groupId: String) {
-    projects(groupId: $groupId) {
-      id
-      name
-      color
-      groupId
-      workspaceCount
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-export const CREATE_FOLDER = gql`
-  mutation CreateProject($createProjectInput: CreateProjectInput!) {
-    createProject(createProjectInput: $createProjectInput) {
-      id
-      name
-      color
-    }
-  }
-`;
-
-export const UPDATE_FOLDER = gql`
-  mutation UpdateProject($updateProjectInput: UpdateProjectInput!) {
-    updateProject(updateProjectInput: $updateProjectInput) {
-      id
-      name
-      color
-    }
-  }
-`;
-
-export const DELETE_FOLDER = gql`
-  mutation DeleteProject($id: ID!) {
-    removeProject(id: $id)
-  }
-`;
 
 // Project Group operations
 export const GET_PROJECT_GROUPS = gql`
