@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
-  CheckBox as CheckBoxIcon,
+  CheckBoxOutlined as CheckBoxIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import {
@@ -36,6 +36,7 @@ interface WorkspaceCardItemProps {
   onUnlinkTask: (workspace: WorkspaceTypes) => void;
   groupName?: string;
   groupColor?: string;
+  compact?: boolean;
 }
 
 // Safely parse the document content to get a plain text preview snippet
@@ -74,6 +75,7 @@ export const WorkspaceCardItem = ({
   onUnlinkTask,
   groupName,
   groupColor,
+  compact = false,
 }: WorkspaceCardItemProps) => {
   const theme = useTheme();
 
@@ -100,6 +102,7 @@ export const WorkspaceCardItem = ({
     <WorkspaceCard
       onClick={() => onSelect(workspace)}
       gradient={isBackgroundActive ? gradient : undefined}
+      compact={compact}
     >
       {/* Top Row: Avatar (left), Folder Badge & Menu Options (right) */}
       <Box
@@ -233,199 +236,203 @@ export const WorkspaceCardItem = ({
       </Box>
 
       {/* Properties Section: 2x2 Grid */}
-      <PropertyGrid
-        sx={{
-          ...(isBackgroundActive && {
-            borderTopColor: isLightBg
-              ? 'rgba(0, 0, 0, 0.08)'
-              : 'rgba(255, 255, 255, 0.15)',
-          }),
-        }}
-      >
-        <PropertyItem>
-          <PropertyLabel
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? 'rgba(0, 0, 0, 0.5)'
-                  : 'rgba(255, 255, 255, 0.5)'
-                : 'text.secondary',
-            }}
-          >
-            Project
-          </PropertyLabel>
-          <PropertyValue
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? '#000'
-                  : '#fff'
-                : 'text.primary',
-            }}
-          >
-            {folderName}
-          </PropertyValue>
-        </PropertyItem>
+      {!compact && (
+        <PropertyGrid
+          sx={{
+            ...(isBackgroundActive && {
+              borderTopColor: isLightBg
+                ? 'rgba(0, 0, 0, 0.08)'
+                : 'rgba(255, 255, 255, 0.15)',
+            }),
+          }}
+        >
+          <PropertyItem>
+            <PropertyLabel
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? 'rgba(0, 0, 0, 0.5)'
+                    : 'rgba(255, 255, 255, 0.5)'
+                  : 'text.secondary',
+              }}
+            >
+              Project
+            </PropertyLabel>
+            <PropertyValue
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? '#000'
+                    : '#fff'
+                  : 'text.primary',
+              }}
+            >
+              {folderName}
+            </PropertyValue>
+          </PropertyItem>
 
-        <PropertyItem>
-          <PropertyLabel
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? 'rgba(0, 0, 0, 0.5)'
-                  : 'rgba(255, 255, 255, 0.5)'
-                : 'text.secondary',
-            }}
-          >
-            Created
-          </PropertyLabel>
-          <PropertyValue
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? '#000'
-                  : '#fff'
-                : 'text.primary',
-            }}
-          >
-            {format(new Date(workspace.createdAt), 'MMM dd, yyyy')}
-          </PropertyValue>
-        </PropertyItem>
+          <PropertyItem>
+            <PropertyLabel
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? 'rgba(0, 0, 0, 0.5)'
+                    : 'rgba(255, 255, 255, 0.5)'
+                  : 'text.secondary',
+              }}
+            >
+              Created
+            </PropertyLabel>
+            <PropertyValue
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? '#000'
+                    : '#fff'
+                  : 'text.primary',
+              }}
+            >
+              {format(new Date(workspace.createdAt), 'MMM dd, yyyy')}
+            </PropertyValue>
+          </PropertyItem>
 
-        <PropertyItem>
-          <PropertyLabel
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? 'rgba(0, 0, 0, 0.5)'
-                  : 'rgba(255, 255, 255, 0.5)'
-                : 'text.secondary',
-            }}
-          >
-            Task Status
-          </PropertyLabel>
-          <PropertyValue
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? '#000'
-                  : '#fff'
-                : 'text.primary',
-              textTransform: 'capitalize',
-            }}
-          >
-            {workspace.task
-              ? workspace.task.status.toLowerCase().replace('_', ' ')
-              : 'None'}
-          </PropertyValue>
-        </PropertyItem>
+          <PropertyItem>
+            <PropertyLabel
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? 'rgba(0, 0, 0, 0.5)'
+                    : 'rgba(255, 255, 255, 0.5)'
+                  : 'text.secondary',
+              }}
+            >
+              Task Status
+            </PropertyLabel>
+            <PropertyValue
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? '#000'
+                    : '#fff'
+                  : 'text.primary',
+                textTransform: 'capitalize',
+              }}
+            >
+              {workspace.task
+                ? workspace.task.status.toLowerCase().replace('_', ' ')
+                : 'None'}
+            </PropertyValue>
+          </PropertyItem>
 
-        <PropertyItem>
-          <PropertyLabel
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? 'rgba(0, 0, 0, 0.5)'
-                  : 'rgba(255, 255, 255, 0.5)'
-                : 'text.secondary',
-            }}
-          >
-            Time Est/Act
-          </PropertyLabel>
-          <PropertyValue
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? '#000'
-                  : '#fff'
-                : 'text.primary',
-            }}
-          >
-            {workspace.task
-              ? `${formatDuration(workspace.task.estimate_timer) || '0m'} / ${formatDuration(workspace.task.real_timer) || '0m'}`
-              : '—'}
-          </PropertyValue>
-        </PropertyItem>
-      </PropertyGrid>
+          <PropertyItem>
+            <PropertyLabel
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? 'rgba(0, 0, 0, 0.5)'
+                    : 'rgba(255, 255, 255, 0.5)'
+                  : 'text.secondary',
+              }}
+            >
+              Time Est/Act
+            </PropertyLabel>
+            <PropertyValue
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? '#000'
+                    : '#fff'
+                  : 'text.primary',
+              }}
+            >
+              {workspace.task
+                ? `${formatDuration(workspace.task.estimate_timer) || '0m'} / ${formatDuration(workspace.task.real_timer) || '0m'}`
+                : '—'}
+            </PropertyValue>
+          </PropertyItem>
+        </PropertyGrid>
+      )}
 
       {/* Footer Section: Action Buttons */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mt: 'auto',
-          pt: 1,
-        }}
-      >
-        {workspace.task ? (
-          <Box
+      {!compact && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mt: 'auto',
+            pt: 1,
+          }}
+        >
+          {workspace.task ? (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                cursor: 'pointer',
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? 'rgba(0, 0, 0, 0.7)'
+                    : 'rgba(255, 255, 255, 0.8)'
+                  : 'primary.main',
+                transition: 'all 0.2s',
+                '&:hover': {
+                  color: 'error.main',
+                },
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onUnlinkTask(workspace);
+              }}
+            >
+              <CheckBoxIcon sx={{ fontSize: 18 }} />
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '11px',
+                  maxWidth: '180px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Linked: {workspace.task.title}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography
+              variant="caption"
+              sx={{
+                color: isBackgroundActive
+                  ? isLightBg
+                    ? 'rgba(0, 0, 0, 0.5)'
+                    : 'rgba(255, 255, 255, 0.5)'
+                  : 'text.secondary',
+                fontStyle: 'italic',
+                fontSize: '11px',
+              }}
+            >
+              No task linked
+            </Typography>
+          )}
+          <HoverArrowButton
+            className="arrow-button"
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: 500,
               color: isBackgroundActive
                 ? isLightBg
                   ? 'rgba(0, 0, 0, 0.7)'
                   : 'rgba(255, 255, 255, 0.8)'
-                : 'primary.main',
-              transition: 'all 0.2s',
-              '&:hover': {
-                color: 'error.main',
-              },
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onUnlinkTask(workspace);
-            }}
-          >
-            <CheckBoxIcon sx={{ fontSize: 18 }} />
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: 700,
-                fontSize: '11px',
-                maxWidth: '180px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Linked: {workspace.task.title}
-            </Typography>
-          </Box>
-        ) : (
-          <Typography
-            variant="caption"
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? 'rgba(0, 0, 0, 0.5)'
-                  : 'rgba(255, 255, 255, 0.5)'
                 : 'text.secondary',
-              fontStyle: 'italic',
-              fontSize: '11px',
             }}
           >
-            No task linked
-          </Typography>
-        )}
-        <HoverArrowButton
-          className="arrow-button"
-          sx={{
-            fontSize: '16px',
-            fontWeight: 500,
-            color: isBackgroundActive
-              ? isLightBg
-                ? 'rgba(0, 0, 0, 0.7)'
-                : 'rgba(255, 255, 255, 0.8)'
-              : 'text.secondary',
-          }}
-        >
-          →
-        </HoverArrowButton>
-      </Box>
+            →
+          </HoverArrowButton>
+        </Box>
+      )}
     </WorkspaceCard>
   );
 };
