@@ -369,38 +369,56 @@ export const FilterButton = styled(Box, {
   },
 }));
 
-export const GridContainer = styled(Box)(({ theme }) => ({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-  gap: '20px',
-  overflowY: 'auto',
-  paddingBottom: '24px',
-  paddingTop: '16px',
-  // Custom scrollbar
-  '&::-webkit-scrollbar': {
-    width: '6px',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.1)'
-        : 'rgba(0, 0, 0, 0.15)',
-    borderRadius: '3px',
-    '&:hover': {
+export const GridContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'layout',
+})<{ layout?: 'gallery' | 'list' | 'grid' }>(({ theme, layout }) => {
+  const scrollbarStyles = {
+    '&::-webkit-scrollbar': {
+      width: '6px',
+    },
+    '&::-webkit-scrollbar-thumb': {
       backgroundColor:
         theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.2)'
-          : 'rgba(0, 0, 0, 0.25)',
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.15)',
+      borderRadius: '3px',
+      '&:hover': {
+        backgroundColor:
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.2)'
+            : 'rgba(0, 0, 0, 0.25)',
+      },
     },
-  },
-  '&::-webkit-scrollbar-track': {
-    backgroundColor: 'transparent',
-  },
-}));
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: 'transparent',
+    },
+  };
+
+  if (layout === 'list') {
+    return {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+      overflowY: 'auto',
+      paddingBottom: '24px',
+      paddingTop: '16px',
+      ...scrollbarStyles,
+    };
+  }
+  return {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+    gap: '20px',
+    overflowY: 'auto',
+    paddingBottom: '24px',
+    paddingTop: '16px',
+    ...scrollbarStyles,
+  };
+});
 
 export const WorkspaceCard = styled(Card, {
-  shouldForwardProp: (prop) => prop !== 'gradient',
-})<{ gradient?: string }>(({ theme, gradient }) => {
+  shouldForwardProp: (prop) => prop !== 'gradient' && prop !== 'compact',
+})<{ gradient?: string; compact?: boolean }>(({ theme, gradient, compact }) => {
   const isDark = theme.palette.mode === 'dark';
   const isGradient = gradient?.startsWith('linear-gradient');
   return {
@@ -414,7 +432,7 @@ export const WorkspaceCard = styled(Card, {
     padding: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '180px',
+    minHeight: compact ? '130px' : '180px',
     height: '100%',
     cursor: 'pointer',
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',

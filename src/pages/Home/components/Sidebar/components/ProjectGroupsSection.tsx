@@ -13,7 +13,8 @@ import {
   ExpandLess,
   Add as AddIcon,
   MoreHoriz as MoreHorizIcon,
-  NotesOutlined as NotesIcon,
+  FolderOutlined as FolderIcon,
+  DescriptionOutlined as NoteIcon,
 } from '@mui/icons-material';
 import {
   ProjectsList,
@@ -84,7 +85,7 @@ export const ProjectGroupsSection = ({
                 : 'rgba(0,0,0,0.02)',
           }}
         >
-          <NotesIcon
+          <FolderIcon
             sx={{ fontSize: 16, mr: 1, color: theme.palette.primary.main }}
           />
           <input
@@ -136,7 +137,7 @@ export const ProjectGroupsSection = ({
       {/* Group Mapping */}
       {projectGroups.map((group: ProjectGroupTypes) => {
         const isGroupExpanded = expandedGroups[group.id] !== false;
-        
+
         // Workspaces in this group
         const groupWorkspaces = (workspacesData?.workspaces || []).filter(
           (w: WorkspaceTypes) => w.groupId === group.id,
@@ -166,7 +167,7 @@ export const ProjectGroupsSection = ({
                 )}
               </IconButton>
 
-              <NotesIcon
+              <FolderIcon
                 sx={{
                   fontSize: 16,
                   mr: 1,
@@ -256,9 +257,22 @@ export const ProjectGroupsSection = ({
                     isActive={isWorkspaceTab && selectedWorkspaceId === w.id}
                     onClick={() => handleSelectWorkspace(w)}
                   >
-                    <Typography sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}>
-                      {w.emoji || '📄'}
-                    </Typography>
+                    {w.emoji ? (
+                      <Typography
+                        sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}
+                      >
+                        {w.emoji}
+                      </Typography>
+                    ) : (
+                      <NoteIcon
+                        sx={{
+                          fontSize: 16,
+                          mr: 1,
+                          color: 'text.secondary',
+                          opacity: 0.85,
+                        }}
+                      />
+                    )}
                     <Typography
                       variant="body2"
                       noWrap
@@ -305,9 +319,14 @@ export const ProjectGroupsSection = ({
                       },
                     }}
                   >
-                    <Typography sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}>
-                      📄
-                    </Typography>
+                    <NoteIcon
+                      sx={{
+                        fontSize: 16,
+                        mr: 1,
+                        color: 'text.secondary',
+                        opacity: 0.85,
+                      }}
+                    />
                     <input
                       autoFocus
                       placeholder="Note name..."
@@ -384,7 +403,7 @@ export const ProjectGroupsSection = ({
                 )}
               </IconButton>
 
-              <NotesIcon
+              <FolderIcon
                 sx={{
                   fontSize: 16,
                   mr: 1,

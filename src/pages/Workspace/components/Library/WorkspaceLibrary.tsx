@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   LibraryContainer,
   GridContainer,
@@ -29,6 +30,7 @@ import type {
 import {
   LibrarySearchHeader,
   WorkspaceCardItem,
+  WorkspaceListItem,
 } from './components';
 import { useWorkspaceLibrary } from './hooks/useWorkspaceLibrary.hook';
 
@@ -46,11 +48,7 @@ export const WorkspaceLibrary = ({
   const { state, actions, data } = useWorkspaceLibrary(selectedGroupId);
   const { handleOpen: handleDeleteConfirm } = useWorkspace();
 
-  const {
-    searchTerm,
-    anchorEl,
-    selectedWorkspace,
-  } = state;
+  const { searchTerm, anchorEl, selectedWorkspace } = state;
 
   const {
     setSearchTerm,
@@ -60,14 +58,23 @@ export const WorkspaceLibrary = ({
     handleClearSearch,
   } = actions;
 
-  const {
-    workspaces,
-    projectGroups,
-    loading,
-    error,
-  } = data;
+  const { workspaces, projectGroups, loading, error } = data;
 
   const theme = useTheme();
+
+  const [viewMode, setViewMode] = useState<'gallery' | 'list' | 'grid'>(() => {
+    return (
+      (localStorage.getItem('workspace_view_mode') as
+        | 'gallery'
+        | 'list'
+        | 'grid') || 'gallery'
+    );
+  });
+
+  const handleViewModeChange = (mode: 'gallery' | 'list' | 'grid') => {
+    setViewMode(mode);
+    localStorage.setItem('workspace_view_mode', mode);
+  };
   const activeGroup = selectedGroupId
     ? projectGroups.find((g: ProjectGroupTypes) => g.id === selectedGroupId)
     : null;
@@ -178,6 +185,8 @@ export const WorkspaceLibrary = ({
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           onClearSearch={handleClearSearch}
+          viewMode={viewMode}
+          onViewModeChange={handleViewModeChange}
         />
       </Box>
 
@@ -190,7 +199,7 @@ export const WorkspaceLibrary = ({
           </Typography>
         </Box>
       ) : (
-        <GridContainer>
+        <GridContainer layout={viewMode}>
           {searchTerm && !workspaces.length && !loading && (
             <EmptyState
               title="No results found"
@@ -211,77 +220,57 @@ export const WorkspaceLibrary = ({
           )}
 
           {loading && !workspaces.length
-            ? [1, 2, 3, 4, 5].map((i) => (
-                <WorkspaceCard
-                  key={i}
-                  sx={{ borderStyle: 'solid', cursor: 'default' }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      mb: 2,
-                    }}
-                  >
+            ? [1, 2, 3, 4, 5].map((i) => {
+                if (viewMode === 'list') {
+                  return (
                     <Box
-                      sx={{
-                        width: '30%',
-                        height: 20,
-                        bgcolor: 'action.hover',
-                        borderRadius: 1,
-                      }}
-                    />
-                    <Box
-                      sx={{
-                        width: 24,
-                        height: 24,
-                        bgcolor: 'action.hover',
-                        borderRadius: '50%',
-                      }}
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      width: '80%',
-                      height: 24,
-                      bgcolor: 'action.hover',
-                      mb: 1.5,
-                      borderRadius: 1,
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      width: '100%',
-                      height: 16,
-                      bgcolor: 'action.hover',
-                      mb: 0.5,
-                      borderRadius: 1,
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      width: '90%',
-                      height: 16,
-                      bgcolor: 'action.hover',
-                      mb: 0.5,
-                      borderRadius: 1,
-                    }}
-                  />
-                  <Box sx={{ mt: 'auto', width: '100%' }}>
-                    <Box
+                      key={i}
                       sx={{
                         display: 'flex',
-                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        pt: 1,
+                        justifyContent: 'space-between',
+                        p: '14px 16px',
+                        borderRadius: '8px',
+                        border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)'}`,
+                        bgcolor:
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(26, 31, 43, 0.4)'
+                            : '#ffffff',
+                        gap: 2,
                       }}
                     >
+                      <Box
+                        sx={{
+                          width: 28,
+                          height: 28,
+                          bgcolor: 'action.hover',
+                          borderRadius: '50%',
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          width: '20%',
+                          height: 16,
+                          bgcolor: 'action.hover',
+                          borderRadius: 1,
+                        }}
+                      />
                       <Box
                         sx={{
                           width: '40%',
                           height: 14,
                           bgcolor: 'action.hover',
                           borderRadius: 1,
+                          display: { xs: 'none', md: 'block' },
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          width: '10%',
+                          height: 16,
+                          bgcolor: 'action.hover',
+                          borderRadius: 1,
+                          display: { xs: 'none', sm: 'block' },
                         }}
                       />
                       <Box
@@ -293,11 +282,118 @@ export const WorkspaceLibrary = ({
                         }}
                       />
                     </Box>
-                  </Box>
-                </WorkspaceCard>
-              ))
+                  );
+                }
+                return (
+                  <WorkspaceCard
+                    key={i}
+                    sx={{ borderStyle: 'solid', cursor: 'default' }}
+                    compact={viewMode === 'grid'}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        mb: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: '30%',
+                          height: 20,
+                          bgcolor: 'action.hover',
+                          borderRadius: 1,
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          bgcolor: 'action.hover',
+                          borderRadius: '50%',
+                        }}
+                      />
+                    </Box>
+                    <Box
+                      sx={{
+                        width: '80%',
+                        height: 24,
+                        bgcolor: 'action.hover',
+                        mb: 1.5,
+                        borderRadius: 1,
+                      }}
+                    />
+                    {!(viewMode === 'grid') && (
+                      <>
+                        <Box
+                          sx={{
+                            width: '100%',
+                            height: 16,
+                            bgcolor: 'action.hover',
+                            mb: 0.5,
+                            borderRadius: 1,
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            width: '90%',
+                            height: 16,
+                            bgcolor: 'action.hover',
+                            mb: 0.5,
+                            borderRadius: 1,
+                          }}
+                        />
+                        <Box sx={{ mt: 'auto', width: '100%' }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              pt: 1,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: '40%',
+                                height: 14,
+                                bgcolor: 'action.hover',
+                                borderRadius: 1,
+                              }}
+                            />
+                            <Box
+                              sx={{
+                                width: 14,
+                                height: 14,
+                                bgcolor: 'action.hover',
+                                borderRadius: 1,
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      </>
+                    )}
+                  </WorkspaceCard>
+                );
+              })
             : workspaces.map((workspace: WorkspaceTypes) => {
-                const group = projectGroups.find((g: ProjectGroupTypes) => g.id === workspace.groupId);
+                const group = projectGroups.find(
+                  (g: ProjectGroupTypes) => g.id === workspace.groupId,
+                );
+
+                if (viewMode === 'list') {
+                  return (
+                    <WorkspaceListItem
+                      key={workspace.id}
+                      workspace={workspace}
+                      onSelect={onSelect}
+                      onMenuOpen={handleMenuOpen}
+                      onUnlinkTask={handleUnlinkTask}
+                      groupName={group?.name}
+                      groupColor={group?.color}
+                    />
+                  );
+                }
+
                 return (
                   <WorkspaceCardItem
                     key={workspace.id}
@@ -307,6 +403,7 @@ export const WorkspaceLibrary = ({
                     onUnlinkTask={handleUnlinkTask}
                     groupName={group?.name}
                     groupColor={group?.color}
+                    compact={viewMode === 'grid'}
                   />
                 );
               })}

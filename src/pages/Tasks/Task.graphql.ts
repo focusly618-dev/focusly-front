@@ -97,11 +97,6 @@ export const GET_TASKS_TITLES = gql`
       workspace {
         id
         title
-        project {
-          id
-          name
-          color
-        }
       }
     }
   }

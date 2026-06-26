@@ -1,9 +1,18 @@
 import { useState } from 'react';
-import { List, ListItem, ListItemIcon, ListItemText, Box, Collapse, IconButton, Tooltip } from '@mui/material';
 import {
-  Dashboard as DashboardIcon,
-  CheckCircle as TasksIcon,
-  BarChart as InsightsIcon,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  Collapse,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
+import {
+  DashboardOutlined as DashboardIcon,
+  CheckCircleOutlined as TasksIcon,
+  BarChartOutlined as InsightsIcon,
   ExpandMore,
   ExpandLess,
   Add as AddIcon,
@@ -158,7 +167,10 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           />
         </NavItem>
       </ListItem>
-      <ListItem disablePadding sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
+      <ListItem
+        disablePadding
+        sx={{ flexDirection: 'column', alignItems: 'stretch' }}
+      >
         <NavItem
           id="joyride-workspace"
           active={activeTab === TaskBar.Workspace}
