@@ -7,10 +7,6 @@ import { useAppSelector } from '@/redux/hooks';
 import { ColorModeContext } from '@/context/ColorModeContext';
 import {
   GET_WORKSPACES,
-  GET_FOLDERS,
-  CREATE_FOLDER,
-  UPDATE_FOLDER,
-  DELETE_FOLDER,
   REMOVE_WORKSPACE,
   CREATE_WORKSPACE,
   GET_PROJECT_GROUPS,
@@ -21,7 +17,6 @@ import {
 import { sileo } from '@/utils/sileo';
 import type {
   WorkspaceTypes,
-  ProjectTypes,
   ProjectGroupTypes,
 } from '@/pages/Workspace/types/workspace.types';
 import { TaskBar, type SidebarProps } from '../types/Sidebar.types';
@@ -32,33 +27,20 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const { user } = useAppSelector((state) => state.auth);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Projects & Workspaces Queries
+  // Workspaces Queries & Mutations
   const { data: workspacesData } = useQuery(GET_WORKSPACES, {
     variables: { search: '' },
-    fetchPolicy: 'cache-and-network',
-  });
-  const { data: projectsData } = useQuery(GET_FOLDERS, {
     fetchPolicy: 'cache-and-network',
   });
   const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
     fetchPolicy: 'cache-and-network',
   });
 
-  // Projects & Workspaces Mutations
+  // Workspaces Mutations
   const refetchAll = [
-    { query: GET_FOLDERS },
     { query: GET_WORKSPACES, variables: { search: '' } },
     { query: GET_PROJECT_GROUPS },
   ];
-  const [createProject] = useMutation(CREATE_FOLDER, {
-    refetchQueries: refetchAll,
-  });
-  const [updateProject] = useMutation(UPDATE_FOLDER, {
-    refetchQueries: refetchAll,
-  });
-  const [deleteProject] = useMutation(DELETE_FOLDER, {
-    refetchQueries: refetchAll,
-  });
   const [deleteWorkspaceMutation] = useMutation(REMOVE_WORKSPACE, {
     refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
   });
@@ -77,42 +59,18 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
 
   // State from URL Search Params
   const selectedWorkspaceId = searchParams.get('workspaceId') || undefined;
-  const selectedProjectId = searchParams.get('projectId');
   const selectedGroupId = searchParams.get('groupId');
   const isWorkspaceTab = activeTab === TaskBar.Workspace;
 
-  // Tree expanded states
-  const [expandedProjects, setExpandedProjects] = useState<
-    Record<string, boolean>
-  >(() => {
-    return { general: true };
-  });
   // Track expanded groups
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {},
   );
 
-  // Modals state
-  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] =
-    useState(false);
-  const [isUpdateProjectModalOpen, setIsUpdateProjectModalOpen] =
-    useState(false);
-  const [selectedProjectToManage, setSelectedProjectToManage] =
-    useState<ProjectTypes | null>(null);
-
-  // Inline Folder Creation state — tracks which group is creating a folder
-  const [creatingFolderInGroupId, setCreatingFolderInGroupId] = useState<
-    string | null
-  >(null);
-  const [newFolderName, setNewFolderName] = useState('');
-
   // Inline Project Group creation state
   const [isCreatingGroupInline, setIsCreatingGroupInline] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
 
-  // Inline Workspace Creation state
-  const [creatingWorkspaceInFolderId, setCreatingWorkspaceInFolderId] =
-    useState<string | null>(null);
   // Track which group the workspace creation belongs to
   const [creatingWorkspaceInGroupId, setCreatingWorkspaceInGroupId] = useState<
     string | null
@@ -122,24 +80,14 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   // Tree Context Menus
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [activeMenuType, setActiveMenuType] = useState<
-    'project' | 'workspace' | 'group' | null
+    'workspace' | 'group' | null
   >(null);
-  const [activeProjectItem, setActiveProjectItem] =
-    useState<ProjectTypes | null>(null);
   const [activeWorkspaceItem, setActiveWorkspaceItem] =
     useState<WorkspaceTypes | null>(null);
   const [activeGroupItem, setActiveGroupItem] =
     useState<ProjectGroupTypes | null>(null);
 
   // Handlers
-  const toggleProjectExpand = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setExpandedProjects((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
   const toggleGroupExpand = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setExpandedGroups((prev) => ({
@@ -150,15 +98,13 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
 
   const handleOpenMenu = (
     e: React.MouseEvent<HTMLElement>,
-    type: 'project' | 'workspace' | 'group',
-    item: ProjectTypes | ProjectGroupTypes | WorkspaceTypes,
+    type: 'workspace' | 'group',
+    item: ProjectGroupTypes | WorkspaceTypes,
   ) => {
     e.stopPropagation();
     setMenuAnchor(e.currentTarget);
     setActiveMenuType(type);
-    if (type === 'project') {
-      setActiveProjectItem(item as ProjectTypes);
-    } else if (type === 'group') {
+    if (type === 'group') {
       setActiveGroupItem(item as ProjectGroupTypes);
     } else {
       setActiveWorkspaceItem(item as WorkspaceTypes);
@@ -168,22 +114,8 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const handleCloseMenu = () => {
     setMenuAnchor(null);
     setActiveMenuType(null);
-    setActiveProjectItem(null);
     setActiveWorkspaceItem(null);
     setActiveGroupItem(null);
-  };
-
-  const handleSelectProject = (projectId: string | null) => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('tab', TaskBar.Workspace);
-    if (projectId) {
-      newParams.set('projectId', projectId);
-    } else {
-      newParams.delete('projectId');
-    }
-    newParams.delete('workspaceId');
-    newParams.delete('action');
-    changeStatusTab(TaskBar.Workspace, newParams);
   };
 
   const handleSelectGroup = (groupId: string | null) => {
@@ -204,89 +136,28 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('tab', TaskBar.Workspace);
     newParams.set('workspaceId', workspace.id);
-    if (workspace.projectId) {
-      newParams.set('projectId', workspace.projectId);
-    } else {
-      newParams.delete('projectId');
-    }
+    newParams.delete('projectId');
     newParams.delete('action');
     changeStatusTab(TaskBar.Workspace, newParams);
   };
 
-  const handleCreateProject = async (name: string, color: string) => {
-    try {
-      await createProject({
-        variables: {
-          createProjectInput: { name, color },
-        },
-      });
-      setIsCreateProjectModalOpen(false);
-      sileo.success({
-        title: 'Folder created',
-        description: `Folder "${name}" has been created.`,
-        fill: 'var(--sileo-success-bg)',
-        duration: 4000,
-      });
-    } catch (err) {
-      console.error('Error creating project:', err);
-    }
-  };
-
-  const handleCreateFolderInline = async (groupId: string | null) => {
-    const name = newFolderName.trim();
-    if (!name) return;
-    try {
-      const defaultColors = [
-        '#3b82f6',
-        '#6366f1',
-        '#8b5cf6',
-        '#d946ef',
-        '#22c55e',
-        '#ef4444',
-        '#f97316',
-      ];
-      const existingCount = projectsData?.projects?.length || 0;
-      const color = defaultColors[existingCount % defaultColors.length];
-
-      await createProject({
-        variables: {
-          createProjectInput: { name, color, groupId },
-        },
-      });
-      setNewFolderName('');
-      sileo.success({
-        title: 'Folder created',
-        description: `Folder "${name}" has been created.`,
-        fill: 'var(--sileo-success-bg)',
-        duration: 2000,
-      });
-    } catch (err) {
-      console.error('Error creating folder inline:', err);
-    }
-  };
 
   const handleCreateWorkspaceInline = async () => {
     const title = newWorkspaceTitle.trim();
     if (!title) return;
     try {
-      const projectId =
-        creatingWorkspaceInFolderId &&
-        creatingWorkspaceInFolderId.startsWith('general')
-          ? null
-          : creatingWorkspaceInFolderId;
       const { data } = await createWorkspaceMutation({
         variables: {
           createWorkspaceInput: {
             title,
             content: '[]',
-            projectId,
-            groupId: creatingWorkspaceInGroupId,
+            projectId: null,
+            groupId: creatingWorkspaceInGroupId === 'ungrouped' ? null : creatingWorkspaceInGroupId,
             saveStatus: true,
           },
         },
       });
       setNewWorkspaceTitle('');
-      setCreatingWorkspaceInFolderId(null);
       setCreatingWorkspaceInGroupId(null);
       if (data?.createWorkspace) {
         handleSelectWorkspace(data.createWorkspace);
@@ -328,7 +199,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     sileo.warning({
       title: 'Remove Project',
       description:
-        'Are you sure? Folders and workspaces inside will be unlinked but not deleted.',
+        'Are you sure? Workspaces inside will be unlinked but not deleted.',
       fill: 'var(--sileo-warning-bg)',
       button: {
         title: 'Delete',
@@ -370,58 +241,6 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   // Derive project groups list
   const projectGroups: ProjectGroupTypes[] =
     projectGroupsData?.projectGroups || [];
-
-  const handleUpdateProject = async (
-    id: string,
-    name: string,
-    color: string,
-  ) => {
-    try {
-      await updateProject({
-        variables: {
-          updateProjectInput: { id, name, color },
-        },
-      });
-      sileo.success({
-        title: 'Folder updated',
-        description: 'Changes saved successfully',
-        fill: 'var(--sileo-update-bg)',
-        duration: 3000,
-      });
-    } catch (err) {
-      console.error('Error updating project:', err);
-    }
-  };
-
-  const handleDeleteProject = async (id: string) => {
-    sileo.warning({
-      title: 'Remove Folder',
-      description:
-        'Are you sure you want to remove this folder? Linked workspaces will be kept as general notes.',
-      fill: 'var(--sileo-warning-bg)',
-      button: {
-        title: 'Delete',
-        onClick: async () => {
-          try {
-            await deleteProject({
-              variables: { id },
-            });
-            if (selectedProjectId === id) {
-              handleSelectProject(null);
-            }
-            sileo.success({
-              title: 'Folder deleted',
-              description: 'Folder has been removed.',
-              fill: 'var(--sileo-delete-bg)',
-              duration: 4000,
-            });
-          } catch (err) {
-            console.error('Error deleting project:', err);
-          }
-        },
-      },
-    });
-  };
 
   const handleDeleteWorkspace = (id: string) => {
     sileo.warning({
@@ -505,33 +324,17 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     searchParams,
     setSearchParams,
     workspacesData,
-    projectsData,
     projectGroupsData,
     projectGroups,
     selectedWorkspaceId,
-    selectedProjectId,
     selectedGroupId,
     isWorkspaceTab,
-    expandedProjects,
-    setExpandedProjects,
     expandedGroups,
     setExpandedGroups,
-    isCreateProjectModalOpen,
-    setIsCreateProjectModalOpen,
-    isUpdateProjectModalOpen,
-    setIsUpdateProjectModalOpen,
-    selectedProjectToManage,
-    setSelectedProjectToManage,
-    creatingFolderInGroupId,
-    setCreatingFolderInGroupId,
-    newFolderName,
-    setNewFolderName,
     isCreatingGroupInline,
     setIsCreatingGroupInline,
     newGroupName,
     setNewGroupName,
-    creatingWorkspaceInFolderId,
-    setCreatingWorkspaceInFolderId,
     creatingWorkspaceInGroupId,
     setCreatingWorkspaceInGroupId,
     newWorkspaceTitle,
@@ -540,28 +343,20 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     setMenuAnchor,
     activeMenuType,
     setActiveMenuType,
-    activeProjectItem,
-    setActiveProjectItem,
     activeWorkspaceItem,
     setActiveWorkspaceItem,
     activeGroupItem,
     setActiveGroupItem,
-    toggleProjectExpand,
     toggleGroupExpand,
     handleOpenMenu,
     handleCloseMenu,
-    handleSelectProject,
     handleSelectGroup,
     handleSelectWorkspace,
-    handleCreateProject,
-    handleCreateFolderInline,
     handleCreateWorkspaceInline,
     handleCreateGroupInline,
     handleDeleteGroup,
     handleRenameGroup,
     handleRenameGroupPrompt,
-    handleUpdateProject,
-    handleDeleteProject,
     handleDeleteWorkspace,
     notifAnchor,
     notifications,

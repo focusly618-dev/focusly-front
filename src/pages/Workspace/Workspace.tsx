@@ -52,15 +52,12 @@ export const Workspace = ({
 
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedGroupId = searchParams.get('groupId');
-  const selectedProjectId = searchParams.get('projectId');
   const [isCreatingNew, setIsCreatingNew] = useState(false);
 
   const [prevGroupId, setPrevGroupId] = useState(selectedGroupId);
-  const [prevProjectId, setPrevProjectId] = useState(selectedProjectId);
 
-  if (selectedGroupId !== prevGroupId || selectedProjectId !== prevProjectId) {
+  if (selectedGroupId !== prevGroupId) {
     setPrevGroupId(selectedGroupId);
-    setPrevProjectId(selectedProjectId);
     setIsCreatingNew(false);
   }
 
@@ -220,7 +217,7 @@ export const Workspace = ({
       content: '[]',
       id: undefined,
       taskId: undefined,
-      projectId: selectedProjectId || undefined,
+      projectId: undefined,
       groupId: selectedGroupId || undefined,
       emoji: undefined,
       background_color: undefined,
@@ -467,16 +464,6 @@ export const Workspace = ({
               onCreate={handleCreateNew}
               onSelect={handleSelectWorkspace}
               selectedGroupId={selectedGroupId}
-              selectedProjectId={selectedProjectId}
-              onSelectProject={(id) => {
-                const newParams = new URLSearchParams(searchParams);
-                if (id) {
-                  newParams.set('projectId', id);
-                } else {
-                  newParams.delete('projectId');
-                }
-                setSearchParams(newParams);
-              }}
             />
           </div>
         ) : (

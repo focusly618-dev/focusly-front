@@ -1,8 +1,7 @@
-import { Box, IconButton, Button, useTheme, alpha } from '@mui/material';
+import { Box, IconButton, useTheme } from '@mui/material';
 import {
   Search as SearchIcon,
   Close as CloseIcon,
-  FilterList as FilterListIcon,
   GridView as GridViewIcon,
 } from '@mui/icons-material';
 import { SearchBar } from '../WorkspaceLibrary.styles';
@@ -11,16 +10,12 @@ interface LibrarySearchHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
-  searchMode?: 'workspace' | 'folder';
-  onSearchModeChange?: (mode: 'workspace' | 'folder') => void;
 }
 
 export const LibrarySearchHeader = ({
   searchTerm,
   onSearchChange,
   onClearSearch,
-  searchMode = 'workspace',
-  onSearchModeChange,
 }: LibrarySearchHeaderProps) => {
   const theme = useTheme();
 
@@ -29,11 +24,7 @@ export const LibrarySearchHeader = ({
       <SearchBar id="joyride-workspace-search" sx={{ height: '38px', py: 0 }}>
         <SearchIcon sx={{ color: 'text.secondary', fontSize: 18 }} />
         <input
-          placeholder={
-            searchMode === 'workspace'
-              ? 'Search workspaces...'
-              : 'Search folders...'
-          }
+          placeholder="Search workspaces..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -76,37 +67,6 @@ export const LibrarySearchHeader = ({
           <CloseIcon fontSize="small" />
         </IconButton>
       </SearchBar>
-
-      <Button
-        variant="outlined"
-        size="small"
-        onClick={() => {
-          const nextMode = searchMode === 'workspace' ? 'folder' : 'workspace';
-          onSearchModeChange?.(nextMode);
-          if (searchMode !== nextMode) onClearSearch();
-        }}
-        startIcon={<FilterListIcon sx={{ fontSize: 16 }} />}
-        sx={{
-          borderRadius: '8px',
-          textTransform: 'none',
-          fontWeight: 600,
-          px: 2,
-          py: 0.8,
-          height: '38px',
-          whiteSpace: 'nowrap',
-          borderColor:
-            theme.palette.mode === 'dark'
-              ? 'rgba(255,255,255,0.12)'
-              : 'rgba(0,0,0,0.12)',
-          color: theme.palette.text.primary,
-          '&:hover': {
-            borderColor: theme.palette.primary.main,
-            backgroundColor: alpha(theme.palette.primary.main, 0.04),
-          },
-        }}
-      >
-        {searchMode === 'workspace' ? 'Filter: Notes' : 'Filter: Folders'}
-      </Button>
 
       <IconButton
         size="small"
