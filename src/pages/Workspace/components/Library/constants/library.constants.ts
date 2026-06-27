@@ -1,5 +1,5 @@
+import { DefaultNoteIcon } from '@/components/ui';
 import {
-  ArticleOutlined as ArticleIcon,
   StarBorder as StarIcon,
   BookmarkBorder as BookmarkIcon,
   WorkOutlined as WorkIcon,
@@ -230,7 +230,7 @@ export const colorPaletteMap: Record<
 };
 
 export const iconMap: Record<string, React.ElementType> = {
-  Article: ArticleIcon,
+  Article: DefaultNoteIcon,
   Star: StarIcon,
   Bookmark: BookmarkIcon,
   Work: WorkIcon,
