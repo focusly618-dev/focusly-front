@@ -1,4 +1,36 @@
 #!/usr/bin/env sh
+
+# Resolve node/yarn paths across macOS, Linux, and Windows (Git Bash)
+if ! command -v yarn >/dev/null 2>&1; then
+  # 1. Prepend common macOS/Linux binary paths
+  export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+
+  # 2. Source user shell profiles to load environment managers (nvm, volta, fnm, etc.)
+  for profile in "$HOME/.bash_profile" "$HOME/.profile" "$HOME/.bashrc" "$HOME/.zshrc"; do
+    if [ -f "$profile" ]; then
+      . "$profile"
+      if command -v yarn >/dev/null 2>&1; then
+        break
+      fi
+    fi
+  done
+fi
+
+# 3. Handle Windows Git Bash pathing if yarn is still missing
+if ! command -v yarn >/dev/null 2>&1; then
+  if [ -n "$APPDATA" ] && [ -n "$ProgramFiles" ]; then
+    # Convert Windows backslashes to forward slashes for POSIX compatibility in Git Bash
+    win_npm=$(echo "$APPDATA/npm" | tr '\\' '/')
+    win_node=$(echo "$ProgramFiles/nodejs" | tr '\\' '/')
+    export PATH="$PATH:$win_npm:$win_node"
+  fi
+fi
+
+# Final check: if yarn is still missing, print a helpful warning
+if ! command -v yarn >/dev/null 2>&1; then
+  echo "Warning: 'yarn' command not found in PATH. Pre-commit hooks might fail."
+fi
+
 echo "Checking types..."
 yarn tsc --noEmit
 

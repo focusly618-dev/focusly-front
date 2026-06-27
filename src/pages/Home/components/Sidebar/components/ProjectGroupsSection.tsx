@@ -14,8 +14,8 @@ import {
   Add as AddIcon,
   MoreHoriz as MoreHorizIcon,
   FolderOutlined as FolderIcon,
-  DescriptionOutlined as NoteIcon,
 } from '@mui/icons-material';
+import { DefaultNoteIcon } from '@/components/ui';
 import {
   ProjectsList,
   ProjectItemRow,
@@ -264,7 +264,7 @@ export const ProjectGroupsSection = ({
                         {w.emoji}
                       </Typography>
                     ) : (
-                      <NoteIcon
+                      <DefaultNoteIcon
                         sx={{
                           fontSize: 16,
                           mr: 1,
@@ -319,7 +319,7 @@ export const ProjectGroupsSection = ({
                       },
                     }}
                   >
-                    <NoteIcon
+                    <DefaultNoteIcon
                       sx={{
                         fontSize: 16,
                         mr: 1,
@@ -484,9 +484,22 @@ export const ProjectGroupsSection = ({
                     isActive={isWorkspaceTab && selectedWorkspaceId === w.id}
                     onClick={() => handleSelectWorkspace(w)}
                   >
-                    <Typography sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}>
-                      {w.emoji || '📄'}
-                    </Typography>
+                    {w.emoji ? (
+                      <Typography
+                        sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}
+                      >
+                        {w.emoji}
+                      </Typography>
+                    ) : (
+                      <DefaultNoteIcon
+                        sx={{
+                          fontSize: 16,
+                          mr: 1,
+                          color: 'text.secondary',
+                          opacity: 0.85,
+                        }}
+                      />
+                    )}
                     <Typography
                       variant="body2"
                       noWrap
@@ -533,9 +546,14 @@ export const ProjectGroupsSection = ({
                       },
                     }}
                   >
-                    <Typography sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}>
-                      📄
-                    </Typography>
+                    <DefaultNoteIcon
+                      sx={{
+                        fontSize: 16,
+                        mr: 1,
+                        color: 'text.secondary',
+                        opacity: 0.85,
+                      }}
+                    />
                     <input
                       autoFocus
                       placeholder="Workspace name..."
