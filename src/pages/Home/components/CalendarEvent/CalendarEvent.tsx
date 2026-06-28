@@ -11,9 +11,11 @@ import {
   ContentCopy as DuplicateIcon,
   DeleteOutline as DeleteIcon,
   Schedule as ScheduleIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 
 import type { CalendarEventProps } from './CalendarEvent.types';
+import type { Task } from '@/redux/tasks/task.types';
 import { format, getMinutes } from 'date-fns';
 import { useCalendarContextMenu } from './hooks/useCalendarContextMenu';
 
@@ -49,6 +51,8 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     isReadOnly,
   } = useCalendarContextMenu(event, onStartFocus);
 
+  const isAiTask = event.type === 'task' && (event.resource as Task)?.use_ai;
+
   const renderClassic = () => (
     <EventContainer
       variant={variant}
@@ -79,6 +83,15 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           >
             {startTime}
           </Box>
+          {isAiTask && (
+            <AutoAwesomeIcon
+              sx={{
+                fontSize: 10,
+                color: 'primary.main',
+                flexShrink: 0,
+              }}
+            />
+          )}
           <Box
             sx={{
               fontSize: '11px',
@@ -100,14 +113,33 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           </Box>
           <Box
             sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
               fontSize: '12px',
               fontWeight: 600,
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
             }}
           >
-            {event.title}
+            {isAiTask && (
+              <AutoAwesomeIcon
+                sx={{
+                  fontSize: 12,
+                  color: 'primary.main',
+                  flexShrink: 0,
+                }}
+              />
+            )}
+            <Box
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flexGrow: 1,
+              }}
+            >
+              {event.title}
+            </Box>
           </Box>
         </>
       )}

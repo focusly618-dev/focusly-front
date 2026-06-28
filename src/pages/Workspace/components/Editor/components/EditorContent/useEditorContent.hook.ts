@@ -168,6 +168,7 @@ Text: "${selectedText}"`;
         links: [],
         user_id: user.id || '',
         status: 'Backlog',
+        use_ai: true,
       };
 
       const { data } = await createTaskMutation({
