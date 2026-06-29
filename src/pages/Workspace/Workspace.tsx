@@ -13,6 +13,7 @@ const WorkspaceEditor = lazy(() =>
     default: m.WorkspaceEditor,
   })),
 );
+import { WorkspaceEditorSkeleton } from './components/WorkspaceEditorSkeleton';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { BlockNoteEditor } from '@blocknote/core';
@@ -408,23 +409,7 @@ export const Workspace = ({
             style={{ height: '100%', width: '100%' }}
           >
             <Suspense
-              fallback={
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100%',
-                    width: '100%',
-                    color: 'text.secondary',
-                    bgcolor: 'background.paper',
-                  }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    Loading Strategic Editor...
-                  </Typography>
-                </Box>
-              }
+              fallback={<WorkspaceEditorSkeleton />}
             >
               <WorkspaceEditor
                 key={watch('id') || 'new-workspace'}

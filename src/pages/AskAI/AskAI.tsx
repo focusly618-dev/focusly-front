@@ -1,8 +1,23 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
-import { Send as SendIcon } from '@mui/icons-material';
+import { Box, Typography, useTheme, Button, Tooltip, IconButton } from '@mui/material';
+import {
+  Send as SendIcon,
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Refresh as RefreshIcon,
+} from '@mui/icons-material';
 import { useAppSelector } from '@/redux/hooks';
 import { CuteRobotIcon } from '@/components/ui';
+import {
+  fetchChatStreamResponse,
+  getAIConversations,
+  getAIConversationMessages,
+  deleteAIConversation,
+  type AIConversation,
+} from '@/api/AI/apiAI';
+import { SuggestedActionCard } from '@/components/chat/SuggestedActionCard';
+import { parseLuminaAction } from '@/utils/lumina';
+import { sileo } from '@/utils/sileo';
 import {
   AskAIContainer,
   ChatScrollArea,
@@ -20,6 +35,8 @@ import {
   InputBox,
   StyledInput,
   SendButton,
+  HistorySidebar,
+  ChatAreaWrapper,
 } from './AskAI.styles';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -60,138 +77,68 @@ const suggestions = [
   },
 ];
 
-// ─── Mock AI responses ────────────────────────────────────────────────────────
+// ─── Markdown Rendering Helper ───────────────────────────────────────────────
 
-const getAIResponse = (
-  prompt: string,
-  taskCount: number,
-  biggestTask?: string,
-): string => {
-  const p = prompt.toLowerCase();
+const renderMarkdown = (text: string) => {
+  if (!text) return '';
 
-  if (p.includes('optimize') && p.includes('plan')) {
-    return `<strong>🗓️ Your Optimized Daily Plan</strong>
+  // 1. Escape HTML
+  let html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
-Based on typical productivity research, here's a smart schedule for your day:
+  // 2. Bold: **text** -> <strong>text</strong>
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-<strong>Morning Block (9 AM – 12 PM)</strong> — Peak Cognitive Hours
-Use this for your most demanding, deep-focus work. No meetings, no Slack. Pure creation.
+  // 3. Inline code: `code` -> <code>code</code>
+  html = html.replace(/`(.*?)`/g, '<code>$1</code>');
 
-<strong>Early Afternoon (1 PM – 2:30 PM)</strong> — Light Admin
-After lunch your alertness dips. Schedule emails, reviews, and light tasks here.
-
-<strong>Afternoon Block (3 PM – 5 PM)</strong> — Creative & Collaboration
-Energy rebounds. Good for calls, brainstorming, and creative tasks.
-
-<strong>Wind Down (5 PM – 5:30 PM)</strong> — Capture & Plan
-Spend 30 mins reviewing what you finished and setting tomorrow's top 3 priorities.
-
-💡 <strong>Tip:</strong> Time-box each task to prevent scope creep. 25-minute sprints work wonders!`;
-  }
-
-  if (p.includes('break down') || p.includes('smaller task')) {
-    if (biggestTask) {
-      return `<strong>🔨 Breaking Down: "${biggestTask}"</strong>
-
-Here are 5 focused tasks to tackle this effectively:
-
-<strong>1. Define scope & success metrics</strong>
-Clarify what done looks like. Write 3–5 acceptance criteria. <code>~30 min</code>
-
-<strong>2. Research & gather resources</strong>
-Collect all information, assets, or dependencies you'll need upfront. <code>~1 hr</code>
-
-<strong>3. Draft a rough version (v0)</strong>
-Don't aim for perfect. Get something on paper/screen first. <code>~2 hrs</code>
-
-<strong>4. Review & iterate</strong>
-Step away, then come back with fresh eyes to refine. <code>~1 hr</code>
-
-<strong>5. Polish & finalize</strong>
-Final quality pass, proofread, validate against success criteria. <code>~45 min</code>
-
-💡 Add these tasks directly in your Workspace to start tracking progress!`;
+  // 4. Links: [text](url) -> <a href="url" target="_blank">text</a>
+  html = html.replace(/\[(.*?)\]\((.*?)\)/g, (_, text, url) => {
+    const isInternal = /^\/(?!\/)/.test(url);
+    if (isInternal) {
+      return `<a href="${url}" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">${text}</a>`;
     }
-    return `<strong>🔨 Task Breakdown Template</strong>
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">${text}</a>`;
+  });
 
-I don't see a specific task selected, but here's a universal breakdown framework:
+  // 5. Lists: lines starting with "- " or "* " -> <li>...</li>
+  const lines = html.split('\n');
+  let inList = false;
+  const processedLines = [];
 
-<strong>1. Define the goal clearly</strong> — What does success look like? <code>30 min</code>
-<strong>2. Research & collect resources</strong> — Gather everything you need first. <code>1 hr</code>
-<strong>3. Create a rough draft / v0</strong> — Ship imperfect fast. <code>2 hrs</code>
-<strong>4. Review & iterate</strong> — Fresh eyes after a break. <code>1 hr</code>
-<strong>5. Finalize & wrap up</strong> — Polish and close the loop. <code>45 min</code>
-
-Navigate to your Workspace, select a task, and I can analyze it specifically! 🎯`;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      if (!inList) {
+        processedLines.push('<ul style="margin: 6px 0; padding-left: 20px;">');
+        inList = true;
+      }
+      processedLines.push(
+        `<li style="margin-bottom: 4px;">${trimmed.substring(2)}</li>`,
+      );
+    } else {
+      if (inList) {
+        processedLines.push('</ul>');
+        inList = false;
+      }
+      if (trimmed === '') {
+        processedLines.push('<p style="margin: 0; min-height: 8px;"></p>');
+      } else {
+        processedLines.push(
+          `<p style="margin: 0; margin-bottom: 6px;">${line}</p>`,
+        );
+      }
+    }
+  }
+  if (inList) {
+    processedLines.push('</ul>');
   }
 
-  if (
-    p.includes('focus strategy') ||
-    p.includes('deep work') ||
-    p.includes('productivity technique')
-  ) {
-    return `<strong>⚡ Top Focus Strategies for Deep Work</strong>
-
-Here are 3 powerful techniques, ranked by intensity:
-
-<strong>🍅 1. Pomodoro Technique (Beginner-friendly)</strong>
-25 min work → 5 min break. After 4 rounds, take a 15–30 min break.
-Best for: task lists, varied work, fighting procrastination.
-
-<strong>⏱️ 2. Timeboxing (Intermediate)</strong>
-Assign fixed calendar blocks for specific tasks. No overflow allowed.
-Best for: structured days, preventing perfectionism, team work.
-
-<strong>🌊 3. Flowtime Method (Advanced)</strong>
-Work until focus breaks naturally, then log how long you sustained it.
-Over weeks, you'll discover your personal peak flow windows.
-Best for: creative work, coding, writing, deep analysis.
-
-💡 <strong>My recommendation:</strong> Start with Pomodoro today. Use your Focusly Focus Mode for the timer — it's built for exactly this!`;
-  }
-
-  if (
-    p.includes('analyze') ||
-    p.includes('productiv') ||
-    p.includes('pattern')
-  ) {
-    const rate =
-      taskCount > 5 ? 'active' : taskCount > 2 ? 'moderate' : 'light';
-    return `<strong>📊 Your Productivity Snapshot</strong>
-
-Based on your Focusly data:
-
-<strong>Task Load:</strong> You have <strong>${taskCount} task${taskCount !== 1 ? 's' : ''}</strong> — that's a ${rate} workload.
-
-<strong>🟢 What's working:</strong>
-• You're organized enough to use a productivity app — that's already ahead of 80% of people!
-• Breaking large tasks into smaller steps dramatically reduces cognitive load.
-
-<strong>🟡 Opportunities:</strong>
-• If tasks sit at "In Progress" for more than 3 days, they may be too large. Break them down.
-• Schedule your hardest task within the first 2 hours of your workday (peak willpower).
-
-<strong>🔴 Watch out for:</strong>
-• Planning fallacy — we always underestimate time. Add 30% buffer to estimates.
-• Multitasking costs up to 40% of your productive time. Protect your focus blocks.
-
-💡 Use the Focus Mode on your highest-priority task today! 🚀`;
-  }
-
-  // Generic fallback
-  return `<strong>✨ Lumina here!</strong>
-
-That's a great question! As your AI productivity buddy, I can help you with:
-
-• 📅 **Planning & scheduling** your day for peak performance
-• 🔨 **Breaking down** complex tasks into actionable steps
-• ⚡ **Focus strategies** to maximize your deep work sessions
-• 📊 **Analyzing patterns** in how you work and where you lose time
-
-Try asking me something like: *"How should I structure my morning?"* or *"I have 8 tasks — what should I focus on first?"*
-
-I'm here to help you do your best work! 🙌`;
+  return processedLines.join('\n');
 };
+
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -203,11 +150,66 @@ export const AskAI: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [conversations, setConversations] = useState<AIConversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const hasMessages = messages.length > 0;
+
+  const loadConversations = useCallback(async () => {
+    try {
+      const data = await getAIConversations();
+      setConversations(data);
+    } catch (err) {
+      console.error('Error loading conversations:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+
+  const handleSelectConversation = async (conversationId: string) => {
+    setActiveConversationId(conversationId);
+    try {
+      const msgs = await getAIConversationMessages(conversationId);
+      setMessages(
+        msgs.map((m) => ({
+          id: m.id,
+          sender: m.role === 'user' ? 'user' : 'ai',
+          text: m.content,
+          html: renderMarkdown(m.content),
+        })),
+      );
+    } catch (err) {
+      console.error('Error loading conversation messages:', err);
+    }
+  };
+
+  const handleNewChat = () => {
+    setActiveConversationId(null);
+    setMessages([]);
+  };
+
+  const handleDeleteConversation = async (id: string) => {
+    try {
+      await deleteAIConversation(id);
+      if (activeConversationId === id) {
+        handleNewChat();
+      }
+      loadConversations();
+      sileo.success({
+        title: 'Chat deleted',
+        description: 'The conversation has been removed.',
+        fill: 'var(--sileo-delete-bg)',
+        duration: 3000,
+      });
+    } catch (err) {
+      console.error('Error deleting conversation:', err);
+    }
+  };
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -234,7 +236,7 @@ export const AskAI: React.FC = () => {
   );
 
   const sendMessage = useCallback(
-    (text: string) => {
+    async (text: string, customHistory?: Message[]) => {
       if (!text.trim()) return;
 
       const userMsg: Message = {
@@ -243,30 +245,125 @@ export const AskAI: React.FC = () => {
         text: text.trim(),
       };
 
-      setMessages((prev) => [...prev, userMsg]);
+      const baseHistory = customHistory || messages;
+      const history = [
+        ...baseHistory.map((m) => ({
+          role: m.sender === 'user' ? ('user' as const) : ('assistant' as const),
+          content: m.text,
+        })),
+        { role: 'user' as const, content: text.trim() },
+      ];
+
+      if (!customHistory) {
+        setMessages((prev) => [...prev, userMsg]);
+      } else {
+        setMessages([...customHistory, userMsg]);
+      }
       setInputValue('');
       setIsTyping(true);
 
-      // Simulate AI thinking delay (800ms – 1.5s)
-      const delay = 800 + Math.random() * 700;
-      setTimeout(() => {
-        const aiResponseHtml = getAIResponse(
-          text,
-          tasks.length,
-          biggestTask?.title,
+      const aiMsgId = `ai-${Date.now()}`;
+      const aiMsg: Message = {
+        id: aiMsgId,
+        sender: 'ai',
+        text: '',
+        html: '',
+      };
+
+      setMessages((prev) => [...prev, aiMsg]);
+
+      let accumulatedText = '';
+      try {
+        const stream = await fetchChatStreamResponse(
+          history,
+          biggestTask
+            ? {
+                title: biggestTask.title,
+                description: biggestTask.notes_encrypted || '',
+                status: biggestTask.status || 'Todo',
+                priority_level: biggestTask.priority_level ?? 0,
+                estimate_timer: biggestTask.estimate_timer ?? 0,
+                real_timer: biggestTask.real_timer ?? undefined,
+                deadline: biggestTask.deadline || '',
+              }
+            : null,
+          undefined,
+          'gemini-2.5-flash-lite',
+          activeConversationId || undefined,
         );
-        const aiMsg: Message = {
-          id: `ai-${Date.now()}`,
-          sender: 'ai',
-          text: aiResponseHtml,
-          html: aiResponseHtml,
-        };
-        setMessages((prev) => [...prev, aiMsg]);
+
+        const reader = stream.getReader();
+        const decoder = new TextDecoder();
         setIsTyping(false);
-      }, delay);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          accumulatedText += chunk;
+
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === aiMsgId
+                ? {
+                    ...msg,
+                    text: accumulatedText,
+                    html: renderMarkdown(accumulatedText),
+                  }
+                : msg
+            )
+          );
+        }
+
+        const updatedConvs = await getAIConversations();
+        setConversations(updatedConvs);
+        if (!activeConversationId && updatedConvs.length > 0) {
+          setActiveConversationId(updatedConvs[0].id);
+        }
+      } catch (err) {
+        console.error('Error fetching stream response:', err);
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === aiMsgId
+              ? {
+                  ...msg,
+                  text: 'Lo siento, ha ocurrido un error al generar la respuesta.',
+                  html: '<p style="color: red;">Error generating response.</p>',
+                }
+              : msg
+          )
+        );
+        setIsTyping(false);
+      }
     },
-    [tasks.length, biggestTask?.title],
+    [messages, biggestTask, activeConversationId, loadConversations],
   );
+
+  const handleRetry = async (msgId: string) => {
+    const msgIndex = messages.findIndex((m) => m.id === msgId);
+    if (msgIndex === -1) return;
+
+    const msg = messages[msgIndex];
+    let retryText = '';
+    let truncateToIndex = msgIndex;
+
+    if (msg.sender === 'user') {
+      retryText = msg.text;
+      truncateToIndex = msgIndex;
+    } else {
+      const prevUserMsgIndex = messages.slice(0, msgIndex).reduce((acc, curr, idx) => {
+        if (curr.sender === 'user') return idx;
+        return acc;
+      }, -1);
+      if (prevUserMsgIndex === -1) return;
+      retryText = messages[prevUserMsgIndex].text;
+      truncateToIndex = prevUserMsgIndex;
+    }
+
+    const truncatedHistory = messages.slice(0, truncateToIndex);
+    setMessages(truncatedHistory);
+    sendMessage(retryText, truncatedHistory);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -285,72 +382,271 @@ export const AskAI: React.FC = () => {
 
   return (
     <AskAIContainer>
-      {/* ── Scrollable chat area ── */}
-      <ChatScrollArea>
-        <CenteredColumn>
-          {/* ── Welcome screen (shown when no messages) ── */}
-          {!hasMessages && (
-            <WelcomeSection>
-              <MascotWrapper>
-                <CuteRobotIcon
-                  size={60}
-                  variant="full"
-                  primaryColor={primaryColor}
-                />
-              </MascotWrapper>
-
-              <Typography
-                variant="h2"
-                fontWeight={700}
-                sx={{ letterSpacing: '-0.02em', color: 'text.primary' }}
+      {/* ── Chat History Sidebar ── */}
+      <HistorySidebar>
+        <Box sx={{ p: 2, display: 'flex', gap: 1 }}>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleNewChat}
+            startIcon={<AddIcon />}
+            sx={{
+              borderRadius: '10px',
+              textTransform: 'none',
+              boxShadow: 'none',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+            }}
+          >
+            New Chat
+          </Button>
+        </Box>
+        <Box sx={{ flex: 1, overflowY: 'auto', px: 1, pb: 2 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            fontWeight={800}
+            sx={{
+              px: 1.5,
+              mb: 1.5,
+              display: 'block',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              fontSize: '10px',
+            }}
+          >
+            Chat History
+          </Typography>
+          {conversations.map((c) => {
+            const isActive = c.id === activeConversationId;
+            return (
+              <Box
+                key={c.id}
+                onClick={() => handleSelectConversation(c.id)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  px: 1.5,
+                  py: 1,
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  mb: 0.5,
+                  bgcolor: isActive
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(59, 130, 246, 0.12)'
+                      : 'rgba(59, 130, 246, 0.08)'
+                    : 'transparent',
+                  color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
+                  '&:hover': {
+                    bgcolor: isActive
+                      ? theme.palette.mode === 'dark'
+                        ? 'rgba(59, 130, 246, 0.15)'
+                        : 'rgba(59, 130, 246, 0.12)'
+                      : theme.palette.action.hover,
+                    '& .delete-btn': { opacity: 1 },
+                  },
+                  transition: 'all 0.15s ease',
+                }}
               >
-                {getGreeting()}
-              </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: isActive ? 700 : 500,
+                    fontSize: '0.85rem',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    mr: 1,
+                    flex: 1,
+                  }}
+                >
+                  {c.title || 'Untitled Chat'}
+                </Typography>
+                <IconButton
+                  className="delete-btn"
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteConversation(c.id);
+                  }}
+                  sx={{
+                    p: 0.25,
+                    opacity: 0,
+                    color: 'text.secondary',
+                    '&:hover': { color: theme.palette.error.main },
+                    transition: 'opacity 0.15s, color 0.15s',
+                  }}
+                >
+                  <DeleteIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </Box>
+            );
+          })}
+        </Box>
+      </HistorySidebar>
 
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{ maxWidth: 440, lineHeight: 1.7 }}
-              >
-                I'm <strong style={{ color: primaryColor }}>Lumina</strong>,
-                your AI productivity buddy. Ask me anything about your tasks,
-                schedule, or focus strategy.
-              </Typography>
+      {/* ── Main Chat Area ── */}
+      <ChatAreaWrapper>
+        {/* ── Scrollable chat area ── */}
+        <ChatScrollArea>
+          <CenteredColumn>
+            {/* ── Welcome screen (shown when no messages) ── */}
+            {!hasMessages && (
+              <WelcomeSection>
+                <MascotWrapper>
+                  <CuteRobotIcon
+                    size={60}
+                    variant="full"
+                    primaryColor={primaryColor}
+                  />
+                </MascotWrapper>
 
-              {/* Suggestion cards */}
-              <SuggestionGrid sx={{ mt: 3 }}>
-                {suggestions.map((s) => (
-                  <SuggestionCard
-                    key={s.title}
-                    onClick={() => handleSuggestionClick(s.prompt)}
-                  >
-                    <Typography fontSize="22px" lineHeight={1}>
-                      {s.emoji}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      fontWeight={700}
-                      color="text.primary"
-                      sx={{ lineHeight: 1.3 }}
+                <Typography
+                  variant="h2"
+                  fontWeight={700}
+                  sx={{ letterSpacing: '-0.02em', color: 'text.primary' }}
+                >
+                  {getGreeting()}
+                </Typography>
+
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ maxWidth: 440, lineHeight: 1.7 }}
+                >
+                  I'm <strong style={{ color: primaryColor }}>Lumina</strong>,
+                  your AI productivity buddy. Ask me anything about your tasks,
+                  schedule, or focus strategy.
+                </Typography>
+
+                {/* Suggestion cards */}
+                <SuggestionGrid sx={{ mt: 3 }}>
+                  {suggestions.map((s) => (
+                    <SuggestionCard
+                      key={s.title}
+                      onClick={() => handleSuggestionClick(s.prompt)}
                     >
-                      {s.title}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {s.subtitle}
-                    </Typography>
-                  </SuggestionCard>
-                ))}
-              </SuggestionGrid>
-            </WelcomeSection>
-          )}
+                      <Typography fontSize="22px" lineHeight={1}>
+                        {s.emoji}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        fontWeight={700}
+                        color="text.primary"
+                        sx={{ lineHeight: 1.3 }}
+                      >
+                        {s.title}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {s.subtitle}
+                      </Typography>
+                    </SuggestionCard>
+                  ))}
+                </SuggestionGrid>
+              </WelcomeSection>
+            )}
 
-          {/* ── Message history ── */}
-          {hasMessages && (
-            <Box display="flex" flexDirection="column" gap={1.5} py={3}>
-              {messages.map((msg) => (
-                <MessageRow key={msg.id} isUser={msg.sender === 'user'}>
-                  {/* AI avatar */}
-                  {msg.sender === 'ai' && (
+            {/* ── Message history ── */}
+            {hasMessages && (
+              <Box display="flex" flexDirection="column" gap={1.5} py={3}>
+                {messages.map((msg) => {
+                  const isUser = msg.sender === 'user';
+                  const { cleanText, action } = parseLuminaAction(msg.text);
+                  const cleanHtml = msg.html ? renderMarkdown(cleanText) : undefined;
+
+                  return (
+                    <MessageRow key={msg.id} isUser={isUser}>
+                      {/* AI avatar */}
+                      {!isUser && (
+                        <AvatarWrapper>
+                          <CuteRobotIcon
+                            size={22}
+                            variant="mini"
+                            primaryColor={primaryColor}
+                          />
+                        </AvatarWrapper>
+                      )}
+
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        sx={{
+                          maxWidth: '75%',
+                          alignItems: isUser ? 'flex-end' : 'flex-start',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            flexDirection: isUser ? 'row-reverse' : 'row',
+                          }}
+                        >
+                          <MessageBubble isUser={isUser}>
+                            {cleanHtml ? (
+                              <div
+                                dangerouslySetInnerHTML={{ __html: cleanHtml }}
+                                style={{ lineHeight: 1.65, fontSize: '14px' }}
+                              />
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                sx={{ whiteSpace: 'pre-wrap' }}
+                              >
+                                {cleanText}
+                              </Typography>
+                            )}
+                          </MessageBubble>
+                          <Tooltip title="Regenerate/Retry" placement="top">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleRetry(msg.id)}
+                              sx={{
+                                opacity: 0,
+                                transition: 'opacity 0.2s',
+                                color: 'text.secondary',
+                                '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
+                                p: 0.5,
+                              }}
+                              className="msg-action-btn"
+                            >
+                              <RefreshIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                        {!isUser && action && (
+                          <SuggestedActionCard action={action} />
+                        )}
+                      </Box>
+
+                      {/* User avatar */}
+                      {isUser && (
+                        <UserAvatar>
+                          {user?.picture ? (
+                            <img
+                              src={user.picture}
+                              alt={user.name}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: '50%',
+                              }}
+                            />
+                          ) : (
+                            userInitial
+                          )}
+                        </UserAvatar>
+                      )}
+                    </MessageRow>
+                  );
+                })}
+
+                {/* Typing indicator */}
+                {isTyping && (
+                  <MessageRow>
                     <AvatarWrapper>
                       <CuteRobotIcon
                         size={22}
@@ -358,95 +654,46 @@ export const AskAI: React.FC = () => {
                         primaryColor={primaryColor}
                       />
                     </AvatarWrapper>
-                  )}
+                    <TypingIndicator>
+                      <div className="dot" />
+                      <div className="dot" />
+                      <div className="dot" />
+                    </TypingIndicator>
+                  </MessageRow>
+                )}
 
-                  <MessageBubble isUser={msg.sender === 'user'}>
-                    {msg.html ? (
-                      <div
-                        dangerouslySetInnerHTML={{ __html: msg.html }}
-                        style={{ lineHeight: 1.65, fontSize: '14px' }}
-                      />
-                    ) : (
-                      <Typography
-                        variant="body2"
-                        sx={{ whiteSpace: 'pre-wrap' }}
-                      >
-                        {msg.text}
-                      </Typography>
-                    )}
-                  </MessageBubble>
+                <div ref={endRef} />
+              </Box>
+            )}
+          </CenteredColumn>
+        </ChatScrollArea>
 
-                  {/* User avatar */}
-                  {msg.sender === 'user' && (
-                    <UserAvatar>
-                      {user?.picture ? (
-                        <img
-                          src={user.picture}
-                          alt={user.name}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            borderRadius: '50%',
-                          }}
-                        />
-                      ) : (
-                        userInitial
-                      )}
-                    </UserAvatar>
-                  )}
-                </MessageRow>
-              ))}
-
-              {/* Typing indicator */}
-              {isTyping && (
-                <MessageRow>
-                  <AvatarWrapper>
-                    <CuteRobotIcon
-                      size={22}
-                      variant="mini"
-                      primaryColor={primaryColor}
-                    />
-                  </AvatarWrapper>
-                  <TypingIndicator>
-                    <div className="dot" />
-                    <div className="dot" />
-                    <div className="dot" />
-                  </TypingIndicator>
-                </MessageRow>
-              )}
-
-              <div ref={endRef} />
-            </Box>
-          )}
-        </CenteredColumn>
-      </ChatScrollArea>
-
-      {/* ── Sticky bottom input ── */}
-      <InputWrapper>
-        <InputBox elevation={0}>
-          <StyledInput
-            inputRef={inputRef}
-            placeholder="Ask Lumina anything…"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            multiline
-            maxRows={5}
-            variant="outlined"
-            fullWidth
-            autoComplete="off"
-          />
-          <SendButton
-            active={!!inputValue.trim()}
-            onClick={() => sendMessage(inputValue)}
-            disabled={!inputValue.trim() || isTyping}
-            size="small"
-          >
-            <SendIcon sx={{ fontSize: 18 }} />
-          </SendButton>
-        </InputBox>
-      </InputWrapper>
+        {/* ── Sticky bottom input ── */}
+        <InputWrapper>
+          <InputBox elevation={0}>
+            <StyledInput
+              inputRef={inputRef}
+              placeholder="Ask Lumina anything…"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              multiline
+              maxRows={5}
+              variant="outlined"
+              fullWidth
+              autoComplete="off"
+            />
+            <SendButton
+              active={!!inputValue.trim()}
+              onClick={() => sendMessage(inputValue)}
+              disabled={!inputValue.trim() || isTyping}
+              size="small"
+            >
+              <SendIcon sx={{ fontSize: 18 }} />
+            </SendButton>
+          </InputBox>
+        </InputWrapper>
+      </ChatAreaWrapper>
     </AskAIContainer>
   );
 };

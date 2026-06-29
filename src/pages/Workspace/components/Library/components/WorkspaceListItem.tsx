@@ -28,6 +28,32 @@ interface WorkspaceListItemProps {
   groupColor?: string;
 }
 
+const cleanMarkdown = (md: string): string => {
+  let text = md;
+  // 1. Remove table lines (any lines with vertical bars)
+  text = text.split('\n')
+    .filter(line => !line.includes('|'))
+    .join('\n');
+  
+  // 2. Remove headers (# heading -> heading)
+  text = text.replace(/#+\s+/g, '');
+  
+  // 3. Remove task list / bullet list markers
+  text = text.replace(/-\s*\[[ xX]\]\s+/g, ''); // checklists
+  text = text.replace(/[-\*]\s+/g, '');         // bullets
+  text = text.replace(/^\d+\.\s+/gm, '');       // numbered lists
+  
+  // 4. Remove bold/italic markup
+  text = text.replace(/[\*_]{1,3}/g, '');
+  
+  // 5. Remove quotes and HTML comments
+  text = text.replace(/^>\s+/gm, '');
+  text = text.replace(/<!--.*?-->/gs, '');
+
+  // 6. Replace multiple spaces/newlines with a single space
+  return text.replace(/\s+/g, ' ').trim() || 'No content yet';
+};
+
 const getSnippet = (contentStr?: string): string => {
   if (!contentStr) return 'No content yet';
   try {
@@ -51,7 +77,7 @@ const getSnippet = (contentStr?: string): string => {
     if (contentStr.startsWith('[') || contentStr.startsWith('{')) {
       return 'No content yet';
     }
-    return contentStr;
+    return cleanMarkdown(contentStr);
   }
   return 'No content yet';
 };

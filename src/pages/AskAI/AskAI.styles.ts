@@ -4,7 +4,7 @@ import { Box, Paper, TextField, styled, IconButton } from '@mui/material';
 
 export const AskAIContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
-  flexDirection: 'column',
+  flexDirection: 'row',
   height: '100%',
   width: '100%',
   backgroundColor: theme.palette.background.default,
@@ -115,6 +115,9 @@ export const MessageRow = styled(Box)<{ isUser?: boolean }>(({ isUser }) => ({
   width: '100%',
   padding: '6px 0',
   justifyContent: isUser ? 'flex-end' : 'flex-start',
+  '&:hover .msg-action-btn': {
+    opacity: 0.85,
+  },
 }));
 
 export const AvatarWrapper = styled(Box)(({ theme }) => ({
@@ -283,3 +286,28 @@ export const SendButton = styled(IconButton)<{ active?: boolean }>(
       : {},
   }),
 );
+
+export const HistorySidebar = styled(Box)(({ theme }) => ({
+  width: '260px',
+  height: '100%',
+  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.6)' : 'rgba(248, 250, 252, 0.8)',
+  borderRight: `1px solid ${theme.palette.divider}`,
+  display: 'flex',
+  flexDirection: 'column',
+  flexShrink: 0,
+  transition: 'width 0.2s',
+  '@media (max-width: 768px)': {
+    width: '0px',
+    overflow: 'hidden',
+    borderRight: 'none',
+  },
+}));
+
+export const ChatAreaWrapper = styled(Box)({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+  overflow: 'hidden',
+  position: 'relative',
+});
