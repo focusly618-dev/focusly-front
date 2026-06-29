@@ -37,6 +37,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={handleCloseMenu}
+        disableRestoreFocus
         transformOrigin={{ horizontal: 'left', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
         PaperProps={{
