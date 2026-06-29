@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/redux/hooks';
 import {
   Box,
@@ -94,10 +95,13 @@ const renderMarkdown = (text: string) => {
   html = html.replace(/`(.*?)`/g, '<code>$1</code>');
 
   // 4. Links: [text](url) -> <a href="url" target="_blank">text</a>
-  html = html.replace(
-    /\[(.*?)\]\((.*?)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">$1</a>',
-  );
+  html = html.replace(/\[(.*?)\]\((.*?)\)/g, (_, text, url) => {
+    const isInternal = /^\/(?!\/)/.test(url);
+    if (isInternal) {
+      return `<a href="${url}" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">${text}</a>`;
+    }
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">${text}</a>`;
+  });
 
   // 5. Lists: lines starting with "- " or "* " -> <li>...</li>
   const lines = html.split('\n');
@@ -151,10 +155,35 @@ const EditorSidebarChat = ({
   const messages = useAuiState((s) => s.thread.messages);
   const isRunning = useAuiState((s) => s.thread.isRunning);
   const thread = useThreadRuntime();
+  const navigate = useNavigate();
 
   useEffect(() => {
     scrollToBottom();
   }, [messages.length, isRunning, scrollToBottom]);
+
+  useEffect(() => {
+    const viewport = chatViewportRef.current;
+    if (!viewport) return;
+
+    const handleInternalNav = (e: MouseEvent) => {
+      const anchor = (e.target as HTMLElement).closest('a');
+
+      if (anchor && viewport.contains(anchor)) {
+        const href = anchor.getAttribute('href');
+
+        if (href && href.startsWith('/') && anchor.target !== '_blank') {
+          e.preventDefault();
+          navigate(href);
+        }
+      }
+    };
+
+    viewport.addEventListener('click', handleInternalNav);
+
+    return () => {
+      viewport.removeEventListener('click', handleInternalNav);
+    };
+  }, [navigate, chatViewportRef]);
 
   const handleSend = () => {
     if (!chatInput.trim() || isRunning) return;

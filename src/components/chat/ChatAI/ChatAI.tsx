@@ -32,6 +32,8 @@ import {
 } from '@assistant-ui/react';
 import type { ChatModelAdapter } from '@assistant-ui/react';
 import { fetchChatStreamResponse } from '@/api/AI/apiAI';
+import { SuggestedActionCard } from '@/components/chat/SuggestedActionCard';
+import { parseLuminaAction } from '@/utils/lumina';
 import {
   ChatContainer,
   FloatingButton,
@@ -352,6 +354,8 @@ const ChatAIInner = ({
               .map((p) => p.text || '')
               .join('\n');
 
+            const { cleanText, action } = parseLuminaAction(textContent);
+
             return (
               <MessageRow key={msg.id} isUser={isUser}>
                 {!isUser && (
@@ -364,12 +368,17 @@ const ChatAIInner = ({
                     />
                   </AIAvatar>
                 )}
-                <MessageBubble
-                  isUser={isUser}
-                  dangerouslySetInnerHTML={{
-                    __html: isUser ? textContent : renderMarkdown(textContent),
-                  }}
-                />
+                <Box display="flex" flexDirection="column" sx={{ maxWidth: '75%', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
+                  <MessageBubble
+                    isUser={isUser}
+                    dangerouslySetInnerHTML={{
+                      __html: isUser ? cleanText : renderMarkdown(cleanText),
+                    }}
+                  />
+                  {!isUser && action && (
+                    <SuggestedActionCard action={action} />
+                  )}
+                </Box>
               </MessageRow>
             );
           })

@@ -4,6 +4,7 @@ import {
   BlockNoteSchema,
   defaultBlockSpecs,
   type PartialBlock,
+  BlockNoteEditor,
 } from '@blocknote/core';
 import { useCreateBlockNote } from '@blocknote/react';
 import type {
@@ -64,19 +65,30 @@ export const useWorkspaceEditor = ({
   }, [tasksData, searchTerm]);
 
   const initialContent = useMemo(() => {
+    if (!currentContent) return undefined;
+
+    const trimmed = currentContent.trim();
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        return Array.isArray(parsed) && parsed.length > 0
+          ? (parsed as PartialBlock[])
+          : undefined;
+      } catch (error) {
+        console.error('Failed to parse workspace content as JSON:', error);
+      }
+    }
+
+    // Fallback: Parse raw Markdown/plain text content using BlockNote's native markdown parser
     try {
-      const parsed = currentContent ? JSON.parse(currentContent) : undefined;
-
-      return Array.isArray(parsed) && parsed.length > 0
-        ? (parsed as PartialBlock[])
-        : undefined;
-    } catch (error) {
-      console.error('Failed to parse workspace content:', error);
-
+      const tempEditor = BlockNoteEditor.create({ schema });
+      const blocks = tempEditor.tryParseMarkdownToBlocks(currentContent);
+      return (blocks.length > 0 ? blocks : undefined) as PartialBlock[];
+    } catch (e) {
+      console.error('Failed to parse content using tryParseMarkdownToBlocks:', e);
       return undefined;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentContent]);
 
   const editor = useCreateBlockNote({
     schema,

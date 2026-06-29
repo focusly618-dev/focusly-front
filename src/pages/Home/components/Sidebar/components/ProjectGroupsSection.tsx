@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -7,6 +7,7 @@ import {
   Divider,
   Collapse,
 } from '@mui/material';
+import type { Theme } from '@mui/material';
 import {
   ChevronRight,
   ExpandMore,
@@ -27,6 +28,71 @@ import type {
   WorkspaceTypes,
   ProjectGroupTypes,
 } from '@/pages/Workspace/types/workspace.types';
+
+interface InlineRenameInputProps {
+  value: string;
+  onChange: (val: string) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+  theme: Theme;
+}
+
+const InlineRenameInput = ({
+  value,
+  onChange,
+  onSubmit,
+  onCancel,
+  theme,
+}: InlineRenameInputProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mountTimeRef = useRef<number>(0);
+
+  useEffect(() => {
+    mountTimeRef.current = Date.now();
+    const timer = setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }, 80); // 80ms delay gives enough time for the menu transition to complete
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleBlur = () => {
+    if (Date.now() - mountTimeRef.current < 250) {
+      inputRef.current?.focus();
+      return;
+    }
+    onSubmit();
+  };
+
+  return (
+    <input
+      ref={inputRef}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          onSubmit();
+        } else if (e.key === 'Escape') {
+          onCancel();
+        }
+      }}
+      onBlur={handleBlur}
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        background: 'transparent',
+        border: 'none',
+        outline: 'none',
+        color: theme.palette.text.primary,
+        fontSize: '0.85rem',
+        fontFamily: 'inherit',
+        fontWeight: 700,
+        width: '100%',
+      }}
+    />
+  );
+};
 
 interface ProjectGroupsSectionProps {
   sidebar: UseSidebarReturn;
@@ -60,6 +126,12 @@ export const ProjectGroupsSection = ({
     setIsCreatingGroupInline,
     setExpandedGroups,
     selectedGroupId,
+    ungroupedName,
+    editingGroupId,
+    setEditingGroupId,
+    editingGroupName,
+    setEditingGroupName,
+    handleRenameGroupSubmit,
   } = sidebar;
 
   const [isSectionExpanded, setIsSectionExpanded] = useState(true);
@@ -90,12 +162,17 @@ export const ProjectGroupsSection = ({
           />
           <input
             autoFocus
-            placeholder="Project name..."
+            placeholder="New project name..."
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                handleCreateGroupInline();
+                if (newGroupName.trim()) {
+                  handleCreateGroupInline();
+                } else {
+                  setIsCreatingGroupInline(false);
+                  setNewGroupName('');
+                }
               } else if (e.key === 'Escape') {
                 setIsCreatingGroupInline(false);
                 setNewGroupName('');
@@ -104,6 +181,7 @@ export const ProjectGroupsSection = ({
             onBlur={() => {
               if (!newGroupName.trim()) {
                 setIsCreatingGroupInline(false);
+                setNewGroupName('');
               } else {
                 handleCreateGroupInline();
               }
@@ -144,7 +222,7 @@ export const ProjectGroupsSection = ({
         );
 
         return (
-          <Box key={group.id} sx={{ mb: 1.5 }}>
+          <Box key={group.id} sx={{ mb: 0.5 }}>
             {/* Group Header */}
             <ProjectItemRow
               isActive={
@@ -176,13 +254,26 @@ export const ProjectGroupsSection = ({
                     (theme.palette.mode === 'dark' ? '#a78bfa' : '#7c3aed'),
                 }}
               />
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 700, fontSize: '0.85rem', flex: 1 }}
-                noWrap
-              >
-                {group.name}
-              </Typography>
+              {editingGroupId === group.id ? (
+                <InlineRenameInput
+                  value={editingGroupName}
+                  onChange={setEditingGroupName}
+                  onSubmit={handleRenameGroupSubmit}
+                  onCancel={() => {
+                    setEditingGroupId(null);
+                    setEditingGroupName('');
+                  }}
+                  theme={theme}
+                />
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, fontSize: '0.85rem', flex: 1 }}
+                  noWrap
+                >
+                  {group.name}
+                </Typography>
+              )}
 
               <ActionButtonContainer className="hover-actions">
                 <Tooltip title="New Note" arrow>
@@ -221,7 +312,7 @@ export const ProjectGroupsSection = ({
             <Collapse in={isGroupExpanded} timeout="auto" unmountOnExit>
               <Box
                 sx={{
-                  ml: 2, // Aligns guide line under group icon
+                  ml: 4.5, // Aligns guide line under folder icon
                   pl: 0,
                   borderLeft: `1px solid ${
                     theme.palette.mode === 'dark'
@@ -329,19 +420,26 @@ export const ProjectGroupsSection = ({
                     />
                     <input
                       autoFocus
-                      placeholder="Note name..."
+                      placeholder="New note name..."
                       value={newWorkspaceTitle}
                       onChange={(e) => setNewWorkspaceTitle(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleCreateWorkspaceInline();
-                        else if (e.key === 'Escape') {
+                        if (e.key === 'Enter') {
+                          if (newWorkspaceTitle.trim()) {
+                            handleCreateWorkspaceInline();
+                          } else {
+                            setCreatingWorkspaceInGroupId(null);
+                            setNewWorkspaceTitle('');
+                          }
+                        } else if (e.key === 'Escape') {
                           setCreatingWorkspaceInGroupId(null);
                           setNewWorkspaceTitle('');
                         }
                       }}
                       onBlur={() => {
                         if (!newWorkspaceTitle.trim()) {
-                          setCreatingWorkspaceInGroupId(null);
+                          setCreatingWorkspaceInGroupId(null)
+                          setNewWorkspaceTitle('');
                         } else handleCreateWorkspaceInline();
                       }}
                       style={{
@@ -361,8 +459,6 @@ export const ProjectGroupsSection = ({
 
             <Divider
               sx={{
-                mt: 1,
-                mb: 1.5,
                 opacity: theme.palette.mode === 'dark' ? 0.05 : 0.08,
               }}
             />
@@ -384,7 +480,7 @@ export const ProjectGroupsSection = ({
         const isUngroupedExpanded = expandedGroups['ungrouped'] !== false;
 
         return (
-          <Box sx={{ mb: 1.5 }}>
+          <Box sx={{ mb: 0.5 }}>
             {/* Ungrouped Header */}
             <ProjectItemRow
               isActive={false}
@@ -410,13 +506,26 @@ export const ProjectGroupsSection = ({
                   color: theme.palette.mode === 'dark' ? '#94a3b8' : '#64748b',
                 }}
               />
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 700, fontSize: '0.85rem', flex: 1 }}
-                noWrap
-              >
-                General (Ungrouped)
-              </Typography>
+              {editingGroupId === 'ungrouped' ? (
+                <InlineRenameInput
+                  value={editingGroupName}
+                  onChange={setEditingGroupName}
+                  onSubmit={handleRenameGroupSubmit}
+                  onCancel={() => {
+                    setEditingGroupId(null);
+                    setEditingGroupName('');
+                  }}
+                  theme={theme}
+                />
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, fontSize: '0.85rem', flex: 1 }}
+                  noWrap
+                >
+                  {ungroupedName}
+                </Typography>
+              )}
 
               <ActionButtonContainer className="hover-actions">
                 <Tooltip title="New Note" arrow>
@@ -441,6 +550,18 @@ export const ProjectGroupsSection = ({
                     <AddIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
+                <IconButton
+                  size="small"
+                  onClick={(e) =>
+                    handleOpenMenu(e, 'group', {
+                      id: 'ungrouped',
+                      name: ungroupedName,
+                    } as unknown as ProjectGroupTypes)
+                  }
+                  sx={{ p: 0.2, color: 'text.secondary' }}
+                >
+                  <MoreHorizIcon sx={{ fontSize: 16 }} />
+                </IconButton>
               </ActionButtonContainer>
             </ProjectItemRow>
 
@@ -448,7 +569,7 @@ export const ProjectGroupsSection = ({
             <Collapse in={isUngroupedExpanded} timeout="auto" unmountOnExit>
               <Box
                 sx={{
-                  ml: 2,
+                  ml: 4.5,
                   pl: 0,
                   borderLeft: `1px solid ${
                     theme.palette.mode === 'dark'
@@ -556,19 +677,26 @@ export const ProjectGroupsSection = ({
                     />
                     <input
                       autoFocus
-                      placeholder="Workspace name..."
+                      placeholder="New note name..."
                       value={newWorkspaceTitle}
                       onChange={(e) => setNewWorkspaceTitle(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleCreateWorkspaceInline();
-                        else if (e.key === 'Escape') {
+                        if (e.key === 'Enter') {
+                          if (newWorkspaceTitle.trim()) {
+                            handleCreateWorkspaceInline();
+                          } else {
+                            setCreatingWorkspaceInGroupId(null);
+                            setNewWorkspaceTitle('');
+                          }
+                        } else if (e.key === 'Escape') {
                           setCreatingWorkspaceInGroupId(null);
                           setNewWorkspaceTitle('');
                         }
                       }}
                       onBlur={() => {
                         if (!newWorkspaceTitle.trim()) {
-                          setCreatingWorkspaceInGroupId(null);
+                          setCreatingWorkspaceInGroupId(null)
+                          setNewWorkspaceTitle('');
                         } else handleCreateWorkspaceInline();
                       }}
                       style={{
@@ -588,8 +716,8 @@ export const ProjectGroupsSection = ({
 
             <Divider
               sx={{
-                mt: 1,
-                mb: 1.5,
+                mt: 0.5,
+                mb: 0.5,
                 opacity: theme.palette.mode === 'dark' ? 0.05 : 0.08,
               }}
             />

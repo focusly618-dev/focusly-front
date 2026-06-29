@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '@/config/env.config';
+import axios from 'axios';
 
 export interface AIMessage {
   role: 'user' | 'assistant' | 'system';
@@ -16,8 +17,15 @@ export interface AITaskContext {
   links?: { title: string; url: string }[];
 }
 
+const getAIEndpoint = () => {
+  const isDev = import.meta.env.DEV;
+  const baseUrl = isDev ? '' : API_BASE_URL;
+  return `${baseUrl}/ai/chat`;
+};
+
 export const fetchEditResult = async (prompt: string): Promise<string> => {
-  const response = await fetch(`${API_BASE_URL}/ai/chat`, {
+  const endpoint = getAIEndpoint();
+  const makeRequest = () => fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -27,6 +35,25 @@ export const fetchEditResult = async (prompt: string): Promise<string> => {
       messages: [{ role: 'user', content: prompt }],
     }),
   });
+
+  let response = await makeRequest();
+
+  if (response.status === 401) {
+    try {
+      const { store } = await import('@/redux/store');
+      const user = store.getState().auth.user;
+      if (user) {
+        await axios.post(
+          `${API_BASE_URL}/auth/refresh`,
+          { userId: user.id },
+          { withCredentials: true },
+        );
+        response = await makeRequest();
+      }
+    } catch (refreshErr) {
+      console.error('Failed to refresh token during edit result fetch:', refreshErr);
+    }
+  }
 
   if (!response.ok) {
     throw new Error(await response.text());
@@ -52,8 +79,10 @@ export const fetchChatStreamResponse = async (
   task: AITaskContext | null,
   abortSignal?: AbortSignal,
   model?: string,
+  conversationId?: string,
 ): Promise<ReadableStream<Uint8Array>> => {
-  const response = await fetch(`${API_BASE_URL}/ai/chat`, {
+  const endpoint = getAIEndpoint();
+  const makeRequest = () => fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -63,9 +92,29 @@ export const fetchChatStreamResponse = async (
       messages,
       task,
       model,
+      conversationId,
     }),
     signal: abortSignal,
   });
+
+  let response = await makeRequest();
+
+  if (response.status === 401) {
+    try {
+      const { store } = await import('@/redux/store');
+      const user = store.getState().auth.user;
+      if (user) {
+        await axios.post(
+          `${API_BASE_URL}/auth/refresh`,
+          { userId: user.id },
+          { withCredentials: true },
+        );
+        response = await makeRequest();
+      }
+    } catch (refreshErr) {
+      console.error('Failed to refresh token during chat stream fetch:', refreshErr);
+    }
+  }
 
   if (!response.ok) {
     throw new Error(await response.text());
@@ -76,4 +125,54 @@ export const fetchChatStreamResponse = async (
   }
 
   return response.body;
+};
+
+export interface AIConversation {
+  id: string;
+  title: string;
+  summary?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ConversationMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: string;
+}
+
+export const getAIConversations = async (): Promise<AIConversation[]> => {
+  const isDev = import.meta.env.DEV;
+  const baseUrl = isDev ? '' : API_BASE_URL;
+  const response = await fetch(`${baseUrl}/ai/conversations`, {
+    credentials: 'include',
+  });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
+};
+
+export const getAIConversationMessages = async (
+  conversationId: string,
+): Promise<ConversationMessage[]> => {
+  const isDev = import.meta.env.DEV;
+  const baseUrl = isDev ? '' : API_BASE_URL;
+  const response = await fetch(`${baseUrl}/ai/conversations/${conversationId}/messages`, {
+    credentials: 'include',
+  });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
+};
+
+export const deleteAIConversation = async (
+  conversationId: string,
+): Promise<{ status: string }> => {
+  const isDev = import.meta.env.DEV;
+  const baseUrl = isDev ? '' : API_BASE_URL;
+  const response = await fetch(`${baseUrl}/ai/conversations/${conversationId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
 };

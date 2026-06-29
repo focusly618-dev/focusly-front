@@ -226,7 +226,11 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             size="small"
             onClick={(e) => {
               e.stopPropagation();
-              setIsProjectsExpanded((prev) => !prev);
+              if (activeTab !== TaskBar.Workspace) {
+                handleProjectsTabClick();
+              } else {
+                setIsProjectsExpanded((prev) => !prev);
+              }
             }}
             sx={{
               p: 0.2,
@@ -234,7 +238,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
               ml: activeTab === TaskBar.Workspace ? 0.5 : 'auto',
             }}
           >
-            {isProjectsExpanded ? (
+            {isProjectsExpanded && activeTab === TaskBar.Workspace ? (
               <ExpandLess sx={{ fontSize: 16 }} />
             ) : (
               <ExpandMore sx={{ fontSize: 16 }} />
