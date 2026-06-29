@@ -247,7 +247,48 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
         </NavItem>
 
         <Collapse in={isProjectsExpanded && activeTab === TaskBar.Workspace}>
-          <Box sx={{ mt: 0.5, pl: 0.5, pr: 0.5 }}>
+          <Box
+            sx={{
+              mt: 1,
+              mb: 1,
+              mx: 0.5,
+              p: 1.5,
+              borderRadius: '12px',
+              maxHeight: '260px',
+              overflowY: 'auto',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(0, 0, 0, 0.25)'
+                  : 'rgba(0, 0, 0, 0.03)',
+              border: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? '1px solid rgba(255, 255, 255, 0.03)'
+                  : '1px solid rgba(0, 0, 0, 0.04)',
+              boxShadow: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'inset 0 1px 2px rgba(0, 0, 0, 0.2)'
+                  : 'inset 0 1px 2px rgba(0, 0, 0, 0.02)',
+              '&::-webkit-scrollbar': {
+                width: '4px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.12)'
+                    : 'rgba(0, 0, 0, 0.08)',
+                borderRadius: '2px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.2)'
+                    : 'rgba(0, 0, 0, 0.15)',
+              },
+            }}
+          >
             <ProjectGroupsSection sidebar={sidebar} hideHeader />
           </Box>
         </Collapse>
