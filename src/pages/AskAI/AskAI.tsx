@@ -158,18 +158,21 @@ export const AskAI: React.FC = () => {
 
   const hasMessages = messages.length > 0;
 
-  const loadConversations = useCallback(async () => {
-    try {
-      const data = await getAIConversations();
-      setConversations(data);
-    } catch (err) {
-      console.error('Error loading conversations:', err);
-    }
-  }, []);
-
   useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
+    let active = true;
+    getAIConversations()
+      .then((data) => {
+        if (active) {
+          setConversations(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error loading conversations:', err);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleSelectConversation = async (conversationId: string) => {
     setActiveConversationId(conversationId);
@@ -199,7 +202,7 @@ export const AskAI: React.FC = () => {
       if (activeConversationId === id) {
         handleNewChat();
       }
-      loadConversations();
+      getAIConversations().then(setConversations).catch(console.error);
       sileo.success({
         title: 'Chat deleted',
         description: 'The conversation has been removed.',
@@ -336,7 +339,7 @@ export const AskAI: React.FC = () => {
         setIsTyping(false);
       }
     },
-    [messages, biggestTask, activeConversationId, loadConversations],
+    [messages, biggestTask, activeConversationId],
   );
 
   const handleRetry = async (msgId: string) => {

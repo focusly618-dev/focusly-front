@@ -51,11 +51,11 @@ const cleanMarkdown = (md: string): string => {
   
   // 3. Remove task list / bullet list markers
   text = text.replace(/-\s*\[[ xX]\]\s+/g, ''); // checklists
-  text = text.replace(/[-\*]\s+/g, '');         // bullets
+  text = text.replace(/[-*]\s+/g, '');         // bullets
   text = text.replace(/^\d+\.\s+/gm, '');       // numbered lists
   
   // 4. Remove bold/italic markup
-  text = text.replace(/[\*_]{1,3}/g, '');
+  text = text.replace(/[*_]{1,3}/g, '');
   
   // 5. Remove quotes and HTML comments
   text = text.replace(/^>\s+/gm, '');

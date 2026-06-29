@@ -88,7 +88,6 @@ export const useWorkspaceEditor = ({
       console.error('Failed to parse content using tryParseMarkdownToBlocks:', e);
       return undefined;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentContent]);
 
   const editor = useCreateBlockNote({
