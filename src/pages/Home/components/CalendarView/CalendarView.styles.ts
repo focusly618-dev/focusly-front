@@ -83,6 +83,9 @@ export const CalendarContainer = styled(Box, {
     '& .rbc-day-slot': {
       backgroundColor: 'transparent !important',
     },
+    '& .rbc-day-slot .rbc-events-container': {
+      marginRight: "0px"
+    },
     '& .rbc-time-column': {
       backgroundColor: `${bgDefault} !important`,
     },
