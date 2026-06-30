@@ -84,7 +84,7 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
               <ListItemIcon sx={{ minWidth: 28 }}>
                 <AddIcon fontSize="small" sx={{ color: 'text.secondary' }} />
               </ListItemIcon>
-              <ListItemText>New Workspace</ListItemText>
+              <ListItemText>New Note</ListItemText>
             </MenuItem>
             <Divider sx={{ my: 0.5, opacity: 0.1 }} />
             <MenuItem

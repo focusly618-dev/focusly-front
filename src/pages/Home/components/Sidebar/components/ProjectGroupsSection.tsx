@@ -423,7 +423,7 @@ export const ProjectGroupsSection = ({
               )}
 
               <ActionButtonContainer className="hover-actions">
-                <Tooltip title="New Workspace" arrow>
+                <Tooltip title="New Note" arrow>
                   <IconButton
                     size="small"
                     onClick={(e) => {
@@ -567,7 +567,7 @@ export const ProjectGroupsSection = ({
                     />
                     <input
                       autoFocus
-                      placeholder="New workspace name..."
+                      placeholder="New note name..."
                       value={newWorkspaceTitle}
                       onChange={(e) => setNewWorkspaceTitle(e.target.value)}
                       onKeyDown={(e) => {
@@ -696,7 +696,7 @@ export const ProjectGroupsSection = ({
               )}
 
               <ActionButtonContainer className="hover-actions">
-                <Tooltip title="New Workspace" arrow>
+                <Tooltip title="New Note" arrow>
                   <IconButton
                     size="small"
                     onClick={(e) => {
@@ -845,7 +845,7 @@ export const ProjectGroupsSection = ({
                     />
                     <input
                       autoFocus
-                      placeholder="New workspace name..."
+                      placeholder="New note name..."
                       value={newWorkspaceTitle}
                       onChange={(e) => setNewWorkspaceTitle(e.target.value)}
                       onKeyDown={(e) => {

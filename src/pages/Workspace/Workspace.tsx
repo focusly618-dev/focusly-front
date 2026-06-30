@@ -45,7 +45,6 @@ export const Workspace = ({
     handleUpdateTask,
     tasksData,
     saveState,
-    triggerSave,
   } = useWorkspace();
 
   const [runOnboarding, setRunOnboarding] = useState((): boolean => {
@@ -55,7 +54,6 @@ export const Workspace = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedGroupId = searchParams.get('groupId');
   const [isCreatingNew, setIsCreatingNew] = useState(false);
-  const [editorKey, setEditorKey] = useState<string>('');
 
   const [prevGroupId, setPrevGroupId] = useState(selectedGroupId);
 
@@ -131,15 +129,12 @@ export const Workspace = ({
                 card_show_background: workspace.card_show_background,
                 saveStatus: true,
               });
-              setEditorKey(workspace.id);
               if (workspace.task) {
                 handleSelectTask(workspace.task);
               } else {
                 handleSelectTask(null);
               }
-              setTimeout(() => {
-                onEditorChange(true);
-              }, 0);
+              onEditorChange(true);
             } else {
               const newParams = new URLSearchParams(searchParams);
               newParams.delete('workspaceId');
@@ -191,7 +186,6 @@ export const Workspace = ({
 
   const handleSelectWorkspace = (workspace: WorkspaceTypes): void => {
     setIsCreatingNew(false);
-    setEditorKey(workspace.id);
     const newParams = new URLSearchParams(searchParams);
     newParams.set('workspaceId', workspace.id);
     setSearchParams(newParams);
@@ -214,14 +208,11 @@ export const Workspace = ({
     } else {
       handleSelectTask(null);
     }
-    setTimeout(() => {
-      onEditorChange(true);
-    }, 0);
+    onEditorChange(true);
   };
 
   const handleCreateNew = (): void => {
     setIsCreatingNew(true);
-    setEditorKey(`new-${Date.now()}`);
     reset({
       title: 'Untitled Strategic Plan',
       taskId: undefined,
@@ -236,9 +227,7 @@ export const Workspace = ({
     });
 
     handleSelectTask(null);
-    setTimeout(() => {
-      onEditorChange(true);
-    }, 0);
+    onEditorChange(true);
   };
 
   const getCustomSlashMenuItems = (editor: BlockNoteEditor) => {
@@ -422,28 +411,13 @@ export const Workspace = ({
           >
             <Suspense fallback={<WorkspaceEditorSkeleton />}>
               <WorkspaceEditor
-                key={editorKey || watch('id') || 'new-workspace'}
+                key={watch('id') || 'new-workspace'}
                 onBack={() => {
-                  triggerSave();
                   onEditorChange(false);
-                  setIsCreatingNew(false);
                   const newParams = new URLSearchParams(searchParams);
                   newParams.delete('workspaceId');
                   setSearchParams(newParams);
-                  reset({
-                    title: 'Untitled Strategic Plan',
-                    taskId: undefined,
-                    content: '[]',
-                    id: undefined,
-                    projectId: undefined,
-                    groupId: selectedGroupId || undefined,
-                    emoji: undefined,
-                    background_color: undefined,
-                    card_show_background: false,
-                    saveStatus: true,
-                  });
                 }}
-                groupId={selectedGroupId || undefined}
                 register={register}
                 setValue={setValue}
                 watch={watch}

@@ -30,8 +30,6 @@ export const WorkspaceEditor = ({
   activeFocusTaskId,
   onUnlinkTask,
   saveState,
-  triggerSave,
-  groupId,
 }: WorkspaceEditorProps) => {
   const [sourceLanguage, setSourceLanguage] = useState('auto');
   const [targetLanguage, setTargetLanguage] = useState('en');
@@ -78,7 +76,6 @@ export const WorkspaceEditor = ({
             setSourceLanguage={setSourceLanguage}
             targetLanguage={targetLanguage}
             setTargetLanguage={setTargetLanguage}
-            groupId={groupId}
           />
 
           <EditorContent
@@ -94,7 +91,6 @@ export const WorkspaceEditor = ({
             setValue={setValue}
             watch={watch}
             targetLanguage={targetLanguage}
-            triggerSave={triggerSave}
           />
         </MainEditorArea>
 

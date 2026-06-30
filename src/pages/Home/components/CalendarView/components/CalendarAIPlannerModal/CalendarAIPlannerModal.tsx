@@ -25,8 +25,9 @@ import { createTimeBlock } from '@/api/TimeBlocks/timeBlocksApi';
 import type { Task } from '@/redux/tasks/task.types';
 import { sileo } from '@/utils/sileo';
 import { format, startOfDay, addDays } from 'date-fns';
-
-import type { ICalendarEvent } from '../../../CalendarEvent';
+import { useMutation } from '@apollo/client';
+import { UPDATE_TASK } from '@/pages/Tasks/Task.graphql';
+import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
 
 interface CalendarAIPlannerModalProps {
   open: boolean;
@@ -49,6 +50,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [scheduling, setScheduling] = useState(false);
   const [proposedEvents, setProposedEvents] = useState<AITimeBlockItem[]>([]);
+  const [updateTaskMutation] = useMutation(UPDATE_TASK);
 
   // Heuristic to calculate 1-hour free slots between 9 AM and 6 PM for today and the next 2 days
   const calculateFreeSlots = (
@@ -68,8 +70,8 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
 
         // Check overlap with existing events
         const isOverlap = existingEvents.some((e) => {
-          const eStart = new Date(e.start || e.startTime);
-          const eEnd = new Date(e.end || e.endTime);
+          const eStart = new Date(e.start);
+          const eEnd = new Date(e.end);
           return slotStart < eEnd && slotEnd > eStart;
         });
 
@@ -137,6 +139,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
     setScheduling(true);
     try {
       for (const item of proposedEvents) {
+        // 1. Crear el TimeBlock en BD
         await createTimeBlock({
           userId: user.id,
           taskId: item.taskId,
@@ -146,6 +149,22 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
           source: 'App',
           title: item.title,
         });
+
+        // 2. Mover la tarea al nuevo slot en el calendario
+        if (item.taskId) {
+          const targetTask = tasks.find((t) => t.id === item.taskId);
+          if (targetTask) {
+            await updateTaskMutation({
+              variables: {
+                updateTaskInput: {
+                  id: targetTask.id,
+                  estimated_start_date: item.startTime,
+                  estimated_end_date: item.endTime,
+                },
+              },
+            });
+          }
+        }
       }
 
       sileo.success({

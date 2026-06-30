@@ -205,7 +205,7 @@ export const WorkspaceLibrary = ({
               },
             }}
           >
-            New Workspace
+            New Note
           </Button>
         </Box>
       </LibraryHeader>
