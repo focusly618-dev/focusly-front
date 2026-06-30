@@ -178,7 +178,10 @@ export const CollapsedSearchContainer = styled(Box)(({ theme }) => ({
   borderRadius: '8px',
   padding: '12px 16px',
   cursor: 'text',
-  border: '1px solid transparent',
+  border:
+    theme.palette.mode === 'dark'
+      ? '1px solid rgba(255, 255, 255, 0.01)'
+      : '1px solid #c0c0c0ff',
   animation: `${fadeIn} 0.2s ease-out`,
   '&:hover': {
     borderColor: theme.palette.primary.main,

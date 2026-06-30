@@ -11,4 +11,7 @@ export interface TaskActionsProps {
   setIsAIScheduleEnabled?: (enabled: boolean) => void;
   isReadOnly?: boolean;
   isDirty?: boolean;
+  handleImproveTask?: (
+    mode: 'subtasks' | 'estimate' | 'priority' | 'all',
+  ) => void;
 }

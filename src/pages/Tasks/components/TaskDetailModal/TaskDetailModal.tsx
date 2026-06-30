@@ -12,6 +12,8 @@ import {
   titleInputPropsSx,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
 import { useTaskDetailModal } from './hooks/useTaskDetailModal.hooks';
+import { improveTaskAI } from '@/api/AI/apiAIPlanner';
+import { sileo } from '@/utils/sileo';
 
 // Sub-components
 import { Collaborators } from './components/Collaborators/Collaborators';
@@ -107,6 +109,69 @@ export const TaskDetailModal = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isLinksExpanded, setIsLinksExpanded] = useState(true);
   const [colorAnchor, setColorAnchor] = useState<HTMLElement | null>(null);
+
+  const handleImproveTask = async (
+    mode: 'subtasks' | 'estimate' | 'priority' | 'all',
+  ) => {
+    if (!title.trim()) {
+      sileo.warning({
+        title: 'Título requerido',
+        description:
+          'Por favor escribe un título para la tarea antes de usar la IA.',
+        duration: 3000,
+      });
+      return;
+    }
+
+    sileo.info({
+      title: 'Optimizando Tarea',
+      description:
+        'Lumina está analizando y mejorando los campos de tu tarea...',
+      duration: 3000,
+    });
+
+    try {
+      const res = await improveTaskAI({ title, description, mode });
+
+      if (mode === 'subtasks' || mode === 'all') {
+        if (res.subtasks && res.subtasks.length > 0) {
+          const checklistText =
+            '\n\nChecklist:\n' + res.subtasks.map((s) => `☐ ${s}`).join('\n');
+          setDescription((description || '') + checklistText);
+        }
+      }
+
+      if (mode === 'estimate' || mode === 'all') {
+        if (res.estimatedTime) {
+          setDuration(res.estimatedTime);
+        }
+      }
+
+      if (mode === 'priority' || mode === 'all') {
+        if (res.suggestedPriority) {
+          const map: Record<string, 'High' | 'Med' | 'Low'> = {
+            HIGH: 'High',
+            MEDIUM: 'Med',
+            LOW: 'Low',
+          };
+          setPriority(map[res.suggestedPriority.toUpperCase()] || 'Med');
+        }
+      }
+
+      sileo.success({
+        title: 'Tarea Optimizada',
+        description: 'Lumina ha mejorado los campos de tu tarea con éxito.',
+        duration: 3000,
+      });
+    } catch (e) {
+      console.error('Error improving task:', e);
+      sileo.error({
+        title: 'Error de IA',
+        description: 'No se pudieron sugerir mejoras para la tarea.',
+        duration: 3000,
+      });
+    }
+  };
 
   const isPureGoogleTask = initialTask?.source === 'google';
   return (
@@ -315,6 +380,7 @@ export const TaskDetailModal = ({
           isAIScheduleEnabled={isAIScheduleEnabled}
           setIsAIScheduleEnabled={setIsAIScheduleEnabled}
           isReadOnly={isReadOnly}
+          handleImproveTask={handleImproveTask}
         />
       </Dialog>
     </LocalizationProvider>

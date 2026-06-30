@@ -215,9 +215,9 @@ export const Workspace = ({
     setIsCreatingNew(true);
     reset({
       title: 'Untitled Strategic Plan',
+      taskId: undefined,
       content: '[]',
       id: undefined,
-      taskId: undefined,
       projectId: undefined,
       groupId: selectedGroupId || undefined,
       emoji: undefined,
@@ -225,6 +225,7 @@ export const Workspace = ({
       card_show_background: false,
       saveStatus: true,
     });
+
     handleSelectTask(null);
     onEditorChange(true);
   };
@@ -408,9 +409,7 @@ export const Workspace = ({
             id="joyride-workspace-editor"
             style={{ height: '100%', width: '100%' }}
           >
-            <Suspense
-              fallback={<WorkspaceEditorSkeleton />}
-            >
+            <Suspense fallback={<WorkspaceEditorSkeleton />}>
               <WorkspaceEditor
                 key={watch('id') || 'new-workspace'}
                 onBack={() => {

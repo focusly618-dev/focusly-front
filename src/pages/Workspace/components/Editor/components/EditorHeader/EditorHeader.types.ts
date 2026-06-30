@@ -48,4 +48,5 @@ export interface EditorHeaderProps {
   setSourceLanguage: (lang: string) => void;
   targetLanguage: string;
   setTargetLanguage: (lang: string) => void;
+  groupId?: string;
 }

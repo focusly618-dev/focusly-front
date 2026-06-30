@@ -1,8 +1,10 @@
-import { Typography, Box, LinearProgress } from '@mui/material';
+import { useState } from 'react';
+import { Typography, Box, LinearProgress, Button } from '@mui/material';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTasks } from './Tasks.hook';
+import { TasksAIOrganizeModal } from './components/TasksAIOrganizeModal/TasksAIOrganizeModal';
 import {
   TasksContainer,
   MainContent,
@@ -27,6 +29,7 @@ export const Tasks = ({
   setIsAIScheduleEnabled: setIsAIScheduleEnabledProp,
   onStartFocus,
 }: TasksProps) => {
+  const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
   const {
     tasks,
     totalCount,
@@ -135,29 +138,48 @@ export const Tasks = ({
             viewMode={viewMode}
             setViewMode={setViewMode}
           >
-            <AISwitchContainer sx={{ height: 'fit-content', gap: 1 }}>
-              <AutoAwesomeIcon
+            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+              <Button
+                variant="contained"
+                onClick={() => setIsAIPlannerOpen(true)}
+                startIcon={<AutoAwesomeIcon />}
                 sx={{
-                  fontSize: 16,
-                  color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
-                  transition: 'color 0.3s ease',
-                }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: 600,
-                  color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
-                  transition: 'color 0.3s ease',
+                  borderRadius: '10px',
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  boxShadow: 'none',
+                  height: 36,
+                  bgcolor: '#7c3aed',
+                  '&:hover': { bgcolor: '#6d28d9', boxShadow: 'none' },
+                  fontSize: '0.8rem',
                 }}
               >
-                Schedule with AI
-              </Typography>
-              <StyledAISwitch
-                checked={isAIScheduleEnabled}
-                onChange={(e) => setIsAIScheduleEnabled(e.target.checked)}
-              />
-            </AISwitchContainer>
+                AI Organize
+              </Button>
+              <AISwitchContainer sx={{ height: 'fit-content', gap: 1 }}>
+                <AutoAwesomeIcon
+                  sx={{
+                    fontSize: 16,
+                    color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
+                    transition: 'color 0.3s ease',
+                  }}
+                />
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 600,
+                    color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
+                    transition: 'color 0.3s ease',
+                  }}
+                >
+                  Schedule with AI
+                </Typography>
+                <StyledAISwitch
+                  checked={isAIScheduleEnabled}
+                  onChange={(e) => setIsAIScheduleEnabled(e.target.checked)}
+                />
+              </AISwitchContainer>
+            </Box>
           </TasksHeader>
 
           <TasksControlsBar
@@ -214,6 +236,11 @@ export const Tasks = ({
           steps={onboardingSteps}
           run={runOnboarding}
           onFinish={handleFinishOnboarding}
+        />
+        <TasksAIOrganizeModal
+          open={isAIPlannerOpen}
+          onClose={() => setIsAIPlannerOpen(false)}
+          tasks={tasks as Task[]}
         />
       </TasksContainer>
     </LocalizationProvider>

@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router';
 import {
   CheckCircleOutline as CheckCircleIcon,
   Mic as MicIcon,
   MicOff as MicOffIcon,
   Language as LanguageIcon,
   SwapHoriz as SwapIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import {
   CircularProgress,
@@ -14,7 +16,9 @@ import {
   Menu,
   MenuItem,
   ListItemText,
+  Button,
 } from '@mui/material';
+
 import { SearchPalette } from '../SearchPalette/SearchPalette';
 import { HeaderCenter, HeaderRight } from '@/pages/Workspace/Workspace.styles';
 import { EditorHeader as StyledEditorHeader } from './EditorHeader.styles';
@@ -49,12 +53,72 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     getLanguageLabel,
   } = useEditorHeader(props);
 
+  const navigate = useNavigate();
+  const backWorkspace = (): void => {
+    if (props.groupId && props.groupId !== undefined) {
+      const baseURL = `/dashboard?tab=Workspace&groupId=${props.groupId}`;
+      navigate(baseURL);
+      return;
+    }
+    navigate('/dashboard?tab=Workspace');
+  };
   return (
     <StyledEditorHeader>
       <HeaderCenter
         id="joyride-editor-search"
         sx={{ position: 'relative', zIndex: 50, mx: 2 }}
       >
+        <Button
+          onClick={backWorkspace}
+          startIcon={
+            <ArrowBackIcon
+              sx={{
+                fontSize: 17,
+                transition: 'transform 0.2s ease',
+              }}
+            />
+          }
+          sx={{
+            height: '34px',
+            px: 1.8,
+            mr: 12,
+            borderRadius: '20px',
+            border: '1px solid',
+            borderColor: 'divider',
+            color: 'text.secondary',
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : 'rgba(0,0,0,0.02)',
+            backdropFilter: 'blur(8px)',
+            textTransform: 'none',
+            fontWeight: 700,
+            fontSize: '12px',
+            letterSpacing: '0.2px',
+            transition: 'all 0.25s ease',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+
+            '&:hover': {
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : 'rgba(0,0,0,0.06)',
+              borderColor: 'text.secondary',
+              transform: 'translateX(-2px)',
+              boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+
+              '& .MuiSvgIcon-root': {
+                transform: 'translateX(-3px)',
+              },
+            },
+
+            '&:active': {
+              transform: 'scale(0.97)',
+            },
+          }}
+        >
+          Back
+        </Button>
         <SearchPalette
           showPalette={showPalette}
           setShowPalette={setShowPalette}
