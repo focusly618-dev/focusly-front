@@ -410,194 +410,6 @@ export const AskAI: React.FC = () => {
 
   return (
     <AskAIContainer>
-      {/* ── Chat History Sidebar ── */}
-      <HistorySidebar>
-        <Box sx={{ p: 2, display: 'flex', gap: 1 }}>
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={handleNewChat}
-            startIcon={<AddIcon />}
-            sx={{
-              borderRadius: '10px',
-              textTransform: 'none',
-              boxShadow: 'none',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-            }}
-          >
-            New Chat
-          </Button>
-        </Box>
-        <Box sx={{ flex: 1, overflowY: 'auto', px: 1, pb: 2 }}>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            fontWeight={800}
-            sx={{
-              px: 1.5,
-              mb: 1.5,
-              display: 'block',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              fontSize: '10px',
-            }}
-          >
-            Chat History
-          </Typography>
-          {conversations.map((c) => {
-            const isActive = c.id === activeConversationId;
-            return (
-              <Box
-                key={c.id}
-                onClick={() => handleSelectConversation(c.id)}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  px: 1.5,
-                  py: 1,
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  mb: 0.5,
-                  bgcolor: isActive
-                    ? theme.palette.mode === 'dark'
-                      ? 'rgba(59, 130, 246, 0.12)'
-                      : 'rgba(59, 130, 246, 0.08)'
-                    : 'transparent',
-                  color: isActive
-                    ? theme.palette.primary.main
-                    : theme.palette.text.primary,
-                  '&:hover': {
-                    bgcolor: isActive
-                      ? theme.palette.mode === 'dark'
-                        ? 'rgba(59, 130, 246, 0.15)'
-                        : 'rgba(59, 130, 246, 0.12)'
-                      : theme.palette.action.hover,
-                    '& .delete-btn': { opacity: 1 },
-                  },
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: isActive ? 700 : 500,
-                    fontSize: '0.85rem',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    mr: 1,
-                    flex: 1,
-                  }}
-                >
-                  {c.title || 'Untitled Chat'}
-                </Typography>
-                <IconButton
-                  className="delete-btn"
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteConversation(c.id);
-                  }}
-                  sx={{
-                    p: 0.25,
-                    opacity: 0,
-                    color: 'text.secondary',
-                    '&:hover': { color: theme.palette.error.main },
-                    transition: 'opacity 0.15s, color 0.15s',
-                  }}
-                >
-                  <DeleteIcon sx={{ fontSize: 14 }} />
-                </IconButton>
-              </Box>
-            );
-          })}
-        </Box>
-        {FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && (
-          <Box
-            sx={{
-              p: 2,
-              borderTop: `1px solid ${theme.palette.divider}`,
-              bgcolor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.02)'
-                  : 'rgba(0, 0, 0, 0.02)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1,
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                fontWeight={600}
-              >
-                Chats creados:
-              </Typography>
-              <Typography
-                variant="caption"
-                color={
-                  conversations.length >= 4 ? 'error.main' : 'text.primary'
-                }
-                fontWeight={700}
-              >
-                {conversations.length} / 4
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                width: '100%',
-                bgcolor:
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.05)'
-                    : 'rgba(0, 0, 0, 0.05)',
-                borderRadius: '2px',
-                height: 4,
-                overflow: 'hidden',
-              }}
-            >
-              <Box
-                sx={{
-                  width: `${Math.min((conversations.length / 4) * 100, 100)}%`,
-                  bgcolor:
-                    conversations.length >= 4 ? 'error.main' : 'primary.main',
-                  height: '100%',
-                  borderRadius: '2px',
-                  transition: 'width 0.3s ease',
-                }}
-              />
-            </Box>
-            {conversations.length >= 4 && (
-              <Button
-                variant="outlined"
-                color="primary"
-                size="small"
-                fullWidth
-                onClick={() => setIsUpgradeModalOpen(true)}
-                sx={{
-                  mt: 0.5,
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  fontSize: '0.7rem',
-                  py: 0.5,
-                  fontWeight: 700,
-                }}
-              >
-                Desbloquear chats ilimitados
-              </Button>
-            )}
-          </Box>
-        )}
-      </HistorySidebar>
-
       {/* ── Main Chat Area ── */}
       <ChatAreaWrapper>
         {/* ── Scrollable chat area ── */}
@@ -811,6 +623,194 @@ export const AskAI: React.FC = () => {
           </InputBox>
         </InputWrapper>
       </ChatAreaWrapper>
+
+      {/* ── Chat History Sidebar (right) ── */}
+      <HistorySidebar>
+        <Box sx={{ p: 2, display: 'flex', gap: 1 }}>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleNewChat}
+            startIcon={<AddIcon />}
+            sx={{
+              borderRadius: '10px',
+              textTransform: 'none',
+              boxShadow: 'none',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+            }}
+          >
+            New Chat
+          </Button>
+        </Box>
+        <Box sx={{ flex: 1, overflowY: 'auto', px: 1, pb: 2 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            fontWeight={800}
+            sx={{
+              px: 1.5,
+              mb: 1.5,
+              display: 'block',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              fontSize: '10px',
+            }}
+          >
+            Chat History
+          </Typography>
+          {conversations.map((c) => {
+            const isActive = c.id === activeConversationId;
+            return (
+              <Box
+                key={c.id}
+                onClick={() => handleSelectConversation(c.id)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  px: 1.5,
+                  py: 1,
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  mb: 0.5,
+                  bgcolor: isActive
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(59, 130, 246, 0.12)'
+                      : 'rgba(59, 130, 246, 0.08)'
+                    : 'transparent',
+                  color: isActive
+                    ? theme.palette.primary.main
+                    : theme.palette.text.primary,
+                  '&:hover': {
+                    bgcolor: isActive
+                      ? theme.palette.mode === 'dark'
+                        ? 'rgba(59, 130, 246, 0.15)'
+                        : 'rgba(59, 130, 246, 0.12)'
+                      : theme.palette.action.hover,
+                    '& .delete-btn': { opacity: 1 },
+                  },
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: isActive ? 700 : 500,
+                    fontSize: '0.85rem',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    mr: 1,
+                    flex: 1,
+                  }}
+                >
+                  {c.title || 'Untitled Chat'}
+                </Typography>
+                <IconButton
+                  className="delete-btn"
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteConversation(c.id);
+                  }}
+                  sx={{
+                    p: 0.25,
+                    opacity: 0,
+                    color: 'text.secondary',
+                    '&:hover': { color: theme.palette.error.main },
+                    transition: 'opacity 0.15s, color 0.15s',
+                  }}
+                >
+                  <DeleteIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </Box>
+            );
+          })}
+        </Box>
+        {FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && (
+          <Box
+            sx={{
+              p: 2,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              bgcolor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.02)'
+                  : 'rgba(0, 0, 0, 0.02)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                fontWeight={600}
+              >
+                Chats creados:
+              </Typography>
+              <Typography
+                variant="caption"
+                color={
+                  conversations.length >= 4 ? 'error.main' : 'text.primary'
+                }
+                fontWeight={700}
+              >
+                {conversations.length} / 4
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                width: '100%',
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.05)'
+                    : 'rgba(0, 0, 0, 0.05)',
+                borderRadius: '2px',
+                height: 4,
+                overflow: 'hidden',
+              }}
+            >
+              <Box
+                sx={{
+                  width: `${Math.min((conversations.length / 4) * 100, 100)}%`,
+                  bgcolor:
+                    conversations.length >= 4 ? 'error.main' : 'primary.main',
+                  height: '100%',
+                  borderRadius: '2px',
+                  transition: 'width 0.3s ease',
+                }}
+              />
+            </Box>
+            {conversations.length >= 4 && (
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                fullWidth
+                onClick={() => setIsUpgradeModalOpen(true)}
+                sx={{
+                  mt: 0.5,
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontSize: '0.7rem',
+                  py: 0.5,
+                  fontWeight: 700,
+                }}
+              >
+                Desbloquear chats ilimitados
+              </Button>
+            )}
+          </Box>
+        )}
+      </HistorySidebar>
 
       <Dialog
         open={isUpgradeModalOpen}

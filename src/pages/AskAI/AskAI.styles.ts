@@ -290,8 +290,11 @@ export const SendButton = styled(IconButton)<{ active?: boolean }>(
 export const HistorySidebar = styled(Box)(({ theme }) => ({
   width: '260px',
   height: '100%',
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.6)' : 'rgba(248, 250, 252, 0.8)',
-  borderRight: `1px solid ${theme.palette.divider}`,
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(15, 23, 42, 0.6)'
+      : 'rgba(248, 250, 252, 0.8)',
+  borderLeft: `1px solid ${theme.palette.divider}`,
   display: 'flex',
   flexDirection: 'column',
   flexShrink: 0,
@@ -299,7 +302,7 @@ export const HistorySidebar = styled(Box)(({ theme }) => ({
   '@media (max-width: 768px)': {
     width: '0px',
     overflow: 'hidden',
-    borderRight: 'none',
+    borderLeft: 'none',
   },
 }));
 
