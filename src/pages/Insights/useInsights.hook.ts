@@ -21,6 +21,23 @@ export interface DistributionEntry {
   color: string;
 }
 
+export interface HeatmapCompletedTask {
+  id: string;
+  title: string;
+  completedAt?: string | null;
+  category?: string | null;
+  realTimer?: number | null;
+}
+
+export interface HeatmapCellData {
+  key: string;
+  label: string;
+  intensity: number;
+  date?: string;
+  count: number;
+  tasks: HeatmapCompletedTask[];
+}
+
 export interface InsightsData {
   totalFocusHours: StatValue;
   taskCompletion: StatValue;
@@ -31,6 +48,7 @@ export interface InsightsData {
   timeDistribution: DistributionEntry[];
   heatmap: number[];
   heatmapLabels: string[];
+  heatmapCells: HeatmapCellData[];
 }
 
 const FILTERS = ['Daily', 'Weekly', 'Monthly'] as const;
@@ -66,6 +84,7 @@ const DEFAULT_STATS: InsightsData = {
   timeDistribution: DEFAULT_DISTRIBUTION,
   heatmap: [],
   heatmapLabels: [],
+  heatmapCells: [],
 };
 
 export const useInsights = () => {
@@ -76,6 +95,7 @@ export const useInsights = () => {
     variables: {
       userId: user?.id || '',
       filter,
+      timezoneOffset: new Date().getTimezoneOffset(),
     },
     skip: !user?.id,
     fetchPolicy: 'cache-and-network',
