@@ -1,11 +1,24 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Box, Typography, useTheme, Button, Tooltip, IconButton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  useTheme,
+  Button,
+  Tooltip,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
 import {
   Send as SendIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
+  InfoOutlined as InfoIcon,
 } from '@mui/icons-material';
+import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector } from '@/redux/hooks';
 import { CuteRobotIcon } from '@/components/ui';
 import {
@@ -139,7 +152,6 @@ const renderMarkdown = (text: string) => {
   return processedLines.join('\n');
 };
 
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const AskAI: React.FC = () => {
@@ -151,7 +163,10 @@ export const AskAI: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [conversations, setConversations] = useState<AIConversation[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -242,6 +257,13 @@ export const AskAI: React.FC = () => {
     async (text: string, customHistory?: Message[]) => {
       if (!text.trim()) return;
 
+      if (FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && !activeConversationId) {
+        if (conversations.length >= 4) {
+          setIsUpgradeModalOpen(true);
+          return;
+        }
+      }
+
       const userMsg: Message = {
         id: `user-${Date.now()}`,
         sender: 'user',
@@ -251,7 +273,8 @@ export const AskAI: React.FC = () => {
       const baseHistory = customHistory || messages;
       const history = [
         ...baseHistory.map((m) => ({
-          role: m.sender === 'user' ? ('user' as const) : ('assistant' as const),
+          role:
+            m.sender === 'user' ? ('user' as const) : ('assistant' as const),
           content: m.text,
         })),
         { role: 'user' as const, content: text.trim() },
@@ -313,8 +336,8 @@ export const AskAI: React.FC = () => {
                     text: accumulatedText,
                     html: renderMarkdown(accumulatedText),
                   }
-                : msg
-            )
+                : msg,
+            ),
           );
         }
 
@@ -333,13 +356,13 @@ export const AskAI: React.FC = () => {
                   text: 'Lo siento, ha ocurrido un error al generar la respuesta.',
                   html: '<p style="color: red;">Error generating response.</p>',
                 }
-              : msg
-          )
+              : msg,
+          ),
         );
         setIsTyping(false);
       }
     },
-    [messages, biggestTask, activeConversationId],
+    [messages, biggestTask, activeConversationId, conversations],
   );
 
   const handleRetry = async (msgId: string) => {
@@ -354,10 +377,12 @@ export const AskAI: React.FC = () => {
       retryText = msg.text;
       truncateToIndex = msgIndex;
     } else {
-      const prevUserMsgIndex = messages.slice(0, msgIndex).reduce((acc, curr, idx) => {
-        if (curr.sender === 'user') return idx;
-        return acc;
-      }, -1);
+      const prevUserMsgIndex = messages
+        .slice(0, msgIndex)
+        .reduce((acc, curr, idx) => {
+          if (curr.sender === 'user') return idx;
+          return acc;
+        }, -1);
       if (prevUserMsgIndex === -1) return;
       retryText = messages[prevUserMsgIndex].text;
       truncateToIndex = prevUserMsgIndex;
@@ -440,7 +465,9 @@ export const AskAI: React.FC = () => {
                       ? 'rgba(59, 130, 246, 0.12)'
                       : 'rgba(59, 130, 246, 0.08)'
                     : 'transparent',
-                  color: isActive ? theme.palette.primary.main : theme.palette.text.primary,
+                  color: isActive
+                    ? theme.palette.primary.main
+                    : theme.palette.text.primary,
                   '&:hover': {
                     bgcolor: isActive
                       ? theme.palette.mode === 'dark'
@@ -487,6 +514,88 @@ export const AskAI: React.FC = () => {
             );
           })}
         </Box>
+        {FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && (
+          <Box
+            sx={{
+              p: 2,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              bgcolor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.02)'
+                  : 'rgba(0, 0, 0, 0.02)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                fontWeight={600}
+              >
+                Chats creados:
+              </Typography>
+              <Typography
+                variant="caption"
+                color={
+                  conversations.length >= 4 ? 'error.main' : 'text.primary'
+                }
+                fontWeight={700}
+              >
+                {conversations.length} / 4
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                width: '100%',
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.05)'
+                    : 'rgba(0, 0, 0, 0.05)',
+                borderRadius: '2px',
+                height: 4,
+                overflow: 'hidden',
+              }}
+            >
+              <Box
+                sx={{
+                  width: `${Math.min((conversations.length / 4) * 100, 100)}%`,
+                  bgcolor:
+                    conversations.length >= 4 ? 'error.main' : 'primary.main',
+                  height: '100%',
+                  borderRadius: '2px',
+                  transition: 'width 0.3s ease',
+                }}
+              />
+            </Box>
+            {conversations.length >= 4 && (
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                fullWidth
+                onClick={() => setIsUpgradeModalOpen(true)}
+                sx={{
+                  mt: 0.5,
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontSize: '0.7rem',
+                  py: 0.5,
+                  fontWeight: 700,
+                }}
+              >
+                Desbloquear chats ilimitados
+              </Button>
+            )}
+          </Box>
+        )}
       </HistorySidebar>
 
       {/* ── Main Chat Area ── */}
@@ -556,7 +665,9 @@ export const AskAI: React.FC = () => {
                 {messages.map((msg) => {
                   const isUser = msg.sender === 'user';
                   const { cleanText, action } = parseLuminaAction(msg.text);
-                  const cleanHtml = msg.html ? renderMarkdown(cleanText) : undefined;
+                  const cleanHtml = msg.html
+                    ? renderMarkdown(cleanText)
+                    : undefined;
 
                   return (
                     <MessageRow key={msg.id} isUser={isUser}>
@@ -610,7 +721,10 @@ export const AskAI: React.FC = () => {
                                 opacity: 0,
                                 transition: 'opacity 0.2s',
                                 color: 'text.secondary',
-                                '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
+                                '&:hover': {
+                                  color: 'primary.main',
+                                  bgcolor: 'action.hover',
+                                },
                                 p: 0.5,
                               }}
                               className="msg-action-btn"
@@ -697,6 +811,109 @@ export const AskAI: React.FC = () => {
           </InputBox>
         </InputWrapper>
       </ChatAreaWrapper>
+
+      <Dialog
+        open={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            p: 2.5,
+            width: '400px',
+            bgcolor: 'background.paper',
+            backgroundImage: 'none',
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            textAlign: 'center',
+            py: 2,
+          }}
+        >
+          <Box
+            sx={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(59, 130, 246, 0.12)'
+                  : 'rgba(59, 130, 246, 0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'primary.main',
+            }}
+          >
+            <InfoIcon sx={{ fontSize: 28 }} />
+          </Box>
+          <DialogTitle
+            sx={{
+              p: 0,
+              fontWeight: 800,
+              fontSize: '1.25rem',
+              letterSpacing: '-0.3px',
+            }}
+          >
+            Límite de Chats Alcanzado
+          </DialogTitle>
+          <DialogContent sx={{ p: 0, mt: 1 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ lineHeight: 1.6 }}
+            >
+              Has alcanzado el límite de <strong>4 conversaciones</strong> en tu
+              plan gratuito. Actualiza a la versión premium hoy para disfrutar
+              de chats ilimitados con la inteligencia artificial y llevar tu
+              planificación al siguiente nivel.
+            </Typography>
+          </DialogContent>
+        </Box>
+        <DialogActions
+          sx={{ px: 0, pb: 1, flexDirection: 'column', gap: 1.25 }}
+        >
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={() => {
+              setIsUpgradeModalOpen(false);
+              sileo.success({
+                title: 'Plan Actualizado',
+                description: '¡Gracias por actualizar tu suscripción!',
+                duration: 4000,
+              });
+            }}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: '10px',
+              py: 1.2,
+              boxShadow: 'none',
+              '&:hover': { boxShadow: 'none' },
+            }}
+          >
+            Pagar y Desbloquear
+          </Button>
+          <Button
+            onClick={() => setIsUpgradeModalOpen(false)}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: '10px',
+              color: 'text.secondary',
+              fontSize: '0.85rem',
+            }}
+          >
+            Más tarde
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AskAIContainer>
   );
 };

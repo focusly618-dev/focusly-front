@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Calendar,
   dateFnsLocalizer,
@@ -17,6 +17,8 @@ import { CalendarHeader } from '../CalendarHeader';
 import { CalendarEvent, type ICalendarEvent } from '../CalendarEvent';
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
+import { CalendarAIPlannerModal } from './components/CalendarAIPlannerModal/CalendarAIPlannerModal';
+import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
 
 // Material UI
 import { Box, Menu, Stack, Typography } from '@mui/material';
@@ -53,6 +55,8 @@ interface CalendarViewProps {
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
+  const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
+  const [isWeeklyPlannerOpen, setIsWeeklyPlannerOpen] = useState(false);
   const {
     events,
     currentView,
@@ -72,6 +76,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     scrollToTime,
     dayPropGetter,
     handleAddTaskClick,
+    tasks,
+    refetchTasks,
   } = useCalendarView();
 
   const handleCreateTaskAtSlot = (priority?: number) => {
@@ -292,6 +298,24 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         onAddTaskClick={handleAddTaskClick}
         events={events}
         onEventSelect={handleSelectEvent}
+        onAIPlannerClick={() => setIsAIPlannerOpen(true)}
+        onWeeklyPlannerClick={() => setIsWeeklyPlannerOpen(true)}
+      />
+
+      <CalendarAIPlannerModal
+        open={isAIPlannerOpen}
+        onClose={() => setIsAIPlannerOpen(false)}
+        events={events}
+        tasks={tasks}
+        currentDate={currentDate}
+        onSuccess={refetchTasks}
+      />
+
+      <CalendarWeeklyPlannerModal
+        open={isWeeklyPlannerOpen}
+        onClose={() => setIsWeeklyPlannerOpen(false)}
+        tasks={tasks}
+        currentDate={currentDate}
       />
     </Box>
   );

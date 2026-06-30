@@ -205,7 +205,7 @@ export const WorkspaceLibrary = ({
               },
             }}
           >
-            New Note
+            New Workspace
           </Button>
         </Box>
       </LibraryHeader>
@@ -554,7 +554,7 @@ export const WorkspaceLibrary = ({
           sx: {
             borderRadius: '16px',
             p: 1.5,
-            width: '320px',
+            width: '520px',
             bgcolor: 'background.paper',
             backgroundImage: 'none',
           },

@@ -140,20 +140,21 @@ export const useCalendarView = () => {
     };
   }, [currentDate]);
 
-  const { data: tasksData, loading: isTasksQueryLoading } = useQuery(
-    GET_TASKS,
-    {
-      skip: !user?.id,
-      variables: {
-        userId: user?.id,
-        filters: {
-          startDate: dateRange.start,
-          endDate: dateRange.end,
-        },
+  const {
+    data: tasksData,
+    loading: isTasksQueryLoading,
+    refetch: refetchTasks,
+  } = useQuery(GET_TASKS, {
+    skip: !user?.id,
+    variables: {
+      userId: user?.id,
+      filters: {
+        startDate: dateRange.start,
+        endDate: dateRange.end,
       },
-      fetchPolicy: 'cache-and-network',
     },
-  );
+    fetchPolicy: 'cache-and-network',
+  });
 
   useEffect(() => {
     if (tasksData?.tasks) {
@@ -733,6 +734,7 @@ export const useCalendarView = () => {
     setIsFocusSessionActive,
     handleShowMore,
     tasks,
+    refetchTasks,
     slotContextMenu,
     handleSlotContextMenu,
     closeSlotContextMenu,

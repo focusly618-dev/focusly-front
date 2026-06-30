@@ -29,6 +29,7 @@ import {
   School as SchoolIcon,
   Person as PersonIcon,
   CalendarToday as CalendarIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 import {
   startOfWeek,
@@ -453,6 +454,8 @@ interface CalendarSidePanelProps {
   onAddTaskClick: () => void;
   events: ICalendarEvent[];
   onEventSelect: (event: ICalendarEvent) => void;
+  onAIPlannerClick?: () => void;
+  onWeeklyPlannerClick?: () => void;
 }
 
 export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
@@ -463,6 +466,8 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   onAddTaskClick,
   events,
   onEventSelect,
+  onAIPlannerClick,
+  onWeeklyPlannerClick,
 }) => {
   const theme = useTheme();
 
@@ -512,6 +517,52 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
           Add New Task
         </AddTaskButton>
 
+        {/* AI Planners */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Button
+            variant="outlined"
+            onClick={onAIPlannerClick}
+            startIcon={<AutoAwesomeIcon />}
+            sx={{
+              textTransform: 'none',
+              borderRadius: 3,
+              fontWeight: 700,
+              py: 1,
+              borderColor: 'primary.light',
+              '&:hover': {
+                borderColor: 'primary.main',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(124, 58, 237, 0.08)'
+                    : 'rgba(124, 58, 237, 0.04)',
+              },
+            }}
+          >
+            AI Time Blocking
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={onWeeklyPlannerClick}
+            startIcon={<CalendarIcon />}
+            sx={{
+              textTransform: 'none',
+              borderRadius: 3,
+              fontWeight: 700,
+              py: 1,
+              borderColor: 'primary.light',
+              '&:hover': {
+                borderColor: 'primary.main',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(124, 58, 237, 0.08)'
+                    : 'rgba(124, 58, 237, 0.04)',
+              },
+            }}
+          >
+            AI Weekly Planner
+          </Button>
+        </Box>
+
         {/* View Toggle Group */}
         <Box>
           <SectionTitle>Calendar View</SectionTitle>
@@ -534,7 +585,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
             >
               Month
             </ToggleButton>
-            </ViewToggleContainer>
+          </ViewToggleContainer>
         </Box>
 
         {/* Mini Calendar Card */}

@@ -30,6 +30,7 @@ export const useWorkspace = () => {
     control,
     saveStatus,
     saveState,
+    triggerSave,
   } = useWorkspaceForm();
 
   // 3. Tasks Hook (Selection, Sync, Updates)
@@ -66,6 +67,7 @@ export const useWorkspace = () => {
     control,
     saveStatus,
     saveState,
+    triggerSave,
     data,
     loading,
 

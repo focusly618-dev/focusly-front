@@ -80,6 +80,7 @@ interface EditorContentProps {
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
   targetLanguage?: string;
+  triggerSave?: () => void;
 }
 
 export const EditorContent = ({
@@ -93,6 +94,7 @@ export const EditorContent = ({
   setValue,
   watch,
   targetLanguage,
+  triggerSave,
 }: EditorContentProps) => {
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
@@ -421,6 +423,13 @@ export const EditorContent = ({
         placeholder="Untitled Document"
         value={currentTitle}
         onChange={(e) => setTitle(e.target.value)}
+        onBlur={triggerSave}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            triggerSave?.();
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
       />
 
       <BlockNoteWrapper

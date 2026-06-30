@@ -178,6 +178,10 @@ export const useWorkspaceForm = () => {
     };
   }, [debouncedSave]);
 
+  const triggerSave = useCallback(() => {
+    debouncedSave.flush();
+  }, [debouncedSave]);
+
   return {
     register,
     watch,
@@ -188,5 +192,6 @@ export const useWorkspaceForm = () => {
     values,
     saveStatus: values.saveStatus || false,
     saveState,
+    triggerSave,
   };
 };
