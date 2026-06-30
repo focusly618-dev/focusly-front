@@ -7,6 +7,8 @@ import { incrementSyncVersion } from '@/redux/calendar/calendar.slice';
 import { API_BASE_URL } from '@/config/env.config';
 import { GET_TASKS } from '@/pages/Tasks/Task.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
+import { sileo } from '@/utils/sileo';
+import { soundPlayer } from '@/utils/notificationSounds';
 import { RealTimeContext } from './RealTimeContext';
 
 export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -73,12 +75,102 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch(incrementSyncVersion());
     });
 
+    newSocket.on(
+      'task_upcoming',
+      (data: {
+        taskId: string;
+        title: string;
+        deadline: string;
+        minutesLeft: number;
+        type: '5min' | '1min';
+      }) => {
+        console.log('[REALTIME] Received task_upcoming event:', data);
+
+        const pushEnabled = user?.pushEnabled !== false;
+        if (!pushEnabled) {
+          console.log('[REALTIME] Notification ignored due to user settings');
+          return;
+        }
+
+        soundPlayer.playTaskUpcoming();
+
+        const date = new Date(data.deadline);
+        const timeFormatted = date.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+
+        const description =
+          data.type === '1min'
+            ? `Comienza en 1 minuto (${timeFormatted})`
+            : `Comienza en ${data.minutesLeft} minutos (${timeFormatted})`;
+
+        if (data.type === '1min') {
+          sileo.warning({
+            title: `¡Tarea urgente: ${data.title}!`,
+            description,
+            duration: 6000,
+          });
+        } else {
+          sileo.info({
+            title: `Tarea próxima: ${data.title}`,
+            description,
+            duration: 5000,
+          });
+        }
+
+        if (typeof Notification !== 'undefined') {
+          if (Notification.permission === 'granted') {
+            try {
+              new Notification(data.title, {
+                body: description,
+                icon: '/Focusly.png',
+                tag: data.taskId,
+              });
+            } catch (err) {
+              console.warn(
+                '[REALTIME] Standard Notification failed, trying Service Worker:',
+                err,
+              );
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready
+                  .then((registration) => {
+                    void registration.showNotification(data.title, {
+                      body: description,
+                      icon: '/Focusly.png',
+                      tag: data.taskId,
+                      renotify: true,
+                    } as NotificationOptions);
+                  })
+                  .catch((swErr) => {
+                    console.error(
+                      '[REALTIME] Service Worker notification error:',
+                      swErr,
+                    );
+                  });
+              }
+            }
+          } else if (Notification.permission !== 'denied') {
+            void Notification.requestPermission().then((permission) => {
+              if (permission === 'granted') {
+                new Notification(data.title, {
+                  body: description,
+                  icon: '/Focusly.png',
+                  tag: data.taskId,
+                });
+              }
+            });
+          }
+        }
+      },
+    );
+
     return () => {
       newSocket.disconnect();
       setSocket(null);
       console.log('[REALTIME] Cleaned up socket connection');
     };
-  }, [userId, apolloClient, dispatch]);
+  }, [userId, apolloClient, dispatch, user?.pushEnabled]);
 
   return (
     <RealTimeContext.Provider value={socket}>

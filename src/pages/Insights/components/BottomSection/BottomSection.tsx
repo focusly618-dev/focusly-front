@@ -1,41 +1,22 @@
 import { Box, Typography, Tooltip } from '@mui/material';
 import { WbSunny, InfoOutlined as InfoIcon } from '@mui/icons-material';
-import {
-  BottomRow,
-  ChartCard,
-  ActionButton,
-  HeatmapGrid,
-  HeatmapCell,
-} from '../../Insights.styles';
-export interface ActivitySectionProps {
+import { BottomRow, ChartCard, ActionButton } from '../../Insights.styles';
+import { ActivityMap } from '../ActivityMap';
+import type { HeatmapCellData } from '../ActivityMap';
+
+export interface BottomSectionProps {
   goldenWindowValue: string;
-  heatmap: number[];
+  heatmapCells: HeatmapCellData[];
   heatmapLabels?: string[];
-  filter?: string;
+  filter: string;
 }
 
 export const BottomSection = ({
   goldenWindowValue,
-  heatmap,
+  heatmapCells,
   heatmapLabels,
-  filter = 'Weekly',
-}: ActivitySectionProps) => {
-  const safeHeatmap = heatmap || [];
-  const defaultLength =
-    filter === 'Daily'
-      ? 24
-      : filter === 'Weekly'
-        ? 7
-        : filter === 'Monthly'
-          ? 30
-          : 7;
-  const displayHeatmap =
-    safeHeatmap.length > 0
-      ? safeHeatmap
-      : Array.from({ length: defaultLength }).map(() => 0);
-
-  const cols = displayHeatmap.length > 24 ? 14 : displayHeatmap.length || 7;
-
+  filter,
+}: BottomSectionProps) => {
   return (
     <BottomRow>
       <ChartCard sx={{ height: 'auto', minHeight: '300px' }}>
@@ -75,61 +56,11 @@ export const BottomSection = ({
         </Typography>
       </ChartCard>
 
-      <ChartCard sx={{ height: 'auto', minHeight: '300px' }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box display="flex" alignItems="center" gap={0.5}>
-            <Typography variant="h6" fontWeight="bold">
-              Activity Map
-            </Typography>
-            <Tooltip
-              title="This map shows your intensity level per day. Darker squares indicate days where you had more focus sessions or dedicated more real time to your tasks."
-              arrow
-            >
-              <InfoIcon
-                sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }}
-              />
-            </Tooltip>
-          </Box>
-          <Box display="flex" gap={1} alignItems="center">
-            <Typography variant="caption" color="text.secondary">
-              Less
-            </Typography>
-            <Box display="flex" gap={0.5}>
-              {[1, 2, 3, 4].map((i) => (
-                <Box
-                  key={i}
-                  sx={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: 0.5,
-                    bgcolor: 'primary.main',
-                    opacity: i * 0.25,
-                  }}
-                />
-              ))}
-            </Box>
-            <Typography variant="caption" color="text.secondary">
-              More
-            </Typography>
-          </Box>
-        </Box>
-        <HeatmapGrid
-          sx={{
-            gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          }}
-        >
-          {displayHeatmap.map((intensity: number, i: number) => (
-            <HeatmapCell key={i} intensity={intensity} />
-          ))}
-        </HeatmapGrid>
-        <Box display="flex" justifyContent="space-between" mt={1}>
-          {(heatmapLabels || []).map((label) => (
-            <Typography key={label} variant="caption" color="text.secondary">
-              {label}
-            </Typography>
-          ))}
-        </Box>
-      </ChartCard>
+      <ActivityMap
+        cells={heatmapCells}
+        heatmapLabels={heatmapLabels}
+        filter={filter}
+      />
     </BottomRow>
   );
 };

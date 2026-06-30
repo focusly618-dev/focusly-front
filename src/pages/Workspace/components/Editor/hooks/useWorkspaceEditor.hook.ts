@@ -7,6 +7,7 @@ import {
   BlockNoteEditor,
 } from '@blocknote/core';
 import { useCreateBlockNote } from '@blocknote/react';
+import { compressImageToDataUrl } from '@/utils/imageCompressor';
 import type {
   TaskSearchItems,
   WorkspaceFormData,
@@ -85,14 +86,16 @@ export const useWorkspaceEditor = ({
       const blocks = tempEditor.tryParseMarkdownToBlocks(currentContent);
       return (blocks.length > 0 ? blocks : undefined) as PartialBlock[];
     } catch (e) {
-      console.error('Failed to parse content using tryParseMarkdownToBlocks:', e);
+      console.error(
+        'Failed to parse content using tryParseMarkdownToBlocks:',
+        e,
+      );
       return undefined;
     }
   }, [currentContent]);
 
   const editor = useCreateBlockNote({
     schema,
-
     initialContent: initialContent || [
       {
         type: 'paragraph',
@@ -100,18 +103,12 @@ export const useWorkspaceEditor = ({
       },
     ],
     uploadFile: async (file: File) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (typeof reader.result === 'string') {
-            resolve(reader.result);
-          } else {
-            reject(new Error('Failed to convert file to base64'));
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+      // Compress the image before storing it as base64.
+      // • WebP output: ~60-80 % smaller than the raw PNG/JPEG base64.
+      // • Max side: 1920 px (full-HD) — sufficient for any editor display.
+      // • Quality: 0.82 — visually lossless at screen resolution.
+      // • GIF / SVG are passed through unchanged (Canvas can't re-encode them).
+      return compressImageToDataUrl(file, { maxSidePx: 1920, quality: 0.82 });
     },
   });
 

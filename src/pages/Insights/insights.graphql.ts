@@ -1,8 +1,12 @@
 import { gql } from '@apollo/client';
 
 export const GET_INSIGHTS = gql`
-  query GetInsights($userId: String!, $filter: String!) {
-    insights: getInsights(userId: $userId, filter: $filter) {
+  query GetInsights($userId: String!, $filter: String!, $timezoneOffset: Int) {
+    insights: getInsights(
+      userId: $userId
+      filter: $filter
+      timezoneOffset: $timezoneOffset
+    ) {
       totalFocusHours {
         value
         change
@@ -40,6 +44,19 @@ export const GET_INSIGHTS = gql`
       }
       heatmap
       heatmapLabels
+      heatmapCells {
+        key
+        label
+        intensity
+        count
+        tasks {
+          id
+          title
+          completedAt
+          category
+          realTimer
+        }
+      }
     }
   }
 `;

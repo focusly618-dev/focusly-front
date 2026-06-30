@@ -63,7 +63,7 @@ export const Insights = () => {
         <Box id="joyride-insights-heatmap">
           <BottomSection
             goldenWindowValue={stats.goldenWindow.value}
-            heatmap={stats.heatmap}
+            heatmapCells={stats.heatmapCells}
             heatmapLabels={stats.heatmapLabels}
             filter={filter}
           />
