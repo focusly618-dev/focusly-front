@@ -31,7 +31,7 @@ export const TaskHeader = ({
 
   const iconSx = {
     ...headerIconSx,
-    color: hasColor ? '#fff' : 'text.secondary',
+    color: hasColor ? '#fff' : 'primary.main',
     '&:hover': {
       backgroundColor: hasColor ? 'rgba(255, 255, 255, 0.2)' : 'action.hover',
     },

@@ -13,7 +13,7 @@ export const TaskDescription = ({
 }: TaskDescriptionProps) => (
   <Box sx={{ px: 4, mb: 4 }}>
     <Box display="flex" alignItems="center" gap={1} mb={1.5}>
-      <DescriptionIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+      <DescriptionIcon sx={{ fontSize: 16, color: 'primary.main' }} />
       <Typography
         variant="caption"
         sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}

@@ -183,7 +183,7 @@ export const iconBoxSx = {
 };
 
 export const headerIconSx = {
-  color: 'text.secondary',
+  color: 'primary.main',
   '&:hover': {
     backgroundColor: 'action.hover',
   },

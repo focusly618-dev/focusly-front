@@ -7,6 +7,7 @@ export interface TasksControlsBarProps {
   setSearchTerm: (term: string) => void;
   filterAnchorEl: HTMLElement | null;
   sortAnchorEl: HTMLElement | null;
+  onAddTaskClick: () => void;
 
   activeSort: SortState | null;
   activeFilterState: FilterState;

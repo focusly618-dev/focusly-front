@@ -118,59 +118,124 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
 
-  const getChipSx = (isHighPriority = false) => ({
-    borderRadius: '20px',
-    px: 1.5,
-    height: '28px',
-    fontSize: '12px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-    bgcolor: (theme: Theme) => {
-      if (isHighPriority) {
-        return theme.palette.mode === 'dark'
-          ? alpha('#ef4444', 0.15)
-          : alpha('#ef4444', 0.08);
+  const getSelectionChipSx = (
+    variant: 'status' | 'priority' | 'category',
+    value: string,
+  ) => {
+    const getColorByValue = () => {
+      switch (variant) {
+        case 'status':
+          switch (value) {
+            case 'Planning':
+              return '#3b82f6';
+            case 'Scheduled':
+              return '#8b5cf6';
+            case 'Pending':
+              return '#f59e0b';
+            case 'On Hold':
+              return '#ef4444';
+            case 'Review':
+              return '#06b6d4';
+            case 'Done':
+              return '#16a34a';
+            case 'Backlog':
+            case 'Archived':
+            case 'Todo':
+            default:
+              return 'text.secondary';
+          }
+        case 'priority':
+          switch (value) {
+            case 'High':
+              return '#ef4444';
+            case 'Med':
+              return '#f59e0b';
+            case 'Low':
+              return '#16a34a';
+            case 'No priority':
+            default:
+              return 'text.secondary';
+          }
+        case 'category':
+          switch (value) {
+            case 'Deep Work':
+              return '#8b5cf6';
+            case 'Meeting':
+              return '#3b82f6';
+            case 'Design':
+            case 'Learning':
+              return '#f59e0b';
+            case 'Development':
+              return '#2563eb';
+            case 'Marketing':
+              return '#ef4444';
+            case 'Planning':
+            case 'Research':
+              return '#06b6d4';
+            default:
+              return 'text.secondary';
+          }
+        default:
+          return 'text.secondary';
       }
-      return theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
-        : 'rgba(0, 0, 0, 0.04)';
-    },
-    border: '1px solid',
-    borderColor: (theme: Theme) => {
-      if (isHighPriority) {
-        return theme.palette.mode === 'dark'
-          ? alpha('#ef4444', 0.25)
-          : alpha('#ef4444', 0.15);
-      }
-      return 'divider';
-    },
-    color: (theme: Theme) => {
-      if (isHighPriority) {
-        return '#ef4444';
-      }
-      return theme.palette.text.secondary;
-    },
-    '&:hover': {
+    };
+
+    const color = getColorByValue();
+
+    return {
+      borderRadius: '20px',
+      px: 1.5,
+      height: '28px',
+      fontSize: '12px',
+      fontWeight: 600,
+      cursor: 'pointer',
+      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
       bgcolor: (theme: Theme) => {
-        if (isHighPriority) {
+        if (color === 'text.secondary') {
           return theme.palette.mode === 'dark'
-            ? alpha('#ef4444', 0.25)
-            : alpha('#ef4444', 0.12);
+            ? 'rgba(255, 255, 255, 0.05)'
+            : 'rgba(0, 0, 0, 0.04)';
         }
         return theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.1)'
-          : 'rgba(0, 0, 0, 0.08)';
+          ? alpha(color, 0.14)
+          : alpha(color, 0.08);
       },
-      transform: 'translateY(-0.5px)',
-    },
-    '& .MuiChip-icon': {
-      marginLeft: '-2px',
-      marginRight: '-4px',
-      color: 'inherit !important',
-      fontSize: '14px',
-    },
-  });
+      border: '1px solid',
+      borderColor: (theme: Theme) => {
+        if (color === 'text.secondary') {
+          return 'divider';
+        }
+        return theme.palette.mode === 'dark'
+          ? alpha(color, 0.28)
+          : alpha(color, 0.18);
+      },
+      color: (theme: Theme) => {
+        if (color === 'text.secondary') {
+          return theme.palette.text.secondary;
+        }
+        return color;
+      },
+      '&:hover': {
+        bgcolor: (theme: Theme) => {
+          if (color === 'text.secondary') {
+            return theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.1)'
+              : 'rgba(0, 0, 0, 0.08)';
+          }
+          return theme.palette.mode === 'dark'
+            ? alpha(color, 0.22)
+            : alpha(color, 0.12);
+        },
+        transform: 'translateY(-0.5px)',
+      },
+      '& .MuiChip-icon': {
+        marginLeft: '-2px',
+        marginRight: '-4px',
+        color: 'inherit !important',
+        fontSize: '14px',
+      },
+    };
+  };
 
   return (
     <Box sx={propertyListSx}>
@@ -265,7 +330,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                     gap: 1.25,
                   }}
                 >
-                  <PlannedIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                  <PlannedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
                   {currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
                 </Box>
                 <DatePicker
@@ -338,7 +403,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   }}
                 >
                   <AccessTimeIcon
-                    sx={{ fontSize: 16, color: 'text.disabled' }}
+                    sx={{ fontSize: 16, color: 'primary.main' }}
                   />
                   {currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
                 </Box>
@@ -405,7 +470,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   minHeight: '43px',
                 }}
               >
-                <TimerIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                <TimerIcon sx={{ fontSize: 16, color: 'primary.main' }} />
                 <TextField
                   variant="standard"
                   value={duration}
@@ -516,7 +581,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   minHeight: '43px',
                 }}
               >
-                <HistoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                <HistoryIcon sx={{ fontSize: 16, color: 'primary.main' }} />
                 <TextField
                   variant="standard"
                   value={realTime}
@@ -639,7 +704,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
         {/* Status */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <TodoIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <TodoIcon sx={{ fontSize: 16, color: 'primary.main' }} />
             <Typography
               variant="caption"
               sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -652,7 +717,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
               icon={getStatusIcon(status)}
               label={status || 'Todo'}
               onClick={(e) => setStatusAnchor(e.currentTarget)}
-              sx={getChipSx(false)}
+              sx={getSelectionChipSx('status', status || 'Todo')}
             />
           </Box>
         </Box>
@@ -660,7 +725,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
         {/* Priority */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <FlagIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <FlagIcon sx={{ fontSize: 16, color: 'primary.main' }} />
             <Typography
               variant="caption"
               sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -673,7 +738,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
               icon={<FlagIcon sx={{ fontSize: 16 }} />}
               label={priority || 'No priority'}
               onClick={(e) => setPriorityAnchor(e.currentTarget)}
-              sx={getChipSx(priority === 'High')}
+              sx={getSelectionChipSx('priority', priority || 'No priority')}
             />
           </Box>
         </Box>
@@ -681,7 +746,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
         {/* Category */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <AutoFixHighIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <AutoFixHighIcon sx={{ fontSize: 16, color: 'primary.main' }} />
             <Typography
               variant="caption"
               sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -694,7 +759,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
               icon={getCategoryIcon(category)}
               label={category || 'General'}
               onClick={(e) => setCategoryAnchor(e.currentTarget)}
-              sx={getChipSx(false)}
+              sx={getSelectionChipSx('category', category || 'General')}
             />
           </Box>
         </Box>
@@ -705,7 +770,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             <DescriptionIcon
               sx={{
                 fontSize: 16,
-                color: 'text.disabled',
+                color: 'primary.main',
                 transform: 'rotate(180deg)',
               }}
             />
