@@ -1,8 +1,9 @@
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Button } from '@mui/material';
 import {
   Search as SearchIcon,
   FilterList as FilterListIcon,
   Sort as SortIcon,
+  Add as AddIcon,
 } from '@mui/icons-material';
 import {
   ControlsBar,
@@ -28,6 +29,7 @@ export const TasksControlsBar = ({
   handleApplyFilters,
   handleSortClose,
   handleApplySort,
+  onAddTaskClick,
 }: TasksControlsBarProps) => {
   if (viewMode === 'board' || viewMode === 'workload') {
     return <ControlsBar id="joyride-tasks-filters" />;
@@ -81,6 +83,22 @@ export const TasksControlsBar = ({
           onApply={handleApplySort}
           activeSort={activeSort ?? undefined}
         />
+        <Button
+          variant="contained"
+          onClick={onAddTaskClick}
+          startIcon={<AddIcon />}
+          sx={{
+            borderRadius: '8px',
+            textTransform: 'none',
+            fontWeight: 600,
+            boxShadow: 'none',
+            px: 1.5,
+            py: 0.75,
+            minWidth: 'auto',
+          }}
+        >
+          Add New Task
+        </Button>
       </Box>
     </ControlsBar>
   );

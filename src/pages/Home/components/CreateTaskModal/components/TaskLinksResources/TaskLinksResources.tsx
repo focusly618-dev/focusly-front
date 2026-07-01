@@ -57,7 +57,7 @@ export const TaskLinksResources = ({
       mb={1.5}
     >
       <Box display="flex" alignItems="center" gap={1}>
-        <LinkIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+        <LinkIcon sx={{ fontSize: 16, color: 'primary.main' }} />
         <Typography
           variant="caption"
           sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}
@@ -74,7 +74,7 @@ export const TaskLinksResources = ({
             isGeneratingMeet ? (
               <CircularProgress size={14} color="inherit" />
             ) : (
-              <VideoCallIcon sx={{ fontSize: 16 }} />
+              <VideoCallIcon sx={{ fontSize: 16, color: 'primary.main' }} />
             )
           }
           sx={{
@@ -100,7 +100,7 @@ export const TaskLinksResources = ({
           <Button
             size="small"
             onClick={() => setIsAddingLink(true)}
-            startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            startIcon={<AddIcon sx={{ fontSize: 16, color: 'primary.main' }} />}
             sx={{
               textTransform: 'none',
               borderRadius: '6px',
@@ -190,11 +190,11 @@ export const TaskLinksResources = ({
                   JOIN
                 </Typography>
               ) : (
-                <LaunchIcon sx={{ fontSize: 16 }} />
+                <LaunchIcon sx={{ fontSize: 16, color: 'primary.main' }} />
               )}
             </IconButton>
             <IconButton size="small" onClick={() => handleRemoveLink(index)}>
-              <CloseIcon sx={{ fontSize: 16 }} />
+              <CloseIcon sx={{ fontSize: 16, color: 'primary.main' }} />
             </IconButton>
           </Box>
         </Box>

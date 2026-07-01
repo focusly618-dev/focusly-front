@@ -367,6 +367,7 @@ export const MessageBubble = styled(Box, {
   fontSize: '13.5px',
   lineHeight: 1.5,
   wordBreak: 'break-word',
+  whiteSpace: 'normal',
   boxShadow:
     theme.palette.mode === 'dark'
       ? '0 4px 12px rgba(0, 0, 0, 0.15)'
@@ -386,9 +387,11 @@ export const MessageBubble = styled(Box, {
         border: `1px solid ${theme.palette.divider}`,
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        '& p': { margin: 0, marginBottom: '8px' },
-        '& p:last-child': { marginBottom: 0 },
-        '& ul, & ol': { margin: '8px 0', paddingLeft: '20px' },
+        '& > p': { margin: 0, marginBottom: '8px' },
+        '& > p:last-child': { marginBottom: 0 },
+        '& > ul, & > ol': { margin: '8px 0', paddingLeft: '20px' },
+        '& > :first-of-type': { marginTop: 0 },
+        '& > :last-child': { marginBottom: 0 },
         '& li': { marginBottom: '4px' },
         '& a': {
           color: theme.palette.primary.light,

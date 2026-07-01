@@ -5,6 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTasks } from './Tasks.hook';
 import { TasksAIOrganizeModal } from './components/TasksAIOrganizeModal/TasksAIOrganizeModal';
+import { CreateTaskModal } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal';
 import { TasksContainer, MainContent } from './Tasks.styles';
 import { TasksHeader } from './components/TasksHeader/TasksHeader';
 import { TasksControlsBar } from './components/TasksControlsBar/TasksControlsBar';
@@ -25,6 +26,7 @@ export const Tasks = ({
   onStartFocus,
 }: TasksProps) => {
   const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
+  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
   const {
     tasks,
     totalCount,
@@ -169,6 +171,7 @@ export const Tasks = ({
             handleApplyFilters={handleApplyFilters}
             handleSortClose={handleSortClose}
             handleApplySort={handleApplySort}
+            onAddTaskClick={() => setIsCreateTaskModalOpen(true)}
           />
 
           <TasksContentView
@@ -207,6 +210,13 @@ export const Tasks = ({
           open={isAIPlannerOpen}
           onClose={() => setIsAIPlannerOpen(false)}
           tasks={tasks as Task[]}
+        />
+        <CreateTaskModal
+          open={isCreateTaskModalOpen}
+          onClose={() => setIsCreateTaskModalOpen(false)}
+          onSave={() => setIsCreateTaskModalOpen(false)}
+          initialStart={null}
+          initialEnd={null}
         />
       </TasksContainer>
     </LocalizationProvider>
