@@ -6,7 +6,7 @@ import {
   parseDuration,
 } from '../CreateTaskModal.utils';
 import type { PriorityType } from '../CreateTaskModal.utils';
-import { addMinutes, format } from 'date-fns';
+import { addMinutes, format, isSameDay } from 'date-fns';
 import type { UseTaskFormStateProps } from '../types/CreateTaskModal.types';
 
 export const useTaskFormState = ({
@@ -92,16 +92,33 @@ export const useTaskFormState = ({
     if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
   };
 
+  const isValidDurationInput = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return true;
+    return /^(?:\d{1,3}(?:h|m)?|\d{1,3}h\s*\d{1,3}m)$/i.test(trimmed);
+  };
+
   const handleDurationChange = (value: string) => {
-    setDuration(value);
+    const trimmedValue = value.replace(/\s+/g, '').trim();
+
+    setDuration(trimmedValue);
     const newErrors: { title?: string; duration?: string } = { ...errors };
-    if (value.trim()) {
-      const durationMinutes = parseDuration(value);
-      if (durationMinutes > 0 && durationMinutes < 15) {
-        newErrors.duration = 'Duration must be at least 15 minutes';
-      } else {
-        delete newErrors.duration;
-      }
+
+    if (!trimmedValue) {
+      delete newErrors.duration;
+      setErrors(newErrors);
+      return;
+    }
+
+    if (!isValidDurationInput(trimmedValue)) {
+      newErrors.duration = 'Use formats like 30m, 2h, or 2h30m';
+      setErrors(newErrors);
+      return;
+    }
+
+    const durationMinutes = parseDuration(trimmedValue);
+    if (durationMinutes > 0 && durationMinutes < 15) {
+      newErrors.duration = 'Duration must be at least 15 minutes';
     } else {
       delete newErrors.duration;
     }
@@ -120,7 +137,7 @@ export const useTaskFormState = ({
       isValid = false;
     } else {
       const durationMinutes = parseDuration(duration);
-      if (durationMinutes < 15) {
+      if (!isValidDurationInput(duration) || durationMinutes < 15) {
         newErrors.duration = 'Duration must be at least 15 minutes';
         isValid = false;
       }
@@ -130,10 +147,22 @@ export const useTaskFormState = ({
   };
 
   const timeSlotDisplay = useMemo(() => {
-    if (!currentDate) return '';
+    if (!currentDate || Number.isNaN(currentDate.getTime())) return '';
+
     const mins = parseDuration(duration) || 25;
     const endDate = addMinutes(currentDate, mins);
-    return `${format(currentDate, 'hh:mm a')} - ${format(endDate, 'hh:mm a')}`;
+
+    if (Number.isNaN(endDate.getTime())) return '';
+
+    const sameDay = isSameDay(currentDate, endDate);
+    const startLabel = format(currentDate, 'hh:mm a');
+    const endLabel = format(endDate, 'hh:mm a');
+
+    if (sameDay) {
+      return `${startLabel} - ${endLabel}`;
+    }
+
+    return `${startLabel} - ${endLabel} • ${format(endDate, 'MMM d')}`;
   }, [currentDate, duration]);
 
   return {
