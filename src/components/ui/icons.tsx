@@ -167,3 +167,23 @@ export const DefaultNoteIcon = (props: SvgIconProps) => (
     />
   </SvgIcon>
 );
+
+// Styled, organic Anthropic Claude logo icon
+export const ClaudeIcon = (props: SvgIconProps) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <path
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.8 15.6-.7-2h-2.2l-.7 2H8.3l3-8.2h1.4l3 8.2h-1.9zm-2.4-6.8-.9 2.5h1.8l-.9-2.5z"
+      fill="currentColor"
+    />
+  </SvgIcon>
+);
+
+// Styled, sparkle-shape Google Gemini logo icon
+export const GeminiIcon = (props: SvgIconProps) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <path
+      d="M12 2c-.1 3.5-1.9 6.8-4.8 9-2.9 2.2-6.2 3-9.7 3.1 3.5.1 6.8 1.9 9 4.8 2.2 2.9 3 6.2 3.1 9.7.1-3.5 1.9-6.8 4.8-9 2.9-2.2 6.2-3 9.7-3.1-3.5-.1-6.8-1.9-9-4.8-2.2-2.9-3-6.2-3.1-9.7z"
+      fill="currentColor"
+    />
+  </SvgIcon>
+);
