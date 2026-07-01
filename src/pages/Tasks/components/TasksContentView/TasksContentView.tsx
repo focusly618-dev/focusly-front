@@ -8,6 +8,7 @@ import {
   DialogContentText,
   DialogActions,
   Checkbox,
+  CircularProgress,
 } from '@mui/material';
 import {
   CheckBox as CheckBoxIcon,
@@ -53,6 +54,7 @@ export const TasksContentView = ({
   const {
     selectedTaskIds,
     isConfirmOpen,
+    isDeleting,
     selectedStatus,
     setSelectedStatus,
     limit,
@@ -405,7 +407,7 @@ export const TasksContentView = ({
               variant="contained"
               size="small"
               color="error"
-              onClick={handleDeleteSelectedClick}
+              onClick={(e) => handleDeleteSelectedClick(e)}
               startIcon={<DeleteIcon />}
               sx={{
                 textTransform: 'none',
@@ -448,6 +450,7 @@ export const TasksContentView = ({
         <DialogActions sx={{ px: 2, py: 1.5, gap: 1 }}>
           <Button
             onClick={handleCancelDelete}
+            disabled={isDeleting}
             sx={{
               textTransform: 'none',
               fontWeight: 600,
@@ -457,18 +460,24 @@ export const TasksContentView = ({
             Cancel
           </Button>
           <Button
-            onClick={handleConfirmDelete}
+            onClick={(e) => handleConfirmDelete(e)}
             variant="contained"
             color="error"
+            disabled={isDeleting}
             autoFocus
             sx={{
               textTransform: 'none',
               fontWeight: 600,
               borderRadius: '8px',
               px: 2.5,
+              minWidth: '90px',
             }}
           >
-            Delete
+            {isDeleting ? (
+              <CircularProgress size={18} color="inherit" />
+            ) : (
+              'Delete'
+            )}
           </Button>
         </DialogActions>
       </Dialog>

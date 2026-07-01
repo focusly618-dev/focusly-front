@@ -122,8 +122,6 @@ export const useTasks = () => {
       ui.setFilterAnchorEl(event.currentTarget);
     } else if (type === 'sort') {
       ui.setSortAnchorEl(event.currentTarget);
-    } else if (type === 'completed') {
-      filterLogic.setIsCompletedFilterActive((prev) => !prev);
     }
   };
 
@@ -153,7 +151,6 @@ export const useTasks = () => {
     highPriorityTasks,
     todayTasks,
     upcomingTasks,
-    isCompletedFilterActive: filterLogic.isCompletedFilterActive,
     dateRange: filterLogic.dateRange,
     setDateRange: filterLogic.setDateRange,
     activeSort: filterLogic.activeSort,

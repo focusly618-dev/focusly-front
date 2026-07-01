@@ -3,13 +3,11 @@ import {
   Search as SearchIcon,
   FilterList as FilterListIcon,
   Sort as SortIcon,
-  CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 import {
   ControlsBar,
   FilterButton,
   SortButton,
-  CompletedButton,
   StyledTextField,
 } from '../../Tasks.styles';
 import { FilterPopover } from '../FilterPopover/FilterPopover';
@@ -22,7 +20,6 @@ export const TasksControlsBar = ({
   setSearchTerm,
   filterAnchorEl,
   sortAnchorEl,
-  isCompletedFilterActive,
   activeSort,
   activeFilterState,
   tags,
@@ -84,16 +81,6 @@ export const TasksControlsBar = ({
           onApply={handleApplySort}
           activeSort={activeSort ?? undefined}
         />
-        <CompletedButton
-          id="joyride-tasks-completed"
-          onClick={(e) => handleFilterClick(e, 'completed')}
-          active={isCompletedFilterActive}
-        >
-          <CheckCircleIcon sx={{ fontSize: 20 }} />
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Completed
-          </Typography>
-        </CompletedButton>
       </Box>
     </ControlsBar>
   );

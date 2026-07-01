@@ -118,6 +118,12 @@ export const useTasksMutations = ({
     try {
       const { data } = await deleteTasksMutation({
         variables: { ids },
+        update(cache) {
+          ids.forEach((id) => {
+            cache.evict({ id: cache.identify({ __typename: 'Task', id }) });
+          });
+          cache.gc();
+        },
         refetchQueries: [
           { query: GET_TASKS, variables: { userId } },
           { query: GET_TASKS_TITLES, variables: { userId } },

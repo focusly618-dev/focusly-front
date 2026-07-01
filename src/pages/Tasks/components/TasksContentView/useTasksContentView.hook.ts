@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { STATUS_SECTIONS } from './TasksContentView.types';
@@ -20,6 +20,7 @@ export const useTasksContentView = ({
     new Set(),
   );
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [prevViewMode, setPrevViewMode] = useState(viewMode);
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
   const [limit, setLimit] = useState(24);
@@ -130,15 +131,25 @@ export const useTasksContentView = ({
     }
   };
 
-  const handleDeleteSelectedClick = () => {
+  const handleDeleteSelectedClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsConfirmOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
-    setIsConfirmOpen(false);
-    if (deleteTasks) {
+  const handleConfirmDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!deleteTasks) return;
+    setIsDeleting(true);
+    try {
       await deleteTasks(Array.from(selectedTaskIds));
       setSelectedTaskIds(new Set());
+      setIsConfirmOpen(false);
+    } catch (err) {
+      console.error('Error deleting tasks:', err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -153,6 +164,7 @@ export const useTasksContentView = ({
   return {
     selectedTaskIds,
     isConfirmOpen,
+    isDeleting,
     selectedStatus,
     setSelectedStatus,
     limit,

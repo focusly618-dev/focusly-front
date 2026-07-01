@@ -5,6 +5,7 @@ import {
   MenuItem,
   Tooltip,
   Checkbox,
+  Switch,
 } from '@mui/material';
 import { useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
@@ -71,8 +72,6 @@ const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
   Scheduled: <StatusBadge statusColor="#8b5cf6" />,
   Archived: <StatusBadge statusColor="#4b5563" />,
 };
-
-import { StyledAISwitch } from '../../Tasks.styles';
 
 export const ListViewTask = ({
   task,
@@ -293,11 +292,11 @@ export const ListViewTask = ({
               transition: 'all 0.3s ease',
             }}
           />
-          <StyledAISwitch
+          <Switch
             size="small"
             checked={task.use_ai || false}
             disabled={isReadOnly}
-            onChange={async (e) => {
+            onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
               if (isReadOnly) return;
               if (updateTask) {
                 await updateTask(task.id, {
@@ -306,7 +305,13 @@ export const ListViewTask = ({
                 });
               }
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            sx={{
+              '& .MuiSwitch-switchBase.Mui-checked': { color: '#7c3aed' },
+              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: '#7c3aed',
+              },
+            }}
           />
         </Box>
 

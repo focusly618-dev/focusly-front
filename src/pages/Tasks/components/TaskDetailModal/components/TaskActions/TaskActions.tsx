@@ -8,10 +8,11 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Switch,
 } from '@mui/material';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { dialogActionsSx, saveButtonSx } from './TaskActions.styles';
-import { AISwitchContainer, StyledAISwitch } from '@/pages/Tasks/Tasks.styles';
+
 import type { TaskActionsProps } from './TaskActions.types';
 
 export const TaskActions = ({
@@ -48,19 +49,11 @@ export const TaskActions = ({
     <DialogActions sx={dialogActionsSx}>
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
         {setIsAIScheduleEnabled && (
-          <AISwitchContainer
+          <Box
             sx={{
-              border: 'none',
-              backgroundColor: 'transparent',
-              p: 0,
+              display: 'flex',
+              alignItems: 'center',
               gap: 1,
-              transform: 'none !important',
-              boxShadow: 'none !important',
-              '&:hover': {
-                borderColor: 'transparent',
-                boxShadow: 'none',
-                transform: 'none',
-              },
             }}
           >
             <AutoAwesomeIcon
@@ -80,13 +73,21 @@ export const TaskActions = ({
             >
               Schedule with AI
             </Typography>
-            <StyledAISwitch
+            <Switch
               size="small"
               checked={isAIScheduleEnabled}
-              onChange={(e) => setIsAIScheduleEnabled(e.target.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setIsAIScheduleEnabled(e.target.checked)
+              }
               disabled={isReadOnly}
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': { color: '#7c3aed' },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#7c3aed',
+                },
+              }}
             />
-          </AISwitchContainer>
+          </Box>
         )}
       </Box>
       {handleImproveTask && !isReadOnly && (

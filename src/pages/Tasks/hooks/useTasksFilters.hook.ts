@@ -28,7 +28,7 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
   const [activeSort, setActiveSort] = useState<TaskSortInput | undefined>(
     undefined,
   );
-  const [isCompletedFilterActive, setIsCompletedFilterActive] = useState(false);
+
   const [dateRange, setDateRange] = useState<DateRangeFilter>(() => {
     const saved = localStorage.getItem('tasksDateRange');
     return (saved as DateRangeFilter) || 'all';
@@ -66,7 +66,9 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
           }
 
           if (dateRange === 'this_month') {
-            const start = startOfMonth(now);
+            const startMonth = startOfMonth(now);
+            const startWeek = startOfWeek(now, { weekStartsOn: 1 });
+            const start = startWeek < startMonth ? startWeek : startMonth;
             const end = endOfMonth(now);
             return isWithinInterval(taskDate, { start, end });
           }
@@ -86,16 +88,14 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
       }
       const isStatusFiltered = (activeFilterState?.statuses?.length ?? 0) > 0;
 
-      if (isCompletedFilterActive) {
-        result = result.filter((task) => task.status === 'Done');
-      } else if (!isStatusFiltered) {
-        // Only hide Done tasks by default if we are not explicitly filtering by status
+      if (!isStatusFiltered) {
+        // Hide Done tasks by default if we are not explicitly filtering by status
         result = result.filter((task) => task.status !== 'Done');
       }
 
       return result;
     },
-    [dateRange, searchTerm, activeFilterState, isCompletedFilterActive],
+    [dateRange, searchTerm, activeFilterState],
   );
 
   const filteredTasks = useMemo(
@@ -185,8 +185,6 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
     activeFilters,
     activeFilterState,
     activeSort,
-    isCompletedFilterActive,
-    setIsCompletedFilterActive,
     dateRange,
     setDateRange,
     filteredTasks,
