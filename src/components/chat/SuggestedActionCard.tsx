@@ -63,6 +63,12 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
 
   const isLoading = taskLoading || wsLoading || groupLoading;
 
+  const normalizeEstimateTimer = (value?: number) => {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return 1800;
+    if (value > 1000 && value % 60 === 0) return Math.round(value / 60);
+    return value;
+  };
+
   const handleExecute = async () => {
     if (!user) {
       setErrorMessage('User not authenticated');
@@ -73,7 +79,9 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
     try {
       if (action.type === 'CREATE_TASK') {
         const priorityLevel = action.payload.priority_level ?? 2;
-        const estimateTimer = action.payload.estimate_timer ?? 1800;
+        const estimateTimer = normalizeEstimateTimer(
+          Number(action.payload.estimate_timer) || 1800,
+        );
 
         const res = await createTask({
           variables: {

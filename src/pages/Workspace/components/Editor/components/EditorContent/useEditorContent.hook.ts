@@ -102,8 +102,8 @@ export const useEditorContent = ({
 
     setIsAIProcessing(true);
 
-    const aiPrompt = `You are a task details generator. Analyze the text below and extract a task from it.
-Response MUST be a single raw JSON object (with no conversational preamble, quotes, markdown formatting, or introductory text) matching this schema:
+    const aiPrompt = `You are a helpful productivity assistant. Analyze the selected text and turn it into a clear task suggestion.
+Respond with a single raw JSON object and no extra commentary, matching this schema:
 {
   "title": "Action-oriented task title",
   "description": "Short explanation or context extracted from the text",

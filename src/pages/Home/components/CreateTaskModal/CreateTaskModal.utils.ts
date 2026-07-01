@@ -1,13 +1,23 @@
 export const parseDuration = (d: string | undefined | null): number => {
   if (!d || typeof d !== 'string') return 0;
-  const norm = d.toLowerCase();
-  const h = norm.match(/(\d+)h/)?.[1];
-  const m = norm.match(/(\d+)m/)?.[1];
-  let val = 0;
-  if (h) val += parseInt(h, 10) * 60;
-  if (m) val += parseInt(m, 10);
-  if (!h && !m && /^\d+$/.test(norm.trim())) val += parseInt(norm.trim(), 10);
-  return val;
+
+  const norm = d.toLowerCase().trim();
+  if (!norm) return 0;
+
+  const shortMatch = norm.match(/^(\d{1,3})(h|m)?$/i);
+  if (shortMatch) {
+    const amount = parseInt(shortMatch[1], 10);
+    if (shortMatch[2] === 'h') return amount * 60;
+    if (shortMatch[2] === 'm') return amount;
+    return amount;
+  }
+
+  const combinedMatch = norm.match(/^(\d{1,3})h\s*(\d{1,3})m$/i);
+  if (combinedMatch) {
+    return parseInt(combinedMatch[1], 10) * 60 + parseInt(combinedMatch[2], 10);
+  }
+
+  return 0;
 };
 
 export const formatDuration = (minutes?: number): string => {

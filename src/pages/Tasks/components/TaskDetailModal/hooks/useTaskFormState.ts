@@ -6,7 +6,7 @@ import {
   parseDuration,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { PriorityType } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import { addMinutes, format } from 'date-fns';
+import { addMinutes, format, isSameDay } from 'date-fns';
 import type { UseTaskFormStateProps } from '../types/TaskDetailModal.types';
 
 export const useTaskFormState = ({
@@ -99,6 +99,12 @@ export const useTaskFormState = ({
     if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
   };
 
+  const isValidDurationInput = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return true;
+    return /^(?:\d{1,3}(?:h|m)?|\d{1,3}h\s*\d{1,3}m)$/i.test(trimmed);
+  };
+
   const validateForm = () => {
     let isValid = true;
     const newErrors: { title?: string; duration?: string } = {};
@@ -109,16 +115,32 @@ export const useTaskFormState = ({
     if (!duration.trim()) {
       newErrors.duration = 'Duration is required';
       isValid = false;
+    } else if (!isValidDurationInput(duration)) {
+      newErrors.duration =
+        'Use up to 3 digits and formats like 30m, 2h, or 2h30m';
+      isValid = false;
     }
     setErrors(newErrors);
     return isValid;
   };
 
   const timeSlotDisplay = useMemo(() => {
-    if (!currentDate) return '';
+    if (!currentDate || Number.isNaN(currentDate.getTime())) return '';
+
     const mins = parseDuration(duration) || 25;
     const endDate = addMinutes(currentDate, mins);
-    return `${format(currentDate, 'hh:mm a')} - ${format(endDate, 'hh:mm a')}`;
+
+    if (Number.isNaN(endDate.getTime())) return '';
+
+    const sameDay = isSameDay(currentDate, endDate);
+    const startLabel = format(currentDate, 'hh:mm a');
+    const endLabel = format(endDate, 'hh:mm a');
+
+    if (sameDay) {
+      return `${startLabel} - ${endLabel}`;
+    }
+
+    return `${startLabel} - ${endLabel} • ${format(endDate, 'MMM d')}`;
   }, [currentDate, duration]);
 
   return {
