@@ -5,12 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTasks } from './Tasks.hook';
 import { TasksAIOrganizeModal } from './components/TasksAIOrganizeModal/TasksAIOrganizeModal';
-import {
-  TasksContainer,
-  MainContent,
-  AISwitchContainer,
-  StyledAISwitch,
-} from './Tasks.styles';
+import { TasksContainer, MainContent } from './Tasks.styles';
 import { TasksHeader } from './components/TasksHeader/TasksHeader';
 import { TasksControlsBar } from './components/TasksControlsBar/TasksControlsBar';
 import { TasksContentView } from './components/TasksContentView/TasksContentView';
@@ -40,7 +35,7 @@ export const Tasks = ({
     setSearchTerm,
     dateRange,
     setDateRange,
-    isCompletedFilterActive,
+
     activeSort,
     activeFilters,
     activeFilterState,
@@ -99,11 +94,6 @@ export const Tasks = ({
       content:
         'Use filters and sorting to stay focused on what matters most right now.',
     },
-    {
-      target: '#joyride-tasks-completed',
-      content:
-        'Toggle completed tasks to review your progress or clear your workspace.',
-    },
   ];
 
   return (
@@ -156,29 +146,6 @@ export const Tasks = ({
               >
                 AI Organize
               </Button>
-              <AISwitchContainer sx={{ height: 'fit-content', gap: 1 }}>
-                <AutoAwesomeIcon
-                  sx={{
-                    fontSize: 16,
-                    color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
-                    transition: 'color 0.3s ease',
-                  }}
-                />
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 600,
-                    color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
-                    transition: 'color 0.3s ease',
-                  }}
-                >
-                  Schedule with AI
-                </Typography>
-                <StyledAISwitch
-                  checked={isAIScheduleEnabled}
-                  onChange={(e) => setIsAIScheduleEnabled(e.target.checked)}
-                />
-              </AISwitchContainer>
             </Box>
           </TasksHeader>
 
@@ -188,7 +155,6 @@ export const Tasks = ({
             setSearchTerm={setSearchTerm}
             filterAnchorEl={filterAnchorEl}
             sortAnchorEl={sortAnchorEl}
-            isCompletedFilterActive={isCompletedFilterActive}
             activeSort={activeSort ?? null}
             activeFilterState={
               activeFilterState ?? {

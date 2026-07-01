@@ -153,7 +153,6 @@ export const useTasks = () => {
     highPriorityTasks,
     todayTasks,
     upcomingTasks,
-    isCompletedFilterActive: filterLogic.isCompletedFilterActive,
     dateRange: filterLogic.dateRange,
     setDateRange: filterLogic.setDateRange,
     activeSort: filterLogic.activeSort,
