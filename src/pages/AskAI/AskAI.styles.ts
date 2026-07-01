@@ -155,27 +155,27 @@ export const UserAvatar = styled(Box)(({ theme }) => ({
 export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
   ({ theme, isUser }) => ({
     maxWidth: '78%',
-    padding: '12px 16px',
-    borderRadius: isUser ? '18px 18px 4px 18px' : '4px 18px 18px 18px',
+    padding: '10px 14px',
+    borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
     backgroundColor: isUser
       ? theme.palette.primary.main
       : theme.palette.mode === 'dark'
-        ? 'rgba(255,255,255,0.05)'
-        : 'rgba(0,0,0,0.04)',
+        ? 'rgba(255,255,255,0.02)'
+        : 'rgba(0,0,0,0.015)',
     color: isUser ? '#fff' : theme.palette.text.primary,
-    fontSize: '14px',
-    lineHeight: '1.6',
-    border: isUser ? 'none' : `1px solid ${theme.palette.divider}`,
-    boxShadow: isUser ? '0 4px 14px rgba(19, 127, 236, 0.25)' : 'none',
+    fontSize: '13.5px',
+    lineHeight: '1.5',
+    border: `1px solid ${theme.palette.divider}`,
+    boxShadow: 'none',
     '& p': { margin: 0 },
     '& strong': { fontWeight: 700 },
     '& code': {
       fontFamily: 'monospace',
-      fontSize: '13px',
+      fontSize: '12px',
       backgroundColor:
         theme.palette.mode === 'dark'
           ? 'rgba(255,255,255,0.08)'
-          : 'rgba(0,0,0,0.07)',
+          : 'rgba(0,0,0,0.05)',
       padding: '1px 5px',
       borderRadius: '4px',
     },
@@ -188,21 +188,21 @@ export const TypingIndicator = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: '5px',
-  padding: '12px 16px',
-  borderRadius: '4px 18px 18px 18px',
+  padding: '10px 14px',
+  borderRadius: '16px 16px 16px 4px',
   border: `1px solid ${theme.palette.divider}`,
   backgroundColor:
     theme.palette.mode === 'dark'
-      ? 'rgba(255,255,255,0.05)'
-      : 'rgba(0,0,0,0.04)',
+      ? 'rgba(255,255,255,0.02)'
+      : 'rgba(0,0,0,0.015)',
   width: 'fit-content',
   '@keyframes dotBounce': {
     '0%, 80%, 100%': { transform: 'translateY(0)', opacity: 0.4 },
-    '40%': { transform: 'translateY(-5px)', opacity: 1 },
+    '40%': { transform: 'translateY(-4px)', opacity: 1 },
   },
   '& .dot': {
-    width: '6px',
-    height: '6px',
+    width: '5px',
+    height: '5px',
     borderRadius: '50%',
     backgroundColor: theme.palette.text.secondary,
     animation: 'dotBounce 1.2s ease-in-out infinite',
@@ -225,23 +225,20 @@ export const InputBox = styled(Paper)(({ theme }) => ({
   display: 'flex',
   alignItems: 'flex-end',
   gap: '8px',
-  padding: '10px 12px 10px 18px',
-  borderRadius: '16px',
+  padding: '8px 10px 8px 16px',
+  borderRadius: '12px',
   width: '100%',
   maxWidth: '780px',
   backgroundColor:
     theme.palette.mode === 'dark'
-      ? 'rgba(255,255,255,0.04)'
+      ? 'rgba(255,255,255,0.02)'
       : 'rgba(255,255,255,0.95)',
-  border: `1.5px solid ${theme.palette.divider}`,
-  boxShadow:
-    theme.palette.mode === 'dark'
-      ? '0 4px 24px rgba(0,0,0,0.35)'
-      : '0 4px 24px rgba(0,0,0,0.08)',
+  border: `1px solid ${theme.palette.divider}`,
+  boxShadow: 'none',
   transition: 'border-color 0.2s, box-shadow 0.2s',
   '&:focus-within': {
     borderColor: theme.palette.primary.main,
-    boxShadow: `0 4px 24px rgba(19, 127, 236, 0.15)`,
+    boxShadow: `0 0 0 3px ${theme.palette.primary.main}25`,
   },
 }));
 

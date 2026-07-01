@@ -112,6 +112,33 @@ export const useWorkspaceEditor = ({
     },
   });
 
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleInsert = (e: Event) => {
+      const customEvent = e as CustomEvent<{ text: string }>;
+      const textToInsert = customEvent.detail?.text;
+      if (!textToInsert) return;
+
+      try {
+        const blocks = editor.tryParseMarkdownToBlocks(textToInsert);
+        // Insert at the end of the document
+        const lastBlock = editor.document[editor.document.length - 1];
+        editor.insertBlocks(blocks, lastBlock, 'after');
+      } catch (err) {
+        console.error(
+          'Lumina failed to insert blocks into BlockNote editor:',
+          err,
+        );
+      }
+    };
+
+    window.addEventListener('lumina-insert-content', handleInsert);
+    return () => {
+      window.removeEventListener('lumina-insert-content', handleInsert);
+    };
+  }, [editor]);
+
   const onboardingSteps = [
     {
       target: '#joyride-editor-search',

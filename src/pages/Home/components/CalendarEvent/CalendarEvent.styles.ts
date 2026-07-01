@@ -127,7 +127,8 @@ export const EventContainer = styled(Box, {
     zIndex: 1,
     boxShadow: 'none',
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-    border: 'none',
+    borderRadius: '6px',
+    border: `1px solid ${theme.palette.divider}`,
     borderLeft: `3px solid ${borderColor}`,
     '&:hover': {
       backgroundColor: finalBgHover,

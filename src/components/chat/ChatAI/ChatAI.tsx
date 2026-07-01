@@ -15,6 +15,7 @@ import {
   Menu,
   MenuItem,
   Button,
+  useTheme,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -47,6 +48,7 @@ import {
   MessageBubble,
   AIAvatar,
   RobotIconWrapper,
+  TypingIndicator,
   SuggestionGrid,
   SuggestionChip,
   InputArea,
@@ -55,7 +57,7 @@ import {
   SendButton,
 } from './ChatAI.styles';
 
-const renderMarkdown = (text: string) => {
+const renderMarkdown = (text: string, isDark: boolean) => {
   if (!text) return '';
 
   // 1. Escape HTML
@@ -79,31 +81,152 @@ const renderMarkdown = (text: string) => {
   // 5. Lists: lines starting with "- " or "* " -> <li>...</li>
   const lines = html.split('\n');
   let inList = false;
-  const processedLines = [];
+  let inTable = false;
+  let tableLines: string[] = [];
+  const processedLines: string[] = [];
+
+  const flushTable = () => {
+    if (tableLines.length === 0) return;
+
+    // Parse tableLines into rows and columns
+    const rows = tableLines.map((line) => {
+      const parts = line.replace(/^\|/, '').replace(/\|$/, '').split('|');
+      return parts.map((p) => p.trim());
+    });
+
+    if (rows.length > 0) {
+      const borderColor = isDark
+        ? 'rgba(255,255,255,0.08)'
+        : 'rgba(0,0,0,0.08)';
+      const headerBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
+      const rowBg = isDark ? 'rgba(15,23,42,0.15)' : 'rgba(255,255,255,0.95)';
+      const thColor = isDark ? '#f8fafc' : '#0f172a';
+      const tdColor = isDark ? '#e2e8f0' : '#334155';
+      const rowBorder = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+
+      let tableHtml = `<div style="overflow-x: auto; margin: 12px 0; border-radius: 8px; border: 1px solid ${borderColor}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); alignment-adjust: central;">`;
+      tableHtml += `<table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; background: ${rowBg}; backdrop-filter: blur(4px); table-layout: auto;">`;
+
+      // Determine if second line is a Markdown table separator line
+      const hasHeader =
+        tableLines.length > 1 &&
+        (tableLines[1].includes('---') || tableLines[1].includes('-|-'));
+
+      let startIdx = 0;
+      if (hasHeader) {
+        tableHtml += `<thead><tr style="background: ${headerBg}; border-bottom: 1.5px solid ${borderColor};">`;
+        rows[0].forEach((cell) => {
+          tableHtml += `<th style="padding: 10px 14px; font-weight: 600; color: ${thColor};">${cell}</th>`;
+        });
+        tableHtml += '</tr></thead>';
+        startIdx = 2; // Skip header row and separator line
+      }
+
+      tableHtml += '<tbody>';
+      for (let i = startIdx; i < rows.length; i++) {
+        const row = rows[i];
+        if (row.length === 1 && row[0] === '') continue;
+
+        tableHtml += `<tr style="border-bottom: 1px solid ${rowBorder}; transition: background-color 0.15s;">`;
+        row.forEach((cell) => {
+          tableHtml += `<td style="padding: 10px 14px; color: ${tdColor}; vertical-align: middle;">${cell}</td>`;
+        });
+        tableHtml += '</tr>';
+      }
+      tableHtml += '</tbody></table></div>';
+      processedLines.push(tableHtml);
+    }
+
+    tableLines = [];
+    inTable = false;
+  };
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
-      if (!inList) {
-        processedLines.push('<ul style="margin: 6px 0; padding-left: 20px;">');
-        inList = true;
-      }
-      processedLines.push(
-        `<li style="margin-bottom: 4px;">${trimmed.substring(2)}</li>`,
-      );
-    } else {
+    const isTableLine =
+      trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 1;
+
+    if (isTableLine) {
       if (inList) {
         processedLines.push('</ul>');
         inList = false;
       }
-      if (trimmed === '') {
-        processedLines.push('<p style="margin: 0; min-height: 8px;"></p>');
-      } else {
+      inTable = true;
+      tableLines.push(trimmed);
+    } else {
+      if (inTable) {
+        flushTable();
+      }
+
+      if (trimmed.startsWith('### ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const titleText = trimmed.substring(4);
+        const color = isDark ? '#f8fafc' : '#0f172a';
         processedLines.push(
-          `<p style="margin: 0; margin-bottom: 6px;">${line}</p>`,
+          `<h3 style="margin: 14px 0 6px 0; font-size: 14px; font-weight: 700; color: ${color};">${titleText}</h3>`,
         );
+      } else if (trimmed.startsWith('## ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const titleText = trimmed.substring(3);
+        const color = isDark ? '#f8fafc' : '#0f172a';
+        processedLines.push(
+          `<h2 style="margin: 18px 0 8px 0; font-size: 16px; font-weight: 700; color: ${color}; border-bottom: 1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}; padding-bottom: 4px;">${titleText}</h2>`,
+        );
+      } else if (trimmed.startsWith('# ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const titleText = trimmed.substring(2);
+        const color = isDark ? '#f8fafc' : '#0f172a';
+        processedLines.push(
+          `<h1 style="margin: 22px 0 10px 0; font-size: 18px; font-weight: 800; color: ${color};">${titleText}</h1>`,
+        );
+      } else if (trimmed.startsWith('> ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const quoteText = trimmed.substring(2);
+        const quoteBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+        const quoteColor = isDark ? '#cbd5e1' : '#475569';
+        processedLines.push(
+          `<blockquote style="margin: 10px 0; padding: 8px 14px; background: ${quoteBg}; border-left: 4px solid #3b82f6; border-radius: 0 6px 6px 0; color: ${quoteColor}; font-style: italic; font-size: 13.5px; line-height: 1.6;">${quoteText}</blockquote>`,
+        );
+      } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        if (!inList) {
+          processedLines.push(
+            '<ul style="margin: 6px 0; padding-left: 20px;">',
+          );
+          inList = true;
+        }
+        processedLines.push(
+          `<li style="margin-bottom: 4px;">${trimmed.substring(2)}</li>`,
+        );
+      } else {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        if (trimmed === '') {
+          processedLines.push('<p style="margin: 0; min-height: 8px;"></p>');
+        } else {
+          processedLines.push(
+            `<p style="margin: 0; margin-bottom: 6px;">${line}</p>`,
+          );
+        }
       }
     }
+  }
+
+  if (inTable) {
+    flushTable();
   }
   if (inList) {
     processedLines.push('</ul>');
@@ -136,6 +259,7 @@ const ChatAIInner = ({
   selectedModel,
   setSelectedModel,
 }: ChatAIInnerProps) => {
+  const theme = useTheme();
   const messages = useAuiState((s) => s.thread.messages);
   const isRunning = useAuiState((s) => s.thread.isRunning);
   const thread = useThreadRuntime();
@@ -368,20 +492,54 @@ const ChatAIInner = ({
                     />
                   </AIAvatar>
                 )}
-                <Box display="flex" flexDirection="column" sx={{ maxWidth: '75%', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  sx={{
+                    maxWidth: '75%',
+                    alignItems: isUser ? 'flex-end' : 'flex-start',
+                  }}
+                >
                   <MessageBubble
                     isUser={isUser}
                     dangerouslySetInnerHTML={{
-                      __html: isUser ? cleanText : renderMarkdown(cleanText),
+                      __html: isUser
+                        ? cleanText
+                        : renderMarkdown(
+                            cleanText,
+                            theme.palette.mode === 'dark',
+                          ),
                     }}
                   />
-                  {!isUser && action && (
-                    <SuggestedActionCard action={action} />
-                  )}
+                  {!isUser && action && <SuggestedActionCard action={action} />}
                 </Box>
               </MessageRow>
             );
           })
+        )}
+        {/* Typing indicator */}
+        {isRunning && (
+          <MessageRow isUser={false}>
+            <AIAvatar>
+              <CuteRobotIcon
+                size={16}
+                variant="mini"
+                primaryColor="#137fec"
+                eyeColor="#22d3ee"
+              />
+            </AIAvatar>
+            <Box
+              display="flex"
+              flexDirection="column"
+              sx={{ maxWidth: '75%', alignItems: 'flex-start' }}
+            >
+              <TypingIndicator>
+                <div className="dot" />
+                <div className="dot" />
+                <div className="dot" />
+              </TypingIndicator>
+            </Box>
+          </MessageRow>
         )}
         <div ref={endRef} />
       </MessageList>
