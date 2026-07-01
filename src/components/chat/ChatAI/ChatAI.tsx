@@ -25,7 +25,7 @@ import {
   KeyboardArrowDown as ArrowDownIcon,
   RadioButtonChecked as TokenIcon,
 } from '@mui/icons-material';
-import { CuteRobotIcon } from '@/components/ui';
+import { CuteRobotIcon, ClaudeIcon, GeminiIcon } from '@/components/ui';
 import {
   useLocalRuntime,
   AssistantRuntimeProvider,
@@ -255,6 +255,15 @@ const getModelLabel = (model: string) => {
   }
 };
 
+const getModelIcon = (model: string, isMenu: boolean = false) => {
+  const size = isMenu ? 16 : 14;
+  const mr = isMenu ? 1.5 : 0.5;
+  if (model.startsWith('claude')) {
+    return <ClaudeIcon sx={{ fontSize: size, color: '#cc6543', mr }} />;
+  }
+  return <GeminiIcon sx={{ fontSize: size, color: '#137fec', mr }} />;
+};
+
 interface ChatAIInnerProps {
   setIsOpen: (open: boolean) => void;
   selectedModel: string;
@@ -364,6 +373,7 @@ const ChatAIInner = ({
           <ModelBadgeButton
             size="small"
             onClick={(e) => setModelAnchor(e.currentTarget)}
+            startIcon={getModelIcon(selectedModel)}
             endIcon={<ArrowDownIcon sx={{ fontSize: 12 }} />}
           >
             {getModelLabel(selectedModel)}
@@ -391,6 +401,7 @@ const ChatAIInner = ({
               selected={selectedModel === 'claude-3-5-sonnet'}
               sx={{ fontSize: '12px', fontWeight: 600 }}
             >
+              <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
               Claude 3.5 Sonnet (Recommended)
             </MenuItem>
             <MenuItem
@@ -401,6 +412,7 @@ const ChatAIInner = ({
               selected={selectedModel === 'claude-3-5-haiku'}
               sx={{ fontSize: '12px', fontWeight: 600 }}
             >
+              <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
               Claude 3.5 Haiku (Fast)
             </MenuItem>
             <MenuItem
@@ -411,6 +423,7 @@ const ChatAIInner = ({
               selected={selectedModel === 'claude-3-opus'}
               sx={{ fontSize: '12px', fontWeight: 600 }}
             >
+              <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
               Claude 3 Opus (Advanced)
             </MenuItem>
             <Divider sx={{ my: 0.5 }} />
@@ -423,6 +436,7 @@ const ChatAIInner = ({
               selected={selectedModel === 'gemini-2.5-flash-lite'}
               sx={{ fontSize: '12px', fontWeight: 600 }}
             >
+              <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
               Gemini 2.5 Flash Lite
             </MenuItem>
             <MenuItem
@@ -433,6 +447,7 @@ const ChatAIInner = ({
               selected={selectedModel === 'gemini-2.5-flash'}
               sx={{ fontSize: '12px', fontWeight: 600 }}
             >
+              <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
               Gemini 2.5 Flash
             </MenuItem>
             <MenuItem
@@ -443,6 +458,7 @@ const ChatAIInner = ({
               selected={selectedModel === 'gemini-1.5-flash'}
               sx={{ fontSize: '12px', fontWeight: 600 }}
             >
+              <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
               Gemini 1.5 Flash
             </MenuItem>
           </Menu>
