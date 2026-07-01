@@ -327,7 +327,7 @@ export const AskAI: React.FC = () => {
           id: m.id,
           sender: m.role === 'user' ? 'user' : 'ai',
           text: m.content,
-          html: renderMarkdown(m.content),
+          html: renderMarkdown(m.content, theme.palette.mode === 'dark'),
         })),
       );
     } catch (err) {
