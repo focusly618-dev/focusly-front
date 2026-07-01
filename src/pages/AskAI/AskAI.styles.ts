@@ -311,3 +311,41 @@ export const ChatAreaWrapper = styled(Box)({
   overflow: 'hidden',
   position: 'relative',
 });
+
+export const ChatHeader = styled(Box)(({ theme }) => ({
+  height: '52px',
+  padding: '0 24px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(15, 23, 42, 0.4)'
+      : 'rgba(255, 255, 255, 0.4)',
+  backdropFilter: 'blur(10px)',
+  zIndex: 10,
+}));
+
+export const ModelBadgeButton = styled(Button)(({ theme }) => ({
+  padding: '4px 10px',
+  borderRadius: '8px',
+  textTransform: 'none',
+  fontSize: '11px',
+  fontWeight: 700,
+  minWidth: 0,
+  gap: '4px',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.05)'
+      : 'rgba(0, 0, 0, 0.05)',
+  border: `1px solid ${theme.palette.divider}`,
+  color: theme.palette.text.primary,
+  '&:hover': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.1)'
+        : 'rgba(0, 0, 0, 0.08)',
+    borderColor: theme.palette.primary.main,
+  },
+}));

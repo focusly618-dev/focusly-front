@@ -10,6 +10,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Menu,
+  MenuItem,
+  Divider,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -17,6 +20,7 @@ import {
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
   InfoOutlined as InfoIcon,
+  ArrowDropDown as ArrowDownIcon,
 } from '@mui/icons-material';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector } from '@/redux/hooks';
@@ -50,6 +54,8 @@ import {
   SendButton,
   HistorySidebar,
   ChatAreaWrapper,
+  ChatHeader,
+  ModelBadgeButton,
 } from './AskAI.styles';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -288,6 +294,8 @@ export const AskAI: React.FC = () => {
     string | null
   >(null);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('claude-3-5-sonnet');
+  const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
 
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -363,6 +371,25 @@ export const AskAI: React.FC = () => {
     return `Good evening, ${name} 🌙`;
   };
 
+  const getModelLabel = (model: string) => {
+    switch (model) {
+      case 'claude-3-5-sonnet':
+        return 'Claude 3.5 Sonnet';
+      case 'claude-3-5-haiku':
+        return 'Claude 3.5 Haiku';
+      case 'claude-3-opus':
+        return 'Claude 3 Opus';
+      case 'gemini-2.5-flash-lite':
+        return 'Gemini Flash Lite';
+      case 'gemini-2.5-flash':
+        return 'Gemini Flash 2.5';
+      case 'gemini-1.5-flash':
+        return 'Gemini Flash 1.5';
+      default:
+        return 'AI Model';
+    }
+  };
+
   const biggestTask = tasks.reduce(
     (prev, curr) =>
       (curr.estimated_end_date &&
@@ -435,7 +462,7 @@ export const AskAI: React.FC = () => {
               }
             : null,
           undefined,
-          'gemini-2.5-flash-lite',
+          selectedModel,
           activeConversationId || undefined,
         );
 
@@ -492,6 +519,7 @@ export const AskAI: React.FC = () => {
       activeConversationId,
       conversations,
       theme.palette.mode,
+      selectedModel,
     ],
   );
 
@@ -542,6 +570,113 @@ export const AskAI: React.FC = () => {
     <AskAIContainer>
       {/* ── Main Chat Area ── */}
       <ChatAreaWrapper>
+        {/* ── Chat Header with Model Selector ── */}
+        <ChatHeader>
+          <Box display="flex" alignItems="center" gap={1}>
+            <CuteRobotIcon
+              size={20}
+              variant="mini"
+              primaryColor={primaryColor}
+            />
+            <Typography
+              variant="subtitle2"
+              fontWeight={800}
+              color="text.primary"
+            >
+              Lumina AI Chat
+            </Typography>
+          </Box>
+
+          <Box display="flex" alignItems="center" gap={1}>
+            <ModelBadgeButton
+              size="small"
+              onClick={(e) => setModelAnchor(e.currentTarget)}
+              endIcon={<ArrowDownIcon sx={{ fontSize: 12 }} />}
+            >
+              {getModelLabel(selectedModel)}
+            </ModelBadgeButton>
+            <Menu
+              anchorEl={modelAnchor}
+              open={Boolean(modelAnchor)}
+              onClose={() => setModelAnchor(null)}
+              PaperProps={{
+                sx: {
+                  borderRadius: '10px',
+                  minWidth: '150px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  mt: 0.5,
+                },
+              }}
+            >
+              {/* Claude models */}
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-5-sonnet');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-5-sonnet'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Claude 3.5 Sonnet (Recommended)
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-5-haiku');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-5-haiku'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Claude 3.5 Haiku (Fast)
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-opus');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-opus'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Claude 3 Opus (Advanced)
+              </MenuItem>
+              <Divider sx={{ my: 0.5 }} />
+              {/* Gemini models */}
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-2.5-flash-lite');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-2.5-flash-lite'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Gemini 2.5 Flash Lite
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-2.5-flash');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-2.5-flash'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Gemini 2.5 Flash
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-1.5-flash');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-1.5-flash'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Gemini 1.5 Flash
+              </MenuItem>
+            </Menu>
+          </Box>
+        </ChatHeader>
+
         {/* ── Scrollable chat area ── */}
         <ChatScrollArea>
           <CenteredColumn>

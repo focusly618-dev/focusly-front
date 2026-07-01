@@ -16,6 +16,7 @@ import {
   MenuItem,
   Button,
   useTheme,
+  Divider,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -237,12 +238,18 @@ const renderMarkdown = (text: string, isDark: boolean) => {
 
 const getModelLabel = (model: string) => {
   switch (model) {
+    case 'claude-3-5-sonnet':
+      return 'Claude 3.5 Sonnet';
+    case 'claude-3-5-haiku':
+      return 'Claude 3.5 Haiku';
+    case 'claude-3-opus':
+      return 'Claude 3 Opus';
     case 'gemini-2.5-flash-lite':
-      return 'Flash Lite';
+      return 'Gemini Flash Lite';
     case 'gemini-2.5-flash':
-      return 'Flash 2.5';
+      return 'Gemini Flash 2.5';
     case 'gemini-1.5-flash':
-      return 'Flash 1.5';
+      return 'Gemini Flash 1.5';
     default:
       return 'AI Model';
   }
@@ -375,6 +382,39 @@ const ChatAIInner = ({
               },
             }}
           >
+            {/* Claude models */}
+            <MenuItem
+              onClick={() => {
+                setSelectedModel('claude-3-5-sonnet');
+                setModelAnchor(null);
+              }}
+              selected={selectedModel === 'claude-3-5-sonnet'}
+              sx={{ fontSize: '12px', fontWeight: 600 }}
+            >
+              Claude 3.5 Sonnet (Recommended)
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setSelectedModel('claude-3-5-haiku');
+                setModelAnchor(null);
+              }}
+              selected={selectedModel === 'claude-3-5-haiku'}
+              sx={{ fontSize: '12px', fontWeight: 600 }}
+            >
+              Claude 3.5 Haiku (Fast)
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setSelectedModel('claude-3-opus');
+                setModelAnchor(null);
+              }}
+              selected={selectedModel === 'claude-3-opus'}
+              sx={{ fontSize: '12px', fontWeight: 600 }}
+            >
+              Claude 3 Opus (Advanced)
+            </MenuItem>
+            <Divider sx={{ my: 0.5 }} />
+            {/* Gemini models */}
             <MenuItem
               onClick={() => {
                 setSelectedModel('gemini-2.5-flash-lite');
@@ -383,7 +423,7 @@ const ChatAIInner = ({
               selected={selectedModel === 'gemini-2.5-flash-lite'}
               sx={{ fontSize: '12px', fontWeight: 600 }}
             >
-              Gemini 2.5 Flash Lite (Fast)
+              Gemini 2.5 Flash Lite
             </MenuItem>
             <MenuItem
               onClick={() => {
