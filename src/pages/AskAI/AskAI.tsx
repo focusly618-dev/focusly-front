@@ -10,6 +10,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Menu,
+  MenuItem,
+  Divider,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -17,6 +20,7 @@ import {
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
   InfoOutlined as InfoIcon,
+  ArrowDropDown as ArrowDownIcon,
 } from '@mui/icons-material';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector } from '@/redux/hooks';
@@ -50,6 +54,8 @@ import {
   SendButton,
   HistorySidebar,
   ChatAreaWrapper,
+  ChatHeader,
+  ModelBadgeButton,
 } from './AskAI.styles';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -92,7 +98,7 @@ const suggestions = [
 
 // ─── Markdown Rendering Helper ───────────────────────────────────────────────
 
-const renderMarkdown = (text: string) => {
+const renderMarkdown = (text: string, isDark: boolean) => {
   if (!text) return '';
 
   // 1. Escape HTML
@@ -119,31 +125,152 @@ const renderMarkdown = (text: string) => {
   // 5. Lists: lines starting with "- " or "* " -> <li>...</li>
   const lines = html.split('\n');
   let inList = false;
-  const processedLines = [];
+  let inTable = false;
+  let tableLines: string[] = [];
+  const processedLines: string[] = [];
+
+  const flushTable = () => {
+    if (tableLines.length === 0) return;
+
+    // Parse tableLines into rows and columns
+    const rows = tableLines.map((line) => {
+      const parts = line.replace(/^\|/, '').replace(/\|$/, '').split('|');
+      return parts.map((p) => p.trim());
+    });
+
+    if (rows.length > 0) {
+      const borderColor = isDark
+        ? 'rgba(255,255,255,0.08)'
+        : 'rgba(0,0,0,0.08)';
+      const headerBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
+      const rowBg = isDark ? 'rgba(15,23,42,0.15)' : 'rgba(255,255,255,0.95)';
+      const thColor = isDark ? '#f8fafc' : '#0f172a';
+      const tdColor = isDark ? '#e2e8f0' : '#334155';
+      const rowBorder = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+
+      let tableHtml = `<div style="overflow-x: auto; margin: 12px 0; border-radius: 8px; border: 1px solid ${borderColor}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); alignment-adjust: central;">`;
+      tableHtml += `<table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; background: ${rowBg}; backdrop-filter: blur(4px); table-layout: auto;">`;
+
+      // Determine if second line is a Markdown table separator line
+      const hasHeader =
+        tableLines.length > 1 &&
+        (tableLines[1].includes('---') || tableLines[1].includes('-|-'));
+
+      let startIdx = 0;
+      if (hasHeader) {
+        tableHtml += `<thead><tr style="background: ${headerBg}; border-bottom: 1.5px solid ${borderColor};">`;
+        rows[0].forEach((cell) => {
+          tableHtml += `<th style="padding: 10px 14px; font-weight: 600; color: ${thColor};">${cell}</th>`;
+        });
+        tableHtml += '</tr></thead>';
+        startIdx = 2; // Skip header row and separator line
+      }
+
+      tableHtml += '<tbody>';
+      for (let i = startIdx; i < rows.length; i++) {
+        const row = rows[i];
+        if (row.length === 1 && row[0] === '') continue;
+
+        tableHtml += `<tr style="border-bottom: 1px solid ${rowBorder}; transition: background-color 0.15s;">`;
+        row.forEach((cell) => {
+          tableHtml += `<td style="padding: 10px 14px; color: ${tdColor}; vertical-align: middle;">${cell}</td>`;
+        });
+        tableHtml += '</tr>';
+      }
+      tableHtml += '</tbody></table></div>';
+      processedLines.push(tableHtml);
+    }
+
+    tableLines = [];
+    inTable = false;
+  };
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
-      if (!inList) {
-        processedLines.push('<ul style="margin: 6px 0; padding-left: 20px;">');
-        inList = true;
-      }
-      processedLines.push(
-        `<li style="margin-bottom: 4px;">${trimmed.substring(2)}</li>`,
-      );
-    } else {
+    const isTableLine =
+      trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 1;
+
+    if (isTableLine) {
       if (inList) {
         processedLines.push('</ul>');
         inList = false;
       }
-      if (trimmed === '') {
-        processedLines.push('<p style="margin: 0; min-height: 8px;"></p>');
-      } else {
+      inTable = true;
+      tableLines.push(trimmed);
+    } else {
+      if (inTable) {
+        flushTable();
+      }
+
+      if (trimmed.startsWith('### ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const titleText = trimmed.substring(4);
+        const color = isDark ? '#f8fafc' : '#0f172a';
         processedLines.push(
-          `<p style="margin: 0; margin-bottom: 6px;">${line}</p>`,
+          `<h3 style="margin: 14px 0 6px 0; font-size: 14px; font-weight: 700; color: ${color};">${titleText}</h3>`,
         );
+      } else if (trimmed.startsWith('## ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const titleText = trimmed.substring(3);
+        const color = isDark ? '#f8fafc' : '#0f172a';
+        processedLines.push(
+          `<h2 style="margin: 18px 0 8px 0; font-size: 16px; font-weight: 700; color: ${color}; border-bottom: 1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}; padding-bottom: 4px;">${titleText}</h2>`,
+        );
+      } else if (trimmed.startsWith('# ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const titleText = trimmed.substring(2);
+        const color = isDark ? '#f8fafc' : '#0f172a';
+        processedLines.push(
+          `<h1 style="margin: 22px 0 10px 0; font-size: 18px; font-weight: 800; color: ${color};">${titleText}</h1>`,
+        );
+      } else if (trimmed.startsWith('> ')) {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        const quoteText = trimmed.substring(2);
+        const quoteBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+        const quoteColor = isDark ? '#cbd5e1' : '#475569';
+        processedLines.push(
+          `<blockquote style="margin: 10px 0; padding: 8px 14px; background: ${quoteBg}; border-left: 4px solid #3b82f6; border-radius: 0 6px 6px 0; color: ${quoteColor}; font-style: italic; font-size: 13.5px; line-height: 1.6;">${quoteText}</blockquote>`,
+        );
+      } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        if (!inList) {
+          processedLines.push(
+            '<ul style="margin: 6px 0; padding-left: 20px;">',
+          );
+          inList = true;
+        }
+        processedLines.push(
+          `<li style="margin-bottom: 4px;">${trimmed.substring(2)}</li>`,
+        );
+      } else {
+        if (inList) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+        if (trimmed === '') {
+          processedLines.push('<p style="margin: 0; min-height: 8px;"></p>');
+        } else {
+          processedLines.push(
+            `<p style="margin: 0; margin-bottom: 6px;">${line}</p>`,
+          );
+        }
       }
     }
+  }
+
+  if (inTable) {
+    flushTable();
   }
   if (inList) {
     processedLines.push('</ul>');
@@ -167,6 +294,8 @@ export const AskAI: React.FC = () => {
     string | null
   >(null);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('claude-3-5-sonnet');
+  const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
 
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -198,7 +327,7 @@ export const AskAI: React.FC = () => {
           id: m.id,
           sender: m.role === 'user' ? 'user' : 'ai',
           text: m.content,
-          html: renderMarkdown(m.content),
+          html: renderMarkdown(m.content, theme.palette.mode === 'dark'),
         })),
       );
     } catch (err) {
@@ -240,6 +369,25 @@ export const AskAI: React.FC = () => {
     if (hour < 12) return `Good morning, ${name} ☀️`;
     if (hour < 17) return `Good afternoon, ${name} 👋`;
     return `Good evening, ${name} 🌙`;
+  };
+
+  const getModelLabel = (model: string) => {
+    switch (model) {
+      case 'claude-3-5-sonnet':
+        return 'Claude 3.5 Sonnet';
+      case 'claude-3-5-haiku':
+        return 'Claude 3.5 Haiku';
+      case 'claude-3-opus':
+        return 'Claude 3 Opus';
+      case 'gemini-2.5-flash-lite':
+        return 'Gemini Flash Lite';
+      case 'gemini-2.5-flash':
+        return 'Gemini Flash 2.5';
+      case 'gemini-1.5-flash':
+        return 'Gemini Flash 1.5';
+      default:
+        return 'AI Model';
+    }
   };
 
   const biggestTask = tasks.reduce(
@@ -314,7 +462,7 @@ export const AskAI: React.FC = () => {
               }
             : null,
           undefined,
-          'gemini-2.5-flash-lite',
+          selectedModel,
           activeConversationId || undefined,
         );
 
@@ -334,7 +482,10 @@ export const AskAI: React.FC = () => {
                 ? {
                     ...msg,
                     text: accumulatedText,
-                    html: renderMarkdown(accumulatedText),
+                    html: renderMarkdown(
+                      accumulatedText,
+                      theme.palette.mode === 'dark',
+                    ),
                   }
                 : msg,
             ),
@@ -362,7 +513,14 @@ export const AskAI: React.FC = () => {
         setIsTyping(false);
       }
     },
-    [messages, biggestTask, activeConversationId, conversations],
+    [
+      messages,
+      biggestTask,
+      activeConversationId,
+      conversations,
+      theme.palette.mode,
+      selectedModel,
+    ],
   );
 
   const handleRetry = async (msgId: string) => {
@@ -412,6 +570,113 @@ export const AskAI: React.FC = () => {
     <AskAIContainer>
       {/* ── Main Chat Area ── */}
       <ChatAreaWrapper>
+        {/* ── Chat Header with Model Selector ── */}
+        <ChatHeader>
+          <Box display="flex" alignItems="center" gap={1}>
+            <CuteRobotIcon
+              size={20}
+              variant="mini"
+              primaryColor={primaryColor}
+            />
+            <Typography
+              variant="subtitle2"
+              fontWeight={800}
+              color="text.primary"
+            >
+              Lumina AI Chat
+            </Typography>
+          </Box>
+
+          <Box display="flex" alignItems="center" gap={1}>
+            <ModelBadgeButton
+              size="small"
+              onClick={(e) => setModelAnchor(e.currentTarget)}
+              endIcon={<ArrowDownIcon sx={{ fontSize: 12 }} />}
+            >
+              {getModelLabel(selectedModel)}
+            </ModelBadgeButton>
+            <Menu
+              anchorEl={modelAnchor}
+              open={Boolean(modelAnchor)}
+              onClose={() => setModelAnchor(null)}
+              PaperProps={{
+                sx: {
+                  borderRadius: '10px',
+                  minWidth: '150px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  mt: 0.5,
+                },
+              }}
+            >
+              {/* Claude models */}
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-5-sonnet');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-5-sonnet'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Claude 3.5 Sonnet (Recommended)
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-5-haiku');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-5-haiku'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Claude 3.5 Haiku (Fast)
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-opus');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-opus'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Claude 3 Opus (Advanced)
+              </MenuItem>
+              <Divider sx={{ my: 0.5 }} />
+              {/* Gemini models */}
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-2.5-flash-lite');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-2.5-flash-lite'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Gemini 2.5 Flash Lite
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-2.5-flash');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-2.5-flash'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Gemini 2.5 Flash
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-1.5-flash');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-1.5-flash'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                Gemini 1.5 Flash
+              </MenuItem>
+            </Menu>
+          </Box>
+        </ChatHeader>
+
         {/* ── Scrollable chat area ── */}
         <ChatScrollArea>
           <CenteredColumn>
@@ -478,7 +743,7 @@ export const AskAI: React.FC = () => {
                   const isUser = msg.sender === 'user';
                   const { cleanText, action } = parseLuminaAction(msg.text);
                   const cleanHtml = msg.html
-                    ? renderMarkdown(cleanText)
+                    ? renderMarkdown(cleanText, theme.palette.mode === 'dark')
                     : undefined;
 
                   return (
@@ -671,14 +936,21 @@ export const AskAI: React.FC = () => {
                   justifyContent: 'space-between',
                   px: 1.5,
                   py: 1,
-                  borderRadius: '10px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  mb: 0.5,
+                  mb: 0.8,
                   bgcolor: isActive
                     ? theme.palette.mode === 'dark'
                       ? 'rgba(59, 130, 246, 0.12)'
                       : 'rgba(59, 130, 246, 0.08)'
-                    : 'transparent',
+                    : theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.02)'
+                      : 'rgba(0, 0, 0, 0.015)',
+                  border: `1px solid ${
+                    isActive
+                      ? theme.palette.primary.main
+                      : theme.palette.divider
+                  }`,
                   color: isActive
                     ? theme.palette.primary.main
                     : theme.palette.text.primary,
@@ -687,7 +959,12 @@ export const AskAI: React.FC = () => {
                       ? theme.palette.mode === 'dark'
                         ? 'rgba(59, 130, 246, 0.15)'
                         : 'rgba(59, 130, 246, 0.12)'
-                      : theme.palette.action.hover,
+                      : theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.05)'
+                        : 'rgba(0, 0, 0, 0.03)',
+                    borderColor: isActive
+                      ? theme.palette.primary.dark
+                      : 'rgba(19, 127, 236, 0.3)',
                     '& .delete-btn': { opacity: 1 },
                   },
                   transition: 'all 0.15s ease',

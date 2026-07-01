@@ -6,15 +6,23 @@ export interface LuminaActionPayload {
   priority_level?: number;
   groupId?: string;
   content?: string;
+  markdown?: string;
 }
 
 export interface ParsedLuminaAction {
-  type: 'CREATE_TASK' | 'CREATE_WORKSPACE' | 'CREATE_PROJECT_GROUP';
+  type:
+    | 'CREATE_TASK'
+    | 'CREATE_WORKSPACE'
+    | 'CREATE_PROJECT_GROUP'
+    | 'INSERT_TO_WORKSPACE';
   payload: LuminaActionPayload;
 }
 
-export const parseLuminaAction = (text: string): { cleanText: string; action: ParsedLuminaAction | null } => {
-  const regex = /\[ACTION:\s*(CREATE_TASK|CREATE_WORKSPACE|CREATE_PROJECT_GROUP)\s*(\{.*?\})\]/;
+export const parseLuminaAction = (
+  text: string,
+): { cleanText: string; action: ParsedLuminaAction | null } => {
+  const regex =
+    /\[ACTION:\s*(CREATE_TASK|CREATE_WORKSPACE|CREATE_PROJECT_GROUP|INSERT_TO_WORKSPACE)\s*(\{.*?\})\]/;
   const match = text.match(regex);
   if (!match) {
     return { cleanText: text, action: null };

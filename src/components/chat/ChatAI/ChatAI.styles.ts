@@ -186,25 +186,18 @@ export const MessageBubble = styled(Box, {
   backgroundColor: isUser
     ? theme.palette.primary.main
     : theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.03)'
-      : 'rgba(0, 0, 0, 0.02)',
+      ? 'rgba(255, 255, 255, 0.02)'
+      : 'rgba(0, 0, 0, 0.015)',
   color: isUser
     ? theme.palette.primary.contrastText
     : theme.palette.text.primary,
-  ...(isUser && {
-    background: 'linear-gradient(135deg, #137fec 0%, #4f46e5 100%)',
-  }),
-  padding: '12px 16px',
+  padding: '10px 14px',
   borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-  fontSize: '13.5px',
+  fontSize: '13px',
   lineHeight: '1.5',
   wordBreak: 'break-word',
-  boxShadow: isUser
-    ? '0 4px 12px rgba(19, 127, 236, 0.25)'
-    : theme.palette.mode === 'dark'
-      ? '0 4px 12px rgba(0, 0, 0, 0.15)'
-      : 'none',
-  border: isUser ? 'none' : `1px solid ${theme.palette.divider}`,
+  boxShadow: 'none',
+  border: `1px solid ${theme.palette.divider}`,
   backdropFilter: isUser ? 'none' : 'blur(8px)',
   '& p': { margin: 0, marginBottom: '6px' },
   '& p:last-child': { marginBottom: 0 },
@@ -229,6 +222,34 @@ export const MessageBubble = styled(Box, {
     overflowX: 'auto',
     fontSize: '12px',
     margin: '8px 0',
+  },
+}));
+
+export const TypingIndicator = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '5px',
+  padding: '10px 14px',
+  borderRadius: '16px 16px 16px 4px',
+  border: `1px solid ${theme.palette.divider}`,
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.02)'
+      : 'rgba(0, 0, 0, 0.015)',
+  width: 'fit-content',
+  alignSelf: 'flex-start',
+  '@keyframes dotBounce': {
+    '0%, 80%, 100%': { transform: 'translateY(0)', opacity: 0.4 },
+    '40%': { transform: 'translateY(-4px)', opacity: 1 },
+  },
+  '& .dot': {
+    width: '5px',
+    height: '5px',
+    borderRadius: '50%',
+    backgroundColor: theme.palette.text.secondary,
+    animation: 'dotBounce 1.2s ease-in-out infinite',
+    '&:nth-of-type(2)': { animationDelay: '0.2s' },
+    '&:nth-of-type(3)': { animationDelay: '0.4s' },
   },
 }));
 
