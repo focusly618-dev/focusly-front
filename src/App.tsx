@@ -10,7 +10,7 @@ import NotFoundPage from '@/pages/NotFound/page_not_found';
 import Dashboard from '@/pages/Dashboard/Dashboard';
 import { useSession } from '@/hooks/useSession';
 import { useAppSelector } from '@/redux/hooks';
-import { SessionExpiredBanner } from '@/components/SessionExpiredBanner';
+import { SessionExpiredBanner } from '@/components/ui/SessionExpiredBanner';
 import { ReleaseModal } from '@/components/ReleaseModal/ReleaseModal';
 
 function App() {

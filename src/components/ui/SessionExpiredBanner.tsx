@@ -65,7 +65,10 @@ export const SessionExpiredBanner = () => {
                 justifyContent: 'center',
                 borderRadius: '12px',
                 color: theme.palette.warning.main,
-                backgroundColor: alpha(theme.palette.warning.main, isDark ? 0.14 : 0.16),
+                backgroundColor: alpha(
+                  theme.palette.warning.main,
+                  isDark ? 0.14 : 0.16,
+                ),
                 border: `1px solid ${alpha(theme.palette.warning.main, isDark ? 0.2 : 0.18)}`,
               }}
             >
@@ -102,7 +105,10 @@ export const SessionExpiredBanner = () => {
                 color: theme.palette.text.secondary,
                 flexShrink: 0,
                 '&:hover': {
-                  backgroundColor: alpha(theme.palette.text.primary, isDark ? 0.08 : 0.06),
+                  backgroundColor: alpha(
+                    theme.palette.text.primary,
+                    isDark ? 0.08 : 0.06,
+                  ),
                   color: theme.palette.text.primary,
                 },
               }}
