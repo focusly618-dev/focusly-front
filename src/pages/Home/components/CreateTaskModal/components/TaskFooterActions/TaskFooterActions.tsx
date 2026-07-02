@@ -16,6 +16,7 @@ interface TaskFooterActionsProps {
   handleUpdate: () => void;
   handleDelete: () => Promise<void>;
   loadingSave: boolean;
+  disabled?: boolean;
 }
 
 export const TaskFooterActions = ({
@@ -25,6 +26,7 @@ export const TaskFooterActions = ({
   handleUpdate,
   handleDelete,
   loadingSave,
+  disabled,
 }: TaskFooterActionsProps) => (
   <DialogActions sx={dialogActionsSx}>
     <Box
@@ -73,6 +75,7 @@ export const TaskFooterActions = ({
       Cancel
     </Button>
     <Button
+      disabled={disabled}
       onClick={
         initialTask && initialTask.user_id !== 'google-user'
           ? handleUpdate

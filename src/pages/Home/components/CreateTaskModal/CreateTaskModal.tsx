@@ -286,6 +286,7 @@ export const CreateTaskModal = ({
           handleUpdate={handleUpdate}
           handleDelete={handleDelete}
           loadingSave={loadingSave}
+          disabled={!title.trim() || !duration.trim()}
         />
 
         <TaskPopovers
