@@ -7,8 +7,6 @@ export interface TaskActionsProps {
   handleUpdate: () => void;
   handleSave: () => void;
   loadingSave: boolean;
-  isAIScheduleEnabled?: boolean;
-  setIsAIScheduleEnabled?: (enabled: boolean) => void;
   isReadOnly?: boolean;
   isDirty?: boolean;
   handleImproveTask?: (
