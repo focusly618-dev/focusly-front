@@ -4,11 +4,9 @@ import {
   Button,
   CircularProgress,
   DialogActions,
-  Typography,
   Menu,
   MenuItem,
   Divider,
-  Switch,
 } from '@mui/material';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { dialogActionsSx, saveButtonSx } from './TaskActions.styles';
@@ -20,8 +18,6 @@ export const TaskActions = ({
   handleUpdate,
   handleSave,
   loadingSave,
-  isAIScheduleEnabled,
-  setIsAIScheduleEnabled,
   isReadOnly,
   isDirty,
   handleImproveTask,
@@ -48,49 +44,7 @@ export const TaskActions = ({
   };
   return (
     <DialogActions sx={dialogActionsSx}>
-      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-        {setIsAIScheduleEnabled && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            }}
-          >
-            <AutoAwesomeIcon
-              sx={{
-                fontSize: 14,
-                color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
-                transition: 'color 0.3s ease',
-              }}
-            />
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: 600,
-                color: isAIScheduleEnabled ? '#7c3aed' : 'text.secondary',
-                transition: 'color 0.3s ease',
-              }}
-            >
-              Schedule with AI
-            </Typography>
-            <Switch
-              size="small"
-              checked={isAIScheduleEnabled}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setIsAIScheduleEnabled(e.target.checked)
-              }
-              disabled={isReadOnly}
-              sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': { color: '#7c3aed' },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#7c3aed',
-                },
-              }}
-            />
-          </Box>
-        )}
-      </Box>
+      <Box sx={{ flex: 1 }} />
       {handleImproveTask && !isReadOnly && (
         <>
           <Button
