@@ -1,18 +1,9 @@
 import axios from '@/api/axiosInstance';
-import type { UserResponse } from '../User/apiUser';
-
-export interface GoogleLoginResponse {
-  user: UserResponse;
-}
-
-export interface MagicLinkResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface VerifyMagicLinkResponse {
-  user: UserResponse;
-}
+import type {
+  GoogleLoginResponse,
+  MagicLinkResponse,
+  VerifyMagicLinkResponse,
+} from './authApi.types';
 
 export const loginWithGoogle = async (
   code: string,

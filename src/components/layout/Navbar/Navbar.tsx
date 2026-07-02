@@ -7,7 +7,7 @@ import {
   Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
-import { ColorModeContext } from '@/context/ColorModeContext';
+import { ColorModeContext } from '@/context';
 import {
   Header,
   LogoWrapper,

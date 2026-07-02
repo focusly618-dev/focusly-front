@@ -1,21 +1,6 @@
 import { API_BASE_URL } from '@/config/env.config';
 import axios from 'axios';
-
-export interface AIMessage {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-}
-
-export interface AITaskContext {
-  title: string;
-  description: string;
-  status: string;
-  priority_level: number;
-  estimate_timer: number;
-  real_timer?: number;
-  deadline: string;
-  links?: { title: string; url: string }[];
-}
+import type { AIMessage, AITaskContext } from './apiAI.types';
 
 const getAIEndpoint = () => {
   const isDev = import.meta.env.DEV;
@@ -25,16 +10,17 @@ const getAIEndpoint = () => {
 
 export const fetchEditResult = async (prompt: string): Promise<string> => {
   const endpoint = getAIEndpoint();
-  const makeRequest = () => fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({
-      messages: [{ role: 'user', content: prompt }],
-    }),
-  });
+  const makeRequest = () =>
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
 
   let response = await makeRequest();
 
@@ -51,7 +37,10 @@ export const fetchEditResult = async (prompt: string): Promise<string> => {
         response = await makeRequest();
       }
     } catch (refreshErr) {
-      console.error('Failed to refresh token during edit result fetch:', refreshErr);
+      console.error(
+        'Failed to refresh token during edit result fetch:',
+        refreshErr,
+      );
     }
   }
 
@@ -82,20 +71,21 @@ export const fetchChatStreamResponse = async (
   conversationId?: string,
 ): Promise<ReadableStream<Uint8Array>> => {
   const endpoint = getAIEndpoint();
-  const makeRequest = () => fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({
-      messages,
-      task,
-      model,
-      conversationId,
-    }),
-    signal: abortSignal,
-  });
+  const makeRequest = () =>
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        messages,
+        task,
+        model,
+        conversationId,
+      }),
+      signal: abortSignal,
+    });
 
   let response = await makeRequest();
 
@@ -112,7 +102,10 @@ export const fetchChatStreamResponse = async (
         response = await makeRequest();
       }
     } catch (refreshErr) {
-      console.error('Failed to refresh token during chat stream fetch:', refreshErr);
+      console.error(
+        'Failed to refresh token during chat stream fetch:',
+        refreshErr,
+      );
     }
   }
 
@@ -157,9 +150,12 @@ export const getAIConversationMessages = async (
 ): Promise<ConversationMessage[]> => {
   const isDev = import.meta.env.DEV;
   const baseUrl = isDev ? '' : API_BASE_URL;
-  const response = await fetch(`${baseUrl}/ai/conversations/${conversationId}/messages`, {
-    credentials: 'include',
-  });
+  const response = await fetch(
+    `${baseUrl}/ai/conversations/${conversationId}/messages`,
+    {
+      credentials: 'include',
+    },
+  );
   if (!response.ok) throw new Error(await response.text());
   return response.json();
 };
@@ -169,10 +165,13 @@ export const deleteAIConversation = async (
 ): Promise<{ status: string }> => {
   const isDev = import.meta.env.DEV;
   const baseUrl = isDev ? '' : API_BASE_URL;
-  const response = await fetch(`${baseUrl}/ai/conversations/${conversationId}`, {
-    method: 'DELETE',
-    credentials: 'include',
-  });
+  const response = await fetch(
+    `${baseUrl}/ai/conversations/${conversationId}`,
+    {
+      method: 'DELETE',
+      credentials: 'include',
+    },
+  );
   if (!response.ok) throw new Error(await response.text());
   return response.json();
 };

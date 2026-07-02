@@ -1,23 +1,12 @@
 import { API_BASE_URL } from '@/config/env.config';
 import axios from 'axios';
+import type { PatternAnalysisResponse } from './apiAI.types';
 
-export interface PatternChip {
-  label: string;
-  icon: string;
-}
-
-export interface PatternAnalysisData {
-  goldenHours: string;
-  goldenHoursConfidence: number;
-  behaviorSummary: string;
-  patterns: PatternChip[];
-  workStyle: string;
-}
-
-export interface PatternAnalysisResponse {
-  success: boolean;
-  data: PatternAnalysisData;
-}
+export type {
+  PatternChip,
+  PatternAnalysisData,
+  PatternAnalysisResponse,
+} from './apiAI.types';
 
 const getAnalyzePatternsEndpoint = () => {
   const isDev = import.meta.env.DEV;
