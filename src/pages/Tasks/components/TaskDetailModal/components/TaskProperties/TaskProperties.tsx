@@ -63,6 +63,12 @@ import {
   colorPopoverPaperSx,
   colorGridSx,
 } from './TaskProperties.styles';
+import {
+  triggerDurationError,
+  triggerRealTimeError,
+  sanitizeDurationValue,
+  getPriorityColor,
+} from './TaskProperties.utils';
 
 interface TaskPropertiesProps {
   status: TaskStatus;
@@ -161,30 +167,6 @@ export const TaskProperties = ({
   const [rTimeout, setRTimeout] = useState<ReturnType<
     typeof setTimeout
   > | null>(null);
-
-  const triggerDurationError = () => {
-    setDurationInputError('Solo se permiten números y las letras h, m, s');
-    if (dTimeout) clearTimeout(dTimeout);
-    const t = setTimeout(() => setDurationInputError(null), 3000);
-    setDTimeout(t);
-  };
-
-  const triggerRealTimeError = () => {
-    setRealTimeInputError('Solo se permiten números y las letras h, m, s');
-    if (rTimeout) clearTimeout(rTimeout);
-    const t = setTimeout(() => setRealTimeInputError(null), 3000);
-    setRTimeout(t);
-  };
-
-  const sanitizeDurationValue = (value: string) =>
-    value.replace(/[^0-9hHmMsS\s]/g, '');
-
-  const getPriorityColor = (p: string) => {
-    if (p === 'High') return '#ef4444';
-    if (p === 'Med') return '#f59e0b';
-    if (p === 'Low') return '#22c55e';
-    return '#6b7280';
-  };
 
   return (
     <Box sx={propertiesContainerSx}>
@@ -434,7 +416,11 @@ export const TaskProperties = ({
                   disabled={!isOwner}
                   onChange={(e) => {
                     if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
-                      triggerDurationError();
+                      triggerDurationError(
+                        dTimeout,
+                        setDurationInputError,
+                        setDTimeout,
+                      );
                     }
                     const sanitizedValue = sanitizeDurationValue(
                       e.target.value,
@@ -545,7 +531,11 @@ export const TaskProperties = ({
                   disabled={!isOwner}
                   onChange={(e) => {
                     if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
-                      triggerRealTimeError();
+                      triggerRealTimeError(
+                        rTimeout,
+                        setRealTimeInputError,
+                        setRTimeout,
+                      );
                     }
                     const sanitizedValue = sanitizeDurationValue(
                       e.target.value,
