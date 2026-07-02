@@ -6,7 +6,7 @@ import {
   GET_WORKSPACES,
   CREATE_WORKSPACE,
   UPDATE_WORKSPACE,
-} from '../workspaces.graphql';
+} from '../Workspace.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
 

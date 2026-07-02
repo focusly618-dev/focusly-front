@@ -26,7 +26,7 @@ import type { Task } from '@/redux/tasks/task.types';
 import { sileo } from '@/utils/sileo';
 import { format, startOfDay, addDays } from 'date-fns';
 import { useMutation } from '@apollo/client';
-import { UPDATE_TASK } from '@/pages/Tasks/Task.graphql';
+import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
 
 interface CalendarAIPlannerModalProps {

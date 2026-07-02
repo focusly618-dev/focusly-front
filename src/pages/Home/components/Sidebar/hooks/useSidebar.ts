@@ -13,7 +13,7 @@ import {
   CREATE_PROJECT_GROUP,
   UPDATE_PROJECT_GROUP,
   DELETE_PROJECT_GROUP,
-} from '@/pages/Workspace/workspaces.graphql';
+} from '@/pages/Workspace/Workspace.graphql';
 import { sileo } from '@/utils/sileo';
 import type {
   WorkspaceTypes,

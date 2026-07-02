@@ -4,15 +4,11 @@ import {
   GET_WORKSPACES,
   UPDATE_WORKSPACE,
   GET_PROJECT_GROUPS,
-} from '../../../workspaces.graphql';
-import type {
-  WorkspaceTypes,
-} from '../../../types/workspace.types';
+} from '../../../Workspace.graphql';
+import type { WorkspaceTypes } from '../../../types/workspace.types';
 import { sileo } from '@/utils/sileo';
 
-export const useWorkspaceLibrary = (
-  selectedGroupId: string | null = null,
-) => {
+export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchMode, setSearchMode] = useState<'workspace'>('workspace');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

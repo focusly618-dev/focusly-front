@@ -5,12 +5,12 @@ import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import {
   GET_TOTAL_WORKSPACES,
   GET_WORKSPACES,
-} from '@/pages/Workspace/workspaces.graphql';
+} from '@/pages/Workspace/Workspace.graphql';
 import {
   UPDATE_TASK,
   GET_TASKS,
   GET_TASKS_TITLES,
-} from '@/pages/Tasks/Task.graphql';
+} from '@/pages/Tasks/Tasks.graphql';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 import { handleMutationError } from '@/utils/errorHandler';
 

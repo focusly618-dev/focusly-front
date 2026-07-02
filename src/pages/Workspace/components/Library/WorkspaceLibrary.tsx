@@ -8,7 +8,7 @@ import {
   HeaderSubtitle,
 } from './WorkspaceLibrary.styles';
 import { useMutation } from '@apollo/client';
-import { UPDATE_PROJECT_GROUP } from '../../workspaces.graphql';
+import { UPDATE_PROJECT_GROUP } from '../../Workspace.graphql';
 import {
   Box,
   Typography,

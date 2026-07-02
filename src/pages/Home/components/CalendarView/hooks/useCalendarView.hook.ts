@@ -25,13 +25,13 @@ import {
   fetchGoogleEvents,
   deleteGoogleEvent,
 } from '@/api/GoogleCalendar/googleCalendarApi';
-import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
+import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import type { ICalendarEvent } from '../../CalendarEvent';
 import {
   GET_TASKS,
   DELETE_TASK,
   UPDATE_TASK,
-} from '@/pages/Tasks/Task.graphql';
+} from '@/pages/Tasks/Tasks.graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { CalendarNavigateAction } from '../calendarView.types';
