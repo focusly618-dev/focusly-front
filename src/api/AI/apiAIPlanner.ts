@@ -1,48 +1,23 @@
 import axiosInstance from '../axiosInstance';
 import type { Task } from '@/redux/tasks/task.types';
+import type {
+  AICalendarPlannerResponse,
+  AIImproveTaskResponse,
+  AIOrganizeResponse,
+  AIWeeklyPlanResponse,
+} from './apiAI.types';
+
+export type {
+  AIPlanItem,
+  AIOrganizeResponse,
+  AITimeBlockItem,
+  AICalendarPlannerResponse,
+  AIWeeklyPlanDayItem,
+  AIWeeklyPlanResponse,
+  AIImproveTaskResponse,
+} from './apiAI.types';
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
-
-export interface AIPlanItem {
-  taskId: string;
-  recommendedPriority: 'HIGH' | 'MEDIUM' | 'LOW';
-  suggestedOrder: number;
-  reason: string;
-  suggestedDate?: string;
-  estimatedTime?: string;
-}
-
-export interface AIOrganizeResponse {
-  plan: AIPlanItem[];
-}
-
-export interface AITimeBlockItem {
-  taskId?: string;
-  title: string;
-  startTime: string; // ISO string
-  endTime: string; // ISO string
-  reason: string;
-}
-
-export interface AICalendarPlannerResponse {
-  events: AITimeBlockItem[];
-}
-
-export interface AIWeeklyPlanDayItem {
-  day: string;
-  tasks: string[];
-}
-
-export interface AIWeeklyPlanResponse {
-  weeklyPlan: AIWeeklyPlanDayItem[];
-  recommendationSummary: string;
-}
-
-export interface AIImproveTaskResponse {
-  subtasks?: string[];
-  estimatedTime?: string;
-  suggestedPriority?: string;
-}
 
 // ─── Client Methods ───────────────────────────────────────────────────────────
 

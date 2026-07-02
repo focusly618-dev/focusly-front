@@ -4,7 +4,7 @@ import { Temporal } from 'temporal-polyfill';
 
 import { createRoot } from 'react-dom/client';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AppThemeProvider } from '@/context/ThemeContext';
+import { AppThemeProvider, RealTimeProvider } from '@/context';
 import './index.css';
 import './styles/notifications.css';
 import App from './App.tsx';
@@ -13,7 +13,6 @@ import { Provider } from 'react-redux';
 import { store } from '@/redux/store.ts';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@/api/apollo';
-import { RealTimeProvider } from '@/context/RealTimeProvider';
 
 import { NotificationToaster } from '@/components/Notification/NotificationToaster';
 import { BrowserRouter } from 'react-router-dom';

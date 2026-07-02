@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material';
 import { useQuery, useMutation } from '@apollo/client';
 import { startOfWeek, addDays, startOfMonth } from 'date-fns';
 import { useAppSelector } from '@/redux/hooks';
-import { ColorModeContext } from '@/context/ColorModeContext';
+import { ColorModeContext } from '@/context';
 import {
   GET_WORKSPACES,
   REMOVE_WORKSPACE,
@@ -77,7 +77,9 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   >(null);
   const [newWorkspaceTitle, setNewWorkspaceTitle] = useState('');
   const [ungroupedName, setUngroupedName] = useState(() => {
-    return localStorage.getItem('ungrouped_group_name') || 'General (Ungrouped)';
+    return (
+      localStorage.getItem('ungrouped_group_name') || 'General (Ungrouped)'
+    );
   });
 
   // Inline Group Renaming state
@@ -148,7 +150,6 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     changeStatusTab(TaskBar.Workspace, newParams);
   };
 
-
   const handleCreateWorkspaceInline = async () => {
     const title = newWorkspaceTitle.trim();
     if (!title) return;
@@ -158,7 +159,10 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           createWorkspaceInput: {
             title,
             content: '[]',
-            groupId: creatingWorkspaceInGroupId === 'ungrouped' ? null : creatingWorkspaceInGroupId,
+            groupId:
+              creatingWorkspaceInGroupId === 'ungrouped'
+                ? null
+                : creatingWorkspaceInGroupId,
             saveStatus: true,
           },
         },
