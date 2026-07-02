@@ -4,7 +4,7 @@ import {
   GET_TASKS,
   GET_TASKS_TITLES,
   DELETE_TASKS,
-} from '@/pages/Tasks/Task.graphql';
+} from '@/pages/Tasks/Tasks.graphql';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import {

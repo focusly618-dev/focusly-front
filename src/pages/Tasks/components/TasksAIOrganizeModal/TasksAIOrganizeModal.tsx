@@ -22,7 +22,7 @@ import {
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 import { useMutation } from '@apollo/client';
-import { UPDATE_TASK, GET_TASKS } from '@/pages/Tasks/Task.graphql';
+import { UPDATE_TASK, GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { organizeTasksAI, type AIPlanItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
 import { sileo } from '@/utils/sileo';

@@ -130,7 +130,6 @@ export const GET_WORKSPACE_BY_ID = gql`
   }
 `;
 
-
 // Project Group operations
 export const GET_PROJECT_GROUPS = gql`
   query GetProjectGroups {

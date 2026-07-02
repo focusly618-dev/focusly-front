@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMutation } from '@apollo/client';
-import { UPDATE_PROJECT_GROUP } from '@/pages/Workspace/workspaces.graphql';
+import { UPDATE_PROJECT_GROUP } from '@/pages/Workspace/Workspace.graphql';
 import {
   Box,
   Typography,

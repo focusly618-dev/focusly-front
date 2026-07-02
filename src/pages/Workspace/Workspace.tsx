@@ -1,10 +1,9 @@
-import { WorkspaceEmptyState } from '@/components/ui';
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import type { Step } from 'react-joyride';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { GET_WORKSPACE_BY_ID, GET_WORKSPACES } from './workspaces.graphql';
+import { GET_WORKSPACE_BY_ID, GET_WORKSPACES } from './Workspace.graphql';
 import { useEffect, useState, lazy, Suspense } from 'react';
 import type { WorkspaceProps, WorkspaceTypes } from './types/workspace.types';
 
@@ -24,6 +23,7 @@ import {
   CalendarTodayOutlined as CalendarIcon,
   SpeedOutlined as SpeedIcon,
 } from '@mui/icons-material';
+import { WorkspaceEmptyState } from '@/components/ui/WorkspaceEmptyState';
 
 export const Workspace = ({
   isEditorOpen,

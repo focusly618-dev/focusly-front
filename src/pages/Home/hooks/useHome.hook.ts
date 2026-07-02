@@ -2,8 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { useMutation } from '@apollo/client';
-import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
-import { GET_TASKS, DELETE_TASK } from '@/pages/Tasks/Task.graphql';
+import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
+import { GET_TASKS, DELETE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import {
   removeTask,
   upsertTask as upsertTaskRedux,

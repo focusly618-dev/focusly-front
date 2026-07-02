@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_TASKS } from '@/pages/Tasks/Task.graphql';
+import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import type {
   TaskResponse,
   TaskFilterInput,

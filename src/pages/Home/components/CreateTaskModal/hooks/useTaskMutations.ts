@@ -6,11 +6,11 @@ import {
   UPDATE_TASK,
   DELETE_TASK,
   GET_TASKS,
-} from '@/pages/Tasks/Task.graphql';
+} from '@/pages/Tasks/Tasks.graphql';
 import {
   REMOVE_WORKSPACE,
   GET_WORKSPACES,
-} from '@/pages/Workspace/workspaces.graphql';
+} from '@/pages/Workspace/Workspace.graphql';
 import { sileo } from '@/utils/sileo';
 import {
   createGoogleEvent,

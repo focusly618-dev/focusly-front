@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_INSIGHTS } from './insights.graphql';
+import { GET_INSIGHTS } from './Insights.graphql';
 import { useAppSelector } from '@/redux/hooks';
 
 export interface StatValue {

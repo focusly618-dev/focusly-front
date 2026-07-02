@@ -6,13 +6,13 @@ import {
   CREATE_TASK,
   GET_TASKS,
   GET_TASKS_TITLES,
-} from '@/pages/Tasks/Task.graphql';
+} from '@/pages/Tasks/Tasks.graphql';
 import {
   CREATE_PROJECT_GROUP,
   CREATE_WORKSPACE,
   GET_PROJECT_GROUPS,
   GET_WORKSPACES,
-} from '@/pages/Workspace/workspaces.graphql';
+} from '@/pages/Workspace/Workspace.graphql';
 import type { ParsedLuminaAction } from '@/utils/lumina';
 import type { UseSuggestedActionCardReturn } from './suggestedActionCard.types';
 import {

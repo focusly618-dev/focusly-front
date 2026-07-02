@@ -12,7 +12,7 @@ import {
   CREATE_TASK,
   GET_TASKS,
   GET_TASKS_TITLES,
-} from '@/pages/Tasks/Task.graphql';
+} from '@/pages/Tasks/Tasks.graphql';
 import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
 
 export const useEditorContent = ({

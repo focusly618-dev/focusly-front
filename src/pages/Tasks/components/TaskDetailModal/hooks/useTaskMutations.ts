@@ -4,13 +4,13 @@ import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import {
   GET_WORKSPACES,
   UPDATE_WORKSPACE,
-} from '@/pages/Workspace/workspaces.graphql';
+} from '@/pages/Workspace/Workspace.graphql';
 import {
   CREATE_TASK,
   UPDATE_TASK,
   DELETE_TASK,
   GET_TASKS,
-} from '../../../Task.graphql';
+} from '../../../Tasks.graphql';
 import { sileo } from '@/utils/sileo';
 import {
   createGoogleEvent,
