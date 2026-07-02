@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { alpha } from '@mui/material/styles';
-import type { Theme } from '@mui/material/styles';
 import {
   Box,
   Typography,
@@ -40,46 +38,8 @@ import {
 } from '../../CreateTaskModal.styles';
 import { getTagColors } from '../../CreateTaskModal.utils';
 import { getStatusIcon, getCategoryIcon } from '../TaskIcons';
-import type { TaskStatus } from '@/redux/tasks/task.types';
-
-interface TaskPropertiesProps {
-  status: TaskStatus;
-  setStatusAnchor: (el: HTMLElement | null) => void;
-  priority: string;
-  setPriorityAnchor: (el: HTMLElement | null) => void;
-  category: string;
-  setCategoryAnchor: (el: HTMLElement | null) => void;
-  currentDate: Date | null;
-  setCurrentDate: (d: Date | null) => void;
-  timeSlotDisplay: string;
-  tags: string[];
-  setTags: (t: string[]) => void;
-  newTag: string;
-  setNewTag: (v: string) => void;
-  isAddingTag: boolean;
-  setIsAddingTag: (v: boolean) => void;
-  handleAddTag: () => void;
-  duration: string;
-  setDuration: (v: string) => void;
-  realTime: string;
-  setRealTime: (v: string) => void;
-  handleTimerChange: (
-    value: string,
-    setter: (v: string) => void,
-    setSuggestions: (s: string[]) => void,
-    setAnchor: (el: HTMLDivElement | null) => void,
-    target: HTMLDivElement,
-  ) => void;
-  durationSuggestions: string[];
-  setDurationSuggestions: (s: string[]) => void;
-  durationAnchor: HTMLDivElement | null;
-  setDurationAnchor: (el: HTMLDivElement | null) => void;
-  realTimeSuggestions: string[];
-  setRealTimeSuggestions: (s: string[]) => void;
-  realTimeAnchor: HTMLDivElement | null;
-  setRealTimeAnchor: (el: HTMLDivElement | null) => void;
-  errors?: { duration?: string };
-}
+import { getSelectionChipSx } from './TaskProperties.utils';
+import type { TaskPropertiesProps } from './TaskProperties.types';
 
 export const TaskProperties = (props: TaskPropertiesProps) => {
   const {
@@ -117,125 +77,35 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
 
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
+  const [durationInputError, setDurationInputError] = useState<string | null>(
+    null,
+  );
+  const [realTimeInputError, setRealTimeInputError] = useState<string | null>(
+    null,
+  );
+  const [dTimeout, setDTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const [rTimeout, setRTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
-  const getSelectionChipSx = (
-    variant: 'status' | 'priority' | 'category',
-    value: string,
-  ) => {
-    const getColorByValue = () => {
-      switch (variant) {
-        case 'status':
-          switch (value) {
-            case 'Planning':
-              return '#3b82f6';
-            case 'Scheduled':
-              return '#8b5cf6';
-            case 'Pending':
-              return '#f59e0b';
-            case 'On Hold':
-              return '#ef4444';
-            case 'Review':
-              return '#06b6d4';
-            case 'Done':
-              return '#16a34a';
-            case 'Backlog':
-            case 'Archived':
-            case 'Todo':
-            default:
-              return 'text.secondary';
-          }
-        case 'priority':
-          switch (value) {
-            case 'High':
-              return '#ef4444';
-            case 'Med':
-              return '#f59e0b';
-            case 'Low':
-              return '#16a34a';
-            case 'No priority':
-            default:
-              return 'text.secondary';
-          }
-        case 'category':
-          switch (value) {
-            case 'Deep Work':
-              return '#8b5cf6';
-            case 'Meeting':
-              return '#3b82f6';
-            case 'Design':
-            case 'Learning':
-              return '#f59e0b';
-            case 'Development':
-              return '#2563eb';
-            case 'Marketing':
-              return '#ef4444';
-            case 'Planning':
-            case 'Research':
-              return '#06b6d4';
-            default:
-              return 'text.secondary';
-          }
-        default:
-          return 'text.secondary';
-      }
-    };
-
-    const color = getColorByValue();
-
-    return {
-      borderRadius: '20px',
-      px: 1.5,
-      height: '28px',
-      fontSize: '12px',
-      fontWeight: 600,
-      cursor: 'pointer',
-      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-      bgcolor: (theme: Theme) => {
-        if (color === 'text.secondary') {
-          return theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.05)'
-            : 'rgba(0, 0, 0, 0.04)';
-        }
-        return theme.palette.mode === 'dark'
-          ? alpha(color, 0.14)
-          : alpha(color, 0.08);
-      },
-      border: '1px solid',
-      borderColor: (theme: Theme) => {
-        if (color === 'text.secondary') {
-          return 'divider';
-        }
-        return theme.palette.mode === 'dark'
-          ? alpha(color, 0.28)
-          : alpha(color, 0.18);
-      },
-      color: (theme: Theme) => {
-        if (color === 'text.secondary') {
-          return theme.palette.text.secondary;
-        }
-        return color;
-      },
-      '&:hover': {
-        bgcolor: (theme: Theme) => {
-          if (color === 'text.secondary') {
-            return theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.1)'
-              : 'rgba(0, 0, 0, 0.08)';
-          }
-          return theme.palette.mode === 'dark'
-            ? alpha(color, 0.22)
-            : alpha(color, 0.12);
-        },
-        transform: 'translateY(-0.5px)',
-      },
-      '& .MuiChip-icon': {
-        marginLeft: '-2px',
-        marginRight: '-4px',
-        color: 'inherit !important',
-        fontSize: '14px',
-      },
-    };
+  const triggerDurationError = () => {
+    setDurationInputError('Solo se permiten números y las letras h, m, s');
+    if (dTimeout) clearTimeout(dTimeout);
+    const t = setTimeout(() => setDurationInputError(null), 3000);
+    setDTimeout(t);
   };
+
+  const triggerRealTimeError = () => {
+    setRealTimeInputError('Solo se permiten números y las letras h, m, s');
+    if (rTimeout) clearTimeout(rTimeout);
+    const t = setTimeout(() => setRealTimeInputError(null), 3000);
+    setRTimeout(t);
+  };
+
+  const sanitizeDurationValue = (value: string) =>
+    value.replace(/[^0-9hHmMsS\s]/g, '');
 
   return (
     <Box sx={propertyListSx}>
@@ -462,7 +332,10 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   px: 1.5,
                   borderRadius: '10px',
                   border: '1px solid',
-                  borderColor: errors?.duration ? 'error.main' : 'divider',
+                  borderColor:
+                    errors?.duration || durationInputError
+                      ? 'error.main'
+                      : 'divider',
                   bgcolor: (theme) =>
                     theme.palette.mode === 'dark'
                       ? '#1A1F2B'
@@ -474,18 +347,32 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                 <TextField
                   variant="standard"
                   value={duration}
-                  onChange={(e) =>
-                    handleTimerChange(
+                  type="text"
+                  inputMode="text"
+                  onChange={(e) => {
+                    if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
+                      triggerDurationError();
+                    }
+                    const sanitizedValue = sanitizeDurationValue(
                       e.target.value,
+                    );
+                    e.target.value = sanitizedValue;
+                    handleTimerChange(
+                      sanitizedValue,
                       setDuration,
                       setDurationSuggestions,
                       setDurationAnchor,
                       e.currentTarget.parentElement as HTMLDivElement,
-                    )
-                  }
+                    );
+                  }}
                   onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
                   placeholder="2h 00m"
                   error={!!errors?.duration}
+                  inputProps={{
+                    inputMode: 'text',
+                    pattern: '[0-9hHmM s]*',
+                    maxLength: 12,
+                  }}
                   InputProps={{
                     disableUnderline: true,
                   }}
@@ -538,7 +425,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   </List>
                 </Popover>
               </Box>
-              {errors?.duration && (
+              {(errors?.duration || durationInputError) && (
                 <Typography
                   variant="caption"
                   sx={{
@@ -547,7 +434,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                     ml: 0.5,
                   }}
                 >
-                  {errors.duration}
+                  {durationInputError || errors?.duration}
                 </Typography>
               )}
             </Box>
@@ -573,7 +460,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   px: 1.5,
                   borderRadius: '10px',
                   border: '1px solid',
-                  borderColor: 'divider',
+                  borderColor: realTimeInputError ? 'error.main' : 'divider',
                   bgcolor: (theme) =>
                     theme.palette.mode === 'dark'
                       ? '#1A1F2B'
@@ -585,17 +472,29 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                 <TextField
                   variant="standard"
                   value={realTime}
-                  onChange={(e) =>
-                    handleTimerChange(
+                  onChange={(e) => {
+                    if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
+                      triggerRealTimeError();
+                    }
+                    const sanitizedValue = sanitizeDurationValue(
                       e.target.value,
+                    );
+                    e.target.value = sanitizedValue;
+                    handleTimerChange(
+                      sanitizedValue,
                       setRealTime,
                       setRealTimeSuggestions,
                       setRealTimeAnchor,
                       e.currentTarget.parentElement as HTMLDivElement,
-                    )
-                  }
+                    );
+                  }}
                   onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
                   placeholder="1h 30m"
+                  inputProps={{
+                    inputMode: 'text',
+                    pattern: '[0-9hHmM s]*',
+                    maxLength: 12,
+                  }}
                   InputProps={{
                     disableUnderline: true,
                   }}
@@ -648,6 +547,18 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   </List>
                 </Popover>
               </Box>
+              {realTimeInputError && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'error.main',
+                    fontSize: '10px',
+                    ml: 0.5,
+                  }}
+                >
+                  {realTimeInputError}
+                </Typography>
+              )}
             </Box>
           </Box>
         </Box>
