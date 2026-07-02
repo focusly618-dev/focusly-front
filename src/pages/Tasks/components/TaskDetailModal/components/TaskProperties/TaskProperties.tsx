@@ -149,6 +149,36 @@ export const TaskProperties = ({
     null,
   );
 
+  const [durationInputError, setDurationInputError] = useState<string | null>(
+    null,
+  );
+  const [realTimeInputError, setRealTimeInputError] = useState<string | null>(
+    null,
+  );
+  const [dTimeout, setDTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const [rTimeout, setRTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+
+  const triggerDurationError = () => {
+    setDurationInputError('Solo se permiten números y las letras h, m, s');
+    if (dTimeout) clearTimeout(dTimeout);
+    const t = setTimeout(() => setDurationInputError(null), 3000);
+    setDTimeout(t);
+  };
+
+  const triggerRealTimeError = () => {
+    setRealTimeInputError('Solo se permiten números y las letras h, m, s');
+    if (rTimeout) clearTimeout(rTimeout);
+    const t = setTimeout(() => setRealTimeInputError(null), 3000);
+    setRTimeout(t);
+  };
+
+  const sanitizeDurationValue = (value: string) =>
+    value.replace(/[^0-9hHmMsS\s]/g, '');
+
   const getPriorityColor = (p: string) => {
     if (p === 'High') return '#ef4444';
     if (p === 'Med') return '#f59e0b';
@@ -389,7 +419,7 @@ export const TaskProperties = ({
                   px: 1.5,
                   borderRadius: '10px',
                   border: '1px solid',
-                  borderColor: 'divider',
+                  borderColor: durationInputError ? 'error.main' : 'divider',
                   bgcolor: (theme) =>
                     theme.palette.mode === 'dark'
                       ? '#1A1F2B'
@@ -402,15 +432,22 @@ export const TaskProperties = ({
                   variant="standard"
                   value={duration}
                   disabled={!isOwner}
-                  onChange={(e) =>
-                    handleTimerChange(
+                  onChange={(e) => {
+                    if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
+                      triggerDurationError();
+                    }
+                    const sanitizedValue = sanitizeDurationValue(
                       e.target.value,
+                    );
+                    e.target.value = sanitizedValue;
+                    handleTimerChange(
+                      sanitizedValue,
                       setDuration,
                       setDurationSuggestions,
                       setDurationAnchor,
                       e.currentTarget.parentElement as HTMLDivElement,
-                    )
-                  }
+                    );
+                  }}
                   onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
                   placeholder="2h 00m"
                   InputProps={{
@@ -458,6 +495,18 @@ export const TaskProperties = ({
                   </List>
                 </Popover>
               </Box>
+              {durationInputError && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'error.main',
+                    fontSize: '10px',
+                    ml: 0.5,
+                  }}
+                >
+                  {durationInputError}
+                </Typography>
+              )}
             </Box>
 
             {/* Real Duration */}
@@ -481,7 +530,7 @@ export const TaskProperties = ({
                   px: 1.5,
                   borderRadius: '10px',
                   border: '1px solid',
-                  borderColor: 'divider',
+                  borderColor: realTimeInputError ? 'error.main' : 'divider',
                   bgcolor: (theme) =>
                     theme.palette.mode === 'dark'
                       ? '#1A1F2B'
@@ -494,15 +543,22 @@ export const TaskProperties = ({
                   variant="standard"
                   value={realTime}
                   disabled={!isOwner}
-                  onChange={(e) =>
-                    handleTimerChange(
+                  onChange={(e) => {
+                    if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
+                      triggerRealTimeError();
+                    }
+                    const sanitizedValue = sanitizeDurationValue(
                       e.target.value,
+                    );
+                    e.target.value = sanitizedValue;
+                    handleTimerChange(
+                      sanitizedValue,
                       setRealTime,
                       setRealTimeSuggestions,
                       setRealTimeAnchor,
                       e.currentTarget.parentElement as HTMLDivElement,
-                    )
-                  }
+                    );
+                  }}
                   onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
                   placeholder="1h 30m"
                   InputProps={{
@@ -550,6 +606,18 @@ export const TaskProperties = ({
                   </List>
                 </Popover>
               </Box>
+              {realTimeInputError && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'error.main',
+                    fontSize: '10px',
+                    ml: 0.5,
+                  }}
+                >
+                  {realTimeInputError}
+                </Typography>
+              )}
             </Box>
           </Box>
         </Box>
