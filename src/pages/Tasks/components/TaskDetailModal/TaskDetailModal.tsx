@@ -381,6 +381,7 @@ export const TaskDetailModal = ({
           setIsAIScheduleEnabled={setIsAIScheduleEnabled}
           isReadOnly={isReadOnly}
           handleImproveTask={handleImproveTask}
+          disabled={!title.trim() || !duration.trim()}
         />
       </Dialog>
     </LocalizationProvider>

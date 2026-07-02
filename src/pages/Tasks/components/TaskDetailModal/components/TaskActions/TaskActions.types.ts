@@ -14,4 +14,5 @@ export interface TaskActionsProps {
   handleImproveTask?: (
     mode: 'subtasks' | 'estimate' | 'priority' | 'all',
   ) => void;
+  disabled?: boolean;
 }

@@ -394,6 +394,18 @@ export const saveButtonSx = {
         : 'none',
     transform: 'translateY(-1px)',
   },
+  '&.Mui-disabled': {
+    background: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.12)'
+        : 'rgba(0, 0, 0, 0.12)',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.3)'
+        : 'rgba(0, 0, 0, 0.26)',
+    boxShadow: 'none',
+    transform: 'none',
+  },
 };
 
 export const descriptionInputSx = {

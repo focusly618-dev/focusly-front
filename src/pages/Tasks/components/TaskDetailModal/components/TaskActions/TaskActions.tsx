@@ -25,6 +25,7 @@ export const TaskActions = ({
   isReadOnly,
   isDirty,
   handleImproveTask,
+  disabled,
 }: TaskActionsProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
@@ -137,6 +138,7 @@ export const TaskActions = ({
         <></>
       ) : (
         <Button
+          disabled={disabled}
           onClick={initialTask ? handleUpdate : handleSave}
           variant="contained"
           sx={saveButtonSx}
