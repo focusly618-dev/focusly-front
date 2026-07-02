@@ -1,18 +1,9 @@
 // Notification Sound Utility for Focusly
 // Uses Web Audio API to generate sounds programmatically
 
-export type SoundType =
-  | 'taskUpcoming'
-  | 'sessionStart'
-  | 'breakReminder'
-  | 'sessionEnd';
+import type { SoundType, SoundOptions } from './notifications.types';
 
 const PREFERRED_SOUND_KEY = 'focusly_notification_sound';
-
-interface SoundOptions {
-  volume?: number;
-  duration?: number;
-}
 
 class NotificationSoundPlayer {
   private audioContext: AudioContext | null = null;

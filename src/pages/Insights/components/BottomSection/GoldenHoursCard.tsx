@@ -17,7 +17,7 @@ import {
   fetchAIBehavioralPatterns,
   type PatternAnalysisData,
 } from '@/api/AI/apiAIInsights';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 
 import { useAppSelector } from '@/redux/hooks';
 

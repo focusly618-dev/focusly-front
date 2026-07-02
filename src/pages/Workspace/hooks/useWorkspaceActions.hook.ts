@@ -1,6 +1,6 @@
 import { client } from '@/api/apollo';
 import { REMOVE_WORKSPACE, GET_WORKSPACES } from '../Workspace.graphql';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 
 export const useWorkspaceActions = () => {
   const handleOpen = (id: string): void => {

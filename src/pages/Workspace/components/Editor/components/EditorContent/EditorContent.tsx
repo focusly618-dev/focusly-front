@@ -64,7 +64,7 @@ import {
   TitleInput,
   BlockNoteWrapper,
 } from './EditorContent.styles';
-import { colorPalette } from '@/utils/colors';
+import { colorPalette } from '@/utils';
 import { CuteRobotIcon } from '@/components/ui';
 
 interface EditorContentProps {

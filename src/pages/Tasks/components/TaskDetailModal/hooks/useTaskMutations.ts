@@ -11,7 +11,7 @@ import {
   DELETE_TASK,
   GET_TASKS,
 } from '../../../Tasks.graphql';
-import { sileo } from '@/utils/sileo';
+import { sileo, handleMutationError } from '@/utils';
 import {
   createGoogleEvent,
   updateGoogleEvent,
@@ -31,7 +31,6 @@ import type {
   UseTaskMutationsProps,
 } from '../types/TaskDetailModal.types';
 import type { PriorityType } from '../TaskDetailModal.utils';
-import { handleMutationError } from '@/utils/errorHandler';
 
 export const useTaskMutations = ({
   onSave,

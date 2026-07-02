@@ -17,7 +17,7 @@ import { useMutation } from '@apollo/client';
 import { UPDATE_TASK, GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { planWeeklyAI, type AIWeeklyPlanDayItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import { startOfWeek, addDays, format } from 'date-fns';
 
 interface CalendarWeeklyPlannerModalProps {

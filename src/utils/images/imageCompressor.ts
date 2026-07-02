@@ -19,12 +19,7 @@
  * image `src` — no extra processing needed on the front-end.
  */
 
-export interface CompressImageOptions {
-  /** Maximum pixels for the longest side. Default: 1920 */
-  maxSidePx?: number;
-  /** WebP quality 0–1. Default: 0.82 */
-  quality?: number;
-}
+import type { CompressImageOptions } from './images.types';
 
 /**
  * Compresses `file` and resolves with a base64 data-URL.

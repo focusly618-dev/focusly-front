@@ -12,7 +12,7 @@ import {
   GET_TASKS_TITLES,
 } from '@/pages/Tasks/Tasks.graphql';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
-import { handleMutationError } from '@/utils/errorHandler';
+import { handleMutationError } from '@/utils';
 
 interface UseFocusModeActionsProps {
   userId?: string;

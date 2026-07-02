@@ -33,8 +33,7 @@ import {
   type AIConversation,
 } from '@/api/AI/apiAI';
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
-import { parseLuminaAction } from '@/utils/lumina';
-import { sileo } from '@/utils/sileo';
+import { parseLuminaAction, sileo } from '@/utils';
 import {
   AskAIContainer,
   ChatScrollArea,

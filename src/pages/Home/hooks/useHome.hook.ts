@@ -20,7 +20,7 @@ import {
   getBaseGoogleId,
 } from '@/api/Tasks/taskMapper';
 import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
-import { handleMutationError } from '@/utils/errorHandler';
+import { handleMutationError } from '@/utils';
 
 export const useHome = () => {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 
 export const useTasksUI = () => {
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);

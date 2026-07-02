@@ -5,8 +5,7 @@ import type {
   UseEditorContentProps,
   UseEditorContentReturn,
 } from './useEditorContent.types';
-import { colorPalette, type HeaderColor } from '@/utils/colors';
-import { sileo } from '@/utils/sileo';
+import { colorPalette, type HeaderColor, sileo } from '@/utils';
 import { fetchEditResult } from '@/api/AI/apiAI';
 import {
   CREATE_TASK,

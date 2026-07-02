@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/redux/store';
 import { updateUser } from '@/redux/auth/auth.slice';
 import { useNotificationSounds } from '@/hooks/useNotificationSounds';
-import { soundPlayer, type SoundType } from '@/utils/notificationSounds';
+import { soundPlayer, type SoundType } from '@/utils';
 import { Box, Switch, Typography, Stack } from '@mui/material';
 import {
   CampaignOutlined as CampaignIcon,

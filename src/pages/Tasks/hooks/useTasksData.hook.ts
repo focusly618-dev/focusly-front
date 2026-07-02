@@ -9,7 +9,7 @@ import type {
 import { useAppDispatch } from '@/redux/hooks';
 import { setTasks } from '@/redux/tasks/task.slice';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
-import { handleMutationError } from '@/utils/errorHandler';
+import { handleMutationError } from '@/utils';
 
 interface UseTasksDataProps {
   userId?: string;

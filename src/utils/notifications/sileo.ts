@@ -1,27 +1,9 @@
-export type NotificationType =
-  | 'success'
-  | 'error'
-  | 'warning'
-  | 'info'
-  | 'loading';
-
-export interface NotificationButton {
-  title: string;
-  onClick: () => void;
-}
-
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  description?: string;
-  fill?: string;
-  duration?: number;
-  dismissing?: boolean;
-  button?: NotificationButton;
-}
-
-export type Listener = (notifications: Notification[]) => void;
+import type {
+  NotificationType,
+  NotificationButton,
+  Notification,
+  Listener,
+} from './notifications.types';
 
 let notifications: Notification[] = [];
 const listeners: Set<Listener> = new Set();

@@ -7,8 +7,7 @@ import { incrementSyncVersion } from '@/redux/calendar/calendar.slice';
 import { API_BASE_URL } from '@/config/env.config';
 import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
-import { sileo } from '@/utils/sileo';
-import { soundPlayer } from '@/utils/notificationSounds';
+import { sileo, soundPlayer } from '@/utils';
 import { RealTimeContext } from './RealTimeContext';
 
 export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({

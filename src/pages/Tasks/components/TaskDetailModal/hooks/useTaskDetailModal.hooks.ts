@@ -5,7 +5,7 @@ import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../TaskDetailModal.utils';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
 
 export const useTaskDetailModal = ({

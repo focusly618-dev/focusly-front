@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout as logoutThunk, clearAuth } from '@/redux/auth/auth.slice';
 import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 
 /**
  * useSession Hook
