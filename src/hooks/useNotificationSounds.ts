@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { soundPlayer, playNotificationSound } from '@/utils/notificationSounds';
+import { soundPlayer, playNotificationSound } from '@/utils';
 import Swal from 'sweetalert2';
 
 type SoundType =

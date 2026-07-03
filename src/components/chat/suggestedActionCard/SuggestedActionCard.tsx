@@ -14,7 +14,7 @@ import {
   Add as AddIcon,
 } from '@mui/icons-material';
 
-import { type ParsedLuminaAction } from '@/utils/lumina';
+import { type ParsedLuminaAction } from '@/utils';
 import { useSuggestedActionCard } from './useSuggestedActionCard.hook';
 
 interface SuggestedActionCardProps {

@@ -8,7 +8,7 @@ import {
 import { headerIconSx } from '../../CreateTaskModal.styles';
 import { TASK_COLORS } from '../../CreateTaskModal.utils';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 
 interface TaskHeaderProps {
   color: string;

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import type {
   EditorHeaderProps,
   ISpeechRecognition,

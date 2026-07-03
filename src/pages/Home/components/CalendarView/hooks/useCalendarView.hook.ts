@@ -16,7 +16,7 @@ import {
   format,
   isSameDay,
 } from 'date-fns';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
 import { setTasks, removeTask, updateTask } from '@/redux/tasks/task.slice';

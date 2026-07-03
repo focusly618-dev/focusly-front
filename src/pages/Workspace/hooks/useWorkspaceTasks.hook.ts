@@ -5,7 +5,7 @@ import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import type { TaskSearchItems } from '../types/workspace.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
-import { handleMutationError } from '@/utils/errorHandler';
+import { handleMutationError } from '@/utils';
 
 interface UseWorkspaceTasksProps {
   userId?: string;

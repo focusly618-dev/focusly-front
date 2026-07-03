@@ -6,7 +6,7 @@ import {
   GET_PROJECT_GROUPS,
 } from '../../../Workspace.graphql';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 
 export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const [searchTerm, setSearchTerm] = useState('');

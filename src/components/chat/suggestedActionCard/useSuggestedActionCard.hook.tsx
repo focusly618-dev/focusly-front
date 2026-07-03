@@ -13,7 +13,7 @@ import {
   GET_PROJECT_GROUPS,
   GET_WORKSPACES,
 } from '@/pages/Workspace/Workspace.graphql';
-import type { ParsedLuminaAction } from '@/utils/lumina';
+import type { ParsedLuminaAction } from '@/utils';
 import type { UseSuggestedActionCardReturn } from './suggestedActionCard.types';
 import {
   Folder as FolderIcon,

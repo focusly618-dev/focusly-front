@@ -5,7 +5,7 @@ import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../CreateTaskModal.utils';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 
 export const useCreateTaskModal = ({
   onSave,

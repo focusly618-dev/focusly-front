@@ -14,7 +14,7 @@ import {
   UPDATE_PROJECT_GROUP,
   DELETE_PROJECT_GROUP,
 } from '@/pages/Workspace/Workspace.graphql';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import type {
   WorkspaceTypes,
   ProjectGroupTypes,

@@ -11,7 +11,7 @@ import {
   REMOVE_WORKSPACE,
   GET_WORKSPACES,
 } from '@/pages/Workspace/Workspace.graphql';
-import { sileo } from '@/utils/sileo';
+import { sileo, handleMutationError } from '@/utils';
 import {
   createGoogleEvent,
   updateGoogleEvent,
@@ -30,7 +30,6 @@ import type {
   TaskInput,
   UseTaskMutationsProps,
 } from '../types/CreateTaskModal.types';
-import { handleMutationError } from '@/utils/errorHandler';
 
 export const useTaskMutations = ({
   onSave,

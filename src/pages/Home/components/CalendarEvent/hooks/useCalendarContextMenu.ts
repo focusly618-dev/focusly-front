@@ -9,7 +9,7 @@ import {
 } from '@/pages/Tasks/Tasks.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import type { Task } from '@/redux/tasks/task.types';
 import { format } from 'date-fns';
 

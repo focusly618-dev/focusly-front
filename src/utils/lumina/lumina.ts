@@ -1,22 +1,4 @@
-export interface LuminaActionPayload {
-  title?: string;
-  name?: string;
-  notes_encrypted?: string;
-  estimate_timer?: number;
-  priority_level?: number;
-  groupId?: string;
-  content?: string;
-  markdown?: string;
-}
-
-export interface ParsedLuminaAction {
-  type:
-    | 'CREATE_TASK'
-    | 'CREATE_WORKSPACE'
-    | 'CREATE_PROJECT_GROUP'
-    | 'INSERT_TO_WORKSPACE';
-  payload: LuminaActionPayload;
-}
+import type { LuminaActionPayload, ParsedLuminaAction } from './lumina.types';
 
 export const parseLuminaAction = (
   text: string,

@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, DialogActions } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import {
   dialogActionsSx,
   cancelButtonSx,

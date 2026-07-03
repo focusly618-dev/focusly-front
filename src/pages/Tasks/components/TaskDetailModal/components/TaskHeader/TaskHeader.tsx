@@ -8,7 +8,7 @@ import {
 } from '@mui/icons-material';
 import { TASK_COLORS } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import { headerContainerSx, headerIconButtonSx } from './TaskHeader.styles';
 
 interface TaskHeaderProps {

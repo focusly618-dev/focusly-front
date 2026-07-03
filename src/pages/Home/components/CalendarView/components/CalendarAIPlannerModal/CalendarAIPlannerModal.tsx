@@ -23,7 +23,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { planCalendarAI, type AITimeBlockItem } from '@/api/AI/apiAIPlanner';
 import { createTimeBlock } from '@/api/TimeBlocks/timeBlocksApi';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 import { format, startOfDay, addDays } from 'date-fns';
 import { useMutation } from '@apollo/client';
 import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';

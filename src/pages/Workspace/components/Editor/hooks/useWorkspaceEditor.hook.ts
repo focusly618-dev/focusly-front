@@ -7,7 +7,7 @@ import {
   BlockNoteEditor,
 } from '@blocknote/core';
 import { useCreateBlockNote } from '@blocknote/react';
-import { compressImageToDataUrl } from '@/utils/imageCompressor';
+import { compressImageToDataUrl } from '@/utils';
 import type {
   TaskSearchItems,
   WorkspaceFormData,

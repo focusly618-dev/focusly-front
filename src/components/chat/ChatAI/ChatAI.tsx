@@ -35,7 +35,7 @@ import {
 import type { ChatModelAdapter } from '@assistant-ui/react';
 import { fetchChatStreamResponse } from '@/api/AI/apiAI';
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
-import { parseLuminaAction } from '@/utils/lumina';
+import { parseLuminaAction } from '@/utils';
 import {
   ChatContainer,
   FloatingButton,

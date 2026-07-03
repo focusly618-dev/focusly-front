@@ -12,7 +12,7 @@ import {
   removeTasks,
 } from '@/redux/tasks/task.slice';
 import type { Task } from '@/redux/tasks/task.types';
-import { handleMutationError } from '@/utils/errorHandler';
+import { handleMutationError } from '@/utils';
 
 interface UseTasksMutationsProps {
   userId?: string;

@@ -1,4 +1,4 @@
-import { sileo } from '@/utils/sileo';
+import { sileo } from '../notifications/sileo';
 
 export const handleMutationError = (
   error: unknown,

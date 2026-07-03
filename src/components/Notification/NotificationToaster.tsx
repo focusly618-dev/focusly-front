@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { sileo } from '@/utils/sileo';
-import type { Notification, NotificationType } from '@/utils/sileo';
+import { sileo, type Notification, type NotificationType } from '@/utils';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';

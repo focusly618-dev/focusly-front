@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { ParsedLuminaAction } from '@/utils/lumina';
+import type { ParsedLuminaAction } from '@/utils';
 
 export interface SuggestedActionCardProps {
   action: ParsedLuminaAction;

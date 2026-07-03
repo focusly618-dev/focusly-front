@@ -13,7 +13,7 @@ import {
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
 import { useTaskDetailModal } from './hooks/useTaskDetailModal.hooks';
 import { improveTaskAI } from '@/api/AI/apiAIPlanner';
-import { sileo } from '@/utils/sileo';
+import { sileo } from '@/utils';
 
 // Sub-components
 import { Collaborators } from './components/Collaborators/Collaborators';
