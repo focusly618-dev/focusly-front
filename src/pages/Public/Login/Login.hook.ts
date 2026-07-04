@@ -21,14 +21,14 @@ export const useLogin = () => {
       return;
     }
 
-    if (form.isRegistering && !form.fullName) {
-      alert('Please enter your name');
-      return;
+    let resolvedName = form.fullName;
+    if (form.isRegistering && !resolvedName) {
+      resolvedName = form.email.split('@')[0];
     }
 
     const success = await auth.sendMagicLink(
       form.email,
-      form.isRegistering ? form.fullName : undefined,
+      form.isRegistering ? resolvedName : undefined,
     );
 
     if (success) {

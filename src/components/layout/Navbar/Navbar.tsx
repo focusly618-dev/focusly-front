@@ -46,14 +46,14 @@ const Navbar: React.FC = () => {
             spacing={4}
             sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}
           >
+            <NavbarLink component={NavLink} to="/features">
+              Features
+            </NavbarLink>
             <NavbarLink component={NavLink} to="/how-it-works">
               How it works
             </NavbarLink>
             <NavbarLink component={NavLink} to="/pricing">
               Pricing
-            </NavbarLink>
-            <NavbarLink component={NavLink} to="/about">
-              About
             </NavbarLink>
             <NavbarLink
               component={NavLink}
