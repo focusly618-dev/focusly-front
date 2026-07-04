@@ -6,7 +6,6 @@ import {
   Grid,
   Typography,
   Button,
-  IconButton,
   Paper,
 } from '@mui/material';
 import { NavLink } from 'react-router-dom';
@@ -17,9 +16,6 @@ import {
   NotesOutlined as NotesIcon,
   AutoAwesome as AutoAwesomeIcon,
   CheckCircleRounded as CheckCircleIcon,
-  GitHub as GitHubIcon,
-  LinkedIn as LinkedInIcon,
-  Twitter as TwitterIcon,
   PeopleOutlined as PeopleIcon,
   LockOutlined as LockIcon,
   AssessmentOutlined as AssessmentIcon,
@@ -1276,59 +1272,6 @@ const FeaturesPage: React.FC = () => {
       <FooterContainer>
         <Container maxWidth="lg">
           <Grid container spacing={6}>
-            <Grid size={{ xs: 12, md: 5 }}>
-              <Stack spacing={2.5}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <AutoAwesomeIcon
-                    sx={{ fontSize: 18, color: 'primary.main' }}
-                  />
-                  <Typography
-                    variant="h3"
-                    sx={{
-                      fontSize: '1.125rem',
-                      fontWeight: 800,
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    Focusly
-                  </Typography>
-                </Stack>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ maxWidth: 300, lineHeight: 1.5 }}
-                >
-                  The open OS for high-performance teams.
-                </Typography>
-                <Stack direction="row" spacing={1.5}>
-                  <IconButton
-                    href="https://github.com"
-                    target="_blank"
-                    color="inherit"
-                    size="small"
-                  >
-                    <GitHubIcon sx={{ fontSize: 18 }} />
-                  </IconButton>
-                  <IconButton
-                    href="https://linkedin.com"
-                    target="_blank"
-                    color="inherit"
-                    size="small"
-                  >
-                    <LinkedInIcon sx={{ fontSize: 18 }} />
-                  </IconButton>
-                  <IconButton
-                    href="https://twitter.com"
-                    target="_blank"
-                    color="inherit"
-                    size="small"
-                  >
-                    <TwitterIcon sx={{ fontSize: 18 }} />
-                  </IconButton>
-                </Stack>
-              </Stack>
-            </Grid>
-
             <Grid size={{ xs: 4, md: 2.3 }}>
               <Typography
                 variant="caption"
