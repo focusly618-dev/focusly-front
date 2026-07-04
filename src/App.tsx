@@ -2,8 +2,8 @@ import { Box } from '@mui/material';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from '@/pages/Public/LandingPage/LandingPage';
 import HowItWorksPage from '@/pages/Public/HowItWorks/HowItWorksPage';
+import FeaturesPage from '@/pages/Public/Features/FeaturesPage';
 import PricingPage from '@/pages/Public/Pricing/PricingPage';
-import AboutPage from '@/pages/Public/About/AboutPage';
 import { Login } from '@/pages/Public/Login/Login';
 import Profile from '@/pages/Profile/Profile';
 import NotFoundPage from '@/pages/NotFound/page_not_found';
@@ -50,9 +50,9 @@ function App() {
               )
             }
           />
+          <Route path="/features" element={<FeaturesPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/about" element={<AboutPage />} />
           <Route
             path="/login"
             element={isLogged ? <Navigate to="/dashboard" /> : <Login />}

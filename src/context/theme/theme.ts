@@ -7,73 +7,75 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
     palette: {
       mode,
       primary: {
-        main: isDark ? '#3b82f6' : '#137fec',
-        light: isDark ? '#60a5fa' : '#42a5f5',
-        dark: isDark ? '#1d4ed8' : '#1565c0',
-        contrastText: '#fff',
+        main: isDark ? '#60A5FA' : '#3B82F6', // Accent
+        light: isDark ? '#93C5FD' : '#60A5FA',
+        dark: isDark ? '#2563EB' : '#1D4ED8',
+        contrastText: '#ffffff',
       },
       success: {
-        main: isDark ? '#4ade80' : '#22c55e',
-        light: isDark ? 'rgba(74, 222, 128, 0.15)' : 'rgba(34, 197, 94, 0.15)',
+        main: '#16A34A',
+        light: 'rgba(22, 163, 74, 0.12)',
       },
       error: {
-        main: isDark ? '#f87171' : '#ef4444',
-        light: isDark ? 'rgba(248, 113, 113, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+        main: '#EF4444',
+        light: 'rgba(239, 68, 68, 0.1)',
       },
       warning: {
-        main: isDark ? '#fbbf24' : '#f59e0b',
-        light: isDark ? 'rgba(251, 191, 36, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+        main: '#F59E0B',
+        light: 'rgba(245, 158, 11, 0.1)',
       },
       background: {
-        default: isDark ? '#0B0F14' : '#F8F8F7',
-        paper: isDark ? '#111827' : '#ffffff',
+        default: isDark ? '#0F0F10' : '#FFFFFF',
+        paper: isDark ? '#202024' : '#FFFFFF', // Cards background
       },
       text: {
-        primary: isDark ? '#e0e2e9' : '#1C1C1A',
-        secondary: isDark ? '#a1a1aa' : '#8A8A85',
+        primary: isDark ? '#F5F5F5' : '#111111',
+        secondary: isDark ? '#A1A1AA' : '#6B7280',
         disabled: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
       },
-      divider: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.06)',
+      divider: isDark ? '#2D2D30' : '#E5E5E5',
     },
     typography: {
       fontFamily:
-        '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+        '"Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
       fontSize: 14,
       h1: {
-        fontWeight: 700,
-        fontSize: '1.875rem',
-        letterSpacing: '-0.02em',
+        fontWeight: 800,
+        fontSize: '4rem', // 64px
+        letterSpacing: '-0.025em',
+        lineHeight: 1.15,
       },
       h2: {
         fontWeight: 700,
-        fontSize: '1.5rem',
-        letterSpacing: '-0.015em',
+        fontSize: '2.625rem', // 42px
+        letterSpacing: '-0.02em',
+        lineHeight: 1.2,
       },
       h3: {
-        fontWeight: 700,
-        fontSize: '1.25rem',
-        letterSpacing: '-0.01em',
+        fontWeight: 600,
+        fontSize: '1.5rem', // 24px
+        letterSpacing: '-0.015em',
       },
       body1: {
-        fontSize: '0.875rem',
-        lineHeight: 1.5,
+        fontSize: '1.125rem', // 18px
+        lineHeight: 1.6,
       },
       body2: {
-        fontSize: '0.8125rem',
+        fontSize: '0.9375rem', // 15px
         lineHeight: 1.5,
       },
       caption: {
-        fontSize: '0.75rem',
+        fontSize: '0.8125rem',
         lineHeight: 1.4,
       },
       button: {
         textTransform: 'none',
         fontWeight: 600,
-        fontSize: '0.875rem',
+        fontSize: '1rem', // 16px
       },
     },
     shape: {
-      borderRadius: 8,
+      borderRadius: 12, // Modernized border radius to 12px
     },
     components: {
       MuiButton: {
@@ -84,18 +86,16 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
             transition: 'all 0.2s ease-in-out',
           },
           containedPrimary: {
-            boxShadow: isDark
-              ? '0 4px 14px 0 rgba(99, 102, 241, 0.3)'
-              : '0 4px 14px 0 rgba(19, 127, 236, 0.39)',
-            background: isDark
-              ? 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)'
-              : undefined,
+            boxShadow: 'none',
+            background: isDark ? '#60A5FA' : '#3B82F6',
+            color: isDark ? '#0F0F10' : '#ffffff',
             border: 'none',
             '&:hover': {
               boxShadow: isDark
-                ? '0 6px 20px rgba(99, 102, 241, 0.5)'
-                : '0 6px 20px rgba(19, 127, 236, 0.23)',
+                ? '0 4px 20px rgba(96, 165, 250, 0.25)'
+                : '0 4px 20px rgba(59, 130, 246, 0.25)',
               transform: 'translateY(-1px)',
+              backgroundColor: isDark ? '#93C5FD' : '#2563EB',
             },
           },
         },
@@ -104,23 +104,21 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            backgroundColor: isDark ? '#111827' : '#ffffff',
-            border: isDark
-              ? '1px solid rgba(255, 255, 255, 0.05)'
-              : '1px solid rgba(0, 0, 0, 0.05)',
+            backgroundColor: isDark ? '#202024' : '#ffffff',
+            border: isDark ? '1px solid #2D2D30' : '1px solid #E5E5E5',
             boxShadow: isDark
-              ? '0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.2)'
-              : '0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03)',
+              ? 'none'
+              : '0 1px 3px rgba(0, 0, 0, 0.01), 0 4px 12px rgba(0, 0, 0, 0.02)',
           },
         },
       },
       MuiDialog: {
         styleOverrides: {
           paper: {
-            backgroundColor: isDark ? 'rgba(17, 24, 39, 0.85)' : undefined,
-            backdropFilter: isDark ? 'blur(16px)' : undefined,
-            WebkitBackdropFilter: isDark ? 'blur(16px)' : undefined,
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : undefined,
+            backgroundColor: isDark ? 'rgba(32, 32, 36, 0.9)' : undefined,
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: isDark ? '1px solid #2D2D30' : '1px solid #E5E5E5',
             borderRadius: '16px',
             boxShadow: isDark
               ? '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
@@ -133,22 +131,22 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
           root: {
             borderRadius: '8px',
             transition: 'all 0.2s ease-in-out',
-            backgroundColor: isDark ? '#1A1F2B' : undefined,
+            backgroundColor: isDark ? '#18181B' : undefined, // Surface as background
             '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : undefined,
+              borderColor: isDark ? '#2D2D30' : '#E5E5E5',
             },
             '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.18)' : undefined,
+              borderColor: isDark ? '#60A5FA' : '#3B82F6',
             },
             '&.Mui-focused': {
-              backgroundColor: isDark ? 'rgba(26, 31, 43, 0.9)' : undefined,
+              backgroundColor: isDark ? '#0F0F10' : undefined,
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? '#6366f1' : undefined,
+                borderColor: isDark ? '#60A5FA' : '#3B82F6',
                 borderWidth: '1px',
               },
               boxShadow: isDark
-                ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-                : undefined,
+                ? '0 0 0 3px rgba(96, 165, 250, 0.15)'
+                : '0 0 0 3px rgba(59, 130, 246, 0.15)',
             },
           },
         },
@@ -156,10 +154,10 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
       MuiMenu: {
         styleOverrides: {
           paper: {
-            backgroundColor: isDark ? 'rgba(26, 31, 43, 0.95)' : undefined,
-            backdropFilter: isDark ? 'blur(16px)' : undefined,
-            WebkitBackdropFilter: isDark ? 'blur(16px)' : undefined,
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : undefined,
+            backgroundColor: isDark ? 'rgba(32, 32, 36, 0.95)' : undefined,
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: isDark ? '1px solid #2D2D30' : '1px solid #E5E5E5',
             borderRadius: '10px',
             boxShadow: isDark ? '0 10px 20px rgba(0,0,0,0.3)' : undefined,
           },
@@ -176,11 +174,11 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
               backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : undefined,
             },
             '&.Mui-selected': {
-              backgroundColor: isDark ? 'rgba(99, 102, 241, 0.15)' : undefined,
-              color: isDark ? '#818cf8' : undefined,
+              backgroundColor: isDark ? 'rgba(96, 165, 250, 0.15)' : undefined,
+              color: isDark ? '#60A5FA' : undefined,
               '&:hover': {
                 backgroundColor: isDark
-                  ? 'rgba(99, 102, 241, 0.25)'
+                  ? 'rgba(96, 165, 250, 0.25)'
                   : undefined,
               },
             },

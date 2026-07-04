@@ -1,3 +1,4 @@
+import type { ElementType } from 'react';
 import {
   Box,
   Button,
@@ -5,7 +6,7 @@ import {
   Paper,
   Typography,
   styled,
-  alpha,
+  Link,
 } from '@mui/material';
 
 // --- Global Page Wrapper ---
@@ -13,91 +14,84 @@ export const PageWrapper = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
   width: '100%',
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
   position: 'relative',
-  overflow: 'hidden',
-  backgroundColor: theme.palette.background.default,
+  overflowX: 'hidden',
+  backgroundColor: theme.palette.mode === 'dark' ? '#0F0F10' : '#F9FAFB',
   color: theme.palette.text.primary,
-  fontFamily: "'Inter', sans-serif",
 }));
 
-// --- Background Decorations ---
-export const TopRightBlob = styled(Box)({
-  position: 'absolute',
-  top: '-10%',
-  right: '-10%',
-  width: '500px',
-  height: '500px',
-  borderRadius: '50%',
-  background: 'rgba(19, 127, 236, 0.2)', // Primary blue low opacity
-  filter: 'blur(100px)',
-  zIndex: 0,
-  pointerEvents: 'none',
-  opacity: 0.3,
-});
+export const LogoWrapper = styled(Box)<{
+  component?: ElementType;
+  to?: string;
+}>(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  marginBottom: theme.spacing(4),
+}));
 
-export const BottomLeftBlob = styled(Box)({
-  position: 'absolute',
-  bottom: '-10%',
-  left: '-10%',
-  width: '300px',
-  height: '300px',
-  borderRadius: '50%',
-  background: 'rgba(168, 85, 247, 0.1)', // Purple low opacity
-  filter: 'blur(80px)',
-  zIndex: 0,
-  pointerEvents: 'none',
-  opacity: 0.2,
-});
+export const LogoBox = styled(Box)(({ theme }) => ({
+  width: 32,
+  height: 32,
+  borderRadius: 8,
+  backgroundColor: theme.palette.text.primary,
+  color: theme.palette.background.default,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontWeight: 800,
+  fontSize: '1.125rem',
+}));
 
-// --- Main Login Card ---
 export const LoginCard = styled(Paper)(({ theme }) => ({
   position: 'relative',
   zIndex: 10,
   width: '100%',
-  maxWidth: '448px', // max-w-md
-  padding: theme.spacing(4),
+  maxWidth: 480,
+  padding: theme.spacing(6, 5),
   backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '16px',
+  borderRadius: 16,
   boxShadow:
     theme.palette.mode === 'dark'
-      ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-      : '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+      ? '0 25px 50px -12px rgba(0, 0, 0, 0.6)'
+      : '0 20px 40px -15px rgba(0, 0, 0, 0.05)',
   [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(3),
+    padding: theme.spacing(4, 3),
     margin: theme.spacing(2),
   },
 }));
 
-// --- Form Elements ---
+export const LoginHeader = styled(Box)(({ theme }) => ({
+  textAlign: 'center',
+  marginBottom: theme.spacing(4),
+}));
+
 export const FormLabel = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.secondary,
+  color: theme.palette.text.primary,
   fontSize: '0.875rem',
-  fontWeight: 500,
-  marginBottom: '6px',
+  fontWeight: 600,
+  marginBottom: theme.spacing(1),
   display: 'block',
+  textAlign: 'left',
 }));
 
 export const StyledInput = styled(InputBase)(({ theme }) => ({
-  'label + &': {
-    marginTop: theme.spacing(3),
-  },
+  width: '100%',
   '& .MuiInputBase-input': {
-    borderRadius: '8px',
-    position: 'relative',
-    backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : '#f1f5f9',
+    borderRadius: 8,
+    backgroundColor: 'transparent',
     border: `1px solid ${theme.palette.divider}`,
-    fontSize: '0.875rem',
+    fontSize: '0.9375rem',
     width: '100%',
-    padding: '10px 16px',
+    padding: '12px 16px',
     color: theme.palette.text.primary,
-    transition: theme.transitions.create(['border-color', 'box-shadow']),
+    transition: 'all 0.2s',
     '&:focus': {
-      borderColor: theme.palette.primary.main,
-      boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.2)}`,
+      borderColor: theme.palette.text.primary,
     },
     '&::placeholder': {
       color: theme.palette.text.disabled,
@@ -106,41 +100,32 @@ export const StyledInput = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export const ForgotPasswordLink = styled('a')(({ theme }) => ({
-  color: theme.palette.primary.main,
-  fontSize: '0.875rem',
-  fontWeight: 500,
-  textDecoration: 'none',
-  cursor: 'pointer',
-  transition: 'color 0.2s',
-  '&:hover': {
-    color: theme.palette.primary.light,
-  },
-}));
-
 export const SignInButton = styled(Button)(({ theme }) => ({
-  marginTop: '24px',
+  marginTop: theme.spacing(3),
   width: '100%',
-  padding: '10px 16px',
-  backgroundColor: theme.palette.primary.main,
-  color: '#fff',
-  fontWeight: 700,
-  fontSize: '0.875rem',
+  padding: '12px 16px',
+  backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+  color: theme.palette.mode === 'dark' ? '#000000' : '#FFFFFF',
+  fontWeight: 600,
+  fontSize: '0.9375rem',
   textTransform: 'none',
-  borderRadius: '8px',
-  boxShadow: `0 4px 6px -1px ${alpha(theme.palette.primary.main, 0.25)}`,
+  borderRadius: 8,
+  boxShadow: 'none',
+  transition: 'all 0.2s',
   '&:hover': {
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: theme.palette.mode === 'dark' ? '#E4E4E7' : '#1F2937',
+  },
+  '&:disabled': {
+    backgroundColor: theme.palette.divider,
+    color: theme.palette.text.disabled,
   },
 }));
 
-// --- Divider ---
-export const DividerWrapper = styled(Box)({
+export const DividerWrapper = styled(Box)(({ theme }) => ({
   position: 'relative',
-  marginTop: '32px',
-  marginBottom: '24px',
+  margin: theme.spacing(4, 0),
   textAlign: 'center',
-});
+}));
 
 export const DividerLine = styled(Box)(({ theme }) => ({
   position: 'absolute',
@@ -153,64 +138,55 @@ export const DividerLine = styled(Box)(({ theme }) => ({
 export const DividerText = styled('span')(({ theme }) => ({
   position: 'relative',
   zIndex: 1,
-  padding: '0 12px',
+  padding: '0 16px',
   backgroundColor: theme.palette.background.paper,
   color: theme.palette.text.secondary,
-  fontSize: '0.875rem',
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
 }));
 
-// --- Social Buttons ---
-export const SocialButtonsStack = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '12px',
-  marginTop: '24px',
-});
-
-export const FullWidthSocialButton = styled(Button)(({ theme }) => ({
+export const GoogleSocialButton = styled(Button)(({ theme }) => ({
   width: '100%',
-  padding: '10px 16px',
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+  padding: '12px 16px',
+  backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '8px',
+  borderRadius: 8,
   color: theme.palette.text.primary,
   textTransform: 'none',
-  fontWeight: 500,
-  fontSize: '0.875rem',
+  fontWeight: 600,
+  fontSize: '0.9375rem',
   display: 'flex',
-  justifyContent: 'flex-start',
-  gap: '12px',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '10px',
   transition: 'all 0.2s',
+  boxShadow: 'none',
   '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-    borderColor:
-      theme.palette.mode === 'dark'
-        ? theme.palette.divider
-        : theme.palette.primary.main,
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F9FAFB',
+    borderColor: theme.palette.text.primary,
   },
   '& .MuiButton-startIcon': {
     margin: 0,
   },
 }));
 
-// --- Header/Footer in Login ---
-export const LoginHeader = styled(Box)({
+export const FooterContainer = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(6),
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  textAlign: 'center',
-  marginBottom: '32px',
-});
-
-export const IconContainer = styled(Box)({
-  width: '48px',
-  height: '48px',
-  borderRadius: '50%',
-  backgroundColor: 'rgba(19, 127, 236, 0.1)',
-  display: 'flex',
-  alignItems: 'center',
   justifyContent: 'center',
-  color: '#137fec',
-  marginBottom: '16px',
-});
+  gap: theme.spacing(3),
+  flexWrap: 'wrap',
+}));
+
+export const FooterLink = styled(Link)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  fontSize: '0.8125rem',
+  textDecoration: 'none',
+  transition: 'color 0.2s',
+  '&:hover': {
+    color: theme.palette.text.primary,
+  },
+}));
