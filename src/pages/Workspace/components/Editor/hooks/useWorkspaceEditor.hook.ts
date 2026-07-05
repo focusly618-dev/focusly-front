@@ -64,7 +64,6 @@ export const useWorkspaceEditor = ({
       return task.title.toLowerCase().includes(lowerSearch);
     });
   }, [tasksData, searchTerm]);
-
   const initialContent = useMemo(() => {
     if (!currentContent) return undefined;
 

@@ -72,6 +72,7 @@ export const TasksContentView = ({
     handleConfirmDelete,
     handleCancelDelete,
     handleClearSelection,
+    handleScroll,
   } = useTasksContentView({
     filteredTasks,
     viewMode,
@@ -313,7 +314,7 @@ export const TasksContentView = ({
             <TableHeaderCell className="col-ai">AI Schedule</TableHeaderCell>
             <TableHeaderCell>Actions</TableHeaderCell>
           </TableHeader>
-          <TableBodyContainer>
+          <TableBodyContainer onScroll={handleScroll}>
             {displayedTasks.slice(0, limit).map((task) => (
               <ListViewTask
                 key={task.id}

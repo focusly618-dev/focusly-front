@@ -57,8 +57,8 @@ export const GET_TASKS = gql`
 `;
 
 export const GET_TASKS_TITLES = gql`
-  query GetTasksTitles($userId: String!) {
-    tasks: getTasksByUser(userId: $userId) {
+  query GetTasksTitles($userId: String!, $limit: Int!, $offset: Int!) {
+    tasks: getTasksByUser(userId: $userId, limit: $limit, offset: $offset) {
       id
       title
       status
@@ -87,7 +87,6 @@ export const GET_TASKS_TITLES = gql`
       source
       estimated_start_date
       estimated_end_date
-
       collaborators {
         name
         email
@@ -101,7 +100,6 @@ export const GET_TASKS_TITLES = gql`
     }
   }
 `;
-
 export const UPDATE_TASK = gql`
   mutation UpdateTask($updateTaskInput: UpdateTaskInput!) {
     updateTask(updateTaskInput: $updateTaskInput) {

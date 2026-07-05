@@ -51,6 +51,7 @@ export const Workspace = ({
     searchParams,
     setSearchParams,
     selectedGroupId,
+    loadMore,
   } = useWorkspace({ isEditorOpen, onEditorChange });
 
   const getCustomSlashMenuItems = (editor: BlockNoteEditor) => {
@@ -209,6 +210,7 @@ export const Workspace = ({
                   newParams.delete('workspaceId');
                   setSearchParams(newParams);
                 }}
+                loadMore={loadMore}
                 register={register}
                 setValue={setValue}
                 watch={watch}

@@ -12,20 +12,28 @@ interface UseWorkspaceTasksProps {
   onTaskSelect?: (taskId: string | undefined) => void;
 }
 
+const LIMIT = 24;
+
 export const useWorkspaceTasks = ({
   userId,
   onTaskSelect,
 }: UseWorkspaceTasksProps) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [offset] = useState(0);
 
   const {
     data: rawTasksData,
     loading: isLoading,
     error,
+    fetchMore,
   } = useQuery(GET_TASKS_TITLES, {
     skip: !userId,
-    variables: { userId },
     fetchPolicy: 'cache-and-network',
+    variables: {
+      userId,
+      limit: LIMIT,
+      offset,
+    },
   });
 
   useEffect(() => {
@@ -38,17 +46,39 @@ export const useWorkspaceTasks = ({
 
   const tasksData = useMemo(() => {
     if (!rawTasksData?.tasks) return undefined;
+
     return {
       tasks: rawTasksData.tasks.map(
         (t: TaskResponse) => mapResponseToTask(t) as unknown as TaskSearchItems,
       ),
+      total: rawTasksData.tasks.length,
     };
   }, [rawTasksData]);
 
+  const loadMore = async () => {
+    if (!tasksData || isLoading) return;
+
+    await fetchMore({
+      variables: {
+        userId,
+        limit: LIMIT,
+        offset: tasksData.tasks.length,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev;
+
+        return {
+          tasks: [...prev.tasks, ...fetchMoreResult.tasks],
+        };
+      },
+    });
+  };
+
   const selectTask = useMemo(() => {
     if (!tasksData?.tasks || !selectedTaskId) return null;
+
     return (
-      tasksData.tasks.find((t: TaskSearchItems) => t.id === selectedTaskId) ||
+      tasksData.tasks.find((t: TaskSearchItems) => t.id === selectedTaskId) ??
       null
     );
   }, [tasksData, selectedTaskId]);
@@ -71,8 +101,17 @@ export const useWorkspaceTasks = ({
           },
         },
         refetchQueries: [
-          { query: GET_TASKS_TITLES, variables: { userId } },
-          { query: GET_TOTAL_WORKSPACES },
+          {
+            query: GET_TASKS_TITLES,
+            variables: {
+              userId,
+              limit: LIMIT,
+              offset: 0,
+            },
+          },
+          {
+            query: GET_TOTAL_WORKSPACES,
+          },
         ],
       });
     } catch (error) {
@@ -86,5 +125,6 @@ export const useWorkspaceTasks = ({
     selectTask,
     handleSelectTask,
     handleUpdateTask,
+    loadMore,
   };
 };

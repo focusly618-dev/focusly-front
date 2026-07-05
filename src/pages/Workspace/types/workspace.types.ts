@@ -86,6 +86,7 @@ export interface WorkspaceEditorProps {
   getWorkspaceMentionMenuItems: (editor: any) => any[];
   activeFocusTaskId?: string | null;
   onUnlinkTask?: () => void;
+  loadMore: () => Promise<void>;
 }
 
 export interface WorkspaceProps {
