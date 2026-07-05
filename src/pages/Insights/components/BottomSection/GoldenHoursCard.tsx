@@ -180,64 +180,63 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
       {/* Result or Fallback */}
       {!loading && (
         <Box display="flex" flexDirection="column" gap={2} flex={1}>
-          {/* Main Time Range Banner */}
-          <Box
-            p={2}
-            bgcolor="warning.light"
-            borderRadius={2}
-            display="flex"
-            gap={2}
-            alignItems="start"
-          >
-            <WbSunny sx={{ color: 'warning.main', mt: 0.5 }} />
-            <Box flex={1}>
-              <Typography variant="body2" color="warning.main">
-                Eres más productivo entre{' '}
-                <b>
-                  {analysisData
-                    ? analysisData.goldenHours
-                    : fallbackGoldenWindow}
-                </b>
-              </Typography>
-              {analysisData && (
-                <Box display="flex" alignItems="center" gap={1} mt={0.5}>
-                  <Typography variant="caption" color="text.secondary">
-                    Confianza:
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: '60px',
-                      height: '4px',
-                      bgcolor: 'rgba(0,0,0,0.06)',
-                      borderRadius: '2px',
-                      overflow: 'hidden',
-                    }}
-                  >
+          {analysisData && (
+            <Box
+              p={2}
+              bgcolor="warning.light"
+              borderRadius={2}
+              display="flex"
+              gap={2}
+              alignItems="start"
+            >
+              <WbSunny sx={{ color: 'warning.main', mt: 0.5 }} />
+              <Box flex={1}>
+                <Typography variant="body2" color="warning.main">
+                  Eres más productivo entre{' '}
+                  <b>
+                    {analysisData
+                      ? analysisData.goldenHours
+                      : fallbackGoldenWindow}
+                  </b>
+                </Typography>
+                {analysisData && (
+                  <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                    <Typography variant="caption" color="text.secondary">
+                      Confianza:
+                    </Typography>
                     <Box
                       sx={{
-                        width: `${analysisData.goldenHoursConfidence * 100}%`,
-                        height: '100%',
-                        bgcolor: getConfidenceColor(
-                          analysisData.goldenHoursConfidence,
-                        ),
+                        width: '60px',
+                        height: '4px',
+                        bgcolor: 'rgba(0,0,0,0.06)',
+                        borderRadius: '2px',
+                        overflow: 'hidden',
                       }}
-                    />
+                    >
+                      <Box
+                        sx={{
+                          width: `${analysisData.goldenHoursConfidence * 100}%`,
+                          height: '100%',
+                          bgcolor: getConfidenceColor(
+                            analysisData.goldenHoursConfidence,
+                          ),
+                        }}
+                      />
+                    </Box>
+                    <Typography
+                      variant="caption"
+                      fontWeight="bold"
+                      color={getConfidenceColor(
+                        analysisData.goldenHoursConfidence,
+                      )}
+                    >
+                      {Math.round(analysisData.goldenHoursConfidence * 100)}%
+                    </Typography>
                   </Box>
-                  <Typography
-                    variant="caption"
-                    fontWeight="bold"
-                    color={getConfidenceColor(
-                      analysisData.goldenHoursConfidence,
-                    )}
-                  >
-                    {Math.round(analysisData.goldenHoursConfidence * 100)}%
-                  </Typography>
-                </Box>
-              )}
+                )}
+              </Box>
             </Box>
-          </Box>
-
-          {/* AI Behavioral Insights */}
+          )}
           {analysisData ? (
             <Box display="flex" flexDirection="column" gap={2}>
               {/* Style chip & summary */}

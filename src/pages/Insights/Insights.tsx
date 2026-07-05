@@ -1,26 +1,28 @@
-import { Box, CircularProgress } from '@mui/material';
-import { PageContainer, ChartsRow } from './Insights.styles';
+import { Box } from '@mui/material';
+import { PageContainer } from './Insights.styles';
 import { useInsights } from './useInsights.hook';
 import { InsightsHeader } from './components/InsightsHeader';
 import { StatsCards } from './components/StatsCards';
 import { ProductivityTrendsChart } from './components/ProductivityTrendsChart';
-import { TimeDistributionChart } from './components/TimeDistributionChart';
 import { BottomSection } from './components/BottomSection/BottomSection';
+import { InsightsSkeleton } from './components/InsightsSkeleton';
 
 export const Insights = () => {
-  const { stats, loading, hasData, filter, filters, setFilter } = useInsights();
+  const {
+    stats,
+    loading,
+    hasData,
+    filter,
+    filters,
+    setFilter,
+    baseDate,
+    navigatePeriod,
+    resetPeriod,
+    periodLabel,
+  } = useInsights();
 
   if (loading && !hasData) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <InsightsSkeleton />;
   }
 
   return (
@@ -29,13 +31,17 @@ export const Insights = () => {
         filter={filter}
         filters={[...filters]}
         onFilterChange={setFilter}
+        baseDate={baseDate}
+        onNavigate={navigatePeriod}
+        onReset={resetPeriod}
+        periodLabel={periodLabel}
       />
 
       <Box
         sx={{
-          opacity: loading ? 0.6 : 1,
+          opacity: loading && !baseDate ? 0.6 : 1,
           transition: 'opacity 0.25s ease-in-out',
-          pointerEvents: loading ? 'none' : 'auto',
+          pointerEvents: loading && !baseDate ? 'none' : 'auto',
           display: 'flex',
           flexDirection: 'column',
           gap: '24px',
@@ -51,20 +57,16 @@ export const Insights = () => {
           />
         </Box>
 
-        <ChartsRow>
-          <Box id="joyride-insights-trends" sx={{ flex: 1 }}>
-            <ProductivityTrendsChart data={stats.productivityTrends} />
-          </Box>
-          <Box id="joyride-insights-distribution" sx={{ flex: 1 }}>
-            <TimeDistributionChart data={stats.timeDistribution} />
-          </Box>
-        </ChartsRow>
+        <Box id="joyride-insights-trends" sx={{ width: '100%' }}>
+          <ProductivityTrendsChart data={stats.productivityTrends} />
+        </Box>
 
         <Box id="joyride-insights-heatmap">
           <BottomSection
             goldenWindowValue={stats.goldenWindow.value}
             heatmapCells={stats.heatmapCells}
             heatmapLabels={stats.heatmapLabels}
+            timeDistribution={stats.timeDistribution}
             filter={filter}
           />
         </Box>

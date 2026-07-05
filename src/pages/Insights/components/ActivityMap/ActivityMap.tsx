@@ -17,18 +17,42 @@ const buildEmptyCells = (filter: string): HeatmapCellData[] => {
   }
 
   if (filter === 'Monthly') {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    return Array.from({ length: daysInMonth }, (_, i) => {
-      const day = i + 1;
-
+    return Array.from({ length: 30 }, (_, i) => {
+      const now = new Date();
+      const target = new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000);
       return {
-        key: String(day),
-        label: `${day}`,
+        key: target.toISOString().split('T')[0],
+        label: target.toLocaleDateString(undefined, {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        }),
+        intensity: 0,
+        count: 0,
+        tasks: [],
+      };
+    });
+  }
+
+  if (filter === 'Yearly') {
+    const now = new Date();
+    const startDay = new Date(now.getTime() - 364 * 24 * 60 * 60 * 1000);
+    const dayOfWeek = startDay.getDay();
+    const alignedStart = new Date(
+      startDay.getTime() - dayOfWeek * 24 * 60 * 60 * 1000,
+    );
+
+    return Array.from({ length: 53 * 7 }, (_, i) => {
+      const target = new Date(alignedStart.getTime() + i * 24 * 60 * 60 * 1000);
+      return {
+        key: target.toISOString().split('T')[0],
+        label: target.toLocaleDateString(undefined, {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        }),
         intensity: 0,
         count: 0,
         tasks: [],
@@ -49,6 +73,8 @@ export const ActivityMap = ({
   cells,
   heatmapLabels = [],
   filter,
+  baseDate,
+  loading,
 }: ActivityMapProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [activeCell, setActiveCell] = useState<HeatmapCellData | null>(null);
@@ -96,7 +122,13 @@ export const ActivityMap = ({
 
   return (
     <ChartCard sx={{ height: 'auto', minHeight: '300px' }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        flexWrap="wrap"
+        gap={2}
+      >
         <Box display="flex" alignItems="center" gap={0.5}>
           <Typography variant="h6" fontWeight="bold">
             Activity Map
@@ -110,20 +142,20 @@ export const ActivityMap = ({
             />
           </Tooltip>
         </Box>
+
         <Box display="flex" gap={1} alignItems="center">
           <Typography variant="caption" color="text.secondary">
             Less
           </Typography>
           <Box display="flex" gap={0.5}>
-            {[1, 2, 3, 4].map((i) => (
-              <Box
+            {[0, 1, 2, 3, 4].map((i) => (
+              <HeatmapCell
                 key={i}
+                intensity={i}
                 sx={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: 0.5,
-                  bgcolor: 'primary.main',
-                  opacity: i * 0.25,
+                  width: 10,
+                  height: 10,
+                  borderRadius: '1.5px',
                 }}
               />
             ))}
@@ -134,7 +166,13 @@ export const ActivityMap = ({
         </Box>
       </Box>
 
-      <HeatmapGrid sx={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      <HeatmapGrid
+        sx={{
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          opacity: loading && baseDate ? 0.4 : 1,
+          transition: 'opacity 0.2s ease-in-out',
+        }}
+      >
         {displayCells.map((cell) => (
           <HeatmapCell
             key={cell.key}
@@ -146,7 +184,6 @@ export const ActivityMap = ({
               transition: 'transform 0.15s ease, opacity 0.15s ease',
               '&:hover': {
                 transform: 'scale(1.08)',
-                opacity: `${0.25 + cell.intensity * 0.15} !important`,
               },
             }}
           />

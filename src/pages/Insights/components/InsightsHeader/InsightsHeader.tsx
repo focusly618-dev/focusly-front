@@ -1,6 +1,11 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
-import { FileDownloadOutlined, Add } from '@mui/icons-material';
+import { Box, Typography, IconButton, Button } from '@mui/material';
+import {
+  FileDownloadOutlined,
+  Add,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
 import {
   HeaderContainer,
   FilterButton,
@@ -12,6 +17,10 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
   filter,
   filters,
   onFilterChange,
+  baseDate,
+  onNavigate,
+  onReset,
+  periodLabel,
 }) => {
   return (
     <HeaderContainer>
@@ -22,7 +31,9 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
               ? "Today's"
               : filter === 'Weekly'
                 ? 'Weekly'
-                : 'Monthly'}{' '}
+                : filter === 'Monthly'
+                  ? 'Monthly'
+                  : 'Yearly'}{' '}
             Insights
           </Typography>
           <Typography variant="body1" color="text.secondary" mt={1}>
@@ -41,16 +52,82 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
         </Box>
       </Box>
 
-      <Box display="flex" gap={1} mt={2}>
-        {filters.map((f) => (
-          <FilterButton
-            key={f}
-            active={filter === f}
-            onClick={() => onFilterChange(f)}
+      <Box display="flex" alignItems="center" gap={1} mt={2}>
+        <Box display="flex" gap={1}>
+          {filters.map((f) => (
+            <FilterButton
+              key={f}
+              active={filter === f}
+              onClick={() => onFilterChange(f)}
+            >
+              {f}
+            </FilterButton>
+          ))}
+        </Box>
+
+        {filter === 'Monthly' && onNavigate && (
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={0.5}
+            sx={{
+              backgroundColor: 'action.hover',
+              borderRadius: '20px',
+              px: 1,
+              py: 0.25,
+              ml: 2,
+            }}
           >
-            {f}
-          </FilterButton>
-        ))}
+            <IconButton
+              size="small"
+              onClick={() => onNavigate('prev')}
+              aria-label="Previous month"
+              sx={{ p: 0.25 }}
+            >
+              <ChevronLeftIcon fontSize="small" />
+            </IconButton>
+
+            <Typography
+              variant="caption"
+              fontWeight="600"
+              sx={{
+                minWidth: '100px',
+                textAlign: 'center',
+                userSelect: 'none',
+              }}
+            >
+              {periodLabel}
+            </Typography>
+
+            <IconButton
+              size="small"
+              onClick={() => onNavigate('next')}
+              aria-label="Next month"
+              disabled={!baseDate}
+              sx={{ p: 0.25 }}
+            >
+              <ChevronRightIcon fontSize="small" />
+            </IconButton>
+
+            {baseDate && onReset && (
+              <Button
+                size="small"
+                onClick={onReset}
+                variant="text"
+                sx={{
+                  ml: 0.5,
+                  fontSize: '9px',
+                  textTransform: 'none',
+                  minWidth: 'auto',
+                  p: 0,
+                  fontWeight: 'bold',
+                }}
+              >
+                Today
+              </Button>
+            )}
+          </Box>
+        )}
       </Box>
     </HeaderContainer>
   );
