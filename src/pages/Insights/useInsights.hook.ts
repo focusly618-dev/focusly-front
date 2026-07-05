@@ -38,13 +38,30 @@ export const useInsights = () => {
       const cached = localStorage.getItem(`focusly_insights_${userId}_${f}`);
       if (cached) {
         try {
-          const parsed = JSON.parse(cached) as InsightsData;
-          const expectedLen = expectedLengths[f];
-          if (expectedLen && parsed.heatmapCells?.length !== expectedLen) {
+          const parsedContainer = JSON.parse(cached);
+          const data =
+            parsedContainer && parsedContainer.data
+              ? parsedContainer.data
+              : (parsedContainer as InsightsData);
+          const updatedAt =
+            parsedContainer && parsedContainer.updatedAt
+              ? parsedContainer.updatedAt
+              : 0;
+
+          // Expiration check: 24 hours
+          const isExpired = Date.now() - updatedAt > 24 * 60 * 60 * 1000;
+
+          if (isExpired) {
             localStorage.removeItem(`focusly_insights_${userId}_${f}`);
             continue;
           }
-          loadedCache[f] = parsed;
+
+          const expectedLen = expectedLengths[f];
+          if (expectedLen && data.heatmapCells?.length !== expectedLen) {
+            localStorage.removeItem(`focusly_insights_${userId}_${f}`);
+            continue;
+          }
+          loadedCache[f] = data;
         } catch (e) {
           console.error(`Error parsing cached insights for ${f}`, e);
         }
@@ -92,12 +109,28 @@ export const useInsights = () => {
         ...prev,
         [filter]: insights,
       }));
+      const cacheValue = {
+        data: insights,
+        updatedAt: Date.now(),
+      };
       localStorage.setItem(
         `focusly_insights_${userId}_${filter}`,
-        JSON.stringify(insights),
+        JSON.stringify(cacheValue),
       );
     }
   }, [data, filter, userId, baseDate]);
+
+  // Invalidate stale cache for other users or on logout
+  useEffect(() => {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('focusly_insights_')) {
+        if (!userId || !key.startsWith(`focusly_insights_${userId}_`)) {
+          localStorage.removeItem(key);
+        }
+      }
+    }
+  }, [userId]);
 
   // Sync lastData to retain previous month's results during refetches
   useEffect(() => {
