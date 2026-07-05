@@ -172,9 +172,32 @@ export const HeatmapGrid = styled(Box)({
 
 export const HeatmapCell = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'intensity',
-})<{ intensity: number }>(({ theme, intensity }) => ({
-  aspectRatio: '1',
-  borderRadius: '4px',
-  backgroundColor: theme.palette.primary.main,
-  opacity: 0.1 + intensity * 0.15, // distinct opacities
-}));
+})<{ intensity: number }>(({ theme, intensity }) => {
+  const isDark = theme.palette.mode === 'dark';
+
+  const colors = isDark
+    ? {
+        0: '#161b22',
+        1: '#0e4429',
+        2: '#006d32',
+        3: '#26a641',
+        4: '#39d353',
+        5: '#39d353',
+      }
+    : {
+        0: '#ebedf0',
+        1: '#9be9a8',
+        2: '#40c463',
+        3: '#30a14e',
+        4: '#216e39',
+        5: '#216e39',
+      };
+
+  return {
+    aspectRatio: '1',
+    borderRadius: '2px',
+    backgroundColor: colors[intensity as keyof typeof colors] || colors[0],
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(27, 31, 35, 0.04)'}`,
+    transition: 'background-color 0.15s ease',
+  };
+});

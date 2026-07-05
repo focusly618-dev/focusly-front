@@ -1,11 +1,17 @@
 import { gql } from '@apollo/client';
 
 export const GET_INSIGHTS = gql`
-  query GetInsights($userId: String!, $filter: String!, $timezoneOffset: Int) {
+  query GetInsights(
+    $userId: String!
+    $filter: String!
+    $timezoneOffset: Int
+    $baseDate: String
+  ) {
     insights: getInsights(
       userId: $userId
       filter: $filter
       timezoneOffset: $timezoneOffset
+      baseDate: $baseDate
     ) {
       totalFocusHours {
         value

@@ -1,4 +1,4 @@
-import type { TrendData } from '../../useInsights.hook';
+import type { TrendData } from '../../useInsights.types';
 
 export interface ProductivityTrendsChartProps {
   data: TrendData[];

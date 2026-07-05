@@ -18,4 +18,6 @@ export interface ActivityMapProps {
   cells: HeatmapCellData[];
   heatmapLabels?: string[];
   filter: string;
+  baseDate?: string | null;
+  loading?: boolean;
 }

@@ -1,4 +1,4 @@
-import type { StatValue } from '../../useInsights.hook';
+import type { StatValue } from '../../useInsights.types';
 
 export interface StatsCardsProps {
   totalFocusHours: StatValue;

@@ -25,7 +25,13 @@ export const ActivityMapPopover = ({
   filter,
 }: ActivityMapPopoverProps) => {
   const periodLabel =
-    filter === 'Daily' ? 'Hour' : filter === 'Weekly' ? 'Day' : 'Date';
+    filter === 'Daily'
+      ? 'Hour'
+      : filter === 'Weekly'
+        ? 'Day'
+        : filter === 'Monthly'
+          ? 'Date'
+          : 'Month';
 
   return (
     <Box sx={{ p: 2, minWidth: 240, maxWidth: 320 }}>

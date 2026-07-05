@@ -1,4 +1,4 @@
-import type { DistributionEntry } from '../../useInsights.hook';
+import type { DistributionEntry } from '../../useInsights.types';
 export type { DistributionEntry };
 
 export interface TimeDistributionChartProps {
