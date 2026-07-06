@@ -35,12 +35,27 @@ export const TasksHeader = ({
   return (
     <Header>
       <Box>
-        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'text.secondary',
+            display: { xs: 'none', md: 'block' },
+          }}
+        >
           Manage and prioritize your work
         </Typography>
         <Title>My Tasks</Title>
       </Box>
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: { xs: 1, sm: 2 },
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          width: { xs: '100%', md: 'auto' },
+          justifyContent: { xs: 'space-between', md: 'flex-end' },
+        }}
+      >
         {children}
         <Box
           sx={{

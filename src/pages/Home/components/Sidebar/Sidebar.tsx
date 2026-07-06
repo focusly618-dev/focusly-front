@@ -14,10 +14,14 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
 
   return (
     <SidebarContainer>
-      <SidebarHeader sidebar={sidebar} />
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <SidebarHeader sidebar={sidebar} />
+      </Box>
       <SidebarNavigation sidebar={sidebar} />
-      <Box sx={{ flexGrow: 1 }} />
-      <UserProfile sidebar={sidebar} />
+      <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }} />
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <UserProfile sidebar={sidebar} />
+      </Box>
       <SidebarMenus sidebar={sidebar} />
     </SidebarContainer>
   );

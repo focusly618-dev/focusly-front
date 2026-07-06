@@ -39,16 +39,28 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
   } = sidebar;
 
   return (
-    <Box paddingLeft={3} paddingRight={3}>
-      <Logo id="joyride-logo" as="div" sx={{ justifyContent: 'space-between' }}>
+    <Box sx={{ px: { xs: 0, lg: 3 } }}>
+      <Logo
+        id="joyride-logo"
+        as="div"
+        sx={{
+          justifyContent: { xs: 'center', lg: 'space-between' },
+          px: { xs: 2, lg: 0 },
+        }}
+      >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <FocuslyLogo size={30} />
-          Focusly
+          <Box component="span" sx={{ display: { xs: 'none', lg: 'inline' } }}>
+            Focusly
+          </Box>
         </Box>
         <IconButton
           size="small"
           onClick={handleNotifOpen}
-          sx={{ color: 'text.secondary' }}
+          sx={{
+            color: 'text.secondary',
+            display: { xs: 'none', lg: 'inline-flex' },
+          }}
         >
           <Badge
             badgeContent={unreadCount}

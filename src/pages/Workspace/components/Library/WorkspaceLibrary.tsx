@@ -178,7 +178,14 @@ export const WorkspaceLibrary = ({
           </HeaderSubtitle>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1.5,
+            alignItems: 'center',
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
           <Button
             variant="contained"
             size="small"
@@ -191,6 +198,8 @@ export const WorkspaceLibrary = ({
               px: 2.5,
               py: 0.8,
               boxShadow: 'none',
+              width: { xs: '100%', sm: 'auto' },
+              justifyContent: 'center',
               bgcolor: theme.palette.mode === 'dark' ? '#ffffff' : '#1c1c1a',
               color: theme.palette.mode === 'dark' ? '#0b0f14' : '#ffffff',
               '&:hover': {
@@ -214,11 +223,11 @@ export const WorkspaceLibrary = ({
       <Box
         sx={{
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'stretch', sm: 'center' },
           justifyContent: 'space-between',
           mb: 3,
           gap: 2,
-          flexWrap: 'wrap',
           mt: 2,
         }}
       >

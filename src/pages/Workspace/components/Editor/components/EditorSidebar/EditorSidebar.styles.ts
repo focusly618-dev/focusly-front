@@ -36,6 +36,17 @@ export const RightSidebar = styled(Box, {
     overflowX: 'hidden',
     position: 'relative',
     height: '100%',
+    [theme.breakpoints.down('md')]: {
+      display: isOpen ? 'flex' : 'none',
+      width: '100vw',
+      height: '100vh',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      zIndex: 1200,
+      borderLeft: 'none',
+      padding: '24px',
+    },
     // Custom scrollbar
     '&::-webkit-scrollbar': {
       width: '6px',

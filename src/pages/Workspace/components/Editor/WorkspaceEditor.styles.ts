@@ -61,6 +61,10 @@ export const EditorHeader = styled(Box, {
   background: gradient || 'transparent',
   backgroundSize: 'cover',
   position: 'relative',
+  [theme.breakpoints.down('md')]: {
+    height: '84px',
+    padding: '0 20px',
+  },
   '&::before': gradient
     ? {
         content: '""',
@@ -83,10 +87,13 @@ export const EditorHeader = styled(Box, {
   },
 }));
 
-export const EditorContent = styled(Box)({
+export const EditorContent = styled(Box)(({ theme }) => ({
   padding: '40px 60px',
   flex: 1,
-});
+  [theme.breakpoints.down('md')]: {
+    padding: '16px 8px',
+  },
+}));
 
 export const DraftingBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
@@ -348,6 +355,9 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
     backgroundColor: 'transparent',
     padding: '0 16px 100px 16px', // Extra padding at bottom
     minHeight: 'calc(100vh - 250px)', // Ensures editor stretches down so empty space is clickable
+    [theme.breakpoints.down('md')]: {
+      padding: '0 8px 80px 8px',
+    },
   },
   '& .bn-block-content': {
     color: theme.palette.text.secondary,

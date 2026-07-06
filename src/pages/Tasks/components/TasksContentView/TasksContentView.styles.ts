@@ -51,6 +51,11 @@ export const StatusTabsContainer = muiStyled(Box)(({ theme }) => ({
   '&::-webkit-scrollbar': {
     display: 'none',
   },
+  position: 'sticky',
+  left: 0,
+  width: '100%',
+  boxSizing: 'border-box',
+  zIndex: 4,
 }));
 
 export interface StatusTabProps {

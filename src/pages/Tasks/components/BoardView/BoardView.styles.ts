@@ -10,13 +10,18 @@ export const BoardContainer = styled(Box)(({ theme }) => ({
   alignItems: 'flex-start',
   height: '100%',
   minHeight: '600px',
+  WebkitOverflowScrolling: 'touch',
 }));
 
-export const ColumnWrapper = styled(Box)(() => ({
+export const ColumnWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   width: '320px',
-  minWidth: '320px',
+  minWidth: '280px',
+  [theme.breakpoints.down('sm')]: {
+    width: 'calc(100vw - 48px)',
+    minWidth: '280px',
+  },
   flexShrink: 0,
 }));
 

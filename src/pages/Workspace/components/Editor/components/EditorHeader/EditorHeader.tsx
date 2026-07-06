@@ -20,7 +20,11 @@ import {
 } from '@mui/material';
 
 import { SearchPalette } from '../SearchPalette/SearchPalette';
-import { HeaderCenter, HeaderRight } from '@/pages/Workspace/Workspace.styles';
+import {
+  HeaderLeft,
+  HeaderCenter,
+  HeaderRight,
+} from '@/pages/Workspace/Workspace.styles';
 import { EditorHeader as StyledEditorHeader } from './EditorHeader.styles';
 import type { EditorHeaderProps } from './EditorHeader.types';
 import { useEditorHeader } from './useEditorHeader.hook';
@@ -55,6 +59,11 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     getLanguageLabel,
   } = useEditorHeader(props);
 
+  const getMobileLanguageLabel = (code: string) => {
+    if (code === 'auto') return 'Auto';
+    return code.toUpperCase();
+  };
+
   const navigate = useNavigate();
   const backWorkspace = (): void => {
     if (props.groupId && props.groupId !== undefined) {
@@ -66,10 +75,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
   };
   return (
     <StyledEditorHeader>
-      <HeaderCenter
-        id="joyride-editor-search"
-        sx={{ position: 'relative', zIndex: 50, mx: 2 }}
-      >
+      <HeaderLeft>
         <Button
           onClick={backWorkspace}
           startIcon={
@@ -83,7 +89,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           sx={{
             height: '34px',
             px: 1.8,
-            mr: 12,
+            mr: { xs: 0, md: 12 },
             borderRadius: '20px',
             border: '1px solid',
             borderColor: 'divider',
@@ -121,6 +127,17 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         >
           Back
         </Button>
+      </HeaderLeft>
+
+      <HeaderCenter
+        id="joyride-editor-search"
+        sx={{
+          display: { xs: 'none', md: 'flex' },
+          position: 'relative',
+          zIndex: 50,
+          mx: 2,
+        }}
+      >
         <SearchPalette
           showPalette={showPalette}
           setShowPalette={setShowPalette}
@@ -160,7 +177,12 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           }}
         >
           <LanguageIcon sx={{ fontSize: 14 }} />
-          {getLanguageLabel(sourceLanguage)}
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            {getLanguageLabel(sourceLanguage)}
+          </Box>
+          <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+            {getMobileLanguageLabel(sourceLanguage)}
+          </Box>
         </IconButton>
 
         {/* Swap Languages Button */}
@@ -206,7 +228,12 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           }}
         >
           <LanguageIcon sx={{ fontSize: 14 }} />
-          {getLanguageLabel(targetLanguage)}
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            {getLanguageLabel(targetLanguage)}
+          </Box>
+          <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+            {getMobileLanguageLabel(targetLanguage)}
+          </Box>
         </IconButton>
 
         {/* Real-time speech preview overlay */}
@@ -250,6 +277,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
                   fontWeight: 600,
                   fontSize: '11px',
                   whiteSpace: 'nowrap',
+                  display: { xs: 'none', sm: 'inline-block' },
                 }}
               >
                 Listening...
@@ -344,6 +372,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
                     fontWeight: 600,
                     letterSpacing: '0.5px',
                     fontSize: '11px',
+                    display: { xs: 'none', sm: 'inline-block' },
                   }}
                 >
                   saving
@@ -364,6 +393,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
                     fontWeight: 700,
                     letterSpacing: '0.5px',
                     fontSize: '11px',
+                    display: { xs: 'none', sm: 'inline-block' },
                   }}
                 >
                   saved

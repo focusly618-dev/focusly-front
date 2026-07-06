@@ -21,13 +21,16 @@ const LayoutContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
 }));
 
-const MainContent = styled(Box)({
+const MainContent = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   display: 'flex',
   flexDirection: 'column',
   height: '100vh',
   overflow: 'hidden',
-});
+  [theme.breakpoints.down('md')]: {
+    paddingBottom: '80px',
+  },
+}));
 
 export const Home = () => {
   const {
@@ -88,7 +91,7 @@ export const Home = () => {
           {activeTab === TaskBar.Settings && <Settings />}
           {activeTab === TaskBar.AskAI && <AskAI />}
         </MainContent>
-        <Box id="joyride-chat-ai">
+        <Box id="joyride-chat-ai" sx={{ display: { xs: 'none', md: 'block' } }}>
           {activeTab !== TaskBar.AskAI && (
             <ChatAI
               rightOffset={

@@ -8,6 +8,7 @@ import {
   Collapse,
   IconButton,
   Tooltip,
+  Avatar,
 } from '@mui/material';
 import { ExpandMore, ExpandLess, Add as AddIcon } from '@mui/icons-material';
 import { NavItem } from '../Sidebar.styles';
@@ -53,8 +54,29 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
   };
 
   return (
-    <List sx={{ padding: '16px', marginTop: '-30px' }}>
-      <ListItem disablePadding>
+    <List
+      sx={{
+        padding: '16px',
+        marginTop: '-30px',
+        [theme.breakpoints.down('md')]: {
+          padding: 0,
+          marginTop: 0,
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '8px',
+          width: '100%',
+          justifyContent: 'space-around',
+        },
+      }}
+    >
+      <ListItem
+        disablePadding
+        sx={{
+          [theme.breakpoints.down('md')]: {
+            width: 'auto',
+          },
+        }}
+      >
         <NavItem
           id="joyride-daily-plan"
           active={activeTab === TaskBar.DailyPlan}
@@ -66,10 +88,20 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           <ListItemText
             primary="Daily Plan"
             primaryTypographyProps={{ fontWeight: 600 }}
+            sx={{
+              display: { xs: 'none', lg: 'block' },
+            }}
           />
         </NavItem>
       </ListItem>
-      <ListItem disablePadding>
+      <ListItem
+        disablePadding
+        sx={{
+          [theme.breakpoints.down('md')]: {
+            width: 'auto',
+          },
+        }}
+      >
         <NavItem
           id="joyride-tasks"
           active={activeTab === TaskBar.Tasks}
@@ -81,10 +113,20 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           <ListItemText
             primary="Tasks"
             primaryTypographyProps={{ fontWeight: 500 }}
+            sx={{
+              display: { xs: 'none', lg: 'block' },
+            }}
           />
         </NavItem>
       </ListItem>
-      <ListItem disablePadding>
+      <ListItem
+        disablePadding
+        sx={{
+          [theme.breakpoints.down('lg')]: {
+            width: 'auto',
+          },
+        }}
+      >
         <NavItem
           id="joyride-ask-ai"
           active={activeTab === TaskBar.AskAI}
@@ -131,10 +173,20 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                   activeTab === TaskBar.AskAI ? 'transparent' : 'inherit',
               },
             }}
+            sx={{
+              display: { xs: 'none', lg: 'block' },
+            }}
           />
         </NavItem>
       </ListItem>
-      <ListItem disablePadding>
+      <ListItem
+        disablePadding
+        sx={{
+          [theme.breakpoints.down('lg')]: {
+            width: 'auto',
+          },
+        }}
+      >
         <NavItem
           id="joyride-insights"
           active={activeTab === TaskBar.Insights}
@@ -146,12 +198,23 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           <ListItemText
             primary="Insights"
             primaryTypographyProps={{ fontWeight: 500 }}
+            sx={{
+              display: { xs: 'none', lg: 'block' },
+            }}
           />
         </NavItem>
       </ListItem>
       <ListItem
         disablePadding
-        sx={{ flexDirection: 'column', alignItems: 'stretch' }}
+        sx={{
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          [theme.breakpoints.down('lg')]: {
+            width: 'auto',
+            flexDirection: 'row',
+            alignItems: 'center',
+          },
+        }}
       >
         <NavItem
           id="joyride-workspace"
@@ -187,14 +250,17 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             </Box>
           </ListItemIcon>
           <ListItemText
-            primary="Project"
+            primary="Projects"
             primaryTypographyProps={{ fontWeight: 500 }}
+            sx={{
+              display: { xs: 'none', lg: 'block' },
+            }}
           />
 
           <Box
             className="tab-hover-actions"
             sx={{
-              display: 'flex',
+              display: { xs: 'none', lg: 'flex' },
               alignItems: 'center',
               gap: 0.5,
               opacity: 0,
@@ -222,76 +288,119 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             )}
           </Box>
 
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (activeTab !== TaskBar.Workspace) {
-                handleProjectsTabClick();
-              } else {
-                setIsProjectsExpanded((prev) => !prev);
-              }
-            }}
-            sx={{
-              p: 0.2,
-              color: 'text.secondary',
-              ml: activeTab === TaskBar.Workspace ? 0.5 : 'auto',
-            }}
-          >
-            {isProjectsExpanded && activeTab === TaskBar.Workspace ? (
-              <ExpandLess sx={{ fontSize: 16 }} />
-            ) : (
-              <ExpandMore sx={{ fontSize: 16 }} />
-            )}
-          </IconButton>
+          <Box sx={{ display: { xs: 'none', lg: 'inline-flex' } }}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (activeTab !== TaskBar.Workspace) {
+                  handleProjectsTabClick();
+                } else {
+                  setIsProjectsExpanded((prev) => !prev);
+                }
+              }}
+              sx={{
+                p: 0.2,
+                color: 'text.secondary',
+                ml: activeTab === TaskBar.Workspace ? 0.5 : 'auto',
+              }}
+            >
+              {isProjectsExpanded && activeTab === TaskBar.Workspace ? (
+                <ExpandLess sx={{ fontSize: 16 }} />
+              ) : (
+                <ExpandMore sx={{ fontSize: 16 }} />
+              )}
+            </IconButton>
+          </Box>
         </NavItem>
 
-        <Collapse in={isProjectsExpanded && activeTab === TaskBar.Workspace}>
-          <Box
-            sx={{
-              mt: 1,
-              mb: 1,
-              mx: 0.5,
-              p: 1.5,
-              borderRadius: '12px',
-              maxHeight: '260px',
-              overflowY: 'auto',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(0, 0, 0, 0.25)'
-                  : 'rgba(0, 0, 0, 0.03)',
-              border: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? '1px solid rgba(255, 255, 255, 0.03)'
-                  : '1px solid rgba(0, 0, 0, 0.04)',
-              boxShadow: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'inset 0 1px 2px rgba(0, 0, 0, 0.2)'
-                  : 'inset 0 1px 2px rgba(0, 0, 0, 0.02)',
-              '&::-webkit-scrollbar': {
-                width: '4px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'transparent',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: (theme) =>
+        <Box sx={{ display: { xs: 'none', lg: 'block' }, width: '100%' }}>
+          <Collapse in={isProjectsExpanded && activeTab === TaskBar.Workspace}>
+            <Box
+              sx={{
+                mt: 1,
+                mb: 1,
+                mx: 0.5,
+                p: 1.5,
+                borderRadius: '12px',
+                maxHeight: '260px',
+                overflowY: 'auto',
+                bgcolor: (theme) =>
                   theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.12)'
-                    : 'rgba(0, 0, 0, 0.08)',
-                borderRadius: '2px',
-              },
-              '&::-webkit-scrollbar-thumb:hover': {
-                background: (theme) =>
+                    ? 'rgba(0, 0, 0, 0.25)'
+                    : 'rgba(0, 0, 0, 0.03)',
+                border: (theme) =>
                   theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.2)'
-                    : 'rgba(0, 0, 0, 0.15)',
-              },
-            }}
+                    ? '1px solid rgba(255, 255, 255, 0.03)'
+                    : '1px solid rgba(0, 0, 0, 0.04)',
+                boxShadow: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'inset 0 1px 2px rgba(0, 0, 0, 0.2)'
+                    : 'inset 0 1px 2px rgba(0, 0, 0, 0.02)',
+                '&::-webkit-scrollbar': {
+                  width: '4px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.12)'
+                      : 'rgba(0, 0, 0, 0.08)',
+                  borderRadius: '2px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  background: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 0.15)',
+                },
+              }}
+            >
+              <ProjectGroupsSection sidebar={sidebar} hideHeader />
+            </Box>
+          </Collapse>
+        </Box>
+      </ListItem>
+
+      {/* Profile Tab - Mobile Only */}
+      <ListItem
+        disablePadding
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          width: 'auto',
+        }}
+      >
+        <NavItem
+          id="joyride-mobile-profile"
+          active={activeTab === TaskBar.Settings}
+          onClick={() => changeStatusTab(TaskBar.Settings)}
+          sx={{
+            justifyContent: 'center',
+            p: '8px 12px',
+          }}
+        >
+          <ListItemIcon
+            sx={{ minWidth: 'auto', display: 'flex', justifyContent: 'center' }}
           >
-            <ProjectGroupsSection sidebar={sidebar} hideHeader />
-          </Box>
-        </Collapse>
+            <Avatar
+              src={sidebar.user?.picture}
+              alt={sidebar.user?.name}
+              sx={{
+                width: 24,
+                height: 24,
+                border: '1.5px solid',
+                borderColor:
+                  activeTab === TaskBar.Settings
+                    ? theme.palette.primary.main
+                    : 'transparent',
+              }}
+            >
+              {sidebar.user?.name?.charAt(0)}
+            </Avatar>
+          </ListItemIcon>
+        </NavItem>
       </ListItem>
     </List>
   );

@@ -14,6 +14,32 @@ export const SidebarContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   color: theme.palette.text.primary,
   flexShrink: 0,
+  [theme.breakpoints.down('lg')]: {
+    width: 80,
+  },
+  [theme.breakpoints.down('md')]: {
+    width: 'fit-content',
+    maxWidth: 'calc(100vw - 32px)',
+    height: 'auto',
+    position: 'fixed',
+    bottom: 16,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 1100,
+    flexDirection: 'row',
+    borderRadius: '20px',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+    border:
+      theme.palette.mode === 'dark'
+        ? '1px solid rgba(255, 255, 255, 0.08)'
+        : '1px solid rgba(0, 0, 0, 0.06)',
+    padding: '6px 12px',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(17, 24, 39, 0.8)'
+        : 'rgba(255, 255, 255, 0.85)',
+    backdropFilter: 'blur(20px)',
+  },
 }));
 
 export const Logo = styled(Typography)(({ theme }) => ({
@@ -88,6 +114,34 @@ export const NavItem = styled(ListItemButton, {
   '& .MuiListItemIcon-root': {
     color: 'inherit',
     minWidth: 40,
+  },
+  [theme.breakpoints.down('lg')]: {
+    justifyContent: 'center',
+    paddingLeft: 16,
+    paddingRight: 16,
+    '& .MuiListItemIcon-root': {
+      minWidth: 'auto',
+      display: 'flex',
+      justifyContent: 'center',
+    },
+  },
+  [theme.breakpoints.down('md')]: {
+    marginBottom: 0,
+    borderLeft: 'none',
+    borderBottom:
+      active && theme.palette.mode === 'dark'
+        ? '3px solid #6366f1'
+        : '3px solid transparent',
+    padding: '8px 12px',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    '& .MuiListItemIcon-root': {
+      minWidth: 'auto',
+      marginRight: 0,
+    },
   },
 }));
 

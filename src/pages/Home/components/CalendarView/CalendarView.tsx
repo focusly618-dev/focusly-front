@@ -21,7 +21,15 @@ import { CalendarAIPlannerModal } from './components/CalendarAIPlannerModal/Cale
 import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
 
 // Material UI
-import { Box, Menu, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Menu,
+  Stack,
+  Typography,
+  Drawer,
+  IconButton,
+} from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
 
 // Styles & Hooks
 import { CalendarContainer } from './CalendarView.styles';
@@ -57,6 +65,7 @@ interface CalendarViewProps {
 export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
   const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
   const [isWeeklyPlannerOpen, setIsWeeklyPlannerOpen] = useState(false);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const {
     events,
     currentView,
@@ -133,7 +142,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             pb: 1,
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'flex-start',
+            alignItems: 'center',
           }}
         >
           <Box>
@@ -143,10 +152,29 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             >
               Calendar
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                display: { xs: 'none', md: 'block' },
+              }}
+            >
               Stay Organized and On Track with Your Personalized Calendar
             </Typography>
           </Box>
+          <IconButton
+            onClick={() => setIsSidePanelOpen(true)}
+            sx={{
+              display: { xs: 'flex', md: 'none' },
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '8px',
+              p: 1,
+              color: 'text.secondary',
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
         </Box>
 
         <Box
@@ -290,17 +318,67 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           </Box>
         </Menu>
       </CalendarContainer>
-      <CalendarSidePanel
-        currentView={currentView}
-        currentDate={currentDate}
-        onDateChange={handleOnNavigate}
-        onViewChange={handleOnChangeView}
-        onAddTaskClick={handleAddTaskClick}
-        events={events}
-        onEventSelect={handleSelectEvent}
-        onAIPlannerClick={() => setIsAIPlannerOpen(true)}
-        onWeeklyPlannerClick={() => setIsWeeklyPlannerOpen(true)}
-      />
+
+      {/* Desktop Sidebar (In-flow) */}
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <CalendarSidePanel
+          currentView={currentView}
+          currentDate={currentDate}
+          onDateChange={handleOnNavigate}
+          onViewChange={handleOnChangeView}
+          onAddTaskClick={handleAddTaskClick}
+          events={events}
+          onEventSelect={handleSelectEvent}
+          onAIPlannerClick={() => setIsAIPlannerOpen(true)}
+          onWeeklyPlannerClick={() => setIsWeeklyPlannerOpen(true)}
+        />
+      </Box>
+
+      {/* Mobile Overlay Side Panel Drawer */}
+      <Drawer
+        anchor="right"
+        open={isSidePanelOpen}
+        onClose={() => setIsSidePanelOpen(false)}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': {
+            width: '320px',
+            boxSizing: 'border-box',
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'dark' ? '#0f172a' : '#faf9f6',
+          },
+        }}
+      >
+        <CalendarSidePanel
+          currentView={currentView}
+          currentDate={currentDate}
+          onDateChange={(date) => {
+            handleOnNavigate(date);
+            setIsSidePanelOpen(false);
+          }}
+          onViewChange={(view) => {
+            handleOnChangeView(view);
+            setIsSidePanelOpen(false);
+          }}
+          onAddTaskClick={() => {
+            handleAddTaskClick();
+            setIsSidePanelOpen(false);
+          }}
+          events={events}
+          onEventSelect={(event) => {
+            handleSelectEvent(event);
+            setIsSidePanelOpen(false);
+          }}
+          onAIPlannerClick={() => {
+            setIsAIPlannerOpen(true);
+            setIsSidePanelOpen(false);
+          }}
+          onWeeklyPlannerClick={() => {
+            setIsWeeklyPlannerOpen(true);
+            setIsSidePanelOpen(false);
+          }}
+        />
+      </Drawer>
 
       <CalendarAIPlannerModal
         open={isAIPlannerOpen}

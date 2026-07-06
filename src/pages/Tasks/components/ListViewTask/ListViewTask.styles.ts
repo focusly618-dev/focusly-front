@@ -413,7 +413,9 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
   backgroundColor:
     theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.4)' : '#ffffff',
   backdropFilter: theme.palette.mode === 'dark' ? 'blur(12px)' : 'none',
-  overflow: 'hidden',
+  overflowX: 'auto',
+  overflowY: 'hidden',
+  WebkitOverflowScrolling: 'touch',
   boxShadow:
     theme.palette.mode === 'dark'
       ? '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
@@ -425,7 +427,7 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
 export const TableHeader = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns:
-    '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
+    '55px minmax(150px, 3fr) 100px 117px 123px 80px 125px 95px',
   padding: '6px 40px 6px 24px',
   backgroundColor:
     theme.palette.mode === 'dark'
@@ -444,26 +446,7 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   zIndex: 2,
   boxSizing: 'border-box',
-
-  // Responsive hiding
-  [theme.breakpoints.down('lg')]: {
-    gridTemplateColumns:
-      '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
-    '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
-      { display: 'none' },
-  },
-  [theme.breakpoints.down('md')]: {
-    gridTemplateColumns: '55px minmax(1px, 3fr) 100px 117px 123px 80px',
-    '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
-      { display: 'none' },
-  },
-  [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: '55px minmax(1px, 2fr) 100px 117px 123px',
-    '& .col-estimated, & .col-actual, & .col-ai, & .cell-estimated, & .cell-actual, & .cell-ai':
-      {
-        display: 'none',
-      },
-  },
+  minWidth: '950px',
 }));
 
 export const TableHeaderCell = styled(Box)(() => ({
@@ -479,6 +462,7 @@ export const TableBodyContainer = styled(Box)(({ theme }) => ({
   flex: 1,
   overflowY: 'auto',
   minHeight: 0,
+  minWidth: '950px',
   '&::-webkit-scrollbar': {
     width: '6px',
   },
@@ -522,6 +506,8 @@ export const TableStatusGroupRow = styled(Box, {
   cursor: 'pointer',
   userSelect: 'none',
   transition: 'background-color 0.15s ease',
+  minWidth: '950px',
+  boxSizing: 'border-box',
   '&:hover': {
     backgroundColor:
       theme.palette.mode === 'dark'
@@ -535,7 +521,7 @@ export const TaskRow = styled(Box, {
 })<{ statusColor?: string }>(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns:
-    '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
+    '55px minmax(150px, 3fr) 100px 117px 123px 80px 125px 95px',
   alignItems: 'center',
   padding: '5px 40px 5px 24px',
   backgroundColor: 'transparent',
@@ -547,6 +533,7 @@ export const TaskRow = styled(Box, {
   transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   gap: '12px',
   boxSizing: 'border-box',
+  minWidth: '950px',
 
   '&:hover': {
     backgroundColor:
@@ -562,24 +549,5 @@ export const TaskRow = styled(Box, {
 
   '&:hover .checkbox-cell': {
     opacity: 1,
-  },
-
-  // Responsive hiding
-  [theme.breakpoints.down('lg')]: {
-    gridTemplateColumns:
-      '55px minmax(1px, 3fr) 100px 117px 123px 80px 125px 95px',
-    '& .cell-estimated, & .cell-actual, & .cell-ai': { display: 'none' },
-  },
-  [theme.breakpoints.down('md')]: {
-    gridTemplateColumns: '55px minmax(1px, 3fr) 100px 117px 123px 80px',
-    '& .cell-estimated, & .cell-actual, & .cell-ai': {
-      display: 'none',
-    },
-  },
-  [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: '55px minmax(1px, 2fr) 100px 117px 123px',
-    '& .cell-estimated, & .cell-actual, & .cell-ai': {
-      display: 'none',
-    },
   },
 }));

@@ -74,7 +74,14 @@ export const SearchPalette = ({
     }
   };
   return (
-    <Box sx={{ width: '100%', maxWidth: '600px', position: 'relative' }}>
+    <Box
+      sx={{
+        width: '100%',
+        flexGrow: 1,
+        maxWidth: '600px',
+        position: 'relative',
+      }}
+    >
       {showPalette ? (
         <CommandPaletteContainer
           ref={containerRef}

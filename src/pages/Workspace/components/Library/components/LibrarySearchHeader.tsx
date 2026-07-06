@@ -62,8 +62,23 @@ export const LibrarySearchHeader = ({
   };
 
   return (
-    <Box display="flex" alignItems="center" sx={{ gap: 1.5, py: 1 }}>
-      <SearchBar id="joyride-workspace-search" sx={{ height: '38px', py: 0 }}>
+    <Box
+      display="flex"
+      alignItems="center"
+      sx={{
+        gap: 1.5,
+        py: 1,
+        width: { xs: '100%', sm: 'auto' },
+      }}
+    >
+      <SearchBar
+        id="joyride-workspace-search"
+        sx={{
+          height: '38px',
+          py: 0,
+          flex: { xs: 1, sm: 'none' },
+        }}
+      >
         <SearchIcon sx={{ color: 'text.secondary', fontSize: 18 }} />
         <input
           placeholder="Search workspaces..."
