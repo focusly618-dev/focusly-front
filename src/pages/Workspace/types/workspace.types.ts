@@ -73,7 +73,7 @@ export interface WorkspaceEditorProps {
     taskId: string,
     updates: Partial<TaskSearchItems>,
   ) => Promise<void>;
-  tasksData: { tasks: TaskSearchItems[] } | undefined;
+  tasksData: { tasks: TaskSearchItems[]; hasMore?: boolean } | undefined;
   onStartFocus?: (task?: TaskSearchItems | null) => void;
   onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   isRightSidebarOpen: boolean;
