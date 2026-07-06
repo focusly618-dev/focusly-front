@@ -32,6 +32,7 @@ interface SearchPaletteProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (field: any, value: any) => void;
   loadMore: () => Promise<void>;
+  hasMore?: boolean;
 }
 
 export const SearchPalette = ({
@@ -44,6 +45,7 @@ export const SearchPalette = ({
   handleSelectTask,
   setValue,
   loadMore,
+  hasMore,
 }: SearchPaletteProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -55,7 +57,7 @@ export const SearchPalette = ({
   };
   const loadingMore = useRef(false);
   const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
-    if (loadingMore.current) return;
+    if (loadingMore.current || hasMore === false) return;
 
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 

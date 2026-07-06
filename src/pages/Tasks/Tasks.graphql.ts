@@ -105,7 +105,6 @@ export const UPDATE_TASK = gql`
       use_ai
       estimate_timer
       real_timer
-      priority_level
       tags {
         name
       }
@@ -147,7 +146,6 @@ export const CREATE_TASK = gql`
       use_ai
       estimate_timer
       real_timer
-      priority_level
       tags {
         name
       }

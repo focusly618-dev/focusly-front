@@ -19,7 +19,7 @@ export const useWorkspaceTasks = ({
   onTaskSelect,
 }: UseWorkspaceTasksProps) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [offset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
   const {
     data: rawTasksData,
@@ -32,9 +32,18 @@ export const useWorkspaceTasks = ({
     variables: {
       userId,
       limit: LIMIT,
-      offset,
+      offset: 0,
     },
   });
+
+  useEffect(() => {
+    if (rawTasksData?.tasks) {
+      if (rawTasksData.tasks.length < LIMIT) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setHasMore(false);
+      }
+    }
+  }, [rawTasksData, userId]);
 
   useEffect(() => {
     if (error) {
@@ -52,26 +61,42 @@ export const useWorkspaceTasks = ({
         (t: TaskResponse) => mapResponseToTask(t) as unknown as TaskSearchItems,
       ),
       total: rawTasksData.tasks.length,
+      hasMore,
     };
-  }, [rawTasksData]);
+  }, [rawTasksData, hasMore]);
 
   const loadMore = async () => {
-    if (!tasksData || isLoading) return;
+    if (!tasksData || isLoading || !hasMore) return;
 
-    await fetchMore({
-      variables: {
-        userId,
-        limit: LIMIT,
-        offset: tasksData.tasks.length,
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return prev;
+    try {
+      await fetchMore({
+        variables: {
+          userId,
+          limit: LIMIT,
+          offset: tasksData.tasks.length,
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (
+            !fetchMoreResult ||
+            !fetchMoreResult.tasks ||
+            fetchMoreResult.tasks.length === 0
+          ) {
+            setHasMore(false);
+            return prev;
+          }
 
-        return {
-          tasks: [...prev.tasks, ...fetchMoreResult.tasks],
-        };
-      },
-    });
+          if (fetchMoreResult.tasks.length < LIMIT) {
+            setHasMore(false);
+          }
+
+          return {
+            tasks: [...prev.tasks, ...fetchMoreResult.tasks],
+          };
+        },
+      });
+    } catch (e) {
+      console.error('Error fetching more tasks in loadMore:', e);
+    }
   };
 
   const selectTask = useMemo(() => {

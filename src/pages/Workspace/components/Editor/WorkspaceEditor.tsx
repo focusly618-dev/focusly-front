@@ -73,6 +73,7 @@ export const WorkspaceEditor = ({
             setValue={setValue}
             saveState={saveState}
             loadMore={loadMore}
+            hasMore={tasksData?.hasMore}
             editor={editor}
             sourceLanguage={sourceLanguage}
             setSourceLanguage={setSourceLanguage}

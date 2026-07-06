@@ -39,6 +39,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     saveState,
     sourceLanguage,
     targetLanguage,
+    hasMore,
   } = props;
 
   const {
@@ -130,6 +131,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           handleSelectTask={handleSelectTask}
           setValue={setValue}
           loadMore={loadMore}
+          hasMore={hasMore}
         />
       </HeaderCenter>
 

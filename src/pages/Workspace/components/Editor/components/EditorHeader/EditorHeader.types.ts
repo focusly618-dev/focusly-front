@@ -50,4 +50,5 @@ export interface EditorHeaderProps {
   setTargetLanguage: (lang: string) => void;
   groupId?: string;
   loadMore: () => Promise<void>;
+  hasMore?: boolean;
 }

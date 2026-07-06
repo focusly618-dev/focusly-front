@@ -78,5 +78,25 @@ const errorLink = onError(
 
 export const client = new ApolloClient({
   link: from([errorLink, httpLink]),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          getTasksByUser: {
+            keyArgs: ['userId', 'filters', 'sort'],
+            merge(existing, incoming, { args }) {
+              const offset = args?.offset ?? 0;
+              const merged = existing ? (existing as unknown[]).slice(0) : [];
+              if (Array.isArray(incoming)) {
+                for (let i = 0; i < incoming.length; ++i) {
+                  merged[offset + i] = incoming[i];
+                }
+              }
+              return merged;
+            },
+          },
+        },
+      },
+    },
+  }),
 });
