@@ -174,7 +174,10 @@ Text: "${selectedText}"`;
         variables: { createTaskInput },
         refetchQueries: [
           { query: GET_TASKS, variables: { userId: user.id || '' } },
-          { query: GET_TASKS_TITLES, variables: { userId: user.id || '' } },
+          {
+            query: GET_TASKS_TITLES,
+            variables: { userId: user.id || '', limit: 24, offset: 0 },
+          },
         ],
       });
 

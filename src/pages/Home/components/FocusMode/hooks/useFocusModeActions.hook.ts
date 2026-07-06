@@ -45,7 +45,10 @@ export const useFocusModeActions = ({
         },
         refetchQueries: [
           { query: GET_TASKS, variables: { userId } },
-          { query: GET_TASKS_TITLES, variables: { userId } },
+          {
+            query: GET_TASKS_TITLES,
+            variables: { userId, limit: 24, offset: 0 },
+          },
           { query: GET_TOTAL_WORKSPACES },
           { query: GET_WORKSPACES, variables: { search: '' } },
         ],
@@ -74,7 +77,10 @@ export const useFocusModeActions = ({
         },
         refetchQueries: [
           { query: GET_TASKS, variables: { userId } },
-          { query: GET_TASKS_TITLES, variables: { userId } },
+          {
+            query: GET_TASKS_TITLES,
+            variables: { userId, limit: 24, offset: 0 },
+          },
         ],
       });
 
@@ -100,7 +106,10 @@ export const useFocusModeActions = ({
         },
         refetchQueries: [
           { query: GET_TASKS, variables: { userId } },
-          { query: GET_TASKS_TITLES, variables: { userId } },
+          {
+            query: GET_TASKS_TITLES,
+            variables: { userId, limit: 24, offset: 0 },
+          },
         ],
       });
 

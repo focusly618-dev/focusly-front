@@ -104,6 +104,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     selectTask,
     handleSelectTask,
     handleUpdateTask,
+    loadMore,
   } = useWorkspaceTasks({
     userId: user?.id,
     onTaskSelect: (taskId) => setValue('taskId', taskId),
@@ -304,6 +305,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
 
     // Tasks
     tasksData,
+    loadMore,
     isLoading,
     handleSelectTask,
     selectTask,

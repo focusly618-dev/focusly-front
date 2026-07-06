@@ -13,7 +13,6 @@ export const GET_TASKS = gql`
       status
       estimate_timer
       real_timer
-      duration
       priority_level
       user_id
       is_owner
@@ -22,11 +21,6 @@ export const GET_TASKS = gql`
       use_ai
       tags {
         name
-      }
-      filters {
-        status
-        priorityLevel
-        category
       }
       deadline
       created_at
@@ -49,22 +43,19 @@ export const GET_TASKS = gql`
       workspace {
         id
         title
-        content
-        updatedAt
       }
     }
   }
 `;
 
 export const GET_TASKS_TITLES = gql`
-  query GetTasksTitles($userId: String!) {
-    tasks: getTasksByUser(userId: $userId) {
+  query GetTasksTitles($userId: String!, $limit: Int!, $offset: Int!) {
+    tasks: getTasksByUser(userId: $userId, limit: $limit, offset: $offset) {
       id
       title
       status
       estimate_timer
       real_timer
-      duration
       priority_level
       user_id
       is_owner
@@ -87,7 +78,6 @@ export const GET_TASKS_TITLES = gql`
       source
       estimated_start_date
       estimated_end_date
-
       collaborators {
         name
         email
@@ -101,7 +91,6 @@ export const GET_TASKS_TITLES = gql`
     }
   }
 `;
-
 export const UPDATE_TASK = gql`
   mutation UpdateTask($updateTaskInput: UpdateTaskInput!) {
     updateTask(updateTaskInput: $updateTaskInput) {
@@ -116,7 +105,6 @@ export const UPDATE_TASK = gql`
       use_ai
       estimate_timer
       real_timer
-      duration
       tags {
         name
       }
@@ -158,7 +146,6 @@ export const CREATE_TASK = gql`
       use_ai
       estimate_timer
       real_timer
-      duration
       tags {
         name
       }
@@ -234,7 +221,6 @@ export const GET_TASKS_PAGINATED = gql`
         status
         estimate_timer
         real_timer
-        duration
         priority_level
         user_id
         is_owner
@@ -243,11 +229,6 @@ export const GET_TASKS_PAGINATED = gql`
         use_ai
         tags {
           name
-        }
-        filters {
-          status
-          priorityLevel
-          category
         }
         deadline
         created_at
@@ -270,8 +251,6 @@ export const GET_TASKS_PAGINATED = gql`
         workspace {
           id
           title
-          content
-          updatedAt
         }
       }
       totalCount

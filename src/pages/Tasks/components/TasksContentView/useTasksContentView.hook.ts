@@ -161,6 +161,19 @@ export const useTasksContentView = ({
     setSelectedTaskIds(new Set());
   };
 
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+      // If we are close to the bottom (within 100px), increase the limit to show more items
+      if (scrollHeight - scrollTop - clientHeight < 100) {
+        if (displayedTasks.length > limit) {
+          setLimit((prev) => prev + 24);
+        }
+      }
+    },
+    [displayedTasks.length, limit],
+  );
+
   return {
     selectedTaskIds,
     isConfirmOpen,
@@ -183,5 +196,6 @@ export const useTasksContentView = ({
     handleConfirmDelete,
     handleCancelDelete,
     handleClearSelection,
+    handleScroll,
   };
 };

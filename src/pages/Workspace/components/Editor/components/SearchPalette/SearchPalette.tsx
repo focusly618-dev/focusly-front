@@ -31,6 +31,8 @@ interface SearchPaletteProps {
   handleSelectTask: (task: TaskSearchItems | null) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (field: any, value: any) => void;
+  loadMore: () => Promise<void>;
+  hasMore?: boolean;
 }
 
 export const SearchPalette = ({
@@ -42,17 +44,35 @@ export const SearchPalette = ({
   selectTask,
   handleSelectTask,
   setValue,
+  loadMore,
+  hasMore,
 }: SearchPaletteProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const containerRef = useRef<HTMLDivElement>(null);
-
   const handleBlur = (e: React.FocusEvent) => {
     if (containerRef.current?.contains(e.relatedTarget as Node)) {
       return;
     }
     setShowPalette(false);
   };
+  const loadingMore = useRef(false);
+  const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
+    if (loadingMore.current || hasMore === false) return;
 
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+    const reachedBottom = scrollHeight - scrollTop <= clientHeight + 20;
+
+    if (!reachedBottom) return;
+
+    loadingMore.current = true;
+
+    try {
+      await loadMore();
+    } finally {
+      loadingMore.current = false;
+    }
+  };
   return (
     <Box sx={{ width: '100%', maxWidth: '600px', position: 'relative' }}>
       {showPalette ? (
@@ -72,7 +92,7 @@ export const SearchPalette = ({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </CommandInputWrapper>
-          <ResultList>
+          <ResultList onScroll={handleScroll}>
             <ResultHeader>
               <ResultTitle>AVAILABLE PROJECTS & TASKS</ResultTitle>
               <ResultCount>{filteredTasks.length} MATCHES</ResultCount>

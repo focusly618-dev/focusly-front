@@ -30,6 +30,7 @@ export const WorkspaceEditor = ({
   activeFocusTaskId,
   onUnlinkTask,
   saveState,
+  loadMore,
 }: WorkspaceEditorProps) => {
   const [sourceLanguage, setSourceLanguage] = useState('auto');
   const [targetLanguage, setTargetLanguage] = useState('en');
@@ -71,6 +72,8 @@ export const WorkspaceEditor = ({
             handleSelectTask={handleSelectTask}
             setValue={setValue}
             saveState={saveState}
+            loadMore={loadMore}
+            hasMore={tasksData?.hasMore}
             editor={editor}
             sourceLanguage={sourceLanguage}
             setSourceLanguage={setSourceLanguage}

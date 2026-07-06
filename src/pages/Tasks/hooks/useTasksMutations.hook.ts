@@ -97,7 +97,10 @@ export const useTasksMutations = ({
         },
         refetchQueries: [
           { query: GET_TASKS, variables: { userId } },
-          { query: GET_TASKS_TITLES, variables: { userId } },
+          {
+            query: GET_TASKS_TITLES,
+            variables: { userId, limit: 24, offset: 0 },
+          },
         ],
       });
 
@@ -126,7 +129,10 @@ export const useTasksMutations = ({
         },
         refetchQueries: [
           { query: GET_TASKS, variables: { userId } },
-          { query: GET_TASKS_TITLES, variables: { userId } },
+          {
+            query: GET_TASKS_TITLES,
+            variables: { userId, limit: 24, offset: 0 },
+          },
         ],
       });
 
