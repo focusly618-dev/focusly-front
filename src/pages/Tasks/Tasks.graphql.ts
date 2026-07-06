@@ -13,7 +13,6 @@ export const GET_TASKS = gql`
       status
       estimate_timer
       real_timer
-      duration
       priority_level
       user_id
       is_owner
@@ -22,11 +21,6 @@ export const GET_TASKS = gql`
       use_ai
       tags {
         name
-      }
-      filters {
-        status
-        priorityLevel
-        category
       }
       deadline
       created_at
@@ -49,8 +43,6 @@ export const GET_TASKS = gql`
       workspace {
         id
         title
-        content
-        updatedAt
       }
     }
   }
@@ -64,7 +56,6 @@ export const GET_TASKS_TITLES = gql`
       status
       estimate_timer
       real_timer
-      duration
       priority_level
       user_id
       is_owner
@@ -114,7 +105,7 @@ export const UPDATE_TASK = gql`
       use_ai
       estimate_timer
       real_timer
-      duration
+      priority_level
       tags {
         name
       }
@@ -156,7 +147,7 @@ export const CREATE_TASK = gql`
       use_ai
       estimate_timer
       real_timer
-      duration
+      priority_level
       tags {
         name
       }
@@ -232,7 +223,6 @@ export const GET_TASKS_PAGINATED = gql`
         status
         estimate_timer
         real_timer
-        duration
         priority_level
         user_id
         is_owner
@@ -241,11 +231,6 @@ export const GET_TASKS_PAGINATED = gql`
         use_ai
         tags {
           name
-        }
-        filters {
-          status
-          priorityLevel
-          category
         }
         deadline
         created_at
@@ -268,8 +253,6 @@ export const GET_TASKS_PAGINATED = gql`
         workspace {
           id
           title
-          content
-          updatedAt
         }
       }
       totalCount

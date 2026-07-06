@@ -17,15 +17,6 @@ export const GET_WORKSPACES = gql`
         status
         estimate_timer
         real_timer
-        duration
-        priority_level
-        links {
-          title
-          url
-        }
-        google_event_id
-        source
-        created_at
       }
       groupId
     }
@@ -36,26 +27,6 @@ export const CREATE_WORKSPACE = gql`
   mutation CreateWorkspace($createWorkspaceInput: CreateWorkspaceInput!) {
     createWorkspace(createWorkspaceInput: $createWorkspaceInput) {
       id
-      title
-      content
-      emoji
-      background_color
-      card_show_background
-      updatedAt
-      taskId
-      groupId
-      saveStatus
-      task {
-        id
-        title
-        status
-        estimate_timer
-        real_timer
-        duration
-        priority_level
-        source
-        created_at
-      }
     }
   }
 `;
@@ -64,25 +35,6 @@ export const UPDATE_WORKSPACE = gql`
   mutation UpdateWorkspace($updateWorkspaceInput: UpdateWorkspaceInput!) {
     updateWorkspace(updateWorkspaceInput: $updateWorkspaceInput) {
       id
-      title
-      content
-      emoji
-      background_color
-      card_show_background
-      updatedAt
-      taskId
-      groupId
-      task {
-        id
-        title
-        status
-        estimate_timer
-        real_timer
-        duration
-        priority_level
-        source
-        created_at
-      }
     }
   }
 `;
@@ -115,7 +67,6 @@ export const GET_WORKSPACE_BY_ID = gql`
         status
         estimate_timer
         real_timer
-        duration
         priority_level
         notes_encrypted
         links {
@@ -138,8 +89,6 @@ export const GET_PROJECT_GROUPS = gql`
       name
       color
       emoji
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -151,8 +100,6 @@ export const CREATE_PROJECT_GROUP = gql`
       name
       color
       emoji
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -164,8 +111,6 @@ export const UPDATE_PROJECT_GROUP = gql`
       name
       color
       emoji
-      createdAt
-      updatedAt
     }
   }
 `;

@@ -48,7 +48,6 @@ export const GET_INSIGHTS = gql`
         value
         color
       }
-      heatmap
       heatmapLabels
       heatmapCells {
         key
@@ -60,7 +59,6 @@ export const GET_INSIGHTS = gql`
           title
           completedAt
           category
-          realTimer
         }
       }
     }
