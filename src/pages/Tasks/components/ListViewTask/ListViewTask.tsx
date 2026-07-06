@@ -168,7 +168,10 @@ export const ListViewTask = ({
         </Box>
 
         {/* Cell 3: Priority */}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box
+          className="cell-priority"
+          sx={{ display: 'flex', alignItems: 'center' }}
+        >
           <PriorityChip
             priorityColor={priorityColor}
             onClick={(e) => {
@@ -208,7 +211,10 @@ export const ListViewTask = ({
         </Box>
 
         {/* Cell 4: Due Date */}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box
+          className="cell-date"
+          sx={{ display: 'flex', alignItems: 'center' }}
+        >
           {task.deadline || task.status === 'Done' ? (
             <DateChip
               onClick={(e) => {

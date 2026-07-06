@@ -58,9 +58,6 @@ const PanelContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   flexShrink: 0,
-  [theme.breakpoints.down('md')]: {
-    display: 'none', // Hide on smaller screens
-  },
 }));
 
 const Card = styled(Paper)(({ theme }) => ({

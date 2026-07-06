@@ -27,6 +27,7 @@ import {
   AssignmentOutlined as AssignmentIcon,
   LightbulbOutlined as TipIcon,
   Search as SearchIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import {
   getPriorityFromLevel,
@@ -161,7 +162,12 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
       isDragging={isDragging}
     >
       {isRightSidebarOpen && (
-        <DragHandle isDragging={isDragging} onPointerDown={handlePointerDown} />
+        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+          <DragHandle
+            isDragging={isDragging}
+            onPointerDown={handlePointerDown}
+          />
+        </Box>
       )}
 
       <Box
@@ -221,7 +227,18 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
             },
           }}
         >
-          {isRightSidebarOpen ? <ChevronRight /> : <ChevronLeft />}
+          {isRightSidebarOpen ? (
+            <>
+              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <ChevronRight />
+              </Box>
+              <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                <CloseIcon />
+              </Box>
+            </>
+          ) : (
+            <ChevronLeft />
+          )}
         </IconButton>
       </Box>
 

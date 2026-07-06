@@ -1,12 +1,22 @@
-import { Box, styled, LinearProgress, linearProgressClasses } from '@mui/material';
+import {
+  Box,
+  styled,
+  LinearProgress,
+  linearProgressClasses,
+} from '@mui/material';
 
 export const DashboardContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: theme.spacing(3),
   width: '100%',
   alignItems: 'flex-start',
+  justifyContent: 'center',
+  maxWidth: '1200px',
+  margin: '0 auto',
+  boxSizing: 'border-box',
   '@media (max-width: 1024px)': {
     flexDirection: 'column',
+    alignItems: 'stretch',
   },
 }));
 
@@ -96,17 +106,19 @@ export const ProgressHeader = styled(Box)(() => ({
   alignItems: 'center',
 }));
 
-export const StyledLinearProgress = styled(LinearProgress)<{ overLimit?: boolean }>(
-  ({ theme, overLimit }) => ({
-    height: 8,
+export const StyledLinearProgress = styled(LinearProgress)<{
+  overLimit?: boolean;
+}>(({ theme, overLimit }) => ({
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: theme.palette.divider,
+  [`& .${linearProgressClasses.bar}`]: {
     borderRadius: 4,
-    backgroundColor: theme.palette.divider,
-    [`& .${linearProgressClasses.bar}`]: {
-      borderRadius: 4,
-      backgroundColor: overLimit ? theme.palette.error.main : theme.palette.primary.main,
-    },
-  })
-);
+    backgroundColor: overLimit
+      ? theme.palette.error.main
+      : theme.palette.primary.main,
+  },
+}));
 
 export const RightCard = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -127,22 +139,27 @@ export const MiniProgress = styled(LinearProgress)<{ barColor?: string }>(
       borderRadius: 2,
       backgroundColor: barColor || theme.palette.primary.main,
     },
-  })
+  }),
 );
 
-export const AlertBox = styled(Box)<{ type: 'error' | 'warning' }>(({ theme, type }) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  gap: theme.spacing(1.5),
-  padding: theme.spacing(2),
-  borderRadius: '8px',
-  backgroundColor: type === 'error' ? 'rgba(255, 77, 79, 0.1)' : 'rgba(250, 173, 20, 0.1)',
-  border: `1px solid ${type === 'error' ? 'rgba(255, 77, 79, 0.2)' : 'rgba(250, 173, 20, 0.2)'}`,
-}));
+export const AlertBox = styled(Box)<{ type: 'error' | 'warning' }>(
+  ({ theme, type }) => ({
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: theme.spacing(1.5),
+    padding: theme.spacing(2),
+    borderRadius: '8px',
+    backgroundColor:
+      type === 'error' ? 'rgba(255, 77, 79, 0.1)' : 'rgba(250, 173, 20, 0.1)',
+    border: `1px solid ${type === 'error' ? 'rgba(255, 77, 79, 0.2)' : 'rgba(250, 173, 20, 0.2)'}`,
+  }),
+);
 
 export const SmartActionCard = styled(Box)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(47, 129, 247, 0.05)' : theme.palette.background.paper,
+    theme.palette.mode === 'dark'
+      ? 'rgba(47, 129, 247, 0.05)'
+      : theme.palette.background.paper,
   borderRadius: '16px',
   padding: theme.spacing(3),
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(47, 129, 247, 0.2)' : theme.palette.divider}`,

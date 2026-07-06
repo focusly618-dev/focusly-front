@@ -27,21 +27,28 @@ export const HeaderLeft = styled(Box)({
   justifyContent: 'flex-start',
 });
 
-export const HeaderCenter = styled(Box)({
+export const HeaderCenter = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   flex: 2,
   padding: '0 24px',
-});
+  [theme.breakpoints.down('md')]: {
+    padding: 0,
+    flex: 'none',
+  },
+}));
 
-export const HeaderRight = styled(Box)({
+export const HeaderRight = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: '16px',
   flex: 1,
   justifyContent: 'flex-end',
-});
+  [theme.breakpoints.down('md')]: {
+    gap: '12px',
+  },
+}));
 
 export const SearchInput = styled(InputBase)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,

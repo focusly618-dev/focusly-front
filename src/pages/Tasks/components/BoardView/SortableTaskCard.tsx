@@ -77,6 +77,7 @@ export const SortableTaskCard = memo(
           outline: 'none',
           display: 'block',
           marginBottom: '12px',
+          touchAction: 'none',
         }}
       >
         <Box

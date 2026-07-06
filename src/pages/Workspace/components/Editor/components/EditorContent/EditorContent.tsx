@@ -219,9 +219,9 @@ export const EditorContent = ({
       {hasCover ? (
         <Box
           sx={{
-            ml: '-60px',
-            mr: '-60px',
-            mt: '-40px',
+            ml: { xs: '-8px', md: '-60px' },
+            mr: { xs: '-8px', md: '-60px' },
+            mt: { xs: '-16px', md: '-40px' },
             position: 'relative',
             mb: headerIcon ? '36px' : '16px',
           }}
@@ -253,8 +253,8 @@ export const EditorContent = ({
             sx={{
               position: 'absolute',
               bottom: headerIcon ? '-36px' : 0,
-              left: '60px',
-              right: '60px',
+              left: { xs: '20px', md: '60px' },
+              right: { xs: '20px', md: '60px' },
               display: 'flex',
               alignItems: 'flex-end',
               justifyContent: 'space-between',
@@ -312,7 +312,11 @@ export const EditorContent = ({
                 <EmojiPickerIcon sx={{ fontSize: 14 }} />
                 <Typography
                   variant="caption"
-                  sx={{ color: 'inherit', fontWeight: 600 }}
+                  sx={{
+                    color: 'inherit',
+                    fontWeight: 600,
+                    display: { xs: 'none', sm: 'inline-block' },
+                  }}
                 >
                   {headerIcon ? 'Change icon' : 'Add icon'}
                 </Typography>
@@ -321,7 +325,11 @@ export const EditorContent = ({
                 <CoverIcon sx={{ fontSize: 14 }} />
                 <Typography
                   variant="caption"
-                  sx={{ color: 'inherit', fontWeight: 600 }}
+                  sx={{
+                    color: 'inherit',
+                    fontWeight: 600,
+                    display: { xs: 'none', sm: 'inline-block' },
+                  }}
                 >
                   Change cover
                 </Typography>
@@ -344,7 +352,11 @@ export const EditorContent = ({
             <EmojiPickerIcon sx={{ fontSize: 14 }} />
             <Typography
               variant="caption"
-              sx={{ color: 'inherit', fontWeight: 600 }}
+              sx={{
+                color: 'inherit',
+                fontWeight: 600,
+                display: { xs: 'none', sm: 'inline-block' },
+              }}
             >
               {headerIcon ? 'Change icon' : 'Add icon'}
             </Typography>
@@ -353,7 +365,11 @@ export const EditorContent = ({
             <CoverIcon sx={{ fontSize: 14 }} />
             <Typography
               variant="caption"
-              sx={{ color: 'inherit', fontWeight: 600 }}
+              sx={{
+                color: 'inherit',
+                fontWeight: 600,
+                display: { xs: 'none', sm: 'inline-block' },
+              }}
             >
               Add cover
             </Typography>

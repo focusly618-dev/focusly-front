@@ -49,10 +49,18 @@ export const TasksControlsBar = ({
         }}
         size="small"
       />
-      <Box sx={{ display: 'flex', gap: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          width: { xs: '100%', sm: 'auto' },
+          justifyContent: { xs: 'space-between', sm: 'flex-start' },
+        }}
+      >
         <FilterButton
           onClick={(e) => handleFilterClick(e, 'filter')}
           active={Boolean(filterAnchorEl)}
+          sx={{ flex: { xs: 1, sm: 'none' } }}
         >
           <FilterListIcon sx={{ fontSize: 20 }} />
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -70,6 +78,7 @@ export const TasksControlsBar = ({
         <SortButton
           onClick={(e) => handleFilterClick(e, 'sort')}
           active={Boolean(sortAnchorEl)}
+          sx={{ flex: { xs: 1, sm: 'none' } }}
         >
           <SortIcon sx={{ fontSize: 20 }} />
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -95,9 +104,15 @@ export const TasksControlsBar = ({
             px: 1.5,
             py: 0.75,
             minWidth: 'auto',
+            flex: { xs: 1.5, sm: 'none' },
           }}
         >
-          Add New Task
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            Add New Task
+          </Box>
+          <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+            Add Task
+          </Box>
         </Button>
       </Box>
     </ControlsBar>

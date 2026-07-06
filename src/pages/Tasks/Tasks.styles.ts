@@ -66,30 +66,46 @@ export const Sidebar = styled(Box)({
   gap: '24px',
 });
 
-export const Header = styled(Box)({
+export const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
   marginBottom: '24px',
   padding: '16px 24px',
-});
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: '16px',
+    padding: '16px',
+  },
+}));
 
 export const Title = styled(Typography)({
   fontWeight: 'bold',
   fontSize: '24px',
 });
 
-export const ControlsBar = styled(Box)({
+export const ControlsBar = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: '16px',
   marginBottom: '32px',
   padding: '16px 24px',
-});
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    padding: '16px',
+    marginBottom: '16px',
+  },
+}));
 
 export const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
+  maxWidth: '380px',
   backgroundColor: theme.palette.mode === 'dark' ? '#1A1F2B' : '#ffffff',
   borderRadius: '8px',
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: 'none',
+  },
   transition: 'all 0.2s ease-in-out',
   '& .MuiOutlinedInput-root': {
     color: theme.palette.text.primary,
@@ -406,13 +422,16 @@ export const ViewToggleButton = styled(Box, {
   },
 }));
 
-export const GridTaskContainer = styled(Box)({
+export const GridTaskContainer = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
   gap: '16px',
   paddingTop: '16px',
   paddingBottom: '32px',
-});
+  [theme.breakpoints.down('sm')]: {
+    gridTemplateColumns: '1fr',
+  },
+}));
 
 export const PriorityCardsContainer = styled(Box)({
   display: 'flex',

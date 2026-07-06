@@ -8,6 +8,9 @@ export const LibraryContainer = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   backgroundColor: theme.palette.background.default,
   padding: theme.spacing(3),
+  [theme.breakpoints.down('md')]: {
+    padding: theme.spacing(2),
+  },
 }));
 
 export const LibraryHeader = styled(Box)(({ theme }) => ({
@@ -16,6 +19,11 @@ export const LibraryHeader = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   marginBottom: theme.spacing(3),
   marginTop: theme.spacing(1),
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: '16px',
+  },
 }));
 
 export const HeaderTitle = styled(Typography)(({ theme }) => ({
@@ -24,6 +32,9 @@ export const HeaderTitle = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,
   marginBottom: theme.spacing(0.5),
   letterSpacing: '-0.5px',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '22px',
+  },
 }));
 
 export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
@@ -43,6 +54,9 @@ export const SearchBar = styled(Box)(({ theme }) => ({
   width: '380px',
   border: `1px solid ${theme.palette.divider}`,
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+  },
   '&:focus-within': {
     borderColor: theme.palette.primary.main,
     backgroundColor:
@@ -407,11 +421,14 @@ export const GridContainer = styled(Box, {
   }
   return {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
     gap: '20px',
     overflowY: 'auto',
     paddingBottom: '24px',
     paddingTop: '16px',
+    [theme.breakpoints.down('sm')]: {
+      gridTemplateColumns: '1fr',
+    },
     ...scrollbarStyles,
   };
 });

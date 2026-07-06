@@ -160,8 +160,10 @@ export const TasksContentView = ({
                 <Checkbox disabled size="small" sx={{ padding: 0 }} />
               </TableHeaderCell>
               <TableHeaderCell>Task Name</TableHeaderCell>
-              <TableHeaderCell>Priority</TableHeaderCell>
-              <TableHeaderCell>Due Date</TableHeaderCell>
+              <TableHeaderCell className="col-priority">
+                Priority
+              </TableHeaderCell>
+              <TableHeaderCell className="col-date">Due Date</TableHeaderCell>
               <TableHeaderCell className="col-estimated">
                 Estimated
               </TableHeaderCell>
@@ -305,8 +307,8 @@ export const TasksContentView = ({
               />
             </TableHeaderCell>
             <TableHeaderCell>Task Name</TableHeaderCell>
-            <TableHeaderCell>Priority</TableHeaderCell>
-            <TableHeaderCell>Due Date</TableHeaderCell>
+            <TableHeaderCell className="col-priority">Priority</TableHeaderCell>
+            <TableHeaderCell className="col-date">Due Date</TableHeaderCell>
             <TableHeaderCell className="col-estimated">
               Estimated
             </TableHeaderCell>

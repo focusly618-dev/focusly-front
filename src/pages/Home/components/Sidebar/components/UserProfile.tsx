@@ -18,38 +18,42 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
       id="joyride-user-profile"
       onClick={() => changeStatusTab(TaskBar.Settings)}
       sx={{
-        p: '12px 16px',
+        p: { xs: '8px', lg: '12px 16px' },
         borderRadius: '16px',
-        mx: 2,
+        mx: { xs: 1.5, lg: 2 },
         mb: 2,
         display: 'flex',
+        flexDirection: { xs: 'column', lg: 'row' },
         alignItems: 'center',
+        justifyContent: 'center',
         gap: 1.5,
         cursor: 'pointer',
-        border: '1px solid',
-        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
-        backgroundColor:
+        border: { xs: 'none', lg: '1px solid' },
+        borderColor:
           theme.palette.mode === 'dark'
-            ? 'rgba(30, 41, 59, 0.3)'
-            : 'rgba(255, 255, 255, 0.7)',
-        backdropFilter: 'blur(10px)',
-        boxShadow:
-          theme.palette.mode === 'dark'
-            ? '0 4px 24px rgba(0, 0, 0, 0.25)'
-            : '0 4px 16px rgba(0, 0, 0, 0.03)',
+            ? 'rgba(255, 255, 255, 0.08)'
+            : 'rgba(0, 0, 0, 0.06)',
+        backgroundColor: {
+          xs: 'transparent',
+          lg:
+            theme.palette.mode === 'dark'
+              ? 'rgba(30, 41, 59, 0.3)'
+              : 'rgba(255, 255, 255, 0.7)',
+        },
+        backdropFilter: { xs: 'none', lg: 'blur(10px)' },
+        boxShadow: 'none',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         flexShrink: 0,
         '&:hover': {
-          backgroundColor:
-            theme.palette.mode === 'dark'
-              ? 'rgba(30, 41, 59, 0.5)'
-              : 'rgba(255, 255, 255, 0.9)',
+          backgroundColor: {
+            xs: 'action.hover',
+            lg:
+              theme.palette.mode === 'dark'
+                ? 'rgba(30, 41, 59, 0.5)'
+                : 'rgba(255, 255, 255, 0.9)',
+          },
           borderColor: theme.palette.primary.main,
           transform: 'translateY(-2px)',
-          boxShadow:
-            theme.palette.mode === 'dark'
-              ? `0 8px 30px rgba(99, 102, 241, 0.12), 0 0 8px ${theme.palette.primary.main}15`
-              : `0 8px 24px rgba(99, 102, 241, 0.08)`,
           '& .profile-avatar': {
             transform: 'scale(1.05)',
             borderColor: theme.palette.primary.main,
@@ -65,14 +69,17 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
           width: 36,
           height: 36,
           border: '2px solid',
-          borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+          borderColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.12)'
+              : 'rgba(0, 0, 0, 0.08)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         {user?.name?.charAt(0)}
       </Avatar>
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box sx={{ flex: 1, minWidth: 0, display: { xs: 'none', lg: 'block' } }}>
         <Typography
           variant="body2"
           fontWeight="800"
@@ -98,36 +105,38 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
           View Profile
         </Typography>
       </Box>
-      <IconButton
-        size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          colorMode.toggleColorMode();
-        }}
-        sx={{
-          width: 30,
-          height: 30,
-          color: colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
-          bgcolor: alpha(
-            colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
-            0.08,
-          ),
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': {
+      <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            colorMode.toggleColorMode();
+          }}
+          sx={{
+            width: 30,
+            height: 30,
+            color: colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
             bgcolor: alpha(
               colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
-              0.16,
+              0.08,
             ),
-            transform: 'rotate(180deg) scale(1.05)',
-          },
-        }}
-      >
-        {colorMode.mode === 'dark' ? (
-          <LightModeIcon sx={{ fontSize: 16 }} />
-        ) : (
-          <DarkModeIcon sx={{ fontSize: 16 }} />
-        )}
-      </IconButton>
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': {
+              bgcolor: alpha(
+                colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
+                0.16,
+              ),
+              transform: 'rotate(180deg) scale(1.05)',
+            },
+          }}
+        >
+          {colorMode.mode === 'dark' ? (
+            <LightModeIcon sx={{ fontSize: 16 }} />
+          ) : (
+            <DarkModeIcon sx={{ fontSize: 16 }} />
+          )}
+        </IconButton>
+      </Box>
     </Box>
   );
 };
