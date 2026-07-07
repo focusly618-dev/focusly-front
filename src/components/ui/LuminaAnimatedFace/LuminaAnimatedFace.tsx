@@ -2,6 +2,8 @@ import React from 'react';
 
 interface LuminaAnimatedFaceProps {
   size?: number;
+  primaryColor?: string;
+  secondaryColor?: string;
 }
 
 /**
@@ -14,6 +16,8 @@ interface LuminaAnimatedFaceProps {
  */
 export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
   size = 32,
+  primaryColor = '#1d4ed8',
+  secondaryColor = '#f472b6',
 }) => {
   const baseId = React.useId();
   const cleanId = baseId.replace(/:/g, '');
@@ -83,7 +87,7 @@ export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
           y2="38"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0%" stopColor="#2563eb" />
+          <stop offset="0%" stopColor={primaryColor} />
           <stop offset="100%" stopColor="#1e3a8a" />
         </linearGradient>
 
@@ -123,6 +127,10 @@ export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
           stroke="#d1d5db"
           strokeWidth="1.2"
         />
+
+        {/* Blushing cheeks */}
+        <circle cx="19" cy="35" r="2.5" fill={secondaryColor} opacity="0.4" />
+        <circle cx="45" cy="35" r="2.5" fill={secondaryColor} opacity="0.4" />
 
         {/* Deep Blue Vertical Oval Eyes */}
         <g className={`lumina-eye-left-${cleanId}`}>
