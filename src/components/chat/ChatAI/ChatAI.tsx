@@ -421,16 +421,35 @@ const ChatAIInner = ({
           </Box>
         </Box>
 
-        <Box display="flex" alignItems="center" gap={1}>
-          {/* Model Selector Badge */}
-          <ModelBadgeButton
-            size="small"
-            onClick={(e) => setModelAnchor(e.currentTarget)}
-            startIcon={getModelIcon(selectedModel)}
-            endIcon={<ArrowDownIcon sx={{ fontSize: 12 }} />}
+        <Box display="flex" alignItems="center" gap={0.75}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="flex-end"
+            gap={0.5}
           >
-            {getModelLabel(selectedModel)}
-          </ModelBadgeButton>
+            {/* Model Selector Badge */}
+            <ModelBadgeButton
+              size="small"
+              onClick={(e) => setModelAnchor(e.currentTarget)}
+              startIcon={getModelIcon(selectedModel)}
+              endIcon={<ArrowDownIcon sx={{ fontSize: 12 }} />}
+              sx={{ height: '22px', py: 0 }}
+            >
+              {getModelLabel(selectedModel)}
+            </ModelBadgeButton>
+
+            {/* Token Counter */}
+            {tokensSpent > 0 && (
+              <TokenCounterBadge
+                sx={{ height: '16px', py: 0, px: '6px', fontSize: '9px' }}
+              >
+                <TokenIcon sx={{ fontSize: 9 }} />
+                <span>{tokensSpent.toLocaleString()} tkn</span>
+              </TokenCounterBadge>
+            )}
+          </Box>
+
           <Menu
             anchorEl={modelAnchor}
             open={Boolean(modelAnchor)}
@@ -516,14 +535,6 @@ const ChatAIInner = ({
             </MenuItem>
           </Menu>
 
-          {/* Token Counter */}
-          {tokensSpent > 0 && (
-            <TokenCounterBadge>
-              <TokenIcon sx={{ fontSize: 10 }} />
-              <span>{tokensSpent.toLocaleString()} tkn</span>
-            </TokenCounterBadge>
-          )}
-
           <IconButton
             onClick={() => setIsOpen(false)}
             size="small"
@@ -584,6 +595,10 @@ const ChatAIInner = ({
               .join('\n');
 
             const { cleanText, action } = parseLuminaAction(textContent);
+
+            if (!isUser && !cleanText.trim()) {
+              return null;
+            }
 
             return (
               <MessageRow key={msg.id} isUser={isUser}>
