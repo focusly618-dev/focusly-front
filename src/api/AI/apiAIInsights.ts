@@ -6,6 +6,7 @@ export type {
   PatternChip,
   PatternAnalysisData,
   PatternAnalysisResponse,
+  TimelineBlock,
 } from './apiAI.types';
 
 const getAnalyzePatternsEndpoint = () => {

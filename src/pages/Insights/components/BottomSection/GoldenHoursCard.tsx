@@ -200,7 +200,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
         estimated_start_date: string;
         estimated_end_date: string;
       };
-    };
+    } | null;
   }) => {
     if (!rec.action || rec.action.type !== 'RESCHEDULE_TASK') return;
     const { taskId, estimated_start_date, estimated_end_date } =
