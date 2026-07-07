@@ -119,6 +119,32 @@ export const useSuggestedActionCard = (
           localStorage.setItem(actionIdKey, id);
           setCreatedId(id);
         }
+      } else if (action.type === 'CREATE_NOTE') {
+        const res = await createWorkspace({
+          variables: {
+            createWorkspaceInput: {
+              title: action.payload.title || 'AI Note',
+              content:
+                action.payload.content_encrypted ||
+                action.payload.content ||
+                '[]',
+              groupId:
+                action.payload.project_group_id ||
+                action.payload.groupId ||
+                null,
+              saveStatus: true,
+            },
+          },
+          refetchQueries: [
+            { query: GET_WORKSPACES, variables: { search: '' } },
+          ],
+        });
+
+        const id = res.data?.createWorkspace?.id;
+        if (id) {
+          localStorage.setItem(actionIdKey, id);
+          setCreatedId(id);
+        }
       } else if (action.type === 'CREATE_PROJECT_GROUP') {
         const res = await createProjectGroup({
           variables: {
@@ -157,6 +183,7 @@ export const useSuggestedActionCard = (
   const getActionTitle = (): string => {
     if (action.type === 'CREATE_TASK') return 'Create Task';
     if (action.type === 'CREATE_WORKSPACE') return 'Create Workspace';
+    if (action.type === 'CREATE_NOTE') return 'Create Note';
     if (action.type === 'INSERT_TO_WORKSPACE') return 'Insert into Workspace';
     return 'Create Project Group';
   };
@@ -165,7 +192,7 @@ export const useSuggestedActionCard = (
     if (action.type === 'CREATE_TASK') {
       return `Title: "${action.payload.title}"`;
     }
-    if (action.type === 'CREATE_WORKSPACE') {
+    if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE') {
       return `Title: "${action.payload.title}"`;
     }
     if (action.type === 'INSERT_TO_WORKSPACE') {
@@ -178,7 +205,8 @@ export const useSuggestedActionCard = (
   const getActionIcon = (): ReactNode => {
     const sx = { fontSize: 20, color: theme.palette.primary.main };
     if (action.type === 'CREATE_TASK') return <AssignmentIcon sx={sx} />;
-    if (action.type === 'CREATE_WORKSPACE') return <DescriptionIcon sx={sx} />;
+    if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE')
+      return <DescriptionIcon sx={sx} />;
     if (action.type === 'INSERT_TO_WORKSPACE')
       return <AssignmentIcon sx={sx} />;
     return <FolderIcon sx={sx} />;

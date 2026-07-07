@@ -192,8 +192,8 @@ export const DELETE_TAG = gql`
 `;
 
 export const GET_TAGS = gql`
-  query GetTagsByUser($userId: String!) {
-    getTagsByUser(userId: $userId) {
+  query GetTagsByUser($userId: String!, $searchTerm: String) {
+    getTagsByUser(userId: $userId, searchTerm: $searchTerm) {
       name
     }
   }

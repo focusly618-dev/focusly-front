@@ -93,38 +93,42 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
                 <Typography variant="caption" fontWeight={700}>
                   {action.type === 'INSERT_TO_WORKSPACE'
                     ? 'Inserted Successfully!'
-                    : 'Created Successfully!'}
+                    : action.type === 'CREATE_NOTE'
+                      ? 'Note Created Successfully!'
+                      : 'Created Successfully!'}
                 </Typography>
               </Box>
 
-              {createdId && action.type === 'CREATE_WORKSPACE' && (
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() =>
-                    setSearchParams({
-                      tab: 'Workspace',
-                      workspaceId: createdId,
-                    })
-                  }
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    fontSize: '10px',
-                    borderRadius: '6px',
-                    py: 0.2,
-                    px: 1.2,
-                    borderColor: 'primary.main',
-                    color: 'primary.main',
-                    '&:hover': {
-                      borderColor: 'primary.dark',
-                      bgcolor: 'rgba(59, 130, 246, 0.08)',
-                    },
-                  }}
-                >
-                  Open Workspace
-                </Button>
-              )}
+              {createdId &&
+                (action.type === 'CREATE_WORKSPACE' ||
+                  action.type === 'CREATE_NOTE') && (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() =>
+                      setSearchParams({
+                        tab: 'Workspace',
+                        workspaceId: createdId,
+                      })
+                    }
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      fontSize: '10px',
+                      borderRadius: '6px',
+                      py: 0.2,
+                      px: 1.2,
+                      borderColor: 'primary.main',
+                      color: 'primary.main',
+                      '&:hover': {
+                        borderColor: 'primary.dark',
+                        bgcolor: 'rgba(59, 130, 246, 0.08)',
+                      },
+                    }}
+                  >
+                    Open Workspace
+                  </Button>
+                )}
 
               {createdId && action.type === 'CREATE_TASK' && (
                 <Button

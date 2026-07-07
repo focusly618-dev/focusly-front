@@ -6,19 +6,30 @@ import {
   CircularProgress,
   Button,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Divider,
 } from '@mui/material';
 import {
   WbSunny,
   InfoOutlined as InfoIcon,
   AutoAwesome as SparklesIcon,
+  Close as CloseIcon,
+  WarningAmber as WarningAmberIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  LightbulbOutlined as LightbulbIcon,
 } from '@mui/icons-material';
+import { useMutation } from '@apollo/client';
 import { ChartCard } from '../../Insights.styles';
 import {
   fetchAIBehavioralPatterns,
   type PatternAnalysisData,
+  type TimelineBlock,
 } from '@/api/AI/apiAIInsights';
+import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { sileo } from '@/utils';
-
 import { useAppSelector } from '@/redux/hooks';
 
 export interface GoldenHoursCardProps {
@@ -27,6 +38,87 @@ export interface GoldenHoursCardProps {
 
 const CACHE_KEY_PREFIX = 'focusly_ai_patterns_';
 const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const TimelineView = ({ blocks }: { blocks: TimelineBlock[] }) => {
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        height: '34px',
+        bgcolor: (theme) =>
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.05)'
+            : 'rgba(0, 0, 0, 0.03)',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        mb: 1,
+        border: '1px solid',
+        borderColor: 'divider',
+      }}
+    >
+      {blocks.map((block, idx) => {
+        const left = (block.startHour / 24) * 100;
+        const width = ((block.endHour - block.startHour) / 24) * 100;
+        return (
+          <Tooltip
+            key={idx}
+            title={`${block.label}: ${block.startHour}:00 - ${block.endHour}:00`}
+            arrow
+          >
+            <Box
+              sx={{
+                position: 'absolute',
+                left: `${left}%`,
+                width: `${width}%`,
+                height: '100%',
+                bgcolor: block.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontSize: '10px',
+                fontWeight: 700,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                px: 0.5,
+                borderRight: '1px solid rgba(255, 255, 255, 0.15)',
+              }}
+            >
+              {block.label}
+            </Box>
+          </Tooltip>
+        );
+      })}
+    </Box>
+  );
+};
+
+const HourMarkers = () => {
+  const hours = [0, 4, 8, 12, 16, 20, 24];
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        px: 0.5,
+        mt: 0.5,
+        mb: 2,
+      }}
+    >
+      {hours.map((h) => (
+        <Typography
+          key={h}
+          variant="caption"
+          sx={{ fontSize: '9px', color: 'text.secondary', fontWeight: 600 }}
+        >
+          {h === 24 ? '24:00' : `${h.toString().padStart(2, '0')}:00`}
+        </Typography>
+      ))}
+    </Box>
+  );
+};
 
 export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
   fallbackGoldenWindow,
@@ -37,6 +129,11 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
   const [analysisData, setAnalysisData] = useState<PatternAnalysisData | null>(
     null,
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [appliedTasks, setAppliedTasks] = useState<Set<string>>(new Set());
+
+  const [updateTaskMutation, { loading: isMutating }] =
+    useMutation(UPDATE_TASK);
 
   const cacheKey = `${CACHE_KEY_PREFIX}${userId}`;
 
@@ -92,6 +189,50 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApplyAction = async (rec: {
+    action?: {
+      type: string;
+      payload: {
+        taskId: string;
+        estimated_start_date: string;
+        estimated_end_date: string;
+      };
+    } | null;
+  }) => {
+    if (!rec.action || rec.action.type !== 'RESCHEDULE_TASK') return;
+    const { taskId, estimated_start_date, estimated_end_date } =
+      rec.action.payload;
+    try {
+      await updateTaskMutation({
+        variables: {
+          updateTaskInput: {
+            id: taskId,
+            estimated_start_date,
+            estimated_end_date,
+          },
+        },
+      });
+      setAppliedTasks((prev) => {
+        const next = new Set(prev);
+        next.add(taskId);
+        return next;
+      });
+      sileo.success({
+        title: '¡Cambio Aplicado con éxito! 🚀',
+        description:
+          'La tarea ha sido agendada en tu calendario durante tus Golden Hours.',
+        duration: 4000,
+      });
+    } catch (err) {
+      console.error('Error applying recommendation action:', err);
+      sileo.error({
+        title: 'Error al aplicar cambio',
+        description: 'No pudimos reagendar la tarea en este momento.',
+        duration: 4000,
+      });
     }
   };
 
@@ -237,57 +378,53 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
               </Box>
             </Box>
           )}
+
           {analysisData ? (
-            <Box display="flex" flexDirection="column" gap={2}>
+            <Box display="flex" flexDirection="column" gap={2} flex={1}>
               {/* Style chip & summary */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  display="block"
-                  mb={0.5}
-                >
-                  ESTILO DE TRABAJO
-                </Typography>
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
-                  color="primary.main"
-                >
-                  ⚡ {analysisData.workStyle}
-                </Typography>
-              </Box>
-
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  display="block"
-                  mb={0.5}
-                >
-                  PATRONES DETECTADOS
-                </Typography>
-                <Box display="flex" flexWrap="wrap" gap={1}>
-                  {analysisData.patterns.map((p) => (
-                    <Chip
-                      key={p.label}
-                      icon={<span>{p.icon}</span>}
-                      label={p.label}
-                      size="small"
-                      sx={{
-                        borderRadius: '6px',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        bgcolor: (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255,255,255,0.05)'
-                            : 'rgba(0,0,0,0.04)',
-                        border: '1px solid',
-                        borderColor: 'divider',
-                      }}
-                    />
-                  ))}
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Box>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                    mb={0.5}
+                  >
+                    ESTILO DE TRABAJO
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    color="primary.main"
+                  >
+                    ⚡ {analysisData.workStyle}
+                  </Typography>
                 </Box>
+
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => setIsModalOpen(true)}
+                  startIcon={<SparklesIcon sx={{ fontSize: 13 }} />}
+                  sx={{
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    bgcolor: 'primary.main',
+                    boxShadow: 'none',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                      boxShadow: 'none',
+                    },
+                  }}
+                >
+                  Ver Diagnóstico (AI)
+                </Button>
               </Box>
 
               <Box>
@@ -297,7 +434,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
                   display="block"
                   mb={0.5}
                 >
-                  ANÁLISIS DE COMPORTAMIENTO
+                  RESUMEN GENERAL
                 </Typography>
                 <Typography
                   variant="body2"
@@ -355,6 +492,381 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
             PRODUCTIVITY SCORE (LAST 7 DAYS)
           </Typography>
         </Box>
+      )}
+
+      {/* Deep-dive AI Advisor Modal */}
+      {analysisData && (
+        <Dialog
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          maxWidth="sm"
+          fullWidth
+          scroll="body"
+          PaperProps={{
+            sx: {
+              borderRadius: '16px',
+              p: 1,
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontWeight: 700,
+              fontSize: '1.1rem',
+              pb: 1.5,
+            }}
+          >
+            <Box display="flex" alignItems="center" gap={1}>
+              <SparklesIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+              Lumina: Tu Coach de Productividad AI
+            </Box>
+            <IconButton size="small" onClick={() => setIsModalOpen(false)}>
+              <CloseIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          </DialogTitle>
+          <Divider />
+
+          <DialogContent
+            sx={{ display: 'flex', flexDirection: 'column', gap: 3.5, pt: 3 }}
+          >
+            {/* Work Style Details */}
+            <Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                mb={1}
+                fontWeight="bold"
+                letterSpacing="0.5px"
+              >
+                PERFIL DE TRABAJO
+              </Typography>
+              <Box display="flex" alignItems="center" gap={1.5} mb={2}>
+                <Typography variant="h6" fontWeight={800} color="primary.main">
+                  ⚡ {analysisData.workStyle}
+                </Typography>
+                <Chip
+                  label={`Confianza: ${Math.round(analysisData.goldenHoursConfidence * 100)}%`}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    borderRadius: '6px',
+                    fontWeight: 600,
+                    fontSize: '10px',
+                  }}
+                />
+              </Box>
+
+              <Typography
+                variant="body2"
+                color="text.primary"
+                sx={{
+                  lineHeight: 1.5,
+                  p: 2,
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.02)'
+                      : 'rgba(0, 0, 0, 0.01)',
+                  borderRadius: '12px',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                {analysisData.behaviorSummary}
+              </Typography>
+            </Box>
+
+            {/* Timeline Comparison Diagram */}
+            {analysisData.timelines && (
+              <Box>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  display="block"
+                  mb={2}
+                  fontWeight="bold"
+                  letterSpacing="0.5px"
+                >
+                  COMPARACIÓN DE RUTINAS (24H)
+                </Typography>
+                <Box
+                  sx={{
+                    p: 2.5,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: '12px',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.01)'
+                        : 'rgba(0,0,0,0.005)',
+                  }}
+                >
+                  <Box sx={{ mb: 2.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        mb: 0.5,
+                        fontWeight: 700,
+                        color: 'text.secondary',
+                      }}
+                    >
+                      DISTRIBUCIÓN DETECTADA
+                    </Typography>
+                    <TimelineView blocks={analysisData.timelines.current} />
+                  </Box>
+
+                  <Box sx={{ mb: 1.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        mb: 0.5,
+                        fontWeight: 700,
+                        color: 'primary.main',
+                      }}
+                    >
+                      PLAN OPTIMIZADO POR LUMINA (AI)
+                    </Typography>
+                    <TimelineView blocks={analysisData.timelines.recommended} />
+                  </Box>
+
+                  <HourMarkers />
+
+                  <Box
+                    display="flex"
+                    gap={2}
+                    justifyContent="center"
+                    flexWrap="wrap"
+                    sx={{
+                      borderTop: '1px solid',
+                      borderColor: 'divider',
+                      pt: 2,
+                    }}
+                  >
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: '#475569',
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{ fontSize: '10px', fontWeight: 600 }}
+                      >
+                        Sueño
+                      </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: '#8b5cf6',
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{ fontSize: '10px', fontWeight: 600 }}
+                      >
+                        Golden Hour
+                      </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: '#06b6d4',
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{ fontSize: '10px', fontWeight: 600 }}
+                      >
+                        Secundario
+                      </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: '#f43f5e',
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{ fontSize: '10px', fontWeight: 600 }}
+                      >
+                        Ocio/Otros
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            )}
+
+            {/* Recommendations List */}
+            {analysisData.recommendations &&
+              analysisData.recommendations.length > 0 && (
+                <Box display="flex" flexDirection="column" gap={1.5}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                    mb={0.5}
+                    fontWeight="bold"
+                    letterSpacing="0.5px"
+                  >
+                    RECOMENDACIONES RELEVANTES
+                  </Typography>
+                  <Box display="flex" flexDirection="column" gap={1.5}>
+                    {analysisData.recommendations.map((rec, index) => {
+                      const isWarning = rec.type === 'warning';
+                      const isSuccess = rec.type === 'success';
+                      const iconColor = isWarning
+                        ? 'warning.main'
+                        : isSuccess
+                          ? 'success.main'
+                          : 'primary.main';
+
+                      const bgColor = isWarning
+                        ? (t: { palette: { mode: string } }) =>
+                            t.palette.mode === 'dark'
+                              ? 'rgba(239, 140, 0, 0.08)'
+                              : 'rgba(239, 140, 0, 0.03)'
+                        : isSuccess
+                          ? (t: { palette: { mode: string } }) =>
+                              t.palette.mode === 'dark'
+                                ? 'rgba(16, 185, 129, 0.08)'
+                                : 'rgba(16, 185, 129, 0.03)'
+                          : (t: { palette: { mode: string } }) =>
+                              t.palette.mode === 'dark'
+                                ? 'rgba(59, 130, 246, 0.08)'
+                                : 'rgba(59, 130, 246, 0.03)';
+
+                      const borderColor = isWarning
+                        ? 'rgba(239, 140, 0, 0.2)'
+                        : isSuccess
+                          ? 'rgba(16, 185, 129, 0.2)'
+                          : 'rgba(59, 130, 246, 0.2)';
+
+                      const isApplied =
+                        rec.action &&
+                        appliedTasks.has(rec.action.payload.taskId);
+
+                      return (
+                        <Box
+                          key={index}
+                          sx={{
+                            p: 2,
+                            bgcolor: bgColor,
+                            borderRadius: '10px',
+                            border: '1px solid',
+                            borderColor: borderColor,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1.5,
+                          }}
+                        >
+                          <Box display="flex" gap={1.5} alignItems="start">
+                            <Box sx={{ mt: 0.25 }}>
+                              {isWarning ? (
+                                <WarningAmberIcon
+                                  sx={{ color: iconColor, fontSize: 18 }}
+                                />
+                              ) : isSuccess ? (
+                                <CheckCircleOutlineIcon
+                                  sx={{ color: iconColor, fontSize: 18 }}
+                                />
+                              ) : (
+                                <LightbulbIcon
+                                  sx={{ color: iconColor, fontSize: 18 }}
+                                />
+                              )}
+                            </Box>
+                            <Box flex={1}>
+                              <Typography
+                                variant="subtitle2"
+                                fontWeight={700}
+                                sx={{ fontSize: '13px', mb: 0.25 }}
+                              >
+                                {rec.title}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ fontSize: '12px', lineHeight: 1.45 }}
+                              >
+                                {rec.description}
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          {rec.action &&
+                            rec.action.type === 'RESCHEDULE_TASK' && (
+                              <Box
+                                display="flex"
+                                justifyContent="flex-end"
+                                sx={{ mt: 0.5 }}
+                              >
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  onClick={() => handleApplyAction(rec)}
+                                  disabled={isApplied || isMutating}
+                                  startIcon={
+                                    isApplied ? (
+                                      <CheckCircleOutlineIcon />
+                                    ) : (
+                                      <SparklesIcon sx={{ fontSize: 11 }} />
+                                    )
+                                  }
+                                  sx={{
+                                    borderRadius: '8px',
+                                    textTransform: 'none',
+                                    fontSize: '0.7rem',
+                                    fontWeight: 700,
+                                    py: 0.25,
+                                    px: 1.5,
+                                    borderColor: isApplied
+                                      ? 'success.main'
+                                      : iconColor,
+                                    color: isApplied
+                                      ? 'success.main'
+                                      : iconColor,
+                                    '&:hover': {
+                                      borderColor: isApplied
+                                        ? 'success.main'
+                                        : iconColor,
+                                      bgcolor: `${iconColor}15`,
+                                    },
+                                  }}
+                                >
+                                  {isApplied
+                                    ? 'Aplicado con Éxito'
+                                    : rec.action.label}
+                                </Button>
+                              </Box>
+                            )}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
+              )}
+          </DialogContent>
+        </Dialog>
       )}
     </ChartCard>
   );

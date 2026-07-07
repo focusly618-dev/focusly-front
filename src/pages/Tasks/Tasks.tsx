@@ -33,6 +33,8 @@ export const Tasks = ({
     filteredTasks,
     isLoading,
     tags,
+    tagSearchTerm,
+    setTagSearchTerm,
     searchTerm,
     setSearchTerm,
     dateRange,
@@ -166,6 +168,8 @@ export const Tasks = ({
               }
             }
             tags={tags}
+            tagSearchTerm={tagSearchTerm}
+            setTagSearchTerm={setTagSearchTerm}
             handleFilterClick={handleFilterClick}
             handleFilterClose={handleFilterClose}
             handleApplyFilters={handleApplyFilters}

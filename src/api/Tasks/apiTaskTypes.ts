@@ -15,6 +15,7 @@ export interface TaskFilterInput {
   startDate?: string;
   endDate?: string;
   searchTerm?: string;
+  tags?: string[];
 }
 
 export interface TaskSortInput {

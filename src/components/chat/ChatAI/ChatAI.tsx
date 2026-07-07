@@ -17,6 +17,7 @@ import {
   Button,
   useTheme,
   Divider,
+  Chip,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -24,6 +25,7 @@ import {
   AutoAwesome as AutoAwesomeIcon,
   KeyboardArrowDown as ArrowDownIcon,
   RadioButtonChecked as TokenIcon,
+  AlternateEmail as AtIcon,
 } from '@mui/icons-material';
 import { CuteRobotIcon, ClaudeIcon, GeminiIcon } from '@/components/ui';
 import {
@@ -34,8 +36,12 @@ import {
 } from '@assistant-ui/react';
 import type { ChatModelAdapter } from '@assistant-ui/react';
 import { fetchChatStreamResponse } from '@/api/AI/apiAI';
+import { useQuery } from '@apollo/client';
+import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
+import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
 import { parseLuminaAction } from '@/utils';
+import { useAppSelector } from '@/redux/hooks';
 import {
   ChatContainer,
   FloatingButton,
@@ -264,16 +270,26 @@ const getModelIcon = (model: string, isMenu: boolean = false) => {
   return <GeminiIcon sx={{ fontSize: size, color: '#137fec', mr }} />;
 };
 
+export interface AIContextSelector {
+  type: 'tasks' | 'workspaces' | 'task' | 'workspace';
+  id?: string;
+  title: string;
+}
+
 interface ChatAIInnerProps {
   setIsOpen: (open: boolean) => void;
   selectedModel: string;
   setSelectedModel: (model: string) => void;
+  selectedContext: AIContextSelector | null;
+  setSelectedContext: (ctx: AIContextSelector | null) => void;
 }
 
 const ChatAIInner = ({
   setIsOpen,
   selectedModel,
   setSelectedModel,
+  selectedContext,
+  setSelectedContext,
 }: ChatAIInnerProps) => {
   const theme = useTheme();
   const messages = useAuiState((s) => s.thread.messages);
@@ -281,7 +297,30 @@ const ChatAIInner = ({
   const thread = useThreadRuntime();
   const [chatInput, setChatInput] = useState('');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
+  const [contextAnchor, setContextAnchor] = useState<null | HTMLElement>(null);
+  const [contextMenuLevel, setContextMenuLevel] = useState<
+    'main' | 'tasks' | 'workspaces'
+  >('main');
+  const chatInputWrapperRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+
+  const { user } = useAppSelector((state) => state.auth);
+  const userId = user?.id || '';
+
+  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, {
+    variables: { userId, filters: {} },
+    skip: !userId,
+  });
+  const tasksList = tasksData?.tasks || [];
+
+  const { data: workspacesData, loading: workspacesLoading } = useQuery(
+    GET_WORKSPACES,
+    {
+      variables: { search: '' },
+      skip: !userId,
+    },
+  );
+  const workspacesList = workspacesData?.workspaces || [];
 
   const scrollToBottom = useCallback(() => {
     if (endRef.current) {
@@ -297,6 +336,7 @@ const ChatAIInner = ({
     if (!chatInput.trim() || isRunning) return;
     const content = chatInput;
     setChatInput('');
+    setSelectedContext(null); // Clear context on send
     thread.append({
       role: 'user',
       content: [{ type: 'text', text: content }],
@@ -310,7 +350,26 @@ const ChatAIInner = ({
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setChatInput(val);
+    if (val.endsWith('@')) {
+      setContextAnchor(chatInputWrapperRef.current);
+      setContextMenuLevel('main');
+    }
+  };
+
+  const selectContext = (ctx: AIContextSelector) => {
+    setSelectedContext(ctx);
+    setContextAnchor(null);
+    setContextMenuLevel('main');
+    if (chatInput.endsWith('@')) {
+      setChatInput((prev) => prev.slice(0, -1));
+    }
+  };
+
   const handleSuggestionClick = (prompt: string) => {
+    setSelectedContext(null); // Clear context on suggestion
     thread.append({
       role: 'user',
       content: [{ type: 'text', text: prompt }],
@@ -631,11 +690,255 @@ const ChatAIInner = ({
 
       {/* Input */}
       <InputArea>
-        <ChatInputWrapper>
+        <IconButton
+          size="small"
+          onClick={() => {
+            setContextAnchor(chatInputWrapperRef.current);
+            setContextMenuLevel('main');
+          }}
+          sx={{
+            color: selectedContext ? 'primary.main' : 'text.secondary',
+            alignSelf: 'center',
+            '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
+          }}
+        >
+          <AtIcon sx={{ fontSize: 18 }} />
+        </IconButton>
+
+        <Menu
+          anchorEl={contextAnchor}
+          open={Boolean(contextAnchor)}
+          onClose={() => {
+            setContextAnchor(null);
+            setContextMenuLevel('main');
+          }}
+          PaperProps={{
+            sx: {
+              borderRadius: '12px',
+              width: contextAnchor ? `${contextAnchor.clientWidth}px` : 'auto',
+              maxHeight: '320px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+              border: '1px solid',
+              borderColor: 'divider',
+              overflowY: 'auto',
+            },
+          }}
+        >
+          {contextMenuLevel === 'main' && (
+            <>
+              <Typography
+                variant="caption"
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: 'block',
+                  fontWeight: 800,
+                  color: 'text.secondary',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : 'rgba(0,0,0,0.02)',
+                }}
+              >
+                SELECCIONAR CONTEXTO
+              </Typography>
+              <MenuItem
+                onClick={() => setContextMenuLevel('tasks')}
+                sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
+              >
+                📋 Tasks / Tareas
+              </MenuItem>
+              <MenuItem
+                onClick={() => setContextMenuLevel('workspaces')}
+                sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
+              >
+                🗂️ Workspaces / Espacios de Trabajo
+              </MenuItem>
+            </>
+          )}
+
+          {contextMenuLevel === 'tasks' && (
+            <>
+              <MenuItem
+                onClick={() => setContextMenuLevel('main')}
+                sx={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'primary.main',
+                  py: 0.75,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                ⬅️ Volver al menú principal
+              </MenuItem>
+              <Typography
+                variant="caption"
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: 'block',
+                  fontWeight: 800,
+                  color: 'text.secondary',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : 'rgba(0,0,0,0.02)',
+                }}
+              >
+                SELECCIONAR TAREA
+              </Typography>
+              <MenuItem
+                onClick={() =>
+                  selectContext({ type: 'tasks', title: 'Todas las Tareas' })
+                }
+                sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
+              >
+                📋 Todas las Tareas (@Tasks)
+              </MenuItem>
+              <Divider sx={{ my: 0.5 }} />
+              {tasksLoading ? (
+                <MenuItem disabled sx={{ fontSize: '11px' }}>
+                  Cargando tareas...
+                </MenuItem>
+              ) : tasksList.length === 0 ? (
+                <MenuItem disabled sx={{ fontSize: '11px' }}>
+                  No hay tareas activas
+                </MenuItem>
+              ) : (
+                tasksList
+                  .slice(0, 8)
+                  .map((t: { id: string; title: string }) => (
+                    <MenuItem
+                      key={t.id}
+                      onClick={() =>
+                        selectContext({
+                          type: 'task',
+                          id: t.id,
+                          title: t.title,
+                        })
+                      }
+                      sx={{
+                        fontSize: '11px',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        py: 0.5,
+                      }}
+                    >
+                      📋 {t.title}
+                    </MenuItem>
+                  ))
+              )}
+            </>
+          )}
+
+          {contextMenuLevel === 'workspaces' && (
+            <>
+              <MenuItem
+                onClick={() => setContextMenuLevel('main')}
+                sx={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'primary.main',
+                  py: 0.75,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                ⬅️ Volver al menú principal
+              </MenuItem>
+              <Typography
+                variant="caption"
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: 'block',
+                  fontWeight: 800,
+                  color: 'text.secondary',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : 'rgba(0,0,0,0.02)',
+                }}
+              >
+                SELECCIONAR WORKSPACE
+              </Typography>
+              <MenuItem
+                onClick={() =>
+                  selectContext({
+                    type: 'workspaces',
+                    title: 'Todos los Workspaces',
+                  })
+                }
+                sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
+              >
+                🗂️ Todos los Workspaces (@Workspaces)
+              </MenuItem>
+              <Divider sx={{ my: 0.5 }} />
+              {workspacesLoading ? (
+                <MenuItem disabled sx={{ fontSize: '11px' }}>
+                  Cargando workspaces...
+                </MenuItem>
+              ) : workspacesList.length === 0 ? (
+                <MenuItem disabled sx={{ fontSize: '11px' }}>
+                  No hay workspaces
+                </MenuItem>
+              ) : (
+                workspacesList
+                  .slice(0, 8)
+                  .map((w: { id: string; title: string }) => (
+                    <MenuItem
+                      key={w.id}
+                      onClick={() =>
+                        selectContext({
+                          type: 'workspace',
+                          id: w.id,
+                          title: w.title,
+                        })
+                      }
+                      sx={{
+                        fontSize: '11px',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        py: 0.5,
+                      }}
+                    >
+                      🗂️ {w.title}
+                    </MenuItem>
+                  ))
+              )}
+            </>
+          )}
+        </Menu>
+
+        <ChatInputWrapper ref={chatInputWrapperRef}>
+          {selectedContext && (
+            <Chip
+              label={`@${selectedContext.title}`}
+              onDelete={() => setSelectedContext(null)}
+              color="primary"
+              variant="outlined"
+              size="small"
+              sx={{
+                borderRadius: '6px',
+                fontWeight: 700,
+                height: '24px',
+                fontSize: '10px',
+                maxWidth: '120px',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(99, 102, 241, 0.15)'
+                    : 'rgba(99, 102, 241, 0.05)',
+                borderColor: 'primary.main',
+              }}
+            />
+          )}
           <ChatTextArea
             placeholder="Ask Lumina anything..."
             value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             rows={1}
           />
@@ -667,6 +970,13 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
     modelRef.current = selectedModel;
   }, [selectedModel]);
 
+  const [selectedContext, setSelectedContext] =
+    useState<AIContextSelector | null>(null);
+  const selectedContextRef = useRef(selectedContext);
+  useEffect(() => {
+    selectedContextRef.current = selectedContext;
+  }, [selectedContext]);
+
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
       async *run({ messages, abortSignal }) {
@@ -692,6 +1002,9 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
             null, // no task context for global chat buddy
             abortSignal,
             modelRef.current, // Dynamic model selection!
+            undefined,
+            selectedContextRef.current?.type || null,
+            selectedContextRef.current?.id || null,
           );
         } catch (e: unknown) {
           const errMsg = e instanceof Error ? e.message : String(e);
@@ -821,6 +1134,8 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
               setIsOpen={setIsOpen}
               selectedModel={selectedModel}
               setSelectedModel={setSelectedModel}
+              selectedContext={selectedContext}
+              setSelectedContext={setSelectedContext}
             />
           </AssistantRuntimeProvider>
         </Box>

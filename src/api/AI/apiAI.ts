@@ -69,6 +69,8 @@ export const fetchChatStreamResponse = async (
   abortSignal?: AbortSignal,
   model?: string,
   conversationId?: string,
+  contextType?: 'tasks' | 'workspaces' | 'task' | 'workspace' | null,
+  contextId?: string | null,
 ): Promise<ReadableStream<Uint8Array>> => {
   const endpoint = getAIEndpoint();
   const makeRequest = () =>
@@ -83,6 +85,8 @@ export const fetchChatStreamResponse = async (
         task,
         model,
         conversationId,
+        contextType,
+        contextId,
       }),
       signal: abortSignal,
     });

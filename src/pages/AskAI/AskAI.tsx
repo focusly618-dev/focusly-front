@@ -13,6 +13,7 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Chip,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -21,10 +22,13 @@ import {
   Refresh as RefreshIcon,
   InfoOutlined as InfoIcon,
   ArrowDropDown as ArrowDownIcon,
+  AlternateEmail as AtIcon,
 } from '@mui/icons-material';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector } from '@/redux/hooks';
 import { CuteRobotIcon, ClaudeIcon, GeminiIcon } from '@/components/ui';
+import { useQuery } from '@apollo/client';
+import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
   fetchChatStreamResponse,
   getAIConversations,
@@ -278,6 +282,35 @@ const renderMarkdown = (text: string, isDark: boolean) => {
   return processedLines.join('\n');
 };
 
+export interface AIContextSelector {
+  type: 'tasks' | 'workspaces' | 'task' | 'workspace';
+  id?: string;
+  title: string;
+}
+
+const formatUpdateTime = (dateStr: string) => {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const now = new Date();
+
+    if (d.toDateString() === now.toDateString()) {
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    if (d.toDateString() === yesterday.toDateString()) {
+      return 'Ayer';
+    }
+
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  } catch {
+    return '';
+  }
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const AskAI: React.FC = () => {
@@ -295,6 +328,22 @@ export const AskAI: React.FC = () => {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState('claude-3-5-sonnet');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
+  const [selectedContext, setSelectedContext] =
+    useState<AIContextSelector | null>(null);
+  const [contextAnchor, setContextAnchor] = useState<null | HTMLElement>(null);
+  const [contextMenuLevel, setContextMenuLevel] = useState<
+    'main' | 'tasks' | 'workspaces'
+  >('main');
+  const inputBoxRef = useRef<HTMLDivElement>(null);
+
+  const { data: workspacesData, loading: workspacesLoading } = useQuery(
+    GET_WORKSPACES,
+    {
+      variables: { search: '' },
+      skip: !user?.id,
+    },
+  );
+  const workspacesList = workspacesData?.workspaces || [];
 
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -407,6 +456,15 @@ export const AskAI: React.FC = () => {
     tasks[0],
   );
 
+  const selectContext = (ctx: AIContextSelector) => {
+    setSelectedContext(ctx);
+    setContextAnchor(null);
+    setContextMenuLevel('main');
+    if (inputValue.endsWith('@')) {
+      setInputValue((prev) => prev.slice(0, -1));
+    }
+  };
+
   const sendMessage = useCallback(
     async (text: string, customHistory?: Message[]) => {
       if (!text.trim()) return;
@@ -470,7 +528,10 @@ export const AskAI: React.FC = () => {
           undefined,
           selectedModel,
           activeConversationId || undefined,
+          selectedContext?.type || null,
+          selectedContext?.id || null,
         );
+        setSelectedContext(null);
 
         const reader = stream.getReader();
         const decoder = new TextDecoder();
@@ -526,6 +587,7 @@ export const AskAI: React.FC = () => {
       conversations,
       theme.palette.mode,
       selectedModel,
+      selectedContext,
     ],
   );
 
@@ -877,12 +939,260 @@ export const AskAI: React.FC = () => {
 
         {/* ── Sticky bottom input ── */}
         <InputWrapper>
-          <InputBox elevation={0}>
+          <Menu
+            anchorEl={contextAnchor}
+            open={Boolean(contextAnchor)}
+            onClose={() => {
+              setContextAnchor(null);
+              setContextMenuLevel('main');
+            }}
+            PaperProps={{
+              sx: {
+                borderRadius: '12px',
+                width: contextAnchor
+                  ? `${contextAnchor.clientWidth}px`
+                  : 'auto',
+                maxHeight: '320px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                border: '1px solid',
+                borderColor: 'divider',
+                overflowY: 'auto',
+              },
+            }}
+          >
+            {contextMenuLevel === 'main' && (
+              <>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    display: 'block',
+                    fontWeight: 800,
+                    color: 'text.secondary',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.03)'
+                        : 'rgba(0,0,0,0.02)',
+                  }}
+                >
+                  SELECCIONAR CONTEXTO
+                </Typography>
+                <MenuItem
+                  onClick={() => setContextMenuLevel('tasks')}
+                  sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
+                >
+                  📋 Tasks / Tareas
+                </MenuItem>
+                <MenuItem
+                  onClick={() => setContextMenuLevel('workspaces')}
+                  sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
+                >
+                  🗂️ Workspaces / Espacios de Trabajo
+                </MenuItem>
+              </>
+            )}
+
+            {contextMenuLevel === 'tasks' && (
+              <>
+                <MenuItem
+                  onClick={() => setContextMenuLevel('main')}
+                  sx={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: 'primary.main',
+                    py: 0.75,
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  ⬅️ Volver al menú principal
+                </MenuItem>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    display: 'block',
+                    fontWeight: 800,
+                    color: 'text.secondary',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.03)'
+                        : 'rgba(0,0,0,0.02)',
+                  }}
+                >
+                  SELECCIONAR TAREA
+                </Typography>
+                <MenuItem
+                  onClick={() =>
+                    selectContext({ type: 'tasks', title: 'Todas las Tareas' })
+                  }
+                  sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
+                >
+                  📋 Todas las Tareas (@Tasks)
+                </MenuItem>
+                <Divider sx={{ my: 0.5 }} />
+                {tasks.length === 0 ? (
+                  <MenuItem disabled sx={{ fontSize: '11px' }}>
+                    No hay tareas activas
+                  </MenuItem>
+                ) : (
+                  tasks.slice(0, 8).map((t) => (
+                    <MenuItem
+                      key={t.id}
+                      onClick={() =>
+                        selectContext({
+                          type: 'task',
+                          id: t.id,
+                          title: t.title,
+                        })
+                      }
+                      sx={{
+                        fontSize: '11px',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        py: 0.5,
+                      }}
+                    >
+                      📋 {t.title}
+                    </MenuItem>
+                  ))
+                )}
+              </>
+            )}
+
+            {contextMenuLevel === 'workspaces' && (
+              <>
+                <MenuItem
+                  onClick={() => setContextMenuLevel('main')}
+                  sx={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: 'primary.main',
+                    py: 0.75,
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  ⬅️ Volver al menú principal
+                </MenuItem>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    display: 'block',
+                    fontWeight: 800,
+                    color: 'text.secondary',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.03)'
+                        : 'rgba(0,0,0,0.02)',
+                  }}
+                >
+                  SELECCIONAR WORKSPACE
+                </Typography>
+                <MenuItem
+                  onClick={() =>
+                    selectContext({
+                      type: 'workspaces',
+                      title: 'Todos los Workspaces',
+                    })
+                  }
+                  sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
+                >
+                  🗂️ Todos los Workspaces (@Workspaces)
+                </MenuItem>
+                <Divider sx={{ my: 0.5 }} />
+                {workspacesLoading ? (
+                  <MenuItem disabled sx={{ fontSize: '11px' }}>
+                    Cargando workspaces...
+                  </MenuItem>
+                ) : workspacesList.length === 0 ? (
+                  <MenuItem disabled sx={{ fontSize: '11px' }}>
+                    No hay workspaces
+                  </MenuItem>
+                ) : (
+                  workspacesList
+                    .slice(0, 8)
+                    .map((w: { id: string; title: string }) => (
+                      <MenuItem
+                        key={w.id}
+                        onClick={() =>
+                          selectContext({
+                            type: 'workspace',
+                            id: w.id,
+                            title: w.title,
+                          })
+                        }
+                        sx={{
+                          fontSize: '11px',
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          py: 0.5,
+                        }}
+                      >
+                        🗂️ {w.title}
+                      </MenuItem>
+                    ))
+                )}
+              </>
+            )}
+          </Menu>
+
+          <InputBox elevation={0} ref={inputBoxRef}>
+            <IconButton
+              size="small"
+              onClick={() => {
+                setContextAnchor(inputBoxRef.current);
+                setContextMenuLevel('main');
+              }}
+              sx={{
+                color: selectedContext ? 'primary.main' : 'text.secondary',
+                mr: 1,
+                alignSelf: 'center',
+                '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
+              }}
+            >
+              <AtIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+
+            {selectedContext && (
+              <Chip
+                label={`@${selectedContext.title}`}
+                onDelete={() => setSelectedContext(null)}
+                color="primary"
+                variant="outlined"
+                size="small"
+                sx={{
+                  mr: 1,
+                  borderRadius: '6px',
+                  fontWeight: 700,
+                  maxWidth: '150px',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(99, 102, 241, 0.15)'
+                      : 'rgba(99, 102, 241, 0.05)',
+                  borderColor: 'primary.main',
+                }}
+              />
+            )}
+
             <StyledInput
               inputRef={inputRef}
               placeholder="Ask Lumina anything…"
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setInputValue(val);
+                if (val.endsWith('@')) {
+                  setContextAnchor(inputBoxRef.current);
+                  setContextMenuLevel('main');
+                }
+              }}
               onKeyDown={handleKeyDown}
               multiline
               maxRows={5}
@@ -983,20 +1293,34 @@ export const AskAI: React.FC = () => {
                   transition: 'all 0.15s ease',
                 }}
               >
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: isActive ? 700 : 500,
-                    fontSize: '0.85rem',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    mr: 1,
-                    flex: 1,
-                  }}
-                >
-                  {c.title || 'Untitled Chat'}
-                </Typography>
+                <Box sx={{ flex: 1, overflow: 'hidden', mr: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: isActive ? 700 : 500,
+                      fontSize: '0.85rem',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {c.title || 'Untitled Chat'}
+                  </Typography>
+                  {c.updatedAt && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{
+                        fontSize: '10px',
+                        opacity: 0.7,
+                        display: 'block',
+                        mt: 0.2,
+                      }}
+                    >
+                      {formatUpdateTime(c.updatedAt)}
+                    </Typography>
+                  )}
+                </Box>
                 <IconButton
                   className="delete-btn"
                   size="small"
