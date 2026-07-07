@@ -298,6 +298,10 @@ const ChatAIInner = ({
   const [chatInput, setChatInput] = useState('');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
   const [contextAnchor, setContextAnchor] = useState<null | HTMLElement>(null);
+  const [contextMenuLevel, setContextMenuLevel] = useState<
+    'main' | 'tasks' | 'workspaces'
+  >('main');
+  const chatInputWrapperRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   const { user } = useAppSelector((state) => state.auth);
@@ -350,13 +354,15 @@ const ChatAIInner = ({
     const val = e.target.value;
     setChatInput(val);
     if (val.endsWith('@')) {
-      setContextAnchor(e.currentTarget);
+      setContextAnchor(chatInputWrapperRef.current);
+      setContextMenuLevel('main');
     }
   };
 
   const selectContext = (ctx: AIContextSelector) => {
     setSelectedContext(ctx);
     setContextAnchor(null);
+    setContextMenuLevel('main');
     if (chatInput.endsWith('@')) {
       setChatInput((prev) => prev.slice(0, -1));
     }
@@ -686,7 +692,10 @@ const ChatAIInner = ({
       <InputArea>
         <IconButton
           size="small"
-          onClick={(e) => setContextAnchor(e.currentTarget)}
+          onClick={() => {
+            setContextAnchor(chatInputWrapperRef.current);
+            setContextMenuLevel('main');
+          }}
           sx={{
             color: selectedContext ? 'primary.main' : 'text.secondary',
             alignSelf: 'center',
@@ -699,11 +708,14 @@ const ChatAIInner = ({
         <Menu
           anchorEl={contextAnchor}
           open={Boolean(contextAnchor)}
-          onClose={() => setContextAnchor(null)}
+          onClose={() => {
+            setContextAnchor(null);
+            setContextMenuLevel('main');
+          }}
           PaperProps={{
             sx: {
               borderRadius: '12px',
-              minWidth: '240px',
+              width: contextAnchor ? `${contextAnchor.clientWidth}px` : 'auto',
               maxHeight: '320px',
               boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
               border: '1px solid',
@@ -712,142 +724,196 @@ const ChatAIInner = ({
             },
           }}
         >
-          <Typography
-            variant="caption"
-            sx={{
-              px: 2,
-              py: 1,
-              display: 'block',
-              fontWeight: 800,
-              color: 'text.secondary',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.03)'
-                  : 'rgba(0,0,0,0.02)',
-            }}
-          >
-            CONTEXTO GENERAL
-          </Typography>
-          <MenuItem
-            onClick={() =>
-              selectContext({ type: 'tasks', title: 'Todas las Tareas' })
-            }
-            sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
-          >
-            📋 Todas las Tareas (@Tasks)
-          </MenuItem>
-          <MenuItem
-            onClick={() =>
-              selectContext({
-                type: 'workspaces',
-                title: 'Todos los Workspaces',
-              })
-            }
-            sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
-          >
-            🗂️ Todos los Workspaces (@Workspaces)
-          </MenuItem>
-
-          <Divider sx={{ my: 0.5 }} />
-
-          <Typography
-            variant="caption"
-            sx={{
-              px: 2,
-              py: 1,
-              display: 'block',
-              fontWeight: 800,
-              color: 'text.secondary',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.03)'
-                  : 'rgba(0,0,0,0.02)',
-            }}
-          >
-            SELECCIONAR TAREA ESPECÍFICA
-          </Typography>
-          {tasksLoading ? (
-            <MenuItem disabled sx={{ fontSize: '11px' }}>
-              Cargando tareas...
-            </MenuItem>
-          ) : tasksList.length === 0 ? (
-            <MenuItem disabled sx={{ fontSize: '11px' }}>
-              No hay tareas activas
-            </MenuItem>
-          ) : (
-            tasksList.slice(0, 8).map((t: { id: string; title: string }) => (
-              <MenuItem
-                key={t.id}
-                onClick={() =>
-                  selectContext({ type: 'task', id: t.id, title: t.title })
-                }
+          {contextMenuLevel === 'main' && (
+            <>
+              <Typography
+                variant="caption"
                 sx={{
-                  fontSize: '11px',
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  py: 0.5,
+                  px: 2,
+                  py: 1,
+                  display: 'block',
+                  fontWeight: 800,
+                  color: 'text.secondary',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : 'rgba(0,0,0,0.02)',
                 }}
               >
-                📋 {t.title}
+                SELECCIONAR CONTEXTO
+              </Typography>
+              <MenuItem
+                onClick={() => setContextMenuLevel('tasks')}
+                sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
+              >
+                📋 Tasks / Tareas
               </MenuItem>
-            ))
+              <MenuItem
+                onClick={() => setContextMenuLevel('workspaces')}
+                sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
+              >
+                🗂️ Workspaces / Espacios de Trabajo
+              </MenuItem>
+            </>
           )}
 
-          <Divider sx={{ my: 0.5 }} />
-
-          <Typography
-            variant="caption"
-            sx={{
-              px: 2,
-              py: 1,
-              display: 'block',
-              fontWeight: 800,
-              color: 'text.secondary',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.03)'
-                  : 'rgba(0,0,0,0.02)',
-            }}
-          >
-            SELECCIONAR WORKSPACE ESPECÍFICO
-          </Typography>
-          {workspacesLoading ? (
-            <MenuItem disabled sx={{ fontSize: '11px' }}>
-              Cargando workspaces...
-            </MenuItem>
-          ) : workspacesList.length === 0 ? (
-            <MenuItem disabled sx={{ fontSize: '11px' }}>
-              No hay workspaces
-            </MenuItem>
-          ) : (
-            workspacesList
-              .slice(0, 8)
-              .map((w: { id: string; title: string }) => (
-                <MenuItem
-                  key={w.id}
-                  onClick={() =>
-                    selectContext({
-                      type: 'workspace',
-                      id: w.id,
-                      title: w.title,
-                    })
-                  }
-                  sx={{
-                    fontSize: '11px',
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
-                    py: 0.5,
-                  }}
-                >
-                  🗂️ {w.title}
+          {contextMenuLevel === 'tasks' && (
+            <>
+              <MenuItem
+                onClick={() => setContextMenuLevel('main')}
+                sx={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'primary.main',
+                  py: 0.75,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                ⬅️ Volver al menú principal
+              </MenuItem>
+              <Typography
+                variant="caption"
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: 'block',
+                  fontWeight: 800,
+                  color: 'text.secondary',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : 'rgba(0,0,0,0.02)',
+                }}
+              >
+                SELECCIONAR TAREA
+              </Typography>
+              <MenuItem
+                onClick={() =>
+                  selectContext({ type: 'tasks', title: 'Todas las Tareas' })
+                }
+                sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
+              >
+                📋 Todas las Tareas (@Tasks)
+              </MenuItem>
+              <Divider sx={{ my: 0.5 }} />
+              {tasksLoading ? (
+                <MenuItem disabled sx={{ fontSize: '11px' }}>
+                  Cargando tareas...
                 </MenuItem>
-              ))
+              ) : tasksList.length === 0 ? (
+                <MenuItem disabled sx={{ fontSize: '11px' }}>
+                  No hay tareas activas
+                </MenuItem>
+              ) : (
+                tasksList
+                  .slice(0, 8)
+                  .map((t: { id: string; title: string }) => (
+                    <MenuItem
+                      key={t.id}
+                      onClick={() =>
+                        selectContext({
+                          type: 'task',
+                          id: t.id,
+                          title: t.title,
+                        })
+                      }
+                      sx={{
+                        fontSize: '11px',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        py: 0.5,
+                      }}
+                    >
+                      📋 {t.title}
+                    </MenuItem>
+                  ))
+              )}
+            </>
+          )}
+
+          {contextMenuLevel === 'workspaces' && (
+            <>
+              <MenuItem
+                onClick={() => setContextMenuLevel('main')}
+                sx={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'primary.main',
+                  py: 0.75,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                ⬅️ Volver al menú principal
+              </MenuItem>
+              <Typography
+                variant="caption"
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: 'block',
+                  fontWeight: 800,
+                  color: 'text.secondary',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : 'rgba(0,0,0,0.02)',
+                }}
+              >
+                SELECCIONAR WORKSPACE
+              </Typography>
+              <MenuItem
+                onClick={() =>
+                  selectContext({
+                    type: 'workspaces',
+                    title: 'Todos los Workspaces',
+                  })
+                }
+                sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
+              >
+                🗂️ Todos los Workspaces (@Workspaces)
+              </MenuItem>
+              <Divider sx={{ my: 0.5 }} />
+              {workspacesLoading ? (
+                <MenuItem disabled sx={{ fontSize: '11px' }}>
+                  Cargando workspaces...
+                </MenuItem>
+              ) : workspacesList.length === 0 ? (
+                <MenuItem disabled sx={{ fontSize: '11px' }}>
+                  No hay workspaces
+                </MenuItem>
+              ) : (
+                workspacesList
+                  .slice(0, 8)
+                  .map((w: { id: string; title: string }) => (
+                    <MenuItem
+                      key={w.id}
+                      onClick={() =>
+                        selectContext({
+                          type: 'workspace',
+                          id: w.id,
+                          title: w.title,
+                        })
+                      }
+                      sx={{
+                        fontSize: '11px',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        py: 0.5,
+                      }}
+                    >
+                      🗂️ {w.title}
+                    </MenuItem>
+                  ))
+              )}
+            </>
           )}
         </Menu>
 
-        <ChatInputWrapper>
+        <ChatInputWrapper ref={chatInputWrapperRef}>
           {selectedContext && (
             <Chip
               label={`@${selectedContext.title}`}
