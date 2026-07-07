@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
 import {
-  Flag as FlagIcon,
-  CircleOutlined as CircleOutlinedIcon,
-  CheckCircleOutline as CheckCircleOutlineIcon,
-  History as HistoryIcon,
-} from '@mui/icons-material';
+  Typography,
+  TextField,
+  InputAdornment,
+  Chip,
+  Box,
+} from '@mui/material';
+import { Flag as FlagIcon, Search as SearchIcon } from '@mui/icons-material';
 
 import {
   StyledPopover,
@@ -14,13 +15,9 @@ import {
   ItemRow,
   ItemLabel,
   RadioCircle,
-  CategoryRow,
-  CategoryItem,
-  Dot,
   Footer,
   ClearButton,
   ApplyButton,
-  AccessTimeIcon,
 } from '../Popover.styles';
 
 export interface FilterState {
@@ -36,6 +33,8 @@ interface FilterPopoverProps {
   onApply?: (filters: FilterState) => void;
   onClear?: () => void;
   tags: string[];
+  tagSearchTerm: string;
+  onTagSearchChange: (term: string) => void;
   activeFilterState?: FilterState;
 }
 
@@ -48,6 +47,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
   onApply,
   onClear,
   tags,
+  onTagSearchChange,
   activeFilterState,
 }) => {
   const [selectedPriorities, setSelectedPriorities] = useState<string[]>(
@@ -62,8 +62,20 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
 
   const [prevOpen, setPrevOpen] = useState(open);
 
+  const [localSearch, setLocalSearch] = useState('');
+
+  // Debounce the call to onTagSearchChange
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      onTagSearchChange(localSearch);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [localSearch, onTagSearchChange]);
+
   if (open && !prevOpen) {
     setPrevOpen(true);
+    setLocalSearch('');
+    onTagSearchChange('');
     setSelectedPriorities(activeFilterState?.priorities || []);
     setSelectedCategories(activeFilterState?.categories || []);
     setSelectedStatuses(activeFilterState?.statuses || []);
@@ -87,6 +99,8 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
     setSelectedPriorities([]);
     setSelectedCategories([]);
     setSelectedStatuses([]);
+    setLocalSearch('');
+    onTagSearchChange('');
     if (onClear) onClear();
   };
 
@@ -149,144 +163,113 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
       </Section>
       <Section>
         <SectionTitle>By Tags</SectionTitle>
-        <CategoryRow>
-          {tags.map((tag: string) => (
-            <CategoryItem
-              key={tag}
-              selected={selectedCategories.includes(tag)}
-              onClick={() =>
-                toggleSelection(tag, selectedCategories, setSelectedCategories)
-              }
-            >
-              <Dot color={getTagColors(tag).color} />
-              <Typography variant="body2" sx={{ fontSize: '13px' }}>
-                {tag}
-              </Typography>
-            </CategoryItem>
-          ))}
-        </CategoryRow>
-      </Section>
-
-      {/* BY STATUS */}
-      <Section>
-        <SectionTitle>By Status</SectionTitle>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Todo', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <CircleOutlinedIcon sx={{ color: '#94a3b8', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              To Do
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Todo')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Planning', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <AccessTimeIcon sx={{ color: '#3b82f6', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Planning
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Planning')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Scheduled', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <AccessTimeIcon sx={{ color: '#8b5cf6', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Scheduled
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Scheduled')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Review', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <HistoryIcon sx={{ color: '#06b6d4', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Review
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Review')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Pending', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <HistoryIcon sx={{ color: '#f59e0b', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Pending
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Pending')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('On Hold', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <HistoryIcon sx={{ color: '#ef4444', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              On Hold
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('On Hold')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Done', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <CheckCircleOutlineIcon sx={{ color: '#10b981', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Done
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Done')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Backlog', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <HistoryIcon sx={{ color: '#64748b', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Backlog
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Backlog')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Archived', selectedStatuses, setSelectedStatuses)
-          }
-        >
-          <ItemLabel>
-            <HistoryIcon sx={{ color: '#4b5563', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Archived
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedStatuses.includes('Archived')} />
-        </ItemRow>
+        <TextField
+          size="small"
+          placeholder="Search tags..."
+          value={localSearch}
+          onChange={(e) => setLocalSearch(e.target.value)}
+          sx={{
+            mb: 1.5,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '8px',
+              fontSize: '12px',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.05)'
+                  : 'rgba(0, 0, 0, 0.02)',
+              '& fieldset': {
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.1)'
+                    : 'rgba(0, 0, 0, 0.08)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'primary.main',
+              },
+            },
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+              </InputAdornment>
+            ),
+          }}
+          fullWidth
+        />
+        {tags.length === 0 ? (
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: '12px',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+              px: 1,
+              py: 0.5,
+            }}
+          >
+            No tags found
+          </Typography>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+              maxHeight: '140px',
+              overflowY: 'auto',
+              pr: 0.5,
+              py: 0.5,
+              '&::-webkit-scrollbar': {
+                width: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                bgcolor: 'rgba(0,0,0,0.1)',
+                borderRadius: '4px',
+              },
+            }}
+          >
+            {tags.map((tag: string) => {
+              const isSelected = selectedCategories.includes(tag);
+              const colors = getTagColors(tag);
+              return (
+                <Chip
+                  key={tag}
+                  label={tag}
+                  onClick={() =>
+                    toggleSelection(
+                      tag,
+                      selectedCategories,
+                      setSelectedCategories,
+                    )
+                  }
+                  variant={isSelected ? 'filled' : 'outlined'}
+                  size="small"
+                  sx={{
+                    fontSize: '11px',
+                    fontWeight: 500,
+                    height: '24px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    color: isSelected ? '#ffffff' : colors.color,
+                    borderColor: isSelected
+                      ? 'transparent'
+                      : `${colors.color}40`,
+                    bgcolor: isSelected ? colors.color : `${colors.color}10`,
+                    '&:hover': {
+                      bgcolor: isSelected ? colors.color : `${colors.color}20`,
+                      transform: 'translateY(-1px)',
+                    },
+                    '&:active': {
+                      transform: 'translateY(0)',
+                    },
+                  }}
+                />
+              );
+            })}
+          </Box>
+        )}
       </Section>
 
       {/* FOOTER */}

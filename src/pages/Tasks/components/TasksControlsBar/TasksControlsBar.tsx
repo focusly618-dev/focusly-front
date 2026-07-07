@@ -24,6 +24,8 @@ export const TasksControlsBar = ({
   activeSort,
   activeFilterState,
   tags,
+  tagSearchTerm,
+  setTagSearchTerm,
   handleFilterClick,
   handleFilterClose,
   handleApplyFilters,
@@ -72,6 +74,8 @@ export const TasksControlsBar = ({
           anchorEl={filterAnchorEl}
           onClose={handleFilterClose}
           tags={tags}
+          tagSearchTerm={tagSearchTerm}
+          onTagSearchChange={setTagSearchTerm}
           onApply={handleApplyFilters}
           activeFilterState={activeFilterState}
         />

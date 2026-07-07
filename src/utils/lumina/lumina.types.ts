@@ -7,6 +7,8 @@ export interface LuminaActionPayload {
   groupId?: string;
   content?: string;
   markdown?: string;
+  content_encrypted?: string;
+  project_group_id?: string;
 }
 
 export interface ParsedLuminaAction {
@@ -14,6 +16,7 @@ export interface ParsedLuminaAction {
     | 'CREATE_TASK'
     | 'CREATE_WORKSPACE'
     | 'CREATE_PROJECT_GROUP'
-    | 'INSERT_TO_WORKSPACE';
+    | 'INSERT_TO_WORKSPACE'
+    | 'CREATE_NOTE';
   payload: LuminaActionPayload;
 }

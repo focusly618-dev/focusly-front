@@ -14,6 +14,7 @@ export const useTasks = () => {
   const [, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [tagSearchTerm, setTagSearchTerm] = useState('');
 
   // ── View & UI local state ──────────────────────────────────────────
   const [viewMode, setViewMode] = useState<
@@ -26,7 +27,7 @@ export const useTasks = () => {
   // ── Composed hooks ─────────────────────────────────────────────────
 
   const ui = useTasksUI();
-  const filterLogic = useTasksFilters([]);
+  const filterLogic = useTasksFilters(viewMode);
 
   const data = useTasksData({
     userId: user?.id,
@@ -43,12 +44,16 @@ export const useTasks = () => {
   });
 
   const { data: tagsData } = useQuery(GET_TAGS, {
-    variables: { userId: user?.id },
+    variables: {
+      userId: user?.id,
+      searchTerm: tagSearchTerm || undefined,
+    },
     skip: !user?.id || !ui.filterAnchorEl,
+    fetchPolicy: 'cache-and-network',
   });
 
   const tags: string[] = useMemo(
-    () => tagsData?.getTagsByUser || [],
+    () => (tagsData?.getTagsByUser || []).map((t: { name: string }) => t.name),
     [tagsData],
   );
 
@@ -148,6 +153,8 @@ export const useTasks = () => {
     // Filters & search
     searchTerm: filterLogic.searchTerm,
     setSearchTerm: filterLogic.setSearchTerm,
+    tagSearchTerm,
+    setTagSearchTerm,
     highPriorityTasks,
     todayTasks,
     upcomingTasks,

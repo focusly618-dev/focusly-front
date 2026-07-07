@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   isToday,
   isWithinInterval,
@@ -17,7 +17,9 @@ import type { SortState } from '../components/SortPopover/SortPopover';
 
 export type DateRangeFilter = 'today' | 'this_week' | 'this_month' | 'all';
 
-export const useTasksFilters = (tasks: TaskResponse[]) => {
+export const useTasksFilters = (
+  viewMode?: 'list' | 'grid' | 'board' | 'workload',
+) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<
     TaskFilterInput | undefined
@@ -46,9 +48,11 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
       if (dateRange !== 'all') {
         result = result.filter((task) => {
           const dateToUse =
-            task.status === 'Done' || !task.deadline
-              ? task.created_at || task.updated_at
-              : task.deadline;
+            task.estimated_start_date ||
+            task.deadline ||
+            task.completed_at ||
+            task.created_at ||
+            task.updated_at;
 
           if (!dateToUse) return false;
 
@@ -86,21 +90,34 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
               .includes(searchTerm.toLowerCase()),
         );
       }
+
+      const selectedTags = activeFilterState?.categories || [];
+      if (selectedTags.length > 0) {
+        const targetTags = new Set(selectedTags.map((t) => t.toLowerCase()));
+        result = result.filter((task) => {
+          const taskTags = task.tags || [];
+          return taskTags.some((tag) => {
+            const tagName = typeof tag === 'string' ? tag : tag.name || '';
+            return targetTags.has(tagName.toLowerCase());
+          });
+        });
+      }
       const isStatusFiltered = (activeFilterState?.statuses?.length ?? 0) > 0;
 
-      if (!isStatusFiltered) {
-        // Hide Done tasks by default if we are not explicitly filtering by status
+      if (!isStatusFiltered && viewMode === 'grid') {
+        // Hide Done tasks by default only if we are in grid view and not explicitly filtering by status
         result = result.filter((task) => task.status !== 'Done');
       }
 
       return result;
     },
-    [dateRange, searchTerm, activeFilterState],
-  );
-
-  const filteredTasks = useMemo(
-    () => applyLocalFilters(tasks),
-    [tasks, applyLocalFilters],
+    [
+      dateRange,
+      searchTerm,
+      activeFilterState?.statuses?.length,
+      activeFilterState?.categories,
+      viewMode,
+    ],
   );
 
   const handleApplySort = (sort: SortState) => {
@@ -128,7 +145,7 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
         filters.priorities.length > 0
           ? filters.priorities.map((p) => priorityMap[p])
           : undefined,
-      category: filters.categories.length > 0 ? filters.categories : undefined,
+      tags: filters.categories.length > 0 ? filters.categories : undefined,
     };
 
     if (
@@ -187,7 +204,7 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
     activeSort,
     dateRange,
     setDateRange,
-    filteredTasks,
+
     handleApplySort,
     handleApplyFilters,
     setPriorityFilter,

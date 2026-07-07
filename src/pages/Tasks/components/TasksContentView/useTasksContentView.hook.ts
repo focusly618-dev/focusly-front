@@ -72,7 +72,7 @@ export const useTasksContentView = ({
         id: 'All',
         label: 'All',
         color: '#6366f1',
-        filter: () => true,
+        filter: (t: TaskResponse) => t.status !== 'Done',
       },
       ...STATUS_SECTIONS,
     ];
@@ -80,7 +80,7 @@ export const useTasksContentView = ({
 
   const tabCounts = useMemo(() => {
     const counts: Record<string, number> = {
-      All: filteredTasks.length,
+      All: filteredTasks.filter((t) => t.status !== 'Done').length,
     };
     STATUS_SECTIONS.forEach((section) => {
       counts[section.id] = filteredTasks.filter(section.filter).length;

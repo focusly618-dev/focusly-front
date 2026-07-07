@@ -12,6 +12,8 @@ export interface TasksControlsBarProps {
   activeSort: SortState | null;
   activeFilterState: FilterState;
   tags: string[];
+  tagSearchTerm: string;
+  setTagSearchTerm: (term: string) => void;
   handleFilterClick: (
     event: React.MouseEvent<HTMLElement>,
     type: string,

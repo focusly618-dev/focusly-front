@@ -19,12 +19,41 @@ export interface PatternChip {
   icon: string;
 }
 
+export interface AIRecommendation {
+  type: 'warning' | 'tip' | 'success';
+  title: string;
+  description: string;
+  action?: {
+    type: 'RESCHEDULE_TASK';
+    label: string;
+    payload: {
+      taskId: string;
+      estimated_start_date: string;
+      estimated_end_date: string;
+    };
+  } | null;
+}
+
+export interface TimelineBlock {
+  label: string;
+  startHour: number;
+  endHour: number;
+  color: string;
+}
+
+export interface AITimelines {
+  current: TimelineBlock[];
+  recommended: TimelineBlock[];
+}
+
 export interface PatternAnalysisData {
   goldenHours: string;
   goldenHoursConfidence: number;
   behaviorSummary: string;
   patterns: PatternChip[];
   workStyle: string;
+  recommendations?: AIRecommendation[];
+  timelines?: AITimelines;
 }
 
 export interface PatternAnalysisResponse {
