@@ -10,59 +10,39 @@ export const ChatContainer = styled(Box, {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
-  gap: '16px',
+  gap: '12px',
   transition: 'right 0.3s ease',
 }));
 
-export const FloatingButton = styled(IconButton)(() => ({
-  width: '60px',
-  height: '60px',
-  background: 'linear-gradient(135deg, #137fec 0%, #4f46e5 100%)',
-  color: '#ffffff',
-  boxShadow: '0 0 0 0 rgba(19,127,236,0.5), 0 8px 32px rgba(19,127,236,0.35)',
+export const FloatingButton = styled(IconButton)(({ theme }) => ({
+  width: '56px',
+  height: '56px',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
+  color: theme.palette.mode === 'dark' ? '#f5f5f5' : '#37352f',
+  border: `1px solid ${theme.palette.divider}`,
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)',
   transition:
-    'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease',
-  border: '2px solid rgba(255, 255, 255, 0.15)',
-  animation: 'floatingPulse 2.8s ease-in-out infinite',
-  '@keyframes floatingPulse': {
-    '0%': {
-      boxShadow:
-        '0 0 0 0 rgba(19,127,236,0.45), 0 8px 28px rgba(19,127,236,0.3)',
-    },
-    '60%': {
-      boxShadow:
-        '0 0 0 10px rgba(19,127,236,0), 0 8px 28px rgba(19,127,236,0.3)',
-    },
-    '100%': {
-      boxShadow: '0 0 0 0 rgba(19,127,236,0), 0 8px 28px rgba(19,127,236,0.3)',
-    },
-  },
+    'background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
   '&:hover': {
-    transform: 'scale(1.12) translateY(-2px)',
-    background: 'linear-gradient(135deg, #1e91ff 0%, #4f46e5 100%)',
-    boxShadow: '0 12px 40px rgba(19,127,236,0.5)',
+    backgroundColor: theme.palette.mode === 'dark' ? '#2e2e2e' : '#f7f7f5',
+    boxShadow: '0 6px 16px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.06)',
+    transform: 'translateY(-1px)',
   },
 }));
 
 export const NotificationCard = styled(Paper)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(30, 41, 59, 0.95)'
-      : 'rgba(255, 255, 255, 0.95)',
-  backdropFilter: 'blur(12px)',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
   border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '16px',
-  padding: '16px',
-  width: '320px',
-  boxShadow:
-    theme.palette.mode === 'dark'
-      ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-      : '0 8px 32px rgba(0, 0, 0, 0.1)',
+  borderRadius: '12px',
+  padding: '14px 16px',
+  width: '300px',
+  boxShadow: '0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)',
   position: 'relative',
-  animation: 'slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-  marginBottom: '8px',
+  animation: 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+  marginBottom: '4px',
+  color: theme.palette.mode === 'dark' ? '#f5f5f5' : '#37352f',
   '@keyframes slideIn': {
-    from: { opacity: 0, transform: 'translateY(20px) scale(0.95)' },
+    from: { opacity: 0, transform: 'translateY(12px) scale(0.98)' },
     to: { opacity: 1, transform: 'translateY(0) scale(1)' },
   },
   '&::after': {
@@ -72,10 +52,7 @@ export const NotificationCard = styled(Paper)(({ theme }) => ({
     right: '24px',
     width: '16px',
     height: '16px',
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(30, 41, 59, 0.95)'
-        : 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
     transform: 'rotate(45deg)',
     borderRight: `1px solid ${theme.palette.divider}`,
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -87,17 +64,13 @@ export const ChatWindow = styled(Paper)(({ theme }) => ({
   maxWidth: 'calc(100vw - 32px)',
   height: '600px',
   maxHeight: 'calc(100vh - 100px)',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(15, 23, 42, 0.95)'
-      : 'rgba(255, 255, 255, 0.95)',
-  backdropFilter: 'blur(20px)',
-  borderRadius: '24px',
+  backgroundColor: theme.palette.mode === 'dark' ? '#191919' : '#ffffff',
+  borderRadius: '12px',
   border: `1px solid ${theme.palette.divider}`,
   boxShadow:
     theme.palette.mode === 'dark'
-      ? '0 24px 48px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255,255,255,0.05)'
-      : '0 24px 48px -12px rgba(0, 0, 0, 0.15)',
+      ? '0 12px 32px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3)'
+      : '0 12px 32px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05)',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -106,11 +79,8 @@ export const ChatWindow = styled(Paper)(({ theme }) => ({
 }));
 
 export const Header = styled(Box)(({ theme }) => ({
-  padding: '12px 16px',
-  background:
-    theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)'
-      : 'linear-gradient(135deg, #e0f2fe 0%, #f1f5f9 100%)',
+  padding: '14px 16px',
+  backgroundColor: theme.palette.mode === 'dark' ? '#202020' : '#f7f7f5',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -122,40 +92,37 @@ export const Header = styled(Box)(({ theme }) => ({
 }));
 
 export const ModelBadgeButton = styled(Button)(({ theme }) => ({
-  padding: '4px 10px',
-  borderRadius: '8px',
+  padding: '4px 8px',
+  borderRadius: '6px',
   textTransform: 'none',
   fontSize: '11px',
-  fontWeight: 700,
+  fontWeight: 600,
   minWidth: 0,
   gap: '4px',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.05)'
-      : 'rgba(0, 0, 0, 0.05)',
+  backgroundColor: 'transparent',
   border: `1px solid ${theme.palette.divider}`,
-  color: theme.palette.text.primary,
+  color: theme.palette.text.secondary,
   '&:hover': {
     backgroundColor:
       theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.1)'
-        : 'rgba(0, 0, 0, 0.08)',
-    borderColor: theme.palette.primary.main,
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(0, 0, 0, 0.03)',
+    borderColor: theme.palette.text.primary,
+    color: theme.palette.text.primary,
   },
 }));
 
-export const TokenCounterBadge = styled(Box)(() => ({
+export const TokenCounterBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: '4px',
-  padding: '4px 8px',
-  borderRadius: '8px',
+  padding: '3px 8px',
+  borderRadius: '6px',
   fontSize: '10px',
-  fontWeight: 700,
-  color: '#ffffff',
-  background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-  boxShadow: '0 2px 8px rgba(236, 72, 153, 0.3)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
+  fontWeight: 600,
+  color: theme.palette.mode === 'dark' ? '#f5f5f5' : '#37352f',
+  backgroundColor: theme.palette.mode === 'dark' ? '#2e2e2e' : '#f1f1ef',
+  border: `1px solid ${theme.palette.divider}`,
   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
   flexShrink: 0,
   whiteSpace: 'nowrap',
@@ -192,21 +159,18 @@ export const MessageBubble = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'isUser',
 })<{ isUser?: boolean }>(({ theme, isUser }) => ({
   backgroundColor: isUser
-    ? theme.palette.primary.main
-    : theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.02)'
-      : 'rgba(0, 0, 0, 0.015)',
-  color: isUser
-    ? theme.palette.primary.contrastText
-    : theme.palette.text.primary,
-  padding: '10px 14px',
-  borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-  fontSize: '13px',
-  lineHeight: '1.5',
+    ? theme.palette.mode === 'dark'
+      ? '#2f2f2f'
+      : '#f1f1ef'
+    : 'transparent',
+  color: theme.palette.text.primary,
+  padding: '8px 12px',
+  borderRadius: '8px',
+  fontSize: '13.5px',
+  lineHeight: '1.6',
   wordBreak: 'break-word',
   boxShadow: 'none',
-  border: `1px solid ${theme.palette.divider}`,
-  backdropFilter: isUser ? 'none' : 'blur(8px)',
+  border: isUser ? 'none' : `1px solid ${theme.palette.divider}`,
   '& p': { margin: 0, marginBottom: '6px' },
   '& p:last-child': { marginBottom: 0 },
   '& ul, & ol': { margin: '6px 0', paddingLeft: '20px' },
@@ -215,8 +179,8 @@ export const MessageBubble = styled(Box, {
     fontFamily: 'monospace',
     backgroundColor:
       theme.palette.mode === 'dark'
-        ? 'rgba(255,255,255,0.08)'
-        : 'rgba(0,0,0,0.05)',
+        ? 'rgba(255,255,255,0.06)'
+        : 'rgba(0,0,0,0.04)',
     padding: '2px 4px',
     borderRadius: '4px',
     fontSize: '12px',
@@ -224,9 +188,9 @@ export const MessageBubble = styled(Box, {
   '& pre': {
     fontFamily: 'monospace',
     backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.06)',
+      theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.04)',
     padding: '10px',
-    borderRadius: '8px',
+    borderRadius: '6px',
     overflowX: 'auto',
     fontSize: '12px',
     margin: '8px 0',
@@ -237,13 +201,10 @@ export const TypingIndicator = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: '5px',
-  padding: '10px 14px',
-  borderRadius: '16px 16px 16px 4px',
+  padding: '8px 12px',
+  borderRadius: '8px',
   border: `1px solid ${theme.palette.divider}`,
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.02)'
-      : 'rgba(0, 0, 0, 0.015)',
+  backgroundColor: 'transparent',
   width: 'fit-content',
   alignSelf: 'flex-start',
   '@keyframes dotBounce': {
@@ -264,33 +225,25 @@ export const TypingIndicator = styled(Box)(({ theme }) => ({
 export const RobotIconWrapper = styled(Box)(({ theme }) => ({
   width: '32px',
   height: '32px',
-  borderRadius: '10px',
-  background:
-    theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)'
-      : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)',
-  border: `1px solid ${theme.palette.primary.main}30`,
-  boxShadow: `0 0 10px ${theme.palette.primary.main}15`,
+  borderRadius: '6px',
+  backgroundColor: theme.palette.mode === 'dark' ? '#2e2e2e' : '#f1f1ef',
+  border: `1px solid ${theme.palette.divider}`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: theme.palette.primary.main,
+  color: theme.palette.text.secondary,
 }));
 
 export const AIAvatar = styled(Box)(({ theme }) => ({
   width: '28px',
   height: '28px',
-  borderRadius: '8px',
-  background:
-    theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)'
-      : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)',
-  border: `1px solid ${theme.palette.primary.main}30`,
-  boxShadow: `0 0 10px ${theme.palette.primary.main}15`,
+  borderRadius: '6px',
+  backgroundColor: theme.palette.mode === 'dark' ? '#2e2e2e' : '#f1f1ef',
+  border: `1px solid ${theme.palette.divider}`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: theme.palette.primary.main,
+  color: theme.palette.text.secondary,
   flexShrink: 0,
 }));
 
@@ -344,20 +297,17 @@ export const ChatInputWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'flex-end',
   gap: '6px',
-  padding: '8px 10px',
-  borderRadius: '12px',
+  padding: '6px 10px',
+  borderRadius: '8px',
   flexGrow: 1,
   minWidth: 0,
   overflow: 'hidden',
-  backgroundColor:
-    theme.palette.mode === 'dark' ? '#1A1F2B' : 'rgba(0,0,0,0.015)',
+  backgroundColor: theme.palette.mode === 'dark' ? '#222222' : '#f7f7f5',
   border: `1px solid ${theme.palette.divider}`,
-  transition: 'all 0.2s ease-in-out',
+  transition: 'border-color 0.15s ease, background-color 0.15s ease',
   '&:focus-within': {
-    borderColor: theme.palette.primary.main,
-    boxShadow: `0 0 0 3px ${theme.palette.primary.main}25`,
-    backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(26, 31, 43, 0.95)' : undefined,
+    borderColor: theme.palette.mode === 'dark' ? '#4f4f4f' : '#dfdfde',
+    backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#ffffff',
   },
 }));
 
@@ -371,35 +321,36 @@ export const ChatTextArea = styled('textarea')(({ theme }) => ({
   background: 'transparent',
   color: theme.palette.text.primary,
   fontFamily: 'inherit',
-  fontSize: '13px',
+  fontSize: '13.5px',
   lineHeight: 1.5,
   maxHeight: '100px',
   minHeight: '24px',
   padding: '4px 0',
   '&::placeholder': {
     color: theme.palette.text.secondary,
-    opacity: 0.8,
+    opacity: 0.6,
   },
 }));
 
 export const SendButton = styled(IconButton)(({ theme }) => ({
-  color: '#ffffff',
-  backgroundColor: theme.palette.primary.main,
-  borderRadius: '8px',
-  width: '32px',
-  height: '32px',
+  color: theme.palette.mode === 'dark' ? '#ffffff' : '#37352f',
+  backgroundColor: 'transparent',
+  borderRadius: '6px',
+  width: '30px',
+  height: '30px',
   padding: 0,
   flexShrink: 0,
   transition: 'all 0.2s ease',
-  boxShadow: `0 2px 8px ${theme.palette.primary.main}30`,
+  border: `1px solid ${theme.palette.divider}`,
   '&:hover': {
-    backgroundColor: theme.palette.primary.dark,
-    transform: 'translateY(-1px)',
-    boxShadow: `0 4px 12px ${theme.palette.primary.main}45`,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.08)'
+        : 'rgba(0, 0, 0, 0.04)',
   },
   '&:disabled': {
-    backgroundColor: theme.palette.action.disabledBackground,
     color: theme.palette.action.disabled,
-    boxShadow: 'none',
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
   },
 }));

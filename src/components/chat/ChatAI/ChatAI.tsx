@@ -22,12 +22,11 @@ import {
 import {
   Close as CloseIcon,
   Send as SendIcon,
-  AutoAwesome as AutoAwesomeIcon,
   KeyboardArrowDown as ArrowDownIcon,
   RadioButtonChecked as TokenIcon,
   AlternateEmail as AtIcon,
 } from '@mui/icons-material';
-import { CuteRobotIcon, ClaudeIcon, GeminiIcon } from '@/components/ui';
+import { LuminaAnimatedFace, ClaudeIcon, GeminiIcon } from '@/components/ui';
 import {
   useLocalRuntime,
   AssistantRuntimeProvider,
@@ -401,28 +400,23 @@ const ChatAIInner = ({
       <Header>
         <Box display="flex" alignItems="center" gap={1.5}>
           <RobotIconWrapper>
-            <CuteRobotIcon
-              size={20}
-              variant="mini"
-              primaryColor="#137fec"
-              eyeColor="#22d3ee"
-            />
+            <LuminaAnimatedFace size={20} />
           </RobotIconWrapper>
           <Box>
             <Typography
               variant="subtitle2"
               color="text.primary"
-              fontWeight={800}
+              fontWeight={700}
               lineHeight={1.2}
             >
-              Lumina
+              Lumina ✨
             </Typography>
             <Typography
               variant="caption"
               color="text.secondary"
               display="block"
             >
-              AI Buddy
+              Assistant
             </Typography>
           </Box>
         </Box>
@@ -556,27 +550,23 @@ const ChatAIInner = ({
               gap: 2,
             }}
           >
-            <RobotIconWrapper
-              sx={{ width: 44, height: 44, borderRadius: '12px' }}
-            >
-              <AutoAwesomeIcon sx={{ fontSize: 22 }} />
-            </RobotIconWrapper>
-            <Box>
+            <LuminaAnimatedFace size={40} />
+            <Box sx={{ mt: 1 }}>
               <Typography
                 variant="subtitle2"
-                fontWeight={850}
+                fontWeight={700}
                 color="text.primary"
                 sx={{ mb: 0.5 }}
               >
-                Meet Lumina AI
+                Lumina ✨
               </Typography>
               <Typography
                 variant="caption"
                 color="text.secondary"
                 sx={{ maxWidth: '240px', display: 'block', mx: 'auto' }}
               >
-                Ask me tips to boost focus, request summaries, or let me
-                organize your task workloads!
+                Pregúntame cómo mejorar tu productividad, solicita resúmenes o
+                déjame organizar tus tareas diarias.
               </Typography>
             </Box>
           </Box>
@@ -599,12 +589,7 @@ const ChatAIInner = ({
               <MessageRow key={msg.id} isUser={isUser}>
                 {!isUser && (
                   <AIAvatar>
-                    <CuteRobotIcon
-                      size={16}
-                      variant="mini"
-                      primaryColor="#137fec"
-                      eyeColor="#22d3ee"
-                    />
+                    <LuminaAnimatedFace size={18} />
                   </AIAvatar>
                 )}
                 <Box
@@ -636,12 +621,7 @@ const ChatAIInner = ({
         {isRunning && (
           <MessageRow isUser={false}>
             <AIAvatar>
-              <CuteRobotIcon
-                size={16}
-                variant="mini"
-                primaryColor="#137fec"
-                eyeColor="#22d3ee"
-              />
+              <LuminaAnimatedFace size={18} />
             </AIAvatar>
             <Box
               display="flex"
@@ -1055,12 +1035,7 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
             />
             <Box flex={1}>
               <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                <CuteRobotIcon
-                  size={16}
-                  variant="mini"
-                  primaryColor="#137fec"
-                  eyeColor="#22d3ee"
-                />
+                <LuminaAnimatedFace size={16} />
                 <Typography
                   variant="subtitle2"
                   color="text.primary"
@@ -1144,12 +1119,7 @@ export const ChatAI = ({ rightOffset = 100 }: ChatAIProps) => {
       {/* Floating Toggle Button */}
       <Zoom in={!isOpen} unmountOnExit>
         <FloatingButton onClick={() => setIsOpen(true)}>
-          <CuteRobotIcon
-            size={38}
-            variant="full"
-            primaryColor="#137fec"
-            eyeColor="#22d3ee"
-          />
+          <LuminaAnimatedFace size={34} />
         </FloatingButton>
       </Zoom>
     </ChatContainer>

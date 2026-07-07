@@ -26,7 +26,7 @@ import {
 } from '@mui/icons-material';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector } from '@/redux/hooks';
-import { CuteRobotIcon, ClaudeIcon, GeminiIcon } from '@/components/ui';
+import { LuminaAnimatedFace, ClaudeIcon, GeminiIcon } from '@/components/ui';
 import { useQuery } from '@apollo/client';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
@@ -641,11 +641,7 @@ export const AskAI: React.FC = () => {
         {/* ── Chat Header with Model Selector ── */}
         <ChatHeader>
           <Box display="flex" alignItems="center" gap={1}>
-            <CuteRobotIcon
-              size={20}
-              variant="mini"
-              primaryColor={primaryColor}
-            />
+            <LuminaAnimatedFace size={20} primaryColor={primaryColor} />
             <Typography
               variant="subtitle2"
               fontWeight={800}
@@ -759,11 +755,7 @@ export const AskAI: React.FC = () => {
             {!hasMessages && (
               <WelcomeSection>
                 <MascotWrapper>
-                  <CuteRobotIcon
-                    size={60}
-                    variant="full"
-                    primaryColor={primaryColor}
-                  />
+                  <LuminaAnimatedFace size={60} primaryColor={primaryColor} />
                 </MascotWrapper>
 
                 <Typography
@@ -826,9 +818,8 @@ export const AskAI: React.FC = () => {
                       {/* AI avatar */}
                       {!isUser && (
                         <AvatarWrapper>
-                          <CuteRobotIcon
+                          <LuminaAnimatedFace
                             size={22}
-                            variant="mini"
                             primaryColor={primaryColor}
                           />
                         </AvatarWrapper>
@@ -917,9 +908,8 @@ export const AskAI: React.FC = () => {
                 {isTyping && (
                   <MessageRow>
                     <AvatarWrapper>
-                      <CuteRobotIcon
+                      <LuminaAnimatedFace
                         size={22}
-                        variant="mini"
                         primaryColor={primaryColor}
                       />
                     </AvatarWrapper>
