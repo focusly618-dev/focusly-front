@@ -318,6 +318,56 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   Contexto avanzado de tareas
                 </Typography>
               </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  📅
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  <strong>Hábitos inteligentes</strong>
+                  <br />
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: 'var(--mui-palette-text-secondary)',
+                    }}
+                  >
+                    (Optimización diaria de rutinas)
+                  </span>
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  📂
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  <strong>Exportación rápida</strong>
+                  <br />
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: 'var(--mui-palette-text-secondary)',
+                    }}
+                  >
+                    (Descarga notas en Markdown y PDF)
+                  </span>
+                </Typography>
+              </Box>
             </Box>
           </Box>
 
@@ -458,6 +508,106 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   sx={{ fontSize: '11px', lineHeight: 1.4 }}
                 >
                   Insights profundos de productividad
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  🛡️
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  <strong>Historial de versiones</strong>
+                  <br />
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: 'var(--mui-palette-text-secondary)',
+                    }}
+                  >
+                    (Respaldos automáticos de workspaces)
+                  </span>
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  🎙️
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  <strong>Notas por voz con IA</strong>
+                  <br />
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: 'var(--mui-palette-text-secondary)',
+                    }}
+                  >
+                    (Transcripción de audios a tareas)
+                  </span>
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  🔗
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  <strong>Integraciones directas</strong>
+                  <br />
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: 'var(--mui-palette-text-secondary)',
+                    }}
+                  >
+                    (Conexión con Calendar y Slack)
+                  </span>
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  🎨
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  <strong>Personalización completa</strong>
+                  <br />
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: 'var(--mui-palette-text-secondary)',
+                    }}
+                  >
+                    (Temas y branding a tu medida)
+                  </span>
                 </Typography>
               </Box>
             </Box>
