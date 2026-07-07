@@ -23,7 +23,7 @@ export const HeaderLeft = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   gap: '12px',
-  flex: 1,
+  flex: '0 0 auto',
   justifyContent: 'flex-start',
 });
 
@@ -31,7 +31,9 @@ export const HeaderCenter = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  flex: 2,
+  flex: '1 1 auto',
+  minWidth: '200px',
+  maxWidth: '600px',
   padding: '0 24px',
   [theme.breakpoints.down('md')]: {
     padding: 0,
@@ -43,7 +45,7 @@ export const HeaderRight = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: '16px',
-  flex: 1,
+  flex: '0 0 auto',
   justifyContent: 'flex-end',
   [theme.breakpoints.down('md')]: {
     gap: '12px',

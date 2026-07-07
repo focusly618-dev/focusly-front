@@ -119,7 +119,8 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
 
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem('workspace_sidebar_width');
-    return saved ? parseInt(saved, 10) : 360;
+    const width = saved ? parseInt(saved, 10) : 340;
+    return Math.max(300, Math.min(380, width));
   });
   const [isDragging, setIsDragging] = useState(false);
 
@@ -133,7 +134,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
 
       const handlePointerMove = (moveEvent: PointerEvent) => {
         const deltaX = startX - moveEvent.clientX;
-        const newWidth = Math.max(300, Math.min(600, startWidth + deltaX));
+        const newWidth = Math.max(300, Math.min(380, startWidth + deltaX));
         setSidebarWidth(newWidth);
       };
 

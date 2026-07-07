@@ -77,9 +77,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   >(null);
   const [newWorkspaceTitle, setNewWorkspaceTitle] = useState('');
   const [ungroupedName, setUngroupedName] = useState(() => {
-    return (
-      localStorage.getItem('ungrouped_group_name') || 'General (Ungrouped)'
-    );
+    return localStorage.getItem('ungrouped_group_name') || 'Sin grupo';
   });
 
   // Inline Group Renaming state

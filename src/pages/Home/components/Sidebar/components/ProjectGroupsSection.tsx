@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 import type { Theme } from '@mui/material';
 import {
-  ChevronRight,
   ExpandMore,
   ExpandLess,
   Add as AddIcon,
@@ -27,11 +26,9 @@ import {
   Close as CloseIcon,
   FolderOff as FolderOffIcon,
 } from '@mui/icons-material';
-import { DefaultNoteIcon } from '@/components/ui';
 import {
   ProjectsList,
   ProjectItemRow,
-  WorkspaceItemRow,
   ActionButtonContainer,
 } from '../Sidebar.styles';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
@@ -120,22 +117,15 @@ export const ProjectGroupsSection = ({
     workspacesData,
     isWorkspaceTab,
     selectedWorkspaceId,
-    expandedGroups,
     isCreatingGroupInline,
     newGroupName,
     setNewGroupName,
     creatingWorkspaceInGroupId,
     setCreatingWorkspaceInGroupId,
-    newWorkspaceTitle,
-    setNewWorkspaceTitle,
-    toggleGroupExpand,
     handleSelectGroup,
-    handleSelectWorkspace,
     handleOpenMenu,
-    handleCreateWorkspaceInline,
     handleCreateGroupInline,
     setIsCreatingGroupInline,
-    setExpandedGroups,
     selectedGroupId,
     ungroupedName,
     editingGroupId,
@@ -329,13 +319,6 @@ export const ProjectGroupsSection = ({
 
       {/* Group Mapping */}
       {filteredProjectGroups.map((group: ProjectGroupTypes) => {
-        const isGroupExpanded = expandedGroups[group.id] !== false;
-
-        // Workspaces in this group
-        const groupWorkspaces = (workspacesData?.workspaces || []).filter(
-          (w: WorkspaceTypes) => w.groupId === group.id,
-        );
-
         return (
           <Box key={group.id} sx={{ mb: 0.5 }}>
             {/* Group Header */}
@@ -348,18 +331,6 @@ export const ProjectGroupsSection = ({
               onClick={() => handleSelectGroup(group.id)}
               sx={{ '&:hover .hover-actions': { opacity: 1 } }}
             >
-              <IconButton
-                size="small"
-                onClick={(e) => toggleGroupExpand(group.id, e)}
-                sx={{ p: 0.2, mr: 0.5, color: 'text.disabled' }}
-              >
-                {isGroupExpanded ? (
-                  <ExpandMore fontSize="inherit" />
-                ) : (
-                  <ChevronRight fontSize="inherit" />
-                )}
-              </IconButton>
-
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -431,10 +402,6 @@ export const ProjectGroupsSection = ({
                       setCreatingWorkspaceInGroupId((prev) =>
                         prev === group.id ? null : group.id,
                       );
-                      setExpandedGroups((prev) => ({
-                        ...prev,
-                        [group.id]: true,
-                      }));
                     }}
                     sx={{
                       p: 0.2,
@@ -455,155 +422,6 @@ export const ProjectGroupsSection = ({
               </ActionButtonContainer>
             </ProjectItemRow>
 
-            {/* Expanded Group Content */}
-            <Collapse in={isGroupExpanded} timeout="auto" unmountOnExit>
-              <Box
-                sx={{
-                  ml: 4.5, // Aligns guide line under folder icon
-                  pl: 0,
-                  borderLeft: `1px solid ${
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : 'rgba(0, 0, 0, 0.08)'
-                  }`,
-                  mt: 0.5,
-                  mb: 0.5,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 0.25,
-                }}
-              >
-                {groupWorkspaces.length === 0 &&
-                  creatingWorkspaceInGroupId !== group.id && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        pl: 2.25,
-                        py: 0.5,
-                        display: 'block',
-                        color: 'text.disabled',
-                        fontStyle: 'italic',
-                      }}
-                    >
-                      No notes
-                    </Typography>
-                  )}
-
-                {groupWorkspaces.map((w: WorkspaceTypes) => (
-                  <WorkspaceItemRow
-                    key={w.id}
-                    isActive={isWorkspaceTab && selectedWorkspaceId === w.id}
-                    onClick={() => handleSelectWorkspace(w)}
-                  >
-                    {w.emoji ? (
-                      <Typography
-                        sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}
-                      >
-                        {w.emoji}
-                      </Typography>
-                    ) : (
-                      <DefaultNoteIcon
-                        sx={{
-                          fontSize: 16,
-                          mr: 1,
-                          color: 'text.secondary',
-                          opacity: 0.85,
-                        }}
-                      />
-                    )}
-                    <Typography
-                      variant="body2"
-                      noWrap
-                      sx={{ flex: 1, textOverflow: 'ellipsis' }}
-                    >
-                      {w.title || 'Untitled note'}
-                    </Typography>
-                    <ActionButtonContainer className="hover-actions">
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleOpenMenu(e, 'workspace', w)}
-                        sx={{ p: 0.2, color: 'text.secondary' }}
-                      >
-                        <MoreHorizIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                    </ActionButtonContainer>
-                  </WorkspaceItemRow>
-                ))}
-
-                {creatingWorkspaceInGroupId === group.id && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '7px 8px 7px 18px',
-                      borderRadius: '6px',
-                      mb: 0.5,
-                      position: 'relative',
-                      backgroundColor:
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.03)'
-                          : 'rgba(0,0,0,0.02)',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        left: 0,
-                        top: '50%',
-                        width: 12,
-                        height: 1,
-                        backgroundColor:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.08)'
-                            : 'rgba(0, 0, 0, 0.08)',
-                      },
-                    }}
-                  >
-                    <DefaultNoteIcon
-                      sx={{
-                        fontSize: 16,
-                        mr: 1,
-                        color: 'text.secondary',
-                        opacity: 0.85,
-                      }}
-                    />
-                    <input
-                      autoFocus
-                      placeholder="New note name..."
-                      value={newWorkspaceTitle}
-                      onChange={(e) => setNewWorkspaceTitle(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          if (newWorkspaceTitle.trim()) {
-                            handleCreateWorkspaceInline();
-                          } else {
-                            setCreatingWorkspaceInGroupId(null);
-                            setNewWorkspaceTitle('');
-                          }
-                        } else if (e.key === 'Escape') {
-                          setCreatingWorkspaceInGroupId(null);
-                          setNewWorkspaceTitle('');
-                        }
-                      }}
-                      onBlur={() => {
-                        if (!newWorkspaceTitle.trim()) {
-                          setCreatingWorkspaceInGroupId(null);
-                          setNewWorkspaceTitle('');
-                        } else handleCreateWorkspaceInline();
-                      }}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        outline: 'none',
-                        color: theme.palette.text.primary,
-                        fontSize: '0.85rem',
-                        fontFamily: 'inherit',
-                        width: '100%',
-                      }}
-                    />
-                  </Box>
-                )}
-              </Box>
-            </Collapse>
-
             <Divider
               sx={{
                 opacity: theme.palette.mode === 'dark' ? 0.05 : 0.08,
@@ -617,28 +435,14 @@ export const ProjectGroupsSection = ({
       {(() => {
         if (!hasUngroupedActive) return null;
 
-        const isUngroupedExpanded = expandedGroups['ungrouped'] !== false;
-
         return (
           <Box sx={{ mb: 0.5 }}>
             {/* Ungrouped Header */}
             <ProjectItemRow
-              isActive={false}
-              onClick={() => {}}
+              isActive={isWorkspaceTab && selectedGroupId === 'ungrouped'}
+              onClick={() => handleSelectGroup('ungrouped')}
               sx={{ '&:hover .hover-actions': { opacity: 1 } }}
             >
-              <IconButton
-                size="small"
-                onClick={(e) => toggleGroupExpand('ungrouped', e)}
-                sx={{ p: 0.2, mr: 0.5, color: 'text.disabled' }}
-              >
-                {isUngroupedExpanded ? (
-                  <ExpandMore fontSize="inherit" />
-                ) : (
-                  <ChevronRight fontSize="inherit" />
-                )}
-              </IconButton>
-
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -704,10 +508,6 @@ export const ProjectGroupsSection = ({
                       setCreatingWorkspaceInGroupId((prev) =>
                         prev === 'ungrouped' ? null : 'ungrouped',
                       );
-                      setExpandedGroups((prev) => ({
-                        ...prev,
-                        ungrouped: true,
-                      }));
                     }}
                     sx={{
                       p: 0.2,
@@ -732,155 +532,6 @@ export const ProjectGroupsSection = ({
                 </IconButton>
               </ActionButtonContainer>
             </ProjectItemRow>
-
-            {/* Expanded Ungrouped Content */}
-            <Collapse in={isUngroupedExpanded} timeout="auto" unmountOnExit>
-              <Box
-                sx={{
-                  ml: 4.5,
-                  pl: 0,
-                  borderLeft: `1px solid ${
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : 'rgba(0, 0, 0, 0.08)'
-                  }`,
-                  mt: 0.5,
-                  mb: 0.5,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 0.25,
-                }}
-              >
-                {ungroupedWorkspaces.length === 0 &&
-                  creatingWorkspaceInGroupId !== 'ungrouped' && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        pl: 2.25,
-                        py: 0.5,
-                        display: 'block',
-                        color: 'text.disabled',
-                        fontStyle: 'italic',
-                      }}
-                    >
-                      No notes
-                    </Typography>
-                  )}
-
-                {ungroupedWorkspaces.map((w: WorkspaceTypes) => (
-                  <WorkspaceItemRow
-                    key={w.id}
-                    isActive={isWorkspaceTab && selectedWorkspaceId === w.id}
-                    onClick={() => handleSelectWorkspace(w)}
-                  >
-                    {w.emoji ? (
-                      <Typography
-                        sx={{ mr: 1, fontSize: '1rem', lineHeight: 1 }}
-                      >
-                        {w.emoji}
-                      </Typography>
-                    ) : (
-                      <DefaultNoteIcon
-                        sx={{
-                          fontSize: 16,
-                          mr: 1,
-                          color: 'text.secondary',
-                          opacity: 0.85,
-                        }}
-                      />
-                    )}
-                    <Typography
-                      variant="body2"
-                      noWrap
-                      sx={{ flex: 1, textOverflow: 'ellipsis' }}
-                    >
-                      {w.title || 'Untitled note'}
-                    </Typography>
-                    <ActionButtonContainer className="hover-actions">
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleOpenMenu(e, 'workspace', w)}
-                        sx={{ p: 0.2, color: 'text.secondary' }}
-                      >
-                        <MoreHorizIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                    </ActionButtonContainer>
-                  </WorkspaceItemRow>
-                ))}
-
-                {creatingWorkspaceInGroupId === 'ungrouped' && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '7px 8px 7px 18px',
-                      borderRadius: '6px',
-                      mb: 0.5,
-                      position: 'relative',
-                      backgroundColor:
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.03)'
-                          : 'rgba(0,0,0,0.02)',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        left: 0,
-                        top: '50%',
-                        width: 12,
-                        height: 1,
-                        backgroundColor:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.08)'
-                            : 'rgba(0, 0, 0, 0.08)',
-                      },
-                    }}
-                  >
-                    <DefaultNoteIcon
-                      sx={{
-                        fontSize: 16,
-                        mr: 1,
-                        color: 'text.secondary',
-                        opacity: 0.85,
-                      }}
-                    />
-                    <input
-                      autoFocus
-                      placeholder="New note name..."
-                      value={newWorkspaceTitle}
-                      onChange={(e) => setNewWorkspaceTitle(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          if (newWorkspaceTitle.trim()) {
-                            handleCreateWorkspaceInline();
-                          } else {
-                            setCreatingWorkspaceInGroupId(null);
-                            setNewWorkspaceTitle('');
-                          }
-                        } else if (e.key === 'Escape') {
-                          setCreatingWorkspaceInGroupId(null);
-                          setNewWorkspaceTitle('');
-                        }
-                      }}
-                      onBlur={() => {
-                        if (!newWorkspaceTitle.trim()) {
-                          setCreatingWorkspaceInGroupId(null);
-                          setNewWorkspaceTitle('');
-                        } else handleCreateWorkspaceInline();
-                      }}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        outline: 'none',
-                        color: theme.palette.text.primary,
-                        fontSize: '0.85rem',
-                        fontFamily: 'inherit',
-                        width: '100%',
-                      }}
-                    />
-                  </Box>
-                )}
-              </Box>
-            </Collapse>
 
             <Divider
               sx={{

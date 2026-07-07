@@ -1,8 +1,18 @@
 import { gql } from '@apollo/client';
 
 export const GET_WORKSPACES = gql`
-  query GetWorkspaces($search: String, $groupId: String) {
-    workspaces(search: $search, groupId: $groupId) {
+  query GetWorkspaces(
+    $search: String
+    $groupId: String
+    $limit: Int
+    $offset: Int
+  ) {
+    workspaces(
+      search: $search
+      groupId: $groupId
+      limit: $limit
+      offset: $offset
+    ) {
       id
       title
       content
