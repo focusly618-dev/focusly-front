@@ -131,31 +131,52 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </Typography>
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Box display="flex" flexDirection="column" gap={1.25} mb={3}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="flex"
-                gap={1}
-              >
-                <span>📋</span> Límite de 4 conversaciones
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="flex"
-                gap={1}
-              >
-                <span>⚡</span> Respuestas básicas del asistente
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="flex"
-                gap={1}
-              >
-                <span>❌</span> Sin IA en el editor de workspaces
-              </Typography>
+            <Box display="flex" flexDirection="column" gap={1.75} mb={3}>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  📋
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  Límite de 4 conversaciones
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  ⚡
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  Respuestas básicas del asistente
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  ❌
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  Sin IA en el editor de workspaces
+                </Typography>
+              </Box>
             </Box>
           </Box>
 
@@ -239,35 +260,64 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </Typography>
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Box display="flex" flexDirection="column" gap={1.25} mb={3}>
-              <Typography
-                variant="caption"
-                color="text.primary"
-                display="flex"
-                gap={1}
-                fontWeight={600}
-              >
-                <span>✨</span> Chats ilimitados con IA
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.primary"
-                display="flex"
-                gap={1}
-                fontWeight={600}
-              >
-                <span>📝</span> <strong>Editor de workspaces con IA</strong>{' '}
-                (Genera y expande textos)
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.primary"
-                display="flex"
-                gap={1}
-                fontWeight={600}
-              >
-                <span>🧠</span> Contexto avanzado de tareas
-              </Typography>
+            <Box display="flex" flexDirection="column" gap={1.75} mb={3}>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  ✨
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  Chats ilimitados con IA
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  📝
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  <strong>Editor de workspaces con IA</strong>
+                  <br />
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: 'var(--mui-palette-text-secondary)',
+                    }}
+                  >
+                    (Genera y expande textos)
+                  </span>
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  🧠
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  Contexto avanzado de tareas
+                </Typography>
+              </Box>
             </Box>
           </Box>
 
@@ -336,44 +386,80 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </Typography>
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Box display="flex" flexDirection="column" gap={1.25} mb={3}>
-              <Typography
-                variant="caption"
-                color="text.primary"
-                display="flex"
-                gap={1}
-                fontWeight={600}
-              >
-                <span>🚀</span> Respuestas rápidas prioritarias
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.primary"
-                display="flex"
-                gap={1}
-                fontWeight={600}
-              >
-                <span>🪄</span> <strong>IA en Editor ilimitada</strong>{' '}
-                (Fórmulas, traducción y bloques)
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.primary"
-                display="flex"
-                gap={1}
-                fontWeight={600}
-              >
-                <span>👥</span> Trabajo en equipo colaborativo
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.primary"
-                display="flex"
-                gap={1}
-                fontWeight={600}
-              >
-                <span>📈</span> Insights profundos de productividad
-              </Typography>
+            <Box display="flex" flexDirection="column" gap={1.75} mb={3}>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  🚀
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  Respuestas rápidas prioritarias
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  🪄
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  <strong>IA en Editor ilimitada</strong>
+                  <br />
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: 'var(--mui-palette-text-secondary)',
+                    }}
+                  >
+                    (Fórmulas, traducción y bloques)
+                  </span>
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  👥
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  Trabajo en equipo colaborativo
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="flex-start" gap={1}>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+                >
+                  📈
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.primary"
+                  fontWeight={600}
+                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                >
+                  Insights profundos de productividad
+                </Typography>
+              </Box>
             </Box>
           </Box>
 
