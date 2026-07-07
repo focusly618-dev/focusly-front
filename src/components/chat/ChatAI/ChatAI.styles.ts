@@ -60,10 +60,10 @@ export const NotificationCard = styled(Paper)(({ theme }) => ({
 }));
 
 export const ChatWindow = styled(Paper)(({ theme }) => ({
-  width: '380px',
+  width: '420px',
   maxWidth: 'calc(100vw - 32px)',
-  height: '600px',
-  maxHeight: 'calc(100vh - 100px)',
+  height: '680px',
+  maxHeight: 'calc(105vh - 120px)',
   backgroundColor: theme.palette.mode === 'dark' ? '#191919' : '#ffffff',
   borderRadius: '12px',
   border: `1px solid ${theme.palette.divider}`,
