@@ -84,7 +84,9 @@ export const NotificationCard = styled(Paper)(({ theme }) => ({
 
 export const ChatWindow = styled(Paper)(({ theme }) => ({
   width: '380px',
+  maxWidth: 'calc(100vw - 32px)',
   height: '600px',
+  maxHeight: 'calc(100vh - 100px)',
   backgroundColor:
     theme.palette.mode === 'dark'
       ? 'rgba(15, 23, 42, 0.95)'
@@ -104,7 +106,7 @@ export const ChatWindow = styled(Paper)(({ theme }) => ({
 }));
 
 export const Header = styled(Box)(({ theme }) => ({
-  padding: '16px 20px',
+  padding: '12px 16px',
   background:
     theme.palette.mode === 'dark'
       ? 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)'
@@ -113,6 +115,10 @@ export const Header = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   borderBottom: `1px solid ${theme.palette.divider}`,
+  gap: '8px',
+  minHeight: '56px',
+  flexShrink: 0,
+  overflow: 'hidden',
 }));
 
 export const ModelBadgeButton = styled(Button)(({ theme }) => ({
@@ -142,15 +148,17 @@ export const TokenCounterBadge = styled(Box)(() => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: '4px',
-  padding: '4px 10px',
+  padding: '4px 8px',
   borderRadius: '8px',
-  fontSize: '11px',
+  fontSize: '10px',
   fontWeight: 700,
   color: '#ffffff',
   background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
   boxShadow: '0 2px 8px rgba(236, 72, 153, 0.3)',
   border: '1px solid rgba(255, 255, 255, 0.1)',
   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
 }));
 
 export const MessageList = styled(Box)(({ theme }) => ({
@@ -321,21 +329,26 @@ export const SuggestionChip = styled(Button)(({ theme }) => ({
 }));
 
 export const InputArea = styled(Box)(({ theme }) => ({
-  padding: '16px',
+  padding: '12px',
   backgroundColor: theme.palette.background.default,
   borderTop: `1px solid ${theme.palette.divider}`,
   display: 'flex',
-  gap: '8px',
+  gap: '6px',
   alignItems: 'flex-end',
+  flexShrink: 0,
+  minWidth: 0,
+  overflow: 'hidden',
 }));
 
 export const ChatInputWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'flex-end',
-  gap: '8px',
-  padding: '10px 12px',
+  gap: '6px',
+  padding: '8px 10px',
   borderRadius: '12px',
   flexGrow: 1,
+  minWidth: 0,
+  overflow: 'hidden',
   backgroundColor:
     theme.palette.mode === 'dark' ? '#1A1F2B' : 'rgba(0,0,0,0.015)',
   border: `1px solid ${theme.palette.divider}`,
@@ -350,6 +363,8 @@ export const ChatInputWrapper = styled(Box)(({ theme }) => ({
 
 export const ChatTextArea = styled('textarea')(({ theme }) => ({
   flexGrow: 1,
+  flexShrink: 1,
+  minWidth: 0,
   border: 'none',
   resize: 'none',
   outline: 'none',
