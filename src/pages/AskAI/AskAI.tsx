@@ -809,6 +809,11 @@ export const AskAI: React.FC = () => {
                 {messages.map((msg) => {
                   const isUser = msg.sender === 'user';
                   const { cleanText, action } = parseLuminaAction(msg.text);
+
+                  if (!isUser && !cleanText.trim()) {
+                    return null;
+                  }
+
                   const cleanHtml = msg.html
                     ? renderMarkdown(cleanText, theme.palette.mode === 'dark')
                     : undefined;
