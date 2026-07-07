@@ -22,7 +22,7 @@ export const ContentContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flex: 1,
   overflow: 'hidden',
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
     overflowY: 'auto',
   },
@@ -35,7 +35,7 @@ export const Sidebar = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   backgroundColor: theme.palette.background.default,
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('sm')]: {
     width: '100%',
     borderRight: 'none',
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -57,7 +57,7 @@ export const MainContent = styled(Box)(({ theme }) => ({
   padding: '40px',
   overflowY: 'auto',
   backgroundColor: theme.palette.background.default,
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('sm')]: {
     padding: '24px 16px',
     overflowY: 'visible',
     height: 'auto',
@@ -73,7 +73,7 @@ export const UserCard = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.divider}`,
   marginBottom: '24px',
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('sm')]: {
     marginBottom: 0,
     padding: '8px 12px',
   },
@@ -94,9 +94,15 @@ export const MenuButton = styled(Button)<{ active?: boolean }>(
     },
     gap: '12px',
     marginBottom: '4px',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('sm')]: {
       marginBottom: 0,
       flexShrink: 0,
+      minWidth: 'auto',
+      padding: '10px',
+      justifyContent: 'center',
+      '& .MuiButton-startIcon': {
+        margin: 0,
+      },
     },
   }),
 );

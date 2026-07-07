@@ -95,7 +95,12 @@ export const Settings = () => {
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.icon}
-            {tab.label}
+            <Box
+              component="span"
+              sx={{ display: { xs: 'none', sm: 'inline' } }}
+            >
+              {tab.label}
+            </Box>
           </SidebarItem>
         ))}
       </SettingsSidebar>

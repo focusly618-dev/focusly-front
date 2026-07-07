@@ -4,7 +4,7 @@ export const SettingsLayout = styled(Box)(({ theme }) => ({
   display: 'flex',
   minHeight: '100%',
   backgroundColor: theme.palette.mode === 'dark' ? '#0C0C0E' : '#FAFAF8',
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
   },
 }));
@@ -17,7 +17,7 @@ export const SettingsSidebar = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(1),
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('sm')]: {
     width: '100%',
     padding: theme.spacing(2),
     borderRight: 'none',
@@ -69,6 +69,12 @@ export const SidebarItem = styled(Box, {
       color: '#6366F1',
     },
   },
+  [theme.breakpoints.down('sm')]: {
+    justifyContent: 'center',
+    padding: '10px',
+    minWidth: 'auto',
+    gap: 0,
+  },
 }));
 
 export const ContentArea = styled(Box)(({ theme }) => ({
@@ -87,7 +93,7 @@ export const ContentArea = styled(Box)(({ theme }) => ({
     background: 'rgba(0, 0, 0, 0.1)',
     borderRadius: '4px',
   },
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(4, 2),
     height: 'auto',
   },
@@ -116,6 +122,11 @@ export const SectionCard = styled(Box)(({ theme }) => ({
   borderRadius: '20px',
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'}`,
   padding: theme.spacing(4),
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2.5),
+    borderRadius: '16px',
+    marginBottom: theme.spacing(3),
+  },
   marginBottom: theme.spacing(4),
   boxShadow:
     theme.palette.mode === 'dark'

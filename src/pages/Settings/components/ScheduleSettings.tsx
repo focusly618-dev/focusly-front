@@ -53,6 +53,15 @@ export const ScheduleSettings = () => {
     return `${displayHour.toString().padStart(2, '0')}:00 ${period}`;
   };
 
+  const formatHourWithMinutes = (hourVal: number) => {
+    const hours = Math.floor(hourVal);
+    const minutes = Math.round((hourVal - hours) * 60);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    let displayHour = hours % 12;
+    if (displayHour === 0) displayHour = 12;
+    return `${displayHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
   const switchStyles = {
     '& .MuiSwitch-switchBase.Mui-checked': {
       color: '#6366F1',
@@ -177,95 +186,124 @@ export const ScheduleSettings = () => {
               mb: 1,
             }}
           >
-            09:00 AM - 11:30 AM
+            {formatHourWithMinutes(workHours[0])} -{' '}
+            {formatHourWithMinutes(
+              workHours[0] + (workHours[1] - workHours[0]) * 0.31,
+            )}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
             This is your highest energy window. Focusly schedules deep focus
             work during this period.
           </Typography>
 
-          {/* Custom SVG Curve representing energy peaks */}
+          {/* Custom SVG Curve representing energy peaks - adapted to be responsive and dynamic */}
           <Box
             sx={{
-              height: 120,
               width: '100%',
               bgcolor: 'rgba(99, 102, 241, 0.01)',
               borderRadius: '16px',
               border: '1px solid rgba(99, 102, 241, 0.04)',
-              p: 2,
+              p: { xs: 1.5, sm: 2 },
               position: 'relative',
-              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
             }}
           >
-            <svg
-              width="100%"
-              height="100%"
-              viewBox="0 0 500 80"
-              preserveAspectRatio="none"
-              style={{ display: 'block', overflow: 'visible' }}
-            >
-              <defs>
-                <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="rgba(99, 102, 241, 0.25)" />
-                  <stop offset="100%" stopColor="rgba(99, 102, 241, 0.00)" />
-                </linearGradient>
-              </defs>
+            <Box sx={{ height: { xs: 120, sm: 85 }, width: '100%' }}>
+              <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 500 80"
+                preserveAspectRatio="none"
+                style={{ display: 'block', overflow: 'visible' }}
+              >
+                <defs>
+                  <linearGradient
+                    id="curveGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="rgba(99, 102, 241, 0.25)" />
+                    <stop offset="100%" stopColor="rgba(99, 102, 241, 0.00)" />
+                  </linearGradient>
+                </defs>
 
-              {/* Energy peak path filled */}
-              <path
-                d="M0,80 Q70,75 120,20 T200,80 T300,75 T420,40 Q460,78 500,80 L500,80 L0,80 Z"
-                fill="url(#curveGradient)"
-              />
+                {/* Energy peak path filled */}
+                <path
+                  d="M0,80 Q70,75 120,20 T200,80 T300,75 T420,40 Q460,78 500,80 L500,80 L0,80 Z"
+                  fill="url(#curveGradient)"
+                />
 
-              {/* Peak energy curve line */}
-              <path
-                d="M0,80 Q70,75 120,20 T200,80 T300,75 T420,40 Q460,78 500,80"
-                fill="none"
-                stroke="#6366F1"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
+                {/* Peak energy curve line */}
+                <path
+                  d="M0,80 Q70,75 120,20 T200,80 T300,75 T420,40 Q460,78 500,80"
+                  fill="none"
+                  stroke="#6366F1"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
 
-              {/* Dotted indicator for Golden Hours */}
-              <line
-                x1="120"
-                y1="20"
-                x2="120"
-                y2="80"
-                stroke="#6366F1"
-                strokeWidth="1"
-                strokeDasharray="3,3"
-              />
-              <circle cx="120" cy="20" r="4" fill="#6366F1" />
-            </svg>
+                {/* Dotted indicator for Golden Hours */}
+                <line
+                  x1="120"
+                  y1="20"
+                  x2="120"
+                  y2="80"
+                  stroke="#6366F1"
+                  strokeWidth="1"
+                  strokeDasharray="3,3"
+                />
+                <circle cx="120" cy="20" r="4" fill="#6366F1" />
 
-            {/* Labels overlay */}
+                {/* Dynamic text positioned in vector space relative to the peak dot (y=20) */}
+                <text
+                  x="120"
+                  y="10"
+                  textAnchor="middle"
+                  fill="#6366F1"
+                  style={{
+                    fontSize: '8px',
+                    fontWeight: 800,
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  ENERGY PEAK
+                </text>
+              </svg>
+            </Box>
+
             <Box
-              sx={{
-                position: 'absolute',
-                top: 15,
-                left: '25%',
-                transform: 'translateX(-50%)',
-                textAlign: 'center',
-              }}
+              sx={{ display: 'flex', justifyContent: 'space-between', px: 0.5 }}
             >
               <Typography
-                sx={{ fontSize: '9px', fontWeight: 800, color: '#6366F1' }}
+                sx={{
+                  fontSize: { xs: '12px', sm: '10px' },
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                }}
               >
-                ENERGY PEAK
+                {formatHour(workHours[0])}
               </Typography>
-            </Box>
-            <Box
-              sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}
-            >
-              <Typography sx={{ fontSize: '10px', color: 'text.secondary' }}>
-                09:00 AM
+              <Typography
+                sx={{
+                  fontSize: { xs: '12px', sm: '10px' },
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                }}
+              >
+                {formatHour(Math.round((workHours[0] + workHours[1]) / 2))}
               </Typography>
-              <Typography sx={{ fontSize: '10px', color: 'text.secondary' }}>
-                01:00 PM
-              </Typography>
-              <Typography sx={{ fontSize: '10px', color: 'text.secondary' }}>
-                05:00 PM
+              <Typography
+                sx={{
+                  fontSize: { xs: '12px', sm: '10px' },
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                }}
+              >
+                {formatHour(workHours[1])}
               </Typography>
             </Box>
           </Box>

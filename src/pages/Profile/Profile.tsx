@@ -121,7 +121,7 @@ const Profile: React.FC = () => {
       <ContentContainer>
         {/* Sidebar */}
         <Sidebar>
-          <UserCard sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <UserCard sx={{ display: { xs: 'none', sm: 'flex' } }}>
             <Avatar
               src={user?.picture}
               sx={{
@@ -146,10 +146,10 @@ const Profile: React.FC = () => {
           <Box
             sx={{
               display: 'flex',
-              flexDirection: { xs: 'row', md: 'column' },
+              flexDirection: { xs: 'row', sm: 'column' },
               gap: 0.5,
               flex: 1,
-              overflowX: { xs: 'auto', md: 'visible' },
+              overflowX: { xs: 'auto', sm: 'visible' },
               width: '100%',
               whiteSpace: 'nowrap',
               '&::-webkit-scrollbar': {
@@ -162,28 +162,48 @@ const Profile: React.FC = () => {
               onClick={() => setActiveTab('profile')}
               startIcon={<PersonIcon />}
             >
-              General Profile
+              <Box
+                component="span"
+                sx={{ display: { xs: 'none', sm: 'inline' } }}
+              >
+                General Profile
+              </Box>
             </MenuButton>
             <MenuButton
               active={activeTab === 'schedule'}
               onClick={() => setActiveTab('schedule')}
               startIcon={<ScheduleIcon />}
             >
-              Schedule & Energy
+              <Box
+                component="span"
+                sx={{ display: { xs: 'none', sm: 'inline' } }}
+              >
+                Schedule & Energy
+              </Box>
             </MenuButton>
             <MenuButton
               active={activeTab === 'focus'}
               onClick={() => setActiveTab('focus')}
               startIcon={<BoltIcon />}
             >
-              Focus Engine
+              <Box
+                component="span"
+                sx={{ display: { xs: 'none', sm: 'inline' } }}
+              >
+                Focus Engine
+              </Box>
             </MenuButton>
             <MenuButton
               active={activeTab === 'notifications'}
               onClick={() => setActiveTab('notifications')}
               startIcon={<NotificationsIcon />}
             >
-              Notifications
+              <Box
+                component="span"
+                sx={{ display: { xs: 'none', sm: 'inline' } }}
+              >
+                Notifications
+              </Box>
             </MenuButton>
           </Box>
 
@@ -191,16 +211,26 @@ const Profile: React.FC = () => {
             startIcon={<LogoutIcon />}
             sx={{
               color: 'text.secondary',
-              justifyContent: 'flex-start',
+              justifyContent: { xs: 'center', sm: 'flex-start' },
               textTransform: 'none',
-              mt: { xs: 0, md: 2 },
-              ml: { xs: 1.5, md: 0 },
+              mt: { xs: 0, sm: 2 },
+              ml: { xs: 1.5, sm: 0 },
               flexShrink: 0,
+              minWidth: { xs: 'auto', sm: '64px' },
+              p: { xs: '10px', sm: '6px 8px' },
               '&:hover': { color: 'error.main', bgcolor: 'action.hover' },
+              '& .MuiButton-startIcon': {
+                margin: { xs: 0, sm: '0 8px 0 -4px' },
+              },
             }}
             onClick={handleLogout}
           >
-            Log Out
+            <Box
+              component="span"
+              sx={{ display: { xs: 'none', sm: 'inline' } }}
+            >
+              Log Out
+            </Box>
           </Button>
         </Sidebar>
 
