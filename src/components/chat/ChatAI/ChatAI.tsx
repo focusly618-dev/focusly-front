@@ -27,6 +27,8 @@ import {
   AlternateEmail as AtIcon,
 } from '@mui/icons-material';
 import { LuminaAnimatedFace, ClaudeIcon, GeminiIcon } from '@/components/ui';
+import { FEATURE_FLAGS } from '@/config/featureFlags.config';
+import { getAIConversations } from '@/api/AI/apiAI';
 import {
   useLocalRuntime,
   AssistantRuntimeProvider,
@@ -302,6 +304,22 @@ const ChatAIInner = ({
   >('main');
   const chatInputWrapperRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const [conversationCount, setConversationCount] = useState(0);
+
+  useEffect(() => {
+    if (FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS) {
+      getAIConversations()
+        .then((data) => {
+          setConversationCount(data.length);
+        })
+        .catch((err) => {
+          console.error('Error loading conversations for limit check:', err);
+        });
+    }
+  }, []);
+
+  const isLimitReached =
+    FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && conversationCount >= 4;
 
   const { user } = useAppSelector((state) => state.auth);
   const userId = user?.id || '';
@@ -333,6 +351,7 @@ const ChatAIInner = ({
 
   const handleSend = () => {
     if (!chatInput.trim() || isRunning) return;
+    if (FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && conversationCount >= 4) return;
     const content = chatInput;
     setChatInput('');
     setSelectedContext(null); // Clear context on send
@@ -683,6 +702,39 @@ const ChatAIInner = ({
         </SuggestionGrid>
       )}
 
+      {isLimitReached && (
+        <Box
+          sx={{
+            px: 2,
+            py: 1.5,
+            mx: 1.5,
+            mb: 1.5,
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(239, 68, 68, 0.15)'
+                : 'rgba(239, 68, 68, 0.05)',
+            border: '1px solid',
+            borderColor: 'error.main',
+            borderRadius: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.25,
+          }}
+        >
+          <Typography variant="caption" color="error.main" fontWeight={700}>
+            Límite de conversaciones alcanzado (4/4)
+          </Typography>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontSize: '11px' }}
+          >
+            Elimina chats en Ask AI o actualiza tu cuenta para seguir enviando
+            mensajes.
+          </Typography>
+        </Box>
+      )}
+
       {/* Input */}
       <InputArea>
         <IconButton
@@ -691,6 +743,7 @@ const ChatAIInner = ({
             setContextAnchor(chatInputWrapperRef.current);
             setContextMenuLevel('main');
           }}
+          disabled={isLimitReached}
           sx={{
             color: selectedContext ? 'primary.main' : 'text.secondary',
             alignSelf: 'center',
@@ -931,16 +984,21 @@ const ChatAIInner = ({
             />
           )}
           <ChatTextArea
-            placeholder="Ask Lumina anything..."
+            placeholder={
+              isLimitReached
+                ? 'Límite de conversaciones alcanzado...'
+                : 'Ask Lumina anything...'
+            }
             value={chatInput}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             rows={1}
+            disabled={isLimitReached}
           />
         </ChatInputWrapper>
         <SendButton
           onClick={handleSend}
-          disabled={!chatInput.trim() || isRunning}
+          disabled={!chatInput.trim() || isRunning || isLimitReached}
         >
           <SendIcon sx={{ fontSize: 16 }} />
         </SendButton>
