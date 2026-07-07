@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router-dom';
 import type { Step } from 'react-joyride';
@@ -34,6 +34,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
 
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [prevGroupId, setPrevGroupId] = useState(selectedGroupId);
+  const isSelectingWorkspaceRef = useRef(false);
 
   if (selectedGroupId !== prevGroupId) {
     setPrevGroupId(selectedGroupId);
@@ -128,6 +129,10 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
   // Load workspace from URL parameters
   useEffect(() => {
     const loadWorkspaceFromUrl = async () => {
+      if (isSelectingWorkspaceRef.current) {
+        isSelectingWorkspaceRef.current = false;
+        return;
+      }
       if (workspaceIdParam) {
         setIsCreatingNew(false);
         if (watch('id') !== workspaceIdParam) {
@@ -208,6 +213,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
 
   // 7. Component Handlers
   const handleSelectWorkspace = (workspace: WorkspaceTypes): void => {
+    isSelectingWorkspaceRef.current = true;
     setIsCreatingNew(false);
     const newParams = new URLSearchParams(searchParams);
     newParams.set('workspaceId', workspace.id);
@@ -235,14 +241,24 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
   };
 
   const handleCreateNew = (): void => {
+    isSelectingWorkspaceRef.current = true;
     setIsCreatingNew(true);
+
+    // Clear workspaceId from URL to prevent reloading the previous workspace
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('workspaceId');
+    setSearchParams(newParams);
+
     reset({
       title: 'Untitled Strategic Plan',
       taskId: undefined,
       content: '[]',
       id: undefined,
       projectId: undefined,
-      groupId: selectedGroupId || undefined,
+      groupId:
+        selectedGroupId && selectedGroupId !== 'ungrouped'
+          ? selectedGroupId
+          : undefined,
       emoji: undefined,
       background_color: undefined,
       card_show_background: false,

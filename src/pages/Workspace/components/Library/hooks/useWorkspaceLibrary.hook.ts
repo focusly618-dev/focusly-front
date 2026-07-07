@@ -4,9 +4,12 @@ import {
   GET_WORKSPACES,
   UPDATE_WORKSPACE,
   GET_PROJECT_GROUPS,
+  GET_TOTAL_WORKSPACES,
 } from '../../../Workspace.graphql';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
 import { sileo } from '@/utils';
+
+const LIMIT = 24;
 
 export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,16 +18,37 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const [selectedWorkspace, setSelectedWorkspace] =
     useState<WorkspaceTypes | null>(null);
   const [showPaletteInMenu, setShowPaletteInMenu] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [prevSearch, setPrevSearch] = useState(searchTerm);
+  const [prevGroupId, setPrevGroupId] = useState(selectedGroupId);
+
+  if (searchTerm !== prevSearch || selectedGroupId !== prevGroupId) {
+    setPrevSearch(searchTerm);
+    setPrevGroupId(selectedGroupId);
+    setHasMore(true);
+  }
 
   // Queries
-  const { data, loading, error } = useQuery(GET_WORKSPACES, {
+  const { data, loading, error, fetchMore } = useQuery(GET_WORKSPACES, {
     variables: {
       search: searchTerm,
       groupId: selectedGroupId || undefined,
+      limit: LIMIT,
+      offset: 0,
     },
+    fetchPolicy: 'cache-and-network',
   });
 
+  const [prevData, setPrevData] = useState(data);
+  if (data !== prevData) {
+    setPrevData(data);
+    if (data?.workspaces && data.workspaces.length < LIMIT) {
+      setHasMore(false);
+    }
+  }
+
   const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS);
+  const { data: totalWorkspacesData } = useQuery(GET_TOTAL_WORKSPACES);
 
   // Mutations
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
@@ -121,6 +145,23 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
     setSearchTerm('');
   };
 
+  const loadMore = async () => {
+    if (loading || !hasMore) return;
+
+    try {
+      const res = await fetchMore({
+        variables: {
+          offset: workspaces.length,
+        },
+      });
+      if (res.data?.workspaces && res.data.workspaces.length < LIMIT) {
+        setHasMore(false);
+      }
+    } catch (e) {
+      console.error('Error fetching more workspaces in loadMore:', e);
+    }
+  };
+
   // Derived data
   const workspaces = data?.workspaces || [];
 
@@ -132,6 +173,7 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
       anchorEl,
       selectedWorkspace,
       showPaletteInMenu,
+      hasMore,
     },
     actions: {
       setSearchTerm,
@@ -143,10 +185,12 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
       handleUnlinkTask,
       handleClearSearch,
       setShowPaletteInMenu,
+      loadMore,
     },
     data: {
       workspaces,
       projectGroups: projectGroupsData?.projectGroups || [],
+      totalWorkspaces: totalWorkspacesData?.totalWorkspaces || 0,
       loading,
       error,
     },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   LibraryContainer,
   GridContainer,
@@ -6,9 +6,14 @@ import {
   LibraryHeader,
   HeaderTitle,
   HeaderSubtitle,
+  FolderCapsule,
+  FolderIconCircle,
+  FolderSection,
+  FolderList,
 } from './WorkspaceLibrary.styles';
 import { useMutation } from '@apollo/client';
 import { UPDATE_PROJECT_GROUP } from '../../Workspace.graphql';
+import { useSearchParams } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -57,7 +62,7 @@ export const WorkspaceLibrary = ({
   const { state, actions, data } = useWorkspaceLibrary(selectedGroupId);
   const { handleOpen: handleDeleteConfirm } = useWorkspace();
 
-  const { searchTerm, anchorEl, selectedWorkspace } = state;
+  const { searchTerm, anchorEl, selectedWorkspace, hasMore } = state;
 
   const {
     setSearchTerm,
@@ -65,11 +70,13 @@ export const WorkspaceLibrary = ({
     handleMenuClose,
     handleUnlinkTask,
     handleClearSearch,
+    loadMore,
   } = actions;
 
-  const { workspaces, projectGroups, loading, error } = data;
+  const { workspaces, projectGroups, totalWorkspaces, loading, error } = data;
 
   const theme = useTheme();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [viewMode, setViewMode] = useState<'gallery' | 'list' | 'grid'>(() => {
     return (
@@ -83,6 +90,33 @@ export const WorkspaceLibrary = ({
   const handleViewModeChange = (mode: 'gallery' | 'list' | 'grid') => {
     setViewMode(mode);
     localStorage.setItem('workspace_view_mode', mode);
+  };
+
+  const handleSelectFolder = (groupId: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tab', 'Workspace');
+    newParams.set('groupId', groupId);
+    newParams.delete('workspaceId');
+    setSearchParams(newParams);
+  };
+
+  const loadingMore = useRef(false);
+
+  const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
+    if (loadingMore.current || !hasMore || loading) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    // Trigger when scrolled to within 50px of the bottom
+    const reachedBottom = scrollHeight - scrollTop <= clientHeight + 50;
+
+    if (!reachedBottom) return;
+
+    loadingMore.current = true;
+    try {
+      await loadMore();
+    } finally {
+      loadingMore.current = false;
+    }
   };
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState('#7c3aed');
@@ -119,10 +153,17 @@ export const WorkspaceLibrary = ({
     : null;
 
   const isUngrouped = selectedGroupId === 'ungrouped';
+  const ungroupedDisplayName =
+    localStorage.getItem('ungrouped_group_name') || 'Sin grupo';
+
   const displayGroupName = isUngrouped
-    ? localStorage.getItem('ungrouped_group_name') || 'Sin grupo'
-    : activeGroup
-      ? activeGroup.name
+    ? ungroupedDisplayName
+    : selectedGroupId
+      ? activeGroup
+        ? activeGroup.name
+        : loading
+          ? 'Loading folder...'
+          : 'Folder'
       : 'All Notes';
 
   const handleOpenCustomize = () => {
@@ -219,6 +260,128 @@ export const WorkspaceLibrary = ({
         </Box>
       </LibraryHeader>
 
+      <FolderSection>
+        <FolderList>
+          {/* All Notes Capsule */}
+          <FolderCapsule
+            active={!selectedGroupId}
+            onClick={() => handleSelectFolder('')}
+            color={theme.palette.primary.main}
+            sx={{
+              minWidth: '150px',
+              height: '54px',
+              padding: '8px 16px 8px 8px',
+              borderRadius: '30px',
+            }}
+          >
+            <FolderIconCircle
+              color={theme.palette.primary.main}
+              sx={{
+                width: '36px',
+                height: '36px',
+                marginRight: '10px',
+                boxShadow: 'none',
+              }}
+            >
+              <PushPinIcon sx={{ fontSize: 16 }} />
+            </FolderIconCircle>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: !selectedGroupId ? 800 : 600,
+                fontSize: '0.85rem',
+                color: 'text.primary',
+              }}
+            >
+              All Notes
+            </Typography>
+          </FolderCapsule>
+
+          {/* Custom Folders Capsules */}
+          {projectGroups.map((group: ProjectGroupTypes) => {
+            const baseColor = group.color || '#7c3aed';
+            const isActive = selectedGroupId === group.id;
+            return (
+              <FolderCapsule
+                key={group.id}
+                active={isActive}
+                onClick={() => handleSelectFolder(group.id)}
+                color={baseColor}
+                sx={{
+                  minWidth: '150px',
+                  height: '54px',
+                  padding: '8px 16px 8px 8px',
+                  borderRadius: '30px',
+                }}
+              >
+                <FolderIconCircle
+                  color={baseColor}
+                  sx={{
+                    width: '36px',
+                    height: '36px',
+                    marginRight: '10px',
+                    boxShadow: 'none',
+                  }}
+                >
+                  {group.emoji === 'outlined' ? (
+                    <FolderOutlinedIcon sx={{ fontSize: 16 }} />
+                  ) : (
+                    <FolderFilledIcon sx={{ fontSize: 16 }} />
+                  )}
+                </FolderIconCircle>
+                <Typography
+                  variant="body2"
+                  noWrap
+                  sx={{
+                    fontWeight: isActive ? 800 : 600,
+                    fontSize: '0.85rem',
+                    color: 'text.primary',
+                    flex: 1,
+                  }}
+                >
+                  {group.name}
+                </Typography>
+              </FolderCapsule>
+            );
+          })}
+
+          {/* Sin Grupo (Ungrouped) Capsule */}
+          <FolderCapsule
+            active={selectedGroupId === 'ungrouped'}
+            onClick={() => handleSelectFolder('ungrouped')}
+            color="#64748b"
+            sx={{
+              minWidth: '150px',
+              height: '54px',
+              padding: '8px 16px 8px 8px',
+              borderRadius: '30px',
+            }}
+          >
+            <FolderIconCircle
+              color="#64748b"
+              sx={{
+                width: '36px',
+                height: '36px',
+                marginRight: '10px',
+                boxShadow: 'none',
+              }}
+            >
+              <FolderOutlinedIcon sx={{ fontSize: 16 }} />
+            </FolderIconCircle>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: selectedGroupId === 'ungrouped' ? 800 : 600,
+                fontSize: '0.85rem',
+                color: 'text.primary',
+              }}
+            >
+              {ungroupedDisplayName}
+            </Typography>
+          </FolderCapsule>
+        </FolderList>
+      </FolderSection>
+
       {/* Toolbar Row with Group Title & Search/Filter Controls */}
       <Box
         sx={{
@@ -252,7 +415,7 @@ export const WorkspaceLibrary = ({
               fontWeight: 500,
             }}
           >
-            {`${workspaces.length} notes`}
+            {`${selectedGroupId || isUngrouped ? workspaces.length : totalWorkspaces} notes`}
           </Typography>
           {(activeGroup || isUngrouped) && (
             <Button
@@ -303,7 +466,7 @@ export const WorkspaceLibrary = ({
           </Typography>
         </Box>
       ) : (
-        <GridContainer layout={viewMode}>
+        <GridContainer layout={viewMode} onScroll={handleScroll}>
           {searchTerm && !workspaces.length && !loading && (
             <EmptyState
               title="No results found"
@@ -511,6 +674,22 @@ export const WorkspaceLibrary = ({
                   />
                 );
               })}
+
+          {loading && workspaces.length > 0 && (
+            <Box
+              sx={{
+                gridColumn: '1 / -1',
+                display: 'flex',
+                justifyContent: 'center',
+                py: 2,
+                width: '100%',
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                Loading more workspaces...
+              </Typography>
+            </Box>
+          )}
         </GridContainer>
       )}
 

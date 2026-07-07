@@ -18,11 +18,15 @@ export const TopBar = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
 }));
 
-export const ContentContainer = styled(Box)({
+export const ContentContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flex: 1,
-  overflow: 'hidden', // Prevent full page scroll if inner scrolls
-});
+  overflow: 'hidden',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    overflowY: 'auto',
+  },
+}));
 
 export const Sidebar = styled(Box)(({ theme }) => ({
   width: '280px',
@@ -31,6 +35,21 @@ export const Sidebar = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   backgroundColor: theme.palette.background.default,
+  [theme.breakpoints.down('md')]: {
+    width: '100%',
+    borderRight: 'none',
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    padding: '16px',
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflowX: 'auto',
+    gap: '12px',
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    '&::-webkit-scrollbar': {
+      display: 'none',
+    },
+  },
 }));
 
 export const MainContent = styled(Box)(({ theme }) => ({
@@ -38,6 +57,11 @@ export const MainContent = styled(Box)(({ theme }) => ({
   padding: '40px',
   overflowY: 'auto',
   backgroundColor: theme.palette.background.default,
+  [theme.breakpoints.down('md')]: {
+    padding: '24px 16px',
+    overflowY: 'visible',
+    height: 'auto',
+  },
 }));
 
 export const UserCard = styled(Box)(({ theme }) => ({
@@ -49,23 +73,33 @@ export const UserCard = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.divider}`,
   marginBottom: '24px',
+  [theme.breakpoints.down('md')]: {
+    marginBottom: 0,
+    padding: '8px 12px',
+  },
 }));
 
-export const MenuButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
-  justifyContent: 'flex-start',
-  textTransform: 'none',
-  padding: '10px 16px',
-  borderRadius: '8px',
-  color: active ? theme.palette.text.primary : theme.palette.text.secondary,
-  backgroundColor: active ? theme.palette.action.selected : 'transparent',
-  fontWeight: active ? 600 : 400,
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-    color: theme.palette.text.primary,
-  },
-  gap: '12px',
-  marginBottom: '4px',
-}));
+export const MenuButton = styled(Button)<{ active?: boolean }>(
+  ({ theme, active }) => ({
+    justifyContent: 'flex-start',
+    textTransform: 'none',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+    backgroundColor: active ? theme.palette.action.selected : 'transparent',
+    fontWeight: active ? 600 : 400,
+    '&:hover': {
+      backgroundColor: theme.palette.action.hover,
+      color: theme.palette.text.primary,
+    },
+    gap: '12px',
+    marginBottom: '4px',
+    [theme.breakpoints.down('md')]: {
+      marginBottom: 0,
+      flexShrink: 0,
+    },
+  }),
+);
 
 export const SectionCard = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
