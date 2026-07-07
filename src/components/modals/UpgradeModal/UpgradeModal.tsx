@@ -565,7 +565,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   component="span"
                   sx={{ fontSize: '13px', lineHeight: 1.3 }}
                 >
-                  🔗
+                  🚀
                 </Typography>
                 <Typography
                   variant="caption"
@@ -573,7 +573,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   fontWeight={600}
                   sx={{ fontSize: '11px', lineHeight: 1.4 }}
                 >
-                  <strong>Integraciones directas</strong>
+                  <strong>Modelos de IA premium</strong>
                   <br />
                   <span
                     style={{
@@ -581,7 +581,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                       color: 'var(--mui-palette-text-secondary)',
                     }}
                   >
-                    (Conexión con Calendar y Slack)
+                    (Acceso a Claude 3 Opus y Gemini Pro)
                   </span>
                 </Typography>
               </Box>
