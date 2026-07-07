@@ -6,10 +6,6 @@ import {
   Button,
   Tooltip,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Menu,
   MenuItem,
   Divider,
@@ -20,7 +16,6 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
-  InfoOutlined as InfoIcon,
   ArrowDropDown as ArrowDownIcon,
   AlternateEmail as AtIcon,
 } from '@mui/icons-material';
@@ -37,6 +32,7 @@ import {
   type AIConversation,
 } from '@/api/AI/apiAI';
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
+import { UpgradeModal } from '@/components/modals';
 import { parseLuminaAction, sileo } from '@/utils';
 import {
   AskAIContainer,
@@ -1421,108 +1417,10 @@ export const AskAI: React.FC = () => {
         )}
       </HistorySidebar>
 
-      <Dialog
+      <UpgradeModal
         open={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: '16px',
-            p: 2.5,
-            width: '400px',
-            bgcolor: 'background.paper',
-            backgroundImage: 'none',
-          },
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            textAlign: 'center',
-            py: 2,
-          }}
-        >
-          <Box
-            sx={{
-              width: 56,
-              height: 56,
-              borderRadius: '50%',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(59, 130, 246, 0.12)'
-                  : 'rgba(59, 130, 246, 0.06)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'primary.main',
-            }}
-          >
-            <InfoIcon sx={{ fontSize: 28 }} />
-          </Box>
-          <DialogTitle
-            sx={{
-              p: 0,
-              fontWeight: 800,
-              fontSize: '1.25rem',
-              letterSpacing: '-0.3px',
-            }}
-          >
-            Límite de Chats Alcanzado
-          </DialogTitle>
-          <DialogContent sx={{ p: 0, mt: 1 }}>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ lineHeight: 1.6 }}
-            >
-              Has alcanzado el límite de <strong>4 conversaciones</strong> en tu
-              plan gratuito. Actualiza a la versión premium hoy para disfrutar
-              de chats ilimitados con la inteligencia artificial y llevar tu
-              planificación al siguiente nivel.
-            </Typography>
-          </DialogContent>
-        </Box>
-        <DialogActions
-          sx={{ px: 0, pb: 1, flexDirection: 'column', gap: 1.25 }}
-        >
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={() => {
-              setIsUpgradeModalOpen(false);
-              sileo.success({
-                title: 'Plan Actualizado',
-                description: '¡Gracias por actualizar tu suscripción!',
-                duration: 4000,
-              });
-            }}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 700,
-              borderRadius: '10px',
-              py: 1.2,
-              boxShadow: 'none',
-              '&:hover': { boxShadow: 'none' },
-            }}
-          >
-            Pagar y Desbloquear
-          </Button>
-          <Button
-            onClick={() => setIsUpgradeModalOpen(false)}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 600,
-              borderRadius: '10px',
-              color: 'text.secondary',
-              fontSize: '0.85rem',
-            }}
-          >
-            Más tarde
-          </Button>
-        </DialogActions>
-      </Dialog>
+      />
     </AskAIContainer>
   );
 };

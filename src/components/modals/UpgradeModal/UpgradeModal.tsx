@@ -1,0 +1,404 @@
+import React from 'react';
+import {
+  Dialog,
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  Divider,
+} from '@mui/material';
+import { Close as CloseIcon } from '@mui/icons-material';
+import { sileo } from '@/utils';
+import { LuminaAnimatedFace } from '@/components/ui';
+
+interface UpgradeModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export const UpgradeModal: React.FC<UpgradeModalProps> = ({
+  open,
+  onClose,
+}) => {
+  const handleUpgrade = (planName: string) => {
+    onClose();
+    sileo.success({
+      title: 'Plan Actualizado',
+      description: `¡Gracias por actualizar tu suscripción a ${planName}!`,
+      duration: 4500,
+    });
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          borderRadius: '12px',
+          p: 3.5,
+          width: '840px',
+          maxWidth: 'calc(100vw - 32px)',
+          bgcolor: (theme) =>
+            theme.palette.mode === 'dark' ? '#191919' : '#ffffff',
+          backgroundImage: 'none',
+          boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.25)',
+          border: '1px solid',
+          borderColor: 'divider',
+        },
+      }}
+    >
+      {/* Header */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <Box display="flex" alignItems="center" gap={1}>
+          <LuminaAnimatedFace size={24} />
+          <Typography variant="subtitle1" fontWeight={750} color="text.primary">
+            Mejorar Plan de Focusly
+          </Typography>
+        </Box>
+        <IconButton
+          size="small"
+          onClick={onClose}
+          sx={{ color: 'text.secondary' }}
+        >
+          <CloseIcon sx={{ fontSize: 18 }} />
+        </IconButton>
+      </Box>
+
+      {/* Main Intro */}
+      <Box mb={3}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ lineHeight: 1.6 }}
+        >
+          Elige el plan que mejor se adapte a tu ritmo de trabajo y desbloquea
+          el poder del asistente de IA.
+        </Typography>
+      </Box>
+
+      {/* Plans Container */}
+      <Box
+        display="grid"
+        gridTemplateColumns={{ xs: '1fr', sm: '1fr', md: 'repeat(3, 1fr)' }}
+        gap={3.5}
+      >
+        {/* Free Plan */}
+        <Box
+          flex={1}
+          minWidth="220px"
+          sx={{
+            p: 2.2,
+            borderRadius: '8px',
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.01)'
+                : 'rgba(0,0,0,0.005)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box>
+            <Typography
+              variant="subtitle2"
+              fontWeight={700}
+              mb={0.5}
+              color="text.primary"
+            >
+              Focusly Free
+            </Typography>
+            <Typography
+              variant="h5"
+              fontWeight={800}
+              mb={2}
+              color="text.primary"
+            >
+              $0
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 0.5 }}
+              >
+                / siempre gratis
+              </Typography>
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box display="flex" flexDirection="column" gap={1.25} mb={3}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="flex"
+                gap={1}
+              >
+                <span>📋</span> Límite de 4 conversaciones
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="flex"
+                gap={1}
+              >
+                <span>⚡</span> Respuestas básicas del asistente
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="flex"
+                gap={1}
+              >
+                <span>❌</span> Sin IA en el editor de workspaces
+              </Typography>
+            </Box>
+          </Box>
+
+          <Button
+            disabled
+            fullWidth
+            variant="outlined"
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: '6px',
+              color: 'text.disabled',
+              borderColor: 'divider',
+              fontSize: '11px',
+            }}
+          >
+            Plan Actual
+          </Button>
+        </Box>
+
+        {/* Pro Plan */}
+        <Box
+          flex={1}
+          minWidth="220px"
+          sx={{
+            p: 2.2,
+            borderRadius: '8px',
+            border: '2px solid',
+            borderColor: 'primary.main',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(99, 102, 241, 0.04)'
+                : 'rgba(99, 102, 241, 0.01)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            boxShadow: '0 4px 16px rgba(99, 102, 241, 0.08)',
+          }}
+        >
+          <Box>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={0.5}
+            >
+              <Typography
+                variant="subtitle2"
+                fontWeight={800}
+                color="primary.main"
+              >
+                Focusly Pro
+              </Typography>
+              <Box
+                sx={{
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: '4px',
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  fontSize: '8px',
+                  fontWeight: 800,
+                }}
+              >
+                POPULAR
+              </Box>
+            </Box>
+            <Typography
+              variant="h5"
+              fontWeight={850}
+              mb={2}
+              color="text.primary"
+            >
+              $8
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 0.5 }}
+              >
+                / mes
+              </Typography>
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box display="flex" flexDirection="column" gap={1.25} mb={3}>
+              <Typography
+                variant="caption"
+                color="text.primary"
+                display="flex"
+                gap={1}
+                fontWeight={600}
+              >
+                <span>✨</span> Chats ilimitados con IA
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.primary"
+                display="flex"
+                gap={1}
+                fontWeight={600}
+              >
+                <span>📝</span> <strong>Editor de workspaces con IA</strong>{' '}
+                (Genera y expande textos)
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.primary"
+                display="flex"
+                gap={1}
+                fontWeight={600}
+              >
+                <span>🧠</span> Contexto avanzado de tareas
+              </Typography>
+            </Box>
+          </Box>
+
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => handleUpgrade('Focusly Pro')}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: '6px',
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+              boxShadow: 'none',
+              fontSize: '11px',
+              '&:hover': {
+                bgcolor: 'primary.dark',
+                boxShadow: 'none',
+              },
+            }}
+          >
+            Pagar y Desbloquear
+          </Button>
+        </Box>
+
+        {/* Max/Elite Plan */}
+        <Box
+          flex={1}
+          minWidth="220px"
+          sx={{
+            p: 2.2,
+            borderRadius: '8px',
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.01)'
+                : 'rgba(0,0,0,0.005)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box>
+            <Typography
+              variant="subtitle2"
+              fontWeight={700}
+              mb={0.5}
+              color="text.primary"
+            >
+              Focusly Elite
+            </Typography>
+            <Typography
+              variant="h5"
+              fontWeight={800}
+              mb={2}
+              color="text.primary"
+            >
+              $15
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 0.5 }}
+              >
+                / mes
+              </Typography>
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box display="flex" flexDirection="column" gap={1.25} mb={3}>
+              <Typography
+                variant="caption"
+                color="text.primary"
+                display="flex"
+                gap={1}
+                fontWeight={600}
+              >
+                <span>🚀</span> Respuestas rápidas prioritarias
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.primary"
+                display="flex"
+                gap={1}
+                fontWeight={600}
+              >
+                <span>🪄</span> <strong>IA en Editor ilimitada</strong>{' '}
+                (Fórmulas, traducción y bloques)
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.primary"
+                display="flex"
+                gap={1}
+                fontWeight={600}
+              >
+                <span>👥</span> Trabajo en equipo colaborativo
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.primary"
+                display="flex"
+                gap={1}
+                fontWeight={600}
+              >
+                <span>📈</span> Insights profundos de productividad
+              </Typography>
+            </Box>
+          </Box>
+
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => handleUpgrade('Focusly Elite')}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: '6px',
+              borderColor: 'primary.main',
+              color: 'primary.main',
+              fontSize: '11px',
+              '&:hover': {
+                borderColor: 'primary.dark',
+                bgcolor: 'rgba(99, 102, 241, 0.04)',
+              },
+            }}
+          >
+            Mejorar a Elite
+          </Button>
+        </Box>
+      </Box>
+    </Dialog>
+  );
+};
+export default UpgradeModal;

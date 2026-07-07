@@ -27,6 +27,7 @@ import {
   AlternateEmail as AtIcon,
 } from '@mui/icons-material';
 import { LuminaAnimatedFace, ClaudeIcon, GeminiIcon } from '@/components/ui';
+import { UpgradeModal } from '@/components/modals';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { getAIConversations } from '@/api/AI/apiAI';
 import {
@@ -305,6 +306,7 @@ const ChatAIInner = ({
   const chatInputWrapperRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [conversationCount, setConversationCount] = useState(0);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   useEffect(() => {
     if (FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS) {
@@ -718,20 +720,40 @@ const ChatAIInner = ({
             borderRadius: '8px',
             display: 'flex',
             flexDirection: 'column',
-            gap: 0.25,
+            gap: 1.25,
           }}
         >
-          <Typography variant="caption" color="error.main" fontWeight={700}>
-            Límite de conversaciones alcanzado (4/4)
-          </Typography>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontSize: '11px' }}
+          <Box display="flex" flexDirection="column" gap={0.25}>
+            <Typography variant="caption" color="error.main" fontWeight={700}>
+              Límite de conversaciones alcanzado (4/4)
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontSize: '11px' }}
+            >
+              Elimina chats en Ask AI o actualiza tu cuenta para seguir enviando
+              mensajes.
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => setIsUpgradeModalOpen(true)}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              fontSize: '11px',
+              py: 0.5,
+              borderRadius: '6px',
+              alignSelf: 'flex-start',
+              boxShadow: 'none',
+              '&:hover': { boxShadow: 'none' },
+            }}
           >
-            Elimina chats en Ask AI o actualiza tu cuenta para seguir enviando
-            mensajes.
-          </Typography>
+            Mejorar plan
+          </Button>
         </Box>
       )}
 
@@ -1003,6 +1025,10 @@ const ChatAIInner = ({
           <SendIcon sx={{ fontSize: 16 }} />
         </SendButton>
       </InputArea>
+      <UpgradeModal
+        open={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+      />
     </ChatWindow>
   );
 };
