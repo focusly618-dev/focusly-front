@@ -13,7 +13,7 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const sidebar = useSidebar({ activeTab, changeStatusTab });
 
   return (
-    <SidebarContainer>
+    <SidebarContainer collapsed={sidebar.isCollapsed}>
       <Box sx={{ display: { xs: 'none', md: 'block' } }}>
         <SidebarHeader sidebar={sidebar} />
       </Box>

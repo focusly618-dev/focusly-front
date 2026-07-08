@@ -1,7 +1,10 @@
 import { Box, Typography, Button, ListItemButton, styled } from '@mui/material';
 
-export const SidebarContainer = styled(Box)(({ theme }) => ({
-  width: 260,
+export const SidebarContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'collapsed',
+})<{ collapsed?: boolean }>(({ theme, collapsed }) => ({
+  width: collapsed ? 80 : 260,
+  transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   backgroundColor:
     theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.6)' : '#F5F5F4',
   backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
@@ -14,6 +17,7 @@ export const SidebarContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   color: theme.palette.text.primary,
   flexShrink: 0,
+  overflow: 'hidden',
   [theme.breakpoints.down('lg')]: {
     width: 80,
   },

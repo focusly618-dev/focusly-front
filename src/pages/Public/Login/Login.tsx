@@ -38,8 +38,10 @@ export const Login: React.FC = () => {
     loginGoogle,
     isLoading,
     email,
+    fullName,
     isRegistering,
     handleEmailChange,
+    handleFullNameChange,
     onSignIn,
     linkSent,
     setLinkSent,
@@ -209,7 +211,22 @@ export const Login: React.FC = () => {
 
             {/* Email form */}
             <Box component="form" onKeyDown={handleKeyDown}>
-              <Box mb={1}>
+              {isRegistering && (
+                <Box mb={2}>
+                  <FormLabel>Full Name</FormLabel>
+                  <StyledInput
+                    fullWidth
+                    placeholder="John Doe"
+                    name="fullName"
+                    type="text"
+                    disabled={isLoading}
+                    value={fullName}
+                    onChange={handleFullNameChange}
+                  />
+                </Box>
+              )}
+
+              <Box mb={2}>
                 <FormLabel>Email Address</FormLabel>
                 <StyledInput
                   fullWidth
@@ -231,6 +248,8 @@ export const Login: React.FC = () => {
               >
                 {isLoading ? (
                   <CircularProgress size={20} color="inherit" />
+                ) : isRegistering ? (
+                  'Sign Up'
                 ) : (
                   'Sign In'
                 )}
