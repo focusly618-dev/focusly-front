@@ -27,6 +27,15 @@ import {
   DELETE_NOTIFICATION,
 } from '@/pages/Notifications/Notifications.graphql';
 
+interface SidebarNotification {
+  id: string;
+  title: string;
+  body: string;
+  time: string;
+  read: boolean;
+  type: string;
+}
+
 export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const colorMode = useContext(ColorModeContext);
   const theme = useTheme();
@@ -389,18 +398,18 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   };
 
   const notificationsList = notificationsData?.getNotifications || [];
-  const notifications = notificationsList.map((n: Record<string, string>) => ({
-    id: n.id,
-    title: n.title,
-    body: n.body,
-    time: formatNotifTime(n.createdAt),
-    read: n.status === 'read',
-    type: n.type,
-  }));
+  const notifications: SidebarNotification[] = notificationsList.map(
+    (n: Record<string, string>) => ({
+      id: n.id,
+      title: n.title,
+      body: n.body,
+      time: formatNotifTime(n.createdAt),
+      read: n.status === 'read',
+      type: n.type,
+    }),
+  );
 
-  const unreadCount = notifications.filter(
-    (n: { read: boolean }) => !n.read,
-  ).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
   const notifOpen = Boolean(notifAnchor);
 
   const handleNotifOpen = (e: React.MouseEvent<HTMLButtonElement>) =>
