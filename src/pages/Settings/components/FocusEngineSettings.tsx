@@ -200,6 +200,58 @@ export const FocusEngineSettings = () => {
           </Badge>
         </SectionHeader>
 
+        <Box
+          sx={{
+            mb: 3,
+            p: 2,
+            borderRadius: '8px',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(99, 102, 241, 0.08)'
+                : 'rgba(99, 102, 241, 0.04)',
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(99, 102, 241, 0.2)'
+                : 'rgba(99, 102, 241, 0.1)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 1.5,
+          }}
+        >
+          <Typography sx={{ fontSize: '18px', mt: -0.25 }}>🔌</Typography>
+          <Box>
+            <Typography
+              variant="body2"
+              fontWeight={650}
+              color="text.primary"
+              sx={{ mb: 0.5 }}
+            >
+              ¿Quieres bloquear sitios web y aplicaciones de verdad?
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: 'block', lineHeight: 1.5 }}
+            >
+              Para habilitar el bloqueo en tiempo real en tu navegador,
+              asegúrate de descargar nuestra extensión oficial{' '}
+              <a
+                href="#"
+                style={{
+                  color: '#6366F1',
+                  fontWeight: 600,
+                  textDecoration: 'underline',
+                }}
+              >
+                Focusly Guard Companion
+              </a>
+              . Una vez instalada, esta extensión bloqueará automáticamente las
+              webs distractoras de tu lista durante tus sesiones de enfoque.
+            </Typography>
+          </Box>
+        </Box>
+
         <ShieldGrid sx={{ mb: 4 }}>
           {/* Social Media Block */}
           <ShieldItemCard
