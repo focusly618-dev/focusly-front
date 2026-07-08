@@ -15,6 +15,8 @@ import {
   DeleteOutline as DeleteNotifIcon,
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { Logo } from '../Sidebar.styles';
 import { FocuslyLogo } from '@/components/ui';
@@ -36,42 +38,95 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
     markAsRead,
     markAllRead,
     deleteNotif,
+    isCollapsed,
+    toggleCollapse,
   } = sidebar;
 
   return (
-    <Box sx={{ px: { xs: 0, lg: 3 } }}>
+    <Box sx={{ px: isCollapsed ? 1 : { xs: 0, lg: 3 } }}>
       <Logo
         id="joyride-logo"
         as="div"
         sx={{
-          justifyContent: { xs: 'center', lg: 'space-between' },
-          px: { xs: 2, lg: 0 },
+          flexDirection: isCollapsed ? 'column' : 'row',
+          justifyContent: isCollapsed
+            ? 'center'
+            : { xs: 'center', lg: 'space-between' },
+          alignItems: 'center',
+          px: isCollapsed ? 0 : { xs: 2, lg: 0 },
+          gap: isCollapsed ? 1.5 : 0,
+          paddingBottom: isCollapsed ? '12px' : undefined,
         }}
       >
+        {/* Logo + Name */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <FocuslyLogo size={30} />
-          <Box component="span" sx={{ display: { xs: 'none', lg: 'inline' } }}>
-            Focusly
-          </Box>
+          {!isCollapsed && (
+            <Box
+              component="span"
+              sx={{ display: { xs: 'none', lg: 'inline' } }}
+            >
+              Focusly
+            </Box>
+          )}
         </Box>
-        <IconButton
-          size="small"
-          onClick={handleNotifOpen}
+
+        {/* Right-side controls */}
+        <Box
           sx={{
-            color: 'text.secondary',
-            display: { xs: 'none', lg: 'inline-flex' },
+            display: { xs: 'none', lg: 'flex' },
+            flexDirection: isCollapsed ? 'column' : 'row',
+            alignItems: 'center',
+            gap: 0.5,
           }}
         >
-          <Badge
-            badgeContent={unreadCount}
-            color="primary"
+          {/* Notification button — hidden when collapsed */}
+          {!isCollapsed && (
+            <IconButton
+              size="small"
+              onClick={handleNotifOpen}
+              sx={{ color: 'text.secondary' }}
+            >
+              <Badge
+                badgeContent={unreadCount}
+                color="primary"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    fontSize: 9,
+                    height: 16,
+                    minWidth: 16,
+                  },
+                }}
+              >
+                <NotificationsNoneIcon sx={{ fontSize: 20 }} />
+              </Badge>
+            </IconButton>
+          )}
+
+          {/* Collapse / Expand toggle */}
+          <IconButton
+            size="small"
+            onClick={toggleCollapse}
             sx={{
-              '& .MuiBadge-badge': { fontSize: 9, height: 16, minWidth: 16 },
+              color: 'text.secondary',
+              borderRadius: '8px',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                color: theme.palette.primary.main,
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(99,102,241,0.12)'
+                    : 'rgba(99,102,241,0.08)',
+              },
             }}
           >
-            <NotificationsNoneIcon sx={{ fontSize: 20 }} />
-          </Badge>
-        </IconButton>
+            {isCollapsed ? (
+              <ChevronRightIcon sx={{ fontSize: 20 }} />
+            ) : (
+              <ChevronLeftIcon sx={{ fontSize: 20 }} />
+            )}
+          </IconButton>
+        </Box>
       </Logo>
 
       {/* Notification Popover */}

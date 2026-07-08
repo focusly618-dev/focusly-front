@@ -42,6 +42,19 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const { user } = useAppSelector((state) => state.auth);
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Collapsed state
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem('sidebar-collapsed') === 'true';
+  });
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('sidebar-collapsed', String(next));
+      return next;
+    });
+  };
+
   // Workspaces Queries & Mutations
   const { data: workspacesData } = useQuery(GET_WORKSPACES, {
     variables: { search: '' },
@@ -516,6 +529,8 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     editingGroupName,
     setEditingGroupName,
     handleRenameGroupSubmit,
+    isCollapsed,
+    toggleCollapse,
   };
 };
 

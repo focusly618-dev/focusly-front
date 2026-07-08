@@ -28,7 +28,7 @@ interface SidebarNavigationProps {
 }
 
 export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
-  const { activeTab, changeStatusTab, theme } = sidebar;
+  const { activeTab, changeStatusTab, theme, isCollapsed } = sidebar;
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
   const expandAll = () => {
@@ -89,7 +89,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             primary="Daily Plan"
             primaryTypographyProps={{ fontWeight: 600 }}
             sx={{
-              display: { xs: 'none', lg: 'block' },
+              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
         </NavItem>
@@ -114,7 +114,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             primary="Tasks"
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
-              display: { xs: 'none', lg: 'block' },
+              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
         </NavItem>
@@ -174,7 +174,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
               },
             }}
             sx={{
-              display: { xs: 'none', lg: 'block' },
+              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
         </NavItem>
@@ -199,7 +199,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             primary="Insights"
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
-              display: { xs: 'none', lg: 'block' },
+              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
         </NavItem>
@@ -253,14 +253,14 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             primary="Projects"
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
-              display: { xs: 'none', lg: 'block' },
+              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
 
           <Box
             className="tab-hover-actions"
             sx={{
-              display: { xs: 'none', lg: 'flex' },
+              display: isCollapsed ? 'none' : { xs: 'none', lg: 'flex' },
               alignItems: 'center',
               gap: 0.5,
               opacity: 0,
@@ -288,7 +288,11 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             )}
           </Box>
 
-          <Box sx={{ display: { xs: 'none', lg: 'inline-flex' } }}>
+          <Box
+            sx={{
+              display: isCollapsed ? 'none' : { xs: 'none', lg: 'inline-flex' },
+            }}
+          >
             <IconButton
               size="small"
               onClick={(e) => {
@@ -314,7 +318,12 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           </Box>
         </NavItem>
 
-        <Box sx={{ display: { xs: 'none', lg: 'block' }, width: '100%' }}>
+        <Box
+          sx={{
+            display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
+            width: '100%',
+          }}
+        >
           <Collapse in={isProjectsExpanded && activeTab === TaskBar.Workspace}>
             <Box
               sx={{

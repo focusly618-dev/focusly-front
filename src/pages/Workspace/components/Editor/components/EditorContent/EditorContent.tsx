@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { BlockNoteEditor } from '@blocknote/core';
 import { useEditorContent } from './useEditorContent.hook';
 import {
@@ -53,6 +53,8 @@ import {
   AccountTree as HubIcon,
   Stars as MagicIcon,
   LocalOffer as TagIcon,
+  ViewSidebar as FocusModeIcon,
+  ViewStream as DefaultModeIcon,
 } from '@mui/icons-material';
 import { BlockNoteView } from '@blocknote/mantine';
 import { SuggestionMenuController } from '@blocknote/react';
@@ -96,6 +98,17 @@ export const EditorContent = ({
 }: EditorContentProps) => {
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
+
+  const [isCentered, setIsCentered] = useState<boolean>(() => {
+    return localStorage.getItem('editor_centered_mode') === 'true';
+  });
+
+  const toggleCentered = () => {
+    setIsCentered((prev) => {
+      localStorage.setItem('editor_centered_mode', String(!prev));
+      return !prev;
+    });
+  };
 
   const {
     menuAnchor,
@@ -253,13 +266,17 @@ export const EditorContent = ({
             sx={{
               position: 'absolute',
               bottom: headerIcon ? '-36px' : 0,
-              left: { xs: '20px', md: '60px' },
-              right: { xs: '20px', md: '60px' },
+              left: isCentered ? '50%' : { xs: '20px', md: '60px' },
+              right: isCentered ? 'auto' : { xs: '20px', md: '60px' },
+              width: isCentered ? '100%' : 'auto',
+              maxWidth: isCentered ? '800px' : 'none',
+              transform: isCentered ? 'translateX(-50%)' : 'none',
               display: 'flex',
               alignItems: 'flex-end',
               justifyContent: 'space-between',
-              px: 0,
+              px: isCentered ? { xs: 2, md: 0 } : 0,
               pb: headerIcon ? 0 : 1.5,
+              transition: 'all 0.3s ease',
             }}
           >
             {/* Large icon card — sits on top of the cover edge */}
@@ -305,7 +322,7 @@ export const EditorContent = ({
                 display: 'flex',
                 gap: 1,
                 alignItems: 'center',
-                pb: headerIcon ? 1.5 : 0,
+                pb: headerIcon ? 1.5 : 1.4,
               }}
             >
               <Box onClick={handleIconClick} sx={ghostBtnSx(true)}>
@@ -334,6 +351,23 @@ export const EditorContent = ({
                   Change cover
                 </Typography>
               </Box>
+              <Box onClick={toggleCentered} sx={ghostBtnSx(true)}>
+                {isCentered ? (
+                  <DefaultModeIcon sx={{ fontSize: 14 }} />
+                ) : (
+                  <FocusModeIcon sx={{ fontSize: 14 }} />
+                )}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'inherit',
+                    fontWeight: 600,
+                    display: { xs: 'none', sm: 'inline-block' },
+                  }}
+                >
+                  {isCentered ? 'Default view' : 'Focus view'}
+                </Typography>
+              </Box>
             </Box>
           </Box>
         </Box>
@@ -345,7 +379,10 @@ export const EditorContent = ({
             alignItems: 'center',
             gap: 1,
             mb: headerIcon ? 1 : 1.5,
-            transition: 'opacity 0.2s',
+            transition: 'all 0.3s ease',
+            maxWidth: isCentered ? '800px' : '100%',
+            margin: isCentered ? '0 auto' : '0',
+            width: '100%',
           }}
         >
           <Box onClick={handleIconClick} sx={ghostBtnSx(false)}>
@@ -374,168 +411,196 @@ export const EditorContent = ({
               Add cover
             </Typography>
           </Box>
+          <Box onClick={toggleCentered} sx={ghostBtnSx(false)}>
+            {isCentered ? (
+              <DefaultModeIcon sx={{ fontSize: 14 }} />
+            ) : (
+              <FocusModeIcon sx={{ fontSize: 14 }} />
+            )}
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'inherit',
+                fontWeight: 600,
+                display: { xs: 'none', sm: 'inline-block' },
+              }}
+            >
+              {isCentered ? 'Default view' : 'Focus view'}
+            </Typography>
+          </Box>
         </Box>
       )}
 
-      {/* ── LARGE ICON when no cover ── */}
-      {!hasCover && headerIcon && (
-        <Tooltip title="Change icon">
-          <Box
-            onClick={handleIconClick}
-            sx={{
-              display: 'inline-flex',
-              mb: 2,
-              width: 56,
-              height: 56,
-              borderRadius: '16px',
-              bgcolor: 'background.paper',
-              border: '1px solid',
-              borderColor: 'divider',
-              boxShadow: isThemeDark
-                ? '0 4px 20px rgba(0,0,0,0.4)'
-                : '0 4px 12px rgba(0,0,0,0.06)',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'transform 0.18s, box-shadow 0.18s',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: isThemeDark
-                  ? '0 8px 30px rgba(0,0,0,0.6)'
-                  : '0 8px 16px rgba(0,0,0,0.12)',
-              },
-            }}
-          >
-            {iconMap[headerIcon] ? (
-              React.createElement(iconMap[headerIcon], {
-                sx: { fontSize: 32, color: 'text.primary' },
-              })
-            ) : (
-              <span style={{ fontSize: '32px', lineHeight: 1 }}>
-                {headerIcon}
-              </span>
-            )}
-          </Box>
-        </Tooltip>
-      )}
-
-      {/* ── FOLDER BADGE ── */}
-      {currentFolder && (
-        <FolderBadge bgColor={currentFolder.color}>
-          <FolderIcon sx={{ fontSize: 12 }} />
-          <Typography
-            variant="caption"
-            fontWeight={700}
-            sx={{ textTransform: 'uppercase' }}
-          >
-            {currentFolder.name}
-          </Typography>
-        </FolderBadge>
-      )}
-
-      <TitleInput
-        placeholder="Untitled Document"
-        value={currentTitle}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-
-      <BlockNoteWrapper
-        id="joyride-editor-area"
-        onContextMenu={handleContextMenu}
-        style={{ position: 'relative' }}
+      {/* ── Center Content Wrapper ── */}
+      <Box
+        sx={{
+          maxWidth: isCentered ? '800px' : '100%',
+          margin: isCentered ? '0 auto' : '0',
+          width: '100%',
+          transition: 'all 0.3s ease',
+        }}
       >
-        <BlockNoteView
-          editor={editor}
-          theme={isThemeDark ? 'dark' : 'light'}
-          slashMenu={false}
-          onChange={onContentChange}
-        >
-          {/* Slash Menu (/) */}
-          <SuggestionMenuController
-            triggerCharacter={'/'}
-            getItems={async (query) =>
-              getCustomSlashMenuItems(editor).filter((item) =>
-                item.title.toLowerCase().includes(query.toLowerCase()),
-              )
-            }
-          />
-          <SuggestionMenuController
-            triggerCharacter={'@'}
-            getItems={async (query) =>
-              getWorkspaceMentionMenuItems(editor).filter((item) =>
-                item.title.toLowerCase().includes(query.toLowerCase()),
-              )
-            }
-          />
-        </BlockNoteView>
-
-        {isAIProcessing && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              bgcolor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(15, 23, 42, 0.45)'
-                  : 'rgba(255, 255, 255, 0.45)',
-              backdropFilter: 'blur(4px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10,
-              borderRadius: '12px',
-              animation: 'fadeIn 0.25s ease-out',
-              '@keyframes fadeIn': {
-                from: { opacity: 0 },
-                to: { opacity: 1 },
-              },
-            }}
-          >
+        {/* ── LARGE ICON when no cover ── */}
+        {!hasCover && headerIcon && (
+          <Tooltip title="Change icon">
             <Box
+              onClick={handleIconClick}
               sx={{
-                display: 'flex',
+                display: 'inline-flex',
+                mb: 2,
+                width: 56,
+                height: 56,
+                borderRadius: '16px',
+                bgcolor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: isThemeDark
+                  ? '0 4px 20px rgba(0,0,0,0.4)'
+                  : '0 4px 12px rgba(0,0,0,0.06)',
                 alignItems: 'center',
-                gap: 1.5,
-                px: 3,
-                py: 1.5,
-                borderRadius: '99px',
-                bgcolor: theme.palette.mode === 'dark' ? '#1e1b4b' : '#e0f2fe',
-                border: `1px solid ${theme.palette.primary.main}30`,
-                boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
-                animation: 'pulseGlow 2s infinite ease-in-out',
-                '@keyframes pulseGlow': {
-                  '0%, 100%': {
-                    transform: 'scale(1)',
-                    boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
-                  },
-                  '50%': {
-                    transform: 'scale(1.02)',
-                    boxShadow: `0 8px 32px rgba(15, 23, 76, 0.35), 0 0 24px ${theme.palette.primary.main}30`,
-                  },
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'transform 0.18s, box-shadow 0.18s',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: isThemeDark
+                    ? '0 8px 30px rgba(0,0,0,0.6)'
+                    : '0 8px 16px rgba(0,0,0,0.12)',
                 },
               }}
             >
-              <CuteRobotIcon
-                size={22}
-                variant="mini"
-                primaryColor="#137fec"
-                eyeColor="#22d3ee"
-              />
-              <Typography
-                variant="body2"
-                fontWeight={750}
-                color="text.primary"
-                sx={{ letterSpacing: '0.2px' }}
-              >
-                Lumina AI is writing...
-              </Typography>
+              {iconMap[headerIcon] ? (
+                React.createElement(iconMap[headerIcon], {
+                  sx: { fontSize: 32, color: 'text.primary' },
+                })
+              ) : (
+                <span style={{ fontSize: '32px', lineHeight: 1 }}>
+                  {headerIcon}
+                </span>
+              )}
             </Box>
-          </Box>
+          </Tooltip>
         )}
-      </BlockNoteWrapper>
+
+        {/* ── FOLDER BADGE ── */}
+        {currentFolder && (
+          <FolderBadge bgColor={currentFolder.color}>
+            <FolderIcon sx={{ fontSize: 12 }} />
+            <Typography
+              variant="caption"
+              fontWeight={700}
+              sx={{ textTransform: 'uppercase' }}
+            >
+              {currentFolder.name}
+            </Typography>
+          </FolderBadge>
+        )}
+
+        <TitleInput
+          placeholder="Untitled Document"
+          value={currentTitle}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <BlockNoteWrapper
+          id="joyride-editor-area"
+          onContextMenu={handleContextMenu}
+          style={{ position: 'relative' }}
+        >
+          <BlockNoteView
+            editor={editor}
+            theme={isThemeDark ? 'dark' : 'light'}
+            slashMenu={false}
+            onChange={onContentChange}
+          >
+            {/* Slash Menu (/) */}
+            <SuggestionMenuController
+              triggerCharacter={'/'}
+              getItems={async (query) =>
+                getCustomSlashMenuItems(editor).filter((item) =>
+                  item.title.toLowerCase().includes(query.toLowerCase()),
+                )
+              }
+            />
+            <SuggestionMenuController
+              triggerCharacter={'@'}
+              getItems={async (query) =>
+                getWorkspaceMentionMenuItems(editor).filter((item) =>
+                  item.title.toLowerCase().includes(query.toLowerCase()),
+                )
+              }
+            />
+          </BlockNoteView>
+
+          {isAIProcessing && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(15, 23, 42, 0.45)'
+                    : 'rgba(255, 255, 255, 0.45)',
+                backdropFilter: 'blur(4px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10,
+                borderRadius: '12px',
+                animation: 'fadeIn 0.25s ease-out',
+                '@keyframes fadeIn': {
+                  from: { opacity: 0 },
+                  to: { opacity: 1 },
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: '99px',
+                  bgcolor:
+                    theme.palette.mode === 'dark' ? '#1e1b4b' : '#e0f2fe',
+                  border: `1px solid ${theme.palette.primary.main}30`,
+                  boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
+                  animation: 'pulseGlow 2s infinite ease-in-out',
+                  '@keyframes pulseGlow': {
+                    '0%, 100%': {
+                      transform: 'scale(1)',
+                      boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
+                    },
+                    '50%': {
+                      transform: 'scale(1.02)',
+                      boxShadow: `0 8px 32px rgba(15, 23, 76, 0.35), 0 0 24px ${theme.palette.primary.main}30`,
+                    },
+                  },
+                }}
+              >
+                <CuteRobotIcon
+                  size={22}
+                  variant="mini"
+                  primaryColor="#137fec"
+                  eyeColor="#22d3ee"
+                />
+                <Typography
+                  variant="body2"
+                  fontWeight={750}
+                  color="text.primary"
+                  sx={{ letterSpacing: '0.2px' }}
+                >
+                  Lumina AI is writing...
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </BlockNoteWrapper>
+      </Box>
 
       <Menu
         open={menuAnchor !== null}

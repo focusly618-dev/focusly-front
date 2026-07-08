@@ -11,19 +11,19 @@ interface UserProfileProps {
 }
 
 export const UserProfile = ({ sidebar }: UserProfileProps) => {
-  const { user, theme, colorMode, changeStatusTab } = sidebar;
+  const { user, theme, colorMode, changeStatusTab, isCollapsed } = sidebar;
 
   return (
     <Box
       id="joyride-user-profile"
       onClick={() => changeStatusTab(TaskBar.Settings)}
       sx={{
-        p: { xs: '8px', lg: '12px 16px' },
+        p: { xs: '8px', lg: isCollapsed ? '8px' : '12px 16px' },
         borderRadius: '16px',
         mx: { xs: 1.5, lg: 2 },
         mb: 2,
         display: 'flex',
-        flexDirection: { xs: 'column', lg: 'row' },
+        flexDirection: isCollapsed ? 'column' : { xs: 'column', lg: 'row' },
         alignItems: 'center',
         justifyContent: 'center',
         gap: 1.5,
@@ -79,7 +79,13 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
       >
         {user?.name?.charAt(0)}
       </Avatar>
-      <Box sx={{ flex: 1, minWidth: 0, display: { xs: 'none', lg: 'block' } }}>
+      <Box
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
+        }}
+      >
         <Typography
           variant="body2"
           fontWeight="800"
@@ -105,38 +111,40 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
           View Profile
         </Typography>
       </Box>
-      <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
-        <IconButton
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            colorMode.toggleColorMode();
-          }}
-          sx={{
-            width: 30,
-            height: 30,
-            color: colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
-            bgcolor: alpha(
-              colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
-              0.08,
-            ),
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-            '&:hover': {
+      {!isCollapsed && (
+        <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              colorMode.toggleColorMode();
+            }}
+            sx={{
+              width: 30,
+              height: 30,
+              color: colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
               bgcolor: alpha(
                 colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
-                0.16,
+                0.08,
               ),
-              transform: 'rotate(180deg) scale(1.05)',
-            },
-          }}
-        >
-          {colorMode.mode === 'dark' ? (
-            <LightModeIcon sx={{ fontSize: 16 }} />
-          ) : (
-            <DarkModeIcon sx={{ fontSize: 16 }} />
-          )}
-        </IconButton>
-      </Box>
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                bgcolor: alpha(
+                  colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
+                  0.16,
+                ),
+                transform: 'rotate(180deg) scale(1.05)',
+              },
+            }}
+          >
+            {colorMode.mode === 'dark' ? (
+              <LightModeIcon sx={{ fontSize: 16 }} />
+            ) : (
+              <DarkModeIcon sx={{ fontSize: 16 }} />
+            )}
+          </IconButton>
+        </Box>
+      )}
     </Box>
   );
 };
