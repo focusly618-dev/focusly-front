@@ -36,7 +36,7 @@ interface WorkspaceCardItemProps {
   onUnlinkTask: (workspace: WorkspaceTypes) => void;
   groupName?: string;
   groupColor?: string;
-  compact?: string;
+  compact?: boolean;
 }
 
 const cleanMarkdown = (md: string): string => {
