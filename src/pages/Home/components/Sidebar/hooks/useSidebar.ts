@@ -20,6 +20,12 @@ import type {
   ProjectGroupTypes,
 } from '@/pages/Workspace/types/workspace.types';
 import { TaskBar, type SidebarProps } from '../types/Sidebar.types';
+import {
+  GET_NOTIFICATIONS,
+  MARK_NOTIFICATION_AS_READ,
+  MARK_ALL_NOTIFICATIONS_AS_READ,
+  DELETE_NOTIFICATION,
+} from '@/pages/Notifications/Notifications.graphql';
 
 export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const colorMode = useContext(ColorModeContext);
@@ -337,24 +343,78 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const [notifAnchor, setNotifAnchor] = useState<HTMLButtonElement | null>(
     null,
   );
-  const [notifications, setNotifications] = useState<
-    { id: string; title: string; time: string; read: boolean }[]
-  >([]);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const { data: notificationsData } = useQuery(GET_NOTIFICATIONS, {
+    pollInterval: 8000,
+  });
+
+  const [markRead] = useMutation(MARK_NOTIFICATION_AS_READ, {
+    refetchQueries: [GET_NOTIFICATIONS],
+  });
+  const [markAllReadMutation] = useMutation(MARK_ALL_NOTIFICATIONS_AS_READ, {
+    refetchQueries: [GET_NOTIFICATIONS],
+  });
+  const [deleteNotifMutation] = useMutation(DELETE_NOTIFICATION, {
+    refetchQueries: [GET_NOTIFICATIONS],
+  });
+
+  const formatNotifTime = (createdAtStr: string) => {
+    try {
+      const date = new Date(createdAtStr);
+      const now = new Date();
+      const isToday = date.toDateString() === now.toDateString();
+      const yesterday = new Date(now);
+      yesterday.setDate(now.getDate() - 1);
+      const isYesterday = date.toDateString() === yesterday.toDateString();
+
+      const timeStr = date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const dateStr = date.toLocaleDateString([], {
+        day: '2-digit',
+        month: 'long',
+      });
+
+      if (isToday) {
+        return `Hoy a las ${timeStr}`;
+      } else if (isYesterday) {
+        return `Ayer a las ${timeStr}`;
+      } else {
+        return `${dateStr} a las ${timeStr}`;
+      }
+    } catch {
+      return createdAtStr;
+    }
+  };
+
+  const notificationsList = notificationsData?.getNotifications || [];
+  const notifications = notificationsList.map((n: Record<string, string>) => ({
+    id: n.id,
+    title: n.title,
+    body: n.body,
+    time: formatNotifTime(n.createdAt),
+    read: n.status === 'read',
+    type: n.type,
+  }));
+
+  const unreadCount = notifications.filter(
+    (n: { read: boolean }) => !n.read,
+  ).length;
   const notifOpen = Boolean(notifAnchor);
 
   const handleNotifOpen = (e: React.MouseEvent<HTMLButtonElement>) =>
     setNotifAnchor(e.currentTarget);
   const handleNotifClose = () => setNotifAnchor(null);
-  const markAsRead = (id: string) =>
-    setNotifications((p) =>
-      p.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
-  const markAllRead = () =>
-    setNotifications((p) => p.map((n) => ({ ...n, read: true })));
-  const deleteNotif = (id: string) =>
-    setNotifications((p) => p.filter((n) => n.id !== id));
+  const markAsRead = (id: string) => {
+    markRead({ variables: { id } });
+  };
+  const markAllRead = () => {
+    markAllReadMutation();
+  };
+  const deleteNotif = (id: string) => {
+    deleteNotifMutation({ variables: { id } });
+  };
 
   const currentView = searchParams.get('v') || 'day';
   const currentDateStr = searchParams.get('d');
