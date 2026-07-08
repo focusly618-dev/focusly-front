@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useQuery, useMutation } from '@apollo/client';
 import {
   Box,
   Typography,
@@ -9,6 +9,7 @@ import {
   Fade,
   Slide,
   Chip,
+  CircularProgress,
 } from '@mui/material';
 import {
   NotificationsNone as NotificationsNoneIcon,
@@ -17,6 +18,13 @@ import {
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
 } from '@mui/icons-material';
+import {
+  GET_NOTIFICATIONS,
+  MARK_NOTIFICATION_AS_READ,
+  MARK_ALL_NOTIFICATIONS_AS_READ,
+  DELETE_NOTIFICATION,
+  DELETE_ALL_NOTIFICATIONS,
+} from './Notifications.graphql';
 
 interface Notification {
   id: string;
@@ -27,31 +35,122 @@ interface Notification {
   type: 'info' | 'success' | 'warning';
 }
 
-const initialNotifications: Notification[] = [];
+const formatNotifTime = (createdAtStr: string) => {
+  try {
+    const date = new Date(createdAtStr);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+
+    const timeStr = date.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const dateStr = date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'long',
+    });
+
+    if (isToday) {
+      return `Hoy a las ${timeStr}`;
+    } else if (isYesterday) {
+      return `Ayer a las ${timeStr}`;
+    } else {
+      return `${dateStr} a las ${timeStr}`;
+    }
+  } catch {
+    return createdAtStr;
+  }
+};
 
 export const Notifications = () => {
   const theme = useTheme();
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  // Load notifications from database
+  const { data, loading, error } = useQuery(GET_NOTIFICATIONS);
+
+  // Mutations
+  const [markRead] = useMutation(MARK_NOTIFICATION_AS_READ, {
+    refetchQueries: [GET_NOTIFICATIONS],
+  });
+  const [markAllRead] = useMutation(MARK_ALL_NOTIFICATIONS_AS_READ, {
+    refetchQueries: [GET_NOTIFICATIONS],
+  });
+  const [deleteNotif] = useMutation(DELETE_NOTIFICATION, {
+    refetchQueries: [GET_NOTIFICATIONS],
+  });
+  const [deleteAllNotifs] = useMutation(DELETE_ALL_NOTIFICATIONS, {
+    refetchQueries: [GET_NOTIFICATIONS],
+  });
 
   const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    markRead({ variables: { id } });
   };
 
   const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    markAllRead();
   };
 
   const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    deleteNotif({ variables: { id } });
   };
 
   const deleteAll = () => {
-    setNotifications([]);
+    deleteAllNotifs();
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <Typography variant="h6" color="error">
+          Ocurrió un error al cargar las notificaciones
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          {error.message}
+        </Typography>
+      </Box>
+    );
+  }
+  const notificationsData = data?.getNotifications || [];
+  const notifications: Notification[] = notificationsData.map(
+    (n: Record<string, string>) => ({
+      id: n.id,
+      title: n.title,
+      message: n.body,
+      time: formatNotifTime(n.createdAt),
+      read: n.status === 'read',
+      type: n.type as 'info' | 'success' | 'warning',
+    }),
+  );
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <Fade in timeout={400}>
@@ -84,19 +183,21 @@ export const Notifications = () => {
                 justifyContent: 'center',
               }}
             >
-              <NotificationsNoneIcon sx={{ color: theme.palette.primary.main, fontSize: 26 }} />
+              <NotificationsNoneIcon
+                sx={{ color: theme.palette.primary.main, fontSize: 26 }}
+              />
             </Box>
             <Box>
               <Typography variant="h5" fontWeight={700}>
-                Notifications
+                Notificaciones
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Stay updated with your latest activity
+                Mantente al día con tus últimas actividades
               </Typography>
             </Box>
             {unreadCount > 0 && (
               <Chip
-                label={`${unreadCount} NEW`}
+                label={`${unreadCount} NUEVAS`}
                 size="small"
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.15),
@@ -123,7 +224,7 @@ export const Notifications = () => {
                   color: theme.palette.primary.main,
                 }}
               >
-                Mark all read
+                Marcar todo como leído
               </Button>
               <Button
                 variant="text"
@@ -136,7 +237,7 @@ export const Notifications = () => {
                   color: '#ef4444',
                 }}
               >
-                Clear all
+                Borrar todo
               </Button>
             </Box>
           )}
@@ -166,10 +267,15 @@ export const Notifications = () => {
                   justifyContent: 'center',
                 }}
               >
-                <InboxIcon sx={{ fontSize: 48, color: alpha(theme.palette.text.primary, 0.2) }} />
+                <InboxIcon
+                  sx={{
+                    fontSize: 48,
+                    color: alpha(theme.palette.text.primary, 0.2),
+                  }}
+                />
               </Box>
               <Typography variant="h6" fontWeight={700} color="text.secondary">
-                No notifications yet
+                No hay notificaciones aún
               </Typography>
               <Typography
                 variant="body2"
@@ -177,8 +283,8 @@ export const Notifications = () => {
                 textAlign="center"
                 maxWidth={320}
               >
-                When you receive notifications about your tasks, focus sessions, or AI
-                recommendations, they will appear here.
+                Cuando recibas notificaciones sobre tus tareas, sesiones de
+                enfoque o recomendaciones de IA, aparecerán aquí.
               </Typography>
             </Box>
           </Fade>
@@ -203,7 +309,7 @@ export const Notifications = () => {
                       ? theme.palette.divider
                       : alpha(theme.palette.primary.main, 0.15),
                     display: 'flex',
-                    alignItems: 'flex-start',
+                    alignItems: 'center',
                     gap: 2,
                     transition: 'all 0.25s ease',
                     '&:hover': {
@@ -213,22 +319,51 @@ export const Notifications = () => {
                     },
                   }}
                 >
-                  {/* Unread dot */}
-                  {!notification.read && (
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        bgcolor: theme.palette.primary.main,
-                        mt: 1,
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
+                  {/* Read / Unread Status Icons */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 40,
+                      height: 40,
+                      borderRadius: '10px',
+                      bgcolor: notification.read
+                        ? (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255,255,255,0.05)'
+                              : 'rgba(0,0,0,0.03)'
+                        : notification.type === 'warning'
+                          ? 'rgba(239, 68, 68, 0.1)'
+                          : notification.type === 'success'
+                            ? 'rgba(34, 197, 94, 0.1)'
+                            : 'rgba(99, 102, 241, 0.1)',
+                      color: notification.read
+                        ? 'text.disabled'
+                        : notification.type === 'warning'
+                          ? '#EF4444'
+                          : notification.type === 'success'
+                            ? '#22C55E'
+                            : '#6366F1',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {notification.read ? (
+                      <DoneAllIcon sx={{ fontSize: 20 }} />
+                    ) : notification.type === 'warning' ? (
+                      <NotificationsNoneIcon sx={{ fontSize: 20 }} />
+                    ) : notification.type === 'success' ? (
+                      <CheckIcon sx={{ fontSize: 20 }} />
+                    ) : (
+                      <NotificationsNoneIcon sx={{ fontSize: 20 }} />
+                    )}
+                  </Box>
 
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="subtitle2" fontWeight={notification.read ? 500 : 700}>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={notification.read ? 500 : 700}
+                    >
                       {notification.title}
                     </Typography>
                     <Typography
@@ -254,7 +389,9 @@ export const Notifications = () => {
                         onClick={() => markAsRead(notification.id)}
                         sx={{
                           color: theme.palette.primary.main,
-                          '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) },
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                          },
                         }}
                       >
                         <CheckIcon fontSize="small" />
@@ -265,7 +402,10 @@ export const Notifications = () => {
                       onClick={() => deleteNotification(notification.id)}
                       sx={{
                         color: alpha(theme.palette.text.primary, 0.4),
-                        '&:hover': { bgcolor: alpha('#ef4444', 0.1), color: '#ef4444' },
+                        '&:hover': {
+                          bgcolor: alpha('#ef4444', 0.1),
+                          color: '#ef4444',
+                        },
                       }}
                     >
                       <DeleteIcon fontSize="small" />

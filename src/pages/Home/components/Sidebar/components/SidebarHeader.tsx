@@ -187,6 +187,16 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
                   >
                     {n.title}
                   </Typography>
+                  {n.body && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      noWrap
+                      sx={{ display: 'block', lineHeight: 1.3 }}
+                    >
+                      {n.body}
+                    </Typography>
+                  )}
                   <Typography variant="caption" color="text.disabled">
                     {n.time}
                   </Typography>
