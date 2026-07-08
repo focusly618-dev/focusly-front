@@ -415,14 +415,21 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const handleNotifOpen = (e: React.MouseEvent<HTMLButtonElement>) =>
     setNotifAnchor(e.currentTarget);
   const handleNotifClose = () => setNotifAnchor(null);
+
   const markAsRead = (id: string) => {
-    markRead({ variables: { id } });
+    markRead({ variables: { id } }).catch((err) => {
+      console.error('Error marking notification as read:', err);
+    });
   };
   const markAllRead = () => {
-    markAllReadMutation();
+    markAllReadMutation().catch((err) => {
+      console.error('Error marking all notifications as read:', err);
+    });
   };
   const deleteNotif = (id: string) => {
-    deleteNotifMutation({ variables: { id } });
+    deleteNotifMutation({ variables: { id } }).catch((err) => {
+      console.error('Error deleting notification:', err);
+    });
   };
 
   const currentView = searchParams.get('v') || 'day';

@@ -9,6 +9,7 @@ import {
   Fade,
   Slide,
   Chip,
+  CircularProgress,
 } from '@mui/material';
 import {
   NotificationsNone as NotificationsNoneIcon,
@@ -43,11 +44,11 @@ const formatNotifTime = (createdAtStr: string) => {
     yesterday.setDate(now.getDate() - 1);
     const isYesterday = date.toDateString() === yesterday.toDateString();
 
-    const timeStr = date.toLocaleTimeString([], {
+    const timeStr = date.toLocaleTimeString('es-ES', {
       hour: '2-digit',
       minute: '2-digit',
     });
-    const dateStr = date.toLocaleDateString([], {
+    const dateStr = date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: 'long',
     });
@@ -68,7 +69,7 @@ export const Notifications = () => {
   const theme = useTheme();
 
   // Load notifications from database
-  const { data } = useQuery(GET_NOTIFICATIONS);
+  const { data, loading, error } = useQuery(GET_NOTIFICATIONS);
 
   // Mutations
   const [markRead] = useMutation(MARK_NOTIFICATION_AS_READ, {
@@ -83,20 +84,6 @@ export const Notifications = () => {
   const [deleteAllNotifs] = useMutation(DELETE_ALL_NOTIFICATIONS, {
     refetchQueries: [GET_NOTIFICATIONS],
   });
-
-  const notificationsData = data?.getNotifications || [];
-  const notifications: Notification[] = notificationsData.map(
-    (n: Record<string, string>) => ({
-      id: n.id,
-      title: n.title,
-      message: n.body,
-      time: formatNotifTime(n.createdAt),
-      read: n.status === 'read',
-      type: n.type as 'info' | 'success' | 'warning',
-    }),
-  );
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = (id: string) => {
     markRead({ variables: { id } });
@@ -113,6 +100,57 @@ export const Notifications = () => {
   const deleteAll = () => {
     deleteAllNotifs();
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <Typography variant="h6" color="error">
+          Ocurrió un error al cargar las notificaciones
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          {error.message}
+        </Typography>
+      </Box>
+    );
+  }
+  const notificationsData = data?.getNotifications || [];
+  const notifications: Notification[] = notificationsData.map(
+    (n: Record<string, string>) => ({
+      id: n.id,
+      title: n.title,
+      message: n.body,
+      time: formatNotifTime(n.createdAt),
+      read: n.status === 'read',
+      type: n.type as 'info' | 'success' | 'warning',
+    }),
+  );
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <Fade in timeout={400}>
