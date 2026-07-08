@@ -449,7 +449,7 @@ export const WorkspaceCard = styled(Card, {
     padding: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
-    minHeight: compact ? '130px' : '180px',
+    minHeight: compact ? '130px' : '300px',
     height: '100%',
     cursor: 'pointer',
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
