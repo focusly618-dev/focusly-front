@@ -174,6 +174,45 @@ export const ProjectGroupsSection = ({
 
   const projectsListContent = (
     <ProjectsList>
+      {/* All Folders — pinned, cannot be renamed or deleted */}
+      <Box sx={{ mb: 0.5 }}>
+        <ProjectItemRow
+          isActive={isWorkspaceTab && !selectedGroupId && !selectedWorkspaceId}
+          onClick={() => handleSelectGroup(null)}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              p: 0.2,
+              mr: 0.5,
+            }}
+          >
+            <FolderIcon
+              sx={{
+                fontSize: 16,
+                color: theme.palette.mode === 'dark' ? '#a78bfa' : '#7c3aed',
+              }}
+            />
+          </Box>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 700, fontSize: '0.85rem', flex: 1 }}
+            noWrap
+          >
+            All folders
+          </Typography>
+        </ProjectItemRow>
+
+        <Divider
+          sx={{
+            mt: 0.5,
+            opacity: theme.palette.mode === 'dark' ? 0.05 : 0.08,
+          }}
+        />
+      </Box>
+
       {/* Folder Search Bar */}
       {projectGroups.length > 0 && (
         <Box
