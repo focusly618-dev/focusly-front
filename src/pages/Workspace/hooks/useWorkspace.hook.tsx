@@ -255,10 +255,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
       content: '[]',
       id: undefined,
       projectId: undefined,
-      groupId:
-        selectedGroupId && selectedGroupId !== 'ungrouped'
-          ? selectedGroupId
-          : undefined,
+      groupId: selectedGroupId || undefined,
       emoji: undefined,
       background_color: undefined,
       card_show_background: false,

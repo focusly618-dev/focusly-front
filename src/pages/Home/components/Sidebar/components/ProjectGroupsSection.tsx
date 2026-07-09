@@ -32,10 +32,7 @@ import {
   ActionButtonContainer,
 } from '../Sidebar.styles';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
-import type {
-  WorkspaceTypes,
-  ProjectGroupTypes,
-} from '@/pages/Workspace/types/workspace.types';
+import type { ProjectGroupTypes } from '@/pages/Workspace/types/workspace.types';
 
 interface InlineRenameInputProps {
   value: string;
@@ -120,14 +117,12 @@ export const ProjectGroupsSection = ({
     isCreatingGroupInline,
     newGroupName,
     setNewGroupName,
-    creatingWorkspaceInGroupId,
     setCreatingWorkspaceInGroupId,
     handleSelectGroup,
     handleOpenMenu,
     handleCreateGroupInline,
     setIsCreatingGroupInline,
     selectedGroupId,
-    ungroupedName,
     editingGroupId,
     setEditingGroupId,
     editingGroupName,
@@ -136,20 +131,11 @@ export const ProjectGroupsSection = ({
   } = sidebar;
 
   const [isSectionExpanded, setIsSectionExpanded] = useState(true);
-  const [customizingGroup, setCustomizingGroup] = useState<
-    | ProjectGroupTypes
-    | { id: string; name: string; color?: string; emoji?: string }
-    | null
-  >(null);
+  const [customizingGroup, setCustomizingGroup] =
+    useState<ProjectGroupTypes | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>('#7c3aed');
   const [selectedStyle, setSelectedStyle] = useState<'filled' | 'outlined'>(
     'filled',
-  );
-  const [ungroupedColor, setUngroupedColor] = useState<string>(
-    () => localStorage.getItem('ungrouped_group_color') || '#64748b',
-  );
-  const [ungroupedEmoji, setUngroupedEmoji] = useState<string>(
-    () => localStorage.getItem('ungrouped_group_emoji') || 'filled',
   );
   const [updateProjectGroup] = useMutation(UPDATE_PROJECT_GROUP);
 
@@ -181,17 +167,6 @@ export const ProjectGroupsSection = ({
   const filteredProjectGroups = projectGroups.filter((group) =>
     group.name.toLowerCase().includes(folderQuery.toLowerCase()),
   );
-
-  const ungroupedWorkspaces = (workspacesData?.workspaces || []).filter(
-    (w: WorkspaceTypes) => !w.groupId,
-  );
-  const matchesUngroupedQuery =
-    !folderQuery ||
-    ungroupedName.toLowerCase().includes(folderQuery.toLowerCase());
-  const hasUngroupedActive =
-    (ungroupedWorkspaces.length > 0 ||
-      creatingWorkspaceInGroupId === 'ungrouped') &&
-    matchesUngroupedQuery;
 
   const totalGroupsCount = projectGroups.length;
   const totalWorkspacesCount = (workspacesData?.workspaces || []).length;
@@ -431,154 +406,39 @@ export const ProjectGroupsSection = ({
         );
       })}
 
-      {/* General / Ungrouped Section */}
-      {(() => {
-        if (!hasUngroupedActive) return null;
-
-        return (
-          <Box sx={{ mb: 0.5 }}>
-            {/* Ungrouped Header */}
-            <ProjectItemRow
-              isActive={isWorkspaceTab && selectedGroupId === 'ungrouped'}
-              onClick={() => handleSelectGroup('ungrouped')}
-              sx={{ '&:hover .hover-actions': { opacity: 1 } }}
-            >
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCustomizingGroup({ id: 'ungrouped', name: ungroupedName });
-                  setSelectedColor(ungroupedColor);
-                  setSelectedStyle(ungroupedEmoji as 'filled' | 'outlined');
-                }}
-                sx={{
-                  p: 0.2,
-                  mr: 0.5,
-                  '&:hover': {
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.08)'
-                        : 'rgba(0, 0, 0, 0.05)',
-                  },
-                }}
-              >
-                {ungroupedEmoji === 'outlined' ? (
-                  <FolderOutlinedIcon
-                    sx={{
-                      fontSize: 16,
-                      color: ungroupedColor,
-                    }}
-                  />
-                ) : (
-                  <FolderIcon
-                    sx={{
-                      fontSize: 16,
-                      color: ungroupedColor,
-                    }}
-                  />
-                )}
-              </IconButton>
-              {editingGroupId === 'ungrouped' ? (
-                <InlineRenameInput
-                  value={editingGroupName}
-                  onChange={setEditingGroupName}
-                  onSubmit={handleRenameGroupSubmit}
-                  onCancel={() => {
-                    setEditingGroupId(null);
-                    setEditingGroupName('');
-                  }}
-                  theme={theme}
-                />
-              ) : (
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, fontSize: '0.85rem', flex: 1 }}
-                  noWrap
-                >
-                  {ungroupedName}
-                </Typography>
-              )}
-
-              <ActionButtonContainer className="hover-actions">
-                <Tooltip title="New Note" arrow>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCreatingWorkspaceInGroupId((prev) =>
-                        prev === 'ungrouped' ? null : 'ungrouped',
-                      );
-                    }}
-                    sx={{
-                      p: 0.2,
-                      color: 'text.secondary',
-                      '&:hover': { color: 'primary.main' },
-                    }}
-                  >
-                    <AddIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </Tooltip>
-                <IconButton
-                  size="small"
-                  onClick={(e) =>
-                    handleOpenMenu(e, 'group', {
-                      id: 'ungrouped',
-                      name: ungroupedName,
-                    } as unknown as ProjectGroupTypes)
-                  }
-                  sx={{ p: 0.2, color: 'text.secondary' }}
-                >
-                  <MoreHorizIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </ActionButtonContainer>
-            </ProjectItemRow>
-
-            <Divider
-              sx={{
-                mt: 0.5,
-                mb: 0.5,
-                opacity: theme.palette.mode === 'dark' ? 0.05 : 0.08,
-              }}
-            />
-          </Box>
-        );
-      })()}
-
       {/* Search Empty State */}
-      {folderQuery &&
-        filteredProjectGroups.length === 0 &&
-        !hasUngroupedActive && (
-          <Box
+      {folderQuery && filteredProjectGroups.length === 0 && (
+        <Box
+          sx={{
+            py: 4,
+            px: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1.5,
+            textAlign: 'center',
+          }}
+        >
+          <FolderOffIcon
             sx={{
-              py: 4,
-              px: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 1.5,
-              textAlign: 'center',
+              fontSize: 32,
+              color: 'text.disabled',
+              opacity: 0.6,
+            }}
+          />
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 500,
+              fontSize: '0.8rem',
             }}
           >
-            <FolderOffIcon
-              sx={{
-                fontSize: 32,
-                color: 'text.disabled',
-                opacity: 0.6,
-              }}
-            />
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'text.secondary',
-                fontWeight: 500,
-                fontSize: '0.8rem',
-              }}
-            >
-              No folders match "{folderQuery}"
-            </Typography>
-          </Box>
-        )}
+            No folders match "{folderQuery}"
+          </Typography>
+        </Box>
+      )}
 
       <Dialog
         open={Boolean(customizingGroup)}
@@ -729,26 +589,18 @@ export const ProjectGroupsSection = ({
             variant="contained"
             onClick={async () => {
               if (customizingGroup) {
-                if (customizingGroup.id === 'ungrouped') {
-                  localStorage.setItem('ungrouped_group_color', selectedColor);
-                  localStorage.setItem('ungrouped_group_emoji', selectedStyle);
-                  setUngroupedColor(selectedColor);
-                  setUngroupedEmoji(selectedStyle);
-                  window.location.reload();
-                } else {
-                  try {
-                    await updateProjectGroup({
-                      variables: {
-                        input: {
-                          id: customizingGroup.id,
-                          color: selectedColor,
-                          emoji: selectedStyle,
-                        },
+                try {
+                  await updateProjectGroup({
+                    variables: {
+                      input: {
+                        id: customizingGroup.id,
+                        color: selectedColor,
+                        emoji: selectedStyle,
                       },
-                    });
-                  } catch (err) {
-                    console.error('Failed to update group styling:', err);
-                  }
+                    },
+                  });
+                } catch (err) {
+                  console.error('Failed to update group styling:', err);
                 }
               }
               setCustomizingGroup(null);

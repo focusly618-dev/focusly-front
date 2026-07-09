@@ -38,7 +38,6 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
     groups.forEach((g) => {
       newExpandedGroups[g.id] = true;
     });
-    newExpandedGroups['ungrouped'] = true;
     sidebar.setExpandedGroups(newExpandedGroups);
   };
 

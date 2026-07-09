@@ -152,31 +152,16 @@ export const WorkspaceLibrary = ({
     ? projectGroups.find((g: ProjectGroupTypes) => g.id === selectedGroupId)
     : null;
 
-  const isUngrouped = selectedGroupId === 'ungrouped';
-  const ungroupedDisplayName =
-    localStorage.getItem('ungrouped_group_name') || 'Sin grupo';
-
-  const displayGroupName = isUngrouped
-    ? ungroupedDisplayName
-    : selectedGroupId
-      ? activeGroup
-        ? activeGroup.name
-        : loading
-          ? 'Loading folder...'
-          : 'Folder'
-      : 'All Notes';
+  const displayGroupName = selectedGroupId
+    ? activeGroup
+      ? activeGroup.name
+      : loading
+        ? 'Loading folder...'
+        : 'Folder'
+    : 'All Notes';
 
   const handleOpenCustomize = () => {
-    if (isUngrouped) {
-      setSelectedColor(
-        localStorage.getItem('ungrouped_group_color') || '#64748b',
-      );
-      setSelectedStyle(
-        (localStorage.getItem('ungrouped_group_emoji') as
-          | 'filled'
-          | 'outlined') || 'filled',
-      );
-    } else if (activeGroup) {
+    if (activeGroup) {
       setSelectedColor(activeGroup.color || '#7c3aed');
       setSelectedStyle(
         activeGroup.emoji === 'outlined' ? 'outlined' : 'filled',
@@ -208,12 +193,10 @@ export const WorkspaceLibrary = ({
       <LibraryHeader>
         <Box>
           <HeaderTitle variant="h4">
-            {isUngrouped || activeGroup
-              ? displayGroupName
-              : 'Workspace Library'}
+            {activeGroup ? displayGroupName : 'Workspace Library'}
           </HeaderTitle>
           <HeaderSubtitle variant="body2">
-            {isUngrouped || activeGroup
+            {activeGroup
               ? `View and manage workspaces inside the "${displayGroupName}" project`
               : 'Organize your notes, ideas, and strategic plan docs'}
           </HeaderSubtitle>
@@ -344,41 +327,6 @@ export const WorkspaceLibrary = ({
               </FolderCapsule>
             );
           })}
-
-          {/* Sin Grupo (Ungrouped) Capsule */}
-          <FolderCapsule
-            active={selectedGroupId === 'ungrouped'}
-            onClick={() => handleSelectFolder('ungrouped')}
-            color="#64748b"
-            sx={{
-              minWidth: '150px',
-              height: '54px',
-              padding: '8px 16px 8px 8px',
-              borderRadius: '30px',
-            }}
-          >
-            <FolderIconCircle
-              color="#64748b"
-              sx={{
-                width: '36px',
-                height: '36px',
-                marginRight: '10px',
-                boxShadow: 'none',
-              }}
-            >
-              <FolderOutlinedIcon sx={{ fontSize: 16 }} />
-            </FolderIconCircle>
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: selectedGroupId === 'ungrouped' ? 800 : 600,
-                fontSize: '0.85rem',
-                color: 'text.primary',
-              }}
-            >
-              {ungroupedDisplayName}
-            </Typography>
-          </FolderCapsule>
         </FolderList>
       </FolderSection>
 
@@ -415,9 +363,9 @@ export const WorkspaceLibrary = ({
               fontWeight: 500,
             }}
           >
-            {`${selectedGroupId || isUngrouped ? workspaces.length : totalWorkspaces} notes`}
+            {`${selectedGroupId ? workspaces.length : totalWorkspaces} notes`}
           </Typography>
-          {(activeGroup || isUngrouped) && (
+          {activeGroup && (
             <Button
               size="small"
               onClick={handleOpenCustomize}
@@ -883,11 +831,7 @@ export const WorkspaceLibrary = ({
           <Button
             variant="contained"
             onClick={async () => {
-              if (isUngrouped) {
-                localStorage.setItem('ungrouped_group_color', selectedColor);
-                localStorage.setItem('ungrouped_group_emoji', selectedStyle);
-                window.location.reload();
-              } else if (activeGroup) {
+              if (activeGroup) {
                 try {
                   await updateProjectGroup({
                     variables: {
