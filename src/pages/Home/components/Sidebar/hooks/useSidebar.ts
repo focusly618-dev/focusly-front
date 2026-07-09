@@ -104,9 +104,6 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     string | null
   >(null);
   const [newWorkspaceTitle, setNewWorkspaceTitle] = useState('');
-  const [ungroupedName, setUngroupedName] = useState(() => {
-    return localStorage.getItem('ungrouped_group_name') || 'Sin grupo';
-  });
 
   // Inline Group Renaming state
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
@@ -185,10 +182,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           createWorkspaceInput: {
             title,
             content: '[]',
-            groupId:
-              creatingWorkspaceInGroupId === 'ungrouped'
-                ? null
-                : creatingWorkspaceInGroupId,
+            groupId: creatingWorkspaceInGroupId,
             saveStatus: true,
           },
         },
@@ -232,45 +226,6 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   };
 
   const handleDeleteGroup = async (id: string) => {
-    if (id === 'ungrouped') {
-      const ungroupedWorkspaces = (workspacesData?.workspaces || []).filter(
-        (w: WorkspaceTypes) => !w.groupId,
-      );
-      if (ungroupedWorkspaces.length === 0) {
-        sileo.success({
-          title: 'No notes to delete',
-          description: 'There are no notes in this section.',
-          fill: 'var(--sileo-success-bg)',
-          duration: 3000,
-        });
-        return;
-      }
-      sileo.warning({
-        title: 'Delete General Notes',
-        description: `Are you sure you want to delete all ${ungroupedWorkspaces.length} notes in this section? This action is permanent.`,
-        fill: 'var(--sileo-warning-bg)',
-        button: {
-          title: 'Delete All',
-          onClick: async () => {
-            try {
-              for (const w of ungroupedWorkspaces) {
-                await deleteWorkspaceMutation({ variables: { id: w.id } });
-              }
-              sileo.success({
-                title: 'Notes deleted',
-                description: 'All general notes have been deleted.',
-                fill: 'var(--sileo-delete-bg)',
-                duration: 4000,
-              });
-            } catch (err) {
-              console.error('Error deleting general workspaces:', err);
-            }
-          },
-        },
-      });
-      return;
-    }
-
     sileo.warning({
       title: 'Remove Project',
       description:
@@ -295,11 +250,6 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   };
 
   const handleRenameGroup = async (id: string, name: string) => {
-    if (id === 'ungrouped') {
-      localStorage.setItem('ungrouped_group_name', name);
-      setUngroupedName(name);
-      return;
-    }
     try {
       await updateProjectGroup({
         variables: {
@@ -313,7 +263,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
 
   const handleRenameGroupPrompt = (group: ProjectGroupTypes) => {
     setEditingGroupId(group.id);
-    setEditingGroupName(group.id === 'ungrouped' ? ungroupedName : group.name);
+    setEditingGroupName(group.name);
   };
 
   const handleRenameGroupSubmit = async () => {
@@ -522,8 +472,6 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     miniCalendarDays,
     activeTab,
     changeStatusTab,
-    ungroupedName,
-    setUngroupedName,
     editingGroupId,
     setEditingGroupId,
     editingGroupName,
