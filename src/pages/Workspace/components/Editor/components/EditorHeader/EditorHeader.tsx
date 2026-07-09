@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router';
 import {
   CheckCircleOutline as CheckCircleIcon,
   Mic as MicIcon,
@@ -31,6 +30,7 @@ import { useEditorHeader } from './useEditorHeader.hook';
 
 export const EditorHeader = (props: EditorHeaderProps) => {
   const {
+    onBack,
     showPalette,
     setShowPalette,
     loadMore,
@@ -64,20 +64,11 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     return code.toUpperCase();
   };
 
-  const navigate = useNavigate();
-  const backWorkspace = (): void => {
-    if (props.groupId && props.groupId !== undefined) {
-      const baseURL = `/dashboard?tab=Workspace&groupId=${props.groupId}`;
-      navigate(baseURL);
-      return;
-    }
-    navigate('/dashboard?tab=Workspace');
-  };
   return (
     <StyledEditorHeader>
       <HeaderLeft>
         <Button
-          onClick={backWorkspace}
+          onClick={onBack}
           startIcon={
             <ArrowBackIcon
               sx={{
