@@ -18,6 +18,7 @@ export const EditorContainer = styled(Box)(({ theme }) => ({
 export const MainEditorArea = styled(Box)(({ theme }) => ({
   flex: 1,
   minWidth: 0,
+  minHeight: 0,
   display: 'flex',
   flexDirection: 'column',
   borderRight: `1px solid ${theme.palette.divider}`,
@@ -445,71 +446,109 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
     },
   },
   // Table Styles
-  '& table': {
-    width: '100%',
-    borderCollapse: 'separate',
-    borderSpacing: 0,
-    margin: '24px 0',
-    backgroundColor: 'transparent',
-    borderRadius: '10px',
-    border:
-      theme.palette.mode === 'dark'
-        ? `1px solid rgb(255 255 255)`
-        : `1px solid ${theme.palette.divider}`,
+  // BlockNote wraps every table in a `.tableWrapper` div (prosemirror-tables).
+  // Rounding + clipping lives on that wrapper, not on the table itself, so
+  // cell borders never poke out past the rounded corners.
+  '& [data-content-type="table"]': {
+    margin: '20px 0',
   },
-  '& th': {
-    backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.8)' : '#f8fafc',
-    color: theme.palette.text.primary,
-    fontWeight: 700,
-    fontSize: '13px',
-    letterSpacing: '0.5px',
-    padding: '16px',
-    textAlign: 'left',
-    borderBottom: `2px solid ${theme.palette.divider}`,
-    borderRight: `1px solid ${theme.palette.divider}`,
-    textTransform: 'uppercase',
-    '&:last-child': {
-      borderRight: 'none',
-    },
-  },
-  '& td': {
-    padding: '16px',
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    borderRight: `1px solid ${theme.palette.divider}`,
-    color: theme.palette.text.secondary,
-    fontSize: '14px',
-    lineHeight: 1.6,
-    transition: 'all 0.2s ease',
-    '&:last-child': {
-      borderRight: 'none',
-    },
-  },
-  '& tr:last-child td': {
-    borderBottom: 'none',
-  },
-  '& tr': {
-    transition: 'background-color 0.2s ease',
-    '&:hover td': {
-      backgroundColor:
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.03)'
-          : 'rgba(0, 0, 0, 0.02)',
-      color: theme.palette.text.primary,
-    },
-  },
-  // Target the BlockNote specific wrapper if it exists to override its styles
-  '& .bn-table-wrapper': {
+  '& .tableWrapper': {
+    // Shrink-wrap to the table's own (dynamic) size instead of always
+    // stretching to fill the block width — a 2-column table stays compact,
+    // a 6-column table grows with it, and only once it outgrows the space
+    // actually available in the editor does the scrollbar below kick in.
+    //
+    // BlockNote's own CSS (`.bn-editor [data-content-type=table] .tableWrapper`)
+    // forces `width: 100%`, and its parent `.bn-block-content` is `display: flex`,
+    // so this wrapper is a flex item — `width` (its flex-basis), not `display`,
+    // is what decides its size. It also needs `min-width: 0` to be allowed to
+    // shrink smaller than the table's intrinsic content width so overflow can
+    // kick in instead of the row just stretching past the editor.
+    display: 'inline-block',
+    width: 'auto !important',
+    minWidth: '0 !important',
+    maxWidth: '100% !important',
+    flexGrow: '0 !important',
+    flexShrink: '1 !important',
+    verticalAlign: 'top',
     overflowX: 'auto',
     overflowY: 'hidden',
     borderRadius: '12px',
-    padding: '8px', // Padding around the table
-    marginBottom: '16px',
     border: `1px solid ${theme.palette.divider}`,
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? '0 2px 8px rgba(0, 0, 0, 0.25)'
+        : '0 1px 4px rgba(15, 23, 42, 0.06)',
+  },
+  '& .tableWrapper table': {
+    borderCollapse: 'collapse',
+    tableLayout: 'auto',
+    backgroundColor: theme.palette.background.paper,
+  },
+  '& .tableWrapper th': {
     backgroundColor:
       theme.palette.mode === 'dark'
-        ? 'rgba(0, 0, 0, 0.2)'
-        : 'rgba(0, 0, 0, 0.02)',
+        ? 'rgba(255, 255, 255, 0.04)'
+        : 'rgba(15, 23, 42, 0.03)',
+    color: theme.palette.text.primary,
+    fontWeight: 700,
+    fontSize: '12.5px',
+    letterSpacing: '0.04em',
+    padding: '12px 16px',
+    textAlign: 'left',
+    textTransform: 'uppercase',
+    minWidth: '80px',
+    border: `1px solid ${theme.palette.divider} !important`,
+    borderTop: 'none !important',
+    '&:first-of-type': {
+      borderLeft: 'none !important',
+    },
+    '&:last-child': {
+      borderRight: 'none !important',
+    },
+  },
+  '& .tableWrapper td': {
+    padding: '12px 16px',
+    color: theme.palette.text.secondary,
+    fontSize: '14px',
+    lineHeight: 1.6,
+    minWidth: '80px',
+    transition: 'background-color 0.15s ease, color 0.15s ease',
+    border: `1px solid ${theme.palette.divider} !important`,
+    '&:first-of-type': {
+      borderLeft: 'none !important',
+    },
+    '&:last-child': {
+      borderRight: 'none !important',
+    },
+  },
+  '& .tableWrapper tr:last-child td': {
+    borderBottom: 'none !important',
+  },
+  '& .tableWrapper tbody tr:nth-of-type(even) td': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.015)'
+        : 'rgba(15, 23, 42, 0.015)',
+  },
+  '& .tableWrapper tr:hover td': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(99, 102, 241, 0.1)'
+        : 'rgba(99, 102, 241, 0.06)',
+    color: theme.palette.text.primary,
+  },
+  // BlockNote/prosemirror-tables ship hardcoded selection & resize colors
+  // (#ddd borders, a pale rgba(200,200,255,.4) cell overlay, #adf handles)
+  // that read as a stark, un-themed highlight in dark mode — rein them in.
+  '& .ProseMirror .selectedCell::after': {
+    background: `${theme.palette.primary.main}26 !important`,
+  },
+  '& .ProseMirror .column-resize-handle': {
+    backgroundColor: `${theme.palette.primary.main} !important`,
+  },
+  '& .bn-table-drop-cursor': {
+    backgroundColor: `${theme.palette.primary.main} !important`,
   },
 }));
 // Search Input Styles

@@ -3,7 +3,7 @@ import type { LuminaActionPayload, ParsedLuminaAction } from './lumina.types';
 export const parseLuminaAction = (
   text: string,
 ): { cleanText: string; action: ParsedLuminaAction | null } => {
-  const regex = /\[ACTION:\s*([A-Z_]+)\s*(\{.*?\})\]/;
+  const regex = /\[ACTION:\s*([A-Z_]+)\s*(\{.*?\})\]/s;
   const match = text.match(regex);
   if (!match) {
     return { cleanText: text, action: null };
