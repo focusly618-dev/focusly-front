@@ -181,29 +181,39 @@ export const DesktopMonitorBase = styled(Box)(({ theme }) => ({
 // --- Dark analytics section elements ---
 export const AnalyticsDarkSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(12, 0),
-  backgroundColor: '#000000',
-  color: '#FFFFFF',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? '#000000'
+      : theme.palette.background.default,
+  color: theme.palette.text.primary,
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
-export const DarkReviewCard = styled(Paper)({
-  backgroundColor: '#0A0A0B',
-  border: '1px solid #27272A',
+export const DarkReviewCard = styled(Paper)(({ theme }) => ({
+  backgroundColor:
+    theme.palette.mode === 'dark' ? '#0A0A0B' : theme.palette.background.paper,
+  border:
+    theme.palette.mode === 'dark'
+      ? '1px solid #27272A'
+      : `1px solid ${theme.palette.divider}`,
   borderRadius: 14,
   padding: '24px 32px',
-  color: '#FFFFFF',
+  color: theme.palette.text.primary,
   boxShadow: 'none',
   height: '100%',
-});
+}));
 
-export const AnalyticsProgressBar = styled(Box)({
+export const AnalyticsProgressBar = styled(Box)(({ theme }) => ({
   height: 6,
   width: '100%',
   borderRadius: 3,
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.1)'
+      : 'rgba(0, 0, 0, 0.06)',
   position: 'relative',
   overflow: 'hidden',
-});
+}));
 
 export const AnalyticsProgressBarFill = styled(Box)<{ width: string }>(
   ({ width }) => ({

@@ -1471,7 +1471,7 @@ const LandingPage: React.FC = () => {
                       Pro
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      More for team leaders.
+                      For power users and professionals.
                     </Typography>
                   </Stack>
                   <Typography
@@ -1513,7 +1513,7 @@ const LandingPage: React.FC = () => {
                       'Unlimited Workspaces',
                       'AI Assistant (500 runs)',
                       'Advanced Analytics',
-                      'Team Sync',
+                      'Google Calendar Integration',
                     ].map((feat, idx) => (
                       <Stack
                         direction="row"
@@ -1541,7 +1541,7 @@ const LandingPage: React.FC = () => {
                       Enterprise
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      For custom deployments.
+                      For ultimate productivity.
                     </Typography>
                   </Stack>
                   <Typography
@@ -1552,7 +1552,17 @@ const LandingPage: React.FC = () => {
                       textAlign: 'left',
                     }}
                   >
-                    Custom
+                    $20
+                    <span
+                      style={{
+                        fontSize: '0.875rem',
+                        color: '#A1A1AA',
+                        fontWeight: 400,
+                      }}
+                    >
+                      {' '}
+                      / mo
+                    </span>
                   </Typography>
                   <Button
                     variant="outlined"
@@ -1566,14 +1576,16 @@ const LandingPage: React.FC = () => {
                       fontWeight: 600,
                     }}
                   >
-                    Contact Sales
+                    Go Enterprise
                   </Button>
                   <Stack spacing={2} pt={1.5}>
                     {[
-                      'Dedicated Support',
-                      'Custom AI Training',
-                      'SLA & SSO',
-                      'Team Roles',
+                      'Unlimited Lumina AI Runs',
+                      'Priority AI Queue Processing',
+                      'Advanced Insights & Audits',
+                      'Export Workspaces (PDF/Markdown)',
+                      'Priority Support & Beta Access',
+                      'SLA & Security Protocols',
                     ].map((feat, idx) => (
                       <Stack
                         direction="row"

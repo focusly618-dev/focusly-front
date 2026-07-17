@@ -508,7 +508,7 @@ export default function AnimatedHeroEditor() {
                         </div>
                         <div className="flex items-center gap-2 justify-between opacity-50">
                           <span className="text-[10px] text-[#FAFAFA] truncate">
-                            Sync with Team
+                            Client Sync
                           </span>
                           <span className="text-[9px] font-mono font-semibold">
                             18:00
