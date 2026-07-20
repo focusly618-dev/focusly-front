@@ -74,6 +74,8 @@ export const useCalendarView = () => {
 
   const [scrollToTime, setScrollToTime] = useState<Date | undefined>(undefined);
   const [flashingDate, setFlashingDate] = useState<Date | null>(null);
+  const [draftEvents, setDraftEvents] = useState<ICalendarEvent[]>([]);
+  const [isCalendarInDraftMode, setIsCalendarInDraftMode] = useState(false);
 
   // Trigger temporary column highlight (flash) when the selected date (d URL param) changes
   useEffect(() => {
@@ -318,7 +320,11 @@ export const useCalendarView = () => {
       }
     });
 
-    const allEvents = Array.from(mergedEventsMap.values());
+    const draftEventsMapped = isCalendarInDraftMode ? draftEvents : [];
+    const allEvents = [
+      ...Array.from(mergedEventsMap.values()),
+      ...draftEventsMapped,
+    ];
     const sortedEvents = allEvents.sort((a, b) => {
       const aStart = a.start?.getTime() || 0;
       const bStart = b.start?.getTime() || 0;
@@ -356,7 +362,7 @@ export const useCalendarView = () => {
     });
 
     return result;
-  }, [reduxEvents, tasks]);
+  }, [reduxEvents, tasks, isCalendarInDraftMode, draftEvents]);
 
   const handleOnChangeView = (selectedView: View) => {
     updateUrlParams(selectedView, currentDate);
@@ -560,6 +566,72 @@ export const useCalendarView = () => {
   };
 
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
+  const [confirmingDraft, setConfirmingDraft] = useState(false);
+
+  const confirmDraftEvents = async () => {
+    if (!user?.id || draftEvents.length === 0) return;
+    setConfirmingDraft(true);
+    try {
+      const { createTimeBlock } =
+        await import('@/api/TimeBlocks/timeBlocksApi');
+      for (const item of draftEvents) {
+        // 1. Create TimeBlock in DB
+        await createTimeBlock({
+          userId: user.id,
+          taskId:
+            item.resource && 'id' in item.resource
+              ? item.resource.id
+              : undefined,
+          startTime: item.start.toISOString(),
+          endTime: item.end.toISOString(),
+          blockType: 'Focus_Block',
+          source: 'App',
+          title: item.title,
+        });
+
+        // 2. Reschedule corresponding task
+        if (item.resource && 'id' in item.resource) {
+          await updateTaskMutation({
+            variables: {
+              updateTaskInput: {
+                id: item.resource.id,
+                estimated_start_date: item.start.toISOString(),
+                estimated_end_date: item.end.toISOString(),
+              },
+            },
+          });
+        }
+      }
+
+      sileo.success({
+        title: 'Calendario Organizado',
+        description: 'Tus sugerencias han sido agendadas con éxito.',
+        duration: 4000,
+      });
+
+      setDraftEvents([]);
+      setIsCalendarInDraftMode(false);
+      refetchTasks();
+    } catch (e) {
+      console.error('Error confirming draft events:', e);
+      sileo.error({
+        title: 'Error',
+        description: 'No se pudieron guardar todas las sugerencias.',
+        duration: 4000,
+      });
+    } finally {
+      setConfirmingDraft(false);
+    }
+  };
+
+  const clearDraftEvents = () => {
+    setDraftEvents([]);
+    setIsCalendarInDraftMode(false);
+  };
+
+  const handleDeleteDraft = (id: string) => {
+    setDraftEvents((prev) => prev.filter((e) => e.id !== id));
+  };
 
   interface CalendarDragEvent {
     event: ICalendarEvent;
@@ -568,6 +640,18 @@ export const useCalendarView = () => {
   }
 
   const handleEventDrop = async ({ event, start, end }: CalendarDragEvent) => {
+    const startDate = typeof start === 'string' ? new Date(start) : start;
+    const endDate = typeof end === 'string' ? new Date(end) : end;
+
+    if (event.isDraft) {
+      setDraftEvents((prev) =>
+        prev.map((e) =>
+          e.id === event.id ? { ...e, start: startDate, end: endDate } : e,
+        ),
+      );
+      return;
+    }
+
     if (event.type !== 'task') return;
 
     const originalTask = tasks.find((t) => t.id === event.id);
@@ -583,9 +667,6 @@ export const useCalendarView = () => {
         return;
       }
     }
-
-    const startDate = typeof start === 'string' ? new Date(start) : start;
-    const endDate = typeof end === 'string' ? new Date(end) : end;
 
     // 1. Optimistic Update in Redux
     if (originalTask) {
@@ -641,6 +722,18 @@ export const useCalendarView = () => {
     start,
     end,
   }: CalendarDragEvent) => {
+    const startDate = typeof start === 'string' ? new Date(start) : start;
+    const endDate = typeof end === 'string' ? new Date(end) : end;
+
+    if (event.isDraft) {
+      setDraftEvents((prev) =>
+        prev.map((e) =>
+          e.id === event.id ? { ...e, start: startDate, end: endDate } : e,
+        ),
+      );
+      return;
+    }
+
     if (event.type !== 'task') return;
 
     const originalTask = tasks.find((t) => t.id === event.id);
@@ -656,9 +749,6 @@ export const useCalendarView = () => {
         return;
       }
     }
-
-    const startDate = typeof start === 'string' ? new Date(start) : start;
-    const endDate = typeof end === 'string' ? new Date(end) : end;
 
     // 1. Optimistic Update in Redux
     if (originalTask) {
@@ -741,5 +831,13 @@ export const useCalendarView = () => {
     scrollToTime,
     dayPropGetter,
     handleAddTaskClick,
+    draftEvents,
+    setDraftEvents,
+    isCalendarInDraftMode,
+    setIsCalendarInDraftMode,
+    handleDeleteDraft,
+    confirmDraftEvents,
+    clearDraftEvents,
+    confirmingDraft,
   };
 };

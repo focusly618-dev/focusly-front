@@ -84,7 +84,7 @@ export const CalendarContainer = styled(Box, {
       backgroundColor: 'transparent !important',
     },
     '& .rbc-day-slot .rbc-events-container': {
-      marginRight: "0px"
+      marginRight: '0px',
     },
     '& .rbc-time-column': {
       backgroundColor: `${bgDefault} !important`,
@@ -370,6 +370,36 @@ export const CalendarContainer = styled(Box, {
     },
     '& .rbc-time-view .rbc-event[style*="height"]': {
       minHeight: '20px !important',
+    },
+  };
+});
+
+export const DraftActionBar = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    position: 'absolute',
+    top: '20px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 1100,
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(3),
+    padding: theme.spacing(1.5, 3),
+    borderRadius: '9999px',
+    backgroundColor: isDark
+      ? 'rgba(30, 41, 59, 0.75)'
+      : 'rgba(255, 255, 255, 0.85)',
+    border: '1px solid',
+    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
+    backdropFilter: 'blur(16px)',
+    boxShadow: isDark
+      ? '0 10px 30px -10px rgba(0,0,0,0.5), 0 1px 3px rgba(255,255,255,0.05)'
+      : '0 10px 30px -10px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.02)',
+    animation: 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    '@keyframes slideDown': {
+      '0%': { transform: 'translate(-50%, -20px)', opacity: 0 },
+      '100%': { transform: 'translate(-50%, 0)', opacity: 1 },
     },
   };
 });

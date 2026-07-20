@@ -6,12 +6,14 @@ import {
   Divider,
   Stack,
   alpha,
+  IconButton,
 } from '@mui/material';
 import {
   ContentCopy as DuplicateIcon,
   DeleteOutline as DeleteIcon,
   Schedule as ScheduleIcon,
   AutoAwesome as AutoAwesomeIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 
 import type { CalendarEventProps } from './CalendarEvent.types';
@@ -27,7 +29,7 @@ import {
 } from './CalendarEvent.styles';
 
 export const CalendarEvent = (props: CalendarEventProps) => {
-  const { event, onStartFocus } = props;
+  const { event, onStartFocus, onDeleteDraft } = props;
   const variant = getEventColor(event as { id?: string });
   const formatTime = (date: Date) => {
     return getMinutes(date) === 0
@@ -52,13 +54,50 @@ export const CalendarEvent = (props: CalendarEventProps) => {
   } = useCalendarContextMenu(event, onStartFocus);
 
   const isAiTask = event.type === 'task' && (event.resource as Task)?.use_ai;
+  const isDraft = event.isDraft;
 
   const renderClassic = () => (
     <EventContainer
       variant={variant}
       isMeeting={isMeeting}
-      onContextMenu={handleContextMenu}
+      isDraft={isDraft}
+      onContextMenu={
+        isDraft
+          ? (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          : handleContextMenu
+      }
+      sx={{
+        position: 'relative',
+        pr: isDraft ? '24px' : '6px',
+      }}
     >
+      {isDraft && onDeleteDraft && (
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeleteDraft(event.id);
+          }}
+          sx={{
+            position: 'absolute',
+            top: 2,
+            right: 2,
+            padding: '2px',
+            color: 'text.secondary',
+            zIndex: 10,
+            '&:hover': {
+              color: 'error.main',
+              bgcolor: 'rgba(239, 68, 68, 0.08)',
+            },
+          }}
+        >
+          <CloseIcon sx={{ fontSize: 12 }} />
+        </IconButton>
+      )}
+
       {isShortEvent ? (
         /* ── Short event (< 40 min): time + title in one row ── */
         <Box
@@ -83,7 +122,23 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           >
             {startTime}
           </Box>
-          {isAiTask && (
+          {isDraft ? (
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '8px',
+                fontWeight: 700,
+                color: 'primary.main',
+                bgcolor: 'rgba(124, 58, 237, 0.1)',
+                px: 0.5,
+                py: 0.1,
+                borderRadius: '3px',
+                flexShrink: 0,
+              }}
+            >
+              ✨ IA
+            </Typography>
+          ) : isAiTask ? (
             <AutoAwesomeIcon
               sx={{
                 fontSize: 10,
@@ -91,7 +146,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                 flexShrink: 0,
               }}
             />
-          )}
+          ) : null}
           <Box
             sx={{
               fontSize: '11px',
@@ -121,7 +176,23 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               overflow: 'hidden',
             }}
           >
-            {isAiTask && (
+            {isDraft ? (
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: '8px',
+                  fontWeight: 700,
+                  color: 'primary.main',
+                  bgcolor: 'rgba(124, 58, 237, 0.1)',
+                  px: 0.5,
+                  py: 0.1,
+                  borderRadius: '3px',
+                  flexShrink: 0,
+                }}
+              >
+                ✨ Sugerencia
+              </Typography>
+            ) : isAiTask ? (
               <AutoAwesomeIcon
                 sx={{
                   fontSize: 12,
@@ -129,7 +200,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                   flexShrink: 0,
                 }}
               />
-            )}
+            ) : null}
             <Box
               sx={{
                 overflow: 'hidden',
