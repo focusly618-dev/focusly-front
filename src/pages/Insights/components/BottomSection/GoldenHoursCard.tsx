@@ -20,6 +20,7 @@ import {
   WarningAmber as WarningAmberIcon,
   CheckCircleOutline as CheckCircleOutlineIcon,
   LightbulbOutlined as LightbulbIcon,
+  Share as ShareIcon,
 } from '@mui/icons-material';
 import { useMutation } from '@apollo/client';
 import { ChartCard } from '../../Insights.styles';
@@ -131,6 +132,30 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [appliedTasks, setAppliedTasks] = useState<Set<string>>(new Set());
+
+  const handleShareProfile = () => {
+    if (!analysisData) return;
+    const textToCopy = `¡Lumina de Focusly me ha calificado como ${analysisData.workStyle}! ⚡ Mi constancia de concentración es del ${Math.round(analysisData.goldenHoursConfidence * 100)}%. ¿Cuál es tu estilo de productividad? Descúbrelo en focusly.app #Focusly #Productividad #AI`;
+
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        sileo.success({
+          title: '¡Copiado con éxito! 🚀',
+          description:
+            'El texto de tu perfil ha sido copiado al portapapeles. ¡Compártelo en tus redes!',
+          duration: 4500,
+        });
+      })
+      .catch((err) => {
+        console.error('Failed to copy text: ', err);
+        sileo.error({
+          title: 'Error al copiar',
+          description: 'No se pudo copiar el texto al portapapeles.',
+          duration: 4000,
+        });
+      });
+  };
 
   const [updateTaskMutation, { loading: isMutating }] =
     useMutation(UPDATE_TASK);
@@ -396,13 +421,30 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
                   >
                     ESTILO DE TRABAJO
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    fontWeight="bold"
-                    color="primary.main"
-                  >
-                    ⚡ {analysisData.workStyle}
-                  </Typography>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Typography
+                      variant="body2"
+                      fontWeight="bold"
+                      color="primary.main"
+                    >
+                      ⚡ {analysisData.workStyle}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={handleShareProfile}
+                      title="Compartir Perfil"
+                      sx={{
+                        color: 'text.secondary',
+                        p: 0.5,
+                        '&:hover': {
+                          color: 'primary.main',
+                          bgcolor: 'rgba(59, 130, 246, 0.08)',
+                        },
+                      }}
+                    >
+                      <ShareIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </Box>
                 </Box>
 
                 <Button
