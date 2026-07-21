@@ -1,17 +1,12 @@
-import { useState } from 'react';
 import {
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Box,
-  Collapse,
-  IconButton,
-  Tooltip,
   Avatar,
   Typography,
 } from '@mui/material';
-import { ExpandMore, ExpandLess, Add as AddIcon } from '@mui/icons-material';
 import { NavItem } from '../Sidebar.styles';
 import { TaskBar } from '../types/Sidebar.types';
 import {
@@ -22,7 +17,6 @@ import {
   ProjectIcon,
 } from '@/components/ui';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
-import { ProjectGroupsSection } from './ProjectGroupsSection';
 
 interface SidebarNavigationProps {
   sidebar: UseSidebarReturn;
@@ -30,27 +24,12 @@ interface SidebarNavigationProps {
 
 export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
   const { activeTab, changeStatusTab, theme, isCollapsed } = sidebar;
-  const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
-
-  const expandAll = () => {
-    // Expand all groups (projects)
-    const newExpandedGroups: Record<string, boolean> = {};
-    const groups = sidebar.projectGroups || [];
-    groups.forEach((g) => {
-      newExpandedGroups[g.id] = true;
-    });
-    sidebar.setExpandedGroups(newExpandedGroups);
-  };
-
   const handleProjectsTabClick = () => {
     // Reset search params to show all workspaces in the main component
     const newParams = new URLSearchParams();
     newParams.set('tab', TaskBar.Workspace);
     sidebar.setSearchParams(newParams);
-
     changeStatusTab(TaskBar.Workspace, newParams);
-    setIsProjectsExpanded(true);
-    expandAll();
   };
 
   return (
@@ -211,9 +190,6 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           id="joyride-workspace"
           active={activeTab === TaskBar.Workspace}
           onClick={handleProjectsTabClick}
-          sx={{
-            '&:hover .tab-hover-actions': { opacity: 1 },
-          }}
         >
           <ListItemIcon>
             <ProjectIcon />
@@ -225,121 +201,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
-
-          <Box
-            className="tab-hover-actions"
-            sx={{
-              display: isCollapsed ? 'none' : { xs: 'none', lg: 'flex' },
-              alignItems: 'center',
-              gap: 0.5,
-              opacity: 0,
-              transition: 'opacity 0.15s ease-in-out',
-              ml: 'auto',
-            }}
-          >
-            {activeTab === TaskBar.Workspace && (
-              <Tooltip title="New Project" arrow>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    sidebar.setIsCreatingGroupInline((prev) => !prev);
-                  }}
-                  sx={{
-                    p: 0.2,
-                    color: 'text.secondary',
-                    '&:hover': { color: 'primary.main' },
-                  }}
-                >
-                  <AddIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-
-          <Box
-            sx={{
-              display: isCollapsed ? 'none' : { xs: 'none', lg: 'inline-flex' },
-            }}
-          >
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (activeTab !== TaskBar.Workspace) {
-                  handleProjectsTabClick();
-                } else {
-                  setIsProjectsExpanded((prev) => !prev);
-                }
-              }}
-              sx={{
-                p: 0.2,
-                color: 'text.secondary',
-                ml: activeTab === TaskBar.Workspace ? 0.5 : 'auto',
-              }}
-            >
-              {isProjectsExpanded && activeTab === TaskBar.Workspace ? (
-                <ExpandLess sx={{ fontSize: 16 }} />
-              ) : (
-                <ExpandMore sx={{ fontSize: 16 }} />
-              )}
-            </IconButton>
-          </Box>
         </NavItem>
-
-        <Box
-          sx={{
-            display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
-            width: '100%',
-          }}
-        >
-          <Collapse in={isProjectsExpanded && activeTab === TaskBar.Workspace}>
-            <Box
-              sx={{
-                mt: 1,
-                mb: 1,
-                mx: 0.5,
-                p: 1.5,
-                borderRadius: '12px',
-                maxHeight: '260px',
-                overflowY: 'auto',
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(0, 0, 0, 0.25)'
-                    : 'rgba(0, 0, 0, 0.03)',
-                border: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? '1px solid rgba(255, 255, 255, 0.03)'
-                    : '1px solid rgba(0, 0, 0, 0.04)',
-                boxShadow: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'inset 0 1px 2px rgba(0, 0, 0, 0.2)'
-                    : 'inset 0 1px 2px rgba(0, 0, 0, 0.02)',
-                '&::-webkit-scrollbar': {
-                  width: '4px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: 'transparent',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.12)'
-                      : 'rgba(0, 0, 0, 0.08)',
-                  borderRadius: '2px',
-                },
-                '&::-webkit-scrollbar-thumb:hover': {
-                  background: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 0.15)',
-                },
-              }}
-            >
-              <ProjectGroupsSection sidebar={sidebar} hideHeader />
-            </Box>
-          </Collapse>
-        </Box>
       </ListItem>
 
       {/* Profile Tab - Mobile Only */}

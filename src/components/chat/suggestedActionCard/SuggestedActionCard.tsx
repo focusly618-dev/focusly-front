@@ -107,7 +107,7 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
                     size="small"
                     onClick={() =>
                       setSearchParams({
-                        tab: 'Workspace',
+                        tab: 'Projects',
                         workspaceId: createdId,
                       })
                     }

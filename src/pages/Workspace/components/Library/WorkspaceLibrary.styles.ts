@@ -1,4 +1,12 @@
-import { styled, Box, Typography, Card, alpha, lighten } from '@mui/material';
+import {
+  styled,
+  Box,
+  Typography,
+  Card,
+  alpha,
+  lighten,
+  TextField,
+} from '@mui/material';
 
 export const LibraryContainer = styled(Box)(({ theme }) => ({
   flex: 1,
@@ -18,23 +26,14 @@ export const LibraryHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   marginBottom: theme.spacing(3),
-  marginTop: theme.spacing(1),
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: '16px',
-  },
+  flexWrap: 'wrap',
+  gap: theme.spacing(2),
 }));
 
 export const HeaderTitle = styled(Typography)(({ theme }) => ({
-  fontSize: '28px',
   fontWeight: 800,
+  fontSize: '24px',
   color: theme.palette.text.primary,
-  marginBottom: theme.spacing(0.5),
-  letterSpacing: '-0.5px',
-  [theme.breakpoints.down('sm')]: {
-    fontSize: '22px',
-  },
 }));
 
 export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
@@ -42,42 +41,51 @@ export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export const SearchBar = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.05)'
-      : 'rgba(0, 0, 0, 0.03)',
-  borderRadius: '8px',
-  padding: '6px 14px',
-  width: '380px',
-  border: `1px solid ${theme.palette.divider}`,
-  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+export const StyledTextField = styled(TextField)(({ theme }) => ({
+  flex: 1,
+  maxWidth: '380px',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A1F2B' : '#ffffff',
+  borderRadius: '30px',
   [theme.breakpoints.down('sm')]: {
-    width: '100%',
+    maxWidth: 'none',
   },
-  '&:focus-within': {
-    borderColor: theme.palette.primary.main,
-    backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#fff',
-    boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.15)}`,
-  },
-  '& input': {
-    border: 'none',
-    backgroundColor: 'transparent',
+  transition: 'all 0.2s ease-in-out',
+  '& .MuiOutlinedInput-root': {
     color: theme.palette.text.primary,
-    outline: 'none',
-    fontSize: '14px',
-    fontWeight: 500,
-    width: '100%',
-    marginLeft: theme.spacing(1),
-    '&::placeholder': {
-      color: theme.palette.text.secondary,
-      opacity: 0.6,
+    borderRadius: '30px',
+    height: '34px',
+    fontSize: '13px',
+    '& fieldset': {
+      borderColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.05)'
+          : 'rgba(0, 0, 0, 0.05)',
+      borderRadius: '30px',
+    },
+    '&:hover fieldset': {
+      borderColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.15)'
+          : 'rgba(0, 0, 0, 0.1)',
+    },
+    '&.Mui-focused': {
+      boxShadow:
+        theme.palette.mode === 'dark'
+          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
+          : '0 0 0 3px rgba(59, 130, 246, 0.08)',
+      '& fieldset': {
+        borderColor: theme.palette.mode === 'dark' ? '#6366f1' : '#2563eb',
+        borderWidth: '1px',
+      },
     },
   },
+  '& .MuiOutlinedInput-input': {
+    padding: '0 10px',
+    fontSize: '13px',
+  },
 }));
+
+export const SearchBar = StyledTextField;
 
 export const ActionCapsule = styled(Box)(({ theme }) => ({
   display: 'flex',

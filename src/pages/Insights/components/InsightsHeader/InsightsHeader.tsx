@@ -1,24 +1,13 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  IconButton,
-  Button,
-  InputBase,
-  Avatar,
-  Divider,
-} from '@mui/material';
+import { Box, Typography, IconButton, Button } from '@mui/material';
 import {
   FileDownloadOutlined,
   Add,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  Search as SearchIcon,
-  NotificationsNoneOutlined as BellIcon,
 } from '@mui/icons-material';
 import { HeaderContainer, ActionButton } from '../../Insights.styles';
 import type { InsightsHeaderProps } from './InsightsHeader.types';
-import { useAppSelector } from '@/redux/hooks';
 
 export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
   filter,
@@ -29,40 +18,44 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
   onReset,
   periodLabel,
 }) => {
-  const { user } = useAppSelector((state) => state.auth);
-
   return (
     <HeaderContainer>
-      {/* Search and Top Action Row */}
+      {/* Title and Actions Row */}
       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
         sx={{ mb: 4, width: '100%' }}
       >
-        {/* Search Bar */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.05)'
-                : '#f1f5f9',
-            borderRadius: '30px',
-            px: 2,
-            py: 0.5,
-            width: '260px',
-          }}
-        >
-          <SearchIcon sx={{ color: 'text.secondary', mr: 1, fontSize: 20 }} />
-          <InputBase
-            placeholder="Search insights..."
-            sx={{ fontSize: '14px', width: '100%' }}
-          />
+        {/* Title Header */}
+        <Box>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: 'text.primary',
+              letterSpacing: '-0.02em',
+              fontSize: '28px',
+            }}
+          >
+            {filter === 'Daily'
+              ? 'Daily'
+              : filter === 'Weekly'
+                ? 'Weekly'
+                : filter === 'Monthly'
+                  ? 'Monthly'
+                  : 'Yearly'}{' '}
+            Insights
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: 'text.secondary', mt: 0.5, fontSize: '13px' }}
+          >
+            Productivity Summary & Analytics
+          </Typography>
         </Box>
 
-        {/* Actions, Bell & Profile */}
+        {/* Actions (Export & Create Report) */}
         <Box display="flex" alignItems="center" gap={2}>
           <ActionButton>
             <FileDownloadOutlined fontSize="small" />
@@ -80,53 +73,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             <Add fontSize="small" />
             Create Report
           </ActionButton>
-          <Divider orientation="vertical" flexItem sx={{ mx: 0.5, my: 1 }} />
-          <IconButton size="small" sx={{ color: 'text.secondary' }}>
-            <BellIcon sx={{ fontSize: 22 }} />
-          </IconButton>
-          <Avatar
-            src={user?.picture || undefined}
-            sx={{
-              width: 32,
-              height: 32,
-              border: '1.5px solid',
-              borderColor: 'divider',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '12px',
-            }}
-          >
-            {user?.name ? user.name[0].toUpperCase() : 'U'}
-          </Avatar>
         </Box>
-      </Box>
-
-      {/* Title Header */}
-      <Box sx={{ mb: 3 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 800,
-            color: 'text.primary',
-            letterSpacing: '-0.02em',
-            fontSize: '28px',
-          }}
-        >
-          {filter === 'Daily'
-            ? 'Daily'
-            : filter === 'Weekly'
-              ? 'Weekly'
-              : filter === 'Monthly'
-                ? 'Monthly'
-                : 'Yearly'}{' '}
-          Insights
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{ color: 'text.secondary', mt: 0.5, fontSize: '13px' }}
-        >
-          Productivity Summary & Analytics
-        </Typography>
       </Box>
 
       {/* Filter Tabs Pill Group */}

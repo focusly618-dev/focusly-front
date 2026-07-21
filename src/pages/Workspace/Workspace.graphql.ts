@@ -102,6 +102,7 @@ export const GET_PROJECT_GROUPS = gql`
       workspaces {
         id
       }
+      updatedAt
     }
   }
 `;

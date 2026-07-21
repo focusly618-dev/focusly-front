@@ -16,7 +16,7 @@ import {
   Apps as AppsIcon,
   Check as CheckIcon,
 } from '@mui/icons-material';
-import { SearchBar } from '../WorkspaceLibrary.styles';
+import { StyledTextField } from '../WorkspaceLibrary.styles';
 
 interface LibrarySearchHeaderProps {
   searchTerm: string;
@@ -71,59 +71,57 @@ export const LibrarySearchHeader = ({
         width: { xs: '100%', sm: 'auto' },
       }}
     >
-      <SearchBar
+      <StyledTextField
         id="joyride-workspace-search"
+        placeholder="Search workspaces..."
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
+        size="small"
         sx={{
-          height: '38px',
-          py: 0,
+          width: '380px',
           flex: { xs: 1, sm: 'none' },
         }}
-      >
-        <SearchIcon sx={{ color: 'text.secondary', fontSize: 18 }} />
-        <input
-          placeholder="Search workspaces..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-        {!searchTerm && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              px: 0.8,
-              py: 0.2,
-              bgcolor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.06)'
-                  : 'rgba(0,0,0,0.05)',
-              border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-              borderRadius: '4px',
-              color: 'text.secondary',
-              fontSize: '10px',
-              fontWeight: 700,
-              fontFamily: 'monospace',
-              letterSpacing: '0.5px',
-              opacity: 0.8,
-              userSelect: 'none',
-              ml: 1,
-            }}
-          >
-            ⌘F
-          </Box>
-        )}
-        <IconButton
-          size="small"
-          sx={{
-            color: 'text.secondary',
-            p: 0.5,
-            visibility: searchTerm ? 'visible' : 'hidden',
-          }}
-          onClick={onClearSearch}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </SearchBar>
+        InputProps={{
+          startAdornment: (
+            <SearchIcon sx={{ color: 'text.secondary', mr: 1, fontSize: 18 }} />
+          ),
+          endAdornment: searchTerm ? (
+            <IconButton
+              size="small"
+              sx={{ color: 'text.secondary', p: 0.5 }}
+              onClick={onClearSearch}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          ) : (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                px: 0.8,
+                py: 0.2,
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(0,0,0,0.05)',
+                border: (theme) =>
+                  `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                borderRadius: '4px',
+                color: 'text.secondary',
+                fontSize: '10px',
+                fontWeight: 700,
+                fontFamily: 'monospace',
+                letterSpacing: '0.5px',
+                opacity: 0.8,
+                userSelect: 'none',
+              }}
+            >
+              ⌘F
+            </Box>
+          ),
+        }}
+      />
 
       <IconButton
         size="small"

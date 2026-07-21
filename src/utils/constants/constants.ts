@@ -13,4 +13,10 @@ export const DEFAULT_WORKSPACE_DATA = {
   title: 'Untitled Strategic Plan',
   content: '[]',
   saveStatus: true,
+  groupId: undefined as string | undefined,
+  taskId: null as string | null,
+  projectId: undefined as string | undefined,
+  emoji: undefined as string | undefined,
+  background_color: undefined as string | undefined,
+  card_show_background: false,
 };
