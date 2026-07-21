@@ -40,6 +40,7 @@ export const TaskDetailModal = ({
   onClose,
   onSave,
   initialStart,
+  initialEnd,
   initialTask,
   handleDelete: onDelete,
   isAIScheduleEnabled,
@@ -100,6 +101,7 @@ export const TaskDetailModal = ({
     onSave,
     onClose,
     initialStart,
+    initialEnd,
     initialTask,
     onDelete,
     isAIScheduleEnabled,
@@ -299,7 +301,7 @@ export const TaskDetailModal = ({
               </Box>
 
               <TaskProperties
-                isOwner={initialTask ? initialTask.is_owner : true}
+                isOwner={!isReadOnly}
                 status={status}
                 setStatus={setStatus}
                 priority={priority}

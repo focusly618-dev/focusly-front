@@ -1,6 +1,5 @@
 import { Box, Button } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
-import { alpha } from '@mui/material';
 
 export const FloatingActionBar = muiStyled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -39,11 +38,12 @@ export const FloatingActionBar = muiStyled(Box)(({ theme }) => ({
 export const StatusTabsContainer = muiStyled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
-  padding: '10px 24px',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(26, 31, 43, 0.4)' : '#ffffff',
+  gap: '16px',
+  padding: '8px 0px',
+  borderBottom: `1px solid ${
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0'
+  }`,
+  backgroundColor: 'transparent',
   overflowX: 'auto',
   whiteSpace: 'nowrap',
   msOverflowStyle: 'none',
@@ -51,11 +51,11 @@ export const StatusTabsContainer = muiStyled(Box)(({ theme }) => ({
   '&::-webkit-scrollbar': {
     display: 'none',
   },
-  position: 'sticky',
-  left: 0,
+  position: 'relative',
   width: '100%',
   boxSizing: 'border-box',
   zIndex: 4,
+  marginBottom: '16px',
 }));
 
 export interface StatusTabProps {
@@ -65,64 +65,60 @@ export interface StatusTabProps {
 
 export const StatusTabButton = muiStyled(Button, {
   shouldForwardProp: (prop) => prop !== 'active' && prop !== 'tabColor',
-})<StatusTabProps>(({ theme, active, tabColor }) => ({
+})<StatusTabProps>(({ theme, active }) => ({
   textTransform: 'none',
-  fontSize: '12px',
+  fontSize: '13px',
   fontWeight: active ? 700 : 500,
-  padding: '4px 14px',
-  borderRadius: '20px',
+  padding: '8px 12px 10px 12px',
+  borderRadius: 0,
   minWidth: 'auto',
   whiteSpace: 'nowrap',
   color: active
     ? theme.palette.mode === 'dark'
-      ? '#ffffff'
-      : tabColor
+      ? '#818cf8'
+      : '#4f46e5'
     : theme.palette.text.secondary,
-  backgroundColor: active
-    ? theme.palette.mode === 'dark'
-      ? tabColor
-      : `${tabColor}15`
-    : 'transparent',
-  border: `1px solid ${active ? tabColor : 'transparent'}`,
-  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  backgroundColor: 'transparent',
+  border: 'none',
+  borderBottom: active
+    ? `2px solid ${theme.palette.mode === 'dark' ? '#818cf8' : '#4f46e5'}`
+    : '2px solid transparent',
+  transition: 'all 0.2s ease',
   '&:hover': {
-    backgroundColor: active
-      ? theme.palette.mode === 'dark'
-        ? tabColor
-        : `${tabColor}25`
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
-        : 'rgba(0, 0, 0, 0.03)',
-    borderColor: active
-      ? tabColor
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.15)'
-        : 'rgba(0, 0, 0, 0.08)',
+    backgroundColor: 'transparent',
+    color: theme.palette.mode === 'dark' ? '#a5b4fc' : '#6366f1',
+    borderBottom: active
+      ? `2px solid ${theme.palette.mode === 'dark' ? '#818cf8' : '#4f46e5'}`
+      : `2px solid ${
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.1)'
+            : 'rgba(0, 0, 0, 0.05)'
+        }`,
   },
 }));
 
 export const TabCountBadge = muiStyled(Box, {
   shouldForwardProp: (prop) => prop !== 'active' && prop !== 'tabColor',
-})<{ active: boolean; tabColor: string }>(({ theme, active, tabColor }) => ({
+})<{ active: boolean; tabColor: string }>(({ theme, active }) => ({
   marginLeft: '6px',
   fontSize: '10px',
   fontWeight: 700,
   padding: '1px 6px',
-  borderRadius: '8px',
+  borderRadius: '6px',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: active
     ? theme.palette.mode === 'dark'
-      ? 'rgba(0, 0, 0, 0.25)'
-      : 'rgba(255, 255, 255, 0.45)'
+      ? 'rgba(129, 140, 248, 0.15)'
+      : '#e0e7ff'
     : theme.palette.mode === 'dark'
-      ? alpha(tabColor, 0.15)
-      : alpha(tabColor, 0.1),
+      ? 'rgba(255, 255, 255, 0.06)'
+      : '#f1f5f9',
   color: active
     ? theme.palette.mode === 'dark'
-      ? '#ffffff'
-      : tabColor
-    : tabColor,
+      ? '#a5b4fc'
+      : '#4f46e5'
+    : theme.palette.text.secondary,
   transition: 'all 0.2s ease',
 }));

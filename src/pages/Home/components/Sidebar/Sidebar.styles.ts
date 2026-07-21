@@ -5,8 +5,7 @@ export const SidebarContainer = styled(Box, {
 })<{ collapsed?: boolean }>(({ theme, collapsed }) => ({
   width: collapsed ? 80 : 260,
   transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.6)' : '#F5F5F4',
+  backgroundColor: theme.palette.mode === 'dark' ? '#111827' : '#f1f5f9',
   backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
   borderRight:
     theme.palette.mode === 'dark'
@@ -92,28 +91,16 @@ export const NavItem = styled(ListItemButton, {
 })<{ active?: boolean }>(({ theme, active }) => ({
   borderRadius: 8,
   marginBottom: 4,
-  backgroundColor: active
-    ? theme.palette.mode === 'dark'
-      ? 'rgba(99, 102, 241, 0.15)'
-      : 'rgba(0, 0, 0, 0.05)'
-    : 'transparent',
-  color: active
-    ? theme.palette.mode === 'dark'
-      ? '#818cf8'
-      : '#1C1C1A'
-    : theme.palette.text.secondary,
-  borderLeft:
-    active && theme.palette.mode === 'dark'
-      ? '3px solid #6366f1'
-      : '3px solid transparent',
-  paddingLeft: active && theme.palette.mode === 'dark' ? 13 : 16,
+  backgroundColor: active ? theme.palette.primary.main : 'transparent',
+  color: active ? '#ffffff' : theme.palette.text.secondary,
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(99, 102, 241, 0.08)'
+    backgroundColor: active
+      ? theme.palette.primary.dark
+      : theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.05)'
         : 'rgba(0, 0, 0, 0.03)',
-    color: theme.palette.mode === 'dark' ? '#818cf8' : '#1C1C1A',
+    color: active ? '#ffffff' : theme.palette.text.primary,
   },
   '& .MuiListItemIcon-root': {
     color: 'inherit',

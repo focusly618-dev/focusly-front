@@ -99,6 +99,9 @@ export const GET_PROJECT_GROUPS = gql`
       name
       color
       emoji
+      workspaces {
+        id
+      }
     }
   }
 `;

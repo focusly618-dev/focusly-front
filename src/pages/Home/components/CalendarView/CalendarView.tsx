@@ -34,12 +34,10 @@ import {
   Stack,
   Typography,
   Drawer,
-  IconButton,
   Backdrop,
   Button,
   CircularProgress,
 } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
 
 // Styles & Hooks
 import { CalendarContainer, DraftActionBar } from './CalendarView.styles';
@@ -337,55 +335,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           flexDirection: 'column',
         }}
       >
-        {/* Top Header */}
-        <Box
-          sx={{
-            px: 3,
-            pt: 3,
-            pb: 1,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}
-            >
-              Calendar
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'text.secondary',
-                display: { xs: 'none', md: 'block' },
-              }}
-            >
-              Stay Organized and On Track with Your Personalized Calendar
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={() => setIsSidePanelOpen(true)}
-            sx={{
-              display: { xs: 'flex', md: 'none' },
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: '8px',
-              p: 1,
-              color: 'text.secondary',
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-        </Box>
-
         <Box
           sx={{
             flexGrow: 1,
             display: 'flex',
             flexDirection: 'column',
-            height: 'calc(100% - 90px)', // Fill remaining height below header
+            height: '100%', // Fill remaining height below header
             position: 'relative',
             overflowX: 'auto', // Allow horizontal scroll on small devices
             overflowY: 'hidden', // Contain vertical overflow inside big-calendar
@@ -429,6 +384,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                   {...props}
                   isSessionActive={isFocusSessionActive}
                   onNavigateAction={handleNavigateAction}
+                  onMobileMenuClick={() => setIsSidePanelOpen(true)}
                 />
               ),
               header: CalendarHeader,

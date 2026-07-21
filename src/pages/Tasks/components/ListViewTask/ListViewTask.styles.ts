@@ -195,33 +195,49 @@ export const PriorityChip = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'priorityColor',
 })<{ priorityColor?: string }>(({ theme, priorityColor }) => {
   const defaultColor = priorityColor || '#6b7280';
+  let bg = alpha(defaultColor, 0.08);
+  let text = defaultColor;
+  let border = alpha(defaultColor, 0.12);
+
+  if (theme.palette.mode === 'light') {
+    if (defaultColor === '#ef4444') {
+      bg = '#fee2e2';
+      text = '#dc2626';
+      border = '#fecaca';
+    } else if (defaultColor === '#f59e0b') {
+      bg = '#ffedd5';
+      text = '#d97706';
+      border = '#fed7aa';
+    } else if (defaultColor === '#22c55e') {
+      bg = '#dcfce7';
+      text = '#15803d';
+      border = '#bbf7d0';
+    }
+  } else {
+    bg = alpha(defaultColor, 0.15);
+    text = alpha(defaultColor, 0.9);
+    border = alpha(defaultColor, 0.25);
+  }
+
   return {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '6px',
-    padding: '3px 8px',
+    padding: '4px 10px',
     borderRadius: '20px',
     fontSize: '11px',
-    fontWeight: 600,
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? alpha(defaultColor, 0.12)
-        : alpha(defaultColor, 0.08),
-    color:
-      theme.palette.mode === 'dark' ? alpha(defaultColor, 0.9) : defaultColor,
-    border: `1px solid ${
-      theme.palette.mode === 'dark'
-        ? alpha(defaultColor, 0.2)
-        : alpha(defaultColor, 0.15)
-    }`,
+    fontWeight: 700,
+    backgroundColor: bg,
+    color: text,
+    border: `1px solid ${border}`,
     transition: 'all 0.2s ease',
     width: 'fit-content',
     cursor: 'pointer',
     '&:hover': {
       backgroundColor:
         theme.palette.mode === 'dark'
-          ? alpha(defaultColor, 0.18)
-          : alpha(defaultColor, 0.12),
+          ? alpha(defaultColor, 0.25)
+          : alpha(defaultColor, 0.15),
     },
   };
 });
@@ -240,25 +256,23 @@ export const DateChip = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: '6px',
-  padding: '3px 8px',
+  padding: '4px 10px',
   borderRadius: '20px',
   fontSize: '11px',
-  fontWeight: 600,
+  fontWeight: 700,
   backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.15)' : '#eff6ff',
+  color: theme.palette.mode === 'dark' ? '#60a5fa' : '#2563eb',
+  border:
     theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.03)'
-      : 'rgba(0, 0, 0, 0.03)',
-  color: theme.palette.text.secondary,
-  border: `1px solid ${theme.palette.divider}`,
+      ? '1px solid rgba(37, 99, 235, 0.25)'
+      : '1px solid #dbeafe',
   transition: 'all 0.2s ease',
   width: 'fit-content',
   cursor: 'pointer',
   '&:hover': {
     backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.08)'
-        : 'rgba(0, 0, 0, 0.05)',
-    color: theme.palette.text.primary,
+      theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.25)' : '#dbeafe',
   },
 }));
 
@@ -396,30 +410,25 @@ export const AIText = styled(Typography)({
 
 // Table Styled Components
 export const TableWrapper = styled(Box)(({ theme }) => ({
-  width: 'calc(100% + 48px)',
-  marginLeft: '-24px',
-  marginRight: '-24px',
+  width: '100%',
   flex: 1,
   minHeight: 0,
   display: 'flex',
   flexDirection: 'column',
   border:
     theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.05)'
-      : '1px solid rgba(0, 0, 0, 0.05)',
-  borderLeft: 'none',
-  borderRight: 'none',
-  borderRadius: 0,
+      ? '1px solid rgba(255, 255, 255, 0.08)'
+      : '1px solid #e2e8f0',
+  borderRadius: '16px',
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.4)' : '#ffffff',
-  backdropFilter: theme.palette.mode === 'dark' ? 'blur(12px)' : 'none',
+    theme.palette.mode === 'dark' ? 'rgba(26, 29, 36, 0.95)' : '#ffffff',
   overflowX: 'auto',
   overflowY: 'hidden',
   WebkitOverflowScrolling: 'touch',
   boxShadow:
     theme.palette.mode === 'dark'
       ? '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
-      : '0 4px 20px rgba(0, 0, 0, 0.02)',
+      : '0 1px 3px rgba(0, 0, 0, 0.02)',
   marginBottom: '24px',
   boxSizing: 'border-box',
 }));

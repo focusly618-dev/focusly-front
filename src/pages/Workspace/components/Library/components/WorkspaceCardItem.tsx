@@ -388,7 +388,8 @@ export const WorkspaceCardItem = ({
             alignItems: 'center',
             justifyContent: 'space-between',
             mt: 'auto',
-            pt: 1,
+            pt: 1.5,
+            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
           }}
         >
           {workspace.task ? (

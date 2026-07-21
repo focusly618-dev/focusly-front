@@ -50,14 +50,17 @@ import {
   timePickerLayoutSx,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
 import {
+  getStatusIcon,
+  getCategoryIcon,
+} from '@/pages/Home/components/CreateTaskModal/components/TaskIcons';
+import { getSelectionChipSx } from '@/pages/Home/components/CreateTaskModal/components/TaskProperties/TaskProperties.utils';
+import {
   getTagColors,
   TASK_COLORS,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 import {
   propertiesContainerSx,
-  metadataRowSx,
-  metadataChipSx,
   popoverPaperSx,
   timerPopoverPaperSx,
   colorPopoverPaperSx,
@@ -170,6 +173,196 @@ export const TaskProperties = ({
 
   return (
     <Box sx={propertiesContainerSx}>
+      {/* Metadata & Tags — right below the title */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+        {/* Status */}
+        <Box sx={propertyRowSx}>
+          <Box sx={propertyLabelSx}>
+            <TodoIcon sx={{ fontSize: 16, color: '#3b82f6' }} />
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '14px', fontWeight: 500 }}
+            >
+              Status
+            </Typography>
+          </Box>
+          <Box sx={propertyValueSx}>
+            <Chip
+              icon={getStatusIcon(status)}
+              label={status || 'Todo'}
+              onClick={(e) => isOwner && setStatusAnchor(e.currentTarget)}
+              sx={{
+                ...getSelectionChipSx('status', status || 'Todo'),
+                pointerEvents: !isOwner ? 'none' : 'auto',
+              }}
+            />
+          </Box>
+        </Box>
+
+        {/* Priority */}
+        <Box sx={propertyRowSx}>
+          <Box sx={propertyLabelSx}>
+            <FlagIcon sx={{ fontSize: 16, color: '#ef4444' }} />
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '14px', fontWeight: 500 }}
+            >
+              Priority
+            </Typography>
+          </Box>
+          <Box sx={propertyValueSx}>
+            <Chip
+              icon={<FlagIcon sx={{ fontSize: 16 }} />}
+              label={priority || 'No priority'}
+              onClick={(e) => isOwner && setPriorityAnchor(e.currentTarget)}
+              sx={{
+                ...getSelectionChipSx('priority', priority || 'No priority'),
+                pointerEvents: !isOwner ? 'none' : 'auto',
+              }}
+            />
+          </Box>
+        </Box>
+
+        {/* Category */}
+        <Box sx={propertyRowSx}>
+          <Box sx={propertyLabelSx}>
+            <AutoFixHighIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '14px', fontWeight: 500 }}
+            >
+              Category
+            </Typography>
+          </Box>
+          <Box sx={propertyValueSx}>
+            <Chip
+              icon={getCategoryIcon(category)}
+              label={category || 'General'}
+              onClick={(e) => isOwner && setCategoryAnchor(e.currentTarget)}
+              sx={{
+                ...getSelectionChipSx('category', category || 'General'),
+                pointerEvents: !isOwner ? 'none' : 'auto',
+              }}
+            />
+          </Box>
+        </Box>
+
+        {/* Tags */}
+        <Box sx={propertyRowSx}>
+          <Box sx={propertyLabelSx}>
+            <DescriptionIcon
+              sx={{
+                fontSize: 16,
+                color: '#06b6d4',
+                transform: 'rotate(180deg)',
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{ fontSize: '14px', fontWeight: 500 }}
+            >
+              Tags
+            </Typography>
+          </Box>
+          <Box sx={propertyValueSx}>
+            <AnimatePresence mode="popLayout" initial={false}>
+              {tags.map((tag) => {
+                const colors = getTagColors(tag);
+                return (
+                  <Box
+                    key={tag}
+                    component={motion.div}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, x: -10 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 400,
+                      damping: 30,
+                      mass: 0.8,
+                    }}
+                  >
+                    <Chip
+                      label={tag}
+                      onDelete={
+                        !isOwner
+                          ? undefined
+                          : () => setTags(tags.filter((t) => t !== tag))
+                      }
+                      sx={{
+                        ...tagChipSx,
+                        bgcolor: colors.bgcolor,
+                        color: colors.color,
+                        border: '1px solid',
+                        borderColor: colors.borderColor,
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        height: '24px',
+                        '& .MuiChip-deleteIcon': {
+                          color: colors.color,
+                          fontSize: '14px',
+                          opacity: 0.7,
+                          '&:hover': { opacity: 1 },
+                        },
+                      }}
+                    />
+                  </Box>
+                );
+              })}
+              {isOwner &&
+                (isAddingTag ? (
+                  <Box
+                    key="add-tag-input"
+                    component={motion.div}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                  >
+                    <TextField
+                      autoFocus
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onBlur={() => handleAddTag()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleAddTag();
+                        else if (e.key === 'Escape') setIsAddingTag(false);
+                      }}
+                      size="small"
+                      sx={addTagInputSx}
+                      placeholder="#"
+                    />
+                  </Box>
+                ) : (
+                  <Box
+                    key="add-tag-button"
+                    component={motion.div}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <Chip
+                      icon={<AddIcon sx={{ fontSize: 14 }} />}
+                      label="Add Tag"
+                      onClick={() => setIsAddingTag(true)}
+                      sx={{
+                        height: 28,
+                        fontSize: 12,
+                        bgcolor: 'transparent',
+                        color: 'text.secondary',
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        '&:hover': { bgcolor: 'action.hover' },
+                      }}
+                    />
+                  </Box>
+                ))}
+            </AnimatePresence>
+          </Box>
+        </Box>
+      </Box>
+
       {/* Schedule & Time Tracking Card */}
       <Box
         sx={{
@@ -690,232 +883,6 @@ export const TaskProperties = ({
             </Typography>
           </Box>
         )}
-      </Box>
-
-      {/* Metadata & Tags at the bottom */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Box sx={metadataRowSx}>
-          {/* Status */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Chip
-              icon={
-                <>
-                  {status === 'Todo' && <TodoIcon sx={{ fontSize: 16 }} />}
-                  {status === 'Planning' && (
-                    <PlannedIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {status === 'Scheduled' && (
-                    <PlannedIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {status === 'Pending' && (
-                    <AccessTimeIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {status === 'On Hold' && <OnHoldIcon sx={{ fontSize: 16 }} />}
-                  {status === 'Review' && (
-                    <VisibilityIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {status === 'Done' && (
-                    <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {status === 'Backlog' && (
-                    <HistoryIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {status === 'Archived' && (
-                    <HistoryIcon sx={{ fontSize: 16 }} />
-                  )}
-                </>
-              }
-              label={status}
-              onClick={(e) => setStatusAnchor(e.currentTarget)}
-              sx={{
-                ...metadataChipSx(false),
-                pointerEvents: !isOwner ? 'none' : 'auto',
-              }}
-            />
-          </Box>
-
-          {/* Priority */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Chip
-              icon={<FlagIcon sx={{ fontSize: 16 }} />}
-              label={priority === 'No priority' ? 'No priority' : priority}
-              onClick={(e) => setPriorityAnchor(e.currentTarget)}
-              sx={{
-                ...metadataChipSx(priority === 'High'),
-                pointerEvents: !isOwner ? 'none' : 'auto',
-              }}
-            />
-          </Box>
-
-          {/* Category */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Chip
-              icon={
-                <>
-                  {category === 'General' && (
-                    <CategoryIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Deep Work' && (
-                    <AutoFixHighIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Meeting' && (
-                    <GroupsIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Admin' && (
-                    <AssignmentIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Design' && <BrushIcon sx={{ fontSize: 16 }} />}
-                  {category === 'Development' && (
-                    <CodeIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Marketing' && (
-                    <TrendingUpIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Planning' && (
-                    <EventNoteIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Research' && (
-                    <PsychologyIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Learning' && (
-                    <SchoolIcon sx={{ fontSize: 16 }} />
-                  )}
-                  {category === 'Personal' && (
-                    <PersonIcon sx={{ fontSize: 16 }} />
-                  )}
-                </>
-              }
-              label={category || 'General'}
-              onClick={(e) => setCategoryAnchor(e.currentTarget)}
-              sx={{
-                ...metadataChipSx(false),
-                pointerEvents: !isOwner ? 'none' : 'auto',
-              }}
-            />
-          </Box>
-        </Box>
-
-        {/* Tags Property */}
-        <Box sx={propertyRowSx}>
-          <Box sx={propertyLabelSx}>
-            <DescriptionIcon
-              sx={{
-                fontSize: 16,
-                color: 'text.disabled',
-                transform: 'rotate(180deg)',
-              }}
-            />
-            <Typography
-              variant="caption"
-              sx={{ fontSize: '14px', fontWeight: 500 }}
-            >
-              Tags
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              ...propertyValueSx,
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1,
-            }}
-          >
-            <AnimatePresence mode="popLayout" initial={false}>
-              {tags.map((tag) => {
-                const colors = getTagColors(tag);
-                return (
-                  <Box
-                    key={tag}
-                    component={motion.div}
-                    layout
-                    initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, x: -10 }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 400,
-                      damping: 30,
-                      mass: 0.8,
-                    }}
-                  >
-                    <Chip
-                      label={tag}
-                      onDelete={
-                        !isOwner
-                          ? undefined
-                          : () => setTags(tags.filter((t) => t !== tag))
-                      }
-                      sx={{
-                        ...tagChipSx,
-                        bgcolor: colors.bgcolor,
-                        color: colors.color,
-                        border: '1px solid',
-                        borderColor: colors.borderColor,
-                        borderRadius: '12px',
-                        fontSize: '12px',
-                        height: '24px',
-                        '& .MuiChip-deleteIcon': {
-                          color: colors.color,
-                          fontSize: '14px',
-                          opacity: 0.7,
-                          '&:hover': { opacity: 1 },
-                        },
-                      }}
-                    />
-                  </Box>
-                );
-              })}
-              {isOwner &&
-                (isAddingTag ? (
-                  <Box
-                    key="add-tag-input"
-                    component={motion.div}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                  >
-                    <TextField
-                      autoFocus
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      onBlur={() => handleAddTag()}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleAddTag();
-                        else if (e.key === 'Escape') setIsAddingTag(false);
-                      }}
-                      size="small"
-                      sx={addTagInputSx}
-                      placeholder="#"
-                    />
-                  </Box>
-                ) : (
-                  <Box
-                    key="add-tag-button"
-                    component={motion.div}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                  >
-                    <Chip
-                      icon={<AddIcon sx={{ fontSize: 14 }} />}
-                      label="Add Tag"
-                      onClick={() => setIsAddingTag(true)}
-                      sx={{
-                        height: 28,
-                        fontSize: 12,
-                        bgcolor: 'transparent',
-                        color: 'text.secondary',
-                        border: '1px dashed',
-                        borderColor: 'divider',
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    />
-                  </Box>
-                ))}
-            </AnimatePresence>
-          </Box>
-        </Box>
       </Box>
 
       {/* Popovers */}

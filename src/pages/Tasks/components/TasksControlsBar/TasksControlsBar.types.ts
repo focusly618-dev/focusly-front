@@ -1,5 +1,7 @@
 import type { FilterState } from '../FilterPopover/FilterPopover';
 import type { SortState } from '../SortPopover/SortPopover';
+import type { DateRangeFilter } from '../../hooks/useTasksFilters.hook';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
 export interface TasksControlsBarProps {
   viewMode: 'list' | 'grid' | 'board' | 'workload';
@@ -22,4 +24,10 @@ export interface TasksControlsBarProps {
   handleApplyFilters: (filters: FilterState) => void;
   handleSortClose: () => void;
   handleApplySort: (sort: SortState) => void;
+
+  // Added for layout restructure matching screenshot
+  filteredTasks: TaskResponse[];
+  dateRange: DateRangeFilter;
+  setDateRange: (range: DateRangeFilter) => void;
+  setViewMode: (mode: 'list' | 'grid' | 'board' | 'workload') => void;
 }

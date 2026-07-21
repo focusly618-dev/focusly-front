@@ -48,6 +48,28 @@ import {
 } from './components';
 import { useWorkspaceLibrary } from './hooks/useWorkspaceLibrary.hook';
 
+const FolderWorkspaceCountBadge = ({ count }: { count: number }) => (
+  <Typography
+    variant="caption"
+    sx={{
+      ml: 0.75,
+      px: 0.7,
+      py: 0.1,
+      borderRadius: '999px',
+      fontSize: '0.7rem',
+      fontWeight: 600,
+      lineHeight: 1.4,
+      color: 'text.secondary',
+      bgcolor: (theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.06)'
+          : 'rgba(0, 0, 0, 0.05)',
+    }}
+  >
+    {count}
+  </Typography>
+);
+
 interface WorkspaceLibraryProps {
   onCreate: () => void;
   onSelect: (workspace: WorkspaceTypes) => void;
@@ -278,6 +300,7 @@ export const WorkspaceLibrary = ({
             >
               All Notes
             </Typography>
+            <FolderWorkspaceCountBadge count={totalWorkspaces} />
           </FolderCapsule>
 
           {/* Custom Folders Capsules */}
@@ -324,6 +347,9 @@ export const WorkspaceLibrary = ({
                 >
                   {group.name}
                 </Typography>
+                <FolderWorkspaceCountBadge
+                  count={group.workspaces?.length ?? 0}
+                />
               </FolderCapsule>
             );
           })}

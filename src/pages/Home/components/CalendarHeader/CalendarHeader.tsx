@@ -11,7 +11,11 @@ export const CalendarHeader = (props: HeaderProps) => {
   const active = isToday(date);
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const currentView = searchParams.get('v') || 'day';
+  const isMonthView = currentView === 'month';
+
   const isSelected = useMemo(() => {
+    if (isMonthView) return false;
     const d = searchParams.get('d');
     if (!d) return false;
     const [year, month, day] = d.split('-').map(Number);
@@ -20,13 +24,34 @@ export const CalendarHeader = (props: HeaderProps) => {
       return isSameDay(date, selectedDate);
     }
     return false;
-  }, [searchParams, date]);
+  }, [searchParams, date, isMonthView]);
 
   const handleClick = () => {
+    if (isMonthView) return;
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set('d', format(date, 'yyyy-MM-dd'));
     setSearchParams(newParams);
   };
+
+  if (isMonthView) {
+    return (
+      <Typography
+        sx={{
+          fontSize: '12px',
+          fontWeight: 600,
+          color: 'text.secondary',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          py: 1.5,
+          display: 'inline-block',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        {dayName}
+      </Typography>
+    );
+  }
 
   return (
     <Typography
@@ -37,17 +62,18 @@ export const CalendarHeader = (props: HeaderProps) => {
         color: active
           ? 'text.primary'
           : isSelected
-            ? '#ef4444'
+            ? 'primary.main'
             : 'text.secondary',
         textTransform: 'uppercase',
         letterSpacing: '0.05em',
         py: 1.5,
-        borderBottom: isSelected ? '2px solid #ef4444' : 'none',
+        borderBottom: isSelected ? '2px solid' : 'none',
+        borderColor: 'primary.main',
         display: 'inline-block',
         cursor: 'pointer',
         transition: 'all 0.2s ease-in-out',
         '&:hover': {
-          color: active ? 'text.primary' : '#ef4444',
+          color: active ? 'text.primary' : 'primary.main',
           opacity: 0.85,
         },
       }}

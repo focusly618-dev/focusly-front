@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { BlockNoteEditor } from '@blocknote/core';
 import { useEditorContent } from './useEditorContent.hook';
 import {
@@ -82,6 +82,8 @@ interface EditorContentProps {
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
   targetLanguage?: string;
+  isCentered: boolean;
+  toggleCentered: () => void;
 }
 
 export const EditorContent = ({
@@ -95,20 +97,11 @@ export const EditorContent = ({
   setValue,
   watch,
   targetLanguage,
+  isCentered,
+  toggleCentered,
 }: EditorContentProps) => {
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
-
-  const [isCentered, setIsCentered] = useState<boolean>(() => {
-    return localStorage.getItem('editor_centered_mode') === 'true';
-  });
-
-  const toggleCentered = () => {
-    setIsCentered((prev) => {
-      localStorage.setItem('editor_centered_mode', String(!prev));
-      return !prev;
-    });
-  };
 
   const {
     menuAnchor,

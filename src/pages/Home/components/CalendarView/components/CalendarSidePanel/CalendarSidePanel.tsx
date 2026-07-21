@@ -1,34 +1,10 @@
 import React, { useMemo } from 'react';
 import type { View } from 'react-big-calendar';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
-import {
-  Box,
-  Button,
-  Typography,
-  styled,
-  useTheme,
-  Stack,
-  IconButton,
-  Paper,
-  alpha,
-  Chip,
-} from '@mui/material';
+import { Box, Button, Typography, styled, Stack } from '@mui/material';
 import {
   Add as AddIcon,
-  ChevronLeft,
   ChevronRight,
-  Category as CategoryIcon,
-  AutoFixHigh as AutoFixHighIcon,
-  Groups as GroupsIcon,
-  Assignment as AssignmentIcon,
-  Brush as BrushIcon,
-  Code as CodeIcon,
-  TrendingUp as TrendingUpIcon,
-  EventNote as EventNoteIcon,
-  Psychology as PsychologyIcon,
-  School as SchoolIcon,
-  Person as PersonIcon,
-  CalendarToday as CalendarIcon,
   AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 import {
@@ -36,10 +12,6 @@ import {
   addDays,
   format,
   isSameDay,
-  isSameWeek,
-  startOfMonth,
-  addMonths,
-  subMonths,
   startOfDay,
   endOfDay,
 } from 'date-fns';
@@ -58,26 +30,6 @@ const PanelContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   flexShrink: 0,
-}));
-
-const Card = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '12px',
-  padding: '20px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '16px',
-  boxShadow: 'none',
-}));
-
-const SectionTitle = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  fontSize: '14px',
-  fontWeight: 700,
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-  marginBottom: '12px',
 }));
 
 const AddTaskButton = styled(Button)({
@@ -149,74 +101,6 @@ const ToggleButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const EventItemContainer = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '12px',
-  padding: '12px 14px',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '12px',
-  cursor: 'pointer',
-  boxShadow: 'none',
-  transition: 'all 0.2s ease-in-out',
-  '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.04)'
-        : 'rgba(0, 0, 0, 0.02)',
-    transform: 'translateY(-2px)',
-    boxShadow:
-      theme.palette.mode === 'dark'
-        ? '0 4px 12px rgba(0, 0, 0, 0.3)'
-        : '0 4px 12px rgba(0, 0, 0, 0.05)',
-    borderColor: theme.palette.primary.main,
-  },
-}));
-
-const IconWrapper = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'color',
-})<{ color: string }>(({ color }) => ({
-  width: '36px',
-  height: '36px',
-  borderRadius: '10px',
-  backgroundColor: alpha(color, 0.12),
-  color: color,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
-}));
-
-const getCategoryIcon = (category: string) => {
-  const normCategory = (category || 'General').toLowerCase().trim();
-  switch (normCategory) {
-    case 'deep work':
-      return <AutoFixHighIcon sx={{ fontSize: 16 }} />;
-    case 'meeting':
-      return <GroupsIcon sx={{ fontSize: 16 }} />;
-    case 'admin':
-      return <AssignmentIcon sx={{ fontSize: 16 }} />;
-    case 'design':
-      return <BrushIcon sx={{ fontSize: 16 }} />;
-    case 'development':
-    case 'dev':
-      return <CodeIcon sx={{ fontSize: 16 }} />;
-    case 'marketing':
-      return <TrendingUpIcon sx={{ fontSize: 16 }} />;
-    case 'planning':
-      return <EventNoteIcon sx={{ fontSize: 16 }} />;
-    case 'research':
-      return <PsychologyIcon sx={{ fontSize: 16 }} />;
-    case 'learning':
-      return <SchoolIcon sx={{ fontSize: 16 }} />;
-    case 'personal':
-      return <PersonIcon sx={{ fontSize: 16 }} />;
-    default:
-      return <CategoryIcon sx={{ fontSize: 16 }} />;
-  }
-};
-
 const getCategoryColor = (category: string) => {
   const normCategory = (category || 'General').toLowerCase().trim();
   switch (normCategory) {
@@ -237,210 +121,6 @@ const getCategoryColor = (category: string) => {
     default:
       return '#6b7280'; // grey
   }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'Done':
-      return '#22c55e';
-    case 'On Hold':
-      return '#ef4444';
-    case 'Pending':
-      return '#f59e0b';
-    case 'Planning':
-      return '#3b82f6';
-    case 'Scheduled':
-      return '#8b5cf6';
-    case 'Review':
-      return '#06b6d4';
-    case 'Archived':
-      return '#4b5563';
-    case 'Todo':
-    default:
-      return '#6b7280';
-  }
-};
-
-interface UpcomingTasksProps {
-  events: ICalendarEvent[];
-  currentDate: Date;
-  onEventSelect: (event: ICalendarEvent) => void;
-}
-
-const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
-  events,
-  currentDate,
-  onEventSelect,
-}) => {
-  const dayEvents = useMemo(() => {
-    const dayStart = startOfDay(currentDate);
-    const dayEnd = endOfDay(currentDate);
-    return events.filter((e) => {
-      const start = new Date(e.start);
-      const end = new Date(e.end);
-      return start <= dayEnd && end >= dayStart;
-    });
-  }, [events, currentDate]);
-
-  const sortedDayEvents = useMemo(() => {
-    return [...dayEvents].sort((a, b) => {
-      const aStart = new Date(a.start).getTime();
-      const bStart = new Date(b.start).getTime();
-      return aStart - bStart;
-    });
-  }, [dayEvents]);
-
-  return (
-    <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2,
-        }}
-      >
-        <SectionTitle sx={{ mb: 0 }}>Upcoming Insights</SectionTitle>
-        <Typography
-          variant="caption"
-          sx={{
-            color: '#3b82f6',
-            fontWeight: 600,
-          }}
-        >
-          {sortedDayEvents.length}{' '}
-          {sortedDayEvents.length === 1 ? 'Item' : 'Items'}
-        </Typography>
-      </Box>
-
-      {sortedDayEvents.length === 0 ? (
-        <Card
-          elevation={0}
-          sx={{
-            bgcolor: 'transparent',
-            border: '1px dashed',
-            borderColor: 'divider',
-            alignItems: 'center',
-            textAlign: 'center',
-            py: 4,
-            px: 2,
-          }}
-        >
-          <CalendarIcon
-            sx={{ fontSize: 28, color: 'text.disabled', mb: 1, opacity: 0.7 }}
-          />
-          <Typography
-            variant="body2"
-            sx={{ color: 'text.secondary', fontWeight: 600, mb: 0.5 }}
-          >
-            No events scheduled
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.disabled',
-              display: 'block',
-              maxWidth: '220px',
-            }}
-          >
-            Select another day or click "Add New Task" to schedule items for
-            today.
-          </Typography>
-        </Card>
-      ) : (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            maxHeight: '260px',
-            overflowY: 'auto',
-            pr: '6px',
-            mr: '-6px',
-            scrollbarWidth: 'thin',
-            '&::-webkit-scrollbar': {
-              width: '5px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.12)'
-                  : 'rgba(0, 0, 0, 0.08)',
-              borderRadius: '10px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.22)'
-                  : 'rgba(0, 0, 0, 0.15)',
-            },
-          }}
-        >
-          {sortedDayEvents.map((event) => {
-            const isTask = event.type === 'task';
-            const task = isTask
-              ? (event.resource as { category?: string; status?: string })
-              : null;
-            const category = task ? task.category || 'General' : 'Meeting';
-            const status = task ? task.status || 'Todo' : 'Scheduled';
-            const categoryColor = getCategoryColor(category);
-            const statusColor = getStatusColor(status);
-
-            const formatTime = (date: Date) => {
-              return format(new Date(date), 'h:mm a');
-            };
-            const timeString = `${formatTime(event.start)} - ${formatTime(event.end)}`;
-
-            return (
-              <EventItemContainer
-                key={event.id}
-                onClick={() => onEventSelect(event)}
-              >
-                <IconWrapper color={categoryColor}>
-                  {getCategoryIcon(category)}
-                </IconWrapper>
-                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    noWrap
-                    sx={{ color: 'text.primary', mb: 0.2 }}
-                  >
-                    {event.title}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    noWrap
-                    sx={{ color: 'text.secondary', display: 'block' }}
-                  >
-                    {timeString} • {category}
-                  </Typography>
-                </Box>
-                <Chip
-                  label={status}
-                  size="small"
-                  sx={{
-                    height: '18px',
-                    fontSize: '9px',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    borderRadius: '4px',
-                    bgcolor: alpha(statusColor, 0.1),
-                    color: statusColor,
-                    border: `1px solid ${alpha(statusColor, 0.15)}`,
-                    flexShrink: 0,
-                  }}
-                />
-              </EventItemContainer>
-            );
-          })}
-        </Box>
-      )}
-    </Box>
-  );
 };
 
 interface CalendarSidePanelProps {
@@ -466,37 +146,20 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   onAIPlannerClick,
   onWeeklyPlannerClick,
 }) => {
-  const theme = useTheme();
-
-  const miniCalendarDays = useMemo(() => {
-    const startOfCurrentMonth = startOfMonth(currentDate);
-    const startOfGrid = startOfWeek(startOfCurrentMonth, { weekStartsOn: 1 }); // 1 = Monday
-    return Array.from({ length: 42 }, (_, i) => addDays(startOfGrid, i));
+  const miniWeekDays = useMemo(() => {
+    const startOfSelectedWeek = startOfWeek(currentDate, { weekStartsOn: 1 }); // 1 = Monday
+    return Array.from({ length: 7 }, (_, i) => addDays(startOfSelectedWeek, i));
   }, [currentDate]);
 
-  // Handler to change view parameter
-  const handleViewChange = (newView: unknown) => {
-    onViewChange(newView as View);
-  };
-
-  // Handler to change date parameter
-  const handleDateClick = (dayDate: Date) => {
-    onDateChange(dayDate);
-  };
-
-  // Handler to navigate mini-calendar months
-  const handlePrevMonth = () => {
-    onDateChange(subMonths(currentDate, 1));
-  };
-
-  const handleNextMonth = () => {
-    onDateChange(addMonths(currentDate, 1));
-  };
-
-  // Handler to trigger Task Creation Modal
-  const handleAddTaskClick = () => {
-    onAddTaskClick();
-  };
+  const awaitedTasks = useMemo(() => {
+    const dayStart = startOfDay(currentDate);
+    const dayEnd = endOfDay(currentDate);
+    return events.filter((e) => {
+      const start = new Date(e.start);
+      const end = new Date(e.end);
+      return start <= dayEnd && end >= dayStart;
+    });
+  }, [events, currentDate]);
 
   return (
     <PanelContainer>
@@ -507,203 +170,127 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: '28px',
+          height: '100%',
         }}
       >
-        {/* Add New Task Button */}
-        <AddTaskButton onClick={handleAddTaskClick} startIcon={<AddIcon />}>
-          Add New Task
+        {/* Header Today & Date */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 800, color: 'text.primary' }}
+          >
+            {isSameDay(currentDate, new Date())
+              ? 'Today'
+              : format(currentDate, 'eeee')}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: 'text.secondary' }}
+          >
+            {format(currentDate, 'd MMMM')}
+          </Typography>
+        </Box>
+
+        {/* View Toggle */}
+        <ViewToggleContainer>
+          {(['day', 'week', 'month'] as const).map((v) => (
+            <ToggleButton
+              key={v}
+              className={currentView === v ? 'active' : ''}
+              onClick={() => onViewChange(v as View)}
+            >
+              {v.charAt(0).toUpperCase() + v.slice(1)}
+            </ToggleButton>
+          ))}
+        </ViewToggleContainer>
+
+        {/* Add Task */}
+        <AddTaskButton onClick={onAddTaskClick} startIcon={<AddIcon />}>
+          Add Task
         </AddTaskButton>
 
-        {/* AI Planners */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <Button
-            variant="outlined"
-            onClick={onAIPlannerClick}
-            startIcon={<AutoAwesomeIcon />}
-            sx={{
-              textTransform: 'none',
-              borderRadius: 3,
-              fontWeight: 700,
-              py: 1,
-              borderColor: 'primary.light',
-              '&:hover': {
-                borderColor: 'primary.main',
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(124, 58, 237, 0.08)'
-                    : 'rgba(124, 58, 237, 0.04)',
-              },
-            }}
-          >
-            AI Time Blocking
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={onWeeklyPlannerClick}
-            startIcon={<CalendarIcon />}
-            sx={{
-              textTransform: 'none',
-              borderRadius: 3,
-              fontWeight: 700,
-              py: 1,
-              borderColor: 'primary.light',
-              '&:hover': {
-                borderColor: 'primary.main',
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(124, 58, 237, 0.08)'
-                    : 'rgba(124, 58, 237, 0.04)',
-              },
-            }}
-          >
-            AI Weekly Planner
-          </Button>
-        </Box>
-
-        {/* View Toggle Group */}
-        <Box>
-          <SectionTitle>Calendar View</SectionTitle>
-          <ViewToggleContainer>
-            <ToggleButton
-              onClick={() => handleViewChange('day')}
-              className={currentView === 'day' ? 'active' : ''}
-            >
-              Day
-            </ToggleButton>
-            <ToggleButton
-              onClick={() => handleViewChange('week')}
-              className={currentView === 'week' ? 'active' : ''}
-            >
-              Week
-            </ToggleButton>
-            <ToggleButton
-              onClick={() => handleViewChange('month')}
-              className={currentView === 'month' ? 'active' : ''}
-            >
-              Month
-            </ToggleButton>
-          </ViewToggleContainer>
-        </Box>
-
-        {/* Mini Calendar Card */}
-        <Box>
-          <Box
-            sx={{
-              p: 2,
-              borderRadius: 3,
-              border: '1px solid',
-              borderColor: 'divider',
-              backgroundColor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.01)'
-                  : '#ffffff',
-            }}
-          >
-            {/* Mini Calendar Month Header & Navigation */}
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ mb: 2 }}
-            >
-              <Typography
-                variant="subtitle2"
-                fontWeight={700}
-                sx={{ textTransform: 'capitalize' }}
-              >
-                {format(currentDate, 'MMMM yyyy')}
-              </Typography>
-              <Stack direction="row" spacing={0.5}>
-                <IconButton size="small" onClick={handlePrevMonth}>
-                  <ChevronLeft sx={{ fontSize: 18 }} />
-                </IconButton>
-                <IconButton size="small" onClick={handleNextMonth}>
-                  <ChevronRight sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Stack>
-            </Stack>
-
-            {/* Weekdays Labels */}
+        {/* Mini Week View Calendar */}
+        <Box
+          sx={{
+            p: 2,
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'divider',
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.01)'
+                : '#ffffff',
+          }}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {/* Weekday letters */}
             <Box
               sx={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(7, 1fr)',
-                gap: 0.5,
                 textAlign: 'center',
-                mb: 1,
               }}
             >
-              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => (
-                <Typography
-                  key={idx}
-                  variant="caption"
-                  sx={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    color: 'text.disabled',
-                  }}
-                >
-                  {letter}
-                </Typography>
-              ))}
+              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => {
+                const dayDate = miniWeekDays[idx];
+                const isSelected = isSameDay(dayDate, currentDate);
+                return (
+                  <Typography
+                    key={idx}
+                    variant="caption"
+                    sx={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: isSelected ? 'primary.main' : 'text.disabled',
+                    }}
+                  >
+                    {letter}
+                  </Typography>
+                );
+              })}
             </Box>
-
-            {/* Calendar Grid Days */}
+            {/* Weekday day numbers */}
             <Box
               sx={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(7, 1fr)',
-                gap: 0.5,
                 textAlign: 'center',
               }}
             >
-              {miniCalendarDays.map((dayDate, idx) => {
+              {miniWeekDays.map((dayDate, idx) => {
                 const isSelected = isSameDay(dayDate, currentDate);
                 const isToday = isSameDay(dayDate, new Date());
-                const isCurrentMonth =
-                  dayDate.getMonth() === currentDate.getMonth();
-                const isInSelectedWeek =
-                  currentView === 'week' &&
-                  isSameWeek(dayDate, currentDate, { weekStartsOn: 1 });
-
                 return (
                   <Box
                     key={idx}
-                    onClick={() => handleDateClick(dayDate)}
+                    onClick={() => onDateChange(dayDate)}
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      aspectRatio: '1',
-                      borderRadius: isSelected ? '50%' : '6px',
+                      height: 28,
+                      width: 28,
+                      mx: 'auto',
+                      borderRadius: '50%',
                       cursor: 'pointer',
-                      fontSize: '0.75rem',
-                      fontWeight: isSelected || isToday ? 700 : 500,
-                      transition: 'all 0.15s ease-in-out',
-                      bgcolor: isSelected
-                        ? theme.palette.primary.main
-                        : isInSelectedWeek
-                          ? theme.palette.mode === 'dark'
-                            ? 'rgba(59, 130, 246, 0.12)'
-                            : 'rgba(59, 130, 246, 0.08)'
-                          : 'transparent',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      bgcolor: isSelected ? 'primary.main' : 'transparent',
                       color: isSelected
                         ? '#ffffff'
-                        : !isCurrentMonth
-                          ? 'text.disabled'
-                          : isToday
-                            ? theme.palette.primary.main
-                            : 'text.primary',
-                      border:
-                        isToday && !isSelected
-                          ? `1px solid ${alpha(theme.palette.primary.main, 0.4)}`
-                          : 'none',
+                        : isToday
+                          ? 'primary.main'
+                          : 'text.primary',
+                      border: isToday && !isSelected ? '1px solid' : 'none',
+                      borderColor: 'primary.main',
                       '&:hover': {
-                        bgcolor: isSelected
-                          ? theme.palette.primary.main
-                          : theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.05)'
-                            : 'rgba(0, 0, 0, 0.04)',
+                        bgcolor: isSelected ? 'primary.main' : 'action.hover',
                       },
                     }}
                   >
@@ -715,12 +302,209 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
           </Box>
         </Box>
 
-        {/* Upcoming Insights card */}
-        <UpcomingTasks
-          events={events}
-          currentDate={currentDate}
-          onEventSelect={onEventSelect}
-        />
+        {/* Awaited Tasks Section */}
+        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2,
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 700,
+                color: 'text.secondary',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                fontSize: '12px',
+              }}
+            >
+              Awaited Tasks
+            </Typography>
+            <Button
+              variant="text"
+              size="small"
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '12px',
+                color: 'primary.main',
+                p: 0,
+                minWidth: 0,
+                '&:hover': {
+                  bgcolor: 'transparent',
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              View All
+            </Button>
+          </Box>
+
+          <Stack
+            spacing={1.5}
+            sx={{
+              overflowY: 'auto',
+              maxHeight: '350px',
+              pr: 0.5,
+            }}
+          >
+            {awaitedTasks.length === 0 ? (
+              <Box
+                sx={{
+                  py: 4,
+                  px: 2,
+                  textAlign: 'center',
+                  border: '1px dashed',
+                  borderColor: 'divider',
+                  borderRadius: 3,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: 'text.secondary', fontWeight: 600 }}
+                >
+                  No tasks awaited
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                  Enjoy your free time!
+                </Typography>
+              </Box>
+            ) : (
+              awaitedTasks.map((event) => {
+                const isTask = event.type === 'task';
+                const task = isTask
+                  ? (event.resource as { category?: string; status?: string })
+                  : null;
+                const category = task ? task.category || 'General' : 'Meeting';
+                const categoryColor = getCategoryColor(category);
+
+                const formatTime = (date: Date) =>
+                  format(new Date(date), 'hh:mm a');
+                const timeString = `${formatTime(event.start)} - ${formatTime(event.end)}`;
+
+                return (
+                  <Box
+                    key={event.id}
+                    onClick={() => onEventSelect(event)}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      p: 1.5,
+                      borderRadius: 3,
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.02)'
+                          : '#ffffff',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: 'primary.main',
+                        bgcolor: 'action.hover',
+                        transform: 'translateX(2px)',
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        minWidth: 0,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: categoryColor,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography
+                          variant="body2"
+                          noWrap
+                          sx={{
+                            fontWeight: 700,
+                            color: 'text.primary',
+                            mb: 0.2,
+                          }}
+                        >
+                          {event.title}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'text.secondary' }}
+                        >
+                          {timeString}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <ChevronRight
+                      sx={{ fontSize: 18, color: 'text.disabled' }}
+                    />
+                  </Box>
+                );
+              })
+            )}
+          </Stack>
+        </Box>
+
+        {/* Optimize Schedule / Weekly Planner Buttons */}
+        <Box
+          sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 'auto' }}
+        >
+          <Button
+            variant="contained"
+            onClick={onAIPlannerClick}
+            startIcon={<AutoAwesomeIcon sx={{ fontSize: 16 }} />}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '14px',
+              py: 1.5,
+              fontWeight: 700,
+              fontSize: '14px',
+              bgcolor: '#4f46e5',
+              color: '#ffffff',
+              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)',
+              '&:hover': {
+                bgcolor: '#4338ca',
+                boxShadow: '0 6px 16px rgba(79, 70, 229, 0.35)',
+              },
+            }}
+          >
+            Optimize Schedule
+          </Button>
+
+          {onWeeklyPlannerClick && (
+            <Button
+              variant="text"
+              onClick={onWeeklyPlannerClick}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '14px',
+                py: 1,
+                fontWeight: 600,
+                fontSize: '13px',
+                color: 'text.secondary',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                  color: 'text.primary',
+                },
+              }}
+            >
+              Open Weekly Planner
+            </Button>
+          )}
+        </Box>
       </PerfectScrollbar>
     </PanelContainer>
   );

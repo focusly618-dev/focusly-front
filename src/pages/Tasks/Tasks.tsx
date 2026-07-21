@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Typography, Box, LinearProgress, Button } from '@mui/material';
-import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
+import {
+  AutoAwesome as AutoAwesomeIcon,
+  Add as AddIcon,
+} from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTasks } from './Tasks.hook';
@@ -123,36 +126,10 @@ export const Tasks = ({
         <MainContent
           sx={{
             borderRadius: '16px',
+            bgcolor: 'transparent',
+            height: '100%',
           }}
         >
-          <TasksHeader
-            filteredTasks={filteredTasks}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-          >
-            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-              <Button
-                variant="contained"
-                onClick={() => setIsAIPlannerOpen(true)}
-                startIcon={<AutoAwesomeIcon />}
-                sx={{
-                  borderRadius: '10px',
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  boxShadow: 'none',
-                  height: 36,
-                  bgcolor: '#7c3aed',
-                  '&:hover': { bgcolor: '#6d28d9', boxShadow: 'none' },
-                  fontSize: '0.8rem',
-                }}
-              >
-                AI Organize
-              </Button>
-            </Box>
-          </TasksHeader>
-
           <TasksControlsBar
             viewMode={viewMode}
             searchTerm={searchTerm}
@@ -176,33 +153,89 @@ export const Tasks = ({
             handleSortClose={handleSortClose}
             handleApplySort={handleApplySort}
             onAddTaskClick={() => setIsCreateTaskModalOpen(true)}
+            filteredTasks={filteredTasks}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            setViewMode={setViewMode}
           />
 
-          <TasksContentView
-            viewMode={viewMode}
-            isLoading={isLoading}
-            tasks={tasks}
-            filteredTasks={filteredTasks}
-            handleTaskClick={handleTaskClick}
-            updateTask={updateTask}
-            deleteTasks={deleteTasks}
-            setSearchTerm={setSearchTerm}
-            isAIScheduleEnabled={isAIScheduleEnabled}
-            setIsAIScheduleEnabled={setIsAIScheduleEnabled}
-            onStartFocus={onStartFocus}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            searchTerm={searchTerm}
-            dateRange={dateRange}
-            totalCount={totalCount}
-            page={page}
-            pageSize={pageSize}
-            onPageChange={setPage}
-            onPageSizeChange={(newSize) => {
-              setPageSize(newSize);
-              setPage(0);
+          <Box
+            sx={{
+              padding: '0 24px 24px 24px',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              overflowY: 'auto',
+              minHeight: 0,
             }}
-          />
+          >
+            <TasksHeader>
+              <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                <Button
+                  variant="contained"
+                  onClick={() => setIsAIPlannerOpen(true)}
+                  startIcon={<AutoAwesomeIcon />}
+                  sx={{
+                    borderRadius: '10px',
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    boxShadow: 'none',
+                    height: 36,
+                    bgcolor: '#6366f1',
+                    '&:hover': { bgcolor: '#4f46e5', boxShadow: 'none' },
+                    fontSize: '0.8rem',
+                    px: 2,
+                  }}
+                >
+                  AI Organize
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => setIsCreateTaskModalOpen(true)}
+                  startIcon={<AddIcon />}
+                  sx={{
+                    borderRadius: '10px',
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    boxShadow: 'none',
+                    height: 36,
+                    bgcolor: '#2563eb',
+                    '&:hover': { bgcolor: '#1d4ed8', boxShadow: 'none' },
+                    fontSize: '0.8rem',
+                    px: 2,
+                  }}
+                >
+                  Add New Task
+                </Button>
+              </Box>
+            </TasksHeader>
+
+            <TasksContentView
+              viewMode={viewMode}
+              isLoading={isLoading}
+              tasks={tasks}
+              filteredTasks={filteredTasks}
+              handleTaskClick={handleTaskClick}
+              updateTask={updateTask}
+              deleteTasks={deleteTasks}
+              setSearchTerm={setSearchTerm}
+              isAIScheduleEnabled={isAIScheduleEnabled}
+              setIsAIScheduleEnabled={setIsAIScheduleEnabled}
+              onStartFocus={onStartFocus}
+              activeFilters={activeFilters}
+              activeSort={activeSort}
+              searchTerm={searchTerm}
+              dateRange={dateRange}
+              totalCount={totalCount}
+              page={page}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(0);
+              }}
+            />
+          </Box>
         </MainContent>
 
         <OnboardingWrapper

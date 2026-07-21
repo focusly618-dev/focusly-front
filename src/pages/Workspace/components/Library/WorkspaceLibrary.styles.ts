@@ -6,7 +6,7 @@ export const LibraryContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   height: '100%',
   overflow: 'hidden',
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: theme.palette.mode === 'dark' ? '#121318' : '#fafbfd',
   padding: theme.spacing(3),
   [theme.breakpoints.down('md')]: {
     padding: theme.spacing(2),
@@ -645,6 +645,8 @@ export const PropertyGrid = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1.5),
   marginTop: theme.spacing(1.5),
   marginBottom: theme.spacing(1.5),
+  paddingTop: theme.spacing(1.5),
+  borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
 export const PropertyItem = styled(Box)({

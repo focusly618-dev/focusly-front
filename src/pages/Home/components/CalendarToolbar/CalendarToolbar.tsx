@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ToolbarProps } from 'react-big-calendar';
+import type { ToolbarProps, View } from 'react-big-calendar';
 import type { ICalendarEvent } from '../CalendarEvent';
 import { Navigate } from 'react-big-calendar';
 import type { CalendarNavigateAction } from '../CalendarView/calendarView.types';
@@ -13,15 +13,17 @@ import {
   Fade,
   alpha,
   useTheme,
+  Stack,
 } from '@mui/material';
 import { format } from 'date-fns';
 import {
-  ArrowBack as ArrowBackIcon,
-  ArrowForward as ArrowForwardIcon,
+  ChevronLeft,
+  ChevronRight,
   CheckCircleOutline as CheckIcon,
   DeleteOutline as DeleteIcon,
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
+  Menu as MenuIcon,
 } from '@mui/icons-material';
 
 import { ToolbarContainer } from './CalendarToolbar.styles';
@@ -38,10 +40,11 @@ const initialNotifications: Notification[] = [];
 interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
   isSessionActive?: boolean;
   onNavigateAction?: (action: CalendarNavigateAction) => void;
+  onMobileMenuClick?: () => void;
 }
 
 export const CalendarToolbar = (props: CustomToolbarProps) => {
-  const { date, onNavigate, onNavigateAction } = props;
+  const { date, onNavigate, onNavigateAction, onMobileMenuClick } = props;
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -75,58 +78,154 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
     onNavigateAction ? onNavigateAction('NEXT') : onNavigate(Navigate.NEXT);
 
   return (
-    <ToolbarContainer
-      sx={{
-        px: 3,
-        py: 2,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderBottom: 1,
-        borderColor: 'divider',
-      }}
-    >
-      {/* Left side: Arrows + Month + Today */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+    <>
+      <ToolbarContainer
+        sx={{
+          px: 4,
+          py: 2.5,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: (theme) =>
+            theme.palette.mode === 'dark' ? 'transparent' : '#ffffff',
+        }}
+      >
+        {/* Left side: Month Year Title & Subtitle */}
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: 'text.primary',
+              letterSpacing: '-0.02em',
+              fontSize: { xs: '24px', md: '28px' },
+            }}
+          >
+            {format(date, 'MMMM yyyy')}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mt: 0.5,
+              fontSize: '13px',
+              display: { xs: 'none', sm: 'block' },
+            }}
+          >
+            Organized clarity for your deep work sessions.
+          </Typography>
+        </Box>
+
+        {/* Center: View Toggle Pill Selector */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.03)'
+                : 'rgba(0, 0, 0, 0.04)',
+            borderRadius: '30px',
+            p: 0.5,
+            border: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          {['day', 'week', 'month'].map((v) => {
+            const isSelected = props.view === v;
+            return (
+              <Button
+                key={v}
+                onClick={() => props.onView(v as View)}
+                sx={{
+                  textTransform: 'none',
+                  borderRadius: '20px',
+                  px: 3,
+                  py: 0.75,
+                  fontSize: '13px',
+                  fontWeight: isSelected ? 700 : 500,
+                  bgcolor: isSelected
+                    ? (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.1)'
+                          : '#ffffff'
+                    : 'transparent',
+                  color: isSelected ? 'primary.main' : 'text.secondary',
+                  boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                  minWidth: '70px',
+                  '&:hover': {
+                    bgcolor: isSelected
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.12)'
+                            : '#ffffff'
+                      : 'action.hover',
+                  },
+                }}
+              >
+                {v.charAt(0).toUpperCase() + v.slice(1)}
+              </Button>
+            );
+          })}
+        </Box>
+
+        {/* Right side: Navigation Arrows */}
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          {onMobileMenuClick && (
+            <IconButton
+              onClick={onMobileMenuClick}
+              sx={{
+                display: { xs: 'flex', md: 'none' },
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: '8px',
+                p: 1,
+                color: 'text.secondary',
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <IconButton
-            size="small"
             onClick={goToBack}
             sx={{
-              border: 2,
+              width: 36,
+              height: 36,
+              border: '1px solid',
               borderColor: 'divider',
-              borderRadius: 2,
+              borderRadius: '50%',
+              color: 'text.primary',
+              transition: 'all 0.2s',
               '&:hover': {
                 borderColor: 'primary.main',
-                bgcolor: alpha(theme.palette.primary.main, 0.04),
+                bgcolor: 'action.hover',
               },
             }}
           >
-            <ArrowBackIcon sx={{ fontSize: '20px' }} />
+            <ChevronLeft sx={{ fontSize: 20 }} />
           </IconButton>
           <IconButton
-            size="small"
             onClick={goToNext}
             sx={{
-              border: 2,
+              width: 36,
+              height: 36,
+              border: '1px solid',
               borderColor: 'divider',
-              borderRadius: 2,
+              borderRadius: '50%',
+              color: 'text.primary',
+              transition: 'all 0.2s',
               '&:hover': {
                 borderColor: 'primary.main',
-                bgcolor: alpha(theme.palette.primary.main, 0.04),
+                bgcolor: 'action.hover',
               },
             }}
           >
-            <ArrowForwardIcon sx={{ fontSize: '20px' }} />
+            <ChevronRight sx={{ fontSize: 20 }} />
           </IconButton>
-        </Box>
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 600, color: 'text.primary', minWidth: '120px' }}
-        >
-          {format(date, 'MMMM yyyy')}
-        </Typography>
-      </Box>
+        </Stack>
+      </ToolbarContainer>
 
       <Popover
         open={open}
@@ -306,6 +405,6 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
           </>
         )}
       </Popover>
-    </ToolbarContainer>
+    </>
   );
 };

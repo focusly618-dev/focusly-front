@@ -7,7 +7,7 @@ export const PageContainer = styled(Box)(({ theme }) => ({
   padding: '32px',
   height: '100%',
   overflowY: 'auto',
-  backgroundColor: theme.palette.background.default, // Matches app background
+  backgroundColor: theme.palette.mode === 'dark' ? '#121318' : '#fafbfd',
   color: theme.palette.text.primary,
 }));
 

@@ -262,16 +262,14 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
           borderColor: (theme) =>
             theme.palette.mode === 'dark'
               ? 'rgba(255, 255, 255, 0.08)'
-              : 'rgba(0, 0, 0, 0.08)',
+              : '#e2e8f0',
           background: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, rgba(26, 31, 43, 0.4) 0%, rgba(15, 23, 42, 0.3) 100%)'
-              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.5) 100%)',
+            theme.palette.mode === 'dark' ? 'rgba(26, 31, 43, 0.4)' : '#f8fafc',
           backdropFilter: 'blur(12px)',
           boxShadow: (theme) =>
             theme.palette.mode === 'dark'
               ? '0 4px 20px rgba(0,0,0,0.2)'
-              : '0 4px 20px rgba(0,0,0,0.05)',
+              : '0 1px 3px rgba(0,0,0,0.01)',
           display: 'flex',
           flexDirection: 'column',
           gap: 2,

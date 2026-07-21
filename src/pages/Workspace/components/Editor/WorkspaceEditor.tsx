@@ -34,6 +34,16 @@ export const WorkspaceEditor = ({
 }: WorkspaceEditorProps) => {
   const [sourceLanguage, setSourceLanguage] = useState('auto');
   const [targetLanguage, setTargetLanguage] = useState('en');
+  const [isCentered, setIsCentered] = useState<boolean>(() => {
+    return localStorage.getItem('editor_centered_mode') === 'true';
+  });
+
+  const toggleCentered = () => {
+    setIsCentered((prev) => {
+      localStorage.setItem('editor_centered_mode', String(!prev));
+      return !prev;
+    });
+  };
 
   const {
     currentTitle,
@@ -79,6 +89,9 @@ export const WorkspaceEditor = ({
             setSourceLanguage={setSourceLanguage}
             targetLanguage={targetLanguage}
             setTargetLanguage={setTargetLanguage}
+            isCentered={isCentered}
+            onToggleCentered={toggleCentered}
+            onToggleSidebar={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
           />
 
           <EditorContent
@@ -94,6 +107,8 @@ export const WorkspaceEditor = ({
             setValue={setValue}
             watch={watch}
             targetLanguage={targetLanguage}
+            isCentered={isCentered}
+            toggleCentered={toggleCentered}
           />
         </MainEditorArea>
 

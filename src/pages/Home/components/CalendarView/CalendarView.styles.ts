@@ -6,7 +6,7 @@ export const CalendarContainer = styled(Box, {
   const isDark = theme.palette.mode === 'dark';
 
   // ── Use the SAME colors as the global MUI theme ──
-  const bgDefault = theme.palette.background.default; // #1b1b1d (dark) / #f8fafc (light)
+  const bgDefault = isDark ? '#121318' : '#fafbfd';
   const bgPaper = theme.palette.background.paper; // #23252a (dark) / #ffffff (light)
   const divider = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
   const dividerStrong = isDark

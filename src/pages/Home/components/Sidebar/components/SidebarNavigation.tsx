@@ -9,6 +9,7 @@ import {
   IconButton,
   Tooltip,
   Avatar,
+  Typography,
 } from '@mui/material';
 import { ExpandMore, ExpandLess, Add as AddIcon } from '@mui/icons-material';
 import { NavItem } from '../Sidebar.styles';
@@ -130,48 +131,13 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           id="joyride-ask-ai"
           active={activeTab === TaskBar.AskAI}
           onClick={() => changeStatusTab(TaskBar.AskAI)}
-          sx={{
-            '&': {
-              position: 'relative',
-              overflow: 'hidden',
-            },
-            ...(activeTab === TaskBar.AskAI && {
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: 0,
-                background:
-                  'linear-gradient(135deg, rgba(19,127,236,0.12) 0%, rgba(124,58,237,0.08) 100%)',
-                borderRadius: 'inherit',
-              },
-            }),
-          }}
         >
           <ListItemIcon>
-            <AskAIIcon
-              sx={{
-                color:
-                  activeTab === TaskBar.AskAI
-                    ? theme.palette.primary.main
-                    : theme.palette.text.secondary,
-              }}
-            />
+            <AskAIIcon />
           </ListItemIcon>
           <ListItemText
             primary="Ask AI"
-            primaryTypographyProps={{
-              fontWeight: activeTab === TaskBar.AskAI ? 700 : 500,
-              sx: {
-                background:
-                  activeTab === TaskBar.AskAI
-                    ? `linear-gradient(90deg, ${theme.palette.primary.main}, #7c3aed)`
-                    : 'none',
-                WebkitBackgroundClip:
-                  activeTab === TaskBar.AskAI ? 'text' : 'unset',
-                WebkitTextFillColor:
-                  activeTab === TaskBar.AskAI ? 'transparent' : 'inherit',
-              },
-            }}
+            primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
@@ -203,6 +169,32 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           />
         </NavItem>
       </ListItem>
+
+      {/* Collections Category Header */}
+      {!isCollapsed && (
+        <Box
+          sx={{
+            px: 2,
+            mt: 2.5,
+            mb: 1.5,
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              fontSize: '10px',
+              opacity: 0.6,
+            }}
+          >
+            collections
+          </Typography>
+        </Box>
+      )}
+
       <ListItem
         disablePadding
         sx={{
@@ -224,29 +216,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           }}
         >
           <ListItemIcon>
-            <Box
-              sx={{
-                width: 24,
-                height: 24,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor:
-                  activeTab === TaskBar.Workspace
-                    ? 'rgba(59, 130, 246, 0.1)'
-                    : 'transparent',
-                borderRadius: 1,
-              }}
-            >
-              <ProjectIcon
-                sx={{
-                  color:
-                    activeTab === TaskBar.Workspace
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                }}
-              />
-            </Box>
+            <ProjectIcon />
           </ListItemIcon>
           <ListItemText
             primary="Projects"

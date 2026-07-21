@@ -25,6 +25,7 @@ import {
   Search as SearchIcon,
   Close as CloseIcon,
   FolderOff as FolderOffIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import {
   ProjectsList,
@@ -32,7 +33,10 @@ import {
   ActionButtonContainer,
 } from '../Sidebar.styles';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
-import type { ProjectGroupTypes } from '@/pages/Workspace/types/workspace.types';
+import type {
+  ProjectGroupTypes,
+  WorkspaceTypes,
+} from '@/pages/Workspace/types/workspace.types';
 
 interface InlineRenameInputProps {
   value: string;
@@ -98,6 +102,28 @@ const InlineRenameInput = ({
     />
   );
 };
+
+const WorkspaceCountBadge = ({ count }: { count: number }) => (
+  <Typography
+    variant="caption"
+    sx={{
+      ml: 0.5,
+      px: 0.7,
+      py: 0.1,
+      borderRadius: '999px',
+      fontSize: '0.7rem',
+      fontWeight: 600,
+      lineHeight: 1.4,
+      color: 'text.secondary',
+      bgcolor: (theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.06)'
+          : 'rgba(0, 0, 0, 0.05)',
+    }}
+  >
+    {count}
+  </Typography>
+);
 
 interface ProjectGroupsSectionProps {
   sidebar: UseSidebarReturn;
@@ -168,9 +194,13 @@ export const ProjectGroupsSection = ({
     group.name.toLowerCase().includes(folderQuery.toLowerCase()),
   );
 
+  const allWorkspaces = workspacesData?.workspaces || [];
   const totalGroupsCount = projectGroups.length;
-  const totalWorkspacesCount = (workspacesData?.workspaces || []).length;
+  const totalWorkspacesCount = allWorkspaces.length;
   const isEmpty = totalGroupsCount === 0 && totalWorkspacesCount === 0;
+
+  const getWorkspaceCountForGroup = (groupId: string) =>
+    allWorkspaces.filter((w: WorkspaceTypes) => w.groupId === groupId).length;
 
   const projectsListContent = (
     <ProjectsList>
@@ -203,6 +233,7 @@ export const ProjectGroupsSection = ({
           >
             All folders
           </Typography>
+          <WorkspaceCountBadge count={totalWorkspacesCount} />
         </ProjectItemRow>
 
         <Divider
@@ -286,6 +317,7 @@ export const ProjectGroupsSection = ({
             onChange={(e) => setNewGroupName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
+                e.preventDefault();
                 if (newGroupName.trim()) {
                   handleCreateGroupInline();
                 } else {
@@ -297,12 +329,13 @@ export const ProjectGroupsSection = ({
                 setNewGroupName('');
               }
             }}
-            onBlur={() => {
+            onBlur={(e) => {
+              // Don't blur-submit if user clicked the confirm button
+              const relatedTarget = e.relatedTarget as HTMLElement | null;
+              if (relatedTarget?.closest('.create-group-confirm')) return;
               if (!newGroupName.trim()) {
                 setIsCreatingGroupInline(false);
                 setNewGroupName('');
-              } else {
-                handleCreateGroupInline();
               }
             }}
             style={{
@@ -315,6 +348,40 @@ export const ProjectGroupsSection = ({
               width: '100%',
             }}
           />
+          <Tooltip title="Create project" arrow>
+            <IconButton
+              className="create-group-confirm"
+              size="small"
+              onClick={() => {
+                if (newGroupName.trim()) {
+                  handleCreateGroupInline();
+                }
+              }}
+              sx={{
+                ml: 0.5,
+                p: 0.4,
+                color: newGroupName.trim()
+                  ? theme.palette.primary.main
+                  : theme.palette.text.disabled,
+                bgcolor: newGroupName.trim()
+                  ? theme.palette.mode === 'dark'
+                    ? 'rgba(99, 102, 241, 0.15)'
+                    : 'rgba(99, 102, 241, 0.08)'
+                  : 'transparent',
+                borderRadius: '6px',
+                '&:hover': {
+                  bgcolor: newGroupName.trim()
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(99, 102, 241, 0.25)'
+                      : 'rgba(99, 102, 241, 0.15)'
+                    : 'transparent',
+                },
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <CheckIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Tooltip>
         </Box>
       )}
 
@@ -406,6 +473,10 @@ export const ProjectGroupsSection = ({
                   {group.name}
                 </Typography>
               )}
+
+              <WorkspaceCountBadge
+                count={getWorkspaceCountForGroup(group.id)}
+              />
 
               <ActionButtonContainer className="hover-actions">
                 <Tooltip title="New Note" arrow>
