@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
-  CheckBoxOutlined as CheckBoxIcon,
+  Link as LinkIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import {
@@ -20,7 +20,6 @@ import {
   PropertyItem,
   PropertyLabel,
   PropertyValue,
-  HoverArrowButton,
 } from '../WorkspaceLibrary.styles';
 import { colorPaletteMap, iconMap } from '../constants/library.constants';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
@@ -125,6 +124,48 @@ export const WorkspaceCardItem = ({
 
   const snippet = getSnippet(workspace.content);
 
+  // Common emojis and their corresponding soft background colors for avatar circle
+  const getAvatarStyles = () => {
+    if (isBackgroundActive) {
+      return {
+        bgcolor: isDark
+          ? 'rgba(255, 255, 255, 0.12)'
+          : 'rgba(255, 255, 255, 0.5)',
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        color: isLightBg ? '#000' : '#fff',
+      };
+    }
+    const emoji = workspace.emoji;
+    const emojiColors: Record<string, string> = {
+      '😁': '#fbbf24', // yellow
+      '😊': '#fbbf24',
+      '😈': '#a78bfa', // purple
+      '🔥': '#f87171', // red
+      '💡': '#fbbf24',
+      '🚀': '#60a5fa', // blue
+      '⭐': '#fbbf24',
+      '❤️': '#f87171',
+    };
+    const matchedColor = emoji ? emojiColors[emoji] : undefined;
+    if (matchedColor) {
+      return {
+        bgcolor: isDark ? alpha(matchedColor, 0.15) : alpha(matchedColor, 0.08),
+        borderColor: isDark
+          ? alpha(matchedColor, 0.25)
+          : alpha(matchedColor, 0.12),
+        color: matchedColor,
+      };
+    }
+    // Fallback to project/group color
+    return {
+      bgcolor: isDark ? alpha(baseColor, 0.15) : alpha(baseColor, 0.08),
+      borderColor: isDark ? alpha(baseColor, 0.25) : alpha(baseColor, 0.12),
+      color: visibleColor,
+    };
+  };
+
+  const avatarStyles = getAvatarStyles();
+
   return (
     <WorkspaceCard
       onClick={() => onSelect(workspace)}
@@ -142,12 +183,11 @@ export const WorkspaceCardItem = ({
       >
         <CardAvatarCircle
           sx={{
-            ...(isBackgroundActive && {
-              bgcolor: isDark
-                ? 'rgba(255, 255, 255, 0.12)'
-                : 'rgba(255, 255, 255, 0.5)',
-              borderColor: 'rgba(255, 255, 255, 0.2)',
-            }),
+            bgcolor: avatarStyles.bgcolor,
+            borderColor: avatarStyles.borderColor,
+            color: avatarStyles.color,
+            borderWidth: '1px',
+            borderStyle: 'solid',
           }}
         >
           {workspace.emoji && !iconMap[workspace.emoji] ? (
@@ -160,11 +200,7 @@ export const WorkspaceCardItem = ({
               {
                 sx: {
                   fontSize: 20,
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? '#000'
-                      : '#fff'
-                    : 'text.primary',
+                  color: avatarStyles.color,
                   opacity: 0.9,
                 },
               },
@@ -177,11 +213,18 @@ export const WorkspaceCardItem = ({
             color={visibleColor}
             bgColor={badgeBgColor}
             sx={{
+              borderRadius: '20px',
+              px: 1.5,
+              py: 0.4,
+              fontSize: '11px',
+              fontWeight: 600,
+              border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'}`,
               ...(isBackgroundActive && {
                 bgcolor: isLightBg
                   ? 'rgba(0, 0, 0, 0.08)'
                   : 'rgba(255, 255, 255, 0.15)',
                 color: isLightBg ? 'rgba(0, 0, 0, 0.8)' : '#fff',
+                borderColor: 'transparent',
               }),
             }}
           >
@@ -227,7 +270,9 @@ export const WorkspaceCardItem = ({
               ? isLightBg
                 ? '#000'
                 : '#fff'
-              : 'text.primary',
+              : workspace.task
+                ? 'primary.main'
+                : 'text.primary',
             textShadow:
               isBackgroundActive && !isLightBg
                 ? '0 1px 3px rgba(0,0,0,0.3)'
@@ -235,6 +280,10 @@ export const WorkspaceCardItem = ({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            transition: 'color 0.2s ease',
+            '.MuiPaper-root:hover &': {
+              color: 'primary.main',
+            },
           }}
         >
           {workspace.title}
@@ -266,11 +315,13 @@ export const WorkspaceCardItem = ({
       {!compact && (
         <PropertyGrid
           sx={{
-            ...(isBackgroundActive && {
-              borderTopColor: isLightBg
+            borderTopColor: isBackgroundActive
+              ? isLightBg
                 ? 'rgba(0, 0, 0, 0.08)'
-                : 'rgba(255, 255, 255, 0.15)',
-            }),
+                : 'rgba(255, 255, 255, 0.15)'
+              : theme.palette.divider,
+            pt: 1.5,
+            mt: 1.5,
           }}
         >
           <PropertyItem>
@@ -292,6 +343,7 @@ export const WorkspaceCardItem = ({
                     ? '#000'
                     : '#fff'
                   : 'text.primary',
+                fontWeight: 700,
               }}
             >
               {folderName}
@@ -341,13 +393,39 @@ export const WorkspaceCardItem = ({
                   ? isLightBg
                     ? '#000'
                     : '#fff'
-                  : 'text.primary',
+                  : workspace.task
+                    ? workspace.task.status.toUpperCase() === 'DONE'
+                      ? '#10b981'
+                      : 'text.primary'
+                    : 'text.secondary',
                 textTransform: 'capitalize',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                fontStyle: !workspace.task ? 'italic' : 'normal',
               }}
             >
-              {workspace.task
-                ? workspace.task.status.toLowerCase().replace('_', ' ')
-                : 'None'}
+              {workspace.task ? (
+                <>
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      bgcolor:
+                        workspace.task.status.toUpperCase() === 'DONE'
+                          ? '#10b981'
+                          : '#fbbf24',
+                      display: 'inline-block',
+                    }}
+                  />
+                  {workspace.task.status.toLowerCase().replace('_', ' ')}
+                </>
+              ) : (
+                'None'
+              )}
             </PropertyValue>
           </PropertyItem>
 
@@ -369,7 +447,10 @@ export const WorkspaceCardItem = ({
                   ? isLightBg
                     ? '#000'
                     : '#fff'
-                  : 'text.primary',
+                  : workspace.task
+                    ? 'primary.main'
+                    : 'text.secondary',
+                fontWeight: 600,
               }}
             >
               {workspace.task
@@ -386,79 +467,91 @@ export const WorkspaceCardItem = ({
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             mt: 'auto',
-            pt: 1.5,
-            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+            width: '100%',
           }}
         >
           {workspace.task ? (
             <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                cursor: 'pointer',
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(0, 0, 0, 0.7)'
-                    : 'rgba(255, 255, 255, 0.8)'
-                  : 'primary.main',
-                transition: 'all 0.2s',
-                '&:hover': {
-                  color: 'error.main',
-                },
-              }}
               onClick={(e) => {
                 e.stopPropagation();
                 onUnlinkTask(workspace);
               }}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                p: '8px 14px',
+                borderRadius: '20px',
+                bgcolor: isDark
+                  ? 'rgba(92, 92, 246, 0.12)'
+                  : 'rgba(92, 92, 246, 0.05)',
+                border: `1px solid ${isDark ? 'rgba(92, 92, 246, 0.2)' : 'rgba(92, 92, 246, 0.1)'}`,
+                color: 'primary.main',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  bgcolor: isDark
+                    ? 'rgba(239, 68, 68, 0.12)'
+                    : 'rgba(239, 68, 68, 0.05)',
+                  borderColor: 'error.main',
+                  color: 'error.main',
+                  '& .unlink-text': {
+                    color: 'error.main',
+                  },
+                },
+              }}
             >
-              <CheckBoxIcon sx={{ fontSize: 18 }} />
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={1}
+                sx={{ overflow: 'hidden', flex: 1, mr: 1 }}
+              >
+                <LinkIcon sx={{ fontSize: 14 }} />
+                <Typography
+                  variant="caption"
+                  className="unlink-text"
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: '0.8rem',
+                    color: 'primary.main',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    transition: 'color 0.2s ease',
+                  }}
+                >
+                  {workspace.task.title}
+                </Typography>
+              </Box>
               <Typography
-                variant="caption"
                 sx={{
+                  fontSize: '14px',
                   fontWeight: 700,
-                  fontSize: '11px',
-                  maxWidth: '180px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
-                Linked: {workspace.task.title}
+                →
               </Typography>
             </Box>
           ) : (
             <Typography
               variant="caption"
               sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(0, 0, 0, 0.5)'
-                    : 'rgba(255, 255, 255, 0.5)'
-                  : 'text.secondary',
-                fontStyle: 'italic',
-                fontSize: '11px',
+                color: 'text.secondary',
+                opacity: 0.6,
+                fontSize: '0.85rem',
+                textAlign: 'center',
+                py: 0.8,
               }}
             >
               No task linked
             </Typography>
           )}
-          <HoverArrowButton
-            className="arrow-button"
-            sx={{
-              fontSize: '16px',
-              fontWeight: 500,
-              color: isBackgroundActive
-                ? isLightBg
-                  ? 'rgba(0, 0, 0, 0.7)'
-                  : 'rgba(255, 255, 255, 0.8)'
-                : 'text.secondary',
-            }}
-          >
-            →
-          </HoverArrowButton>
         </Box>
       )}
     </WorkspaceCard>
