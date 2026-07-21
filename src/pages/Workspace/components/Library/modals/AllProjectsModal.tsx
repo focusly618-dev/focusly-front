@@ -6,14 +6,19 @@ import {
   useTheme,
   Dialog,
   DialogContent,
+  Checkbox,
 } from '@mui/material';
 import {
   Close as CloseIcon,
   Search as SearchIcon,
   Folder as FolderIcon,
+  Delete as DeleteIcon,
+  RadioButtonUnchecked as RadioButtonUncheckedIcon,
+  CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'motion/react';
-import { Button, TextField } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { StyledTextField } from '../WorkspaceLibrary.styles';
 import type { ProjectTypes } from '../../../types/workspace.types';
 
 interface AllProjectsModalProps {
@@ -22,6 +27,7 @@ interface AllProjectsModalProps {
   projects: ProjectTypes[];
   onSelect: (projectId: string) => void;
   selectedId: string | null;
+  onDeleteProjects?: (projectIds: string[]) => Promise<void>;
 }
 
 export const AllProjectsModal = ({
@@ -30,13 +36,22 @@ export const AllProjectsModal = ({
   projects,
   onSelect,
   selectedId,
+  onDeleteProjects,
 }: AllProjectsModalProps) => {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedForDelete, setSelectedForDelete] = useState<string[]>([]);
 
   const filteredProjects = projects.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  const handleDeleteClick = async () => {
+    if (onDeleteProjects) {
+      await onDeleteProjects(selectedForDelete);
+      setSelectedForDelete([]);
+    }
+  };
 
   return (
     <Dialog
@@ -86,28 +101,30 @@ export const AllProjectsModal = ({
         </Box>
 
         <Box sx={{ position: 'relative', my: 3 }}>
-          <TextField
+          <StyledTextField
             fullWidth
             placeholder={`Search across ${projects.length} folders...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <SearchIcon
-                    sx={{ color: 'text.secondary', mr: 1, fontSize: 20 }}
-                  />
-                ),
-              },
-            }}
+            size="small"
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '16px',
-                bgcolor:
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(0,0,0,0.2)'
-                    : 'rgba(0,0,0,0.02)',
-              },
+              maxWidth: 'none',
+            }}
+            InputProps={{
+              startAdornment: (
+                <SearchIcon
+                  sx={{ color: 'text.secondary', mr: 1, fontSize: 18 }}
+                />
+              ),
+              endAdornment: searchTerm ? (
+                <IconButton
+                  size="small"
+                  sx={{ color: 'text.secondary', p: 0.5 }}
+                  onClick={() => setSearchTerm('')}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              ) : null,
             }}
           />
         </Box>
@@ -180,7 +197,7 @@ export const AllProjectsModal = ({
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    p: 2.5,
+                    p: 2,
                     borderRadius: '16px',
                     bgcolor:
                       theme.palette.mode === 'dark'
@@ -200,10 +217,35 @@ export const AllProjectsModal = ({
                           ? '0 0 20px rgba(0, 245, 255, 0.2)'
                           : 'none',
                       borderLeft: `10px solid ${project.color || theme.palette.primary.main}`,
-                      pl: '17px',
+                      pl: '14px',
                     },
                   }}
                 >
+                  <Box
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    sx={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    <Checkbox
+                      checked={selectedForDelete.includes(project.id)}
+                      icon={<RadioButtonUncheckedIcon />}
+                      checkedIcon={<CheckCircleIcon />}
+                      onChange={() => {
+                        setSelectedForDelete((prev) =>
+                          prev.includes(project.id)
+                            ? prev.filter((id) => id !== project.id)
+                            : [...prev, project.id],
+                        );
+                      }}
+                      sx={{
+                        mr: 1,
+                        color: theme.palette.text.secondary,
+                        '&.Mui-checked': {
+                          color: 'error.main',
+                        },
+                      }}
+                    />
+                  </Box>
                   <Box
                     sx={{
                       width: 48,
@@ -279,6 +321,29 @@ export const AllProjectsModal = ({
           alignItems="center"
           mt={4}
         >
+          {selectedForDelete.length > 0 ? (
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={handleDeleteClick}
+              sx={{
+                fontWeight: 800,
+                borderRadius: '12px',
+                px: 2.5,
+                boxShadow: '0 0 15px rgba(244, 67, 54, 0.3)',
+                '&:hover': {
+                  bgcolor: 'error.dark',
+                  boxShadow: '0 0 25px rgba(244, 67, 54, 0.5)',
+                },
+              }}
+            >
+              Eliminar ({selectedForDelete.length})
+            </Button>
+          ) : (
+            <Box />
+          )}
+
           <Box gap={2} display="flex">
             <Button
               variant="text"

@@ -13,6 +13,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  TextField,
+  styled,
 } from '@mui/material';
 import type { Theme } from '@mui/material';
 import {
@@ -37,6 +39,46 @@ import type {
   ProjectGroupTypes,
   WorkspaceTypes,
 } from '@/pages/Workspace/types/workspace.types';
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  flex: 1,
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A1F2B' : '#ffffff',
+  borderRadius: '30px',
+  transition: 'all 0.2s ease-in-out',
+  '& .MuiOutlinedInput-root': {
+    color: theme.palette.text.primary,
+    borderRadius: '30px',
+    height: '34px',
+    fontSize: '13px',
+    '& fieldset': {
+      borderColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.05)'
+          : 'rgba(0, 0, 0, 0.05)',
+      borderRadius: '30px',
+    },
+    '&:hover fieldset': {
+      borderColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.15)'
+          : 'rgba(0, 0, 0, 0.1)',
+    },
+    '&.Mui-focused': {
+      boxShadow:
+        theme.palette.mode === 'dark'
+          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
+          : '0 0 0 3px rgba(59, 130, 246, 0.08)',
+      '& fieldset': {
+        borderColor: theme.palette.mode === 'dark' ? '#6366f1' : '#2563eb',
+        borderWidth: '1px',
+      },
+    },
+  },
+  '& .MuiOutlinedInput-input': {
+    padding: '0 10px',
+    fontSize: '13px',
+  },
+}));
 
 interface InlineRenameInputProps {
   value: string;
@@ -246,50 +288,30 @@ export const ProjectGroupsSection = ({
 
       {/* Folder Search Bar */}
       {projectGroups.length > 0 && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            mb: 1.5,
-            px: 1,
-            py: 0.5,
-            borderRadius: '8px',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.02)'
-                : 'rgba(0, 0, 0, 0.02)',
-            border: (theme) =>
-              theme.palette.mode === 'dark'
-                ? '1px solid rgba(255, 255, 255, 0.05)'
-                : '1px solid rgba(0, 0, 0, 0.05)',
-          }}
-        >
-          <SearchIcon
-            sx={{ fontSize: 16, color: 'text.secondary', mr: 0.75 }}
-          />
-          <input
+        <Box sx={{ mb: 1.5, px: 0.5 }}>
+          <StyledTextField
             placeholder="Search folders..."
             value={folderQuery}
             onChange={(e) => setFolderQuery(e.target.value)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              color: theme.palette.text.primary,
-              fontSize: '0.8rem',
-              fontFamily: 'inherit',
-              width: '100%',
+            size="small"
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <SearchIcon
+                  sx={{ fontSize: 16, color: 'text.secondary', mr: 0.75 }}
+                />
+              ),
+              endAdornment: folderQuery ? (
+                <IconButton
+                  size="small"
+                  onClick={() => setFolderQuery('')}
+                  sx={{ p: 0, color: 'text.disabled' }}
+                >
+                  <CloseIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              ) : null,
             }}
           />
-          {folderQuery && (
-            <IconButton
-              size="small"
-              onClick={() => setFolderQuery('')}
-              sx={{ p: 0, color: 'text.disabled' }}
-            >
-              <CloseIcon sx={{ fontSize: 14 }} />
-            </IconButton>
-          )}
         </Box>
       )}
       {/* Inline Group Creation */}
@@ -784,8 +806,8 @@ export const ProjectGroupsSection = ({
             size="small"
             onClick={() => setIsCreatingGroupInline((prev) => !prev)}
             sx={{
-              color: 'text.secondary',
-              '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
+              color: 'primary.main',
+              '&:hover': { bgcolor: 'action.hover' },
             }}
           >
             <AddIcon sx={{ fontSize: 16 }} />

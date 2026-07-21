@@ -1,7 +1,7 @@
 export enum TaskBar {
   DailyPlan = 'DailyPlan',
   Tasks = 'Tasks',
-  Workspace = 'Workspace',
+  Workspace = 'Projects',
   AskAI = 'AskAI',
   Insights = 'Insights',
   Settings = 'Settings',

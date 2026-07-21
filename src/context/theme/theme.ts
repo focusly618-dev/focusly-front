@@ -37,7 +37,7 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
     },
     typography: {
       fontFamily:
-        '"Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+        '"Outfit", "Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
       fontSize: 14,
       h1: {
         fontWeight: 800,

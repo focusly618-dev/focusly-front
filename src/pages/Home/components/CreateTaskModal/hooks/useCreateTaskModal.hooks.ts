@@ -194,7 +194,7 @@ export const useCreateTaskModal = ({
   const createURLWorkSpace = (workspaceId: string): void => {
     if (workspaceId) {
       const newParams = new URLSearchParams(searchParams);
-      newParams.set('tab', 'Workspace');
+      newParams.set('tab', 'Projects');
       newParams.set('workspaceId', workspaceId);
       newParams.delete('taskId');
       setSearchParams(newParams);
