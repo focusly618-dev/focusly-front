@@ -12,8 +12,25 @@ import type { UseTaskFormStateProps } from '../types/CreateTaskModal.types';
 export const useTaskFormState = ({
   initialTask,
   initialStart,
+  initialEnd,
 }: UseTaskFormStateProps) => {
   const getInitialState = useCallback(() => {
+    let calculatedDuration = '';
+    if (initialStart && initialEnd) {
+      const diffMs = initialEnd.getTime() - initialStart.getTime();
+      const diffMins = Math.round(diffMs / 60000);
+      if (diffMins > 0) {
+        const hrs = Math.floor(diffMins / 60);
+        const mins = diffMins % 60;
+        calculatedDuration =
+          hrs > 0
+            ? mins > 0
+              ? `${hrs}h ${mins}m`
+              : `${hrs}h 00m`
+            : `${mins}m`;
+      }
+    }
+
     const defaults = {
       title: '',
       description: '',
@@ -22,7 +39,7 @@ export const useTaskFormState = ({
       status: 'Backlog' as Task['status'],
       category: 'General',
       currentDate: initialStart || new Date(),
-      duration: '',
+      duration: calculatedDuration,
       realTime: '00:00',
     };
 
@@ -68,7 +85,7 @@ export const useTaskFormState = ({
       duration: estimate_timer ? formatDuration(estimate_timer) : '',
       realTime: real_timer ? formatDuration(real_timer) : '',
     };
-  }, [initialTask, initialStart]);
+  }, [initialTask, initialStart, initialEnd]);
 
   const initialState = useMemo(() => getInitialState(), [getInitialState]);
 

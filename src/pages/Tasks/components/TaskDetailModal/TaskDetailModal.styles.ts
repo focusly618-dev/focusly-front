@@ -3,38 +3,34 @@ import type { Theme } from '@mui/material/styles';
 // Common Input Sx
 export const darkInputSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+    theme.palette.mode === 'dark' ? '#121318' : '#f8fafc',
   borderRadius: '12px',
   '& .MuiOutlinedInput-root': {
     backgroundColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+      theme.palette.mode === 'dark' ? '#121318' : '#f8fafc',
     color: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#e0e2e9' : '#000',
+      theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a',
     fontSize: '14px',
     borderRadius: '12px',
     '& fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
     },
     '&:hover fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.18)'
-          : 'action.hover',
+        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : '#cbd5e1',
     },
     '&.Mui-focused fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+        theme.palette.mode === 'dark' ? '#6366f1' : '#4f46e5',
     },
     '&.Mui-focused': {
       backgroundColor: (theme: Theme) =>
-        theme.palette.mode === 'dark'
-          ? 'rgba(26, 31, 43, 0.9)'
-          : 'background.default',
+        theme.palette.mode === 'dark' ? '#121318' : '#f8fafc',
       boxShadow: (theme: Theme) =>
         theme.palette.mode === 'dark'
           ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : 'none',
+          : '0 0 0 3px rgba(79, 70, 229, 0.08)',
     },
     '& input': {
       padding: '10px 14px',
@@ -58,7 +54,8 @@ export const darkInputSx = {
       borderRadius: '12px',
     },
   '& .MuiInputBase-input': {
-    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
+    color: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#fff' : '#0f172a',
   },
   '& .MuiSvgIcon-root': { color: 'text.secondary' },
 };
@@ -66,30 +63,28 @@ export const darkInputSx = {
 export const darkInputSxTimers = {
   '& .MuiOutlinedInput-root': {
     backgroundColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+      theme.palette.mode === 'dark' ? '#121318' : '#f8fafc',
     borderRadius: '8px',
     color: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#e0e2e9' : '#000',
+      theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a',
     fontSize: '14px',
     '& fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
     },
     '&:hover fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.18)'
-          : 'action.hover',
+        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.18)' : '#cbd5e1',
     },
     '&.Mui-focused fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+        theme.palette.mode === 'dark' ? '#6366f1' : '#4f46e5',
     },
     '&.Mui-focused': {
       boxShadow: (theme: Theme) =>
         theme.palette.mode === 'dark'
           ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : 'none',
+          : '0 0 0 3px rgba(79, 70, 229, 0.08)',
     },
     '& input': {
       padding: '5px 5px',
@@ -106,7 +101,8 @@ export const darkInputSxTimers = {
     },
   },
   '& .MuiInputBase-input': {
-    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
+    color: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#fff' : '#0f172a',
   },
   '& .MuiSvgIcon-root': { color: 'text.secondary' },
 };
@@ -123,13 +119,14 @@ export const labelSx = {
 
 export const paperPropsSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.85)' : '#ffffff',
+    theme.palette.mode === 'dark' ? '#1c1f26' : '#ffffff',
   backgroundImage: 'none',
-  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#e0e2e9' : '#000'),
+  color: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#e0e2e9' : '#0f172a',
   borderRadius: '16px',
   border: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
   backdropFilter: (theme: Theme) =>
     theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
   WebkitBackdropFilter: (theme: Theme) =>
@@ -137,7 +134,7 @@ export const paperPropsSx = {
   boxShadow: (theme: Theme) =>
     theme.palette.mode === 'dark'
       ? '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
-      : 'none',
+      : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
 };
 
@@ -163,13 +160,14 @@ export const dialogTitleSx = {
   justifyContent: 'space-between',
   alignItems: 'center',
   fontSize: '16px',
-  fontWeight: 600,
+  fontWeight: 700,
   borderBottom: '1px solid',
-  borderColor: 'divider',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
   padding: '16px 24px',
-  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
+  color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#0f172a'),
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.4)' : '#ffffff',
+    theme.palette.mode === 'dark' ? '#1c1f26' : '#ffffff',
 };
 
 export const iconBoxSx = {
@@ -324,9 +322,10 @@ export const menuPaperPropsSx = {
 export const dialogActionsSx = {
   padding: '16px 24px',
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.4)' : '#ffffff',
+    theme.palette.mode === 'dark' ? '#1c1f26' : '#ffffff',
   borderTop: '1px solid',
-  borderColor: 'divider',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
   display: 'flex',
   justifyContent: 'flex-end',
   gap: '12px',
@@ -335,51 +334,35 @@ export const dialogActionsSx = {
 export const cancelButtonSx = {
   color: 'text.secondary',
   textTransform: 'none' as const,
-  fontWeight: 500,
+  fontWeight: 700,
+  height: '36px',
+  borderRadius: '10px',
+  px: 2,
   '&:hover': {
     backgroundColor: 'action.hover',
   },
 };
 
 export const saveButtonSx = {
-  background: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)'
-      : undefined,
-  bgcolor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? undefined : 'primary.main',
+  bgcolor: '#2563eb',
   color: '#fff',
   textTransform: 'none' as const,
-  borderRadius: '8px',
-  boxShadow: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? '0 4px 14px 0 rgba(99, 102, 241, 0.3)'
-      : 'none',
-  fontWeight: 600,
+  borderRadius: '10px',
+  fontWeight: 700,
   px: 3,
+  height: '36px',
+  boxShadow: 'none',
   transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    background: (theme: Theme) =>
-      theme.palette.mode === 'dark'
-        ? 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)'
-        : undefined,
-    bgcolor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? undefined : 'primary.dark',
-    boxShadow: (theme: Theme) =>
-      theme.palette.mode === 'dark'
-        ? '0 6px 20px rgba(99, 102, 241, 0.5)'
-        : 'none',
-    transform: 'translateY(-1px)',
+    bgcolor: '#1d4ed8',
+    boxShadow: 'none',
   },
   '&.Mui-disabled': {
-    background: (theme: Theme) =>
+    bgcolor: (theme: Theme) =>
       theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.12)'
-        : 'rgba(0, 0, 0, 0.12)',
-    color: (theme: Theme) =>
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.3)'
-        : 'rgba(0, 0, 0, 0.26)',
+        ? 'rgba(255, 255, 255, 0.08)'
+        : 'rgba(0, 0, 0, 0.08)',
+    color: 'text.disabled',
     boxShadow: 'none',
     transform: 'none',
   },
@@ -489,6 +472,7 @@ export const timeSlotBoxSx = {
 };
 
 export const datePickerPopperSx = {
+  zIndex: 99999,
   '& .MuiPickersLayout-root': {
     backgroundColor: 'transparent',
   },
@@ -543,6 +527,7 @@ export const datePickerPaperSx = {
 };
 
 export const timePickerPopperSx = {
+  zIndex: 99999,
   '& .MuiPickersLayout-root': {
     backgroundColor: 'transparent',
   },

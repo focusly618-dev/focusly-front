@@ -18,6 +18,10 @@ import {
   Refresh as RefreshIcon,
   ArrowDropDown as ArrowDownIcon,
   AlternateEmail as AtIcon,
+  CalendarToday as CalendarIcon,
+  Build as ToolIcon,
+  FlashOn as LightningIcon,
+  BarChart as ChartIcon,
 } from '@mui/icons-material';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector } from '@/redux/hooks';
@@ -70,25 +74,25 @@ interface Message {
 
 const suggestions = [
   {
-    emoji: '📅',
+    iconType: 'calendar',
     title: 'Optimize my daily plan',
     subtitle: 'Reschedule tasks for peak energy',
     prompt: 'Optimize my daily plan',
   },
   {
-    emoji: '🔨',
+    iconType: 'tool',
     title: 'Break down a big task',
     subtitle: 'Split your largest task into smaller tasks',
     prompt: 'Break down my biggest task into smaller tasks',
   },
   {
-    emoji: '⚡',
+    iconType: 'lightning',
     title: 'Suggest a focus strategy',
     subtitle: 'Get personalized deep-work techniques',
     prompt: 'Suggest a focus strategy for me',
   },
   {
-    emoji: '📊',
+    iconType: 'chart',
     title: 'Analyze my productivity',
     subtitle: 'Identify patterns and bottlenecks',
     prompt: 'Analyze my productivity and suggest improvements',
@@ -774,27 +778,64 @@ export const AskAI: React.FC = () => {
 
                 {/* Suggestion cards */}
                 <SuggestionGrid sx={{ mt: 3 }}>
-                  {suggestions.map((s) => (
-                    <SuggestionCard
-                      key={s.title}
-                      onClick={() => handleSuggestionClick(s.prompt)}
-                    >
-                      <Typography fontSize="22px" lineHeight={1}>
-                        {s.emoji}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight={700}
-                        color="text.primary"
-                        sx={{ lineHeight: 1.3 }}
+                  {suggestions.map((s) => {
+                    let IconComponent = CalendarIcon;
+                    if (s.iconType === 'tool') IconComponent = ToolIcon;
+                    if (s.iconType === 'lightning')
+                      IconComponent = LightningIcon;
+                    if (s.iconType === 'chart') IconComponent = ChartIcon;
+
+                    return (
+                      <SuggestionCard
+                        key={s.title}
+                        onClick={() => handleSuggestionClick(s.prompt)}
                       >
-                        {s.title}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {s.subtitle}
-                      </Typography>
-                    </SuggestionCard>
-                  ))}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: 40,
+                            height: 40,
+                            borderRadius: '10px',
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(59, 130, 246, 0.15)'
+                                : 'rgba(59, 130, 246, 0.08)',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <IconComponent
+                            sx={{ fontSize: 20, color: 'primary.main' }}
+                          />
+                        </Box>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '2px',
+                            textAlign: 'left',
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            fontWeight={700}
+                            color="text.primary"
+                            sx={{ lineHeight: 1.3, fontSize: '13.5px' }}
+                          >
+                            {s.title}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontSize: '11px', lineHeight: 1.2 }}
+                          >
+                            {s.subtitle}
+                          </Typography>
+                        </Box>
+                      </SuggestionCard>
+                    );
+                  })}
                 </SuggestionGrid>
               </WelcomeSection>
             )}
@@ -1212,24 +1253,30 @@ export const AskAI: React.FC = () => {
             onClick={handleNewChat}
             startIcon={<AddIcon />}
             sx={{
-              borderRadius: '10px',
+              borderRadius: '12px',
               textTransform: 'none',
-              boxShadow: 'none',
+              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.15)',
               fontWeight: 700,
               fontSize: '0.85rem',
+              py: 1.2,
+              bgcolor: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.dark',
+                boxShadow: '0 6px 16px rgba(79, 70, 229, 0.25)',
+              },
             }}
           >
             New Chat
           </Button>
         </Box>
-        <Box sx={{ flex: 1, overflowY: 'auto', px: 1, pb: 2 }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', px: 2, pb: 2 }}>
           <Typography
             variant="caption"
             color="text.secondary"
             fontWeight={800}
             sx={{
-              px: 1.5,
-              mb: 1.5,
+              px: 2,
+              mb: 2,
               display: 'block',
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
@@ -1248,51 +1295,47 @@ export const AskAI: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  px: 1.5,
-                  py: 1,
-                  borderRadius: '8px',
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: '12px',
                   cursor: 'pointer',
-                  mb: 0.8,
+                  mb: 1.2,
                   bgcolor: isActive
-                    ? theme.palette.mode === 'dark'
-                      ? 'rgba(59, 130, 246, 0.12)'
-                      : 'rgba(59, 130, 246, 0.08)'
-                    : theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.02)'
-                      : 'rgba(0, 0, 0, 0.015)',
-                  border: `1px solid ${
-                    isActive
-                      ? theme.palette.primary.main
-                      : theme.palette.divider
-                  }`,
-                  color: isActive
-                    ? theme.palette.primary.main
-                    : theme.palette.text.primary,
+                    ? (theme) =>
+                        theme.palette.mode === 'dark' ? '#1e293b' : '#ffffff'
+                    : 'transparent',
+                  border: '1px solid transparent',
+                  borderColor: isActive
+                    ? (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(0, 0, 0, 0.04)'
+                    : 'transparent',
+                  color: 'text.primary',
+                  boxShadow: isActive ? '0 4px 20px rgba(0,0,0,0.04)' : 'none',
                   '&:hover': {
-                    bgcolor: isActive
-                      ? theme.palette.mode === 'dark'
-                        ? 'rgba(59, 130, 246, 0.15)'
-                        : 'rgba(59, 130, 246, 0.12)'
-                      : theme.palette.mode === 'dark'
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark' ? '#1e293b' : '#ffffff',
+                    borderColor: (theme) =>
+                      theme.palette.mode === 'dark'
                         ? 'rgba(255, 255, 255, 0.05)'
-                        : 'rgba(0, 0, 0, 0.03)',
-                    borderColor: isActive
-                      ? theme.palette.primary.dark
-                      : 'rgba(19, 127, 236, 0.3)',
-                    '& .delete-btn': { opacity: 1 },
+                        : 'rgba(0, 0, 0, 0.04)',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                    '& .delete-btn': { opacity: 0.7 },
                   },
-                  transition: 'all 0.15s ease',
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <Box sx={{ flex: 1, overflow: 'hidden', mr: 1 }}>
                   <Typography
                     variant="body2"
                     sx={{
-                      fontWeight: isActive ? 700 : 500,
-                      fontSize: '0.85rem',
+                      fontWeight: 700,
+                      fontSize: '13px',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
+                      color: 'text.primary',
                     }}
                   >
                     {c.title || 'Untitled Chat'}
@@ -1302,13 +1345,15 @@ export const AskAI: React.FC = () => {
                       variant="caption"
                       color="text.secondary"
                       sx={{
-                        fontSize: '10px',
-                        opacity: 0.7,
+                        fontSize: '9.5px',
+                        fontWeight: 700,
+                        opacity: 0.6,
                         display: 'block',
-                        mt: 0.2,
+                        mt: 0.5,
+                        textTransform: 'uppercase',
                       }}
                     >
-                      {formatUpdateTime(c.updatedAt)}
+                      {formatUpdateTime(c.updatedAt).toUpperCase()}
                     </Typography>
                   )}
                 </Box>
@@ -1323,7 +1368,10 @@ export const AskAI: React.FC = () => {
                     p: 0.25,
                     opacity: 0,
                     color: 'text.secondary',
-                    '&:hover': { color: theme.palette.error.main },
+                    '&:hover': {
+                      color: theme.palette.error.main,
+                      opacity: '1 !important',
+                    },
                     transition: 'opacity 0.15s, color 0.15s',
                   }}
                 >
@@ -1344,7 +1392,7 @@ export const AskAI: React.FC = () => {
                   : 'rgba(0, 0, 0, 0.02)',
               display: 'flex',
               flexDirection: 'column',
-              gap: 1,
+              gap: 1.5,
             }}
           >
             <Box
@@ -1358,6 +1406,7 @@ export const AskAI: React.FC = () => {
                 variant="caption"
                 color="text.secondary"
                 fontWeight={600}
+                sx={{ fontSize: '11px' }}
               >
                 Chats creados:
               </Typography>
@@ -1367,6 +1416,7 @@ export const AskAI: React.FC = () => {
                   conversations.length >= 4 ? 'error.main' : 'text.primary'
                 }
                 fontWeight={700}
+                sx={{ fontSize: '11px' }}
               >
                 {conversations.length} / 4
               </Typography>
@@ -1378,8 +1428,8 @@ export const AskAI: React.FC = () => {
                   theme.palette.mode === 'dark'
                     ? 'rgba(255, 255, 255, 0.05)'
                     : 'rgba(0, 0, 0, 0.05)',
-                borderRadius: '2px',
-                height: 4,
+                borderRadius: '4px',
+                height: 6,
                 overflow: 'hidden',
               }}
             >
@@ -1389,30 +1439,34 @@ export const AskAI: React.FC = () => {
                   bgcolor:
                     conversations.length >= 4 ? 'error.main' : 'primary.main',
                   height: '100%',
-                  borderRadius: '2px',
+                  borderRadius: '4px',
                   transition: 'width 0.3s ease',
                 }}
               />
             </Box>
-            {conversations.length >= 4 && (
-              <Button
-                variant="outlined"
-                color="primary"
-                size="small"
-                fullWidth
-                onClick={() => setIsUpgradeModalOpen(true)}
-                sx={{
-                  mt: 0.5,
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  fontSize: '0.7rem',
-                  py: 0.5,
-                  fontWeight: 700,
-                }}
-              >
-                Desbloquear chats ilimitados
-              </Button>
-            )}
+            <Button
+              variant="outlined"
+              color="primary"
+              size="small"
+              fullWidth
+              onClick={() => setIsUpgradeModalOpen(true)}
+              sx={{
+                mt: 0.5,
+                borderRadius: '20px',
+                textTransform: 'none',
+                fontSize: '12px',
+                py: 0.8,
+                fontWeight: 700,
+                borderColor: 'primary.main',
+                color: 'primary.main',
+                '&:hover': {
+                  borderColor: 'primary.dark',
+                  bgcolor: 'rgba(79, 70, 229, 0.04)',
+                },
+              }}
+            >
+              Desbloquear chats ilimitados
+            </Button>
           </Box>
         )}
       </HistorySidebar>

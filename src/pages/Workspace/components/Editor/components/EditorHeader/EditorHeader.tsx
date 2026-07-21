@@ -5,6 +5,8 @@ import {
   Language as LanguageIcon,
   SwapHoriz as SwapIcon,
   ArrowBack as ArrowBackIcon,
+  VisibilityOutlined as EyeIcon,
+  InfoOutlined as InfoIcon,
 } from '@mui/icons-material';
 import {
   CircularProgress,
@@ -44,6 +46,9 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     sourceLanguage,
     targetLanguage,
     hasMore,
+    isCentered,
+    onToggleCentered,
+    onToggleSidebar,
   } = props;
 
   const {
@@ -66,7 +71,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
 
   return (
     <StyledEditorHeader>
-      <HeaderLeft>
+      <HeaderLeft sx={{ display: { xs: 'none', md: 'flex' } }}>
         <Button
           onClick={onBack}
           startIcon={
@@ -143,7 +148,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         />
       </HeaderCenter>
 
-      <HeaderRight>
+      <HeaderRight sx={{ display: { xs: 'none', md: 'flex' } }}>
         {/* Source Language Selector */}
         <IconButton
           onClick={(e) => setSourceAnchor(e.currentTarget)}
@@ -508,6 +513,76 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           </MenuItem>
         </Menu>
       </HeaderRight>
+
+      {/* ─── MOBILE ONLY LAYOUT ─── */}
+      <Box
+        sx={{
+          display: { xs: 'flex', md: 'none' },
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        {/* Left: Volver Back Button */}
+        <Button
+          onClick={onBack}
+          startIcon={<ArrowBackIcon sx={{ fontSize: 18 }} />}
+          sx={{
+            color: 'text.primary',
+            textTransform: 'none',
+            fontWeight: 800,
+            fontSize: '13px',
+            letterSpacing: '0.5px',
+            p: 0,
+            minWidth: 0,
+            '&:hover': { bgcolor: 'transparent' },
+          }}
+        >
+          VOLVER
+        </Button>
+
+        {/* Center: MODO ENFOQUE Button */}
+        <Button
+          onClick={onToggleCentered}
+          startIcon={<EyeIcon sx={{ fontSize: 16 }} />}
+          sx={{
+            height: '32px',
+            px: 2,
+            borderRadius: '20px',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(19, 127, 236, 0.2)'
+                : 'rgba(19, 127, 236, 0.1)',
+            color: 'primary.main',
+            fontSize: '11px',
+            fontWeight: 800,
+            letterSpacing: '0.5px',
+            textTransform: 'none',
+            boxShadow: 'none',
+            '&:hover': {
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(19, 127, 236, 0.3)'
+                  : 'rgba(19, 127, 236, 0.15)',
+            },
+          }}
+        >
+          {isCentered ? 'VISTA NORMAL' : 'MODO ENFOQUE'}
+        </Button>
+
+        {/* Right: Info Circle Button */}
+        <IconButton
+          onClick={onToggleSidebar}
+          size="small"
+          sx={{
+            color: 'text.primary',
+            p: 0.5,
+            '&:hover': { bgcolor: 'transparent' },
+          }}
+        >
+          <InfoIcon sx={{ fontSize: 22 }} />
+        </IconButton>
+      </Box>
     </StyledEditorHeader>
   );
 };

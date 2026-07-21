@@ -64,7 +64,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
               variant="caption"
               sx={{ color: 'text.secondary', flex: 1 }}
             >
-              {item.name === 'actual' ? 'Actual Time' : 'Estimated Goal'}:
+              {item.name === 'actual' ? 'Actual Time' : 'Target'}:
             </Typography>
             <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
               {formatValue(item.value)}
@@ -84,20 +84,24 @@ export const ProductivityTrendsChart: React.FC<
   const isDark = theme.palette.mode === 'dark';
 
   return (
-    <ChartCard>
+    <ChartCard sx={{ height: 'auto', p: 3 }}>
       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        sx={{ mb: 2 }}
+        sx={{ mb: 4 }}
       >
         <Box>
           <Box display="flex" alignItems="center" gap={0.5}>
-            <Typography variant="h6" fontWeight="bold">
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              sx={{ fontSize: '18px', color: 'text.primary' }}
+            >
               Focus Performance
             </Typography>
             <MuiTooltip
-              title="We compare your Estimated Goal (the sum of time you planned for tasks due today) against your Actual Time (the total minutes recorded by the timer for those same tasks)."
+              title="We compare your Target (estimated times) against your Actual Time (focus timer recordings)."
               arrow
             >
               <InfoIcon
@@ -105,11 +109,15 @@ export const ProductivityTrendsChart: React.FC<
               />
             </MuiTooltip>
           </Box>
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontSize: '12px' }}
+          >
             Estimated Goal vs. Actual Time
           </Typography>
         </Box>
-        <Box display="flex" gap={2}>
+        <Box display="flex" gap={3}>
           <Box display="flex" alignItems="center" gap={1}>
             <Box
               sx={{
@@ -119,7 +127,13 @@ export const ProductivityTrendsChart: React.FC<
                 bgcolor: 'primary.main',
               }}
             />
-            <Typography variant="caption">Actual Time</Typography>
+            <Typography
+              variant="caption"
+              fontWeight={600}
+              color="text.secondary"
+            >
+              Actual Time
+            </Typography>
           </Box>
           <Box display="flex" alignItems="center" gap={1}>
             <Box
@@ -128,14 +142,21 @@ export const ProductivityTrendsChart: React.FC<
                 height: 8,
                 borderRadius: '50%',
                 bgcolor: 'text.disabled',
+                opacity: 0.5,
               }}
             />
-            <Typography variant="caption">Estimated Goal</Typography>
+            <Typography
+              variant="caption"
+              fontWeight={600}
+              color="text.secondary"
+            >
+              Target
+            </Typography>
           </Box>
         </Box>
       </Box>
 
-      <Box sx={{ width: '100%', height: 300 }}>
+      <Box sx={{ width: '100%', height: 260 }}>
         <ResponsiveContainer>
           <AreaChart
             data={data}
@@ -143,34 +164,36 @@ export const ProductivityTrendsChart: React.FC<
           >
             <defs>
               <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop
+                  offset="5%"
+                  stopColor={theme.palette.primary.main}
+                  stopOpacity={0.15}
+                />
+                <stop
+                  offset="95%"
+                  stopColor={theme.palette.primary.main}
+                  stopOpacity={0}
+                />
               </linearGradient>
             </defs>
             <CartesianGrid
-              strokeDasharray="3 3"
-              stroke={isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9'}
+              stroke={isDark ? 'rgba(255,255,255,0.05)' : '#e2e8f0'}
               vertical={false}
             />
             <XAxis
               dataKey="label"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#64748b', fontSize: 11 }}
-              dy={10}
+              tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
+              dy={15}
             />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#64748b', fontSize: 11 }}
-              tickFormatter={(val) => `${val}h`}
-            />
+            <YAxis hide={true} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Area
               type="monotone"
               dataKey="actual"
-              stroke="#3b82f6"
-              strokeWidth={3}
+              stroke={theme.palette.primary.main}
+              strokeWidth={3.5}
               fillOpacity={1}
               fill="url(#colorActual)"
               animationDuration={1500}

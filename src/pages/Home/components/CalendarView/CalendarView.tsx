@@ -7,7 +7,14 @@ import {
 } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { format, parse, startOfWeek, getDay } from 'date-fns';
+import {
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  startOfDay,
+  addDays,
+} from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -17,8 +24,8 @@ import { CalendarHeader } from '../CalendarHeader';
 import { CalendarEvent, type ICalendarEvent } from '../CalendarEvent';
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
-import { CalendarAIPlannerModal } from './components/CalendarAIPlannerModal/CalendarAIPlannerModal';
 import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
+import type { AITimeBlockItem } from '@/api/AI/apiAIPlanner';
 
 // Material UI
 import {
@@ -27,18 +34,20 @@ import {
   Stack,
   Typography,
   Drawer,
-  IconButton,
+  Backdrop,
+  Button,
+  CircularProgress,
 } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
 
 // Styles & Hooks
-import { CalendarContainer } from './CalendarView.styles';
+import { CalendarContainer, DraftActionBar } from './CalendarView.styles';
 import { useCalendarView } from './hooks/useCalendarView.hook';
 import {
   contextMenuSx,
   priorityCircleSx,
   PRIORITY_COLORS,
 } from '../CalendarEvent/CalendarEvent.styles';
+import { sileo } from '@/utils';
 
 // Types
 import type { Task } from '@/redux/tasks/task.types';
@@ -63,7 +72,6 @@ interface CalendarViewProps {
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
-  const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
   const [isWeeklyPlannerOpen, setIsWeeklyPlannerOpen] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const {
@@ -86,8 +94,129 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     dayPropGetter,
     handleAddTaskClick,
     tasks,
-    refetchTasks,
+    draftEvents,
+    setDraftEvents,
+    isCalendarInDraftMode,
+    setIsCalendarInDraftMode,
+    handleDeleteDraft,
+    confirmDraftEvents,
+    clearDraftEvents,
+    confirmingDraft,
   } = useCalendarView();
+
+  const [isAILoading, setIsAILoading] = useState(false);
+
+  const handleAIPlanningTrigger = async () => {
+    if (isAILoading) return;
+    setIsAILoading(true);
+    sileo.info({
+      title: 'Planificador IA',
+      description:
+        'Lumina está buscando los mejores espacios de enfoque para tus tareas...',
+      duration: 3500,
+    });
+
+    try {
+      const pendingTasks = tasks.filter((t) => t.status !== 'Done');
+      const slots: { start: string; end: string }[] = [];
+      const startDay = startOfDay(currentDate);
+
+      for (let d = 0; d < 3; d++) {
+        const day = addDays(startDay, d);
+        for (let hour = 9; hour < 18; hour++) {
+          const slotStart = new Date(day);
+          slotStart.setHours(hour, 0, 0, 0);
+          const slotEnd = new Date(day);
+          slotEnd.setHours(hour + 1, 0, 0, 0);
+
+          // Check overlap with existing events
+          const isOverlap = events.some((e) => {
+            const eStart = new Date(e.start);
+            const eEnd = new Date(e.end);
+            return slotStart < eEnd && slotEnd > eStart;
+          });
+
+          if (!isOverlap) {
+            slots.push({
+              start: slotStart.toISOString(),
+              end: slotEnd.toISOString(),
+            });
+          }
+        }
+      }
+
+      if (pendingTasks.length === 0) {
+        sileo.info({
+          title: 'Planner',
+          description: 'No tienes tareas pendientes para agendar.',
+          duration: 3000,
+        });
+        setIsAILoading(false);
+        return;
+      }
+
+      if (slots.length === 0) {
+        sileo.warning({
+          title: 'Sin Disponibilidad',
+          description: 'No hay espacios libres en el calendario para agendar.',
+          duration: 3000,
+        });
+        setIsAILoading(false);
+        return;
+      }
+
+      const { planCalendarAI } = await import('@/api/AI/apiAIPlanner');
+      const res = await planCalendarAI(pendingTasks, slots);
+      const proposed = res.events || [];
+
+      if (proposed.length === 0) {
+        sileo.info({
+          title: 'Planner',
+          description:
+            'No se encontraron sugerencias óptimas de bloques de tiempo.',
+          duration: 3000,
+        });
+        setIsAILoading(false);
+        return;
+      }
+
+      const mappedDrafts = proposed.map(
+        (item: AITimeBlockItem, idx: number) => {
+          return {
+            id: `draft-${item.taskId || idx}-${Date.now()}`,
+            title: item.title,
+            start: new Date(item.startTime),
+            end: new Date(item.endTime),
+            allDay: false,
+            resource: item.taskId
+              ? tasks.find((t) => t.id === item.taskId)
+              : undefined,
+            type: 'task' as const,
+            isDraft: true,
+          };
+        },
+      );
+
+      setDraftEvents(mappedDrafts);
+      setIsCalendarInDraftMode(true);
+
+      sileo.success({
+        title: 'Borrador Generado',
+        description:
+          'Lumina ha distribuido tus tareas. Revisa, ajusta o confirma tu agenda.',
+        duration: 5000,
+      });
+    } catch (e) {
+      console.error('Error generating AI schedule:', e);
+      sileo.error({
+        title: 'Error de Planeación',
+        description: 'No se pudo generar la propuesta de bloques de tiempo.',
+        duration: 4000,
+      });
+    } finally {
+      setIsAILoading(false);
+    }
+  };
 
   const handleCreateTaskAtSlot = (priority?: number) => {
     if (slotContextMenu) {
@@ -123,8 +252,80 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         height: '100%',
         width: '100%',
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
+      <Backdrop
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 1200,
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+        open={isAILoading}
+      >
+        <CircularProgress color="inherit" />
+        <Typography variant="body2" fontWeight={500}>
+          Lumina AI está organizando tus tareas en el calendario...
+        </Typography>
+      </Backdrop>
+
+      {isCalendarInDraftMode && (
+        <DraftActionBar>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: 'text.primary' }}
+          >
+            ✨ Lumina propuso {draftEvents.length} bloques de enfoque
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={clearDraftEvents}
+              disabled={confirmingDraft}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '20px',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                color: 'text.secondary',
+                borderColor: 'divider',
+                '&:hover': {
+                  borderColor: 'error.light',
+                  bgcolor: 'rgba(239, 68, 68, 0.04)',
+                  color: 'error.main',
+                },
+              }}
+            >
+              Descartar
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={confirmDraftEvents}
+              disabled={confirmingDraft}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '20px',
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                bgcolor: 'primary.main',
+                boxShadow: 'none',
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                  boxShadow: 'none',
+                },
+              }}
+            >
+              {confirmingDraft ? 'Agendando...' : 'Confirmar Agenda 🚀'}
+            </Button>
+          </Stack>
+        </DraftActionBar>
+      )}
       <CalendarContainer
         isDayView={currentView === Views.DAY}
         sx={{
@@ -134,55 +335,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           flexDirection: 'column',
         }}
       >
-        {/* Top Header */}
-        <Box
-          sx={{
-            px: 3,
-            pt: 3,
-            pb: 1,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}
-            >
-              Calendar
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'text.secondary',
-                display: { xs: 'none', md: 'block' },
-              }}
-            >
-              Stay Organized and On Track with Your Personalized Calendar
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={() => setIsSidePanelOpen(true)}
-            sx={{
-              display: { xs: 'flex', md: 'none' },
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: '8px',
-              p: 1,
-              color: 'text.secondary',
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-        </Box>
-
         <Box
           sx={{
             flexGrow: 1,
             display: 'flex',
             flexDirection: 'column',
-            height: 'calc(100% - 90px)', // Fill remaining height below header
+            height: '100%', // Fill remaining height below header
             position: 'relative',
             overflowX: 'auto', // Allow horizontal scroll on small devices
             overflowY: 'hidden', // Contain vertical overflow inside big-calendar
@@ -226,6 +384,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                   {...props}
                   isSessionActive={isFocusSessionActive}
                   onNavigateAction={handleNavigateAction}
+                  onMobileMenuClick={() => setIsSidePanelOpen(true)}
                 />
               ),
               header: CalendarHeader,
@@ -235,6 +394,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                   {...props}
                   onStartFocus={onStartFocus}
                   currentView={currentView}
+                  onDeleteDraft={handleDeleteDraft}
                 />
               ),
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -329,7 +489,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           onAddTaskClick={handleAddTaskClick}
           events={events}
           onEventSelect={handleSelectEvent}
-          onAIPlannerClick={() => setIsAIPlannerOpen(true)}
+          onAIPlannerClick={handleAIPlanningTrigger}
           onWeeklyPlannerClick={() => setIsWeeklyPlannerOpen(true)}
         />
       </Box>
@@ -370,7 +530,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             setIsSidePanelOpen(false);
           }}
           onAIPlannerClick={() => {
-            setIsAIPlannerOpen(true);
+            handleAIPlanningTrigger();
             setIsSidePanelOpen(false);
           }}
           onWeeklyPlannerClick={() => {
@@ -379,15 +539,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           }}
         />
       </Drawer>
-
-      <CalendarAIPlannerModal
-        open={isAIPlannerOpen}
-        onClose={() => setIsAIPlannerOpen(false)}
-        events={events}
-        tasks={tasks}
-        currentDate={currentDate}
-        onSuccess={refetchTasks}
-      />
 
       <CalendarWeeklyPlannerModal
         open={isWeeklyPlannerOpen}

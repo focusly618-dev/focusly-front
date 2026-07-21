@@ -11,6 +11,7 @@ export interface ICalendarEvent {
   type: 'task' | 'event';
   overlapIndex?: number;
   provider?: string;
+  isDraft?: boolean;
 }
 
 export interface CalendarEventProps {
@@ -23,6 +24,7 @@ export interface CalendarEventProps {
   slotEnd?: Date;
   onStartFocus?: (task: Task) => void;
   currentView?: string;
+  onDeleteDraft?: (id: string) => void;
 }
 
 export interface UseCalendarContextMenuReturn {

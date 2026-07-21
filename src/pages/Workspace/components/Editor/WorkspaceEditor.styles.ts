@@ -63,8 +63,8 @@ export const EditorHeader = styled(Box, {
   backgroundSize: 'cover',
   position: 'relative',
   [theme.breakpoints.down('md')]: {
-    height: '84px',
-    padding: '0 20px',
+    height: '56px',
+    padding: '0 16px',
   },
   '&::before': gradient
     ? {

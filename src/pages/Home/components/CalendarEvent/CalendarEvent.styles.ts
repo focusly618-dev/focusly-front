@@ -39,13 +39,53 @@ export const getEventColor = (event: {
 
 export const EventContainer = styled(Box, {
   shouldForwardProp: (prop) =>
-    prop !== 'variant' && prop !== 'isMeeting' && prop !== 'overlapIndex',
-})<{ variant: { main: string }; isMeeting?: boolean; overlapIndex?: number }>(({
-  theme,
-  variant,
-  isMeeting,
-}) => {
+    prop !== 'variant' &&
+    prop !== 'isMeeting' &&
+    prop !== 'overlapIndex' &&
+    prop !== 'isDraft',
+})<{
+  variant: { main: string };
+  isMeeting?: boolean;
+  overlapIndex?: number;
+  isDraft?: boolean;
+}>(({ theme, variant, isMeeting, isDraft }) => {
   const isDark = theme.palette.mode === 'dark';
+
+  // ── Draft card (dashed border, pulse animation) ──
+  if (isDraft) {
+    const borderColor = variant.main;
+    return {
+      backgroundColor: isDark
+        ? alpha(borderColor, 0.1)
+        : alpha(borderColor, 0.05),
+      color: isDark ? alpha('#ffffff', 0.9) : '#4a5568',
+      height: '100%',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      padding: '2px 6px',
+      overflow: 'hidden',
+      cursor: 'pointer',
+      zIndex: 1,
+      boxShadow: 'none',
+      borderRadius: '6px',
+      border: `2px dashed ${borderColor}`,
+      opacity: 0.75,
+      animation: 'draftPulse 2s infinite ease-in-out',
+      '@keyframes draftPulse': {
+        '0%': { opacity: 0.65 },
+        '50%': { opacity: 0.85 },
+        '100%': { opacity: 0.65 },
+      },
+      '&:hover': {
+        opacity: 0.95,
+        backgroundColor: isDark
+          ? alpha(borderColor, 0.25)
+          : alpha(borderColor, 0.15),
+      },
+    };
+  }
 
   // ── Meeting card (dashed border, clean background) ──
   if (isMeeting) {

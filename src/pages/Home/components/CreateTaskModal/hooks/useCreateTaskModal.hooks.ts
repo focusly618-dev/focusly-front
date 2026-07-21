@@ -12,6 +12,7 @@ export const useCreateTaskModal = ({
   onClose,
   onDelete,
   initialStart,
+  initialEnd,
   initialTask,
 }: UseCreateTaskModalProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -42,7 +43,7 @@ export const useCreateTaskModal = ({
     validateForm,
     initialState,
     timeSlotDisplay,
-  } = useTaskFormState({ initialStart, initialTask });
+  } = useTaskFormState({ initialStart, initialEnd, initialTask });
   const [shouldGenerateMeet, setShouldGenerateMeet] = useState(false);
 
   const mutations = useTaskMutations({

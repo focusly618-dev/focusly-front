@@ -50,4 +50,7 @@ export interface EditorHeaderProps {
   setTargetLanguage: (lang: string) => void;
   loadMore: () => Promise<void>;
   hasMore?: boolean;
+  isCentered?: boolean;
+  onToggleCentered?: () => void;
+  onToggleSidebar?: () => void;
 }

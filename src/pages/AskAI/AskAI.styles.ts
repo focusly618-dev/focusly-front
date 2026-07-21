@@ -83,34 +83,36 @@ export const SuggestionGrid = styled(Box)({
   },
 });
 
-export const SuggestionCard = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-  padding: '14px 16px',
-  borderRadius: '14px',
-  border: `1px solid ${theme.palette.divider}`,
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255,255,255,0.03)'
-      : 'rgba(255,255,255,0.8)',
-  cursor: 'pointer',
-  transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-  backdropFilter: 'blur(8px)',
-  userSelect: 'none',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    borderColor: theme.palette.primary.main,
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(19, 127, 236, 0.08)'
-        : 'rgba(19, 127, 236, 0.05)',
-    boxShadow: `0 4px 20px rgba(19, 127, 236, 0.15)`,
-  },
-  '&:active': {
-    transform: 'translateY(0px)',
-  },
-}));
+export const SuggestionCard = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: '16px',
+    padding: '16px 20px',
+    borderRadius: '16px',
+    border: `1px solid ${theme.palette.divider}`,
+    backgroundColor: isDark
+      ? 'rgba(255, 255, 255, 0.02)'
+      : 'rgba(241, 245, 249, 0.5)',
+    cursor: 'pointer',
+    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+    userSelect: 'none',
+    boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.02)',
+    '&:hover': {
+      transform: 'translateY(-2px)',
+      borderColor: theme.palette.primary.main,
+      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#ffffff',
+      boxShadow: isDark
+        ? '0 10px 30px rgba(0,0,0,0.2)'
+        : '0 10px 30px rgba(79, 70, 229, 0.06)',
+    },
+    '&:active': {
+      transform: 'translateY(0px)',
+    },
+  };
+});
 
 /* ── Message area ──────────────────────────────────────────────────────────── */
 

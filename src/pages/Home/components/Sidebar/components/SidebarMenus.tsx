@@ -8,7 +8,6 @@ import {
 import {
   EditOutlined as EditIcon,
   DeleteOutline as DeleteIcon,
-  Add as AddIcon,
 } from '@mui/icons-material';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 
@@ -26,8 +25,6 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
     handleDeleteWorkspace,
     handleDeleteGroup,
     handleRenameGroupPrompt,
-    setCreatingWorkspaceInGroupId,
-    setExpandedGroups,
   } = sidebar;
 
   return (
@@ -70,23 +67,6 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
 
         {activeMenuType === 'group' && activeGroupItem && (
           <>
-            <MenuItem
-              onClick={() => {
-                setCreatingWorkspaceInGroupId(activeGroupItem.id);
-                setExpandedGroups((prev) => ({
-                  ...prev,
-                  [activeGroupItem.id]: true,
-                }));
-                handleCloseMenu();
-              }}
-              sx={{ fontSize: '13px', py: 0.8 }}
-            >
-              <ListItemIcon sx={{ minWidth: 28 }}>
-                <AddIcon fontSize="small" sx={{ color: 'text.secondary' }} />
-              </ListItemIcon>
-              <ListItemText>New Note</ListItemText>
-            </MenuItem>
-            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
             <MenuItem
               onClick={() => {
                 handleRenameGroupPrompt(activeGroupItem);

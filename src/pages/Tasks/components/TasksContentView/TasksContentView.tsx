@@ -14,6 +14,9 @@ import {
   CheckBox as CheckBoxIcon,
   Delete as DeleteIcon,
   Close as CloseIcon,
+  RadioButtonUnchecked as UncheckedIcon,
+  CheckCircle as CheckedIcon,
+  RemoveCircle as IndeterminateIcon,
 } from '@mui/icons-material';
 
 import { AnimatedContainer, GridTaskContainer } from '../../Tasks.styles';
@@ -189,7 +192,7 @@ export const TasksContentView = ({
           ))}
         </GridTaskContainer>
       ) : (
-        <TableWrapper>
+        <>
           <StatusTabsContainer>
             {tabs.map((tab) => {
               const count = tabCounts[tab.id] || 0;
@@ -215,138 +218,156 @@ export const TasksContentView = ({
             })}
           </StatusTabsContainer>
 
-          {showEmptyStateTasks ? (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                py: 8,
-                width: '100%',
-              }}
-            >
-              <EmptyState
-                icon={<CheckBoxIcon />}
-                title="No tasks yet"
-                description="Plan your day and boost your productivity. Create your first task to see it here."
-              />
-            </Box>
-          ) : showEmptyStateFiltered ? (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                py: 8,
-                width: '100%',
-              }}
-            >
-              <EmptyState
-                title="No tasks match your search"
-                description="Try a different keyword or filter to find what you're looking for, or create a new task above."
-                actionText="Clear all filters"
-                onAction={() => setSearchTerm('')}
-              />
-            </Box>
-          ) : (
-            <>
-              <TableHeader>
-                <TableHeaderCell sx={{ justifyContent: 'center' }}>
-                  <Checkbox
-                    checked={isAllSelected}
-                    indeterminate={isSomeSelected}
-                    onChange={handleToggleSelectAll}
-                    size="small"
-                    sx={{
-                      padding: 0,
-                      color: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.3)'
-                          : 'rgba(0, 0, 0, 0.25)',
-                      '&.Mui-checked, &.MuiCheckbox-indeterminate': {
-                        color: 'primary.main',
-                      },
-                    }}
-                  />
-                </TableHeaderCell>
-                <TableHeaderCell>Task Name</TableHeaderCell>
-                <TableHeaderCell className="col-priority">
-                  Priority
-                </TableHeaderCell>
-                <TableHeaderCell className="col-date">Due Date</TableHeaderCell>
-                <TableHeaderCell className="col-estimated">
-                  Estimated
-                </TableHeaderCell>
-                <TableHeaderCell className="col-actual">Actual</TableHeaderCell>
-                <TableHeaderCell className="col-ai">
-                  AI Schedule
-                </TableHeaderCell>
-                <TableHeaderCell>Actions</TableHeaderCell>
-              </TableHeader>
-              <TableBodyContainer onScroll={handleScroll}>
-                {displayedTasks.slice(0, limit).map((task) => (
-                  <ListViewTask
-                    key={task.id}
-                    task={task}
-                    onTaskClick={handleTaskClick}
-                    updateTask={updateTask}
-                    isAIScheduleEnabled={isAIScheduleEnabled}
-                    onStartFocus={onStartFocus}
-                    isSelected={selectedTaskIds.has(task.id)}
-                    onToggleSelect={() => handleToggleSelect(task.id)}
-                  />
-                ))}
-                {displayedTasks.length === 0 && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      py: 8,
-                      width: '100%',
-                    }}
-                  >
-                    <EmptyState
-                      title={`No tasks in ${activeTab.label}`}
-                      description="Move a task here or change tabs to see tasks."
-                    />
-                  </Box>
-                )}
-                {displayedTasks.length > limit && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      padding: '16px',
-                      backgroundColor: 'transparent',
-                    }}
-                  >
-                    <Button
+          <TableWrapper>
+            {showEmptyStateTasks ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  py: 8,
+                  width: '100%',
+                }}
+              >
+                <EmptyState
+                  icon={<CheckBoxIcon />}
+                  title="No tasks yet"
+                  description="Plan your day and boost your productivity. Create your first task to see it here."
+                />
+              </Box>
+            ) : showEmptyStateFiltered ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  py: 8,
+                  width: '100%',
+                }}
+              >
+                <EmptyState
+                  title="No tasks match your search"
+                  description="Try a different keyword or filter to find what you're looking for, or create a new task above."
+                  actionText="Clear all filters"
+                  onAction={() => setSearchTerm('')}
+                />
+              </Box>
+            ) : (
+              <>
+                <TableHeader>
+                  <TableHeaderCell sx={{ justifyContent: 'center' }}>
+                    <Checkbox
+                      checked={isAllSelected}
+                      indeterminate={isSomeSelected}
+                      onChange={handleToggleSelectAll}
                       size="small"
-                      onClick={() => setLimit((prev) => prev + 24)}
+                      icon={
+                        <UncheckedIcon
+                          sx={{
+                            fontSize: 18,
+                            color: 'text.secondary',
+                            opacity: 0.6,
+                          }}
+                        />
+                      }
+                      checkedIcon={
+                        <CheckedIcon
+                          sx={{ fontSize: 18, color: 'primary.main' }}
+                        />
+                      }
+                      indeterminateIcon={
+                        <IndeterminateIcon
+                          sx={{ fontSize: 18, color: 'primary.main' }}
+                        />
+                      }
                       sx={{
-                        textTransform: 'none',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        color: activeTab.color,
-                        backgroundColor: `${activeTab.color}0a`,
-                        borderRadius: '8px',
-                        px: 3,
-                        py: 0.5,
-                        '&:hover': {
-                          backgroundColor: `${activeTab.color}15`,
-                        },
+                        padding: 0,
+                      }}
+                    />
+                  </TableHeaderCell>
+                  <TableHeaderCell>Task Name</TableHeaderCell>
+                  <TableHeaderCell className="col-priority">
+                    Priority
+                  </TableHeaderCell>
+                  <TableHeaderCell className="col-date">
+                    Due Date
+                  </TableHeaderCell>
+                  <TableHeaderCell className="col-estimated">
+                    Estimated
+                  </TableHeaderCell>
+                  <TableHeaderCell className="col-actual">
+                    Actual
+                  </TableHeaderCell>
+                  <TableHeaderCell className="col-ai">
+                    AI Schedule
+                  </TableHeaderCell>
+                  <TableHeaderCell>Actions</TableHeaderCell>
+                </TableHeader>
+                <TableBodyContainer onScroll={handleScroll}>
+                  {displayedTasks.slice(0, limit).map((task) => (
+                    <ListViewTask
+                      key={task.id}
+                      task={task}
+                      onTaskClick={handleTaskClick}
+                      updateTask={updateTask}
+                      isAIScheduleEnabled={isAIScheduleEnabled}
+                      onStartFocus={onStartFocus}
+                      isSelected={selectedTaskIds.has(task.id)}
+                      onToggleSelect={() => handleToggleSelect(task.id)}
+                    />
+                  ))}
+                  {displayedTasks.length === 0 && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        py: 8,
+                        width: '100%',
                       }}
                     >
-                      Show More ({displayedTasks.length - limit} remaining)
-                    </Button>
-                  </Box>
-                )}
-              </TableBodyContainer>
-            </>
-          )}
-        </TableWrapper>
+                      <EmptyState
+                        title={`No tasks in ${activeTab.label}`}
+                        description="Move a task here or change tabs to see tasks."
+                      />
+                    </Box>
+                  )}
+                  {displayedTasks.length > limit && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '16px',
+                        backgroundColor: 'transparent',
+                      }}
+                    >
+                      <Button
+                        size="small"
+                        onClick={() => setLimit((prev) => prev + 24)}
+                        sx={{
+                          textTransform: 'none',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: activeTab.color,
+                          backgroundColor: `${activeTab.color}0a`,
+                          borderRadius: '8px',
+                          px: 3,
+                          py: 0.5,
+                          '&:hover': {
+                            backgroundColor: `${activeTab.color}15`,
+                          },
+                        }}
+                      >
+                        Show More ({displayedTasks.length - limit} remaining)
+                      </Button>
+                    </Box>
+                  )}
+                </TableBodyContainer>
+              </>
+            )}
+          </TableWrapper>
+        </>
       )}
 
       {isListView && selectedTaskIds.size > 0 && (

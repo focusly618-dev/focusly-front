@@ -14,6 +14,8 @@ import {
   AutoAwesome as AutoAwesomeIcon,
   PlayArrow as PlayIcon,
   Flag as FlagIcon,
+  RadioButtonUnchecked as UncheckedIcon,
+  CheckCircle as CheckedIcon,
 } from '@mui/icons-material';
 
 import {
@@ -151,11 +153,16 @@ export const ListViewTask = ({
             checked={isSelected || false}
             disabled={isReadOnly}
             size="small"
+            icon={
+              <UncheckedIcon
+                sx={{ fontSize: 18, color: 'text.secondary', opacity: 0.6 }}
+              />
+            }
+            checkedIcon={
+              <CheckedIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+            }
             sx={{
               padding: 0,
-              '&.Mui-checked': {
-                color: 'primary.main',
-              },
             }}
           />
         </Box>

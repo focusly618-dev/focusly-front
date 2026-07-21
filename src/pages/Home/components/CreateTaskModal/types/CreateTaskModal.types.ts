@@ -63,6 +63,7 @@ export interface UseTaskCollectionsProps {
 export interface UseTaskFormStateProps {
   initialTask?: Task | null;
   initialStart: Date | null;
+  initialEnd?: Date | null;
 }
 
 export interface UseTaskMutationsProps {
