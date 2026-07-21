@@ -5,7 +5,6 @@ import {
   WorkspaceCard,
   LibraryHeader,
   HeaderTitle,
-  HeaderSubtitle,
   FolderIconCircle,
   StyledTextField,
 } from './WorkspaceLibrary.styles';
@@ -348,11 +347,6 @@ export const WorkspaceLibrary = ({
           <HeaderTitle variant="h4">
             {isInsideFolder ? activeGroup?.name : 'Projects'}
           </HeaderTitle>
-          <HeaderSubtitle variant="body2">
-            {isInsideFolder
-              ? `View and manage workspaces inside the "${activeGroup?.name}" project`
-              : 'This is where you organize your context. Manage notes, projects, and ideas within structured workspace folders.'}
-          </HeaderSubtitle>
         </Box>
 
         <Box
