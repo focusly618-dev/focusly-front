@@ -53,4 +53,5 @@ export interface EditorHeaderProps {
   isCentered?: boolean;
   onToggleCentered?: () => void;
   onToggleSidebar?: () => void;
+  onStartFocus?: (task?: TaskSearchItems | null) => void;
 }

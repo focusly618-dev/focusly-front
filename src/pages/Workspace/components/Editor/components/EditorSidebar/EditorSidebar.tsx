@@ -15,7 +15,6 @@ import {
   CheckCircle as CheckCircleIcon,
   PauseCircle as PauseCircleIcon,
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
-  FlashOn as FlashOnIcon,
   History as HistoryIcon,
   Visibility as VisibilityIcon,
   EventNote as PlannedIcon,
@@ -27,7 +26,6 @@ import {
   AssignmentOutlined as AssignmentIcon,
   LightbulbOutlined as TipIcon,
   Search as SearchIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import {
   getPriorityFromLevel,
@@ -37,9 +35,10 @@ import {
 import type { PriorityType } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import {
   RightSidebar,
+  SidebarHeaderTop,
+  SidebarBody,
   DragHandle,
   MetadataSection,
-  StartFocusButton,
   MarkDoneButton,
   DescriptionContainer,
   DescriptionHeader,
@@ -62,7 +61,6 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     isRightSidebarOpen,
     setIsRightSidebarOpen,
     selectTask,
-    onStartFocus,
     activeFocusTaskId,
     onUnlinkTask,
     setShowPalette,
@@ -171,15 +169,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
         </Box>
       )}
 
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: isRightSidebarOpen ? 'space-between' : 'center',
-          mb: 3,
-          minHeight: '28px',
-        }}
-      >
+      <SidebarHeaderTop>
         {isRightSidebarOpen && (
           <Box display="flex" alignItems="center" gap={1}>
             <Typography
@@ -229,22 +219,15 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           }}
         >
           {isRightSidebarOpen ? (
-            <>
-              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                <ChevronRight />
-              </Box>
-              <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-                <CloseIcon />
-              </Box>
-            </>
+            <ChevronRight sx={{ fontSize: 18 }} />
           ) : (
             <ChevronLeft />
           )}
         </IconButton>
-      </Box>
+      </SidebarHeaderTop>
 
       {isRightSidebarOpen && (
-        <>
+        <SidebarBody>
           {selectTask ? (
             <Box
               sx={{
@@ -302,35 +285,49 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                       onClick={isReadOnly ? undefined : handleStatusClick}
                       sx={{
                         cursor: isReadOnly ? 'default' : 'pointer',
-                        px: 1,
-                        py: 0.5,
-                        borderRadius: '6px',
-                        '&:hover': {
-                          bgcolor: isReadOnly
-                            ? 'transparent'
-                            : theme.palette.action.hover,
-                        },
+                        justifyContent: 'flex-start',
                       }}
                     >
                       <Box
                         sx={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: '50%',
-                          bgcolor: getStatusColor(currentStatus),
-                          boxShadow: `0 0 6px ${getStatusColor(currentStatus)}`,
-                        }}
-                      />
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: '13px',
-                          color: getStatusColor(currentStatus),
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                          px: 1.25,
+                          py: 0.35,
+                          borderRadius: '12px',
+                          bgcolor:
+                            currentStatus === 'Done'
+                              ? '#dcfce7'
+                              : `${getStatusColor(currentStatus)}15`,
+                          color:
+                            currentStatus === 'Done'
+                              ? '#166534'
+                              : getStatusColor(currentStatus),
                         }}
                       >
-                        {currentStatus}
-                      </Typography>
+                        <Box
+                          sx={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            bgcolor:
+                              currentStatus === 'Done'
+                                ? '#166534'
+                                : getStatusColor(currentStatus),
+                          }}
+                        />
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '11px',
+                            lineHeight: 1,
+                          }}
+                        >
+                          {currentStatus}
+                        </Typography>
+                      </Box>
                     </PropertyValue>
                   </PropertyCard>
 
@@ -340,14 +337,6 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                       onClick={isReadOnly ? undefined : handlePriorityClick}
                       sx={{
                         cursor: isReadOnly ? 'default' : 'pointer',
-                        px: 1,
-                        py: 0.5,
-                        borderRadius: '6px',
-                        '&:hover': {
-                          bgcolor: isReadOnly
-                            ? 'transparent'
-                            : theme.palette.action.hover,
-                        },
                       }}
                     >
                       <FlagIcon
@@ -357,16 +346,18 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                         }}
                       />
                       <Typography
-                        variant="body2"
+                        variant="caption"
                         sx={{
-                          fontWeight: 600,
-                          fontSize: '13px',
+                          fontWeight: 700,
+                          fontSize: '11px',
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase',
                           color: getPriorityColor(Number(currentPriorityLevel)),
                         }}
                       >
                         {getPriorityFromLevel(Number(currentPriorityLevel)) ===
                         'No priority'
-                          ? 'None'
+                          ? 'NONE'
                           : getPriorityFromLevel(Number(currentPriorityLevel))}
                       </Typography>
                     </PropertyValue>
@@ -391,7 +382,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                       >
                         {selectTask?.estimate_timer
                           ? formatDuration(selectTask.estimate_timer)
-                          : '0h'}
+                          : '2h'}
                       </Typography>
                     </PropertyValue>
                   </PropertyCard>
@@ -399,13 +390,13 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                   <PropertyCard>
                     <PropertyLabel>REAL TIME</PropertyLabel>
                     <PropertyValue>
-                      <HistoryIcon sx={{ fontSize: 14, color: 'info.main' }} />
+                      <AccessTimeIcon sx={{ fontSize: 14, color: '#3b82f6' }} />
                       <Typography
                         variant="body2"
                         sx={{
                           fontWeight: 600,
                           fontSize: '13px',
-                          color: 'info.main',
+                          color: '#3b82f6',
                         }}
                       >
                         {selectTask?.real_timer
@@ -666,68 +657,54 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                 flexDirection: 'column',
                 mt: 'auto',
                 pt: 2,
-                borderTop: `1px solid ${theme.palette.divider}`,
               }}
             >
-              {currentStatus === 'Done' ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 1.5,
-                    bgcolor: `${theme.palette.success.main}15`,
-                    color: theme.palette.success.main,
-                    p: 1.8,
-                    borderRadius: '10px',
-                    border: `1px solid ${theme.palette.success.main}33`,
-                  }}
-                >
-                  <CheckCircleIcon sx={{ fontSize: 18 }} />
-                  <Typography
-                    variant="body2"
-                    fontWeight={700}
-                    letterSpacing={1}
-                  >
-                    COMPLETED
-                  </Typography>
-                </Box>
-              ) : (
-                <>
-                  {!isTaskInFocus && (
-                    <StartFocusButton
-                      startIcon={<FlashOnIcon sx={{ fontSize: 14 }} />}
-                      disabled={!selectTask}
-                      onClick={() => {
-                        if (onStartFocus && selectTask) {
-                          onStartFocus(selectTask);
-                        }
-                      }}
-                      sx={{
-                        py: 1.5,
-                        fontSize: '11px',
-                        borderRadius: '8px',
-                      }}
-                    >
-                      Start Focus Mode
-                    </StartFocusButton>
-                  )}
-                  <MarkDoneButton
-                    disabled={!selectTask || isReadOnly}
-                    onClick={handleMarkDone}
-                    sx={{
-                      py: 1.5,
-                      fontSize: '11px',
-                      borderRadius: '8px',
-                    }}
-                  >
-                    Mark As Done
-                  </MarkDoneButton>
-                </>
-              )}
+              <MarkDoneButton
+                disabled={!selectTask || isReadOnly}
+                onClick={handleMarkDone}
+                startIcon={
+                  currentStatus === 'Done' ? (
+                    <CheckCircleIcon
+                      sx={{ fontSize: 16, color: '#15803d !important' }}
+                    />
+                  ) : undefined
+                }
+                sx={{
+                  py: 1.4,
+                  fontSize: '11px',
+                  borderRadius: '12px',
+                  fontWeight: 800,
+                  letterSpacing: '0.5px',
+                  ...(currentStatus === 'Done'
+                    ? {
+                        bgcolor: '#dcfce7 !important',
+                        color: '#15803d !important',
+                        border: '1px solid rgba(21, 128, 61, 0.2) !important',
+                        '&:hover': {
+                          bgcolor: '#bbf7d0 !important',
+                        },
+                      }
+                    : {
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.06)'
+                            : '#f1f5f9',
+                        color: 'text.primary',
+                        border: '1px solid #e2e8f0',
+                        '&:hover': {
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255,255,255,0.1)'
+                              : '#e2e8f0',
+                        },
+                      }),
+                }}
+              >
+                {currentStatus === 'Done' ? 'COMPLETED' : 'Mark As Done'}
+              </MarkDoneButton>
             </Box>
           )}
-        </>
+        </SidebarBody>
       )}
 
       <Menu

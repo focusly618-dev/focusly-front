@@ -79,7 +79,7 @@ export const useInsights = () => {
       baseDate,
     },
     skip: !userId,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   });
 
   const isFirstMount = useRef(true);

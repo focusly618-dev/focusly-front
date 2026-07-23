@@ -33,9 +33,11 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
         },
       ];
 
-  const deepWork = data.find((d) => d.name === 'Deep Work')?.value || 0;
   const total = data.reduce((acc, curr) => acc + curr.value, 0);
-  const focusPercentage = total > 0 ? Math.round((deepWork / total) * 100) : 0;
+  const restBreaks = data.find((d) => d.name === 'Rest/Breaks')?.value || 0;
+  const focusActivity = total - restBreaks;
+  const focusPercentage =
+    total > 0 ? Math.round((focusActivity / total) * 100) : 0;
 
   const displayCategories = [...data]
     .sort((a, b) => b.value - a.value)
