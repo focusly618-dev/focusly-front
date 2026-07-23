@@ -34,7 +34,7 @@ export interface SpeechRecognitionWindow {
 export interface EditorHeaderProps {
   onBack: () => void;
   showPalette: boolean;
-  setShowPalette: (b: boolean) => void;
+  setShowPalette: (b: boolean | ((prev: boolean) => boolean)) => void;
   searchTerm: string;
   setSearchTerm: (s: string) => void;
   filteredTasks: TaskSearchItems[];
