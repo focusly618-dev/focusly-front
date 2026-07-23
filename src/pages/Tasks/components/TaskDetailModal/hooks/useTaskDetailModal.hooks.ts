@@ -242,8 +242,8 @@ export const useTaskDetailModal = ({
         duration,
         collaborators,
       });
-      if (meetUrl) {
-        handleAddLink('Google Meet', meetUrl);
+      if (meetUrl?.meetLink) {
+        handleAddLink('Google Meet', meetUrl.meetLink);
         if (initialTask?.id && !initialTask.id.startsWith('temp-')) {
           setShouldGenerateMeet(true);
         }

@@ -72,7 +72,7 @@ export const Login: React.FC = () => {
       <div className="absolute top-6 right-6 z-20">
         <Button
           isIconOnly
-          variant="quiet"
+          variant="ghost"
           aria-label="Toggle theme"
           onClick={colorMode.toggleColorMode}
           className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 shadow-sm rounded-full p-2"
@@ -110,7 +110,10 @@ export const Login: React.FC = () => {
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
                 Hemos enviado un enlace de acceso a <br />
-                <strong className="text-slate-800 dark:text-slate-200 font-semibold">{email}</strong>.
+                <strong className="text-slate-800 dark:text-slate-200 font-semibold">
+                  {email}
+                </strong>
+                .
                 <br />
                 Haz clic en el enlace para ingresar al instante.
               </CardDescription>
@@ -213,7 +216,7 @@ export const Login: React.FC = () => {
                         <PersonIcon className="absolute left-3 text-slate-400 text-lg pointer-events-none" />
                         <Input
                           placeholder="Ej. Juan Pérez"
-                          isDisabled={isLoading}
+                          disabled={isLoading}
                           value={fullName}
                           onChange={handleFullNameChange}
                           className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
@@ -231,7 +234,7 @@ export const Login: React.FC = () => {
                       <Input
                         placeholder="nombre@empresa.com"
                         type="email"
-                        isDisabled={isLoading}
+                        disabled={isLoading}
                         value={email}
                         onChange={handleEmailChange}
                         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
@@ -258,7 +261,9 @@ export const Login: React.FC = () => {
 
               <CardFooter className="px-8 pb-8 pt-2 flex flex-col items-center justify-center">
                 <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-                  {isRegistering ? '¿Ya tienes una cuenta? ' : '¿No tienes una cuenta? '}
+                  {isRegistering
+                    ? '¿Ya tienes una cuenta? '
+                    : '¿No tienes una cuenta? '}
                   <button
                     type="button"
                     onClick={toggleRegister}

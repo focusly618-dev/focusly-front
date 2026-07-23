@@ -47,10 +47,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             <span>Exportar</span>
           </Button>
 
-          <Button
-            color="primary"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-xl text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer"
-          >
+          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-xl text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer">
             <Add className="text-base" />
             <span>Crear Reporte</span>
           </Button>
@@ -62,7 +59,9 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
         {/* HeroUI Filter Tabs */}
         <Tabs
           selectedKey={filter}
-          onSelectionChange={(key) => onFilterChange(String(key) as typeof filter)}
+          onSelectionChange={(key) =>
+            onFilterChange(String(key) as typeof filter)
+          }
           className="w-auto"
         >
           <TabList className="flex bg-slate-100 dark:bg-slate-800/60 p-1 rounded-2xl border border-slate-200/50 dark:border-slate-700/50">

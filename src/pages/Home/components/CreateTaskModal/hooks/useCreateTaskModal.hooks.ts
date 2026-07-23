@@ -223,8 +223,8 @@ export const useCreateTaskModal = ({
         collaborators,
         color,
       });
-      if (meetUrl) {
-        handleAddLink('Google Meet', meetUrl);
+      if (meetUrl?.meetLink) {
+        handleAddLink('Google Meet', meetUrl.meetLink);
         setShouldGenerateMeet(true);
         sileo.success({
           title: 'Google Meet link generated!',
