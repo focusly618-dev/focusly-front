@@ -16,7 +16,6 @@ import { improveTaskAI } from '@/api/AI/apiAIPlanner';
 import { sileo } from '@/utils';
 
 // Sub-components
-import { Collaborators } from './components/Collaborators/Collaborators';
 import { TaskProperties } from './components/TaskProperties/TaskProperties';
 import { TaskHeader } from './components/TaskHeader/TaskHeader';
 import { TaskResources } from './components/TaskResources/TaskResources';
@@ -38,14 +37,16 @@ const Transition = React.forwardRef(function Transition(
 export const TaskDetailModal = ({
   open,
   onClose,
-  onSave,
-  initialStart,
-  initialEnd,
+  onSave = () => {},
+  initialStart = null,
+  initialEnd = null,
   initialTask,
-  handleDelete: onDelete,
+  handleDelete: propHandleDelete,
+  onDelete,
   isAIScheduleEnabled,
   setIsAIScheduleEnabled,
 }: TaskDetailModalProps) => {
+  const effectiveDelete = propHandleDelete || onDelete;
   const {
     isReadOnly,
     isDirty,
@@ -91,6 +92,7 @@ export const TaskDetailModal = ({
     setIsAddingLink,
     collaborators,
     handleAddCollaborator,
+    handleRemoveCollaborator,
     isGeneratingMeet,
     handleGenerateMeet,
     handleTimerChange,
@@ -103,7 +105,7 @@ export const TaskDetailModal = ({
     initialStart,
     initialEnd,
     initialTask,
-    onDelete,
+    onDelete: effectiveDelete,
     isAIScheduleEnabled,
     setIsAIScheduleEnabled,
   });
@@ -346,12 +348,9 @@ export const TaskDetailModal = ({
                 setNewLinkUrl={setNewLinkUrl}
                 handleAddLink={handleAddLink}
                 handleRemoveLink={handleRemoveLink}
-                isReadOnly={isReadOnly}
-              />
-
-              <Collaborators
                 collaborators={collaborators}
                 handleAddCollaborator={handleAddCollaborator}
+                handleRemoveCollaborator={handleRemoveCollaborator}
                 isReadOnly={isReadOnly}
               />
 

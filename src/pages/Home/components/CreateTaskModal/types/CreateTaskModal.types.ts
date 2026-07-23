@@ -1,5 +1,12 @@
 import type { Task } from '@/redux/tasks/task.types';
 
+export interface CollaboratorInput {
+  email: string;
+  name?: string;
+  avatar?: string;
+  responseStatus?: string;
+}
+
 export interface TaskData {
   id?: string;
   title: string;
@@ -10,6 +17,7 @@ export interface TaskData {
   duration: string;
   tags: string[];
   links?: { title: string; url: string }[];
+  collaborators?: CollaboratorInput[];
   google_event_id?: string;
   status?: Task['status'];
   realTime?: string;
@@ -47,6 +55,7 @@ export interface TaskInput {
   category: string;
   color?: string;
   links: { title: string; url: string }[];
+  collaborators?: CollaboratorInput[];
   status?: string;
   google_event_id?: string;
   user_id?: string;

@@ -1,12 +1,11 @@
 import React from 'react';
-import { Box, Typography, IconButton, Button } from '@mui/material';
+import { Button, Tabs, TabList, Tab } from '@heroui/react';
 import {
   FileDownloadOutlined,
   Add,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
-import { HeaderContainer, ActionButton } from '../../Insights.styles';
 import type { InsightsHeaderProps } from './InsightsHeader.types';
 
 export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
@@ -19,25 +18,11 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
   periodLabel,
 }) => {
   return (
-    <HeaderContainer>
-      {/* Title and Actions Row */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 4, width: '100%' }}
-      >
-        {/* Title Header */}
-        <Box>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 800,
-              color: 'text.primary',
-              letterSpacing: '-0.02em',
-              fontSize: '28px',
-            }}
-          >
+    <div className="w-full flex flex-col gap-6 mb-6">
+      {/* Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             {filter === 'Daily'
               ? 'Daily'
               : filter === 'Weekly'
@@ -46,153 +31,89 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
                   ? 'Monthly'
                   : 'Yearly'}{' '}
             Insights
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: 'text.secondary', mt: 0.5, fontSize: '13px' }}
-          >
-            Productivity Summary & Analytics
-          </Typography>
-        </Box>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Resumen de productividad y analíticas
+          </p>
+        </div>
 
-        {/* Actions (Export & Create Report) */}
-        <Box display="flex" alignItems="center" gap={2}>
-          <ActionButton>
-            <FileDownloadOutlined fontSize="small" />
-            Export
-          </ActionButton>
-          <ActionButton
-            primary
-            sx={{
-              bgcolor: 'primary.main',
-              color: '#ffffff',
-              borderRadius: '8px',
-              fontWeight: 700,
-            }}
+        {/* HeroUI Action Buttons */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-semibold px-3 py-2 flex items-center gap-1.5"
           >
-            <Add fontSize="small" />
-            Create Report
-          </ActionButton>
-        </Box>
-      </Box>
+            <FileDownloadOutlined className="text-base" />
+            <span>Exportar</span>
+          </Button>
 
-      {/* Filter Tabs Pill Group */}
-      <Box display="flex" alignItems="center" gap={1.5}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.03)'
-                : 'rgba(0, 0, 0, 0.04)',
-            borderRadius: '30px',
-            p: 0.5,
-            border: '1px solid',
-            borderColor: 'divider',
-          }}
+          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-xl text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer">
+            <Add className="text-base" />
+            <span>Crear Reporte</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Filter Tabs & Date Navigation */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* HeroUI Filter Tabs */}
+        <Tabs
+          selectedKey={filter}
+          onSelectionChange={(key) =>
+            onFilterChange(String(key) as typeof filter)
+          }
+          className="w-auto"
         >
-          {filters.map((f) => {
-            const isSelected = filter === f;
-            return (
-              <Button
+          <TabList className="flex bg-slate-100 dark:bg-slate-800/60 p-1 rounded-2xl border border-slate-200/50 dark:border-slate-700/50">
+            {filters.map((f) => (
+              <Tab
                 key={f}
-                onClick={() => onFilterChange(f)}
-                sx={{
-                  textTransform: 'none',
-                  borderRadius: '20px',
-                  px: 3,
-                  py: 0.75,
-                  fontSize: '13px',
-                  fontWeight: isSelected ? 700 : 500,
-                  bgcolor: isSelected
-                    ? (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.1)'
-                          : '#ffffff'
-                    : 'transparent',
-                  color: isSelected ? 'primary.main' : 'text.secondary',
-                  boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
-                  minWidth: '70px',
-                  '&:hover': {
-                    bgcolor: isSelected
-                      ? (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.12)'
-                            : '#ffffff'
-                      : 'action.hover',
-                  },
-                }}
+                id={f}
+                className="px-4 py-1.5 text-xs font-semibold rounded-xl cursor-pointer transition-all outline-none data-[selected]:bg-white dark:data-[selected]:bg-slate-700 data-[selected]:text-indigo-600 dark:data-[selected]:text-indigo-400 data-[selected]:shadow-sm text-slate-600 dark:text-slate-400"
               >
                 {f}
-              </Button>
-            );
-          })}
-        </Box>
+              </Tab>
+            ))}
+          </TabList>
+        </Tabs>
 
         {filter === 'Monthly' && onNavigate && (
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={0.5}
-            sx={{
-              backgroundColor: 'action.hover',
-              borderRadius: '20px',
-              px: 1,
-              py: 0.25,
-            }}
-          >
-            <IconButton
-              size="small"
+          <div className="flex items-center gap-2 bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl px-2 py-1">
+            <button
+              type="button"
               onClick={() => onNavigate('prev')}
               aria-label="Previous month"
-              sx={{ p: 0.25 }}
+              className="p-1 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors cursor-pointer"
             >
-              <ChevronLeftIcon fontSize="small" />
-            </IconButton>
+              <ChevronLeftIcon className="text-sm" />
+            </button>
 
-            <Typography
-              variant="caption"
-              fontWeight="600"
-              sx={{
-                minWidth: '100px',
-                textAlign: 'center',
-                userSelect: 'none',
-              }}
-            >
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 min-w-[90px] text-center select-none">
               {periodLabel}
-            </Typography>
+            </span>
 
-            <IconButton
-              size="small"
+            <button
+              type="button"
               onClick={() => onNavigate('next')}
               aria-label="Next month"
               disabled={!baseDate}
-              sx={{ p: 0.25 }}
+              className="p-1 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors cursor-pointer disabled:opacity-40"
             >
-              <ChevronRightIcon fontSize="small" />
-            </IconButton>
+              <ChevronRightIcon className="text-sm" />
+            </button>
 
             {baseDate && onReset && (
-              <Button
-                size="small"
+              <button
+                type="button"
                 onClick={onReset}
-                variant="text"
-                sx={{
-                  ml: 0.5,
-                  fontSize: '9px',
-                  textTransform: 'none',
-                  minWidth: 'auto',
-                  p: 0,
-                  fontWeight: 'bold',
-                }}
+                className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline px-1 ml-1 cursor-pointer"
               >
-                Today
-              </Button>
+                Hoy
+              </button>
             )}
-          </Box>
+          </div>
         )}
-      </Box>
-    </HeaderContainer>
+      </div>
+    </div>
   );
 };

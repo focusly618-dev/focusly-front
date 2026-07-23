@@ -14,6 +14,20 @@ export const useTaskFormState = ({
   initialStart,
   initialEnd,
 }: UseTaskFormStateProps) => {
+  const [collaborators, setCollaborators] = useState<
+    { email: string; name?: string; responseStatus?: string }[]
+  >(initialTask?.collaborators || []);
+
+  const handleAddCollaborator = (email: string): void => {
+    const cleanEmail = email.trim().toLowerCase();
+    if (cleanEmail && !collaborators.some((c) => c.email === cleanEmail)) {
+      setCollaborators((prev) => [...prev, { email: cleanEmail }]);
+    }
+  };
+  const handleRemoveCollaborator = (email: string): void => {
+    setCollaborators((prev) => prev.filter((c) => c.email !== email));
+  };
+
   const getInitialState = useCallback(() => {
     let calculatedDuration = '';
     if (initialStart && initialEnd) {
@@ -203,6 +217,10 @@ export const useTaskFormState = ({
     setColor,
     errors,
     setErrors,
+    collaborators,
+    setCollaborators,
+    handleAddCollaborator,
+    handleRemoveCollaborator,
     handleTitleChange,
     handleDurationChange,
     validateForm,

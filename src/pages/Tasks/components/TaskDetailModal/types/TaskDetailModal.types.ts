@@ -20,12 +20,13 @@ export interface TaskData {
 export interface TaskDetailModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (task: Task) => void;
-  initialStart: Date | null;
-  initialEnd: Date | null;
+  onSave?: (task: Task) => void;
+  initialStart?: Date | null;
+  initialEnd?: Date | null;
   initialTask?: Task | null;
-  handleDelete?: (id: string) => Promise<void>;
-  handleUpdate?: (task: Task) => Promise<void>;
+  handleDelete?: (id: string) => void | Promise<void>;
+  onDelete?: (id: string) => void | Promise<void>;
+  handleUpdate?: (task: Task) => void | Promise<void>;
   isAIScheduleEnabled?: boolean;
   setIsAIScheduleEnabled?: (enabled: boolean) => void;
 }

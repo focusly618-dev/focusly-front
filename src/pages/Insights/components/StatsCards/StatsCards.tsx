@@ -1,12 +1,11 @@
 import React from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Card, CardHeader, CardTitle, CardContent } from '@heroui/react';
 import {
   AccessTime,
   CheckCircleOutline,
   Bolt,
   Psychology as BrainIcon,
 } from '@mui/icons-material';
-import { StatsGrid, StatCard, IconWrapper } from '../../Insights.styles';
 import type { StatsCardsProps } from './StatsCards.types';
 
 export const StatsCards: React.FC<StatsCardsProps> = ({
@@ -14,185 +13,78 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
   taskCompletion,
   energyScore,
 }) => {
-  const theme = useTheme();
+  const cards = [
+    {
+      title: 'TOTAL FOCUS',
+      value:
+        totalFocusHours.value === '0h 0m'
+          ? '24h 15m'
+          : totalFocusHours.value,
+      change:
+        totalFocusHours.change === 'No data'
+          ? '📈 +12% vs período anterior'
+          : totalFocusHours.change,
+      icon: <AccessTime className="text-indigo-600 dark:text-indigo-400 text-xl" />,
+      iconBg: 'bg-indigo-50 dark:bg-indigo-950/60',
+      changeColor: 'text-emerald-600 dark:text-emerald-400',
+    },
+    {
+      title: 'TAREAS COMPLETADAS',
+      value: taskCompletion.value === '0%' ? '85%' : taskCompletion.value,
+      change:
+        taskCompletion.change === '0%'
+          ? '📈 +5% vs período anterior'
+          : taskCompletion.change,
+      icon: <CheckCircleOutline className="text-emerald-600 dark:text-emerald-400 text-xl" />,
+      iconBg: 'bg-emerald-50 dark:bg-emerald-950/60',
+      changeColor: 'text-emerald-600 dark:text-emerald-400',
+    },
+    {
+      title: 'ENERGÍA PROMEDIO',
+      value: energyScore.value === 'N/A' ? '78/100' : energyScore.value,
+      change:
+        energyScore.change === '0 pts'
+          ? 'Rendimiento estable'
+          : energyScore.change,
+      icon: <Bolt className="text-amber-500 text-xl" />,
+      iconBg: 'bg-amber-50 dark:bg-amber-950/60',
+      changeColor: 'text-slate-500 dark:text-slate-400',
+    },
+    {
+      title: 'DEEP WORK RATIO',
+      value: '65%',
+      change: 'Rango óptimo de enfoque',
+      icon: <BrainIcon className="text-purple-600 dark:text-purple-400 text-xl" />,
+      iconBg: 'bg-purple-50 dark:bg-purple-950/60',
+      changeColor: 'text-purple-600 dark:text-purple-400',
+    },
+  ];
 
   return (
-    <StatsGrid
-      sx={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}
-    >
-      {/* Card 1: TOTAL FOCUS */}
-      <StatCard>
-        <Box display="flex" justifyContent="space-between" alignItems="start">
-          <Box>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              fontWeight={800}
-              sx={{
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontSize: '10px',
-              }}
-            >
-              Total Focus
-            </Typography>
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              mt={1}
-              sx={{ letterSpacing: '-0.02em' }}
-            >
-              {totalFocusHours.value === '0h 0m'
-                ? '24h 15m'
-                : totalFocusHours.value}
-            </Typography>
-          </Box>
-          <IconWrapper color={theme.palette.primary.main}>
-            <AccessTime />
-          </IconWrapper>
-        </Box>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'success.main',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-          }}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {cards.map((card, idx) => (
+        <Card
+          key={idx}
+          className="shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-4"
         >
-          {totalFocusHours.change === 'No data'
-            ? '📈 +12% vs last period'
-            : totalFocusHours.change}
-        </Typography>
-      </StatCard>
-
-      {/* Card 2: TASKS COMPLETED */}
-      <StatCard>
-        <Box display="flex" justifyContent="space-between" alignItems="start">
-          <Box>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              fontWeight={800}
-              sx={{
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontSize: '10px',
-              }}
-            >
-              Tasks Completed
-            </Typography>
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              mt={1}
-              sx={{ letterSpacing: '-0.02em' }}
-            >
-              {taskCompletion.value === '0%' ? '85%' : taskCompletion.value}
-            </Typography>
-          </Box>
-          <IconWrapper color="#22c55e">
-            <CheckCircleOutline />
-          </IconWrapper>
-        </Box>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'success.main',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-          }}
-        >
-          {taskCompletion.change === '0%'
-            ? '📈 +5% vs last period'
-            : taskCompletion.change}
-        </Typography>
-      </StatCard>
-
-      {/* Card 3: AVG ENERGY */}
-      <StatCard>
-        <Box display="flex" justifyContent="space-between" alignItems="start">
-          <Box>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              fontWeight={800}
-              sx={{
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontSize: '10px',
-              }}
-            >
-              Avg Energy
-            </Typography>
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              mt={1}
-              sx={{ letterSpacing: '-0.02em' }}
-            >
-              {energyScore.value === 'N/A' ? '78/100' : energyScore.value}
-            </Typography>
-          </Box>
-          <IconWrapper color="#f59e0b">
-            <Bolt />
-          </IconWrapper>
-        </Box>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.secondary',
-            fontWeight: 600,
-          }}
-        >
-          {energyScore.change === '0 pts'
-            ? 'Stable performance'
-            : energyScore.change}
-        </Typography>
-      </StatCard>
-
-      {/* Card 4: DEEP WORK RATIO */}
-      <StatCard>
-        <Box display="flex" justifyContent="space-between" alignItems="start">
-          <Box>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              fontWeight={800}
-              sx={{
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontSize: '10px',
-              }}
-            >
-              Deep Work Ratio
-            </Typography>
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              mt={1}
-              sx={{ letterSpacing: '-0.02em' }}
-            >
-              65%
-            </Typography>
-          </Box>
-          <IconWrapper color="#8b5cf6">
-            <BrainIcon />
-          </IconWrapper>
-        </Box>
-        <Typography
-          variant="caption"
-          sx={{
-            color: '#8b5cf6',
-            fontWeight: 600,
-          }}
-        >
-          Optimal focus range
-        </Typography>
-      </StatCard>
-    </StatsGrid>
+          <CardHeader className="flex flex-row items-center justify-between p-0 mb-3">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+              {card.title}
+            </span>
+            <div className={`p-2 rounded-xl ${card.iconBg} flex items-center justify-center`}>
+              {card.icon}
+            </div>
+          </CardHeader>
+          <CardContent className="p-0 space-y-1">
+            <CardTitle className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              {card.value}
+            </CardTitle>
+            <p className={`text-xs font-semibold ${card.changeColor}`}>
+              {card.change}
+            </p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 };

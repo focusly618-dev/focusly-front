@@ -17,7 +17,8 @@ import {
   updateGoogleEvent,
   deleteGoogleEvent,
 } from '@/api/GoogleCalendar/googleCalendarApi';
-import { removeTask } from '@/redux/tasks/task.slice';
+import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
+import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import {
   deduplicateLinks,
@@ -52,8 +53,22 @@ export const useTaskMutations = ({
     state?: Partial<TaskData & { color: string }>,
   ) => {
     try {
+      const attendees = state?.collaborators?.map((c) => ({ email: c.email }));
       if (googleEventId) {
         const updated = await updateGoogleEvent(googleEventId, {
+          summary: state?.title || 'Focusly Meeting',
+          description: state?.description || '',
+          start: {
+            dateTime:
+              state?.deadline?.toISOString() || new Date().toISOString(),
+          },
+          end: {
+            dateTime: new Date(
+              (state?.deadline?.getTime() || Date.now()) +
+                (parseDuration(state?.duration || '30m') || 30) * 60000,
+            ).toISOString(),
+          },
+          attendees,
           conferenceData: {
             createRequest: {
               requestId: `focusly-${Date.now()}`,
@@ -61,7 +76,7 @@ export const useTaskMutations = ({
             },
           },
         });
-        return updated.hangoutLink;
+        return { meetLink: updated.hangoutLink || null, googleEventId };
       } else {
         const tempEvent = await createGoogleEvent({
           summary: state?.title || 'Focusly Meeting',
@@ -76,6 +91,7 @@ export const useTaskMutations = ({
                 (parseDuration(state?.duration || '30m') || 30) * 60000,
             ).toISOString(),
           },
+          attendees,
           conferenceData: {
             createRequest: {
               requestId: `focusly-${Date.now()}`,
@@ -85,16 +101,7 @@ export const useTaskMutations = ({
         });
 
         const meetLink = tempEvent.hangoutLink || null;
-        if (tempEvent.id) {
-          try {
-            // Delete the dummy event so it doesn't show up in the user's Calendar
-            await deleteGoogleEvent(tempEvent.id);
-          } catch (e) {
-            console.warn('Failed to delete dummy meet event immediately', e);
-          }
-        }
-
-        return meetLink;
+        return { meetLink, googleEventId: tempEvent.id };
       }
     } catch (error) {
       console.error('Error generating meet link:', error);
@@ -108,18 +115,18 @@ export const useTaskMutations = ({
     if (!user) return;
     setLoadingSave(true);
 
-    // Check if there's already a Google Meet link in the state
-    const hasExistingMeetLink = state.links?.some(
-      (l) =>
-        l.url.includes('meet.google.com') ||
-        l.title.toLowerCase().includes('meet'),
-    );
-
     let meetLink: string | null = null;
-    // Only generate new meet link if shouldGenerateMeet is true AND no meet link exists
-    if (state.shouldGenerateMeet && !hasExistingMeetLink) {
-      const generated = await generateMeetLinkNow(undefined, state);
-      meetLink = generated || null;
+    let createdGoogleEventId: string | undefined = undefined;
+
+    if (
+      state.shouldGenerateMeet ||
+      (state.collaborators && state.collaborators.length > 0)
+    ) {
+      const res = await generateMeetLinkNow(undefined, state);
+      if (res) {
+        meetLink = res.meetLink;
+        createdGoogleEventId = res.googleEventId;
+      }
     }
 
     const estimateTimer = parseDuration(state.duration);
@@ -134,8 +141,7 @@ export const useTaskMutations = ({
     const links = deduplicateLinks(state.links || []).map(
       (l: { title: string; url: string }) => ({ title: l.title, url: l.url }),
     );
-    // Only add meet link if we generated a new one (not if it already exists)
-    if (meetLink) {
+    if (meetLink && !links.some((l) => l.url === meetLink)) {
       links.push({ title: 'Google Meet', url: meetLink });
     }
 
@@ -166,8 +172,9 @@ export const useTaskMutations = ({
       ...commonInput,
       user_id: user.id || '',
       status: state.status || 'Backlog',
-      google_event_id: (initialTask as { google_event_id?: string })
-        ?.google_event_id,
+      google_event_id:
+        createdGoogleEventId ||
+        (initialTask as { google_event_id?: string })?.google_event_id,
       estimated_start_date: deadlineISO,
       estimated_end_date: endDateISO,
     };
@@ -175,9 +182,15 @@ export const useTaskMutations = ({
     try {
       const { data } = await createTaskMutation({
         variables: { createTaskInput: createInput },
-        refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
+        refetchQueries: [
+          'GetTasks',
+          'GetTasksTitles',
+          'GetTasksByUserPaginated',
+        ],
       });
       if (data?.createTask) {
+        const mappedTask = mapResponseToTask(data.createTask);
+        dispatch(upsertTask(mappedTask));
         sileo.success({
           title: 'Task created',
           fill: 'var(--sileo-success-bg)',
@@ -346,9 +359,15 @@ export const useTaskMutations = ({
     try {
       const { data } = await updateTaskMutation({
         variables: { updateTaskInput: updateInput },
-        refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
+        refetchQueries: [
+          'GetTasks',
+          'GetTasksTitles',
+          'GetTasksByUserPaginated',
+        ],
       });
       if (data?.updateTask) {
+        const mappedTask = mapResponseToTask(data.updateTask);
+        dispatch(upsertTask(mappedTask));
         sileo.success({
           title: 'Task updated',
           fill: 'var(--sileo-update-bg)',
@@ -366,7 +385,7 @@ export const useTaskMutations = ({
     if (!initialTask?.id) return;
 
     if (onDelete) {
-      onDelete(initialTask.id);
+      await onDelete(initialTask.id);
       return;
     }
 
@@ -408,8 +427,12 @@ export const useTaskMutations = ({
 
       resetForm();
       onClose();
-    } catch (e) {
-      handleMutationError(e, 'Error al eliminar la tarea');
+    } catch (e: unknown) {
+      if (e instanceof Error && !e.message.includes('not found')) {
+        handleMutationError(e, 'Error al eliminar la tarea');
+      } else if (!(e instanceof Error)) {
+        handleMutationError(e, 'Error al eliminar la tarea');
+      }
     }
   };
 

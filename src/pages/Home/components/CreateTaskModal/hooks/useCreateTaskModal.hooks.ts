@@ -38,6 +38,10 @@ export const useCreateTaskModal = ({
     setColor,
     errors,
     setErrors,
+    collaborators,
+    setCollaborators,
+    handleAddCollaborator,
+    handleRemoveCollaborator,
     handleTitleChange,
     handleDurationChange,
     validateForm,
@@ -168,6 +172,7 @@ export const useCreateTaskModal = ({
       realTime,
       tags,
       links,
+      collaborators,
       color,
       shouldGenerateMeet,
     });
@@ -186,6 +191,7 @@ export const useCreateTaskModal = ({
       realTime,
       tags,
       links,
+      collaborators,
       color,
       shouldGenerateMeet,
     });
@@ -214,10 +220,11 @@ export const useCreateTaskModal = ({
         priority,
         category,
         tags,
+        collaborators,
         color,
       });
-      if (meetUrl) {
-        handleAddLink('Google Meet', meetUrl);
+      if (meetUrl?.meetLink) {
+        handleAddLink('Google Meet', meetUrl.meetLink);
         setShouldGenerateMeet(true);
         sileo.success({
           title: 'Google Meet link generated!',
@@ -318,6 +325,10 @@ export const useCreateTaskModal = ({
     setShouldGenerateMeet,
     isGeneratingMeet,
     handleGenerateMeet,
+    collaborators,
+    setCollaborators,
+    handleAddCollaborator,
+    handleRemoveCollaborator,
     handleTimerChange,
     hasMeetLink,
   };
