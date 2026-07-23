@@ -92,6 +92,7 @@ export const WorkspaceEditor = ({
             isCentered={isCentered}
             onToggleCentered={toggleCentered}
             onToggleSidebar={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+            onStartFocus={onStartFocus}
           />
 
           <EditorContent

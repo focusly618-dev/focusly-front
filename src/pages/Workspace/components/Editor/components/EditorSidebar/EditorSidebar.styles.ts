@@ -30,10 +30,9 @@ export const RightSidebar = styled(Box, {
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: theme.palette.background.paper,
-    padding: isOpen ? '24px' : '24px 8px',
+    padding: 0,
     borderLeft: `1px solid ${theme.palette.divider}`,
-    overflowY: 'auto',
-    overflowX: 'hidden',
+    overflow: 'hidden',
     position: 'relative',
     height: '100%',
     [theme.breakpoints.down('md')]: {
@@ -45,31 +44,56 @@ export const RightSidebar = styled(Box, {
       left: 0,
       zIndex: 1200,
       borderLeft: 'none',
-      padding: '24px',
+      padding: 0,
     },
-    // Custom scrollbar
-    '&::-webkit-scrollbar': {
-      width: '6px',
-    },
-    '&::-webkit-scrollbar-track': {
-      backgroundColor: 'transparent',
-    },
-    '&::-webkit-scrollbar-thumb': {
-      backgroundColor:
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.12)'
-          : 'rgba(0, 0, 0, 0.08)',
-      borderRadius: '10px',
-      '&:hover': {
-        backgroundColor:
-          theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.2)'
-            : 'rgba(0, 0, 0, 0.15)',
-      },
-    },
-    colorScheme: theme.palette.mode,
   }),
 );
+
+export const SidebarHeaderTop = styled(Box)(({ theme }) => ({
+  height: '60px',
+  minHeight: '60px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '0 24px',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  boxSizing: 'border-box',
+  flexShrink: 0,
+  backgroundColor: theme.palette.background.paper,
+  [theme.breakpoints.down('md')]: {
+    height: '56px',
+    padding: '0 16px',
+  },
+}));
+
+export const SidebarBody = styled(Box)(({ theme }) => ({
+  flex: 1,
+  overflowY: 'auto',
+  overflowX: 'hidden',
+  padding: '24px',
+  display: 'flex',
+  flexDirection: 'column',
+  // Custom scrollbar
+  '&::-webkit-scrollbar': {
+    width: '6px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.15)'
+        : 'rgba(0, 0, 0, 0.12)',
+    borderRadius: '10px',
+    '&:hover': {
+      backgroundColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.25)'
+          : 'rgba(0, 0, 0, 0.2)',
+    },
+  },
+}));
 
 // Col-resize Drag Handle
 export const DragHandle = styled(Box, {
@@ -100,33 +124,28 @@ export const ViewTaskButton = BaseViewTaskButton;
 export const StartFocusButton = BaseStartFocusButton;
 export const MarkDoneButton = BaseMarkDoneButton;
 
-// Redesigned to be a single, cohesive vertical property list
-export const PropertyGrid = styled(Box)(({ theme }) => ({
+export const PropertyGrid = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: '8px',
-  padding: '12px 16px',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.02)'
-      : 'rgba(0, 0, 0, 0.015)',
-  borderRadius: '12px',
-  border: `1px solid ${theme.palette.divider}`,
   marginBottom: '24px',
 }));
 
-export const PropertyCard = styled(Box)({
+export const PropertyCard = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  height: '32px',
-  padding: '0 4px',
-});
+  padding: '12px 0px',
+  borderBottom: `1px solid ${
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.08)'
+      : 'rgba(0, 0, 0, 0.06)'
+  }`,
+}));
 
 export const PropertyLabel = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
   fontSize: '11px',
-  fontWeight: 600,
+  fontWeight: 700,
   textTransform: 'uppercase',
   letterSpacing: '1px',
   width: '100px',
@@ -141,7 +160,7 @@ export const PropertyValue = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: '8px',
   flexGrow: 1,
-  justifyContent: 'flex-start',
+  justifyContent: 'flex-end',
 }));
 
 export const SectionSubtitle = styled(Typography)(({ theme }) => ({
@@ -156,12 +175,17 @@ export const SectionSubtitle = styled(Typography)(({ theme }) => ({
 }));
 
 export const DescriptionContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: 'transparent',
-  borderLeft: `3px solid ${theme.palette.primary.main}40`,
-  padding: '0px 16px',
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(59, 130, 246, 0.08)' : '#f0f4fe',
+  borderRadius: '12px',
+  border:
+    theme.palette.mode === 'dark'
+      ? '1px solid rgba(59, 130, 246, 0.2)'
+      : '1px solid rgba(59, 130, 246, 0.12)',
+  padding: '16px',
   marginBottom: '24px',
   marginTop: '12px',
-  fontSize: '13.5px',
+  fontSize: '13px',
   lineHeight: 1.6,
   color: theme.palette.text.primary,
   '& p': {

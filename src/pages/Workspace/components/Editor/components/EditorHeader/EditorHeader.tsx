@@ -2,11 +2,12 @@ import {
   CheckCircleOutline as CheckCircleIcon,
   Mic as MicIcon,
   MicOff as MicOffIcon,
-  Language as LanguageIcon,
-  SwapHoriz as SwapIcon,
   ArrowBack as ArrowBackIcon,
-  VisibilityOutlined as EyeIcon,
   InfoOutlined as InfoIcon,
+  FlashOn as FlashOnIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  Translate as TranslateIcon,
+  VisibilityOutlined as EyeIcon,
 } from '@mui/icons-material';
 import {
   CircularProgress,
@@ -49,6 +50,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     isCentered,
     onToggleCentered,
     onToggleSidebar,
+    onStartFocus,
   } = props;
 
   const {
@@ -60,64 +62,39 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     toggleListening,
     handleSourceSelect,
     handleTargetSelect,
-    handleSwapLanguages,
     getLanguageLabel,
   } = useEditorHeader(props);
 
-  const getMobileLanguageLabel = (code: string) => {
-    if (code === 'auto') return 'Auto';
-    return code.toUpperCase();
-  };
-
   return (
     <StyledEditorHeader>
+      {/* ─── DESKTOP LAYOUT ─── */}
       <HeaderLeft sx={{ display: { xs: 'none', md: 'flex' } }}>
         <Button
           onClick={onBack}
-          startIcon={
-            <ArrowBackIcon
-              sx={{
-                fontSize: 17,
-                transition: 'transform 0.2s ease',
-              }}
-            />
-          }
+          startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
           sx={{
             height: '34px',
-            px: 1.8,
-            mr: { xs: 0, md: 12 },
-            borderRadius: '20px',
+            px: 1.5,
+            mr: { xs: 0, md: 1 },
+            borderRadius: '8px',
             border: '1px solid',
-            borderColor: 'divider',
-            color: 'text.secondary',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : '#e2e8f0',
+            color: 'text.primary',
             backgroundColor: (theme) =>
               theme.palette.mode === 'dark'
                 ? 'rgba(255,255,255,0.03)'
-                : 'rgba(0,0,0,0.02)',
-            backdropFilter: 'blur(8px)',
+                : '#ffffff',
             textTransform: 'none',
-            fontWeight: 700,
-            fontSize: '12px',
-            letterSpacing: '0.2px',
-            transition: 'all 0.25s ease',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
-
+            fontWeight: 600,
+            fontSize: '13px',
             '&:hover': {
               backgroundColor: (theme) =>
                 theme.palette.mode === 'dark'
                   ? 'rgba(255,255,255,0.08)'
-                  : 'rgba(0,0,0,0.06)',
-              borderColor: 'text.secondary',
-              transform: 'translateX(-2px)',
-              boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
-
-              '& .MuiSvgIcon-root': {
-                transform: 'translateX(-3px)',
-              },
-            },
-
-            '&:active': {
-              transform: 'scale(0.97)',
+                  : '#f8fafc',
             },
           }}
         >
@@ -131,7 +108,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           display: { xs: 'none', md: 'flex' },
           position: 'relative',
           zIndex: 50,
-          mx: 2,
+          mx: { md: 1, lg: 2 },
         }}
       >
         <SearchPalette
@@ -148,139 +125,101 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         />
       </HeaderCenter>
 
-      <HeaderRight sx={{ display: { xs: 'none', md: 'flex' } }}>
-        {/* Source Language Selector */}
-        <IconButton
+      <HeaderRight sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+        {/* Detect Language Button */}
+        <Button
           onClick={(e) => setSourceAnchor(e.currentTarget)}
-          size="small"
+          startIcon={<AutoAwesomeIcon sx={{ fontSize: 14 }} />}
           sx={{
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: '20px',
+            height: '34px',
             px: 1.5,
-            py: 0.5,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.75,
-            height: '32px',
-            fontSize: '11px',
-            fontWeight: 700,
-            color: 'text.secondary',
-            '&:hover': {
-              bgcolor: 'action.hover',
-              borderColor: 'text.secondary',
-            },
-          }}
-        >
-          <LanguageIcon sx={{ fontSize: 14 }} />
-          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-            {getLanguageLabel(sourceLanguage)}
-          </Box>
-          <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
-            {getMobileLanguageLabel(sourceLanguage)}
-          </Box>
-        </IconButton>
-
-        {/* Swap Languages Button */}
-        <IconButton
-          onClick={handleSwapLanguages}
-          size="small"
-          sx={{
-            width: '32px',
-            height: '32px',
+            borderRadius: '8px',
             border: '1px solid',
-            borderColor: 'divider',
-            color: 'text.secondary',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : '#e2e8f0',
+            color: 'text.primary',
+            fontSize: '12px',
+            fontWeight: 600,
+            textTransform: 'none',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : '#ffffff',
             '&:hover': {
-              bgcolor: 'action.hover',
-              borderColor: 'text.secondary',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : '#f8fafc',
             },
           }}
         >
-          <SwapIcon sx={{ fontSize: 16 }} />
-        </IconButton>
+          {sourceLanguage === 'auto'
+            ? 'Detect Language'
+            : getLanguageLabel(sourceLanguage)}
+        </Button>
 
-        {/* Target Language Selector */}
-        <IconButton
+        {/* Target Language Button */}
+        <Button
           onClick={(e) => setTargetAnchor(e.currentTarget)}
-          size="small"
+          startIcon={<TranslateIcon sx={{ fontSize: 14 }} />}
           sx={{
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: '20px',
+            height: '34px',
             px: 1.5,
-            py: 0.5,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.75,
-            height: '32px',
-            fontSize: '11px',
-            fontWeight: 700,
-            color: 'text.secondary',
+            borderRadius: '8px',
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : '#e2e8f0',
+            color: 'text.primary',
+            fontSize: '12px',
+            fontWeight: 600,
+            textTransform: 'none',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : '#ffffff',
             '&:hover': {
-              bgcolor: 'action.hover',
-              borderColor: 'text.secondary',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : '#f8fafc',
             },
           }}
         >
-          <LanguageIcon sx={{ fontSize: 14 }} />
-          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-            {getLanguageLabel(targetLanguage)}
-          </Box>
-          <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
-            {getMobileLanguageLabel(targetLanguage)}
-          </Box>
-        </IconButton>
+          {getLanguageLabel(targetLanguage)}
+        </Button>
 
-        {/* Real-time speech preview overlay */}
-        {isListening && (
-          <Fade in={true}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                backgroundColor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(239, 68, 68, 0.08)'
-                    : 'rgba(239, 68, 68, 0.04)',
-                border: '1px solid rgba(239, 68, 68, 0.2)',
-                padding: '6px 14px',
-                height: '32px',
-                borderRadius: '20px',
-                backdropFilter: 'blur(8px)',
-                transition: 'all 0.3s ease',
-                maxWidth: '280px',
-              }}
-            >
-              <Box
-                sx={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  bgcolor: 'error.main',
-                  animation: 'blink 1.2s infinite ease-in-out',
-                  '@keyframes blink': {
-                    '0%, 100%': { opacity: 0.2 },
-                    '50%': { opacity: 1 },
-                  },
-                }}
-              />
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.secondary',
-                  fontWeight: 600,
-                  fontSize: '11px',
-                  whiteSpace: 'nowrap',
-                  display: { xs: 'none', sm: 'inline-block' },
-                }}
-              >
-                Listening...
-              </Typography>
-            </Box>
-          </Fade>
-        )}
+        {/* Focus Mode Button - Opens Focus Mode Modal */}
+        <Button
+          onClick={() => {
+            if (onStartFocus) {
+              onStartFocus(selectTask);
+            } else if (onToggleCentered) {
+              onToggleCentered();
+            }
+          }}
+          startIcon={<FlashOnIcon sx={{ fontSize: 16 }} />}
+          sx={{
+            height: '34px',
+            px: 2,
+            borderRadius: '10px',
+            bgcolor: '#4f46e5',
+            color: '#ffffff',
+            fontSize: '12px',
+            fontWeight: 700,
+            textTransform: 'none',
+            boxShadow: '0 2px 8px rgba(79, 70, 229, 0.25)',
+            '&:hover': {
+              bgcolor: '#4338ca',
+              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
+            },
+          }}
+        >
+          Focus Mode
+        </Button>
 
         {/* Dictation Microphone Button */}
         <IconButton

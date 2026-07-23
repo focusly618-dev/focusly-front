@@ -32,9 +32,10 @@ export const HeaderCenter = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   flex: '1 1 auto',
-  minWidth: '200px',
-  maxWidth: '600px',
-  padding: '0 24px',
+  minWidth: '220px',
+  flexShrink: 1,
+  maxWidth: '480px',
+  padding: '0 8px',
   [theme.breakpoints.down('md')]: {
     padding: 0,
     flex: 'none',
@@ -160,17 +161,24 @@ const fadeIn = keyframes`
 // Command Palette Styles
 export const CommandPaletteContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
-  top: '-16px',
+  top: '-14px',
   left: '0',
   right: '0',
-  backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '8px',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(15, 23, 42, 0.95)'
+      : 'rgba(255, 255, 255, 0.98)',
+  backdropFilter: 'blur(16px)',
+  border:
+    theme.palette.mode === 'dark'
+      ? '1px solid rgba(255, 255, 255, 0.12)'
+      : '1px solid #e2e8f0',
+  borderRadius: '16px',
   boxShadow:
     theme.palette.mode === 'dark'
-      ? '0 10px 25px rgba(0,0,0,0.5)'
-      : '0 10px 25px rgba(0,0,0,0.1)',
-  zIndex: 10,
+      ? '0 16px 40px rgba(0,0,0,0.6)'
+      : '0 16px 40px rgba(0,0,0,0.12)',
+  zIndex: 100,
   overflow: 'hidden',
   width: '100%',
   animation: `${fadeIn} 0.2s ease-out`,
@@ -181,19 +189,23 @@ export const CollapsedSearchContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   backgroundColor:
-    theme.palette.mode === 'dark'
-      ? theme.palette.background.paper
-      : theme.palette.background.default,
-  borderRadius: '8px',
-  padding: '12px 16px',
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',
+  borderRadius: '24px',
+  padding: '5px 14px',
   cursor: 'text',
+  minWidth: '230px',
+  maxWidth: '480px',
+  width: '100%',
+  whiteSpace: 'nowrap',
   border:
     theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.01)'
-      : '1px solid #c0c0c0ff',
-  animation: `${fadeIn} 0.2s ease-out`,
+      ? '1px solid rgba(255, 255, 255, 0.08)'
+      : '1px solid #e2e8f0',
+  transition: 'all 0.2s ease',
   '&:hover': {
     borderColor: theme.palette.primary.main,
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : '#ffffff',
   },
 }));
 
@@ -341,15 +353,21 @@ export const ResultCount = styled(Box)(({ theme }) => ({
 
 export const TaskItemContainer = styled(Box)<{ active?: boolean }>(
   ({ theme, active }) => ({
-    padding: '10px 16px',
+    padding: '8px 12px',
+    margin: '2px 8px',
+    borderRadius: '10px',
     cursor: 'pointer',
-    transition: 'all 0.2s',
-    borderLeft: active
-      ? `2px solid ${theme.palette.info.main}`
-      : '2px solid transparent',
-    backgroundColor: active ? theme.palette.action.selected : 'transparent',
+    transition: 'all 0.15s ease',
+    backgroundColor: active
+      ? theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.08)'
+        : 'rgba(0, 0, 0, 0.05)'
+      : 'transparent',
     '&:hover': {
-      backgroundColor: theme.palette.action.hover,
+      backgroundColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.06)'
+          : 'rgba(0, 0, 0, 0.04)',
     },
   }),
 );
