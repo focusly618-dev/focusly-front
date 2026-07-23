@@ -191,44 +191,53 @@ export const useHome = () => {
     setSearchParams(newParams);
   };
 
-  const deleteTask = async () => {
-    if (taskDetailsTask?.id) {
-      // 1. Optimistic Delete in Redux
-      dispatch(removeTask({ id: taskDetailsTask.id }));
-      dispatch(removeEvent({ id: taskDetailsTask.id }));
-      if (taskDetailsTask.google_event_id) {
-        dispatch(removeEvent({ id: taskDetailsTask.google_event_id }));
-      }
+  const deleteTask = async (idParam?: string) => {
+    const targetId = idParam || taskDetailsTask?.id;
+    if (!targetId) return;
 
-      try {
-        const isGoogleTask = (taskDetailsTask as Task).source === 'google';
+    const targetTask =
+      tasks.find((t) => t.id === targetId) ||
+      (taskDetailsTask?.id === targetId ? taskDetailsTask : null);
 
-        if (!isGoogleTask) {
-          // Point 2: Platform Task — Delete from BOTH Google (if synced) and Platform
-          if (taskDetailsTask.google_event_id) {
-            try {
-              await deleteGoogleEvent(taskDetailsTask.google_event_id);
-            } catch (err) {
-              console.warn(
-                'Failed to delete synced Google event, proceeding with platform delete',
-                err,
-              );
-            }
+    // 1. Optimistic Delete in Redux
+    dispatch(removeTask({ id: targetId }));
+    dispatch(removeEvent({ id: targetId }));
+    if (targetTask?.google_event_id) {
+      dispatch(removeEvent({ id: targetTask.google_event_id }));
+    }
+
+    try {
+      const isGoogleTask = (targetTask as Task)?.source === 'google';
+
+      if (!isGoogleTask) {
+        // Platform Task — Delete from BOTH Google (if synced) and Platform
+        if (targetTask?.google_event_id) {
+          try {
+            await deleteGoogleEvent(targetTask.google_event_id);
+          } catch (err) {
+            console.warn(
+              'Failed to delete synced Google event, proceeding with platform delete',
+              err,
+            );
           }
-
-          await deleteTaskMutation({
-            variables: { id: taskDetailsTask.id },
-            refetchQueries: [
-              { query: GET_TASKS, variables: { userId: user?.id || '' } },
-              { query: GET_WORKSPACES, variables: { search: '' } },
-            ],
-          });
-        } else {
-          // Point 1: Pure Google Event — Delete only in Google Calendar
-          const eventId = taskDetailsTask.google_event_id || taskDetailsTask.id;
-          await deleteGoogleEvent(eventId);
         }
-      } catch (e) {
+
+        await deleteTaskMutation({
+          variables: { id: targetId },
+          refetchQueries: [
+            { query: GET_TASKS, variables: { userId: user?.id || '' } },
+            { query: GET_WORKSPACES, variables: { search: '' } },
+          ],
+        });
+      } else {
+        // Pure Google Event — Delete only in Google Calendar
+        const eventId = targetTask?.google_event_id || targetId;
+        await deleteGoogleEvent(eventId);
+      }
+    } catch (e: unknown) {
+      if (e instanceof Error && !e.message.includes('not found')) {
+        handleMutationError(e, 'Error al eliminar la tarea');
+      } else if (!(e instanceof Error)) {
         handleMutationError(e, 'Error al eliminar la tarea');
       }
     }

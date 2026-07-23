@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Box,
@@ -8,6 +9,7 @@ import {
   Avatar,
   TextField,
   CircularProgress,
+  Chip,
 } from '@mui/material';
 import {
   Link as LinkIcon,
@@ -17,6 +19,7 @@ import {
   Add as AddIcon,
   Launch as LaunchIcon,
   Close as CloseIcon,
+  PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
 import {
   resourcesContainerSx,
@@ -36,6 +39,13 @@ interface Link {
   url: string;
 }
 
+interface Collaborator {
+  name?: string;
+  email: string;
+  avatar?: string;
+  responseStatus?: string;
+}
+
 interface TaskResourcesProps {
   links: Link[];
   isLinksExpanded: boolean;
@@ -51,6 +61,9 @@ interface TaskResourcesProps {
   setNewLinkUrl: (u: string) => void;
   handleAddLink: (title: string, url: string) => void;
   handleRemoveLink: (idx: number) => void;
+  collaborators?: Collaborator[];
+  handleAddCollaborator?: (name: string, email: string) => void;
+  handleRemoveCollaborator?: (index: number) => void;
   isReadOnly?: boolean;
 }
 
@@ -69,8 +82,30 @@ export const TaskResources = ({
   setNewLinkUrl,
   handleAddLink,
   handleRemoveLink,
+  collaborators = [],
+  handleAddCollaborator,
+  handleRemoveCollaborator,
   isReadOnly,
 }: TaskResourcesProps) => {
+  const [emailInput, setEmailInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
+  const [isAddingCollaborator, setIsAddingCollaborator] = useState(false);
+
+  const submitCollaborator = () => {
+    if (emailInput.includes('@') && handleAddCollaborator) {
+      handleAddCollaborator(nameInput, emailInput);
+      setEmailInput('');
+      setNameInput('');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitCollaborator();
+    }
+  };
+
   const getLinkIcon = (url: string) => {
     try {
       const domain = new URL(url).hostname;
@@ -86,6 +121,9 @@ export const TaskResources = ({
       };
     }
   };
+
+  const showCollaboratorSection =
+    hasMeetLink && (isAddingCollaborator || collaborators.length > 0);
 
   return (
     <Box sx={resourcesContainerSx}>
@@ -136,6 +174,7 @@ export const TaskResources = ({
                   alignItems="center"
                   gap={1}
                 >
+                  {/* Add Meet Button */}
                   <Button
                     size="small"
                     onClick={(e) => {
@@ -164,6 +203,22 @@ export const TaskResources = ({
                     </AnimatePresence>
                   </Button>
 
+                  {/* Add Collaborators Button (PersonAddIcon) */}
+                  {hasMeetLink && (
+                    <Button
+                      size="small"
+                      startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsAddingCollaborator((prev) => !prev);
+                      }}
+                      sx={addResourceButtonSx}
+                    >
+                      Add Collaborators
+                    </Button>
+                  )}
+
+                  {/* Add Resource Button */}
                   <Button
                     size="small"
                     startIcon={<AddIcon sx={{ fontSize: 16 }} />}
@@ -181,6 +236,121 @@ export const TaskResources = ({
           )}
         </Box>
       </Box>
+
+      {/* Collaborators Section (Only when Meet is present) */}
+      <AnimatePresence mode="popLayout">
+        {isLinksExpanded && showCollaboratorSection && (
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            sx={{
+              overflow: 'hidden',
+              mb: 2,
+              p: 2,
+              borderRadius: '8px',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.03)'
+                  : 'rgba(0,0,0,0.02)',
+              border: '1px solid',
+              borderColor: 'divider',
+            }}
+          >
+            <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+              <PersonAddIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                }}
+              >
+                Colaboradores / Asistentes (Invitación vía Google Calendar)
+              </Typography>
+            </Box>
+
+            {!isReadOnly && (
+              <Box
+                display="flex"
+                gap={1}
+                mb={collaborators.length > 0 ? 1.5 : 0}
+              >
+                <TextField
+                  size="small"
+                  fullWidth
+                  placeholder="Escribe el correo del colaborador..."
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                    },
+                  }}
+                />
+                <Button
+                  size="small"
+                  variant="contained"
+                  disableElevation
+                  onClick={submitCollaborator}
+                  disabled={!emailInput.includes('@')}
+                  startIcon={
+                    <PersonAddIcon sx={{ fontSize: 16, color: 'white' }} />
+                  }
+                  sx={{
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Agregar
+                </Button>
+              </Box>
+            )}
+
+            {collaborators.length > 0 && (
+              <Box display="flex" flexWrap="wrap" gap={1} mt={1.5}>
+                {collaborators.map((c, idx) => (
+                  <Chip
+                    key={`${c.email}-${idx}`}
+                    avatar={
+                      <Avatar src={c.avatar}>
+                        {c.name?.charAt(0) || c.email.charAt(0).toUpperCase()}
+                      </Avatar>
+                    }
+                    label={c.name ? `${c.name} (${c.email})` : c.email}
+                    onDelete={
+                      !isReadOnly && handleRemoveCollaborator
+                        ? () => handleRemoveCollaborator(idx)
+                        : undefined
+                    }
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: '6px',
+                      fontWeight: 500,
+                      fontSize: '12px',
+                      borderColor:
+                        c.responseStatus === 'accepted'
+                          ? 'success.main'
+                          : c.responseStatus === 'declined'
+                            ? 'error.main'
+                            : 'divider',
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+          </Box>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence mode="popLayout">
         {isLinksExpanded && (

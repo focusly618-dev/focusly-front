@@ -15,9 +15,9 @@ import { sileo, handleMutationError } from '@/utils';
 import {
   createGoogleEvent,
   updateGoogleEvent,
-  deleteGoogleEvent,
 } from '@/api/GoogleCalendar/googleCalendarApi';
-import { removeTask } from '@/redux/tasks/task.slice';
+import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
+import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import {
   deduplicateLinks,
   parseDuration,
@@ -52,8 +52,22 @@ export const useTaskMutations = ({
     state?: Partial<TaskData & { color: string }>,
   ) => {
     try {
+      const attendees = state?.collaborators?.map((c) => ({ email: c.email }));
       if (googleEventId) {
         const updated = await updateGoogleEvent(googleEventId, {
+          summary: state?.title || 'Focusly Meeting',
+          description: state?.description || '',
+          start: {
+            dateTime:
+              state?.deadline?.toISOString() || new Date().toISOString(),
+          },
+          end: {
+            dateTime: new Date(
+              (state?.deadline?.getTime() || Date.now()) +
+                (parseDuration(state?.duration || '30m') || 30) * 60000,
+            ).toISOString(),
+          },
+          attendees,
           conferenceData: {
             createRequest: {
               requestId: `focusly-${Date.now()}`,
@@ -62,7 +76,7 @@ export const useTaskMutations = ({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
         });
-        return updated.hangoutLink;
+        return { meetLink: updated.hangoutLink || null, googleEventId };
       } else {
         const tempEvent = await createGoogleEvent({
           summary: state?.title || 'Focusly Meeting',
@@ -77,6 +91,7 @@ export const useTaskMutations = ({
                 (parseDuration(state?.duration || '30m') || 30) * 60000,
             ).toISOString(),
           },
+          attendees,
           conferenceData: {
             createRequest: {
               requestId: `focusly-${Date.now()}`,
@@ -87,16 +102,7 @@ export const useTaskMutations = ({
         });
 
         const meetLink = tempEvent.hangoutLink || null;
-        if (tempEvent.id) {
-          try {
-            // Delete the dummy event so it doesn't show up in the user's Calendar
-            await deleteGoogleEvent(tempEvent.id);
-          } catch (e) {
-            console.warn('Failed to delete dummy meet event immediately', e);
-          }
-        }
-
-        return meetLink;
+        return { meetLink, googleEventId: tempEvent.id };
       }
     } catch (error) {
       console.error('Error generating meet link:', error);
@@ -111,9 +117,17 @@ export const useTaskMutations = ({
     setLoadingSave(true);
 
     let meetLink: string | null = null;
-    if (state.shouldGenerateMeet) {
-      const generated = await generateMeetLinkNow(undefined, state);
-      meetLink = generated || null;
+    let createdGoogleEventId: string | undefined = undefined;
+
+    if (
+      state.shouldGenerateMeet ||
+      (state.collaborators && state.collaborators.length > 0)
+    ) {
+      const res = await generateMeetLinkNow(undefined, state);
+      if (res) {
+        meetLink = res.meetLink;
+        createdGoogleEventId = res.googleEventId;
+      }
     }
 
     const estimateTimer = parseDuration(state.duration);
@@ -129,7 +143,7 @@ export const useTaskMutations = ({
       title: l.title,
       url: l.url,
     }));
-    if (meetLink) {
+    if (meetLink && !links.some((l) => l.url === meetLink)) {
       links.push({ title: 'Google Meet', url: meetLink });
     }
 
@@ -146,22 +160,30 @@ export const useTaskMutations = ({
       category: state.category,
       color: state.color,
       links,
+      collaborators: state.collaborators,
     };
 
     const createInput: TaskInput = {
       ...commonInput,
       user_id: user.id || '',
       status: state.status || 'Backlog',
-      google_event_id: (initialTask as { google_event_id?: string })
-        ?.google_event_id,
+      google_event_id:
+        createdGoogleEventId ||
+        (initialTask as { google_event_id?: string })?.google_event_id,
     };
 
     try {
       const { data } = await createTaskMutation({
         variables: { createTaskInput: createInput },
-        refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
+        refetchQueries: [
+          'GetTasks',
+          'GetTasksTitles',
+          'GetTasksByUserPaginated',
+        ],
       });
       if (data?.createTask) {
+        const mappedTask = mapResponseToTask(data.createTask);
+        dispatch(upsertTask(mappedTask));
         sileo.success({
           title: 'Task created',
           description: 'The task has been created successfully',
@@ -243,6 +265,7 @@ export const useTaskMutations = ({
           url: l.url,
         }),
       ),
+      collaborators: state.collaborators || initialTask.collaborators,
       google_event_id:
         (state as { google_event_id?: string }).google_event_id ||
         initialTask.google_event_id,

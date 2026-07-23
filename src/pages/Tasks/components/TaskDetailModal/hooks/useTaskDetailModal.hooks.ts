@@ -240,6 +240,7 @@ export const useTaskDetailModal = ({
         description,
         deadline: currentDate ?? undefined,
         duration,
+        collaborators,
       });
       if (meetUrl) {
         handleAddLink('Google Meet', meetUrl);
