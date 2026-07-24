@@ -391,13 +391,16 @@ export const descriptionInputSx = {
           : 'none',
     },
   },
+  '& .MuiInputBase-root': {
+    color: 'text.primary',
+  },
   '& textarea': {
     fontSize: '14px',
     lineHeight: 1.6,
-    color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
+    color: 'text.primary',
     '&::placeholder': {
       color: 'text.secondary',
-      opacity: 0.6,
+      opacity: 0.7,
     },
   },
 };

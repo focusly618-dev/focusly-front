@@ -47,7 +47,9 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
     }
   }
 
-  const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS);
+  const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
+    fetchPolicy: 'cache-and-network',
+  });
   const { data: totalWorkspacesData } = useQuery(GET_TOTAL_WORKSPACES);
 
   // Mutations

@@ -57,7 +57,7 @@ export const WorkspaceEmptyState = ({ onCreate }: WorkspaceEmptyStateProps) => {
         </Typography>
 
         <ButtonContainer>
-          <ActionButton onClick={onCreate}>CREATE WORKSPACE</ActionButton>
+          <ActionButton onClick={onCreate}>CREATE A NEW PROJECT</ActionButton>
         </ButtonContainer>
       </MainContent>
     </WorkspaceContainer>

@@ -23,7 +23,10 @@ export const MainEditorArea = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   borderRight: `1px solid ${theme.palette.divider}`,
   overflowY: 'auto',
-  overflowX: 'auto',
+  overflowX: 'hidden',
+  overflowAnchor: 'none',
+  overscrollBehaviorY: 'contain',
+  scrollBehavior: 'smooth',
   // Custom scrollbar
   '&::-webkit-scrollbar': {
     width: '8px',
@@ -59,7 +62,7 @@ export const EditorHeader = styled(Box, {
   borderBottom: `1px solid ${theme.palette.divider}`,
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
+  justifyContent: 'flex-start',
   padding: '0 24px',
   background: gradient || 'transparent',
   backgroundSize: 'cover',
@@ -93,6 +96,10 @@ export const EditorHeader = styled(Box, {
 export const EditorContent = styled(Box)(({ theme }) => ({
   padding: '40px 60px',
   flex: 1,
+  width: '100%',
+  maxWidth: '100%',
+  boxSizing: 'border-box',
+  overflowAnchor: 'none',
   [theme.breakpoints.down('md')]: {
     padding: '16px 8px',
   },
@@ -351,6 +358,14 @@ export const TitleInput = styled('input')(({ theme }) => ({
 
 export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
   flex: 1,
+  width: '100%',
+  maxWidth: '100%',
+  overflowWrap: 'break-word',
+  wordBreak: 'break-word',
+  '& .bn-container': {
+    width: '100%',
+    maxWidth: '100%',
+  },
   '& ul, & li': {
     listStyleType: 'circle !important',
   },
@@ -358,14 +373,25 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
     backgroundColor: 'transparent',
     padding: '0 16px 100px 16px', // Extra padding at bottom
     minHeight: 'calc(100vh - 250px)', // Ensures editor stretches down so empty space is clickable
+    width: '100%',
+    boxSizing: 'border-box',
+    overflowWrap: 'break-word',
     [theme.breakpoints.down('md')]: {
       padding: '0 8px 80px 8px',
     },
+  },
+  '& .ProseMirror': {
+    outline: 'none !important',
+    maxWidth: '100%',
+    overflowWrap: 'break-word',
+    wordBreak: 'break-word',
   },
   '& .bn-block-content': {
     color: theme.palette.text.secondary,
     fontSize: '16px',
     lineHeight: 1.8,
+    maxWidth: '100%',
+    overflowWrap: 'break-word',
   },
   // Customizing the slash menu
   '& .bn-suggestion-menu': {
@@ -397,18 +423,26 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
     borderRadius: '12px',
     padding: '20px',
     margin: '16px 0',
-    overflow: 'auto',
+    maxWidth: '100%',
+    overflowX: 'auto',
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'break-word',
+    wordBreak: 'break-word',
     '& code': {
       backgroundColor: 'transparent',
       padding: 0,
       color: theme.palette.text.primary,
       fontSize: '14px',
       lineHeight: 1.6,
+      whiteSpace: 'pre-wrap',
+      overflowWrap: 'break-word',
     },
   },
   '& .bn-block-content[data-content-type=codeBlock]': {
     backgroundColor: theme.palette.mode === 'dark' ? '#0f172a' : '#f4f4f4f5',
     padding: 0,
+    maxWidth: '100%',
+    overflowWrap: 'break-word',
   },
   // Custom Workspace Mention styles
   '& a[href*="workspaceId"]': {
