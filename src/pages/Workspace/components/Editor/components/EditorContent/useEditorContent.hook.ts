@@ -101,11 +101,11 @@ export const useEditorContent = ({
 
     setIsAIProcessing(true);
 
-    const aiPrompt = `You are a helpful productivity assistant. Analyze the selected text and turn it into a clear task suggestion.
-Respond with a single raw JSON object and no extra commentary, matching this schema:
+    const aiPrompt = `You are a helpful productivity assistant. Analyze the selected text and turn it into a clear, actionable task.
+Respond with a single raw JSON object and no extra commentary, matching this schema exactly:
 {
-  "title": "Action-oriented task title",
-  "description": "Short explanation or context extracted from the text",
+  "title": "Short, action-oriented task title (max 60 chars)",
+  "description": "A well-structured task description in rich Markdown. Use ## for sections, **bold** for key terms, - for bullet points, and \`code\` or \`\`\`lang\\n...\`\`\` for code snippets. Make it informative and scannable.",
   "priority": "High" | "Medium" | "Low",
   "duration": "15m" | "30m" | "1h" | "2h"
 }
@@ -156,7 +156,7 @@ Text: "${selectedText}"`;
 
       const createTaskInput = {
         title: parsed.title || 'AI Task',
-        notes_encrypted: `${parsed.description || ''} [COLOR:#3b82f6]`,
+        notes_encrypted: parsed.description || '',
         estimate_timer: estimateTimer,
         real_timer: 0,
         tags: [],
@@ -231,7 +231,7 @@ Text: "${selectedText}"`;
     } else if (action === 'summarize') {
       promptDescription = 'Creating summary...';
       successTitle = 'Summary generated';
-      aiPrompt = `Summarize this text concisely. Return ONLY the summarized text, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
+      aiPrompt = `Summarize the following text concisely using rich Markdown formatting. Use ## headers, ### subheaders, **bold** for key terms, bullet points (-), and \`\`\`code\`\`\` blocks where appropriate to produce a clear and well-structured summary. Return ONLY the formatted Markdown summary, with no conversational preamble, quotes, explanations, or introductory text:\n\n${selectedText}`;
     } else if (action === 'expand') {
       promptDescription = 'Expanding text...';
       successTitle = 'Text expanded';
@@ -280,13 +280,20 @@ Text: "${selectedText}"`;
 
       const refinedText = await fetchPromise;
 
-      editor.insertInlineContent([
-        {
-          type: 'text',
-          text: refinedText,
-          styles: {},
-        },
-      ]);
+      if (action === 'summarize') {
+        // Parse the markdown response into BlockNote blocks and insert them
+        const blocks = editor.tryParseMarkdownToBlocks(refinedText);
+        const currentBlock = editor.getTextCursorPosition().block;
+        editor.insertBlocks(blocks, currentBlock, 'after');
+      } else {
+        editor.insertInlineContent([
+          {
+            type: 'text',
+            text: refinedText,
+            styles: {},
+          },
+        ]);
+      }
     } catch (e) {
       console.error(e);
     } finally {

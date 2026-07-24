@@ -188,12 +188,78 @@ export const DescriptionContainer = styled(Box)(({ theme }) => ({
   fontSize: '13px',
   lineHeight: 1.6,
   color: theme.palette.text.primary,
-  '& p': {
+  wordBreak: 'break-word',
+  overflowWrap: 'break-word',
+  '& h1, & h1.formatted-h1': {
+    fontSize: '1.15rem',
+    fontWeight: 800,
+    margin: '10px 0 4px 0',
+    color: theme.palette.text.primary,
+    lineHeight: 1.3,
+  },
+  '& h2, & h2.formatted-h2': {
+    fontSize: '1.05rem',
+    fontWeight: 700,
+    margin: '8px 0 4px 0',
+    color: theme.palette.text.primary,
+  },
+  '& h3, & h3.formatted-h3': {
+    fontSize: '0.95rem',
+    fontWeight: 700,
+    margin: '6px 0 4px 0',
+    color: theme.palette.text.primary,
+  },
+  '& mark, & mark.formatted-highlight': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(250, 204, 21, 0.25)'
+        : 'rgba(253, 224, 71, 0.4)',
+    color: theme.palette.text.primary,
+    padding: '2px 6px',
+    borderRadius: '4px',
+    fontWeight: 600,
+    border: `1px solid ${
+      theme.palette.mode === 'dark'
+        ? 'rgba(250, 204, 21, 0.4)'
+        : 'rgba(234, 179, 8, 0.4)'
+    }`,
+  },
+  '& p, & p.formatted-p': {
     margin: 0,
-    marginBottom: '8px',
+    marginBottom: '6px',
     '&:last-child': { marginBottom: 0 },
   },
-  '& ul, & ol': { margin: '8px 0', paddingLeft: '20px' },
+  '& ul, & ol': { margin: '6px 0', paddingLeft: '20px' },
+  '& li': { margin: '3px 0' },
+  '& blockquote': {
+    borderLeft: `3px solid ${theme.palette.primary.main}`,
+    margin: '8px 0',
+    padding: '4px 10px',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(59, 130, 246, 0.12)'
+        : 'rgba(59, 130, 246, 0.05)',
+    fontStyle: 'italic',
+    borderRadius: '0 6px 6px 0',
+  },
+  '& code, & code.formatted-code': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.1)'
+        : 'rgba(0, 0, 0, 0.06)',
+    padding: '2px 6px',
+    borderRadius: '4px',
+    fontFamily: 'monospace',
+    fontSize: '0.85em',
+  },
+  '& pre': {
+    backgroundColor: theme.palette.mode === 'dark' ? '#0f172a' : '#f4f4f4',
+    padding: '10px',
+    borderRadius: '8px',
+    overflowX: 'auto',
+    fontFamily: 'monospace',
+    margin: '6px 0',
+  },
 }));
 
 export const DescriptionHeader = styled(Box)(({ theme }) => ({

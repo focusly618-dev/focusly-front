@@ -1,7 +1,11 @@
+import { useState, lazy, Suspense } from 'react';
+import { useMutation } from '@apollo/client';
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
-import { lazy, Suspense } from 'react';
+import { CREATE_PROJECT_GROUP } from './Workspace.graphql';
+import { CreateProjectModal } from './components/Library/modals/CreateProjectModal';
+import { sileo } from '@/utils';
 import type { WorkspaceProps } from './types/workspace.types';
 
 const WorkspaceEditor = lazy(() =>
@@ -29,6 +33,36 @@ export const Workspace = ({
   onSidebarChange,
   activeFocusTaskId,
 }: WorkspaceProps) => {
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] =
+    useState(false);
+
+  const [createProjectGroup] = useMutation(CREATE_PROJECT_GROUP, {
+    refetchQueries: ['GetProjectGroups', 'GetWorkspaces'],
+  });
+
+  const handleCreateProject = async (name: string, color: string) => {
+    try {
+      await createProjectGroup({
+        variables: {
+          input: { name, color },
+        },
+      });
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('tab', 'Projects');
+      newParams.delete('groupId');
+      newParams.delete('workspaceId');
+      setSearchParams(newParams);
+
+      sileo.success({
+        title: 'Project created',
+        description: `Project "${name}" created successfully.`,
+        fill: 'var(--sileo-success-bg)',
+        duration: 3000,
+      });
+    } catch (err) {
+      console.error('Error creating project:', err);
+    }
+  };
   const {
     register,
     setValue,
@@ -248,10 +282,18 @@ export const Workspace = ({
             id="joyride-workspace-empty"
             style={{ height: '100%', width: '100%' }}
           >
-            <WorkspaceEmptyState onCreate={handleCreateNew} />
+            <WorkspaceEmptyState
+              onCreate={() => setIsCreateProjectModalOpen(true)}
+            />
           </div>
         )}
       </Box>
+
+      <CreateProjectModal
+        open={isCreateProjectModalOpen}
+        onClose={() => setIsCreateProjectModalOpen(false)}
+        onCreate={handleCreateProject}
+      />
 
       <OnboardingWrapper
         steps={onboardingSteps}
