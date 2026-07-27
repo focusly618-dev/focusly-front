@@ -19,6 +19,8 @@ export const fetchEditResult = async (prompt: string): Promise<string> => {
       credentials: 'include',
       body: JSON.stringify({
         messages: [{ role: 'user', content: prompt }],
+        system_context:
+          'You are a helpful AI writing assistant integrated into the Focusly workspace editor. Help users refine, summarize, expand, translate, or rewrite their text. Always respond concisely and only with the requested output, no preambles or explanations.',
       }),
     });
 

@@ -11,6 +11,7 @@ import {
   GET_TOTAL_WORKSPACES,
   GET_WORKSPACES,
   GET_WORKSPACE_BY_ID,
+  GET_PROJECT_GROUPS,
 } from '../Workspace.graphql';
 import { useWorkspaceForm } from './useWorkspaceForm.hook';
 import { useWorkspaceTasks } from './useWorkspaceTasks.hook';
@@ -112,18 +113,29 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
   });
 
   // 5. GraphQL Queries
-  const { data: workspacesData, loading: workspacesLoading } = useQuery(
+  const { data: workspacesData, loading: workspacesLoadingQuery } = useQuery(
     GET_WORKSPACES,
     {
       variables: { search: '' },
     },
   );
 
+  const { data: projectGroupsData, loading: projectGroupsLoading } = useQuery(
+    GET_PROJECT_GROUPS,
+    {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+
+  const workspacesLoading = workspacesLoadingQuery || projectGroupsLoading;
+
   const [getWorkspaceById] = useLazyQuery(GET_WORKSPACE_BY_ID);
   const { data: totalWorkspacesData, loading: totalWorkspacesLoading } =
     useQuery(GET_TOTAL_WORKSPACES);
 
-  const hasWorkspaces = (workspacesData?.workspaces?.length ?? 0) > 0;
+  const hasWorkspaces =
+    (workspacesData?.workspaces?.length ?? 0) > 0 ||
+    (projectGroupsData?.projectGroups?.length ?? 0) > 0;
 
   // 6. Effects
   // Load workspace from URL parameters

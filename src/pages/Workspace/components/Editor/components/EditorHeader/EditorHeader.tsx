@@ -69,14 +69,15 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     <StyledEditorHeader>
       {/* ─── DESKTOP LAYOUT ─── */}
       <HeaderLeft sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <Button
+        <IconButton
           onClick={onBack}
-          startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
           sx={{
+            width: '34px',
             height: '34px',
-            px: 1.5,
+            minWidth: '34px',
+            p: 0,
             mr: { xs: 0, md: 1 },
-            borderRadius: '8px',
+            borderRadius: '50%',
             border: '1px solid',
             borderColor: (theme) =>
               theme.palette.mode === 'dark'
@@ -87,9 +88,6 @@ export const EditorHeader = (props: EditorHeaderProps) => {
               theme.palette.mode === 'dark'
                 ? 'rgba(255,255,255,0.03)'
                 : '#ffffff',
-            textTransform: 'none',
-            fontWeight: 600,
-            fontSize: '13px',
             '&:hover': {
               backgroundColor: (theme) =>
                 theme.palette.mode === 'dark'
@@ -98,8 +96,8 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             },
           }}
         >
-          Back
-        </Button>
+          <ArrowBackIcon sx={{ fontSize: 16 }} />
+        </IconButton>
       </HeaderLeft>
 
       <HeaderCenter
@@ -266,10 +264,13 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           timeout={300}
         >
           <Box
+            title={
+              saveState === 'saving' ? 'Saving changes...' : 'All changes saved'
+            }
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 1,
+              gap: 0.75,
               backgroundColor: (theme) =>
                 theme.palette.mode === 'dark'
                   ? 'rgba(255, 255, 255, 0.03)'
@@ -279,11 +280,12 @@ export const EditorHeader = (props: EditorHeaderProps) => {
                 saveState === 'saved'
                   ? 'rgba(16, 185, 129, 0.2)'
                   : theme.palette.divider,
-              padding: '6px 12px',
+              padding: '4px 10px',
               height: '32px',
               borderRadius: '20px',
               backdropFilter: 'blur(8px)',
               transition: 'all 0.3s ease',
+              flexShrink: 0,
               boxShadow:
                 saveState === 'saved'
                   ? '0 0 10px rgba(16, 185, 129, 0.1)'
@@ -307,7 +309,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
                     fontWeight: 600,
                     letterSpacing: '0.5px',
                     fontSize: '11px',
-                    display: { xs: 'none', sm: 'inline-block' },
+                    display: { xs: 'none', xl: 'inline-block' },
                   }}
                 >
                   saving
@@ -328,7 +330,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
                     fontWeight: 700,
                     letterSpacing: '0.5px',
                     fontSize: '11px',
-                    display: { xs: 'none', sm: 'inline-block' },
+                    display: { xs: 'none', xl: 'inline-block' },
                   }}
                 >
                   saved

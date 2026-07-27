@@ -45,11 +45,11 @@ export const HeaderCenter = styled(Box)(({ theme }) => ({
 export const HeaderRight = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '16px',
-  flex: '0 0 auto',
+  gap: '12px',
+  flex: '0 1 auto',
   justifyContent: 'flex-end',
   [theme.breakpoints.down('md')]: {
-    gap: '12px',
+    gap: '8px',
   },
 }));
 

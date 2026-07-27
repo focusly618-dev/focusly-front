@@ -7,6 +7,7 @@ import {
   KeyboardArrowRight as KeyboardArrowRightIcon,
   Link as LinkIcon,
 } from '@mui/icons-material';
+import { formatDescriptionToHtml } from '@/utils/formatDescription';
 import {
   getPriorityFromLevel,
   formatDuration,
@@ -36,25 +37,6 @@ interface TaskDetailsFullProps {
   onStartFocus?: (task: TaskSearchItems) => void;
   activeFocusTaskId?: string | null;
 }
-
-const cleanDescription = (desc?: string): string => {
-  if (!desc) return '';
-  const cleaned = desc
-    .replace(/\[COLOR:(.*?)\]/g, '')
-    .replace(/\[START_DATE:(.*?)\]/g, '')
-    .replace(
-      /https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g,
-      '',
-    )
-    .trim();
-
-  const hasText =
-    cleaned
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .trim().length > 0;
-  return hasText ? cleaned : '';
-};
 
 export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
   task,
@@ -335,7 +317,7 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
       <DescriptionContainer
         dangerouslySetInnerHTML={{
           __html:
-            cleanDescription(task.notes_encrypted) ||
+            formatDescriptionToHtml(task.notes_encrypted) ||
             '<p style="color: grey; font-style: italic;">No description provided for this task.</p>',
         }}
       />

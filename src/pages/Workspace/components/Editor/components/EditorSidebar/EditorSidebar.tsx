@@ -27,6 +27,7 @@ import {
   LightbulbOutlined as TipIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
+import { formatDescriptionToHtml } from '@/utils/formatDescription';
 import {
   getPriorityFromLevel,
   getPriorityLevel,
@@ -111,7 +112,6 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     handleMarkDone,
     currentStatus,
     currentPriorityLevel,
-    cleanDescription,
     theme,
   } = useEditorSidebar(props);
 
@@ -546,7 +546,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                   <DescriptionContainer
                     dangerouslySetInnerHTML={{
                       __html:
-                        cleanDescription(selectTask?.notes_encrypted) ||
+                        formatDescriptionToHtml(selectTask?.notes_encrypted) ||
                         '<p style="color: grey; font-style: italic; font-size: 13px;">No description provided for this task.</p>',
                     }}
                   />

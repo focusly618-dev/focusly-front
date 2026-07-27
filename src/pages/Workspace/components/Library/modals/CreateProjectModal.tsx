@@ -70,7 +70,7 @@ export const CreateProjectModal = ({
           boxShadow: `0 8px 16px ${selectedColor}33`,
         }}
       >
-        Create Folder
+        Create Project
       </Button>
     </>
   );
@@ -79,7 +79,7 @@ export const CreateProjectModal = ({
     <BaseModal
       open={open}
       onClose={onClose}
-      title="Create New Folder"
+      title="Create New Project"
       subtitle="Choose a name and color to keep your workspaces organized and beautiful."
       icon={<CreateNewFolderIcon sx={{ fontSize: 28 }} />}
       iconBgColor={selectedColor}
@@ -97,7 +97,7 @@ export const CreateProjectModal = ({
             letterSpacing: '0.05em',
           }}
         >
-          Folder Name
+          Project Name
         </Typography>
         <TextField
           placeholder="e.g., Marketing Strategy, Q1 Plans..."
@@ -122,7 +122,7 @@ export const CreateProjectModal = ({
             letterSpacing: '0.05em',
           }}
         >
-          Folder Color
+          Project Color
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
           {colors.map((color) => (
