@@ -164,6 +164,42 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
       },
     );
 
+    // ── Workflow: Automatización TODO ─────────────────────────────────────────
+    // Se dispara cuando el backend detecta un "TODO:" en el workspace guardado
+    // y crea tareas automáticamente.
+    // Muestra un toast informativo y refresca la lista de tareas.
+    newSocket.on(
+      'automation_triggered',
+      (data: {
+        workspaceId: string;
+        tasksCreated: { taskId: string; taskTitle: string }[];
+        count: number;
+      }) => {
+        console.log('[REALTIME] Automation triggered:', data);
+
+        if (data.count === 0) return;
+
+        const taskNames = data.tasksCreated
+          .map((t) => `• ${t.taskTitle}`)
+          .join('\n');
+
+        sileo.success({
+          title: `⚡ ${data.count === 1 ? '1 tarea creada' : `${data.count} tareas creadas`} automáticamente`,
+          description: taskNames,
+          duration: 6000,
+        });
+
+        // Refrescar la lista de tareas para que aparezcan las nuevas
+        apolloClient.refetchQueries({ include: [GET_TASKS] }).catch((err) => {
+          console.error(
+            '[REALTIME] Failed to refetch tasks after automation:',
+            err,
+          );
+        });
+      },
+    );
+    // ──────────────────────────────────────────────────────────────────────────
+
     return () => {
       newSocket.disconnect();
       setSocket(null);
