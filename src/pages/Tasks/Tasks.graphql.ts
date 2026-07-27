@@ -1,53 +1,5 @@
 import { gql } from '@apollo/client';
 
-export const GET_TASKS = gql`
-  query GetTasks(
-    $userId: String!
-    $filters: TaskFilterInput
-    $sort: TaskSortInput
-  ) {
-    tasks: getTasksByUser(userId: $userId, filters: $filters, sort: $sort) {
-      id
-      title
-      notes_encrypted
-      status
-      estimate_timer
-      real_timer
-      priority_level
-      user_id
-      is_owner
-      category
-      color
-      use_ai
-      tags {
-        name
-      }
-      deadline
-      created_at
-      updated_at
-      links {
-        title
-        url
-      }
-      google_event_id
-      task_type
-      source
-      estimated_start_date
-      estimated_end_date
-      collaborators {
-        name
-        email
-        avatar
-        responseStatus
-      }
-      workspace {
-        id
-        title
-      }
-    }
-  }
-`;
-
 export const GET_TASKS_TITLES = gql`
   query GetTasksTitles($userId: String!, $limit: Int!, $offset: Int!) {
     tasks: getTasksByUser(userId: $userId, limit: $limit, offset: $offset) {
@@ -257,3 +209,5 @@ export const GET_TASKS_PAGINATED = gql`
     }
   }
 `;
+
+export const GET_TASKS = GET_TASKS_PAGINATED;

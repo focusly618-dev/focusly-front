@@ -72,7 +72,7 @@ export const useTasksContentView = ({
         id: 'All',
         label: 'All',
         color: '#6366f1',
-        filter: (t: TaskResponse) => t.status !== 'Done',
+        filter: () => true,
       },
       ...STATUS_SECTIONS,
     ];
@@ -80,14 +80,13 @@ export const useTasksContentView = ({
 
   const tabCounts = useMemo(() => {
     const counts: Record<string, number> = {
-      All: filteredTasks.filter((t) => t.status !== 'Done').length,
+      All: filteredTasks.length,
     };
     STATUS_SECTIONS.forEach((section) => {
       counts[section.id] = filteredTasks.filter(section.filter).length;
     });
     return counts;
   }, [filteredTasks]);
-
   const activeTab = useMemo(() => {
     return tabs.find((t) => t.id === selectedStatus) || tabs[0];
   }, [selectedStatus, tabs]);

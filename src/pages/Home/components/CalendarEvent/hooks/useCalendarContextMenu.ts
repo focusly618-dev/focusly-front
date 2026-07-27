@@ -196,7 +196,17 @@ export const useCalendarContextMenu = (
         fill: 'var(--sileo-delete-bg)',
         duration: 3000,
       });
-    } catch (error) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('not found')) {
+        dispatch(removeTask({ id: taskId }));
+        dispatch(removeEvent({ id: taskId }));
+        sileo.success({
+          title: 'Task deleted',
+          fill: 'var(--sileo-delete-bg)',
+          duration: 3000,
+        });
+        return;
+      }
       console.error('Failed to delete task:', error);
       sileo.error({
         title: 'Failed to delete task',
@@ -247,12 +257,13 @@ export const useCalendarContextMenu = (
 
   const onDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (event.id) {
-      if (event.type === 'task') {
-        handleDeleteTask(event.id);
-      } else {
-        handleDeleteGoogleEvent(event.id);
+    if (event.type === 'task') {
+      const realTaskId = (event.resource as Task)?.id || event.id;
+      if (realTaskId) {
+        handleDeleteTask(realTaskId);
       }
+    } else if (event.id) {
+      handleDeleteGoogleEvent(event.id);
     }
     handleClose();
   };
