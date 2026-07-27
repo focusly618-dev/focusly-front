@@ -183,10 +183,9 @@ export const useTaskMutations = ({
       const { data } = await createTaskMutation({
         variables: { createTaskInput: createInput },
         refetchQueries: [
-          'GetTasks',
-          'GetTasksTitles',
-          'GetTasksByUserPaginated',
+          { query: GET_TASKS },
         ],
+        awaitRefetchQueries: true,
       });
       if (data?.createTask) {
         const mappedTask = mapResponseToTask(data.createTask);

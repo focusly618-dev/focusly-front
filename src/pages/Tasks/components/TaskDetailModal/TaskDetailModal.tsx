@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, Box, TextField, Slide } from '@mui/material';
+import { Dialog, DialogContent, Box, TextField, Fade } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 import React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -31,7 +31,7 @@ const Transition = React.forwardRef(function Transition(
   },
   ref: React.Ref<unknown>,
 ) {
-  return <Slide direction="up" ref={ref} {...props} />;
+  return <Fade ref={ref} {...props} timeout={150} />;
 });
 
 export const TaskDetailModal = ({

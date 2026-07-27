@@ -68,7 +68,7 @@ export const useTaskDetailModal = ({
     onClose,
     onDelete,
     initialTask,
-    resetForm: () => {},
+    resetForm: () => { },
   });
 
   const {
@@ -294,11 +294,20 @@ export const useTaskDetailModal = ({
   const isDirty = useMemo(() => {
     if (!initialTask) return false;
 
-    const isTitleChanged = title !== initialState.title;
-    const isDescChanged = description !== initialState.description;
-    const isPriorityChanged = priority !== initialState.priority;
-    const isStatusChanged = status !== initialState.status;
-    const isCategoryChanged = category !== initialState.category;
+    const simpleFields = [
+      { current: title, initial: initialState.title },
+      { current: description, initial: initialState.description },
+      { current: priority, initial: initialState.priority },
+      { current: status, initial: initialState.status },
+      { current: category, initial: initialState.category },
+      { current: duration, initial: initialState.duration },
+      { current: realTime, initial: initialState.realTime },
+      { current: color, initial: initialState.color },
+    ];
+
+    if (simpleFields.some(({ current, initial }) => current !== initial)) {
+      return true;
+    }
 
     const initialDateVal =
       initialState.currentDate instanceof Date
@@ -312,47 +321,32 @@ export const useTaskDetailModal = ({
         : currentDate
           ? new Date(currentDate).getTime()
           : 0;
-    const isDateChanged = initialDateVal !== currentDateVal;
+    if (initialDateVal !== currentDateVal) return true;
 
-    const isDurationChanged = duration !== initialState.duration;
-    const isRealTimeChanged = realTime !== initialState.realTime;
-    const isColorChanged = color !== initialState.color;
-
+    if (tags.length !== initialCollections.tags.length) return true;
     const initialTagsSorted = [...initialCollections.tags].sort();
     const currentTagsSorted = [...tags].sort();
-    const isTagsChanged =
-      JSON.stringify(initialTagsSorted) !== JSON.stringify(currentTagsSorted);
+    if (JSON.stringify(initialTagsSorted) !== JSON.stringify(currentTagsSorted)) return true;
 
-    const isLinksChanged =
-      links.length !== initialCollections.links.length ||
+    if (links.length !== initialCollections.links.length) return true;
+    if (
       links.some(
         (l, i) =>
           l.title !== initialCollections.links[i]?.title ||
           l.url !== initialCollections.links[i]?.url,
-      );
+      )
+    ) return true;
 
-    const isCollaboratorsChanged =
-      collaborators.length !== initialCollections.collaborators.length ||
+    if (collaborators.length !== initialCollections.collaborators.length) return true;
+    if (
       collaborators.some(
         (c, i) =>
           c.email !== initialCollections.collaborators[i]?.email ||
           c.name !== initialCollections.collaborators[i]?.name,
-      );
+      )
+    ) return true;
 
-    return (
-      isTitleChanged ||
-      isDescChanged ||
-      isPriorityChanged ||
-      isStatusChanged ||
-      isCategoryChanged ||
-      isDateChanged ||
-      isDurationChanged ||
-      isRealTimeChanged ||
-      isColorChanged ||
-      isTagsChanged ||
-      isLinksChanged ||
-      isCollaboratorsChanged
-    );
+    return false;
   }, [
     initialTask,
     title,

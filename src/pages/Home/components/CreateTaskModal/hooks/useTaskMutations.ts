@@ -6,6 +6,7 @@ import {
   UPDATE_TASK,
   DELETE_TASK,
   GET_TASKS,
+  GET_TASKS_TITLES,
 } from '@/pages/Tasks/Tasks.graphql';
 import {
   REMOVE_WORKSPACE,
@@ -64,7 +65,7 @@ export const useTaskMutations = ({
           end: {
             dateTime: new Date(
               (state?.deadline?.getTime() || Date.now()) +
-                (parseDuration(state?.duration || '30m') || 30) * 60000,
+              (parseDuration(state?.duration || '30m') || 30) * 60000,
             ).toISOString(),
           },
           attendees,
@@ -88,7 +89,7 @@ export const useTaskMutations = ({
           end: {
             dateTime: new Date(
               (state?.deadline?.getTime() || Date.now()) +
-                (parseDuration(state?.duration || '30m') || 30) * 60000,
+              (parseDuration(state?.duration || '30m') || 30) * 60000,
             ).toISOString(),
           },
           attendees,
@@ -176,10 +177,10 @@ export const useTaskMutations = ({
       const { data } = await createTaskMutation({
         variables: { createTaskInput: createInput },
         refetchQueries: [
-          'GetTasks',
-          'GetTasksTitles',
-          'GetTasksByUserPaginated',
+          { query: GET_TASKS },
+          { query: GET_TASKS_TITLES, variables: { userId: user.id, limit: 24, offset: 0 } },
         ],
+        awaitRefetchQueries: true,
       });
       if (data?.createTask) {
         const mappedTask = mapResponseToTask(data.createTask);
@@ -244,8 +245,8 @@ export const useTaskMutations = ({
       : undefined;
     const estimatedEndISO = !isNaN(startDate.getTime())
       ? new Date(
-          startDate.getTime() + (estimateTimer || 30) * 60000,
-        ).toISOString()
+        startDate.getTime() + (estimateTimer || 30) * 60000,
+      ).toISOString()
       : undefined;
 
     const updateInput: TaskInput = {

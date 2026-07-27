@@ -1,6 +1,5 @@
 import { useMemo, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import type {
   TaskResponse,
   TaskFilterInput,
@@ -10,6 +9,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { setTasks } from '@/redux/tasks/task.slice';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import { handleMutationError } from '@/utils';
+import { GET_TASKS_PAGINATED } from '@/pages/Tasks/Tasks.graphql';
 
 interface UseTasksDataProps {
   userId?: string;
@@ -19,7 +19,13 @@ interface UseTasksDataProps {
   limit?: number;
 }
 
-export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
+export const useTasksData = ({
+  userId,
+  filters,
+  sort,
+  offset = 0,
+  limit = 24,
+}: UseTasksDataProps) => {
   const dispatch = useAppDispatch();
 
   const queryVariables = useMemo(
@@ -27,16 +33,17 @@ export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
       userId,
       filters: filters || null,
       sort: sort || null,
+      offset,
+      limit,
     }),
-    [userId, filters, sort],
+    [userId, filters, sort, offset, limit],
   );
 
   const {
     data,
     loading: isLoading,
     error,
-  } = useQuery(GET_TASKS, {
-    skip: !userId,
+  } = useQuery(GET_TASKS_PAGINATED, {
     variables: queryVariables,
     fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
@@ -49,14 +56,17 @@ export const useTasksData = ({ userId, filters, sort }: UseTasksDataProps) => {
   }, [error]);
 
   const tasks: TaskResponse[] = useMemo(() => {
-    const rawTasks = data?.tasks || [];
-    return rawTasks;
+    return data?.result?.tasks || data?.tasks || [];
   }, [data]);
-  const totalCount: number = useMemo(() => tasks.length, [tasks]);
+
+  const totalCount: number = useMemo(() => {
+    return data?.result?.totalCount ?? tasks.length;
+  }, [data, tasks]);
 
   useEffect(() => {
-    if (data?.tasks) {
-      const mappedTasks = data.tasks.map((t: TaskResponse) =>
+    const fetchedTasks = data?.result?.tasks || data?.tasks;
+    if (fetchedTasks) {
+      const mappedTasks = fetchedTasks.map((t: TaskResponse) =>
         mapResponseToTask(t),
       );
       dispatch(setTasks(mappedTasks));
