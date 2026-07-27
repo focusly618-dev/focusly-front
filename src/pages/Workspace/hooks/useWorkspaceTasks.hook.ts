@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_TOTAL_WORKSPACES } from '../Workspace.graphql';
 import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import type { TaskSearchItems } from '../types/workspace.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';

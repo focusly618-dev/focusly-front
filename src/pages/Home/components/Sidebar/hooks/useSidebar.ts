@@ -58,7 +58,8 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   // Workspaces Queries & Mutations
   const { data: workspacesData } = useQuery(GET_WORKSPACES, {
     variables: { search: '' },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
   });
   const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
     fetchPolicy: 'cache-and-network',

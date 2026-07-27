@@ -8,7 +8,6 @@ import { BlockNoteEditor } from '@blocknote/core';
 
 import { useAppSelector } from '@/redux/hooks';
 import {
-  GET_TOTAL_WORKSPACES,
   GET_WORKSPACES,
   GET_WORKSPACE_BY_ID,
   GET_PROJECT_GROUPS,
@@ -117,6 +116,8 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     GET_WORKSPACES,
     {
       variables: { search: '' },
+      fetchPolicy: 'cache-first',
+      nextFetchPolicy: 'cache-first',
     },
   );
 
@@ -130,8 +131,6 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
   const workspacesLoading = workspacesLoadingQuery || projectGroupsLoading;
 
   const [getWorkspaceById] = useLazyQuery(GET_WORKSPACE_BY_ID);
-  const { data: totalWorkspacesData, loading: totalWorkspacesLoading } =
-    useQuery(GET_TOTAL_WORKSPACES);
 
   const hasWorkspaces =
     (workspacesData?.workspaces?.length ?? 0) > 0 ||
@@ -325,8 +324,6 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     control,
     saveStatus,
     saveState,
-    totalWorkspacesData,
-    totalWorkspacesLoading,
 
     // Tasks
     tasksData,
