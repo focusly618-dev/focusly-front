@@ -1,24 +1,9 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import {
-  CREATE_TASK,
-  UPDATE_TASK,
-  DELETE_TASK,
-  GET_TASKS,
-  GET_TASKS_TITLES,
-} from '@/pages/Tasks/Tasks.graphql';
-import {
-  REMOVE_WORKSPACE,
-  GET_WORKSPACES,
-} from '@/pages/Workspace/Workspace.graphql';
+import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
+import { REMOVE_WORKSPACE } from '@/pages/Workspace/Workspace.graphql';
 import { sileo, handleMutationError } from '@/utils';
-import {
-  createGoogleEvent,
-  updateGoogleEvent,
-} from '@/api/GoogleCalendar/googleCalendarApi';
-import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import { mapResponseToTask } from '@/api/Tasks/taskMapper';
+import { useTaskOperations } from '@/hooks/useTaskOperations';
 import {
   deduplicateLinks,
   parseDuration,
@@ -39,77 +24,16 @@ export const useTaskMutations = ({
   initialTask,
   resetForm,
 }: UseTaskMutationsProps) => {
-  const { user } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
   const [loadingSave, setLoadingSave] = useState(false);
+  const {
+    user,
+    generateMeetLinkNow,
+    executeCreateTask,
+    executeUpdateTask,
+    executeDeleteTask,
+  } = useTaskOperations();
 
-  const [createTaskMutation] = useMutation(CREATE_TASK);
-  const [updateTaskMutation] = useMutation(UPDATE_TASK);
-  const [deleteTaskMutation] = useMutation(DELETE_TASK);
   const [removeWorkspaceMutation] = useMutation(REMOVE_WORKSPACE);
-
-  const generateMeetLinkNow = async (
-    googleEventId?: string,
-    state?: Partial<TaskData & { color: string }>,
-  ) => {
-    try {
-      const attendees = state?.collaborators?.map((c) => ({ email: c.email }));
-      if (googleEventId) {
-        const updated = await updateGoogleEvent(googleEventId, {
-          summary: state?.title || 'Focusly Meeting',
-          description: state?.description || '',
-          start: {
-            dateTime:
-              state?.deadline?.toISOString() || new Date().toISOString(),
-          },
-          end: {
-            dateTime: new Date(
-              (state?.deadline?.getTime() || Date.now()) +
-              (parseDuration(state?.duration || '30m') || 30) * 60000,
-            ).toISOString(),
-          },
-          attendees,
-          conferenceData: {
-            createRequest: {
-              requestId: `focusly-${Date.now()}`,
-              conferenceSolutionKey: { type: 'hangoutsMeet' },
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any,
-        });
-        return { meetLink: updated.hangoutLink || null, googleEventId };
-      } else {
-        const tempEvent = await createGoogleEvent({
-          summary: state?.title || 'Focusly Meeting',
-          description: state?.description || '',
-          start: {
-            dateTime:
-              state?.deadline?.toISOString() || new Date().toISOString(),
-          },
-          end: {
-            dateTime: new Date(
-              (state?.deadline?.getTime() || Date.now()) +
-              (parseDuration(state?.duration || '30m') || 30) * 60000,
-            ).toISOString(),
-          },
-          attendees,
-          conferenceData: {
-            createRequest: {
-              requestId: `focusly-${Date.now()}`,
-              conferenceSolutionKey: { type: 'hangoutsMeet' },
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any,
-        });
-
-        const meetLink = tempEvent.hangoutLink || null;
-        return { meetLink, googleEventId: tempEvent.id };
-      }
-    } catch (error) {
-      console.error('Error generating meet link:', error);
-      return null;
-    }
-  };
 
   const handleSave = async (
     state: TaskData & { color: string; shouldGenerateMeet?: boolean },
@@ -174,17 +98,10 @@ export const useTaskMutations = ({
     };
 
     try {
-      const { data } = await createTaskMutation({
-        variables: { createTaskInput: createInput },
-        refetchQueries: [
-          { query: GET_TASKS },
-          { query: GET_TASKS_TITLES, variables: { userId: user.id, limit: 24, offset: 0 } },
-        ],
-        awaitRefetchQueries: true,
-      });
+      const data = await executeCreateTask(
+        createInput as unknown as Record<string, unknown>,
+      );
       if (data?.createTask) {
-        const mappedTask = mapResponseToTask(data.createTask);
-        dispatch(upsertTask(mappedTask));
         sileo.success({
           title: 'Task created',
           description: 'The task has been created successfully',
@@ -245,8 +162,8 @@ export const useTaskMutations = ({
       : undefined;
     const estimatedEndISO = !isNaN(startDate.getTime())
       ? new Date(
-        startDate.getTime() + (estimateTimer || 30) * 60000,
-      ).toISOString()
+          startDate.getTime() + (estimateTimer || 30) * 60000,
+        ).toISOString()
       : undefined;
 
     const updateInput: TaskInput = {
@@ -275,9 +192,9 @@ export const useTaskMutations = ({
     };
 
     try {
-      const { data } = await updateTaskMutation({
-        variables: { updateTaskInput: { ...updateInput, id: initialTask.id } },
-        refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
+      const data = await executeUpdateTask({
+        ...updateInput,
+        id: initialTask.id,
       });
       if (data?.updateTask) {
         sileo.success({
@@ -301,14 +218,9 @@ export const useTaskMutations = ({
     }
 
     try {
-      await deleteTaskMutation({
-        variables: { id: initialTask.id },
-        refetchQueries: [
-          { query: GET_TASKS, variables: { userId: user?.id } },
-          { query: GET_WORKSPACES, variables: { search: '' } },
-        ],
+      await executeDeleteTask(initialTask.id, {
+        googleEventId: initialTask.google_event_id,
       });
-      dispatch(removeTask({ id: initialTask.id }));
       resetForm();
     } catch (e) {
       handleMutationError(e, 'Error al eliminar la tarea');

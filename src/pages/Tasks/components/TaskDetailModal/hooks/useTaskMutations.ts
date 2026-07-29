@@ -1,25 +1,9 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import {
-  GET_WORKSPACES,
-  UPDATE_WORKSPACE,
-} from '@/pages/Workspace/Workspace.graphql';
-import {
-  CREATE_TASK,
-  UPDATE_TASK,
-  DELETE_TASK,
-  GET_TASKS,
-} from '../../../Tasks.graphql';
+import { UPDATE_WORKSPACE } from '@/pages/Workspace/Workspace.graphql';
+import { GET_TASKS } from '../../../Tasks.graphql';
 import { sileo, handleMutationError } from '@/utils';
-import {
-  createGoogleEvent,
-  updateGoogleEvent,
-  deleteGoogleEvent,
-} from '@/api/GoogleCalendar/googleCalendarApi';
-import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import { mapResponseToTask } from '@/api/Tasks/taskMapper';
-import { removeEvent } from '@/redux/calendar/calendar.slice';
+import { useTaskOperations } from '@/hooks/useTaskOperations';
 import {
   deduplicateLinks,
   parseDuration,
@@ -40,74 +24,14 @@ export const useTaskMutations = ({
   initialTask,
   resetForm,
 }: UseTaskMutationsProps) => {
-  const { user } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
   const [loadingSave, setLoadingSave] = useState(false);
-
-  const [createTaskMutation] = useMutation(CREATE_TASK);
-  const [updateTaskMutation] = useMutation(UPDATE_TASK);
-  const [deleteTaskMutation] = useMutation(DELETE_TASK);
-
-  const generateMeetLinkNow = async (
-    googleEventId?: string,
-    state?: Partial<TaskData & { color: string }>,
-  ) => {
-    try {
-      const attendees = state?.collaborators?.map((c) => ({ email: c.email }));
-      if (googleEventId) {
-        const updated = await updateGoogleEvent(googleEventId, {
-          summary: state?.title || 'Focusly Meeting',
-          description: state?.description || '',
-          start: {
-            dateTime:
-              state?.deadline?.toISOString() || new Date().toISOString(),
-          },
-          end: {
-            dateTime: new Date(
-              (state?.deadline?.getTime() || Date.now()) +
-                (parseDuration(state?.duration || '30m') || 30) * 60000,
-            ).toISOString(),
-          },
-          attendees,
-          conferenceData: {
-            createRequest: {
-              requestId: `focusly-${Date.now()}`,
-              conferenceSolutionKey: { type: 'hangoutsMeet' },
-            },
-          },
-        });
-        return { meetLink: updated.hangoutLink || null, googleEventId };
-      } else {
-        const tempEvent = await createGoogleEvent({
-          summary: state?.title || 'Focusly Meeting',
-          description: state?.description || '',
-          start: {
-            dateTime:
-              state?.deadline?.toISOString() || new Date().toISOString(),
-          },
-          end: {
-            dateTime: new Date(
-              (state?.deadline?.getTime() || Date.now()) +
-                (parseDuration(state?.duration || '30m') || 30) * 60000,
-            ).toISOString(),
-          },
-          attendees,
-          conferenceData: {
-            createRequest: {
-              requestId: `focusly-${Date.now()}`,
-              conferenceSolutionKey: { type: 'hangoutsMeet' },
-            },
-          },
-        });
-
-        const meetLink = tempEvent.hangoutLink || null;
-        return { meetLink, googleEventId: tempEvent.id };
-      }
-    } catch (error) {
-      console.error('Error generating meet link:', error);
-      return null;
-    }
-  };
+  const {
+    user,
+    generateMeetLinkNow,
+    executeCreateTask,
+    executeUpdateTask,
+    executeDeleteTask,
+  } = useTaskOperations();
 
   const handleSave = async (
     state: TaskData & { color: string; shouldGenerateMeet?: boolean },
@@ -180,16 +104,10 @@ export const useTaskMutations = ({
     };
 
     try {
-      const { data } = await createTaskMutation({
-        variables: { createTaskInput: createInput },
-        refetchQueries: [
-          { query: GET_TASKS },
-        ],
-        awaitRefetchQueries: true,
-      });
+      const data = await executeCreateTask(
+        createInput as unknown as Record<string, unknown>,
+      );
       if (data?.createTask) {
-        const mappedTask = mapResponseToTask(data.createTask);
-        dispatch(upsertTask(mappedTask));
         sileo.success({
           title: 'Task created',
           fill: 'var(--sileo-success-bg)',
@@ -356,17 +274,12 @@ export const useTaskMutations = ({
     }
 
     try {
-      const { data } = await updateTaskMutation({
-        variables: { updateTaskInput: updateInput },
-        refetchQueries: [
-          'GetTasks',
-          'GetTasksTitles',
-          'GetTasksByUserPaginated',
-        ],
-      });
+      const data = await executeUpdateTask(updateInput, [
+        'GetTasks',
+        'GetTasksTitles',
+        'GetTasksByUserPaginated',
+      ]);
       if (data?.updateTask) {
-        const mappedTask = mapResponseToTask(data.updateTask);
-        dispatch(upsertTask(mappedTask));
         sileo.success({
           title: 'Task updated',
           fill: 'var(--sileo-update-bg)',
@@ -388,41 +301,11 @@ export const useTaskMutations = ({
       return;
     }
 
-    // 1. Optimistic Delete in Redux
-    dispatch(removeTask({ id: initialTask.id }));
-    dispatch(removeEvent({ id: initialTask.id }));
-    if (initialTask.google_event_id) {
-      dispatch(removeEvent({ id: initialTask.google_event_id }));
-    }
-
     try {
-      const isGoogleTask = initialTask.source === 'google';
-
-      if (!isGoogleTask) {
-        // Platform Task — Delete from BOTH Google Calendar (if synced) and Platform DB
-        if (initialTask.google_event_id) {
-          try {
-            await deleteGoogleEvent(initialTask.google_event_id);
-          } catch (err) {
-            console.warn(
-              'Failed to delete synced Google event, proceeding with platform delete',
-              err,
-            );
-          }
-        }
-
-        await deleteTaskMutation({
-          variables: { id: initialTask.id },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user?.id } },
-            { query: GET_WORKSPACES, variables: { search: '' } },
-          ],
-        });
-      } else {
-        // Pure Google Task
-        const eventId = initialTask.google_event_id || initialTask.id;
-        await deleteGoogleEvent(eventId);
-      }
+      await executeDeleteTask(initialTask.id, {
+        googleEventId: initialTask.google_event_id,
+        isGoogleTask: initialTask.source === 'google',
+      });
 
       resetForm();
       onClose();
