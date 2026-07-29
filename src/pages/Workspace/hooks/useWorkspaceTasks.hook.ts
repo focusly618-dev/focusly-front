@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
+import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import type { TaskSearchItems } from '../types/workspace.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
@@ -134,7 +135,8 @@ export const useWorkspaceTasks = ({
             },
           },
           {
-            query: GET_TOTAL_WORKSPACES,
+            query: GET_WORKSPACES,
+            variables: { search: '' },
           },
         ],
       });

@@ -1,11 +1,11 @@
+import { sileo } from '@/utils';
 import { useCallback, useState } from 'react';
-import type { UseCreateTaskModalProps } from '../types/CreateTaskModal.types';
-import { useTaskFormState } from './useTaskFormState';
-import { useTaskCollections } from './useTaskCollections';
-import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../CreateTaskModal.utils';
-import { sileo } from '@/utils';
+import type { UseCreateTaskModalProps } from '../types/CreateTaskModal.types';
+import { useTaskCollections } from './useTaskCollections';
+import { useTaskFormState } from './useTaskFormState';
+import { useTaskMutations } from './useTaskMutations';
 
 export const useCreateTaskModal = ({
   onSave,
@@ -217,11 +217,7 @@ export const useCreateTaskModal = ({
         description,
         deadline: currentDate ?? null,
         duration,
-        priority,
-        category,
-        tags,
         collaborators,
-        color,
       });
       if (meetUrl?.meetLink) {
         handleAddLink('Google Meet', meetUrl.meetLink);
