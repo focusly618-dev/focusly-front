@@ -236,7 +236,8 @@ export const ProjectGroupsSection = ({
     group.name.toLowerCase().includes(folderQuery.toLowerCase()),
   );
 
-  const allWorkspaces = workspacesData?.workspaces || [];
+  const allWorkspaces =
+    workspacesData?.result?.workspaces || workspacesData?.workspaces || [];
   const totalGroupsCount = projectGroups.length;
   const totalWorkspacesCount = allWorkspaces.length;
   const isEmpty = totalGroupsCount === 0 && totalWorkspacesCount === 0;

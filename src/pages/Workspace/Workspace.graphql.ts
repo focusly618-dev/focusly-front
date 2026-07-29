@@ -1,37 +1,43 @@
 import { gql } from '@apollo/client';
 
-export const GET_WORKSPACES = gql`
-  query GetWorkspaces(
+export const GET_WORKSPACES_PAGINATED = gql`
+  query GetWorkspacesPaginated(
     $search: String
-    $groupId: String
+    $projectId: String
     $limit: Int
     $offset: Int
   ) {
-    workspaces(
+    result: workspacesPaginated(
       search: $search
-      groupId: $groupId
+      projectId: $projectId
       limit: $limit
       offset: $offset
     ) {
-      id
-      title
-      content
-      emoji
-      background_color
-      card_show_background
-      updatedAt
-      createdAt
-      task {
+      totalCount
+      hasMore
+      workspaces {
         id
         title
-        status
-        estimate_timer
-        real_timer
+        content
+        emoji
+        background_color
+        card_show_background
+        updatedAt
+        createdAt
+        task {
+          id
+          title
+          status
+          estimate_timer
+          real_timer
+        }
+        projectId
       }
-      groupId
     }
   }
 `;
+
+export const GET_WORKSPACES = GET_WORKSPACES_PAGINATED;
 
 export const CREATE_WORKSPACE = gql`
   mutation CreateWorkspace($createWorkspaceInput: CreateWorkspaceInput!) {
@@ -52,12 +58,6 @@ export const UPDATE_WORKSPACE = gql`
 export const REMOVE_WORKSPACE = gql`
   mutation RemoveWorkspace($id: ID!) {
     removeWorkspace(id: $id)
-  }
-`;
-
-export const GET_TOTAL_WORKSPACES = gql`
-  query GetTotalWorkspaces {
-    totalWorkspaces
   }
 `;
 

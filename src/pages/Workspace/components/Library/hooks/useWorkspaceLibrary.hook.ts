@@ -4,7 +4,6 @@ import {
   GET_WORKSPACES,
   UPDATE_WORKSPACE,
   GET_PROJECT_GROUPS,
-  GET_TOTAL_WORKSPACES,
 } from '../../../Workspace.graphql';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
 import { sileo } from '@/utils';
@@ -32,17 +31,22 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const { data, loading, error, fetchMore } = useQuery(GET_WORKSPACES, {
     variables: {
       search: searchTerm,
-      groupId: selectedGroupId || undefined,
+      projectId: selectedGroupId || undefined,
       limit: LIMIT,
       offset: 0,
     },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
   });
 
   const [prevData, setPrevData] = useState(data);
   if (data !== prevData) {
     setPrevData(data);
-    if (data?.workspaces && data.workspaces.length < LIMIT) {
+    const hasMoreVal = data?.result?.hasMore;
+    const fetchedWorkspaces = data?.result?.workspaces || data?.workspaces;
+    if (hasMoreVal !== undefined) {
+      setHasMore(hasMoreVal);
+    } else if (fetchedWorkspaces && fetchedWorkspaces.length < LIMIT) {
       setHasMore(false);
     }
   }
@@ -50,7 +54,6 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
     fetchPolicy: 'cache-and-network',
   });
-  const { data: totalWorkspacesData } = useQuery(GET_TOTAL_WORKSPACES);
 
   // Mutations
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
@@ -156,7 +159,11 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
           offset: workspaces.length,
         },
       });
-      if (res.data?.workspaces && res.data.workspaces.length < LIMIT) {
+      const fetchedMore = res.data?.result?.workspaces || res.data?.workspaces;
+      const moreHasMore = res.data?.result?.hasMore;
+      if (moreHasMore !== undefined) {
+        setHasMore(moreHasMore);
+      } else if (fetchedMore && fetchedMore.length < LIMIT) {
         setHasMore(false);
       }
     } catch (e) {
@@ -165,7 +172,8 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   };
 
   // Derived data
-  const workspaces = data?.workspaces || [];
+  const workspaces = data?.result?.workspaces || data?.workspaces || [];
+  const totalWorkspaces = data?.result?.totalCount ?? workspaces.length;
 
   return {
     state: {
@@ -192,7 +200,7 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
     data: {
       workspaces,
       projectGroups: projectGroupsData?.projectGroups || [],
-      totalWorkspaces: totalWorkspacesData?.totalWorkspaces || 0,
+      totalWorkspaces,
       loading,
       error,
     },

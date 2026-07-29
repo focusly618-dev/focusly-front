@@ -2,10 +2,7 @@ import { useMutation } from '@apollo/client';
 import { useAppDispatch } from '@/redux/hooks';
 import { upsertTask } from '@/redux/tasks/task.slice';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
-import {
-  GET_TOTAL_WORKSPACES,
-  GET_WORKSPACES,
-} from '@/pages/Workspace/Workspace.graphql';
+import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
   UPDATE_TASK,
   GET_TASKS,
@@ -49,7 +46,6 @@ export const useFocusModeActions = ({
             query: GET_TASKS_TITLES,
             variables: { userId, limit: 24, offset: 0 },
           },
-          { query: GET_TOTAL_WORKSPACES },
           { query: GET_WORKSPACES, variables: { search: '' } },
         ],
       });
