@@ -1,21 +1,24 @@
-import { useMutation, InternalRefetchQueriesInclude } from '@apollo/client';
-import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import {
+  createGoogleEvent,
+  deleteGoogleEvent,
+  updateGoogleEvent,
+} from '@/api/GoogleCalendar/googleCalendarApi';
+import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import {
   CREATE_TASK,
-  UPDATE_TASK,
   DELETE_TASK,
   GET_TASKS,
   GET_TASKS_TITLES,
+  UPDATE_TASK,
 } from '@/pages/Tasks/Tasks.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
-import {
-  createGoogleEvent,
-  updateGoogleEvent,
-  deleteGoogleEvent,
-} from '@/api/GoogleCalendar/googleCalendarApi';
-import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
-import { mapResponseToTask } from '@/api/Tasks/taskMapper';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
+import {
+  useMutation,
+  type InternalRefetchQueriesInclude,
+} from '@apollo/client';
 
 export interface MeetState {
   title?: string;
