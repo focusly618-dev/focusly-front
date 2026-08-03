@@ -26,6 +26,7 @@ import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSl
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
 import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
 import type { AITimeBlockItem } from '@/api/AI/apiAIPlanner';
+import { surfaceColor } from '@/context';
 
 // Material UI
 import {
@@ -505,7 +506,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             width: '320px',
             boxSizing: 'border-box',
             backgroundColor: (theme) =>
-              theme.palette.mode === 'dark' ? '#0f172a' : '#faf9f6',
+              surfaceColor(theme, '#0f172a', '#19191A', '#faf9f6'),
           },
         }}
       >

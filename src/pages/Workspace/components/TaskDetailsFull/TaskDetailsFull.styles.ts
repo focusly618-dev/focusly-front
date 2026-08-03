@@ -1,4 +1,5 @@
 import { styled, Box, Typography, Button } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const SidebarTopNav = styled(Box)({
   display: 'flex',
@@ -67,10 +68,12 @@ export const SidebarFooter = styled(Box)(({ theme }) => ({
 }));
 
 export const ViewTaskButton = styled(Button)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(30, 41, 59, 0.5)'
-      : theme.palette.action.selected,
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(30, 41, 59, 0.5)',
+    'rgba(42, 42, 44, 0.5)',
+    theme.palette.action.selected,
+  ),
   color: theme.palette.text.primary,
   flex: 1,
   fontWeight: 600,

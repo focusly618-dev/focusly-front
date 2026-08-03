@@ -1,4 +1,5 @@
 import { Box, Paper, alpha, styled, Slider, Typography } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const DashboardContainer = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
@@ -55,40 +56,42 @@ export const ProgressBarFill = styled(Box)(({ theme }) => ({
   transition: 'width 0.5s ease-out',
 }));
 
-export const OptionCard = styled(Paper)<{ selected?: boolean }>(({ theme, selected }) => ({
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '16px',
-  padding: '20px',
-  borderRadius: '12px',
-  border: `1px solid ${selected ? theme.palette.primary.main : theme.palette.divider}`,
-  backgroundColor: selected
-    ? alpha(theme.palette.primary.main, 0.1)
-    : theme.palette.background.paper,
-  cursor: 'pointer',
-  transition: 'all 0.2s ease-in-out',
-  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-  '&:hover': {
-    borderColor: alpha(theme.palette.primary.main, 0.5),
-  },
-}));
+export const OptionCard = styled(Paper)<{ selected?: boolean }>(
+  ({ theme, selected }) => ({
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    padding: '20px',
+    borderRadius: '12px',
+    border: `1px solid ${selected ? theme.palette.primary.main : theme.palette.divider}`,
+    backgroundColor: selected
+      ? alpha(theme.palette.primary.main, 0.1)
+      : theme.palette.background.paper,
+    cursor: 'pointer',
+    transition: 'all 0.2s ease-in-out',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    '&:hover': {
+      borderColor: alpha(theme.palette.primary.main, 0.5),
+    },
+  }),
+);
 
-export const IconBox = styled(Box)<{ selected?: boolean }>(({ theme, selected }) => ({
-  width: '48px',
-  height: '48px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderRadius: '8px',
-  backgroundColor: selected
-    ? theme.palette.primary.main
-    : theme.palette.mode === 'dark'
-      ? '#2a3b4d'
-      : theme.palette.grey[200],
-  color: selected ? '#ffffff' : theme.palette.text.secondary,
-  transition: 'background-color 0.2s ease, color 0.2s ease',
-}));
+export const IconBox = styled(Box)<{ selected?: boolean }>(
+  ({ theme, selected }) => ({
+    width: '48px',
+    height: '48px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '8px',
+    backgroundColor: selected
+      ? theme.palette.primary.main
+      : surfaceColor(theme, '#2a3b4d', '#2A2A2C', theme.palette.grey[200]),
+    color: selected ? '#ffffff' : theme.palette.text.secondary,
+    transition: 'background-color 0.2s ease, color 0.2s ease',
+  }),
+);
 
 export const GlowEffect = styled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -189,30 +192,37 @@ export const IconContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '8px',
-  backgroundColor: theme.palette.mode === 'dark' ? '#233648' : theme.palette.grey[200],
+  backgroundColor: surfaceColor(
+    theme,
+    '#233648',
+    '#2A2A2C',
+    theme.palette.grey[200],
+  ),
 }));
 
-export const ConnectButton = styled(Box)<{ disabled?: boolean }>(({ theme, disabled }) => ({
-  height: '36px',
-  minWidth: '84px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderRadius: '8px',
-  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-  color: theme.palette.primary.main,
-  fontSize: '14px',
-  fontWeight: 600,
-  cursor: disabled ? 'not-allowed' : 'pointer',
-  opacity: disabled ? 0.7 : 1,
-  pointerEvents: disabled ? 'none' : 'auto',
-  transition: 'background-color 0.2s',
-  '&:hover': {
-    backgroundColor: disabled
-      ? alpha(theme.palette.primary.main, 0.1)
-      : alpha(theme.palette.primary.main, 0.2),
-  },
-}));
+export const ConnectButton = styled(Box)<{ disabled?: boolean }>(
+  ({ theme, disabled }) => ({
+    height: '36px',
+    minWidth: '84px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '8px',
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+    color: theme.palette.primary.main,
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    opacity: disabled ? 0.7 : 1,
+    pointerEvents: disabled ? 'none' : 'auto',
+    transition: 'background-color 0.2s',
+    '&:hover': {
+      backgroundColor: disabled
+        ? alpha(theme.palette.primary.main, 0.1)
+        : alpha(theme.palette.primary.main, 0.2),
+    },
+  }),
+);
 
 export const StepWrapper = styled(Box)({
   animation: 'fadeIn 0.5s ease-in-out',
@@ -228,26 +238,32 @@ export const StepWrapper = styled(Box)({
   },
 });
 
-export const DayButton = styled('button')<{ selected?: boolean }>(({ theme, selected }) => ({
-  width: '40px',
-  height: '40px',
-  borderRadius: '50%',
-  border: selected ? 'none' : `1px solid ${theme.palette.divider}`,
-  backgroundColor: selected ? theme.palette.primary.main : 'transparent',
-  color: selected ? '#ffffff' : theme.palette.text.secondary,
-  fontSize: '14px',
-  fontWeight: selected ? 700 : 500,
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  transition: 'all 0.2s ease-in-out',
-  '&:hover': {
-    transform: 'scale(1.05)',
-    backgroundColor: selected ? theme.palette.primary.main : theme.palette.action.hover,
-    boxShadow: selected ? `0 4px 6px -1px ${alpha(theme.palette.primary.main, 0.25)}` : 'none',
-  },
-}));
+export const DayButton = styled('button')<{ selected?: boolean }>(
+  ({ theme, selected }) => ({
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    border: selected ? 'none' : `1px solid ${theme.palette.divider}`,
+    backgroundColor: selected ? theme.palette.primary.main : 'transparent',
+    color: selected ? '#ffffff' : theme.palette.text.secondary,
+    fontSize: '14px',
+    fontWeight: selected ? 700 : 500,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.2s ease-in-out',
+    '&:hover': {
+      transform: 'scale(1.05)',
+      backgroundColor: selected
+        ? theme.palette.primary.main
+        : theme.palette.action.hover,
+      boxShadow: selected
+        ? `0 4px 6px -1px ${alpha(theme.palette.primary.main, 0.25)}`
+        : 'none',
+    },
+  }),
+);
 
 export const TimeInputContainer = styled(Box)({
   position: 'relative',
@@ -328,45 +344,45 @@ export const StepItemContainer = styled(Box)({
   },
 });
 
-export const StepIndicator = styled(Box)<{ state: 'completed' | 'active' | 'pending' }>(
-  ({ theme, state }) => ({
-    width: '24px',
-    height: '24px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...(state === 'completed' && {
-      backgroundColor: 'rgba(34, 197, 94, 0.1)',
-      color: theme.palette.success.main,
-    }),
-    ...(state === 'active' && {
-      backgroundColor: theme.palette.primary.main,
-      boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.2)}`,
-    }),
-    ...(state === 'pending' && {
-      border: `2px solid ${theme.palette.divider}`,
-      backgroundColor: 'transparent',
-    }),
-  })
-);
+export const StepIndicator = styled(Box)<{
+  state: 'completed' | 'active' | 'pending';
+}>(({ theme, state }) => ({
+  width: '24px',
+  height: '24px',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  ...(state === 'completed' && {
+    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+    color: theme.palette.success.main,
+  }),
+  ...(state === 'active' && {
+    backgroundColor: theme.palette.primary.main,
+    boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.2)}`,
+  }),
+  ...(state === 'pending' && {
+    border: `2px solid ${theme.palette.divider}`,
+    backgroundColor: 'transparent',
+  }),
+}));
 
-export const StepText = styled(Typography)<{ state: 'completed' | 'active' | 'pending' }>(
-  ({ theme, state }) => ({
-    fontSize: '0.875rem',
-    ...(state === 'completed' && {
-      color: theme.palette.text.secondary,
-      textDecoration: 'line-through',
-    }),
-    ...(state === 'active' && {
-      color: theme.palette.text.primary,
-      fontWeight: 600,
-    }),
-    ...(state === 'pending' && {
-      color: theme.palette.text.secondary,
-    }),
-  })
-);
+export const StepText = styled(Typography)<{
+  state: 'completed' | 'active' | 'pending';
+}>(({ theme, state }) => ({
+  fontSize: '0.875rem',
+  ...(state === 'completed' && {
+    color: theme.palette.text.secondary,
+    textDecoration: 'line-through',
+  }),
+  ...(state === 'active' && {
+    color: theme.palette.text.primary,
+    fontWeight: 600,
+  }),
+  ...(state === 'pending' && {
+    color: theme.palette.text.secondary,
+  }),
+}));
 
 // Profile Step Styles
 export const ProfileAvatarContainer = styled(Box)({
@@ -410,7 +426,10 @@ export const AddIconButton = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   cursor: 'pointer',
   border: `3px solid ${theme.palette.background.paper}`,
-  boxShadow: theme.palette.mode === 'dark' ? '0 4px 12px rgba(0,0,0,0.5)' : '0 2px 8px rgba(0,0,0,0.1)',
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? '0 4px 12px rgba(0,0,0,0.5)'
+      : '0 2px 8px rgba(0,0,0,0.1)',
   transition: 'transform 0.2s',
   '&:hover': {
     transform: 'scale(1.1)',
@@ -430,7 +449,12 @@ export const ProfileInput = styled('input')(({ theme }) => ({
   padding: '14px 16px',
   borderRadius: '12px',
   border: `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.5)' : theme.palette.background.paper,
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(15, 23, 42, 0.5)',
+    'rgba(31, 31, 32, 0.5)',
+    theme.palette.background.paper,
+  ),
   color: theme.palette.text.primary,
   fontSize: '15px',
   outline: 'none',
@@ -440,7 +464,12 @@ export const ProfileInput = styled('input')(({ theme }) => ({
   },
   '&:focus': {
     borderColor: theme.palette.primary.main,
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.8)' : theme.palette.background.paper,
+    backgroundColor: surfaceColor(
+      theme,
+      'rgba(15, 23, 42, 0.8)',
+      'rgba(31, 31, 32, 0.8)',
+      theme.palette.background.paper,
+    ),
     boxShadow: `0 0 0 1px ${theme.palette.primary.main}`,
   },
 }));
@@ -450,7 +479,12 @@ export const ProfileTextArea = styled('textarea')(({ theme }) => ({
   padding: '14px 16px',
   borderRadius: '12px',
   border: `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.5)' : theme.palette.background.paper,
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(15, 23, 42, 0.5)',
+    'rgba(31, 31, 32, 0.5)',
+    theme.palette.background.paper,
+  ),
   color: theme.palette.text.primary,
   fontSize: '15px',
   outline: 'none',
@@ -463,7 +497,12 @@ export const ProfileTextArea = styled('textarea')(({ theme }) => ({
   },
   '&:focus': {
     borderColor: theme.palette.primary.main,
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.8)' : theme.palette.background.paper,
+    backgroundColor: surfaceColor(
+      theme,
+      'rgba(15, 23, 42, 0.8)',
+      'rgba(31, 31, 32, 0.8)',
+      theme.palette.background.paper,
+    ),
     boxShadow: `0 0 0 1px ${theme.palette.primary.main}`,
   },
 }));
@@ -479,9 +518,10 @@ export const PrimaryButton = styled(Box)(({ theme }) => ({
   textAlign: 'center',
   cursor: 'pointer',
   transition: 'all 0.3s',
-  boxShadow: theme.palette.mode === 'dark' 
-    ? `0 4px 20px ${alpha(theme.palette.primary.main, 0.3)}`
-    : `0 4px 14px ${alpha(theme.palette.primary.main, 0.2)}`,
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? `0 4px 20px ${alpha(theme.palette.primary.main, 0.3)}`
+      : `0 4px 14px ${alpha(theme.palette.primary.main, 0.2)}`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

@@ -15,6 +15,7 @@ import {
 } from '@mui/icons-material';
 
 import { type ParsedLuminaAction } from '@/utils';
+import { surfaceColor } from '@/context';
 import { useSuggestedActionCard } from './useSuggestedActionCard.hook';
 
 interface SuggestedActionCardProps {
@@ -44,10 +45,12 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
         mb: 0.5,
         borderRadius: '12px',
         border: `1px solid ${theme.palette.divider}`,
-        background:
-          theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%)'
-            : 'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.6) 100%)',
+        background: surfaceColor(
+          theme,
+          'linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%)',
+          'linear-gradient(135deg, rgba(42, 42, 44, 0.5) 0%, rgba(36, 36, 37, 0.3) 100%)',
+          'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.6) 100%)',
+        ),
         backdropFilter: 'blur(8px)',
         boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
         overflow: 'hidden',

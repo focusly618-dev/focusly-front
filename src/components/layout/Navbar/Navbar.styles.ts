@@ -10,12 +10,15 @@ import {
   IconButton,
 } from '@mui/material';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
+import { surfaceColor } from '@/context';
 
 export const Header = styled(AppBar)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(15, 15, 16, 0.75)'
-      : 'rgba(255, 255, 255, 0.75)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(15, 15, 16, 0.75)',
+    'rgba(25, 25, 26, 0.75)',
+    'rgba(255, 255, 255, 0.75)',
+  ),
   backdropFilter: 'blur(16px)',
   WebkitBackdropFilter: 'blur(16px)',
   borderBottom: '1px solid',

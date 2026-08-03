@@ -12,6 +12,7 @@ import {
   CheckBoxOutlined as CheckBoxIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
+import { surfaceColor } from '@/context';
 import { CardAvatarCircle, BadgeChip } from '../WorkspaceLibrary.styles';
 import { iconMap } from '../constants/library.constants';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
@@ -111,13 +112,23 @@ export const WorkspaceListItem = ({
         p: '10px 16px',
         borderRadius: '8px',
         border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)'}`,
-        bgcolor: isDark ? 'rgba(26, 31, 43, 0.4)' : '#ffffff',
+        bgcolor: surfaceColor(
+          theme,
+          'rgba(26, 31, 43, 0.4)',
+          'rgba(36, 36, 37, 0.4)',
+          '#ffffff',
+        ),
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         gap: 2,
         '&:hover': {
           transform: 'translateY(-1px)',
-          bgcolor: isDark ? 'rgba(26, 31, 43, 0.7)' : '#f9f9fa',
+          bgcolor: surfaceColor(
+            theme,
+            'rgba(26, 31, 43, 0.7)',
+            'rgba(42, 42, 44, 0.7)',
+            '#f9f9fa',
+          ),
           borderColor: isDark
             ? 'rgba(99, 102, 241, 0.3)'
             : 'rgba(0, 0, 0, 0.12)',

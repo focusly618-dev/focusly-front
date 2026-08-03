@@ -2,47 +2,59 @@ import { useState, useMemo, useEffect, type ReactNode } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { getDesignTokens } from './theme';
 
-import { ColorModeContext } from './ColorModeContext';
+import { ColorModeContext, type ThemeMode } from './ColorModeContext';
+
+const VALID_MODES: ThemeMode[] = ['light', 'dark', 'graydark'];
 
 export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [mode, setMode] = useState<'light' | 'dark'>(() => {
+  const [mode, setMode] = useState<ThemeMode>(() => {
     const savedMode = localStorage.getItem('themeMode');
-    return savedMode === 'light' || savedMode === 'dark' ? savedMode : 'dark';
+    return VALID_MODES.includes(savedMode as ThemeMode)
+      ? (savedMode as ThemeMode)
+      : 'dark';
   });
 
   useEffect(() => {
     localStorage.setItem('themeMode', mode);
-    if (mode === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', mode !== 'light');
   }, [mode]);
+
+  const applyModeChange = useCallback(
+    (updater: (prevMode: ThemeMode) => ThemeMode) => {
+      const commit = () => {
+        document.body.classList.add('theme-transitioning');
+        setMode(updater);
+        setTimeout(() => {
+          document.body.classList.remove('theme-transitioning');
+        }, 450);
+      };
+
+      // Modern browsers with View Transition API
+      if (document.startViewTransition) {
+        document.startViewTransition(() => {
+          commit();
+        });
+      } else {
+        // Fallback for non-supporting browsers
+        commit();
+      }
+    },
+    [],
+  );
 
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
-        const toggle = () => {
-          document.body.classList.add('theme-transitioning');
-          setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-          setTimeout(() => {
-            document.body.classList.remove('theme-transitioning');
-          }, 450);
-        };
-
-        // Modern browsers with View Transition API
-        if (document.startViewTransition) {
-          document.startViewTransition(() => {
-            toggle();
-          });
-        } else {
-          // Fallback for non-supporting browsers
-          toggle();
-        }
+        applyModeChange((prevMode) =>
+          prevMode === 'light' ? 'dark' : 'light',
+        );
+      },
+      setMode: (nextMode: ThemeMode) => {
+        applyModeChange(() => nextMode);
       },
       mode,
     }),
-    [mode],
+    [mode, applyModeChange],
   );
 
   const theme = useMemo(() => getDesignTokens(mode), [mode]);

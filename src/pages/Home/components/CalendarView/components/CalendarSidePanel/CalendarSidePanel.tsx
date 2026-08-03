@@ -17,13 +17,18 @@ import {
 } from 'date-fns';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
+import { surfaceColor } from '@/context';
 
 // Styled Components
 const PanelContainer = styled(Box)(({ theme }) => ({
   width: '320px',
   borderLeft: `1px solid ${theme.palette.divider}`,
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.4)' : '#FAF9F6',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(17, 24, 39, 0.4)',
+    'rgba(36, 36, 37, 0.4)',
+    '#FAF9F6',
+  ),
   backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
   height: '100%',
   overflow: 'hidden',
@@ -52,10 +57,12 @@ const AddTaskButton = styled(Button)({
 });
 
 const ViewToggleContainer = styled(Box)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(30, 41, 59, 0.7)'
-      : 'rgba(0, 0, 0, 0.04)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(30, 41, 59, 0.7)',
+    'rgba(42, 42, 44, 0.7)',
+    'rgba(0, 0, 0, 0.04)',
+  ),
   borderRadius: '12px',
   padding: '4px',
   display: 'flex',

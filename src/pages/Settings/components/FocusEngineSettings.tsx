@@ -10,7 +10,6 @@ import {
   Stack,
 } from '@mui/material';
 import {
-  PrecisionManufacturingOutlined as FocusIcon,
   BlockOutlined as BlockIcon,
   Security as StrictIcon,
   CalendarMonthOutlined as CalendarIcon,
@@ -24,10 +23,6 @@ import {
   SectionCard,
   SectionHeader,
   SectionTitle,
-  SliderHeader,
-  SliderLabel,
-  SliderValue,
-  PremiumSlider,
   ShieldGrid,
   ShieldItemCard,
   ShieldInfo,
@@ -41,10 +36,6 @@ import {
 
 export const FocusEngineSettings = () => {
   const theme = useTheme();
-
-  // Focus engine states
-  const [focusLength, setFocusLength] = useState<number>(50);
-  const [breakLength, setBreakLength] = useState<number>(5);
 
   const [blockSocial, setBlockSocial] = useState(true);
   const [blockEntertainment, setBlockEntertainment] = useState(true);
@@ -104,88 +95,6 @@ export const FocusEngineSettings = () => {
 
   return (
     <Box>
-      <Box sx={{ mb: 4 }}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 800,
-            color: 'text.primary',
-            mb: 0.5,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          Build your focus environment
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Tailor how the AI schedules your tasks and safeguards your
-          concentration.
-        </Typography>
-      </Box>
-
-      {/* Focus & Break Blocks */}
-      <SectionCard>
-        <SectionHeader>
-          <SectionTitle>
-            <Box className="icon-wrapper">
-              <FocusIcon />
-            </Box>
-            <Typography>Session Duration</Typography>
-          </SectionTitle>
-        </SectionHeader>
-
-        {/* Focus Block Slider */}
-        <Box sx={{ mb: 4 }}>
-          <SliderHeader>
-            <SliderLabel>Focus Block Length</SliderLabel>
-            <SliderValue>{focusLength} min</SliderValue>
-          </SliderHeader>
-          <PremiumSlider
-            value={focusLength}
-            onChange={(_e, val) => setFocusLength(val as number)}
-            min={25}
-            max={90}
-            step={5}
-            valueLabelDisplay="off"
-          />
-          <Box
-            sx={{ display: 'flex', justifyContent: 'space-between', mt: -0.5 }}
-          >
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              25 min
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              90 min
-            </Typography>
-          </Box>
-        </Box>
-
-        {/* Break Block Slider */}
-        <Box sx={{ mb: 2 }}>
-          <SliderHeader>
-            <SliderLabel>Short Break Duration</SliderLabel>
-            <SliderValue>{breakLength} min</SliderValue>
-          </SliderHeader>
-          <PremiumSlider
-            value={breakLength}
-            onChange={(_e, val) => setBreakLength(val as number)}
-            min={3}
-            max={15}
-            step={1}
-            valueLabelDisplay="off"
-          />
-          <Box
-            sx={{ display: 'flex', justifyContent: 'space-between', mt: -0.5 }}
-          >
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              3 min
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              15 min
-            </Typography>
-          </Box>
-        </Box>
-      </SectionCard>
-
       {/* Focus Shield */}
       <SectionCard>
         <SectionHeader>

@@ -1,4 +1,5 @@
 import { Box, styled } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const CalendarContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'isDayView',
@@ -6,7 +7,7 @@ export const CalendarContainer = styled(Box, {
   const isDark = theme.palette.mode === 'dark';
 
   // ── Use the SAME colors as the global MUI theme ──
-  const bgDefault = isDark ? '#121318' : '#fafbfd';
+  const bgDefault = surfaceColor(theme, '#121318', '#19191A', '#fafbfd');
   const bgPaper = theme.palette.background.paper; // #23252a (dark) / #ffffff (light)
   const divider = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
   const dividerStrong = isDark
@@ -387,9 +388,12 @@ export const DraftActionBar = styled(Box)(({ theme }) => {
     gap: theme.spacing(3),
     padding: theme.spacing(1.5, 3),
     borderRadius: '9999px',
-    backgroundColor: isDark
-      ? 'rgba(30, 41, 59, 0.75)'
-      : 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: surfaceColor(
+      theme,
+      'rgba(30, 41, 59, 0.75)',
+      'rgba(36, 36, 37, 0.75)',
+      'rgba(255, 255, 255, 0.85)',
+    ),
     border: '1px solid',
     borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
     backdropFilter: 'blur(16px)',

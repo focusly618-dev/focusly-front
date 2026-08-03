@@ -7,6 +7,7 @@ import {
   lighten,
   TextField,
 } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const LibraryContainer = styled(Box)(({ theme }) => ({
   flex: 1,
@@ -14,7 +15,7 @@ export const LibraryContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   height: '100%',
   overflow: 'hidden',
-  backgroundColor: theme.palette.mode === 'dark' ? '#121318' : '#fafbfd',
+  backgroundColor: surfaceColor(theme, '#121318', '#19191A', '#fafbfd'),
   padding: theme.spacing(3),
   [theme.breakpoints.down('md')]: {
     padding: theme.spacing(2),
@@ -44,7 +45,7 @@ export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
 export const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
   maxWidth: '380px',
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A1F2B' : '#ffffff',
+  backgroundColor: surfaceColor(theme, '#1A1F2B', '#1F1F20', '#ffffff'),
   borderRadius: '30px',
   [theme.breakpoints.down('sm')]: {
     maxWidth: 'none',
@@ -449,7 +450,13 @@ export const WorkspaceCard = styled(Card, {
   return {
     backgroundColor: isGradient
       ? 'transparent'
-      : gradient || (isDark ? 'rgba(26, 31, 43, 0.7)' : '#ffffff'),
+      : gradient ||
+        surfaceColor(
+          theme,
+          'rgba(26, 31, 43, 0.7)',
+          'rgba(36, 36, 37, 0.7)',
+          '#ffffff',
+        ),
     backgroundImage: isGradient ? gradient : 'none',
     backgroundSize: 'cover',
     backdropFilter: isGradient ? 'none' : 'blur(12px)',

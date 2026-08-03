@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
               color="inherit"
               sx={{ mx: 1 }}
             >
-              {colorMode.mode === 'dark' ? (
+              {colorMode.mode !== 'light' ? (
                 <LightModeIcon sx={{ fontSize: 20 }} />
               ) : (
                 <DarkModeIcon sx={{ fontSize: 20 }} />
@@ -89,7 +89,11 @@ const Navbar: React.FC = () => {
             alignItems="center"
           >
             <IconButton onClick={colorMode.toggleColorMode} color="inherit">
-              {colorMode.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+              {colorMode.mode !== 'light' ? (
+                <LightModeIcon />
+              ) : (
+                <DarkModeIcon />
+              )}
             </IconButton>
             <MobileMenuButton>
               <MenuIcon />

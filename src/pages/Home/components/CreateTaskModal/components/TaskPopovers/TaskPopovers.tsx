@@ -10,6 +10,7 @@ import {
 } from '../TaskIcons';
 import { TASK_COLORS } from '../../CreateTaskModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
+import { surfaceColor } from '@/context';
 
 interface TaskPopoversProps {
   // Status
@@ -35,9 +36,12 @@ const popoverPaperSx = {
   borderRadius: '12px',
   mt: 1,
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'rgba(26, 31, 43, 0.95)'
-      : 'background.paper',
+    surfaceColor(
+      theme,
+      'rgba(26, 31, 43, 0.95)',
+      'rgba(42, 42, 44, 0.95)',
+      'background.paper',
+    ),
   border: '1px solid',
   borderColor: (theme: Theme) =>
     theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'divider',

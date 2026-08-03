@@ -1,57 +1,18 @@
 import { useState } from 'react';
 import { Box, Switch, Typography } from '@mui/material';
+import { BoltOutlined as EnergyIcon } from '@mui/icons-material';
 import {
-  CalendarMonthOutlined as CalendarIcon,
-  BoltOutlined as EnergyIcon,
-} from '@mui/icons-material';
-import {
-  SectionCard,
   AICard,
   SectionHeader,
   SectionTitle,
   Badge,
-  WeeklyContainer,
-  DayPill,
   SmartToggleCard,
   SmartCardTitle,
   SmartCardDesc,
-  SliderHeader,
-  SliderLabel,
-  SliderValue,
-  PremiumSlider,
 } from '../Settings.styles';
 
 export const ScheduleSettings = () => {
-  // Work Rhythm States
-  const [activeDays, setActiveDays] = useState<string[]>([
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-  ]);
-  const [workHours, setWorkHours] = useState<number[]>([9, 17]);
-  const [lunchProtected, setLunchProtected] = useState(true);
   const [protectGoldenHours, setProtectGoldenHours] = useState(true);
-
-  const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-  const toggleDay = (day: string) => {
-    setActiveDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
-    );
-  };
-
-  const handleHoursChange = (_e: Event, newValue: number | number[]) => {
-    setWorkHours(newValue as number[]);
-  };
-
-  const formatHour = (hourVal: number) => {
-    const period = hourVal >= 12 ? 'PM' : 'AM';
-    let displayHour = hourVal % 12;
-    if (displayHour === 0) displayHour = 12;
-    return `${displayHour.toString().padStart(2, '0')}:00 ${period}`;
-  };
 
   const switchStyles = {
     '& .MuiSwitch-switchBase.Mui-checked': {
@@ -67,84 +28,6 @@ export const ScheduleSettings = () => {
 
   return (
     <Box>
-      {/* Work Rhythm Card */}
-      <SectionCard>
-        <SectionHeader>
-          <SectionTitle>
-            <Box className="icon-wrapper">
-              <CalendarIcon />
-            </Box>
-            <Typography>Your Work Rhythm</Typography>
-          </SectionTitle>
-        </SectionHeader>
-
-        {/* Work Days Pill Selector */}
-        <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5 }}
-          >
-            Work Days
-          </Typography>
-          <WeeklyContainer>
-            {daysOfWeek.map((day) => {
-              const isActive = activeDays.includes(day);
-              return (
-                <DayPill
-                  key={day}
-                  active={isActive}
-                  onClick={() => toggleDay(day)}
-                >
-                  {day}
-                </DayPill>
-              );
-            })}
-          </WeeklyContainer>
-        </Box>
-
-        {/* Daily Schedule Timeline Slider */}
-        <Box sx={{ mb: 4 }}>
-          <SliderHeader>
-            <SliderLabel>Daily Schedule</SliderLabel>
-            <SliderValue>
-              {formatHour(workHours[0])} — {formatHour(workHours[1])}
-            </SliderValue>
-          </SliderHeader>
-          <PremiumSlider
-            value={workHours}
-            onChange={handleHoursChange}
-            min={5}
-            max={22}
-            step={1}
-            valueLabelDisplay="off"
-          />
-          <Box
-            sx={{ display: 'flex', justifyContent: 'space-between', mt: -0.5 }}
-          >
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              05:00 AM
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              10:00 PM
-            </Typography>
-          </Box>
-        </Box>
-
-        {/* Lunch Protection */}
-        <SmartToggleCard>
-          <Box>
-            <SmartCardTitle>Protect recovery time</SmartCardTitle>
-            <SmartCardDesc>Smart flexible 45 min lunch window</SmartCardDesc>
-          </Box>
-          <Switch
-            checked={lunchProtected}
-            onChange={(e) => setLunchProtected(e.target.checked)}
-            sx={switchStyles}
-          />
-        </SmartToggleCard>
-      </SectionCard>
-
-      {/* Energy Section - AI Golden Hours */}
       <AICard>
         <SectionHeader>
           <SectionTitle>

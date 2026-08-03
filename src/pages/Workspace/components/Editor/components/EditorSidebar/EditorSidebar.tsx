@@ -690,7 +690,8 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                             ? 'rgba(255,255,255,0.06)'
                             : '#f1f5f9',
                         color: 'text.primary',
-                        border: '1px solid #e2e8f0',
+                        border: '1px solid',
+                        borderColor: 'divider',
                         '&:hover': {
                           bgcolor: (theme) =>
                             theme.palette.mode === 'dark'

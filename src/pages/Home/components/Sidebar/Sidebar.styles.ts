@@ -1,11 +1,12 @@
 import { Box, Typography, Button, ListItemButton, styled } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const SidebarContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'collapsed',
 })<{ collapsed?: boolean }>(({ theme, collapsed }) => ({
   width: collapsed ? 80 : 260,
   transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  backgroundColor: theme.palette.mode === 'dark' ? '#111827' : '#f1f5f9',
+  backgroundColor: surfaceColor(theme, '#111827', '#19191A', '#f1f5f9'),
   backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
   borderRight:
     theme.palette.mode === 'dark'
@@ -37,10 +38,12 @@ export const SidebarContainer = styled(Box, {
         ? '1px solid rgba(255, 255, 255, 0.08)'
         : '1px solid rgba(0, 0, 0, 0.06)',
     padding: '6px 12px',
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(17, 24, 39, 0.8)'
-        : 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: surfaceColor(
+      theme,
+      'rgba(17, 24, 39, 0.8)',
+      'rgba(25, 25, 26, 0.8)',
+      'rgba(255, 255, 255, 0.85)',
+    ),
     backdropFilter: 'blur(20px)',
   },
 }));
@@ -138,9 +141,11 @@ export const NavItem = styled(ListItemButton, {
 
 export const EnergyCard = styled(Box)(({ theme }) => ({
   background:
-    theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, rgba(26, 31, 43, 0.5) 0%, rgba(17, 24, 39, 0.8) 100%)'
-      : '#ffffff',
+    theme.palette.mode !== 'dark'
+      ? '#ffffff'
+      : theme.appMode === 'graydark'
+        ? 'linear-gradient(135deg, rgba(36, 36, 37, 0.5) 0%, rgba(25, 25, 26, 0.8) 100%)'
+        : 'linear-gradient(135deg, rgba(26, 31, 43, 0.5) 0%, rgba(17, 24, 39, 0.8) 100%)',
   border:
     theme.palette.mode === 'dark'
       ? '1px solid rgba(255, 255, 255, 0.05)'

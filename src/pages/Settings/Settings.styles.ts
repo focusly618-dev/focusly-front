@@ -1,9 +1,10 @@
 import { styled, Box, Typography, Slider } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const SettingsLayout = styled(Box)(({ theme }) => ({
   display: 'flex',
   minHeight: '100%',
-  backgroundColor: theme.palette.mode === 'dark' ? '#0C0C0E' : '#FAFAF8',
+  backgroundColor: surfaceColor(theme, '#0C0C0E', '#19191A', '#FAFAF8'),
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
   },
@@ -39,9 +40,7 @@ export const SidebarItem = styled(Box, {
   fontSize: '0.875rem',
   fontWeight: 500,
   color: active
-    ? theme.palette.mode === 'dark'
-      ? '#F4F4F5'
-      : '#1F2937'
+    ? surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937')
     : '#6B7280',
   backgroundColor: active
     ? theme.palette.mode === 'dark'
@@ -64,7 +63,7 @@ export const SidebarItem = styled(Box, {
       : theme.palette.mode === 'dark'
         ? 'rgba(255, 255, 255, 0.02)'
         : 'rgba(0, 0, 0, 0.02)',
-    color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+    color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
     '& svg': {
       color: '#6366F1',
     },
@@ -100,19 +99,19 @@ export const ProfileHeader = styled(Box)(({ theme }) => ({
 export const SettingsTitle = styled(Typography)(({ theme }) => ({
   fontSize: '2rem',
   fontWeight: 800,
-  color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+  color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
   letterSpacing: '-0.02em',
   marginBottom: '4px',
 }));
 
 export const SettingsDescription = styled(Typography)(({ theme }) => ({
   fontSize: '0.925rem',
-  color: theme.palette.mode === 'dark' ? '#A1A1AA' : '#6B7280',
+  color: surfaceColor(theme, '#A1A1AA', '#C4C4C8', '#6B7280'),
   lineHeight: 1.5,
 }));
 
 export const SectionCard = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#141417' : '#FFFFFF',
+  backgroundColor: surfaceColor(theme, '#141417', '#242425', '#FFFFFF'),
   borderRadius: '20px',
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'}`,
   padding: theme.spacing(4),
@@ -132,9 +131,11 @@ export const SectionCard = styled(Box)(({ theme }) => ({
 
 export const AICard = styled(SectionCard)(({ theme }) => ({
   background:
-    theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, #141417 0%, #17172B 100%)'
-      : 'linear-gradient(135deg, #FFFFFF 0%, #F9F9FF 100%)',
+    theme.palette.mode !== 'dark'
+      ? 'linear-gradient(135deg, #FFFFFF 0%, #F9F9FF 100%)'
+      : theme.appMode === 'graydark'
+        ? 'linear-gradient(135deg, #242425 0%, #2A2A30 100%)'
+        : 'linear-gradient(135deg, #141417 0%, #17172B 100%)',
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)'}`,
   position: 'relative',
   overflow: 'hidden',
@@ -168,7 +169,7 @@ export const SectionTitle = styled(Box)(({ theme }) => ({
   '& .MuiTypography-root': {
     fontSize: '1.1rem',
     fontWeight: 700,
-    color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+    color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
     letterSpacing: '-0.01em',
   },
   '& .icon-wrapper': {
@@ -211,7 +212,7 @@ export const InlineEditWrapper = styled(Box)(({ theme }) => ({
 export const InlineLabel = styled(Typography)(({ theme }) => ({
   fontSize: '0.75rem',
   fontWeight: 600,
-  color: theme.palette.mode === 'dark' ? '#A1A1AA' : '#6B7280',
+  color: surfaceColor(theme, '#A1A1AA', '#C4C4C8', '#6B7280'),
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
 }));
@@ -219,7 +220,7 @@ export const InlineLabel = styled(Typography)(({ theme }) => ({
 export const InlineValue = styled(Typography)(({ theme }) => ({
   fontSize: '0.95rem',
   fontWeight: 500,
-  color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+  color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
   minHeight: '20px',
 }));
 
@@ -245,9 +246,7 @@ export const DayPill = styled(Box, {
       : 'rgba(0, 0, 0, 0.03)',
   color: active
     ? '#FFFFFF'
-    : theme.palette.mode === 'dark'
-      ? '#A1A1AA'
-      : '#6B7280',
+    : surfaceColor(theme, '#A1A1AA', '#C4C4C8', '#6B7280'),
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
     backgroundColor: active
@@ -283,12 +282,12 @@ export const SmartToggleCard = styled(Box)(({ theme }) => ({
 export const SmartCardTitle = styled(Typography)(({ theme }) => ({
   fontSize: '0.95rem',
   fontWeight: 700,
-  color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+  color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
 }));
 
 export const SmartCardDesc = styled(Typography)(({ theme }) => ({
   fontSize: '0.85rem',
-  color: theme.palette.mode === 'dark' ? '#A1A1AA' : '#6B7280',
+  color: surfaceColor(theme, '#A1A1AA', '#C4C4C8', '#6B7280'),
 }));
 
 // Slider Wrapper
@@ -302,7 +301,7 @@ export const SliderHeader = styled(Box)({
 export const SliderLabel = styled(Typography)(({ theme }) => ({
   fontSize: '0.925rem',
   fontWeight: 600,
-  color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+  color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
 }));
 
 export const SliderValue = styled(Typography)({
@@ -321,13 +320,13 @@ export const PremiumSlider = styled(Slider)(({ theme }) => ({
   },
   '& .MuiSlider-rail': {
     opacity: 0.12,
-    backgroundColor: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+    backgroundColor: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
     borderRadius: 3,
   },
   '& .MuiSlider-thumb': {
     height: 18,
     width: 18,
-    backgroundColor: theme.palette.mode === 'dark' ? '#141417' : '#FFFFFF',
+    backgroundColor: surfaceColor(theme, '#141417', '#242425', '#FFFFFF'),
     border: '2px solid #6366F1',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     transition: 'all 0.2s ease',
@@ -359,9 +358,7 @@ export const ShieldItemCard = styled(Box, {
     ? theme.palette.mode === 'dark'
       ? 'rgba(99, 102, 241, 0.08)'
       : 'rgba(99, 102, 241, 0.03)'
-    : theme.palette.mode === 'dark'
-      ? '#141417'
-      : '#FFFFFF',
+    : surfaceColor(theme, '#141417', '#242425', '#FFFFFF'),
   border: `1px solid ${active ? 'rgba(99, 102, 241, 0.25)' : theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'}`,
   transition: 'all 0.2s ease',
   cursor: 'pointer',
@@ -379,7 +376,7 @@ export const ShieldInfo = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: '12px',
   '& svg': {
-    color: theme.palette.mode === 'dark' ? '#A1A1AA' : '#6B7280',
+    color: surfaceColor(theme, '#A1A1AA', '#C4C4C8', '#6B7280'),
     fontSize: '1.25rem',
   },
 }));
@@ -387,7 +384,7 @@ export const ShieldInfo = styled(Box)(({ theme }) => ({
 export const ShieldLabel = styled(Typography)(({ theme }) => ({
   fontSize: '0.9rem',
   fontWeight: 600,
-  color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+  color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
 }));
 
 // Blocklist Panel
@@ -404,7 +401,7 @@ export const BlocklistPanel = styled(Box)(({ theme }) => ({
 export const BlocklistTitle = styled(Typography)(({ theme }) => ({
   fontSize: '0.85rem',
   fontWeight: 700,
-  color: theme.palette.mode === 'dark' ? '#A1A1AA' : '#6B7280',
+  color: surfaceColor(theme, '#A1A1AA', '#C4C4C8', '#6B7280'),
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
   marginBottom: '12px',
@@ -416,7 +413,7 @@ export const BlocklistItem = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   padding: '8px 12px',
   borderRadius: '8px',
-  backgroundColor: theme.palette.mode === 'dark' ? '#141417' : '#FFFFFF',
+  backgroundColor: surfaceColor(theme, '#141417', '#242425', '#FFFFFF'),
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)'}`,
   marginBottom: '8px',
   '&:last-child': {
@@ -427,7 +424,7 @@ export const BlocklistItem = styled(Box)(({ theme }) => ({
 export const BlocklistDomain = styled(Typography)(({ theme }) => ({
   fontSize: '0.875rem',
   fontWeight: 500,
-  color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+  color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
 }));
 
 // Sound Picker Cards
@@ -446,9 +443,7 @@ export const SoundCard = styled(Box, {
     ? theme.palette.mode === 'dark'
       ? 'rgba(99, 102, 241, 0.08)'
       : 'rgba(99, 102, 241, 0.03)'
-    : theme.palette.mode === 'dark'
-      ? '#141417'
-      : '#FFFFFF',
+    : surfaceColor(theme, '#141417', '#242425', '#FFFFFF'),
   border: `1px solid ${active ? 'rgba(99, 102, 241, 0.3)' : theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'}`,
   cursor: 'pointer',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -484,9 +479,7 @@ export const SoundCardIcon = styled(Box, {
       : 'rgba(0, 0, 0, 0.03)',
   color: active
     ? '#6366F1'
-    : theme.palette.mode === 'dark'
-      ? '#A1A1AA'
-      : '#6B7280',
+    : surfaceColor(theme, '#A1A1AA', '#C4C4C8', '#6B7280'),
   '& svg': {
     fontSize: '1rem',
   },
@@ -495,7 +488,7 @@ export const SoundCardIcon = styled(Box, {
 export const SoundCardTitle = styled(Typography)(({ theme }) => ({
   fontSize: '0.875rem',
   fontWeight: 700,
-  color: theme.palette.mode === 'dark' ? '#F4F4F5' : '#1F2937',
+  color: surfaceColor(theme, '#F4F4F5', '#FFFFFF', '#1F2937'),
 }));
 
 // Notifications Alert Card
@@ -506,7 +499,7 @@ export const AlertCardGrid = styled(Box)(({ theme }) => ({
 }));
 
 export const AlertCardItem = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#141417' : '#FFFFFF',
+  backgroundColor: surfaceColor(theme, '#141417', '#242425', '#FFFFFF'),
   borderRadius: '16px',
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'}`,
   padding: theme.spacing(3),
@@ -537,7 +530,7 @@ export const SoundPreviewButton = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(1.5),
   fontSize: '0.75rem',
   fontWeight: 700,
-  color: theme.palette.mode === 'dark' ? '#A1A1AA' : '#6B7280',
+  color: surfaceColor(theme, '#A1A1AA', '#C4C4C8', '#6B7280'),
   cursor: 'pointer',
   padding: '4px 8px',
   borderRadius: '6px',
@@ -557,7 +550,7 @@ export const UserProfileSummary = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2.5),
   padding: theme.spacing(3),
   borderRadius: '24px',
-  backgroundColor: theme.palette.mode === 'dark' ? '#141417' : '#FFFFFF',
+  backgroundColor: surfaceColor(theme, '#141417', '#242425', '#FFFFFF'),
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'}`,
   marginBottom: theme.spacing(4),
   boxShadow:

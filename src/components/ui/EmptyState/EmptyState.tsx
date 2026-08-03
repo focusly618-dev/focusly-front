@@ -7,6 +7,7 @@ import {
   type Theme,
 } from '@mui/material';
 import { SearchOff as SearchOffIcon } from '@mui/icons-material';
+import { surfaceColor } from '@/context';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -45,9 +46,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           height: 80,
           borderRadius: '24px',
           background: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
-              : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+            surfaceColor(
+              theme,
+              'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+              'linear-gradient(135deg, #2A2A2C 0%, #19191A 100%)',
+              'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+            ),
           border: '1px solid',
           borderColor: 'divider',
           display: 'flex',

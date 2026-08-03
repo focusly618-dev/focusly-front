@@ -5,6 +5,7 @@ import {
   EventNote as EventNoteIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
+import { surfaceColor } from '@/context';
 import type { ICalendarEvent } from '../../../CalendarEvent';
 import { CalendarEvent } from '../../../CalendarEvent';
 
@@ -43,15 +44,18 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
       PaperProps={{
         sx: {
           backgroundColor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(15, 23, 42, 0.9)'
-              : 'rgba(255, 255, 255, 0.95)',
+            surfaceColor(
+              theme,
+              'rgba(15, 23, 42, 0.9)',
+              'rgba(36, 36, 37, 0.9)',
+              'rgba(255, 255, 255, 0.95)',
+            ),
           backgroundImage: 'none',
           borderRadius: '16px',
           padding: '8px',
           width: '320px',
           backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: (theme) => `1px solid ${theme.palette.divider}`,
           boxShadow: '0 16px 32px rgba(0,0,0,0.4)',
           overflow: 'hidden',
         },
@@ -69,7 +73,7 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
         <Box>
           <Typography
             variant="body2"
-            sx={{ fontWeight: 800, color: '#ffffff', mb: 0.2 }}
+            sx={{ fontWeight: 800, color: 'text.primary', mb: 0.2 }}
           >
             {formattedDate}
           </Typography>
@@ -79,10 +83,14 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
             gap={0.5}
             sx={{ opacity: 0.5 }}
           >
-            <EventNoteIcon sx={{ fontSize: '12px', color: '#ffffff' }} />
+            <EventNoteIcon sx={{ fontSize: '12px', color: 'text.secondary' }} />
             <Typography
               variant="caption"
-              sx={{ color: '#ffffff', fontWeight: 600, fontSize: '10px' }}
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 600,
+                fontSize: '10px',
+              }}
             >
               {events.length} {events.length === 1 ? 'Task' : 'Tasks'}
             </Typography>
@@ -92,11 +100,11 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
           onClick={onClose}
           size="small"
           sx={{
-            color: 'rgba(255,255,255,0.4)',
+            color: 'text.secondary',
             padding: '2px',
             '&:hover': {
-              color: '#ffffff',
-              backgroundColor: 'rgba(255,255,255,0.05)',
+              color: 'text.primary',
+              backgroundColor: 'action.hover',
             },
           }}
         >
@@ -104,7 +112,7 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
         </IconButton>
       </Box>
 
-      <Divider sx={{ mx: 1.5, mb: 1, borderColor: 'rgba(255,255,255,0.06)' }} />
+      <Divider sx={{ mx: 1.5, mb: 1, borderColor: 'divider' }} />
 
       <Box
         sx={{
@@ -131,14 +139,14 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
             sx={{
               cursor: 'pointer',
               borderRadius: '12px',
-              backgroundColor: 'rgba(30, 41, 59, 0.4)',
-              border: '1px solid rgba(255, 255, 255, 0.04)',
+              backgroundColor: 'action.hover',
+              border: (theme) => `1px solid ${theme.palette.divider}`,
               transition: 'all 0.2s',
               '&:hover': {
-                backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                backgroundColor: 'action.selected',
                 transform: 'translateY(-1px)',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                borderColor: 'rgba(255, 255, 255, 0.08)',
+                borderColor: 'divider',
               },
               '& .rbc-event': {
                 background: 'none !important',

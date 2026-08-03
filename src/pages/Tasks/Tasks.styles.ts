@@ -1,5 +1,6 @@
 import { styled, keyframes } from '@mui/material/styles';
 import { Box, Typography, TextField, Button } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 const fadeInSlideUp = keyframes`
   0% {
@@ -41,7 +42,7 @@ export const AnimatedContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const TasksContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#121318' : '#fafbfd',
+  backgroundColor: surfaceColor(theme, '#121318', '#19191A', '#fafbfd'),
   height: '100vh',
   overflow: 'hidden',
   color: theme.palette.text.primary,
@@ -101,7 +102,7 @@ export const ControlsBar = styled(Box)(({ theme }) => ({
 export const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
   maxWidth: '380px',
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A1F2B' : '#ffffff',
+  backgroundColor: surfaceColor(theme, '#1A1F2B', '#1F1F20', '#ffffff'),
   borderRadius: '8px',
   [theme.breakpoints.down('sm')]: {
     maxWidth: 'none',
@@ -327,10 +328,12 @@ export const SectionTitle = styled(Typography, {
 }));
 
 export const AddTaskInput = styled(Box)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(26, 31, 43, 0.65)'
-      : theme.palette.background.paper,
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(26, 31, 43, 0.65)',
+    'rgba(36, 36, 37, 0.65)',
+    theme.palette.background.paper,
+  ),
   padding: '12px 16px',
   borderRadius: '8px',
   display: 'flex',
@@ -357,10 +360,12 @@ export const AddTaskInput = styled(Box)(({ theme }) => ({
 }));
 
 export const SidebarCard = styled(Box)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(17, 24, 39, 0.65)'
-      : theme.palette.background.paper,
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(17, 24, 39, 0.65)',
+    'rgba(36, 36, 37, 0.65)',
+    theme.palette.background.paper,
+  ),
   border:
     theme.palette.mode === 'dark'
       ? '1px solid rgba(255, 255, 255, 0.05)'
@@ -380,8 +385,12 @@ export const InsightScore = styled(Typography)(({ theme }) => ({
 
 export const ViewToggleGroup = styled(Box)(({ theme }) => ({
   display: 'flex',
-  backgroundColor:
-    theme.palette.mode === 'dark' ? '#1A1F2B' : theme.palette.background.paper,
+  backgroundColor: surfaceColor(
+    theme,
+    '#1A1F2B',
+    '#242425',
+    theme.palette.background.paper,
+  ),
   borderRadius: '8px',
   border:
     theme.palette.mode === 'dark'
@@ -451,9 +460,12 @@ export const PriorityCard = styled(Box, {
     borderRadius: '24px',
     backgroundColor: active
       ? `${priorityColor}15`
-      : theme.palette.mode === 'dark'
-        ? '#1A1F2B'
-        : theme.palette.background.paper,
+      : surfaceColor(
+          theme,
+          '#1A1F2B',
+          '#242425',
+          theme.palette.background.paper,
+        ),
     border: '1px solid',
     borderColor: active
       ? priorityColor

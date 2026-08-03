@@ -1,5 +1,6 @@
 import { styled, Box, Typography, Button } from '@mui/material';
 import { keyframes } from '@emotion/react';
+import { surfaceColor } from '@/context';
 
 export const spin = keyframes`
   from { transform: rotate(0deg); }
@@ -271,10 +272,12 @@ export const RelatedDocItem = styled(Box)(({ theme }) => ({
 }));
 
 export const InsightCard = styled(Box)(({ theme }) => ({
-  background:
-    theme.palette.mode === 'dark'
-      ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
-      : theme.palette.background.default,
+  background: surfaceColor(
+    theme,
+    'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)',
+    'linear-gradient(145deg, #2a2a2c 0%, #19191a 100%)',
+    theme.palette.background.default,
+  ),
   borderRadius: '12px',
   padding: '20px',
   // marginTop: 'auto', // Removed to rely on flex spacer
@@ -290,10 +293,12 @@ export const InsightHeader = styled(Box)({
 });
 
 export const MarkDoneButton = styled(Button)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(30, 41, 59, 0.5)'
-      : theme.palette.action.selected, // Transparent/Dark styling
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(30, 41, 59, 0.5)',
+    'rgba(42, 42, 44, 0.5)',
+    theme.palette.action.selected,
+  ), // Transparent/Dark styling
   color: theme.palette.text.secondary,
   width: '100%',
   fontWeight: 600,
@@ -418,7 +423,7 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
     fontSize: '0.9em',
   },
   '& pre': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#0f172a' : '#f4f4f4f5',
+    backgroundColor: surfaceColor(theme, '#0f172a', '#1f1f20', '#f4f4f4f5'),
     border: `1px solid ${theme.palette.divider}`,
     borderRadius: '12px',
     padding: '20px',
@@ -439,7 +444,7 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
     },
   },
   '& .bn-block-content[data-content-type=codeBlock]': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#0f172a' : '#f4f4f4f5',
+    backgroundColor: surfaceColor(theme, '#0f172a', '#1f1f20', '#f4f4f4f5'),
     padding: 0,
     maxWidth: '100%',
     overflowWrap: 'break-word',

@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, useTheme, Tooltip } from '@mui/material';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { surfaceColor } from '@/context';
 import { ChartCard } from '../../Insights.styles';
 import type {
   TimeDistributionChartProps,
@@ -77,7 +78,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               top: 0,
               left: 0,
               bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? '#1e293b' : '#ffffff',
+                surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff'),
               p: 1.5,
               border: '1px solid',
               borderColor: 'divider',

@@ -1,5 +1,6 @@
 import { Box, styled, alpha } from '@mui/material';
 import type { Task } from '@/redux/tasks/task.types';
+import { surfaceColor } from '@/context';
 
 // Priority-based color palette — refined, slightly desaturated for elegance
 export const PRIORITY_COLORS: Record<number, { main: string }> = {
@@ -91,7 +92,12 @@ export const EventContainer = styled(Box, {
   if (isMeeting) {
     const MEETING_COLOR = '#60A5FA';
     return {
-      backgroundColor: isDark ? alpha('#1e293b', 0.1) : '#ffffff',
+      backgroundColor: surfaceColor(
+        theme,
+        alpha('#1e293b', 0.1),
+        alpha('#242425', 0.1),
+        '#ffffff',
+      ),
       color: isDark ? '#e2e8f0' : '#1e293b',
       height: '100%',
       width: '100%',
@@ -120,7 +126,12 @@ export const EventContainer = styled(Box, {
         pointerEvents: 'none',
       },
       '&:hover': {
-        backgroundColor: isDark ? alpha('#1e293b', 1) : '#f8fafc',
+        backgroundColor: surfaceColor(
+          theme,
+          alpha('#1e293b', 1),
+          '#242425',
+          '#f8fafc',
+        ),
         boxShadow: 'none',
         zIndex: 50,
       },
@@ -136,20 +147,12 @@ export const EventContainer = styled(Box, {
   // If no color assigned (DEFAULT_COLOR), use neutral background with black left border
   // If color assigned, use colored background with colored left border
   const finalBgColor = isDefaultColor
-    ? isDark
-      ? '#1e293b'
-      : '#ffffff'
-    : isDark
-      ? '#1e293b'
-      : '#ffffff';
+    ? surfaceColor(theme, '#1e293b', '#242425', '#ffffff')
+    : surfaceColor(theme, '#1e293b', '#242425', '#ffffff');
 
   const finalBgHover = isDefaultColor
-    ? isDark
-      ? '#2d3748'
-      : '#f1f5f9'
-    : isDark
-      ? '#2d3748'
-      : '#f1f5f9';
+    ? surfaceColor(theme, '#2d3748', '#2A2A2C', '#f1f5f9')
+    : surfaceColor(theme, '#2d3748', '#2A2A2C', '#f1f5f9');
 
   const borderColor = variant.main;
 

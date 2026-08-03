@@ -1,5 +1,6 @@
 import { styled, Box, Typography, Button, IconButton } from '@mui/material';
 import { keyframes } from '@emotion/react';
+import { surfaceColor } from '@/context';
 import {
   SidebarHeader as BaseSidebarHeader,
   SectionTitle as BaseSectionTitle,
@@ -253,7 +254,7 @@ export const DescriptionContainer = styled(Box)(({ theme }) => ({
     fontSize: '0.85em',
   },
   '& pre': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#0f172a' : '#f4f4f4',
+    backgroundColor: surfaceColor(theme, '#0f172a', '#1F1F20', '#f4f4f4'),
     padding: '10px',
     borderRadius: '8px',
     overflowX: 'auto',
@@ -557,15 +558,23 @@ export const ChatInputWrapper = styled(Box)(({ theme }) => ({
   gap: '8px',
   padding: '10px 12px',
   borderRadius: '12px',
-  backgroundColor:
-    theme.palette.mode === 'dark' ? '#1A1F2B' : 'rgba(0,0,0,0.015)',
+  backgroundColor: surfaceColor(
+    theme,
+    '#1A1F2B',
+    '#1F1F20',
+    'rgba(0,0,0,0.015)',
+  ),
   border: `1px solid ${theme.palette.divider}`,
   transition: 'all 0.2s ease-in-out',
   '&:focus-within': {
     borderColor: theme.palette.primary.main,
     boxShadow: `0 0 0 3px ${theme.palette.primary.main}25`,
-    backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(26, 31, 43, 0.95)' : undefined,
+    backgroundColor: surfaceColor(
+      theme,
+      'rgba(26, 31, 43, 0.95)',
+      'rgba(31, 31, 32, 0.95)',
+      'rgba(0,0,0,0.015)',
+    ),
   },
 }));
 

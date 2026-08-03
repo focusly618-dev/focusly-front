@@ -11,6 +11,7 @@ import HistoryToggleOffRoundedIcon from '@mui/icons-material/HistoryToggleOffRou
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { dismissSessionExpiredNotice } from '@/redux/auth/auth.slice';
+import { surfaceColor } from '@/context';
 
 export const SessionExpiredBanner = () => {
   const theme = useTheme();
@@ -38,7 +39,7 @@ export const SessionExpiredBanner = () => {
             borderRadius: '18px',
             border: `1px solid ${alpha(theme.palette.warning.main, isDark ? 0.32 : 0.22)}`,
             background: isDark
-              ? `linear-gradient(135deg, ${alpha('#0f172a', 0.96)} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`
+              ? `linear-gradient(135deg, ${alpha(surfaceColor(theme, '#0f172a', '#242425', theme.palette.background.paper), 0.96)} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`
               : `linear-gradient(135deg, ${alpha(theme.palette.warning.main, 0.12)} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`,
             boxShadow: isDark
               ? '0 18px 48px rgba(0, 0, 0, 0.35)'

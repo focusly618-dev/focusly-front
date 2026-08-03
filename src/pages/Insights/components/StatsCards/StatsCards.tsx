@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@heroui/react';
+import { useTheme } from '@mui/material';
 import {
   AccessTime,
   CheckCircleOutline,
@@ -13,18 +14,20 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
   taskCompletion,
   energyScore,
 }) => {
+  const theme = useTheme();
+
   const cards = [
     {
       title: 'TOTAL FOCUS',
       value:
-        totalFocusHours.value === '0h 0m'
-          ? '24h 15m'
-          : totalFocusHours.value,
+        totalFocusHours.value === '0h 0m' ? '24h 15m' : totalFocusHours.value,
       change:
         totalFocusHours.change === 'No data'
           ? '📈 +12% vs período anterior'
           : totalFocusHours.change,
-      icon: <AccessTime className="text-indigo-600 dark:text-indigo-400 text-xl" />,
+      icon: (
+        <AccessTime className="text-indigo-600 dark:text-indigo-400 text-xl" />
+      ),
       iconBg: 'bg-indigo-50 dark:bg-indigo-950/60',
       changeColor: 'text-emerald-600 dark:text-emerald-400',
     },
@@ -35,7 +38,9 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         taskCompletion.change === '0%'
           ? '📈 +5% vs período anterior'
           : taskCompletion.change,
-      icon: <CheckCircleOutline className="text-emerald-600 dark:text-emerald-400 text-xl" />,
+      icon: (
+        <CheckCircleOutline className="text-emerald-600 dark:text-emerald-400 text-xl" />
+      ),
       iconBg: 'bg-emerald-50 dark:bg-emerald-950/60',
       changeColor: 'text-emerald-600 dark:text-emerald-400',
     },
@@ -48,13 +53,15 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
           : energyScore.change,
       icon: <Bolt className="text-amber-500 text-xl" />,
       iconBg: 'bg-amber-50 dark:bg-amber-950/60',
-      changeColor: 'text-slate-500 dark:text-slate-400',
+      changeColor: null,
     },
     {
       title: 'DEEP WORK RATIO',
       value: '65%',
       change: 'Rango óptimo de enfoque',
-      icon: <BrainIcon className="text-purple-600 dark:text-purple-400 text-xl" />,
+      icon: (
+        <BrainIcon className="text-purple-600 dark:text-purple-400 text-xl" />
+      ),
       iconBg: 'bg-purple-50 dark:bg-purple-950/60',
       changeColor: 'text-purple-600 dark:text-purple-400',
     },
@@ -65,21 +72,40 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
       {cards.map((card, idx) => (
         <Card
           key={idx}
-          className="shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-4"
+          className="shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm rounded-2xl p-4"
+          style={{
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
+          }}
         >
           <CardHeader className="flex flex-row items-center justify-between p-0 mb-3">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+            <span
+              className="text-[10px] font-extrabold uppercase tracking-widest"
+              style={{ color: theme.palette.text.secondary }}
+            >
               {card.title}
             </span>
-            <div className={`p-2 rounded-xl ${card.iconBg} flex items-center justify-center`}>
+            <div
+              className={`p-2 rounded-xl ${card.iconBg} flex items-center justify-center`}
+            >
               {card.icon}
             </div>
           </CardHeader>
           <CardContent className="p-0 space-y-1">
-            <CardTitle className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <CardTitle
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight"
+              style={{ color: theme.palette.text.primary }}
+            >
               {card.value}
             </CardTitle>
-            <p className={`text-xs font-semibold ${card.changeColor}`}>
+            <p
+              className={`text-xs font-semibold ${card.changeColor || ''}`}
+              style={
+                card.changeColor
+                  ? undefined
+                  : { color: theme.palette.text.secondary }
+              }
+            >
               {card.change}
             </p>
           </CardContent>

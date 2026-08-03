@@ -1,30 +1,30 @@
-import { useState } from 'react';
-import type { ToolbarProps, View } from 'react-big-calendar';
-import type { ICalendarEvent } from '../CalendarEvent';
-import { Navigate } from 'react-big-calendar';
-import type { CalendarNavigateAction } from '../CalendarView/calendarView.types';
 import {
-  Box,
-  Button,
-  IconButton,
-  Popover,
-  Typography,
-  Divider,
-  Fade,
-  alpha,
-  useTheme,
-  Stack,
-} from '@mui/material';
-import { format } from 'date-fns';
-import {
+  CheckCircleOutline as CheckIcon,
   ChevronLeft,
   ChevronRight,
-  CheckCircleOutline as CheckIcon,
   DeleteOutline as DeleteIcon,
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
   Menu as MenuIcon,
 } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Divider,
+  Fade,
+  IconButton,
+  Popover,
+  Stack,
+  Typography,
+  alpha,
+  useTheme,
+} from '@mui/material';
+import { format } from 'date-fns';
+import { useState } from 'react';
+import type { ToolbarProps } from 'react-big-calendar';
+import { Navigate } from 'react-big-calendar';
+import type { ICalendarEvent } from '../CalendarEvent';
+import type { CalendarNavigateAction } from '../CalendarView/calendarView.types';
 
 import { ToolbarContainer } from './CalendarToolbar.styles';
 
@@ -116,59 +116,6 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
           >
             Organized clarity for your deep work sessions.
           </Typography>
-        </Box>
-
-        {/* Center: View Toggle Pill Selector */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.03)'
-                : 'rgba(0, 0, 0, 0.04)',
-            borderRadius: '30px',
-            p: 0.5,
-            border: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          {['day', 'week', 'month'].map((v) => {
-            const isSelected = props.view === v;
-            return (
-              <Button
-                key={v}
-                onClick={() => props.onView(v as View)}
-                sx={{
-                  textTransform: 'none',
-                  borderRadius: '20px',
-                  px: 3,
-                  py: 0.75,
-                  fontSize: '13px',
-                  fontWeight: isSelected ? 700 : 500,
-                  bgcolor: isSelected
-                    ? (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.1)'
-                          : '#ffffff'
-                    : 'transparent',
-                  color: isSelected ? 'primary.main' : 'text.secondary',
-                  boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
-                  minWidth: '70px',
-                  '&:hover': {
-                    bgcolor: isSelected
-                      ? (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.12)'
-                            : '#ffffff'
-                      : 'action.hover',
-                  },
-                }}
-              >
-                {v.charAt(0).toUpperCase() + v.slice(1)}
-              </Button>
-            );
-          })}
         </Box>
 
         {/* Right side: Navigation Arrows */}
