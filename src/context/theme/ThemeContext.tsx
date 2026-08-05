@@ -1,4 +1,10 @@
-import { useState, useMemo, useEffect, type ReactNode } from 'react';
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { getDesignTokens } from './theme';
 
