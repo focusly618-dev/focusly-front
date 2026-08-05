@@ -1,13 +1,14 @@
 import type { Theme } from '@mui/material/styles';
+import { surfaceColor } from '@/context';
 
 // Common Input Sx
 export const darkInputSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#121318' : '#f8fafc',
+    surfaceColor(theme, '#121318', '#1F1F20', '#f8fafc'),
   borderRadius: '12px',
   '& .MuiOutlinedInput-root': {
     backgroundColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#121318' : '#f8fafc',
+      surfaceColor(theme, '#121318', '#1F1F20', '#f8fafc'),
     color: (theme: Theme) =>
       theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a',
     fontSize: '14px',
@@ -26,7 +27,7 @@ export const darkInputSx = {
     },
     '&.Mui-focused': {
       backgroundColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#121318' : '#f8fafc',
+        surfaceColor(theme, '#121318', '#1F1F20', '#f8fafc'),
       boxShadow: (theme: Theme) =>
         theme.palette.mode === 'dark'
           ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
@@ -63,7 +64,7 @@ export const darkInputSx = {
 export const darkInputSxTimers = {
   '& .MuiOutlinedInput-root': {
     backgroundColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#121318' : '#f8fafc',
+      surfaceColor(theme, '#121318', '#1F1F20', '#f8fafc'),
     borderRadius: '8px',
     color: (theme: Theme) =>
       theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a',
@@ -119,7 +120,7 @@ export const labelSx = {
 
 export const paperPropsSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#1c1f26' : '#ffffff',
+    surfaceColor(theme, '#1c1f26', '#242425', '#ffffff'),
   backgroundImage: 'none',
   color: (theme: Theme) =>
     theme.palette.mode === 'dark' ? '#e0e2e9' : '#0f172a',
@@ -167,7 +168,7 @@ export const dialogTitleSx = {
   padding: '16px 24px',
   color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#0f172a'),
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#1c1f26' : '#ffffff',
+    surfaceColor(theme, '#1c1f26', '#242425', '#ffffff'),
 };
 
 export const iconBoxSx = {
@@ -274,9 +275,12 @@ export const statusSelectSx = {
 
 export const menuPaperPropsSx = {
   bgcolor: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'rgba(26, 31, 43, 0.95)'
-      : 'background.paper',
+    surfaceColor(
+      theme,
+      'rgba(26, 31, 43, 0.95)',
+      'rgba(36, 36, 37, 0.95)',
+      'background.paper',
+    ),
   border: '1px solid',
   borderColor: (theme: Theme) =>
     theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'divider',
@@ -322,7 +326,7 @@ export const menuPaperPropsSx = {
 export const dialogActionsSx = {
   padding: '16px 24px',
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#1c1f26' : '#ffffff',
+    surfaceColor(theme, '#1c1f26', '#242425', '#ffffff'),
   borderTop: '1px solid',
   borderColor: (theme: Theme) =>
     theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
@@ -370,7 +374,7 @@ export const saveButtonSx = {
 
 export const descriptionInputSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+    surfaceColor(theme, '#1A1F2B', '#2A2A2C', 'background.default'),
   borderRadius: '12px',
   mt: 1,
   '& .MuiOutlinedInput-root': {
@@ -429,9 +433,12 @@ export const smallLabelSx = {
 
 export const autocompletePaperSx = {
   bgcolor: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'rgba(26, 31, 43, 0.95)'
-      : 'background.paper',
+    surfaceColor(
+      theme,
+      'rgba(26, 31, 43, 0.95)',
+      'rgba(36, 36, 37, 0.95)',
+      'background.paper',
+    ),
   border: '1px solid',
   borderColor: (theme: Theme) =>
     theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'divider',
@@ -452,7 +459,7 @@ export const autocompletePaperSx = {
 
 export const timeSlotBoxSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+    surfaceColor(theme, '#1A1F2B', '#2A2A2C', 'background.default'),
   border: '1px solid',
   borderColor: (theme: Theme) =>
     theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
@@ -520,7 +527,7 @@ export const datePickerPopperSx = {
 
 export const datePickerPaperSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#111827' : 'background.default',
+    surfaceColor(theme, '#111827', '#19191A', 'background.default'),
   border: '1px solid',
   borderColor: 'divider',
   borderRadius: '16px',
@@ -580,7 +587,7 @@ export const timePickerPopperSx = {
 
 export const timePickerPaperSx = {
   backgroundColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#111827' : 'background.default',
+    surfaceColor(theme, '#111827', '#19191A', 'background.default'),
   border: '1px solid',
   borderColor: 'divider',
   borderRadius: '16px',
@@ -614,7 +621,7 @@ export const modalBackdropSx = {
 export const categorySelectSx = {
   color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#000'),
   bgcolor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+    surfaceColor(theme, '#1A1F2B', '#2A2A2C', 'background.default'),
   borderRadius: '12px',
   '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
   '&:hover .MuiOutlinedInput-notchedOutline': {
@@ -632,5 +639,5 @@ export const categorySelectSx = {
 export const durationInputPropsSx = {
   borderRadius: '12px',
   bgcolor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#1A1F2B' : 'background.default',
+    surfaceColor(theme, '#1A1F2B', '#2A2A2C', 'background.default'),
 };

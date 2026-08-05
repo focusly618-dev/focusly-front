@@ -55,6 +55,7 @@ import {
 import { useWorkspaceLibrary } from './hooks/useWorkspaceLibrary.hook';
 import { AllProjectsModal } from './modals/AllProjectsModal';
 import { sileo } from '@/utils';
+import { surfaceColor } from '@/context';
 
 interface WorkspaceLibraryProps {
   onCreate: () => void;
@@ -743,10 +744,12 @@ export const WorkspaceLibrary = ({
                             p: '14px 16px',
                             borderRadius: '8px',
                             border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)'}`,
-                            bgcolor:
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(26, 31, 43, 0.4)'
-                                : '#ffffff',
+                            bgcolor: surfaceColor(
+                              theme,
+                              'rgba(26, 31, 43, 0.4)',
+                              'rgba(36, 36, 37, 0.4)',
+                              '#ffffff',
+                            ),
                             gap: 2,
                           }}
                         >

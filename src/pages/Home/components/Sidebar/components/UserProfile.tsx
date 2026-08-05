@@ -3,6 +3,7 @@ import {
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
 } from '@mui/icons-material';
+import { surfaceColor } from '@/context';
 import { TaskBar } from '../types/Sidebar.types';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 
@@ -35,10 +36,12 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
             : 'rgba(0, 0, 0, 0.06)',
         backgroundColor: {
           xs: 'transparent',
-          lg:
-            theme.palette.mode === 'dark'
-              ? 'rgba(30, 41, 59, 0.3)'
-              : 'rgba(255, 255, 255, 0.7)',
+          lg: surfaceColor(
+            theme,
+            'rgba(30, 41, 59, 0.3)',
+            'rgba(40, 40, 42, 0.3)',
+            'rgba(255, 255, 255, 0.7)',
+          ),
         },
         backdropFilter: { xs: 'none', lg: 'blur(10px)' },
         boxShadow: 'none',
@@ -47,10 +50,12 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
         '&:hover': {
           backgroundColor: {
             xs: 'action.hover',
-            lg:
-              theme.palette.mode === 'dark'
-                ? 'rgba(30, 41, 59, 0.5)'
-                : 'rgba(255, 255, 255, 0.9)',
+            lg: surfaceColor(
+              theme,
+              'rgba(30, 41, 59, 0.5)',
+              'rgba(40, 40, 42, 0.5)',
+              'rgba(255, 255, 255, 0.9)',
+            ),
           },
           borderColor: theme.palette.primary.main,
           transform: 'translateY(-2px)',

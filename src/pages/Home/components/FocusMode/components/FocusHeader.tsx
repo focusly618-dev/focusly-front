@@ -41,9 +41,9 @@ export const FocusHeader: React.FC<FocusHeaderProps> = ({
         )}
         <IconButton
           sx={{
-            color: '#fff',
+            color: theme.palette.text.primary,
             p: 0.5,
-            bgcolor: 'rgba(255,255,255,0.1)',
+            bgcolor: theme.palette.action.hover,
             borderRadius: '8px',
             mr: 1.5,
           }}

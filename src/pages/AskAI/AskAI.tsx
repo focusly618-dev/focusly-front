@@ -11,6 +11,7 @@ import {
   Divider,
   Chip,
 } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import {
   Send as SendIcon,
   Add as AddIcon,
@@ -38,6 +39,7 @@ import {
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
 import { UpgradeModal } from '@/components/modals';
 import { parseLuminaAction, sileo } from '@/utils';
+import { surfaceColor } from '@/context';
 import {
   AskAIContainer,
   ChatScrollArea,
@@ -101,7 +103,7 @@ const suggestions = [
 
 // ─── Markdown Rendering Helper ───────────────────────────────────────────────
 
-const renderMarkdown = (text: string, isDark: boolean) => {
+const renderMarkdown = (text: string, isDark: boolean, theme: Theme) => {
   if (!text) return '';
 
   // 1. Escape HTML
@@ -146,7 +148,12 @@ const renderMarkdown = (text: string, isDark: boolean) => {
         ? 'rgba(255,255,255,0.08)'
         : 'rgba(0,0,0,0.08)';
       const headerBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
-      const rowBg = isDark ? 'rgba(15,23,42,0.15)' : 'rgba(255,255,255,0.95)';
+      const rowBg = surfaceColor(
+        theme,
+        'rgba(15,23,42,0.15)',
+        'rgba(36,36,37,0.15)',
+        'rgba(255,255,255,0.95)',
+      );
       const thColor = isDark ? '#f8fafc' : '#0f172a';
       const tdColor = isDark ? '#e2e8f0' : '#334155';
       const rowBorder = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
@@ -375,7 +382,7 @@ export const AskAI: React.FC = () => {
           id: m.id,
           sender: m.role === 'user' ? 'user' : 'ai',
           text: m.content,
-          html: renderMarkdown(m.content, theme.palette.mode === 'dark'),
+          html: renderMarkdown(m.content, theme.palette.mode === 'dark', theme),
         })),
       );
     } catch (err) {
@@ -552,6 +559,7 @@ export const AskAI: React.FC = () => {
                     html: renderMarkdown(
                       accumulatedText,
                       theme.palette.mode === 'dark',
+                      theme,
                     ),
                   }
                 : msg,
@@ -585,7 +593,7 @@ export const AskAI: React.FC = () => {
       biggestTask,
       activeConversationId,
       conversations,
-      theme.palette.mode,
+      theme,
       selectedModel,
       selectedContext,
     ],
@@ -852,7 +860,11 @@ export const AskAI: React.FC = () => {
                   }
 
                   const cleanHtml = msg.html
-                    ? renderMarkdown(cleanText, theme.palette.mode === 'dark')
+                    ? renderMarkdown(
+                        cleanText,
+                        theme.palette.mode === 'dark',
+                        theme,
+                      )
                     : undefined;
 
                   return (
@@ -1302,7 +1314,7 @@ export const AskAI: React.FC = () => {
                   mb: 1.2,
                   bgcolor: isActive
                     ? (theme) =>
-                        theme.palette.mode === 'dark' ? '#1e293b' : '#ffffff'
+                        surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff')
                     : 'transparent',
                   border: '1px solid transparent',
                   borderColor: isActive
@@ -1315,7 +1327,7 @@ export const AskAI: React.FC = () => {
                   boxShadow: isActive ? '0 4px 20px rgba(0,0,0,0.04)' : 'none',
                   '&:hover': {
                     bgcolor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#1e293b' : '#ffffff',
+                      surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff'),
                     borderColor: (theme) =>
                       theme.palette.mode === 'dark'
                         ? 'rgba(255, 255, 255, 0.05)'

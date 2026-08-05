@@ -1,4 +1,5 @@
 import { Box, Paper, styled, alpha } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -7,7 +8,7 @@ export const PageContainer = styled(Box)(({ theme }) => ({
   padding: '32px',
   height: '100%',
   overflowY: 'auto',
-  backgroundColor: theme.palette.mode === 'dark' ? '#121318' : '#fafbfd',
+  backgroundColor: surfaceColor(theme, '#121318', '#19191A', '#fafbfd'),
   color: theme.palette.text.primary,
 }));
 
@@ -177,7 +178,7 @@ export const HeatmapCell = styled(Box, {
 
   const colors = isDark
     ? {
-        0: '#161b22',
+        0: theme.appMode === 'graydark' ? '#242425' : '#161b22',
         1: '#0e4429',
         2: '#006d32',
         3: '#26a641',

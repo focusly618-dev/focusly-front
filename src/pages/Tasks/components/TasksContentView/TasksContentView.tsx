@@ -35,6 +35,7 @@ import {
 
 import type { TasksContentViewProps } from './TasksContentView.types';
 import { useTasksContentView } from './useTasksContentView.hook';
+import { surfaceColor } from '@/context';
 import {
   FloatingActionBar,
   StatusTabsContainer,
@@ -91,17 +92,17 @@ export const TasksContentView = ({
         sx={
           isListView
             ? {
-              flex: 1,
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              paddingTop: 0,
-              minHeight: 0,
-            }
+                flex: 1,
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                paddingTop: 0,
+                minHeight: 0,
+              }
             : {
-              padding: '16px 24px',
-            }
+                padding: '16px 24px',
+              }
         }
       >
         <TasksSkeletons viewMode={viewMode} />
@@ -159,17 +160,17 @@ export const TasksContentView = ({
       sx={
         isListView
           ? {
-            flex: 1,
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            paddingTop: 0,
-            minHeight: 0,
-          }
+              flex: 1,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              paddingTop: 0,
+              minHeight: 0,
+            }
           : {
-            padding: '16px 24px',
-          }
+              padding: '16px 24px',
+            }
       }
     >
       {viewMode === 'workload' ? (
@@ -425,7 +426,7 @@ export const TasksContentView = ({
             padding: '16px',
             maxWidth: '400px',
             backgroundColor: (theme) =>
-              theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
+              surfaceColor(theme, '#1e2025', '#242425', '#ffffff'),
             boxShadow: '0 24px 48px rgba(0, 0, 0, 0.2)',
           },
         }}

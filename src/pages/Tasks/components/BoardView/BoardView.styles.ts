@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
-import { styled } from '@mui/system';
+import { styled } from '@mui/material/styles';
+import { surfaceColor } from '@/context';
 
 export const BoardContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -61,8 +62,12 @@ export const ColumnTitle = styled(Typography)(({ theme }) => ({
 }));
 
 export const TaskCountBadge = styled(Box)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark' ? '#30363d' : theme.palette.grey[200],
+  backgroundColor: surfaceColor(
+    theme,
+    '#30363d',
+    '#2A2A2C',
+    theme.palette.grey[200],
+  ),
   color: theme.palette.text.secondary,
   borderRadius: '4px',
   padding: '2px 6px',

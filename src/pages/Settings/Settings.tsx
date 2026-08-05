@@ -16,6 +16,9 @@ import {
   PrecisionManufacturing as PrecisionManufacturingIcon,
   NotificationsNone as NotificationsNoneIcon,
   ShieldOutlined as SecurityIcon,
+  PersonOutline as AccountIcon,
+  ExtensionOutlined as IntegrationsIcon,
+  PaletteOutlined as AppearanceIcon,
 } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/redux/store';
@@ -23,6 +26,9 @@ import { NotificationSettings } from './components/NotificationSettings';
 import { FocusEngineSettings } from './components/FocusEngineSettings';
 import { ScheduleSettings } from './components/ScheduleSettings';
 import { SecuritySettings } from './components/SecuritySettings';
+import { AccountSettings } from './components/AccountSettings';
+import { IntegrationsSettings } from './components/IntegrationsSettings';
+import { AppearanceSettings } from './components/AppearanceSettings';
 import { SettingsTab } from './Settings.types';
 
 export const Settings = () => {
@@ -48,6 +54,23 @@ export const Settings = () => {
           title: 'Notification Channels',
           description:
             'Control how and when you receive alerts for focus sessions, breaks, and digests.',
+        };
+      case SettingsTab.Account:
+        return {
+          title: 'Profile Identity',
+          description:
+            'Manage your display name, avatar, and how your account is signed in.',
+        };
+      case SettingsTab.Integrations:
+        return {
+          title: 'Connected Apps',
+          description:
+            'Manage the external accounts Focusly uses to sync your calendar and generate Meet links.',
+        };
+      case SettingsTab.Appearance:
+        return {
+          title: 'Appearance',
+          description: 'Choose how Focusly looks on this device.',
         };
       case SettingsTab.Security:
         return {
@@ -80,6 +103,17 @@ export const Settings = () => {
       id: SettingsTab.Notifications,
       label: 'Notifications',
       icon: <NotificationsNoneIcon />,
+    },
+    { id: SettingsTab.Account, label: 'Account', icon: <AccountIcon /> },
+    {
+      id: SettingsTab.Integrations,
+      label: 'Integrations',
+      icon: <IntegrationsIcon />,
+    },
+    {
+      id: SettingsTab.Appearance,
+      label: 'Appearance',
+      icon: <AppearanceIcon />,
     },
     { id: SettingsTab.Security, label: 'Security', icon: <SecurityIcon /> },
   ];
@@ -160,6 +194,9 @@ export const Settings = () => {
           {activeTab === SettingsTab.Schedule && <ScheduleSettings />}
           {activeTab === SettingsTab.Focus && <FocusEngineSettings />}
           {activeTab === SettingsTab.Notifications && <NotificationSettings />}
+          {activeTab === SettingsTab.Account && <AccountSettings />}
+          {activeTab === SettingsTab.Integrations && <IntegrationsSettings />}
+          {activeTab === SettingsTab.Appearance && <AppearanceSettings />}
           {activeTab === SettingsTab.Security && <SecuritySettings />}
         </Box>
       </ContentArea>

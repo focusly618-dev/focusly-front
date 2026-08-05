@@ -17,6 +17,7 @@ import {
   styled,
 } from '@mui/material';
 import type { Theme } from '@mui/material';
+import { surfaceColor } from '@/context';
 import {
   ExpandMore,
   ExpandLess,
@@ -42,7 +43,7 @@ import type {
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A1F2B' : '#ffffff',
+  backgroundColor: surfaceColor(theme, '#1A1F2B', '#232324', '#ffffff'),
   borderRadius: '30px',
   transition: 'all 0.2s ease-in-out',
   '& .MuiOutlinedInput-root': {

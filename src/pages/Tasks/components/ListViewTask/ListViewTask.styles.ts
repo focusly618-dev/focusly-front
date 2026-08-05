@@ -7,6 +7,7 @@ import {
   linearProgressClasses,
   alpha,
 } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 // Motion-inspired professional design
 export const TaskCard = styled(Box, {
@@ -420,8 +421,12 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
       ? '1px solid rgba(255, 255, 255, 0.08)'
       : '1px solid #e2e8f0',
   borderRadius: '16px',
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(26, 29, 36, 0.95)' : '#ffffff',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(26, 29, 36, 0.95)',
+    'rgba(36, 36, 37, 0.95)',
+    '#ffffff',
+  ),
   overflowX: 'auto',
   overflowY: 'hidden',
   WebkitOverflowScrolling: 'touch',
@@ -438,15 +443,22 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   gridTemplateColumns:
     '55px minmax(150px, 3fr) 100px 117px 123px 80px 125px 95px',
   padding: '6px 40px 6px 24px',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(26, 31, 43, 0.6)'
-      : 'rgba(249, 250, 251, 0.8)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(26, 31, 43, 0.6)',
+    'rgba(36, 36, 37, 0.6)',
+    'rgba(249, 250, 251, 0.8)',
+  ),
   borderBottom:
     theme.palette.mode === 'dark'
       ? '1px solid rgba(255, 255, 255, 0.06)'
       : '1px solid rgba(0, 0, 0, 0.06)',
-  color: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : '#6B7280',
+  color: surfaceColor(
+    theme,
+    'rgba(255, 255, 255, 0.5)',
+    'rgba(255, 255, 255, 0.65)',
+    '#6B7280',
+  ),
   fontWeight: 600,
   fontSize: '11px',
   textTransform: 'uppercase',
@@ -500,10 +512,12 @@ export const TableStatusGroupRow = styled(Box, {
   alignItems: 'center',
   gap: '8px',
   padding: '6px 40px 6px 24px',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(10, 14, 24, 0.95)'
-      : 'rgba(232, 232, 232, 0.62)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(10, 14, 24, 0.95)',
+    'rgba(30, 30, 31, 0.95)',
+    'rgba(232, 232, 232, 0.62)',
+  ),
   borderBottom:
     theme.palette.mode === 'dark'
       ? '1px solid rgba(255, 255, 255, 0.06)'
@@ -518,10 +532,12 @@ export const TableStatusGroupRow = styled(Box, {
   minWidth: '950px',
   boxSizing: 'border-box',
   '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(20, 26, 40, 0.95)'
-        : 'rgba(215, 218, 226, 0.97)',
+    backgroundColor: surfaceColor(
+      theme,
+      'rgba(20, 26, 40, 0.95)',
+      'rgba(40, 40, 41, 0.95)',
+      'rgba(215, 218, 226, 0.97)',
+    ),
   },
 }));
 

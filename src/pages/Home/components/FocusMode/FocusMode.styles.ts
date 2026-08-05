@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import type { Theme } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 // Animations
 export const ripple = keyframes`
@@ -302,10 +303,12 @@ export const AmbientIconButton = styled(IconButton)(({ theme }) => ({
 
 // Mini Mode styles
 export const MiniTimerBox = styled(Box)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? '#000000'
-      : theme.palette.background.default,
+  backgroundColor: surfaceColor(
+    theme,
+    '#000000',
+    '#1F1F20',
+    theme.palette.background.default,
+  ),
   borderRadius: '12px',
   padding: theme.spacing(1.5),
   display: 'flex',

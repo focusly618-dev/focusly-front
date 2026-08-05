@@ -26,8 +26,10 @@ import {
   RadioButtonChecked as TokenIcon,
   AlternateEmail as AtIcon,
 } from '@mui/icons-material';
+import type { Theme } from '@mui/material/styles';
 import { LuminaAnimatedFace, ClaudeIcon, GeminiIcon } from '@/components/ui';
 import { UpgradeModal } from '@/components/modals';
+import { surfaceColor } from '@/context';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { getAIConversations } from '@/api/AI/apiAI';
 import {
@@ -66,7 +68,7 @@ import {
   SendButton,
 } from './ChatAI.styles';
 
-const renderMarkdown = (text: string, isDark: boolean) => {
+const renderMarkdown = (text: string, isDark: boolean, theme: Theme) => {
   if (!text) return '';
 
   // 1. Escape HTML
@@ -108,7 +110,12 @@ const renderMarkdown = (text: string, isDark: boolean) => {
         ? 'rgba(255,255,255,0.08)'
         : 'rgba(0,0,0,0.08)';
       const headerBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
-      const rowBg = isDark ? 'rgba(15,23,42,0.15)' : 'rgba(255,255,255,0.95)';
+      const rowBg = surfaceColor(
+        theme,
+        'rgba(15,23,42,0.15)',
+        'rgba(42,42,44,0.15)',
+        'rgba(255,255,255,0.95)',
+      );
       const thColor = isDark ? '#f8fafc' : '#0f172a';
       const tdColor = isDark ? '#e2e8f0' : '#334155';
       const rowBorder = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
@@ -644,6 +651,7 @@ const ChatAIInner = ({
                         : renderMarkdown(
                             cleanText,
                             theme.palette.mode === 'dark',
+                            theme,
                           ),
                     }}
                   />

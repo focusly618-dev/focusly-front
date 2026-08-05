@@ -1,5 +1,6 @@
 import { styled, Box, InputBase, Button } from '@mui/material';
 import { keyframes } from '@emotion/react';
+import { surfaceColor } from '@/context';
 
 export const WorkspaceContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -164,10 +165,12 @@ export const CommandPaletteContainer = styled(Box)(({ theme }) => ({
   top: '-14px',
   left: '0',
   right: '0',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(15, 23, 42, 0.95)'
-      : 'rgba(255, 255, 255, 0.98)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(15, 23, 42, 0.95)',
+    'rgba(36, 36, 37, 0.95)',
+    'rgba(255, 255, 255, 0.98)',
+  ),
   backdropFilter: 'blur(16px)',
   border:
     theme.palette.mode === 'dark'

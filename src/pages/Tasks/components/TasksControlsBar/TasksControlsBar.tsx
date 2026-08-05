@@ -1,4 +1,5 @@
 import { Typography, Box, Select, MenuItem } from '@mui/material';
+import { surfaceColor } from '@/context';
 import {
   Search as SearchIcon,
   FilterList as FilterListIcon,
@@ -198,7 +199,7 @@ export const TasksControlsBar = ({
             display: 'flex',
             alignItems: 'center',
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? '#1c1f26' : '#eff6ff',
+              surfaceColor(theme, '#1c1f26', '#2a2a2c', '#eff6ff'),
             border: '1px solid',
             borderColor: (theme) =>
               theme.palette.mode === 'dark'

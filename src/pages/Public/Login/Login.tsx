@@ -77,7 +77,7 @@ export const Login: React.FC = () => {
           onClick={colorMode.toggleColorMode}
           className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 shadow-sm rounded-full p-2"
         >
-          {colorMode.mode === 'dark' ? (
+          {colorMode.mode !== 'light' ? (
             <LightModeIcon className="text-amber-400 text-lg" />
           ) : (
             <DarkModeIcon className="text-slate-700 text-lg" />

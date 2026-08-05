@@ -7,6 +7,7 @@ import { Tag } from '../GridViewTask/GridViewTask.styles';
 import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import { memo, useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
+import { surfaceColor } from '@/context';
 
 interface SortableTaskCardProps {
   task: TaskResponse;
@@ -93,9 +94,12 @@ export const SortableTaskCard = memo(
                 ? theme.palette.mode === 'dark'
                   ? 'rgba(99, 102, 241, 0.15)'
                   : 'rgba(59, 130, 246, 0.08)'
-                : theme.palette.mode === 'dark'
-                  ? 'rgba(26, 31, 43, 0.65)'
-                  : theme.palette.background.paper,
+                : surfaceColor(
+                    theme,
+                    'rgba(26, 31, 43, 0.65)',
+                    'rgba(36, 36, 37, 0.65)',
+                    theme.palette.background.paper,
+                  ),
             backdropFilter: (theme) =>
               theme.palette.mode === 'dark' ? 'blur(8px)' : 'none',
             WebkitBackdropFilter: (theme) =>

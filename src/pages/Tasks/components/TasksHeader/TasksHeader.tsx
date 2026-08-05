@@ -23,7 +23,9 @@ export const TasksHeader = ({ children }: TasksHeaderProps) => {
         >
           MANAGE AND PRIORITIZE YOUR WORK
         </Typography>
-        <Title sx={{ fontWeight: 800, fontSize: '28px', color: '#0f172a' }}>
+        <Title
+          sx={{ fontWeight: 800, fontSize: '28px', color: 'text.primary' }}
+        >
           My Tasks
         </Title>
       </Box>

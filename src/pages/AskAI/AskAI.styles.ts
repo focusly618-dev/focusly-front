@@ -6,6 +6,7 @@ import {
   IconButton,
   Button,
 } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 /* ── Layout containers ─────────────────────────────────────────────────────── */
 
@@ -56,10 +57,12 @@ export const MascotWrapper = styled(Box)(({ theme }) => ({
   width: '88px',
   height: '88px',
   borderRadius: '50%',
-  background:
-    theme.palette.mode === 'dark'
-      ? 'radial-gradient(circle at 35% 35%, #1e3a5f 0%, #0d1117 100%)'
-      : 'radial-gradient(circle at 35% 35%, #dbeafe 0%, #eff6ff 100%)',
+  background: surfaceColor(
+    theme,
+    'radial-gradient(circle at 35% 35%, #1e3a5f 0%, #0d1117 100%)',
+    'radial-gradient(circle at 35% 35%, #2A2A2C 0%, #19191A 100%)',
+    'radial-gradient(circle at 35% 35%, #dbeafe 0%, #eff6ff 100%)',
+  ),
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -135,10 +138,12 @@ export const AvatarWrapper = styled(Box)(({ theme }) => ({
   borderRadius: '50%',
   flexShrink: 0,
   overflow: 'hidden',
-  background:
-    theme.palette.mode === 'dark'
-      ? 'linear-gradient(135deg, #0f2d55 0%, #1a1f2e 100%)'
-      : 'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)',
+  background: surfaceColor(
+    theme,
+    'linear-gradient(135deg, #0f2d55 0%, #1a1f2e 100%)',
+    'linear-gradient(135deg, #2A2A2C 0%, #19191A 100%)',
+    'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)',
+  ),
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -296,10 +301,12 @@ export const SendButton = styled(IconButton)<{ active?: boolean }>(
 export const HistorySidebar = styled(Box)(({ theme }) => ({
   width: '260px',
   height: '100%',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(15, 23, 42, 0.6)'
-      : 'rgba(248, 250, 252, 0.8)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(15, 23, 42, 0.6)',
+    'rgba(36, 36, 37, 0.6)',
+    'rgba(248, 250, 252, 0.8)',
+  ),
   borderLeft: `1px solid ${theme.palette.divider}`,
   display: 'flex',
   flexDirection: 'column',
@@ -328,10 +335,12 @@ export const ChatHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   borderBottom: `1px solid ${theme.palette.divider}`,
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(15, 23, 42, 0.4)'
-      : 'rgba(255, 255, 255, 0.4)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(15, 23, 42, 0.4)',
+    'rgba(36, 36, 37, 0.4)',
+    'rgba(255, 255, 255, 0.4)',
+  ),
   backdropFilter: 'blur(10px)',
   zIndex: 10,
 }));

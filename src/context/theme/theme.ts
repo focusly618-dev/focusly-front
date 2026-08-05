@@ -1,11 +1,32 @@
 import { createTheme } from '@mui/material/styles';
+import type { ThemeMode } from './ColorModeContext';
 
-export const getDesignTokens = (mode: 'light' | 'dark') => {
-  const isDark = mode === 'dark';
+declare module '@mui/material/styles' {
+  interface Theme {
+    appMode: ThemeMode;
+  }
+  interface ThemeOptions {
+    appMode?: ThemeMode;
+  }
+}
+
+export const getDesignTokens = (mode: ThemeMode) => {
+  const isDark = mode !== 'light';
+  const isGray = mode === 'graydark';
+
+  // Surface colors: "graydark" swaps the near-black dark surfaces for neutral grays.
+  const surfaceDefault = isGray ? '#19191A' : isDark ? '#0F0F10' : '#FFFFFF';
+  const surfacePaper = isGray ? '#242425' : isDark ? '#202024' : '#FFFFFF';
+  const surfacePaperAlpha = isGray
+    ? 'rgba(36, 36, 37, 0.92)'
+    : 'rgba(32, 32, 36, 0.9)';
+  const surfaceDivider = isGray ? '#333333' : isDark ? '#2D2D30' : '#E5E5E5';
+  const surfaceInputBg = isGray ? '#1F1F20' : '#18181B';
 
   return createTheme({
+    appMode: mode,
     palette: {
-      mode,
+      mode: mode === 'light' ? 'light' : 'dark',
       primary: {
         main: isDark ? '#60A5FA' : '#3B82F6', // Accent
         light: isDark ? '#93C5FD' : '#60A5FA',
@@ -25,15 +46,17 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
         light: 'rgba(245, 158, 11, 0.1)',
       },
       background: {
-        default: isDark ? '#0F0F10' : '#FFFFFF',
-        paper: isDark ? '#202024' : '#FFFFFF', // Cards background
+        default: surfaceDefault,
+        paper: surfacePaper, // Cards background
       },
       text: {
-        primary: isDark ? '#F5F5F5' : '#111111',
-        secondary: isDark ? '#A1A1AA' : '#6B7280',
+        // Gray Dark's lighter surfaces need brighter text to keep the same
+        // contrast punch regular Dark gets from its near-black background.
+        primary: isGray ? '#FFFFFF' : isDark ? '#F5F5F5' : '#111111',
+        secondary: isGray ? '#C4C4C8' : isDark ? '#A1A1AA' : '#6B7280',
         disabled: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
       },
-      divider: isDark ? '#2D2D30' : '#E5E5E5',
+      divider: surfaceDivider,
     },
     typography: {
       fontFamily:
@@ -88,7 +111,7 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
           containedPrimary: {
             boxShadow: 'none',
             background: isDark ? '#60A5FA' : '#3B82F6',
-            color: isDark ? '#0F0F10' : '#ffffff',
+            color: isDark ? surfaceDefault : '#ffffff',
             border: 'none',
             '&:hover': {
               boxShadow: isDark
@@ -104,8 +127,10 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            backgroundColor: isDark ? '#202024' : '#ffffff',
-            border: isDark ? '1px solid #2D2D30' : '1px solid #E5E5E5',
+            backgroundColor: isDark ? surfacePaper : '#ffffff',
+            border: isDark
+              ? `1px solid ${surfaceDivider}`
+              : '1px solid #E5E5E5',
             boxShadow: isDark
               ? 'none'
               : '0 1px 3px rgba(0, 0, 0, 0.01), 0 4px 12px rgba(0, 0, 0, 0.02)',
@@ -115,10 +140,12 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
       MuiDialog: {
         styleOverrides: {
           paper: {
-            backgroundColor: isDark ? 'rgba(32, 32, 36, 0.9)' : undefined,
+            backgroundColor: isDark ? surfacePaperAlpha : undefined,
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            border: isDark ? '1px solid #2D2D30' : '1px solid #E5E5E5',
+            border: isDark
+              ? `1px solid ${surfaceDivider}`
+              : '1px solid #E5E5E5',
             borderRadius: '16px',
             boxShadow: isDark
               ? '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
@@ -131,15 +158,15 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
           root: {
             borderRadius: '8px',
             transition: 'all 0.2s ease-in-out',
-            backgroundColor: isDark ? '#18181B' : undefined, // Surface as background
+            backgroundColor: isDark ? surfaceInputBg : undefined, // Surface as background
             '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: isDark ? '#2D2D30' : '#E5E5E5',
+              borderColor: isDark ? surfaceDivider : '#E5E5E5',
             },
             '&:hover .MuiOutlinedInput-notchedOutline': {
               borderColor: isDark ? '#60A5FA' : '#3B82F6',
             },
             '&.Mui-focused': {
-              backgroundColor: isDark ? '#0F0F10' : undefined,
+              backgroundColor: isDark ? surfaceDefault : undefined,
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: isDark ? '#60A5FA' : '#3B82F6',
                 borderWidth: '1px',
@@ -154,10 +181,12 @@ export const getDesignTokens = (mode: 'light' | 'dark') => {
       MuiMenu: {
         styleOverrides: {
           paper: {
-            backgroundColor: isDark ? 'rgba(32, 32, 36, 0.95)' : undefined,
+            backgroundColor: isDark ? surfacePaperAlpha : undefined,
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            border: isDark ? '1px solid #2D2D30' : '1px solid #E5E5E5',
+            border: isDark
+              ? `1px solid ${surfaceDivider}`
+              : '1px solid #E5E5E5',
             borderRadius: '10px',
             boxShadow: isDark ? '0 10px 20px rgba(0,0,0,0.3)' : undefined,
           },

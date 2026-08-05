@@ -1,7 +1,13 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@heroui/react';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from '@heroui/react';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
-import { Tooltip as MuiTooltip } from '@mui/material';
+import { Tooltip as MuiTooltip, useTheme, type Theme } from '@mui/material';
 import {
   AreaChart,
   Area,
@@ -11,6 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { surfaceColor } from '@/context';
 import type {
   CustomTooltipProps,
   ProductivityTrendsChartProps,
@@ -26,16 +33,32 @@ const formatValue = (value: number) => {
 };
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  const theme = useTheme();
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/95 dark:bg-slate-900/95 p-3 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl backdrop-blur-md">
-        <p className="text-xs font-bold text-slate-900 dark:text-white mb-1.5">
+      <div
+        className="p-3 border rounded-xl shadow-xl backdrop-blur-md"
+        style={{
+          backgroundColor: surfaceColor(
+            theme,
+            'rgba(15, 23, 42, 0.95)',
+            'rgba(36, 36, 37, 0.95)',
+            'rgba(255, 255, 255, 0.95)',
+          ),
+          borderColor: theme.palette.divider,
+        }}
+      >
+        <p
+          className="text-xs font-bold mb-1.5"
+          style={{ color: theme.palette.text.primary }}
+        >
           {label}
         </p>
         {payload.map((item) => (
           <div
             key={item.name}
-            className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"
+            className="flex items-center gap-2 text-xs"
+            style={{ color: theme.palette.text.secondary }}
           >
             <div
               className="w-2 h-2 rounded-full"
@@ -44,7 +67,10 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
             <span className="flex-1">
               {item.name === 'actual' ? 'Tiempo Real' : 'Objetivo'}:
             </span>
-            <span className="font-bold text-slate-900 dark:text-white">
+            <span
+              className="font-bold"
+              style={{ color: theme.palette.text.primary }}
+            >
               {formatValue(item.value)}
             </span>
           </div>
@@ -55,35 +81,63 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   return null;
 };
 
-export const ProductivityTrendsChart: React.FC<ProductivityTrendsChartProps> = ({ data }) => {
+const axisTickColor = (theme: Theme) =>
+  surfaceColor(theme, '#94a3b8', '#9C9CA1', '#94a3b8');
+
+export const ProductivityTrendsChart: React.FC<
+  ProductivityTrendsChartProps
+> = ({ data }) => {
+  const theme = useTheme();
+
   return (
-    <Card className="shadow-sm border border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-6 w-full">
+    <Card
+      className="shadow-sm backdrop-blur-sm rounded-2xl p-6 w-full"
+      style={{
+        border: `1px solid ${theme.palette.divider}`,
+        backgroundColor: theme.palette.background.paper,
+      }}
+    >
       <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between p-0 mb-6 gap-4">
         <div>
           <div className="flex items-center gap-1.5">
-            <CardTitle className="text-lg font-bold text-slate-900 dark:text-white">
+            <CardTitle
+              className="text-lg font-bold"
+              style={{ color: theme.palette.text.primary }}
+            >
               Rendimiento de Enfoque
             </CardTitle>
             <MuiTooltip
               title="Comparamos tu objetivo (estimado) contra el tiempo real registrado."
               arrow
             >
-              <InfoIcon className="text-slate-400 text-sm cursor-help" />
+              <InfoIcon
+                className="text-sm cursor-help"
+                sx={{ color: 'text.disabled' }}
+              />
             </MuiTooltip>
           </div>
-          <CardDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <CardDescription
+            className="text-xs mt-0.5"
+            style={{ color: theme.palette.text.secondary }}
+          >
             Objetivo Estimado vs. Tiempo Real
           </CardDescription>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
+        <div
+          className="flex items-center gap-4 text-xs font-semibold"
+          style={{ color: theme.palette.text.secondary }}
+        >
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
             <span>Tiempo Real</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-700" />
+            <div
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: theme.palette.divider }}
+            />
             <span>Objetivo</span>
           </div>
         </div>
@@ -105,13 +159,17 @@ export const ProductivityTrendsChart: React.FC<ProductivityTrendsChartProps> = (
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                className="stroke-slate-200 dark:stroke-slate-800"
+                stroke={theme.palette.divider}
               />
               <XAxis
                 dataKey="label"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                tick={{
+                  fill: axisTickColor(theme),
+                  fontSize: 11,
+                  fontWeight: 600,
+                }}
                 dy={15}
               />
               <YAxis hide={true} axisLine={false} tickLine={false} />
@@ -128,7 +186,7 @@ export const ProductivityTrendsChart: React.FC<ProductivityTrendsChartProps> = (
               <Area
                 type="monotone"
                 dataKey="planned"
-                stroke="#94a3b8"
+                stroke={axisTickColor(theme)}
                 strokeWidth={2}
                 strokeDasharray="5 5"
                 fill="none"

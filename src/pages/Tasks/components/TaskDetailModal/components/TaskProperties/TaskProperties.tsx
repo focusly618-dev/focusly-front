@@ -37,6 +37,7 @@ import {
 } from '@mui/icons-material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { format } from 'date-fns';
+import { surfaceColor } from '@/context';
 import {
   propertyRowSx,
   propertyLabelSx,
@@ -375,9 +376,12 @@ export const TaskProperties = ({
               ? 'rgba(255, 255, 255, 0.08)'
               : 'rgba(0, 0, 0, 0.08)',
           background: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, rgba(26, 31, 43, 0.4) 0%, rgba(15, 23, 42, 0.3) 100%)'
-              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.5) 100%)',
+            surfaceColor(
+              theme,
+              'linear-gradient(135deg, rgba(26, 31, 43, 0.4) 0%, rgba(15, 23, 42, 0.3) 100%)',
+              'linear-gradient(135deg, rgba(36, 36, 37, 0.4) 0%, rgba(31, 31, 32, 0.3) 100%)',
+              'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.5) 100%)',
+            ),
           backdropFilter: 'blur(12px)',
           boxShadow: (theme) =>
             theme.palette.mode === 'dark'
@@ -441,9 +445,12 @@ export const TaskProperties = ({
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? '#1A1F2B'
-                        : 'background.paper',
+                      surfaceColor(
+                        theme,
+                        '#1A1F2B',
+                        '#1F1F20',
+                        'background.paper',
+                      ),
                     transition: 'all 0.2s',
                     '&:hover': {
                       borderColor: !isOwner ? 'divider' : 'primary.main',
@@ -516,9 +523,12 @@ export const TaskProperties = ({
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? '#1A1F2B'
-                        : 'background.paper',
+                      surfaceColor(
+                        theme,
+                        '#1A1F2B',
+                        '#1F1F20',
+                        'background.paper',
+                      ),
                     transition: 'all 0.2s',
                     '&:hover': {
                       borderColor: !isOwner ? 'divider' : 'primary.main',
@@ -596,9 +606,12 @@ export const TaskProperties = ({
                   border: '1px solid',
                   borderColor: durationInputError ? 'error.main' : 'divider',
                   bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? '#1A1F2B'
-                      : 'background.paper',
+                    surfaceColor(
+                      theme,
+                      '#1A1F2B',
+                      '#1F1F20',
+                      'background.paper',
+                    ),
                   minHeight: '43px',
                 }}
               >
@@ -711,9 +724,12 @@ export const TaskProperties = ({
                   border: '1px solid',
                   borderColor: realTimeInputError ? 'error.main' : 'divider',
                   bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? '#1A1F2B'
-                      : 'background.paper',
+                    surfaceColor(
+                      theme,
+                      '#1A1F2B',
+                      '#1F1F20',
+                      'background.paper',
+                    ),
                   minHeight: '43px',
                 }}
               >
