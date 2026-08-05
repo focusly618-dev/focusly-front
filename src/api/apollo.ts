@@ -9,20 +9,12 @@ import { onError } from '@apollo/client/link/error';
 import { store } from '@/redux/store';
 import { logout } from '@/redux/auth/auth.slice';
 import { API_BASE_URL } from '@/config/env.config';
-import axios from 'axios';
+import { refreshAuthToken } from './authRefresh';
 
 const httpLink = createHttpLink({
   uri: `${API_BASE_URL}/graphql`,
   credentials: 'include',
 });
-
-let isRefreshing = false;
-let pendingRequests: (() => void)[] = [];
-
-const resolvePendingRequests = () => {
-  pendingRequests.forEach((callback) => callback());
-  pendingRequests = [];
-};
 
 const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
@@ -48,29 +40,18 @@ const errorLink = onError(
         return;
       }
 
-      if (!isRefreshing) {
-        isRefreshing = true;
-        axios
-          .post(
-            `${API_BASE_URL}/auth/refresh`,
-            { userId: user.id },
-            { withCredentials: true },
-          )
-          .then(() => {
-            isRefreshing = false;
-            resolvePendingRequests();
-          })
-          .catch(() => {
-            isRefreshing = false;
-            pendingRequests = [];
-            store.dispatch(logout('expired'));
-          });
-      }
-
+      // Shared with axiosInstance.ts: whichever layer (REST or GraphQL)
+      // hits the 401 first owns the single in-flight refresh call; the
+      // other just awaits the same promise instead of racing its own.
       return new Observable((observer) => {
-        pendingRequests.push(() => {
-          forward(operation).subscribe(observer);
-        });
+        refreshAuthToken(user.id)
+          .then(() => {
+            forward(operation).subscribe(observer);
+          })
+          .catch((refreshError) => {
+            store.dispatch(logout('expired'));
+            observer.error(refreshError);
+          });
       });
     }
   },
