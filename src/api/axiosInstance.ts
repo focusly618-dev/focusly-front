@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/env.config';
+import { refreshAuthToken, isAuthEndpoint } from './authRefresh';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -14,12 +15,12 @@ let isRefreshing = false;
 let failedQueue: any[] = [];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: any) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve(token);
+      prom.resolve();
     }
   });
   failedQueue = [];
@@ -30,7 +31,17 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint(originalRequest?.url)
+    ) {
+      // Marked before the queue check below so a request that ends up
+      // waiting behind an in-flight refresh is just as "already tried" as
+      // the one that triggered it — otherwise a second 401 on the same
+      // request re-enters this branch and opens a redundant refresh cycle.
+      originalRequest._retry = true;
+
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -39,7 +50,6 @@ axiosInstance.interceptors.response.use(
           .catch((err) => Promise.reject(err));
       }
 
-      originalRequest._retry = true;
       isRefreshing = true;
 
       // Lazy load store and actions to prevent circular dependencies at bundle startup
@@ -49,16 +59,15 @@ axiosInstance.interceptors.response.use(
       const user = store.getState().auth.user;
 
       if (!user) {
+        isRefreshing = false;
         store.dispatch(logout('expired'));
         return Promise.reject(error);
       }
 
       try {
-        await axios.post(
-          `${API_BASE_URL}/auth/refresh`,
-          { userId: user.id },
-          { withCredentials: true },
-        );
+        // Shared with apollo.ts: whichever layer (REST or GraphQL) hits the
+        // 401 first owns the single in-flight refresh call.
+        await refreshAuthToken(user.id);
         processQueue(null);
         return axiosInstance(originalRequest);
       } catch (refreshError) {
