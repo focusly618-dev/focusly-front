@@ -62,6 +62,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.11.0",
     "recharts": "^3.7.0",
+    "shiki": "^3",
     "socket.io-client": "^4.8.3",
     "sweetalert2": "^11.26.24",
     "temporal-polyfill": "^0.3.0",

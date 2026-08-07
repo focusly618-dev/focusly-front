@@ -6,16 +6,80 @@ import {
   type PartialBlock,
   BlockNoteEditor,
 } from '@blocknote/core';
+import { createCodeBlockSpec } from '@blocknote/core/blocks';
 import { useCreateBlockNote } from '@blocknote/react';
+import { createHighlighter as createShikiHighlighter } from 'shiki';
 import { compressImageToDataUrl } from '@/utils';
 import type {
   TaskSearchItems,
   WorkspaceFormData,
 } from '../../../types/workspace.types';
 
+// Languages selectable from the dropdown that appears on every code block.
+// Typing ` ```js ` (etc.) at the start of a line also auto-selects the
+// matching language via its alias.
+export const CODE_BLOCK_LANGUAGES: Record<
+  string,
+  { name: string; aliases?: string[] }
+> = {
+  text: { name: 'Plain Text', aliases: ['plaintext', 'txt'] },
+  markdown: { name: 'Markdown', aliases: ['md'] },
+  javascript: { name: 'JavaScript', aliases: ['js'] },
+  typescript: { name: 'TypeScript', aliases: ['ts'] },
+  jsx: { name: 'JSX' },
+  tsx: { name: 'TSX' },
+  python: { name: 'Python', aliases: ['py'] },
+  java: { name: 'Java' },
+  csharp: { name: 'C#', aliases: ['cs', 'c#'] },
+  cpp: { name: 'C++', aliases: ['c++'] },
+  c: { name: 'C' },
+  go: { name: 'Go', aliases: ['golang'] },
+  rust: { name: 'Rust', aliases: ['rs'] },
+  php: { name: 'PHP' },
+  ruby: { name: 'Ruby', aliases: ['rb'] },
+  swift: { name: 'Swift' },
+  kotlin: { name: 'Kotlin', aliases: ['kt'] },
+  sql: { name: 'SQL' },
+  bash: { name: 'Bash', aliases: ['sh', 'shell'] },
+  json: { name: 'JSON' },
+  yaml: { name: 'YAML', aliases: ['yml'] },
+  html: { name: 'HTML' },
+  css: { name: 'CSS' },
+};
+
 const schema = BlockNoteSchema.create({
   blockSpecs: {
     ...defaultBlockSpecs,
+    codeBlock: createCodeBlockSpec({
+      defaultLanguage: 'text',
+      supportedLanguages: CODE_BLOCK_LANGUAGES,
+      // Lazy: only fetched the first time a code block is actually rendered.
+      // BlockNote always calls `codeToTokens` with a single, fixed `theme`
+      // (picked once and cached for the whole session), so a plain
+      // `themes: ['x']` highlighter can't react to the app's light/dark
+      // toggle. Instead we wrap the highlighter to always request Shiki's
+      // dual-theme output (CSS variables per token) so the actual color is
+      // resolved live in CSS via the `[data-mantine-color-scheme]` attribute
+      // BlockNoteView already sets — see the `.shiki` rules in
+      // WorkspaceEditor.styles.ts.
+      createHighlighter: async () => {
+        const highlighter = await createShikiHighlighter({
+          themes: ['github-light', 'github-dark'],
+          langs: Object.keys(CODE_BLOCK_LANGUAGES).filter((l) => l !== 'text'),
+        });
+
+        return Object.assign(Object.create(highlighter), {
+          codeToTokens: (code: string, options: { lang?: string }) =>
+            highlighter.codeToTokens(code, {
+              lang: options?.lang as Parameters<
+                typeof highlighter.codeToTokens
+              >[1]['lang'],
+              themes: { light: 'github-light', dark: 'github-dark' },
+              defaultColor: false,
+            }),
+        });
+      },
+    }),
   },
 });
 

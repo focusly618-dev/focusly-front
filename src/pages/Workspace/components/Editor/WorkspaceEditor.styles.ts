@@ -449,6 +449,37 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
     maxWidth: '100%',
     overflowWrap: 'break-word',
   },
+  // BlockNote bakes a native <select> language-picker into every code
+  // block's own render() (inside createCodeBlockSpec, not something we can
+  // swap via its public options). CodeBlockLanguageMenu.tsx renders a
+  // custom, app-styled replacement instead, so the native one is hidden
+  // here. This MUST stay a static stylesheet rule — never a runtime
+  // `el.style.x =` / `setAttribute` write — because this <div>/<select>
+  // pair sits outside the codeBlock nodeView's `contentDOM` (the <code>
+  // element); per prosemirror-view's mutation observer, any JS-driven
+  // mutation out there (childList or attributes) marks the whole node
+  // dirty and can force an unwanted nodeView rebuild. A CSS rule produces
+  // no MutationRecord at all, so it's the only safe way to hide it.
+  '& .bn-block-content[data-content-type=codeBlock] > div': {
+    display: 'none',
+  },
+  // Reserve room for CodeBlockLanguageMenu.tsx's floating trigger button,
+  // docked to the bottom-right of the block, so it never overlaps the
+  // last line of code. More specific than the generic `& pre` rule above
+  // (attribute selector beats plain type selector), so only this block's
+  // bottom padding is affected.
+  '& .bn-block-content[data-content-type=codeBlock] pre': {
+    paddingBottom: '44px',
+  },
+  // Syntax highlighting colors: Shiki emits both a light and a dark color as
+  // CSS variables per token (see useWorkspaceEditor.hook.ts), we just pick
+  // which one applies based on the color scheme BlockNoteView is rendered in.
+  '& .shiki': {
+    color: 'var(--shiki-light)',
+  },
+  '& [data-mantine-color-scheme="dark"] .shiki': {
+    color: 'var(--shiki-dark)',
+  },
   // Custom Workspace Mention styles
   '& a[href*="workspaceId"]': {
     backgroundColor:

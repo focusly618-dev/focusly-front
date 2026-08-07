@@ -23,6 +23,14 @@ export const calendarSlice = createSlice({
     addEvent: (state, action: PayloadAction<CalendarEvent>) => {
       state.reduxEvents.push(action.payload);
     },
+    updateEvent: (state, action: PayloadAction<CalendarEvent>) => {
+      const index = state.reduxEvents.findIndex(
+        (e) => e.id === action.payload.id,
+      );
+      if (index !== -1) {
+        state.reduxEvents[index] = action.payload;
+      }
+    },
     removeEvent: (state, action: PayloadAction<{ id: string }>) => {
       state.reduxEvents = state.reduxEvents.filter(
         (e) => e.id !== action.payload.id,
@@ -34,7 +42,12 @@ export const calendarSlice = createSlice({
   },
 });
 
-export const { setEvents, addEvent, removeEvent, incrementSyncVersion } =
-  calendarSlice.actions;
+export const {
+  setEvents,
+  addEvent,
+  updateEvent,
+  removeEvent,
+  incrementSyncVersion,
+} = calendarSlice.actions;
 
 export default calendarSlice.reducer;

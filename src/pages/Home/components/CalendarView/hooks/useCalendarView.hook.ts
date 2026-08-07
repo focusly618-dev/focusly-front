@@ -1,46 +1,53 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { Views, type View } from 'react-big-calendar';
+import {
+  deleteGoogleEvent,
+  fetchGoogleEvents,
+  updateGoogleEvent,
+} from '@/api/GoogleCalendar/googleCalendarApi';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import {
+  getBaseGoogleId,
+  mapResponseToTask,
+  normalizeGoogleId,
+  safeISO,
+} from '@/api/Tasks/taskMapper';
+import {
+  DELETE_TASK,
+  GET_TASKS,
+  UPDATE_TASK,
+} from '@/pages/Tasks/Tasks.graphql';
+import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
+import {
+  incrementSyncVersion,
+  removeEvent,
+  setEvents,
+  updateEvent,
+} from '@/redux/calendar/calendar.slice';
+import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
+import type { RootState } from '@/redux/store';
+import { removeTask, setTasks, updateTask } from '@/redux/tasks/task.slice';
+import type { Task } from '@/redux/tasks/task.types';
+import { sileo } from '@/utils';
+import { useMutation, useQuery } from '@apollo/client';
 import {
   addDays,
   addMonths,
   addWeeks,
+  endOfDay,
+  endOfMonth,
+  format,
+  isSameDay,
+  startOfDay,
+  startOfMonth,
   subDays,
   subMonths,
   subWeeks,
-  startOfMonth,
-  endOfMonth,
-  startOfDay,
-  endOfDay,
-  format,
-  isSameDay,
 } from 'date-fns';
-import { sileo } from '@/utils';
-import type { RootState } from '@/redux/store';
-import type { Task } from '@/redux/tasks/task.types';
-import { setTasks, removeTask, updateTask } from '@/redux/tasks/task.slice';
-import { removeEvent, setEvents } from '@/redux/calendar/calendar.slice';
-import {
-  fetchGoogleEvents,
-  deleteGoogleEvent,
-} from '@/api/GoogleCalendar/googleCalendarApi';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
+import { useEffect, useMemo, useState } from 'react';
+import { Views, type View } from 'react-big-calendar';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import type { ICalendarEvent } from '../../CalendarEvent';
-import {
-  GET_TASKS,
-  DELETE_TASK,
-  UPDATE_TASK,
-} from '@/pages/Tasks/Tasks.graphql';
-import { useQuery, useMutation } from '@apollo/client';
-import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { CalendarNavigateAction } from '../calendarView.types';
-import {
-  mapResponseToTask,
-  normalizeGoogleId,
-  getBaseGoogleId,
-  safeISO,
-} from '@/api/Tasks/taskMapper';
 
 export const useCalendarView = () => {
   const dispatch = useDispatch();
@@ -210,6 +217,24 @@ export const useCalendarView = () => {
     dateRange.end,
     syncVersion,
   ]);
+
+  // Fallback polling: the WebSocket/webhook push from Google can silently fail to
+  // arrive (e.g. an unreachable webhook URL), so this re-triggers the fetch above
+  // on a timer as a safety net while the calendar is open, independent of it.
+  useEffect(() => {
+    if (user?.authProvider !== 'google' || !user?.id) {
+      return;
+    }
+
+    const GOOGLE_CALENDAR_POLL_INTERVAL_MS = 60_000;
+    const intervalId = setInterval(() => {
+      dispatch(incrementSyncVersion());
+    }, GOOGLE_CALENDAR_POLL_INTERVAL_MS);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [dispatch, user?.id, user?.authProvider]);
 
   const hasRenderableCalendarData =
     reduxEvents.length > 0 ||
@@ -652,6 +677,51 @@ export const useCalendarView = () => {
       return;
     }
 
+    if (event.type === 'event') {
+      // Virtual Google Calendar event: not yet a Focusly task, so there's no
+      // row to PATCH via updateTaskMutation. Reschedule it directly against
+      // Google, the same way handleDeleteTask already does for delete.
+      const originalEvent = event.resource as GoogleCalendarEvent;
+      if (originalEvent?.is_owner === false) {
+        sileo.error({
+          title: 'Action not allowed',
+          description: "You can't move the task because you are not the owner",
+          duration: 3000,
+        });
+        return;
+      }
+
+      const googleEventId = originalEvent?.google_event_id || event.id;
+
+      dispatch(
+        updateEvent({
+          ...originalEvent,
+          estimated_start_date: startDate.toISOString(),
+          deadline: endDate.toISOString(),
+        }),
+      );
+
+      try {
+        await updateGoogleEvent(googleEventId, {
+          start: { dateTime: startDate.toISOString() },
+          end: { dateTime: endDate.toISOString() },
+        });
+
+        sileo.success({
+          title: 'Task rescheduled!',
+          description: `New time: ${format(startDate, 'hh:mm a')}`,
+          duration: 3000,
+        });
+      } catch (err) {
+        console.error('Error dropping google event:', err);
+        if (originalEvent) {
+          dispatch(updateEvent(originalEvent));
+        }
+        sileo.error({ title: 'Error rescheduling task' });
+      }
+      return;
+    }
+
     if (event.type !== 'task') return;
 
     const originalTask = tasks.find((t) => t.id === event.id);
@@ -731,6 +801,45 @@ export const useCalendarView = () => {
           e.id === event.id ? { ...e, start: startDate, end: endDate } : e,
         ),
       );
+      return;
+    }
+
+    if (event.type === 'event') {
+      // Virtual Google Calendar event: not yet a Focusly task, so there's no
+      // row to PATCH via updateTaskMutation. Reschedule it directly against
+      // Google, the same way handleDeleteTask already does for delete.
+      const originalEvent = event.resource as GoogleCalendarEvent;
+      if (originalEvent?.is_owner === false) {
+        sileo.error({
+          title: 'Action not allowed',
+          description: "You can't move the task because you are not the owner",
+          duration: 3000,
+        });
+        return;
+      }
+
+      const googleEventId = originalEvent?.google_event_id || event.id;
+
+      dispatch(
+        updateEvent({
+          ...originalEvent,
+          estimated_start_date: startDate.toISOString(),
+          deadline: endDate.toISOString(),
+        }),
+      );
+
+      try {
+        await updateGoogleEvent(googleEventId, {
+          start: { dateTime: startDate.toISOString() },
+          end: { dateTime: endDate.toISOString() },
+        });
+      } catch (err) {
+        console.error('Error resizing google event:', err);
+        if (originalEvent) {
+          dispatch(updateEvent(originalEvent));
+        }
+        sileo.error({ title: 'Error rescheduling task' });
+      }
       return;
     }
 

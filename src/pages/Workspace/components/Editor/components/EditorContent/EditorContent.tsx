@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import type { BlockNoteEditor } from '@blocknote/core';
 import { useEditorContent } from './useEditorContent.hook';
+import { CodeBlockLanguageMenu } from './CodeBlockLanguageMenu';
 import {
   Box,
   Typography,
@@ -102,6 +103,7 @@ export const EditorContent = ({
 }: EditorContentProps) => {
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
+  const blockNoteWrapperRef = useRef<HTMLDivElement>(null);
 
   const {
     menuAnchor,
@@ -497,6 +499,7 @@ export const EditorContent = ({
 
         <BlockNoteWrapper
           id="joyride-editor-area"
+          ref={blockNoteWrapperRef}
           onContextMenu={handleContextMenu}
           style={{ position: 'relative' }}
         >
@@ -592,6 +595,11 @@ export const EditorContent = ({
               </Box>
             </Box>
           )}
+
+          <CodeBlockLanguageMenu
+            editor={editor}
+            containerRef={blockNoteWrapperRef}
+          />
         </BlockNoteWrapper>
       </Box>
 
