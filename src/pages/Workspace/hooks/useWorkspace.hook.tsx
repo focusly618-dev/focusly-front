@@ -4,7 +4,6 @@ import { useSearchParams } from 'react-router-dom';
 import type { Step } from 'react-joyride';
 import { Folder as FolderIcon } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
-import { BlockNoteEditor } from '@blocknote/core';
 
 import { useAppSelector } from '@/redux/hooks';
 import {
@@ -15,7 +14,10 @@ import {
 import { useWorkspaceForm } from './useWorkspaceForm.hook';
 import { useWorkspaceTasks } from './useWorkspaceTasks.hook';
 import { useWorkspaceActions } from './useWorkspaceActions.hook';
-import type { WorkspaceTypes } from '../types/workspace.types';
+import type {
+  AnyBlockNoteEditor,
+  WorkspaceTypes,
+} from '../types/workspace.types';
 
 interface UseWorkspaceProps {
   isEditorOpen?: boolean;
@@ -277,7 +279,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     onEditorChange(true);
   };
 
-  const getWorkspaceMentionMenuItems = (editor: BlockNoteEditor) => {
+  const getWorkspaceMentionMenuItems = (editor: AnyBlockNoteEditor) => {
     if (!workspacesData?.workspaces) return [];
 
     const currentId = watch('id');

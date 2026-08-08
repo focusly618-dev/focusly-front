@@ -9,7 +9,8 @@ export default defineConfig(({ mode }) => {
   // El tercer parámetro '' carga todas las variables sin importar el prefijo VITE_
   const env = loadEnv(mode, process.cwd(), '');
 
-  const BACKEND_TARGET = env.VITE_API_URL || 'http://localhost:3000';
+  const BACKEND_TARGET =
+    env.VITE_BACKEND_TARGET || env.VITE_API_URL || 'http://localhost:8000';
   const IS_SECURE = BACKEND_TARGET.startsWith('https');
 
   return {
@@ -47,6 +48,12 @@ export default defineConfig(({ mode }) => {
         '/ai': {
           target: BACKEND_TARGET,
           changeOrigin: true,
+          secure: IS_SECURE,
+        },
+        '/socket.io': {
+          target: BACKEND_TARGET,
+          changeOrigin: true,
+          ws: true,
           secure: IS_SECURE,
         },
       },

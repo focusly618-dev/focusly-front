@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import type { BlockNoteEditor } from '@blocknote/core';
+import type { AnyBlockNoteEditor } from '@/pages/Workspace/types/workspace.types';
 import { useEditorContent } from './useEditorContent.hook';
 import { CodeBlockLanguageMenu } from './CodeBlockLanguageMenu';
 import {
@@ -74,12 +74,12 @@ interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
   currentTitle: string;
   setTitle: (t: string) => void;
-  editor: BlockNoteEditor;
+  editor: AnyBlockNoteEditor;
   onContentChange: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getCustomSlashMenuItems: (editor: BlockNoteEditor) => any[];
+  getCustomSlashMenuItems: (editor: AnyBlockNoteEditor) => any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getWorkspaceMentionMenuItems: (editor: BlockNoteEditor) => any[];
+  getWorkspaceMentionMenuItems: (editor: AnyBlockNoteEditor) => any[];
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
   targetLanguage?: string;

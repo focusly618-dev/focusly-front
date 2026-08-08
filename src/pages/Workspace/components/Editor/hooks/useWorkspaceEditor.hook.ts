@@ -10,6 +10,7 @@ import { createCodeBlockSpec } from '@blocknote/core/blocks';
 import { useCreateBlockNote } from '@blocknote/react';
 import { createHighlighter as createShikiHighlighter } from 'shiki';
 import { compressImageToDataUrl } from '@/utils';
+import { DatabaseTableBlock } from '../blocks/DatabaseTable/DatabaseTableBlock';
 import type {
   TaskSearchItems,
   WorkspaceFormData,
@@ -80,6 +81,7 @@ const schema = BlockNoteSchema.create({
         });
       },
     }),
+    databaseTable: DatabaseTableBlock(),
   },
 });
 

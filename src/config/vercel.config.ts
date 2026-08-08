@@ -7,4 +7,7 @@
 export const IS_VERCEL_API = import.meta.env.VITE_USE_VERCEL_API === 'true';
 
 export const VERCEL_API_URL = import.meta.env.VITE_API_URL || '';
-export const LOCAL_API_URL = 'http://localhost:3000';
+export const LOCAL_API_URL =
+  import.meta.env.VITE_BACKEND_TARGET ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:8000';

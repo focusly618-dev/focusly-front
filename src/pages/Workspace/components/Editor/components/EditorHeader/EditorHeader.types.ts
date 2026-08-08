@@ -1,5 +1,7 @@
-import type { TaskSearchItems } from '@/pages/Workspace/types/workspace.types';
-import type { BlockNoteEditor } from '@blocknote/core';
+import type {
+  AnyBlockNoteEditor,
+  TaskSearchItems,
+} from '@/pages/Workspace/types/workspace.types';
 
 export interface SpeechRecognitionEvent {
   resultIndex: number;
@@ -43,7 +45,7 @@ export interface EditorHeaderProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (field: any, value: any) => void;
   saveState?: 'idle' | 'saving' | 'saved';
-  editor?: BlockNoteEditor;
+  editor?: AnyBlockNoteEditor;
   sourceLanguage: string;
   setSourceLanguage: (lang: string) => void;
   targetLanguage: string;

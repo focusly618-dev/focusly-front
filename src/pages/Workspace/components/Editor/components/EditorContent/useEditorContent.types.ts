@@ -1,12 +1,14 @@
 import type { UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import type { WorkspaceFormData } from '@/pages/Workspace/types/workspace.types';
-import type { BlockNoteEditor } from '@blocknote/core';
+import type {
+  AnyBlockNoteEditor,
+  WorkspaceFormData,
+} from '@/pages/Workspace/types/workspace.types';
 import type { HeaderColor } from '@/utils';
 
 export interface UseEditorContentProps {
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
-  editor: BlockNoteEditor;
+  editor: AnyBlockNoteEditor;
 }
 
 export interface UseEditorContentReturn {

@@ -6,7 +6,10 @@ import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import { CREATE_PROJECT_GROUP } from './Workspace.graphql';
 import { CreateProjectModal } from './components/Library/modals/CreateProjectModal';
 import { sileo } from '@/utils';
-import type { WorkspaceProps } from './types/workspace.types';
+import type {
+  AnyBlockNoteEditor,
+  WorkspaceProps,
+} from './types/workspace.types';
 
 const WorkspaceEditor = lazy(() =>
   import('./components/Editor/WorkspaceEditor').then((m) => ({
@@ -15,14 +18,15 @@ const WorkspaceEditor = lazy(() =>
 );
 import { WorkspaceEditorSkeleton } from './components/WorkspaceEditorSkeleton';
 import { Box } from '@mui/material';
-import { BlockNoteEditor } from '@blocknote/core';
 import { getDefaultReactSlashMenuItems } from '@blocknote/react';
 import {
   InfoOutlined as InfoIcon,
   CalendarTodayOutlined as CalendarIcon,
   SpeedOutlined as SpeedIcon,
+  TableChartOutlined as DatabaseTableIcon,
 } from '@mui/icons-material';
 import { WorkspaceEmptyState } from '@/components/ui/WorkspaceEmptyState';
+import { createDefaultDatabaseTableData } from './components/Editor/blocks/DatabaseTable/DatabaseTable.utils';
 
 export const Workspace = ({
   isEditorOpen,
@@ -88,7 +92,7 @@ export const Workspace = ({
     loadMore,
   } = useWorkspace({ isEditorOpen, onEditorChange });
 
-  const getCustomSlashMenuItems = (editor: BlockNoteEditor) => {
+  const getCustomSlashMenuItems = (editor: AnyBlockNoteEditor) => {
     const defaultItems = getDefaultReactSlashMenuItems(editor);
     const filtered = defaultItems.filter(
       (item) => item.title !== 'Audio' && item.title !== 'File',
@@ -113,6 +117,37 @@ export const Workspace = ({
         groupName: 'Advanced',
         icon: <InfoIcon sx={{ color: 'info.main', fontSize: 18 }} />,
         subtext: 'Insert a highlighted note or alert box',
+      },
+      {
+        title: 'Database Table',
+        onItemClick: () => {
+          const data = createDefaultDatabaseTableData();
+          editor.insertBlocks(
+            [
+              {
+                type: 'databaseTable',
+                props: { data: JSON.stringify(data) },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any,
+            ],
+            editor.getTextCursorPosition().block,
+            'after',
+          );
+        },
+        aliases: [
+          'database',
+          'db',
+          'status',
+          'notion',
+          'table pro',
+          'calculate',
+        ],
+        groupName: 'Advanced',
+        icon: (
+          <DatabaseTableIcon sx={{ color: 'secondary.main', fontSize: 18 }} />
+        ),
+        subtext:
+          'A Notion-style table with status tags and column calculations',
       },
       {
         title: 'Meeting Notes template',

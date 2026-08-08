@@ -95,17 +95,41 @@ export const CodeBlockLanguageMenu = ({
       next.push({
         id,
         language,
-        top: rect.bottom - containerRect.top,
-        left: rect.left - containerRect.left,
-        width: rect.width,
+        top: Math.round(rect.bottom - containerRect.top),
+        left: Math.round(rect.left - containerRect.left),
+        width: Math.round(rect.width),
       });
     });
 
-    setBlocks(next);
+    setBlocks((prev) => {
+      if (
+        prev.length === next.length &&
+        prev.every(
+          (b, i) =>
+            b.id === next[i].id &&
+            b.language === next[i].language &&
+            Math.abs(b.top - next[i].top) < 2 &&
+            Math.abs(b.left - next[i].left) < 2 &&
+            Math.abs(b.width - next[i].width) < 2,
+        )
+      ) {
+        return prev;
+      }
+      return next;
+    });
   }, [editor, containerRef]);
 
   useEffect(() => {
     let teardown: Array<() => void> = [];
+    let rafId: number | null = null;
+
+    const throttledRecompute = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        recompute();
+      });
+    };
 
     const setup = () => {
       const editorRoot = editor.domElement;
@@ -116,24 +140,26 @@ export const CodeBlockLanguageMenu = ({
 
       // Structural changes: new/removed code blocks, language auto-set by
       // the ```lang input rule, undo/redo, etc.
-      const unsubscribeChange = editor.onChange(() => recompute());
+      const unsubscribeChange = editor.onChange(() => throttledRecompute());
 
       // Any size change (typing wraps a line, sidebar collapses, window
       // resize). Read-only observation only — no DOM writes.
-      const resizeObserver = new ResizeObserver(() => recompute());
+      const resizeObserver = new ResizeObserver(() => throttledRecompute());
       resizeObserver.observe(container);
 
-      const handleWindowChange = () => recompute();
-      window.addEventListener('resize', handleWindowChange);
+      window.addEventListener('resize', throttledRecompute);
       // `scroll` doesn't bubble, but a capture-phase listener on `window`
       // still receives it from any nested scroll container.
-      window.addEventListener('scroll', handleWindowChange, true);
+      window.addEventListener('scroll', throttledRecompute, true);
 
       teardown = [
         unsubscribeChange,
         () => resizeObserver.disconnect(),
-        () => window.removeEventListener('resize', handleWindowChange),
-        () => window.removeEventListener('scroll', handleWindowChange, true),
+        () => window.removeEventListener('resize', throttledRecompute),
+        () => window.removeEventListener('scroll', throttledRecompute, true),
+        () => {
+          if (rafId !== null) cancelAnimationFrame(rafId);
+        },
       ];
     };
 

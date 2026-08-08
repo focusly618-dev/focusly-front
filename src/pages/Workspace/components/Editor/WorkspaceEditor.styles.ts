@@ -26,8 +26,6 @@ export const MainEditorArea = styled(Box)(({ theme }) => ({
   overflowY: 'auto',
   overflowX: 'hidden',
   overflowAnchor: 'none',
-  overscrollBehaviorY: 'contain',
-  scrollBehavior: 'smooth',
   // Custom scrollbar
   '&::-webkit-scrollbar': {
     width: '8px',
