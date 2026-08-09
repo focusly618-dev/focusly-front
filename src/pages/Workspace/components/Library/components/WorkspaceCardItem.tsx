@@ -1,21 +1,10 @@
 import { createElement } from 'react';
-import {
-  Box,
-  Typography,
-  IconButton,
-  useTheme,
-  alpha,
-  lighten,
-} from '@mui/material';
-import {
-  MoreVert as MoreVertIcon,
-  Link as LinkIcon,
-} from '@mui/icons-material';
+import { Box, Typography, useTheme, alpha, lighten } from '@mui/material';
+import { Link as LinkIcon } from '@mui/icons-material';
 import { format } from 'date-fns';
 import {
   WorkspaceCard,
   CardAvatarCircle,
-  BadgeChip,
   PropertyGrid,
   PropertyItem,
   PropertyLabel,
@@ -97,9 +86,7 @@ const getSnippet = (contentStr?: string): string => {
 export const WorkspaceCardItem = ({
   workspace,
   onSelect,
-  onMenuOpen,
   onUnlinkTask,
-  groupName,
   groupColor,
   compact,
 }: WorkspaceCardItemProps) => {
@@ -117,10 +104,8 @@ export const WorkspaceCardItem = ({
     workspace.background_color !== 'none';
 
   const isDark = theme.palette.mode === 'dark';
-  const folderName = groupName || 'All Notes';
   const baseColor = groupColor || theme.palette.primary.main;
   const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
-  const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
 
   const snippet = getSnippet(workspace.content);
 
@@ -207,54 +192,6 @@ export const WorkspaceCardItem = ({
             )
           )}
         </CardAvatarCircle>
-
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <BadgeChip
-            color={visibleColor}
-            bgColor={badgeBgColor}
-            sx={{
-              borderRadius: '20px',
-              px: 1.5,
-              py: 0.4,
-              fontSize: '11px',
-              fontWeight: 600,
-              border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'}`,
-              ...(isBackgroundActive && {
-                bgcolor: isLightBg
-                  ? 'rgba(0, 0, 0, 0.08)'
-                  : 'rgba(255, 255, 255, 0.15)',
-                color: isLightBg ? 'rgba(0, 0, 0, 0.8)' : '#fff',
-                borderColor: 'transparent',
-              }),
-            }}
-          >
-            {folderName}
-          </BadgeChip>
-
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              onMenuOpen(e, workspace);
-            }}
-            sx={{
-              color: isBackgroundActive
-                ? isLightBg
-                  ? '#000'
-                  : '#fff'
-                : 'text.secondary',
-              '&:hover': {
-                backgroundColor: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(0,0,0,0.05)'
-                    : 'rgba(255,255,255,0.1)'
-                  : 'action.hover',
-              },
-            }}
-          >
-            <MoreVertIcon fontSize="small" />
-          </IconButton>
-        </Box>
       </Box>
 
       {/* Middle Section: Workspace Title and Snippet Description */}
@@ -324,32 +261,6 @@ export const WorkspaceCardItem = ({
             mt: 1.5,
           }}
         >
-          <PropertyItem>
-            <PropertyLabel
-              sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(0, 0, 0, 0.5)'
-                    : 'rgba(255, 255, 255, 0.5)'
-                  : 'text.secondary',
-              }}
-            >
-              Project
-            </PropertyLabel>
-            <PropertyValue
-              sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? '#000'
-                    : '#fff'
-                  : 'text.primary',
-                fontWeight: 700,
-              }}
-            >
-              {folderName}
-            </PropertyValue>
-          </PropertyItem>
-
           <PropertyItem>
             <PropertyLabel
               sx={{
