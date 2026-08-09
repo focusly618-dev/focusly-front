@@ -1,3 +1,4 @@
+import type { HeadingItem } from '../markdownHeadings';
 import type { GraphEdge, GraphNode } from '../NoteGraphView.types';
 
 export const SETTINGS_STORAGE_KEY = 'workspace_graph_settings';
