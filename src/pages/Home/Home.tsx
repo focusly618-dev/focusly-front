@@ -46,7 +46,6 @@ export const Home = () => {
     setIsFocusModeActive,
     activeFocusTask,
     handleStartFocus,
-    handleOpenTaskDetails,
     taskDetailsTask,
     isEditModalOpen,
     closeTaskDetails,
@@ -81,7 +80,6 @@ export const Home = () => {
               isEditorOpen={isWorkspaceEditorOpen}
               onEditorChange={setIsWorkspaceEditorOpen}
               onStartFocus={handleStartFocus}
-              onOpenTaskDetails={handleOpenTaskDetails}
               isSidebarOpen={isWorkspaceSidebarOpen}
               onSidebarChange={setIsWorkspaceSidebarOpen}
               activeFocusTaskId={isFocusModeActive ? activeFocusTask?.id : null}

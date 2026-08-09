@@ -1,4 +1,6 @@
+import type { RefObject } from 'react';
 import type { TaskSearchItems } from '@/pages/Workspace/types/workspace.types';
+import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 
 export interface EditorSidebarProps {
   isRightSidebarOpen: boolean;
@@ -8,9 +10,10 @@ export interface EditorSidebarProps {
     taskId: string,
     updates: Partial<TaskSearchItems>,
   ) => Promise<void>;
-  onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   onStartFocus?: (task: TaskSearchItems) => void;
   activeFocusTaskId?: string | null;
   onUnlinkTask?: () => void;
   setShowPalette?: (b: boolean | ((prev: boolean) => boolean)) => void;
+  markdownContent?: string;
+  markdownEditorRef?: RefObject<MarkdownEditorRef | null>;
 }

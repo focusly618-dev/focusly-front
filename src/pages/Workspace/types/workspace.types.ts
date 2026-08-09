@@ -4,15 +4,6 @@ import type {
   UseFormSetValue,
   UseFormWatch,
 } from 'react-hook-form';
-import type { BlockNoteEditor } from '@blocknote/core';
-
-// The editor's real type is parameterized with our custom block schema
-// (see useWorkspaceEditor.hook.ts), but most consumers only need "an editor
-// instance" and don't care which blocks are registered — fully opting out of
-// the generics here avoids fighting BlockNote's schema-inference machinery
-// at every prop boundary.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyBlockNoteEditor = BlockNoteEditor<any, any, any>;
 
 export interface ProjectGroupTypes {
   id: string;
@@ -85,15 +76,10 @@ export interface WorkspaceEditorProps {
   ) => Promise<void>;
   tasksData: { tasks: TaskSearchItems[]; hasMore?: boolean } | undefined;
   onStartFocus?: (task?: TaskSearchItems | null) => void;
-  onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   isRightSidebarOpen: boolean;
   setIsRightSidebarOpen: (isOpen: boolean) => void;
   saveState?: 'idle' | 'saving' | 'saved';
   workspaces?: WorkspaceTypes[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getCustomSlashMenuItems: (editor: AnyBlockNoteEditor) => any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getWorkspaceMentionMenuItems: (editor: AnyBlockNoteEditor) => any[];
   activeFocusTaskId?: string | null;
   onUnlinkTask?: () => void;
   loadMore: () => Promise<void>;
@@ -103,7 +89,6 @@ export interface WorkspaceProps {
   isEditorOpen: boolean;
   onEditorChange: (isOpen: boolean) => void;
   onStartFocus?: (task?: TaskSearchItems | null) => void;
-  onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   isSidebarOpen: boolean;
   onSidebarChange: (isOpen: boolean) => void;
   activeFocusTaskId?: string | null;
