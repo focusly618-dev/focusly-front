@@ -71,6 +71,7 @@ export const Workspace = ({
     workspacesData,
     workspacesLoading,
     hasWorkspaces,
+    isCreatingNew,
     handleSelectWorkspace,
     handleCreateNew,
     searchParams,
@@ -84,7 +85,9 @@ export const Workspace = ({
     setValue('taskId', null);
   };
 
-  if (workspacesLoading) return null;
+  const isInitialLoading =
+    workspacesLoading && !workspacesData && !isEditorOpen;
+  if (isInitialLoading) return null;
 
   return (
     <Box
@@ -112,7 +115,11 @@ export const Workspace = ({
           >
             <Suspense fallback={<WorkspaceEditorSkeleton />}>
               <WorkspaceEditor
-                key={watch('id') || 'new-workspace'}
+                key={
+                  isCreatingNew
+                    ? 'new-workspace'
+                    : watch('id') || 'workspace-editor'
+                }
                 onBack={() => {
                   onEditorChange(false);
                   const newParams = new URLSearchParams(searchParams);

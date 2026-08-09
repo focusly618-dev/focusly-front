@@ -22,20 +22,12 @@ export const useWorkspaceActions = () => {
       await client.mutate({
         mutation: REMOVE_WORKSPACE,
         variables: { id },
+        refetchQueries: ['GetWorkspacesPaginated', 'GetWorkspaces'],
         update(cache) {
-          cache.modify({
-            fields: {
-              workspaces(existingWorkspaces = [], { readField }) {
-                return existingWorkspaces.filter(
-                  (workspaceRef: import('@apollo/client').Reference) =>
-                    id !== readField('id', workspaceRef),
-                );
-              },
-              totalWorkspaces(existingTotal = 0) {
-                return Math.max(0, existingTotal - 1);
-              },
-            },
-          });
+          cache.evict({ id: cache.identify({ __typename: 'Workspace', id }) });
+          cache.evict({ fieldName: 'workspacesPaginated' });
+          cache.evict({ fieldName: 'workspaces' });
+          cache.gc();
         },
       });
       sileo.success({

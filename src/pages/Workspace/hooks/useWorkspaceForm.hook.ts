@@ -2,19 +2,30 @@ import { useCallback, useMemo, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm, useWatch } from 'react-hook-form';
 import debounce from 'lodash.debounce';
-import {
-  GET_WORKSPACES,
-  CREATE_WORKSPACE,
-  UPDATE_WORKSPACE,
-} from '../Workspace.graphql';
+import { CREATE_WORKSPACE, UPDATE_WORKSPACE } from '../Workspace.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
 
 export const useWorkspaceForm = () => {
   const [createWorkspace] = useMutation(CREATE_WORKSPACE, {
-    refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
+    refetchQueries: [
+      'GetWorkspacesPaginated',
+      'GetWorkspaces',
+      'GetProjectGroups',
+    ],
+    update(cache) {
+      cache.evict({ fieldName: 'workspacesPaginated' });
+      cache.evict({ fieldName: 'workspaces' });
+      cache.gc();
+    },
   });
-  const [updateWorkspace] = useMutation(UPDATE_WORKSPACE);
+  const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
+    refetchQueries: ['GetWorkspacesPaginated', 'GetWorkspaces'],
+    update(cache) {
+      cache.evict({ fieldName: 'workspacesPaginated' });
+      cache.evict({ fieldName: 'workspaces' });
+    },
+  });
 
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>(
     'idle',

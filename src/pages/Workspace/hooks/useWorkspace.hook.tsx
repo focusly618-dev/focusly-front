@@ -114,7 +114,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     GET_WORKSPACES,
     {
       variables: { search: '' },
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'cache-and-network',
       nextFetchPolicy: 'cache-first',
     },
   );

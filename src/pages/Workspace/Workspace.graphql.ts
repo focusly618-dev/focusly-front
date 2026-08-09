@@ -43,6 +43,14 @@ export const CREATE_WORKSPACE = gql`
   mutation CreateWorkspace($createWorkspaceInput: CreateWorkspaceInput!) {
     createWorkspace(createWorkspaceInput: $createWorkspaceInput) {
       id
+      title
+      content
+      emoji
+      background_color
+      card_show_background
+      createdAt
+      updatedAt
+      projectId
     }
   }
 `;
@@ -51,6 +59,14 @@ export const UPDATE_WORKSPACE = gql`
   mutation UpdateWorkspace($updateWorkspaceInput: UpdateWorkspaceInput!) {
     updateWorkspace(updateWorkspaceInput: $updateWorkspaceInput) {
       id
+      title
+      content
+      emoji
+      background_color
+      card_show_background
+      createdAt
+      updatedAt
+      projectId
     }
   }
 `;
