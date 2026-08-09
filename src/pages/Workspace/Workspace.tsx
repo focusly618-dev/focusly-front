@@ -6,10 +6,7 @@ import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import { CREATE_PROJECT_GROUP } from './Workspace.graphql';
 import { CreateProjectModal } from './components/Library/modals/CreateProjectModal';
 import { sileo } from '@/utils';
-import type {
-  AnyBlockNoteEditor,
-  WorkspaceProps,
-} from './types/workspace.types';
+import type { WorkspaceProps } from './types/workspace.types';
 
 const WorkspaceEditor = lazy(() =>
   import('./components/Editor/WorkspaceEditor').then((m) => ({
@@ -18,21 +15,12 @@ const WorkspaceEditor = lazy(() =>
 );
 import { WorkspaceEditorSkeleton } from './components/WorkspaceEditorSkeleton';
 import { Box } from '@mui/material';
-import { getDefaultReactSlashMenuItems } from '@blocknote/react';
-import {
-  InfoOutlined as InfoIcon,
-  CalendarTodayOutlined as CalendarIcon,
-  SpeedOutlined as SpeedIcon,
-  TableChartOutlined as DatabaseTableIcon,
-} from '@mui/icons-material';
 import { WorkspaceEmptyState } from '@/components/ui/WorkspaceEmptyState';
-import { createDefaultDatabaseTableData } from './components/Editor/blocks/DatabaseTable/DatabaseTable.utils';
 
 export const Workspace = ({
   isEditorOpen,
   onEditorChange,
   onStartFocus,
-  onOpenTaskDetails,
   isSidebarOpen,
   onSidebarChange,
   activeFocusTaskId,
@@ -85,159 +73,11 @@ export const Workspace = ({
     hasWorkspaces,
     handleSelectWorkspace,
     handleCreateNew,
-    getWorkspaceMentionMenuItems,
     searchParams,
     setSearchParams,
     selectedGroupId,
     loadMore,
   } = useWorkspace({ isEditorOpen, onEditorChange });
-
-  const getCustomSlashMenuItems = (editor: AnyBlockNoteEditor) => {
-    const defaultItems = getDefaultReactSlashMenuItems(editor);
-    const filtered = defaultItems.filter(
-      (item) => item.title !== 'Audio' && item.title !== 'File',
-    );
-
-    const customItems = [
-      {
-        title: 'Callout block',
-        onItemClick: () => {
-          editor.insertBlocks(
-            [
-              {
-                type: 'paragraph',
-                content: '⚠️ Callout: Write something important here...',
-              },
-            ],
-            editor.getTextCursorPosition().block,
-            'after',
-          );
-        },
-        aliases: ['alert', 'warning', 'info', 'note'],
-        groupName: 'Advanced',
-        icon: <InfoIcon sx={{ color: 'info.main', fontSize: 18 }} />,
-        subtext: 'Insert a highlighted note or alert box',
-      },
-      {
-        title: 'Database Table',
-        onItemClick: () => {
-          const data = createDefaultDatabaseTableData();
-          editor.insertBlocks(
-            [
-              {
-                type: 'databaseTable',
-                props: { data: JSON.stringify(data) },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              } as any,
-            ],
-            editor.getTextCursorPosition().block,
-            'after',
-          );
-        },
-        aliases: [
-          'database',
-          'db',
-          'status',
-          'notion',
-          'table pro',
-          'calculate',
-        ],
-        groupName: 'Advanced',
-        icon: (
-          <DatabaseTableIcon sx={{ color: 'secondary.main', fontSize: 18 }} />
-        ),
-        subtext:
-          'A Notion-style table with status tags and column calculations',
-      },
-      {
-        title: 'Meeting Notes template',
-        onItemClick: () => {
-          editor.insertBlocks(
-            [
-              {
-                type: 'heading',
-                content:
-                  '📅 Meeting Notes - ' + new Date().toLocaleDateString(),
-                props: { level: 2 },
-              },
-              {
-                type: 'paragraph',
-                content: '**Attendees:** [List participants]',
-              },
-              {
-                type: 'heading',
-                content: '🎯 Objectives',
-                props: { level: 3 },
-              },
-              {
-                type: 'bulletListItem',
-                content: 'Discuss project milestones',
-              },
-              {
-                type: 'bulletListItem',
-                content: 'Align on next design iterations',
-              },
-              {
-                type: 'heading',
-                content: '✅ Action Items',
-                props: { level: 3 },
-              },
-              {
-                type: 'checkListItem',
-                content: 'Create high-fidelity mockups',
-              },
-            ],
-            editor.getTextCursorPosition().block,
-            'after',
-          );
-        },
-        aliases: ['template', 'meeting', 'agenda'],
-        groupName: 'Templates',
-        icon: <CalendarIcon sx={{ color: 'primary.main', fontSize: 18 }} />,
-        subtext: 'Insert a pre-structured meeting outline',
-      },
-      {
-        title: 'Sprint Plan template',
-        onItemClick: () => {
-          editor.insertBlocks(
-            [
-              {
-                type: 'heading',
-                content: '🚀 Sprint Planning',
-                props: { level: 2 },
-              },
-              {
-                type: 'paragraph',
-                content:
-                  '**Sprint Goals:** Deliver the core features & design refinements.',
-              },
-              {
-                type: 'heading',
-                content: '📋 Backlog Items',
-                props: { level: 3 },
-              },
-              {
-                type: 'checkListItem',
-                content: 'Build auto-save status indicator in workspace editor',
-              },
-              {
-                type: 'checkListItem',
-                content: 'Enable image and video blocks inside documents',
-              },
-            ],
-            editor.getTextCursorPosition().block,
-            'after',
-          );
-        },
-        aliases: ['sprint', 'scrum', 'agile'],
-        groupName: 'Templates',
-        icon: <SpeedIcon sx={{ color: 'success.main', fontSize: 18 }} />,
-        subtext: 'Insert a detailed sprint planning layout',
-      },
-    ];
-
-    return [...filtered, ...customItems];
-  };
 
   const handleUnlinkTask = (): void => {
     handleSelectTask(null);
@@ -289,12 +129,9 @@ export const Workspace = ({
                 handleUpdateTask={handleUpdateTask}
                 tasksData={tasksData}
                 onStartFocus={onStartFocus}
-                onOpenTaskDetails={onOpenTaskDetails}
                 isRightSidebarOpen={isSidebarOpen}
                 setIsRightSidebarOpen={onSidebarChange}
                 workspaces={workspacesData?.workspaces}
-                getCustomSlashMenuItems={getCustomSlashMenuItems}
-                getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
                 activeFocusTaskId={activeFocusTaskId}
                 onUnlinkTask={handleUnlinkTask}
                 saveState={saveState}

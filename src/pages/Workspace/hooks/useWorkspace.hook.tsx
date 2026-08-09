@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router-dom';
 import type { Step } from 'react-joyride';
-import { Folder as FolderIcon } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 
 import { useAppSelector } from '@/redux/hooks';
@@ -14,10 +13,7 @@ import {
 import { useWorkspaceForm } from './useWorkspaceForm.hook';
 import { useWorkspaceTasks } from './useWorkspaceTasks.hook';
 import { useWorkspaceActions } from './useWorkspaceActions.hook';
-import type {
-  AnyBlockNoteEditor,
-  WorkspaceTypes,
-} from '../types/workspace.types';
+import type { WorkspaceTypes } from '../types/workspace.types';
 
 interface UseWorkspaceProps {
   isEditorOpen?: boolean;
@@ -279,38 +275,6 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     onEditorChange(true);
   };
 
-  const getWorkspaceMentionMenuItems = (editor: AnyBlockNoteEditor) => {
-    if (!workspacesData?.workspaces) return [];
-
-    const currentId = watch('id');
-    const otherWorkspaces = workspacesData.workspaces.filter(
-      (w: WorkspaceTypes) => w.id !== currentId,
-    );
-
-    return otherWorkspaces.map((w: WorkspaceTypes) => ({
-      title: w.title,
-      icon: (
-        <FolderIcon
-          sx={{ fontSize: 18, color: w.project?.color || 'primary.main' }}
-        />
-      ),
-      onItemClick: () => {
-        editor.insertInlineContent([
-          {
-            type: 'link',
-            href: `/dashboard?tab=Workspace&workspaceId=${w.id}`,
-            content: `@${w.title}`,
-          },
-          {
-            type: 'text',
-            text: ' ',
-            styles: {},
-          },
-        ]);
-      },
-    }));
-  };
-
   return {
     // Onboarding
     runOnboarding,
@@ -351,7 +315,6 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     isCreatingNew,
     handleSelectWorkspace,
     handleCreateNew,
-    getWorkspaceMentionMenuItems,
 
     // URL Parameters
     searchParams,

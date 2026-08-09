@@ -1,94 +1,38 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { UseFormWatch } from 'react-hook-form';
-import {
-  BlockNoteSchema,
-  defaultBlockSpecs,
-  type PartialBlock,
-  BlockNoteEditor,
-} from '@blocknote/core';
-import { createCodeBlockSpec } from '@blocknote/core/blocks';
-import { useCreateBlockNote } from '@blocknote/react';
-import { createHighlighter as createShikiHighlighter } from 'shiki';
-import { compressImageToDataUrl } from '@/utils';
-import { DatabaseTableBlock } from '../blocks/DatabaseTable/DatabaseTableBlock';
+import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
 import type {
   TaskSearchItems,
   WorkspaceFormData,
 } from '../../../types/workspace.types';
-
-// Languages selectable from the dropdown that appears on every code block.
-// Typing ` ```js ` (etc.) at the start of a line also auto-selects the
-// matching language via its alias.
-export const CODE_BLOCK_LANGUAGES: Record<
-  string,
-  { name: string; aliases?: string[] }
-> = {
-  text: { name: 'Plain Text', aliases: ['plaintext', 'txt'] },
-  markdown: { name: 'Markdown', aliases: ['md'] },
-  javascript: { name: 'JavaScript', aliases: ['js'] },
-  typescript: { name: 'TypeScript', aliases: ['ts'] },
-  jsx: { name: 'JSX' },
-  tsx: { name: 'TSX' },
-  python: { name: 'Python', aliases: ['py'] },
-  java: { name: 'Java' },
-  csharp: { name: 'C#', aliases: ['cs', 'c#'] },
-  cpp: { name: 'C++', aliases: ['c++'] },
-  c: { name: 'C' },
-  go: { name: 'Go', aliases: ['golang'] },
-  rust: { name: 'Rust', aliases: ['rs'] },
-  php: { name: 'PHP' },
-  ruby: { name: 'Ruby', aliases: ['rb'] },
-  swift: { name: 'Swift' },
-  kotlin: { name: 'Kotlin', aliases: ['kt'] },
-  sql: { name: 'SQL' },
-  bash: { name: 'Bash', aliases: ['sh', 'shell'] },
-  json: { name: 'JSON' },
-  yaml: { name: 'YAML', aliases: ['yml'] },
-  html: { name: 'HTML' },
-  css: { name: 'CSS' },
-};
-
-const schema = BlockNoteSchema.create({
-  blockSpecs: {
-    ...defaultBlockSpecs,
-    codeBlock: createCodeBlockSpec({
-      defaultLanguage: 'text',
-      supportedLanguages: CODE_BLOCK_LANGUAGES,
-      // Lazy: only fetched the first time a code block is actually rendered.
-      // BlockNote always calls `codeToTokens` with a single, fixed `theme`
-      // (picked once and cached for the whole session), so a plain
-      // `themes: ['x']` highlighter can't react to the app's light/dark
-      // toggle. Instead we wrap the highlighter to always request Shiki's
-      // dual-theme output (CSS variables per token) so the actual color is
-      // resolved live in CSS via the `[data-mantine-color-scheme]` attribute
-      // BlockNoteView already sets — see the `.shiki` rules in
-      // WorkspaceEditor.styles.ts.
-      createHighlighter: async () => {
-        const highlighter = await createShikiHighlighter({
-          themes: ['github-light', 'github-dark'],
-          langs: Object.keys(CODE_BLOCK_LANGUAGES).filter((l) => l !== 'text'),
-        });
-
-        return Object.assign(Object.create(highlighter), {
-          codeToTokens: (code: string, options: { lang?: string }) =>
-            highlighter.codeToTokens(code, {
-              lang: options?.lang as Parameters<
-                typeof highlighter.codeToTokens
-              >[1]['lang'],
-              themes: { light: 'github-light', dark: 'github-dark' },
-              defaultColor: false,
-            }),
-        });
-      },
-    }),
-    databaseTable: DatabaseTableBlock(),
-  },
-});
+import type { MarkdownEditorRef } from '../codemirror/MarkdownEditor.types';
 
 export interface UseWorkspaceEditorProps {
   watch: UseFormWatch<WorkspaceFormData>;
   tasksData: { tasks: TaskSearchItems[] } | undefined;
 }
+
+// Notes created before the CodeMirror migration have BlockNote block-JSON in
+// `content`. This throwaway, schema-default editor instance exists only to
+// convert that legacy JSON to markdown once on load — it is never rendered
+// or edited. (The custom "Database Table" block never shipped to real users
+// before being removed in the same pass that introduced this migration, so
+// the default schema — paragraphs/headings/lists/code/tables/images — covers
+// every note that actually exists.)
+const convertLegacyBlocksToMarkdown = (raw: string): string | null => {
+  const trimmed = raw.trim();
+  if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) return null;
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    const migrationEditor = BlockNoteEditor.create();
+    return migrationEditor.blocksToMarkdownLossy(parsed as PartialBlock[]);
+  } catch (error) {
+    console.error('Failed to migrate legacy workspace content:', error);
+    return null;
+  }
+};
 
 export const useWorkspaceEditor = ({
   watch,
@@ -130,79 +74,30 @@ export const useWorkspaceEditor = ({
       return task.title.toLowerCase().includes(lowerSearch);
     });
   }, [tasksData, searchTerm]);
-  const initialContent = useMemo(() => {
-    if (!currentContent) return undefined;
 
-    const trimmed = currentContent.trim();
-    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-      try {
-        const parsed = JSON.parse(trimmed);
-        return Array.isArray(parsed) && parsed.length > 0
-          ? (parsed as PartialBlock[])
-          : undefined;
-      } catch (error) {
-        console.error('Failed to parse workspace content as JSON:', error);
-      }
-    }
-
-    // Fallback: Parse raw Markdown/plain text content using BlockNote's native markdown parser
-    try {
-      const tempEditor = BlockNoteEditor.create({ schema });
-      const blocks = tempEditor.tryParseMarkdownToBlocks(currentContent);
-      return (blocks.length > 0 ? blocks : undefined) as PartialBlock[];
-    } catch (e) {
-      console.error(
-        'Failed to parse content using tryParseMarkdownToBlocks:',
-        e,
-      );
-      return undefined;
-    }
+  // Read once on mount (and whenever a *different* workspace is loaded) —
+  // MarkdownEditor treats this as its uncontrolled `initialValue`, it does
+  // not get synced back in on every keystroke.
+  const initialMarkdown = useMemo(() => {
+    if (!currentContent) return '';
+    return convertLegacyBlocksToMarkdown(currentContent) ?? currentContent;
   }, [currentContent]);
 
-  const editor = useCreateBlockNote({
-    schema,
-    initialContent: initialContent || [
-      {
-        type: 'paragraph',
-        content: 'Welcome to your new workspace! Type / for commands...',
-      },
-    ],
-    uploadFile: async (file: File) => {
-      // Compress the image before storing it as base64.
-      // • WebP output: ~60-80 % smaller than the raw PNG/JPEG base64.
-      // • Max side: 1920 px (full-HD) — sufficient for any editor display.
-      // • Quality: 0.82 — visually lossless at screen resolution.
-      // • GIF / SVG are passed through unchanged (Canvas can't re-encode them).
-      return compressImageToDataUrl(file, { maxSidePx: 1920, quality: 0.82 });
-    },
-  });
+  const markdownEditorRef = useRef<MarkdownEditorRef>(null);
 
   useEffect(() => {
-    if (!editor) return;
-
     const handleInsert = (e: Event) => {
       const customEvent = e as CustomEvent<{ text: string }>;
       const textToInsert = customEvent.detail?.text;
       if (!textToInsert) return;
-
-      try {
-        const blocks = editor.tryParseMarkdownToBlocks(textToInsert);
-        // Insert at the end of the document
-        const lastBlock = editor.document[editor.document.length - 1];
-        editor.insertBlocks(blocks, lastBlock, 'after');
-      } catch (err) {
-        console.error(
-          'Lumina failed to insert blocks into BlockNote editor:',
-          err,
-        );
-      }
+      markdownEditorRef.current?.insertAtEnd(textToInsert);
     };
 
     window.addEventListener('lumina-insert-content', handleInsert);
     return () => {
       window.removeEventListener('lumina-insert-content', handleInsert);
     };
-  }, [editor]);
+  }, []);
 
   const onboardingSteps = [
     {
@@ -213,7 +108,7 @@ export const useWorkspaceEditor = ({
     {
       target: '#joyride-editor-area',
       content:
-        'Welcome to the smart editor! Type "@" to link other workspaces, or type "/" to bring up formatting options and blocks.',
+        'Welcome to the smart editor! Write in plain Markdown — **bold**, # headings, - lists, and > quotes all render as you type.',
     },
     {
       target: '#joyride-editor-metadata',
@@ -240,7 +135,8 @@ export const useWorkspaceEditor = ({
 
     filteredTasks,
 
-    editor,
+    initialMarkdown,
+    markdownEditorRef,
 
     onboardingSteps,
 

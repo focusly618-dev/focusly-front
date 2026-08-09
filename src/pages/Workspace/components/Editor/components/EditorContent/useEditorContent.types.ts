@@ -1,14 +1,13 @@
+import type { RefObject } from 'react';
 import type { UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import type {
-  AnyBlockNoteEditor,
-  WorkspaceFormData,
-} from '@/pages/Workspace/types/workspace.types';
+import type { WorkspaceFormData } from '@/pages/Workspace/types/workspace.types';
 import type { HeaderColor } from '@/utils';
+import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 
 export interface UseEditorContentProps {
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
-  editor: AnyBlockNoteEditor;
+  markdownEditorRef: RefObject<MarkdownEditorRef | null>;
 }
 
 export interface UseEditorContentReturn {

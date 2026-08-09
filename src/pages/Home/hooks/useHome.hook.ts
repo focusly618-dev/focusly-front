@@ -117,9 +117,20 @@ export const useHome = () => {
     mode: 'view' | 'edit' = 'edit',
   ) => {
     setTempTask(task);
-    const params: Record<string, string> = { tab: activeTab, taskId: task.id };
-    if (mode === 'view') params.view = 'full';
-    setSearchParams(params);
+    // Merge into the existing params (never replace wholesale) — this can be
+    // opened from inside a workspace note, and blowing away `workspaceId`
+    // here closes the editor out from under the user (see
+    // useWorkspace.hook.tsx's effect that falls back to the library list
+    // once `workspaceId` disappears from the URL).
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tab', activeTab);
+    newParams.set('taskId', task.id);
+    if (mode === 'view') {
+      newParams.set('view', 'full');
+    } else {
+      newParams.delete('view');
+    }
+    setSearchParams(newParams);
   };
 
   const closeTaskDetails = () => {

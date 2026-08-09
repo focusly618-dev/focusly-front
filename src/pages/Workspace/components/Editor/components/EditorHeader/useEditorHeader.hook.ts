@@ -9,7 +9,7 @@ import type {
 
 export const useEditorHeader = (props: EditorHeaderProps) => {
   const {
-    editor,
+    markdownEditorRef,
     sourceLanguage,
     setSourceLanguage,
     targetLanguage,
@@ -66,9 +66,7 @@ export const useEditorHeader = (props: EditorHeaderProps) => {
     }
 
     if (interimTranscript) {
-      if (editor) {
-        editor.focus();
-      }
+      markdownEditorRef?.current?.focus();
 
       const selection = window.getSelection();
       if (selection) {
@@ -87,10 +85,8 @@ export const useEditorHeader = (props: EditorHeaderProps) => {
       }
     }
 
-    if (finalTranscript && editor) {
-      if (editor) {
-        editor.focus();
-      }
+    if (finalTranscript) {
+      markdownEditorRef?.current?.focus();
 
       const selection = window.getSelection();
       if (selection) {
@@ -145,9 +141,7 @@ export const useEditorHeader = (props: EditorHeaderProps) => {
       return;
     }
 
-    if (editor) {
-      editor.focus();
-    }
+    markdownEditorRef?.current?.focus();
 
     const rec = new SpeechRecognitionAPI();
     rec.lang = getSpeechLanguageCode();
@@ -219,9 +213,7 @@ export const useEditorHeader = (props: EditorHeaderProps) => {
           else if (lang === 'it') speechLang = 'it-IT';
           else if (lang === 'pt') speechLang = 'pt-PT';
 
-          if (editor) {
-            editor.focus();
-          }
+          markdownEditorRef?.current?.focus();
 
           rec.lang = speechLang;
           rec.continuous = true;

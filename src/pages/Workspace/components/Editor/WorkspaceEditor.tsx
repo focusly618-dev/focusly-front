@@ -8,9 +8,6 @@ import { EditorSidebar } from './components/EditorSidebar/EditorSidebar';
 
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 
-import '@blocknote/core/fonts/inter.css';
-import '@blocknote/mantine/style.css';
-
 import { useWorkspaceEditor } from './hooks/useWorkspaceEditor.hook';
 
 export const WorkspaceEditor = ({
@@ -22,11 +19,8 @@ export const WorkspaceEditor = ({
   handleUpdateTask,
   tasksData,
   onStartFocus,
-  onOpenTaskDetails,
   isRightSidebarOpen,
   setIsRightSidebarOpen,
-  getCustomSlashMenuItems,
-  getWorkspaceMentionMenuItems,
   activeFocusTaskId,
   onUnlinkTask,
   saveState,
@@ -47,6 +41,7 @@ export const WorkspaceEditor = ({
 
   const {
     currentTitle,
+    currentContent,
     currentFolder,
 
     showPalette,
@@ -57,7 +52,8 @@ export const WorkspaceEditor = ({
 
     filteredTasks,
 
-    editor,
+    initialMarkdown,
+    markdownEditorRef,
 
     onboardingSteps,
     runOnboarding,
@@ -84,7 +80,7 @@ export const WorkspaceEditor = ({
             saveState={saveState}
             loadMore={loadMore}
             hasMore={tasksData?.hasMore}
-            editor={editor}
+            markdownEditorRef={markdownEditorRef}
             sourceLanguage={sourceLanguage}
             setSourceLanguage={setSourceLanguage}
             targetLanguage={targetLanguage}
@@ -99,12 +95,9 @@ export const WorkspaceEditor = ({
             currentFolder={currentFolder}
             currentTitle={currentTitle}
             setTitle={(title) => setValue('title', title)}
-            editor={editor}
-            onContentChange={() => {
-              setValue('content', JSON.stringify(editor.document));
-            }}
-            getCustomSlashMenuItems={getCustomSlashMenuItems}
-            getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
+            initialMarkdown={initialMarkdown}
+            markdownEditorRef={markdownEditorRef}
+            onChange={(markdown) => setValue('content', markdown)}
             setValue={setValue}
             watch={watch}
             targetLanguage={targetLanguage}
@@ -118,11 +111,12 @@ export const WorkspaceEditor = ({
           setIsRightSidebarOpen={setIsRightSidebarOpen}
           selectTask={selectTask}
           handleUpdateTask={handleUpdateTask}
-          onOpenTaskDetails={onOpenTaskDetails}
           onStartFocus={onStartFocus}
           activeFocusTaskId={activeFocusTaskId}
           onUnlinkTask={onUnlinkTask}
           setShowPalette={setShowPalette}
+          markdownContent={currentContent}
+          markdownEditorRef={markdownEditorRef}
         />
       </EditorContainer>
 

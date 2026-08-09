@@ -1,7 +1,5 @@
 import React, { useRef } from 'react';
-import type { AnyBlockNoteEditor } from '@/pages/Workspace/types/workspace.types';
 import { useEditorContent } from './useEditorContent.hook';
-import { CodeBlockLanguageMenu } from './CodeBlockLanguageMenu';
 import {
   Box,
   Typography,
@@ -57,29 +55,26 @@ import {
   ViewSidebar as FocusModeIcon,
   ViewStream as DefaultModeIcon,
 } from '@mui/icons-material';
-import { BlockNoteView } from '@blocknote/mantine';
-import { SuggestionMenuController } from '@blocknote/react';
 import type { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { WorkspaceFormData } from '../../../../../../pages/Workspace/types/workspace.types';
 import {
   EditorContent as StyledEditorContent,
   FolderBadge,
   TitleInput,
-  BlockNoteWrapper,
+  MarkdownEditorSurface,
 } from './EditorContent.styles';
 import { colorPalette } from '@/utils';
 import { CuteRobotIcon } from '@/components/ui';
+import { MarkdownEditor } from '../../codemirror/MarkdownEditor';
+import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
   currentTitle: string;
   setTitle: (t: string) => void;
-  editor: AnyBlockNoteEditor;
-  onContentChange: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getCustomSlashMenuItems: (editor: AnyBlockNoteEditor) => any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getWorkspaceMentionMenuItems: (editor: AnyBlockNoteEditor) => any[];
+  initialMarkdown: string;
+  markdownEditorRef: React.RefObject<MarkdownEditorRef | null>;
+  onChange: (markdown: string) => void;
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
   targetLanguage?: string;
@@ -91,10 +86,9 @@ export const EditorContent = ({
   currentFolder,
   currentTitle,
   setTitle,
-  editor,
-  onContentChange,
-  getCustomSlashMenuItems,
-  getWorkspaceMentionMenuItems,
+  initialMarkdown,
+  markdownEditorRef,
+  onChange,
   setValue,
   watch,
   targetLanguage,
@@ -103,7 +97,7 @@ export const EditorContent = ({
 }: EditorContentProps) => {
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
-  const blockNoteWrapperRef = useRef<HTMLDivElement>(null);
+  const editorSurfaceRef = useRef<HTMLDivElement>(null);
 
   const {
     menuAnchor,
@@ -128,7 +122,7 @@ export const EditorContent = ({
   } = useEditorContent({
     setValue,
     watch,
-    editor,
+    markdownEditorRef,
   });
 
   // Use derived values directly - no need for useEffect sync
@@ -497,36 +491,18 @@ export const EditorContent = ({
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        <BlockNoteWrapper
+        <MarkdownEditorSurface
           id="joyride-editor-area"
-          ref={blockNoteWrapperRef}
+          ref={editorSurfaceRef}
           onContextMenu={handleContextMenu}
           style={{ position: 'relative' }}
         >
-          <BlockNoteView
-            editor={editor}
-            theme={isThemeDark ? 'dark' : 'light'}
-            slashMenu={false}
-            onChange={onContentChange}
-          >
-            {/* Slash Menu (/) */}
-            <SuggestionMenuController
-              triggerCharacter={'/'}
-              getItems={async (query) =>
-                getCustomSlashMenuItems(editor).filter((item) =>
-                  item.title.toLowerCase().includes(query.toLowerCase()),
-                )
-              }
-            />
-            <SuggestionMenuController
-              triggerCharacter={'@'}
-              getItems={async (query) =>
-                getWorkspaceMentionMenuItems(editor).filter((item) =>
-                  item.title.toLowerCase().includes(query.toLowerCase()),
-                )
-              }
-            />
-          </BlockNoteView>
+          <MarkdownEditor
+            ref={markdownEditorRef}
+            initialValue={initialMarkdown}
+            onChange={onChange}
+            placeholder="Start writing..."
+          />
 
           {isAIProcessing && (
             <Box
@@ -595,12 +571,7 @@ export const EditorContent = ({
               </Box>
             </Box>
           )}
-
-          <CodeBlockLanguageMenu
-            editor={editor}
-            containerRef={blockNoteWrapperRef}
-          />
-        </BlockNoteWrapper>
+        </MarkdownEditorSurface>
       </Box>
 
       <Menu

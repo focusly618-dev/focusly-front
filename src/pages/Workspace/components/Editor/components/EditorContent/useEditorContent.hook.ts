@@ -17,7 +17,7 @@ import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTas
 export const useEditorContent = ({
   setValue,
   watch,
-  editor,
+  markdownEditorRef,
 }: UseEditorContentProps): UseEditorContentReturn => {
   const [createTaskMutation] = useMutation(CREATE_TASK);
   const { user } = useAppSelector((state) => state.auth);
@@ -30,6 +30,10 @@ export const useEditorContent = ({
     mouseY: number;
   } | null>(null);
   const [selectedText, setSelectedText] = useState('');
+  const [selectedRange, setSelectedRange] = useState<{
+    from: number;
+    to: number;
+  } | null>(null);
   const [colorAnchor, setColorAnchor] = useState<null | HTMLElement>(null);
   const [iconAnchor, setIconAnchor] = useState<null | HTMLElement>(null);
   const [isAIProcessing, setIsAIProcessing] = useState(false);
@@ -61,10 +65,11 @@ export const useEditorContent = ({
   };
 
   const handleContextMenu = (event: React.MouseEvent) => {
-    const selection = window.getSelection()?.toString();
-    if (selection && selection.trim().length > 0) {
+    const selection = markdownEditorRef.current?.getSelection();
+    if (selection && selection.text.trim().length > 0) {
       event.preventDefault();
-      setSelectedText(selection);
+      setSelectedText(selection.text);
+      setSelectedRange({ from: selection.from, to: selection.to });
       setMenuAnchor({
         mouseX: event.clientX - 2,
         mouseY: event.clientY - 4,
@@ -216,7 +221,7 @@ Text: "${selectedText}"`;
 
   const processTextWithAI = async (action: string) => {
     handleClose();
-    if (!selectedText || !editor) return;
+    if (!selectedText || !markdownEditorRef.current) return;
 
     setIsAIProcessing(true);
 
@@ -281,18 +286,15 @@ Text: "${selectedText}"`;
       const refinedText = await fetchPromise;
 
       if (action === 'summarize') {
-        // Parse the markdown response into BlockNote blocks and insert them
-        const blocks = editor.tryParseMarkdownToBlocks(refinedText);
-        const currentBlock = editor.getTextCursorPosition().block;
-        editor.insertBlocks(blocks, currentBlock, 'after');
+        markdownEditorRef.current.insertAtCursor(refinedText);
+      } else if (selectedRange) {
+        markdownEditorRef.current.replaceRange(
+          selectedRange.from,
+          selectedRange.to,
+          refinedText,
+        );
       } else {
-        editor.insertInlineContent([
-          {
-            type: 'text',
-            text: refinedText,
-            styles: {},
-          },
-        ]);
+        markdownEditorRef.current.insertAtCursor(refinedText);
       }
     } catch (e) {
       console.error(e);
