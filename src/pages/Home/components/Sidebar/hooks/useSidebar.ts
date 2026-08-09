@@ -71,10 +71,28 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     { query: GET_PROJECT_GROUPS },
   ];
   const [deleteWorkspaceMutation] = useMutation(REMOVE_WORKSPACE, {
-    refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
+    refetchQueries: [
+      'GetWorkspacesPaginated',
+      'GetWorkspaces',
+      'GetProjectGroups',
+    ],
+    update(cache, _result, { variables }) {
+      if (variables?.id) {
+        cache.evict({
+          id: cache.identify({ __typename: 'Workspace', id: variables.id }),
+        });
+      }
+      cache.evict({ fieldName: 'workspacesPaginated' });
+      cache.evict({ fieldName: 'workspaces' });
+      cache.gc();
+    },
   });
   const [createWorkspaceMutation] = useMutation(CREATE_WORKSPACE, {
-    refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
+    refetchQueries: [
+      'GetWorkspacesPaginated',
+      'GetWorkspaces',
+      'GetProjectGroups',
+    ],
   });
   const [createProjectGroup] = useMutation(CREATE_PROJECT_GROUP, {
     refetchQueries: refetchAll,

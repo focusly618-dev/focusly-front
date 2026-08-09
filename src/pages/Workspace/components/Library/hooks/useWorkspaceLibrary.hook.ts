@@ -35,7 +35,7 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
       limit: LIMIT,
       offset: 0,
     },
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
   });
 
@@ -57,7 +57,7 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
 
   // Mutations
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
-    refetchQueries: ['GetWorkspaces'],
+    refetchQueries: ['GetWorkspacesPaginated', 'GetWorkspaces'],
   });
 
   // Handlers
