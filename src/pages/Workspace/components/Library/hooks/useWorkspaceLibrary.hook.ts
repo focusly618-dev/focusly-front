@@ -4,11 +4,13 @@ import {
   GET_WORKSPACES,
   UPDATE_WORKSPACE,
   GET_PROJECT_GROUPS,
+  GET_PROJECT_GROUPS_PAGINATED,
 } from '../../../Workspace.graphql';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
 import { sileo } from '@/utils';
 
-const LIMIT = 24;
+const LIMIT = 8;
+const GROUP_LIMIT = 8;
 
 export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,47 +19,51 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const [selectedWorkspace, setSelectedWorkspace] =
     useState<WorkspaceTypes | null>(null);
   const [showPaletteInMenu, setShowPaletteInMenu] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [groupPage, setGroupPage] = useState(1);
   const [prevSearch, setPrevSearch] = useState(searchTerm);
   const [prevGroupId, setPrevGroupId] = useState(selectedGroupId);
 
+  // Changing the search term or active folder invalidates the current page
+  // of results — land back on page 1 rather than showing a page number
+  // that may not exist for the new filter.
   if (searchTerm !== prevSearch || selectedGroupId !== prevGroupId) {
     setPrevSearch(searchTerm);
     setPrevGroupId(selectedGroupId);
-    setHasMore(true);
+    setPage(1);
   }
 
   // Queries
-  const { data, loading, error, fetchMore } = useQuery(GET_WORKSPACES, {
+  const { data, loading, error } = useQuery(GET_WORKSPACES, {
     variables: {
       search: searchTerm,
       projectId: selectedGroupId || undefined,
       limit: LIMIT,
-      offset: 0,
+      offset: (page - 1) * LIMIT,
     },
     fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
   });
 
-  const [prevData, setPrevData] = useState(data);
-  if (data !== prevData) {
-    setPrevData(data);
-    const hasMoreVal = data?.result?.hasMore;
-    const fetchedWorkspaces = data?.result?.workspaces || data?.workspaces;
-    if (hasMoreVal !== undefined) {
-      setHasMore(hasMoreVal);
-    } else if (fetchedWorkspaces && fetchedWorkspaces.length < LIMIT) {
-      setHasMore(false);
-    }
-  }
+  const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS_PAGINATED, {
+    variables: {
+      limit: GROUP_LIMIT,
+      offset: (groupPage - 1) * GROUP_LIMIT,
+    },
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-first',
+  });
 
-  const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
+  // Separate, unpaginated fetch — the "All Folders" modal needs every group
+  // to search/browse through, not just the current page shown in the root
+  // grid.
+  const { data: allProjectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
     fetchPolicy: 'cache-and-network',
   });
 
   // Mutations
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
-    refetchQueries: ['GetWorkspacesPaginated', 'GetWorkspaces'],
+    refetchQueries: ['GetWorkspacesPaginated'],
   });
 
   // Handlers
@@ -150,30 +156,15 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
     setSearchTerm('');
   };
 
-  const loadMore = async () => {
-    if (loading || !hasMore) return;
-
-    try {
-      const res = await fetchMore({
-        variables: {
-          offset: workspaces.length,
-        },
-      });
-      const fetchedMore = res.data?.result?.workspaces || res.data?.workspaces;
-      const moreHasMore = res.data?.result?.hasMore;
-      if (moreHasMore !== undefined) {
-        setHasMore(moreHasMore);
-      } else if (fetchedMore && fetchedMore.length < LIMIT) {
-        setHasMore(false);
-      }
-    } catch (e) {
-      console.error('Error fetching more workspaces in loadMore:', e);
-    }
-  };
-
   // Derived data
-  const workspaces = data?.result?.workspaces || data?.workspaces || [];
+  const workspaces = data?.result?.workspaces || [];
   const totalWorkspaces = data?.result?.totalCount ?? workspaces.length;
+  const totalPages = Math.max(1, Math.ceil(totalWorkspaces / LIMIT));
+
+  const projectGroups = projectGroupsData?.result?.projectGroups || [];
+  const totalGroups =
+    projectGroupsData?.result?.totalCount ?? projectGroups.length;
+  const totalGroupPages = Math.max(1, Math.ceil(totalGroups / GROUP_LIMIT));
 
   return {
     state: {
@@ -183,7 +174,10 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
       anchorEl,
       selectedWorkspace,
       showPaletteInMenu,
-      hasMore,
+      page,
+      totalPages,
+      groupPage,
+      totalGroupPages,
     },
     actions: {
       setSearchTerm,
@@ -195,11 +189,13 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
       handleUnlinkTask,
       handleClearSearch,
       setShowPaletteInMenu,
-      loadMore,
+      setPage,
+      setGroupPage,
     },
     data: {
       workspaces,
-      projectGroups: projectGroupsData?.projectGroups || [],
+      projectGroups,
+      allProjectGroups: allProjectGroupsData?.projectGroups || [],
       totalWorkspaces,
       loading,
       error,
