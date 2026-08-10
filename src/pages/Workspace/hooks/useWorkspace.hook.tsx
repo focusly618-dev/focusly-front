@@ -29,7 +29,6 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedGroupId = searchParams.get('groupId');
   const workspaceIdParam = searchParams.get('workspaceId');
-
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [prevGroupId, setPrevGroupId] = useState(selectedGroupId);
   const isSelectingWorkspaceRef = useRef(false);
@@ -131,7 +130,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
   const [getWorkspaceById] = useLazyQuery(GET_WORKSPACE_BY_ID);
 
   const hasWorkspaces =
-    (workspacesData?.workspaces?.length ?? 0) > 0 ||
+    (workspacesData?.result?.workspaces?.length ?? 0) > 0 ||
     (projectGroupsData?.projectGroups?.length ?? 0) > 0;
 
   // 6. Effects

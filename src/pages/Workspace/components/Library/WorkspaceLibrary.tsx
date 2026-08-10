@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import {
   LibraryContainer,
   GridContainer,
@@ -30,6 +30,7 @@ import {
   Tooltip,
   alpha,
   IconButton,
+  Pagination,
 } from '@mui/material';
 import {
   PushPin as PushPinIcon,
@@ -71,7 +72,15 @@ export const WorkspaceLibrary = ({
   const { state, actions, data } = useWorkspaceLibrary(selectedGroupId);
   const { handleOpen: handleDeleteConfirm } = useWorkspace();
 
-  const { searchTerm, anchorEl, selectedWorkspace, hasMore } = state;
+  const {
+    searchTerm,
+    anchorEl,
+    selectedWorkspace,
+    page,
+    totalPages,
+    groupPage,
+    totalGroupPages,
+  } = state;
 
   const {
     setSearchTerm,
@@ -79,10 +88,11 @@ export const WorkspaceLibrary = ({
     handleMenuClose,
     handleUnlinkTask,
     handleClearSearch,
-    loadMore,
+    setPage,
+    setGroupPage,
   } = actions;
 
-  const { workspaces, projectGroups, loading, error } = data;
+  const { workspaces, projectGroups, allProjectGroups, loading, error } = data;
 
   const theme = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -115,23 +125,11 @@ export const WorkspaceLibrary = ({
     setSearchParams(newParams);
   };
 
-  const loadingMore = useRef(false);
-
-  const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
-    if (loadingMore.current || !hasMore || loading) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    // Trigger when scrolled to within 50px of the bottom
-    const reachedBottom = scrollHeight - scrollTop <= clientHeight + 50;
-
-    if (!reachedBottom) return;
-
-    loadingMore.current = true;
-    try {
-      await loadMore();
-    } finally {
-      loadingMore.current = false;
-    }
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    setPage(value);
   };
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState('#7c3aed');
@@ -169,7 +167,10 @@ export const WorkspaceLibrary = ({
   const [folderSearchTerm, setFolderSearchTerm] = useState('');
 
   const handleDeleteProjects = async (ids: string[]) => {
-    const folderNames = projectGroups
+    // Selection comes from the "All Folders" modal, which browses every
+    // folder — not just whichever page the root grid currently has loaded —
+    // so the name lookup has to search the full list too.
+    const folderNames = allProjectGroups
       .filter((g: ProjectGroupTypes) => ids.includes(g.id))
       .map((g: ProjectGroupTypes) => g.name)
       .join(', ');
@@ -221,8 +222,11 @@ export const WorkspaceLibrary = ({
     { name: 'Dark Slate', value: '#475569' },
   ];
 
+  // The active folder can be on any page of the root grid's pagination (or
+  // reached via the "All Folders" modal), so this has to search the full,
+  // unpaginated list rather than whichever page happens to be loaded.
   const activeGroup = selectedGroupId
-    ? projectGroups.find((g: ProjectGroupTypes) => g.id === selectedGroupId)
+    ? allProjectGroups.find((g: ProjectGroupTypes) => g.id === selectedGroupId)
     : null;
 
   const targetGroup = groupToCustomize || activeGroup;
@@ -700,6 +704,18 @@ export const WorkspaceLibrary = ({
               );
             })}
           </Box>
+
+          {!folderSearchTerm && totalGroupPages > 1 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+              <Pagination
+                count={totalGroupPages}
+                page={groupPage}
+                onChange={(_event, value) => setGroupPage(value)}
+                color="primary"
+                shape="rounded"
+              />
+            </Box>
+          )}
         </Box>
       ) : (
         /* Inside Folder: GridContainer showing note cards inside active folder */
@@ -711,7 +727,7 @@ export const WorkspaceLibrary = ({
               </Typography>
             </Box>
           ) : (
-            <GridContainer layout={viewMode} onScroll={handleScroll}>
+            <GridContainer layout={viewMode}>
               {searchTerm && !workspaces.length && !loading && (
                 <EmptyState
                   title="No results found"
@@ -864,7 +880,7 @@ export const WorkspaceLibrary = ({
                     );
                   })
                 : workspaces.map((workspace: WorkspaceTypes) => {
-                    const group = projectGroups.find(
+                    const group = allProjectGroups.find(
                       (g: ProjectGroupTypes) => g.id === workspace.groupId,
                     );
 
@@ -895,23 +911,25 @@ export const WorkspaceLibrary = ({
                       />
                     );
                   })}
-
-              {loading && workspaces.length > 0 && (
-                <Box
-                  sx={{
-                    gridColumn: '1 / -1',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    py: 2,
-                    width: '100%',
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Loading more workspaces...
-                  </Typography>
-                </Box>
-              )}
             </GridContainer>
+          )}
+
+          {!error && workspaces.length > 0 && totalPages > 1 && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                py: 3,
+              }}
+            >
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                shape="rounded"
+              />
+            </Box>
           )}
         </>
       )}
@@ -1453,7 +1471,7 @@ export const WorkspaceLibrary = ({
       <AllProjectsModal
         open={isAllFoldersModalOpen}
         onClose={() => setIsAllFoldersModalOpen(false)}
-        projects={projectGroups.map((g: ProjectGroupTypes) => ({
+        projects={allProjectGroups.map((g: ProjectGroupTypes) => ({
           id: g.id,
           name: g.name,
           userId: g.userId,

@@ -123,6 +123,29 @@ export const GET_PROJECT_GROUPS = gql`
   }
 `;
 
+// Separate from GET_PROJECT_GROUPS above — the sidebar nav, the chat
+// suggested-action card, and useWorkspace.hook.tsx all want every group
+// unpaginated (e.g. for a folder tree), so that query stays as-is. Only the
+// Workspace Library's root folder grid wants pages of groups.
+export const GET_PROJECT_GROUPS_PAGINATED = gql`
+  query GetProjectGroupsPaginated($limit: Int, $offset: Int) {
+    result: projectGroupsPaginated(limit: $limit, offset: $offset) {
+      totalCount
+      hasMore
+      projectGroups {
+        id
+        name
+        color
+        emoji
+        workspaces {
+          id
+        }
+        updatedAt
+      }
+    }
+  }
+`;
+
 export const CREATE_PROJECT_GROUP = gql`
   mutation CreateProjectGroup($input: CreateProjectGroupInput!) {
     createProjectGroup(input: $input) {
