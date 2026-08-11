@@ -57,6 +57,7 @@ import {
 } from '@mui/icons-material';
 import type { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { WorkspaceFormData } from '../../../../../../pages/Workspace/types/workspace.types';
+import { AITaskPreviewModal } from '../AITaskPreviewModal/AITaskPreviewModal';
 import {
   EditorContent as StyledEditorContent,
   FolderBadge,
@@ -119,6 +120,11 @@ export const EditorContent = ({
     handleCreateTask,
     processTextWithAI,
     isAIProcessing,
+    aiTaskPreviewData,
+    isAITaskPreviewOpen,
+    setIsAITaskPreviewOpen,
+    handleConfirmAITask,
+    isCreatingTask,
   } = useEditorContent({
     setValue,
     watch,
@@ -780,6 +786,14 @@ export const EditorContent = ({
           lazyLoadEmojis={true}
         />
       </Menu>
+
+      <AITaskPreviewModal
+        open={isAITaskPreviewOpen}
+        onClose={() => setIsAITaskPreviewOpen(false)}
+        onConfirm={handleConfirmAITask}
+        previewData={aiTaskPreviewData}
+        loading={isCreatingTask}
+      />
     </StyledEditorContent>
   );
 };

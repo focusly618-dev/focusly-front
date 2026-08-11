@@ -3,6 +3,7 @@ import type { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { WorkspaceFormData } from '@/pages/Workspace/types/workspace.types';
 import type { HeaderColor } from '@/utils';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
+import type { AITaskPreviewData } from '../AITaskPreviewModal/AITaskPreviewModal';
 
 export interface UseEditorContentProps {
   setValue?: UseFormSetValue<WorkspaceFormData>;
@@ -33,4 +34,9 @@ export interface UseEditorContentReturn {
   handleCreateTask: () => void;
   processTextWithAI: (action: string) => Promise<void>;
   isAIProcessing: boolean;
+  aiTaskPreviewData: AITaskPreviewData | null;
+  isAITaskPreviewOpen: boolean;
+  setIsAITaskPreviewOpen: (open: boolean) => void;
+  handleConfirmAITask: (finalData: AITaskPreviewData) => Promise<void>;
+  isCreatingTask: boolean;
 }
