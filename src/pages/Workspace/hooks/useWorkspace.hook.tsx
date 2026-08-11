@@ -248,22 +248,27 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     onEditorChange(true);
   };
 
-  const handleCreateNew = (): void => {
+  const handleCreateNew = (
+    initialTitle?: string,
+    initialContent?: string,
+    targetGroupId?: string,
+  ): void => {
     isSelectingWorkspaceRef.current = true;
     setIsCreatingNew(true);
 
     // Clear workspaceId from URL to prevent reloading the previous workspace
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('workspaceId');
+    newParams.delete('modal');
     setSearchParams(newParams);
 
     reset({
-      title: 'Untitled Strategic Plan',
+      title: initialTitle || 'Untitled Strategic Plan',
       taskId: undefined,
-      content: '[]',
+      content: initialContent || '[]',
       id: undefined,
       projectId: undefined,
-      groupId: selectedGroupId || undefined,
+      groupId: targetGroupId || selectedGroupId || undefined,
       emoji: undefined,
       background_color: undefined,
       card_show_background: false,

@@ -16,6 +16,7 @@ import {
   InsightsIcon,
   ProjectIcon,
 } from '@/components/ui';
+import { DescriptionOutlined as TemplateIcon } from '@mui/icons-material';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 
 interface SidebarNavigationProps {
@@ -28,6 +29,14 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
     // Reset search params to show all workspaces in the main component
     const newParams = new URLSearchParams();
     newParams.set('tab', TaskBar.Workspace);
+    sidebar.setSearchParams(newParams);
+    changeStatusTab(TaskBar.Workspace, newParams);
+  };
+
+  const handleTemplatesTabClick = () => {
+    const newParams = new URLSearchParams();
+    newParams.set('tab', TaskBar.Workspace);
+    newParams.set('modal', 'templates');
     sidebar.setSearchParams(newParams);
     changeStatusTab(TaskBar.Workspace, newParams);
   };
@@ -188,7 +197,10 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       >
         <NavItem
           id="joyride-workspace"
-          active={activeTab === TaskBar.Workspace}
+          active={
+            activeTab === TaskBar.Workspace &&
+            !sidebar.searchParams.get('modal')
+          }
           onClick={handleProjectsTabClick}
         >
           <ListItemIcon>
@@ -196,6 +208,25 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           </ListItemIcon>
           <ListItemText
             primary="Projects"
+            primaryTypographyProps={{ fontWeight: 500 }}
+            sx={{
+              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
+            }}
+          />
+        </NavItem>
+        <NavItem
+          id="joyride-templates"
+          active={
+            activeTab === TaskBar.Workspace &&
+            sidebar.searchParams.get('modal') === 'templates'
+          }
+          onClick={handleTemplatesTabClick}
+        >
+          <ListItemIcon>
+            <TemplateIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Templates"
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
