@@ -36,6 +36,10 @@ export const GET_TASKS_TITLES = gql`
         avatar
         responseStatus
       }
+      time_logs {
+        date
+        minutes
+      }
       workspace {
         id
         title
@@ -79,6 +83,10 @@ export const UPDATE_TASK = gql`
         avatar
         responseStatus
       }
+      time_logs {
+        date
+        minutes
+      }
       priority_level
     }
   }
@@ -119,6 +127,10 @@ export const CREATE_TASK = gql`
         email
         avatar
         responseStatus
+      }
+      time_logs {
+        date
+        minutes
       }
       priority_level
     }
@@ -199,6 +211,10 @@ export const GET_TASKS_PAGINATED = gql`
           email
           avatar
           responseStatus
+        }
+        time_logs {
+          date
+          minutes
         }
         workspace {
           id

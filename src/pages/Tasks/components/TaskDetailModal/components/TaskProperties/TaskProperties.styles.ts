@@ -110,6 +110,14 @@ export const timerPopoverPaperSx = {
   borderRadius: '12px',
 };
 
+export const timeLogPopoverPaperSx = {
+  minWidth: 280,
+  maxWidth: 320,
+  borderRadius: '14px',
+  p: 1.5,
+  mt: 1,
+};
+
 export const colorPopoverPaperSx = {
   borderRadius: '16px',
   mt: 1,

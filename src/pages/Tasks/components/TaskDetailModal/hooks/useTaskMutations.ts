@@ -101,6 +101,7 @@ export const useTaskMutations = ({
         (initialTask as { google_event_id?: string })?.google_event_id,
       estimated_start_date: deadlineISO,
       estimated_end_date: endDateISO,
+      time_logs: state.time_logs || [],
     };
 
     try {
@@ -242,6 +243,12 @@ export const useTaskMutations = ({
         key: 'collaborators',
         val: state.collaborators || [],
         initial: initialTask.collaborators || [],
+        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+      },
+      timeLogs: {
+        key: 'time_logs',
+        val: state.time_logs || [],
+        initial: initialTask.time_logs || [],
         isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
       },
       estimatedStartDate: {

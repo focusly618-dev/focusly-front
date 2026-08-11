@@ -10,6 +10,7 @@ export interface TaskData {
   duration: string;
   tags: string[];
   links?: { title: string; url: string }[];
+  time_logs?: { date: string; minutes: number }[];
   google_event_id?: string;
   status?: Task['status'];
   realTime?: string;
@@ -57,6 +58,7 @@ export interface TaskInput {
   google_event_id?: string;
   user_id?: string;
   collaborators?: { name: string; email: string; avatar?: string }[];
+  time_logs?: { date: string; minutes: number }[];
   estimated_start_date?: string;
   estimated_end_date?: string;
 }
@@ -65,6 +67,8 @@ export interface UseTaskCollectionsProps {
   initialTask?: Task | null;
   onAddLink?: (links: { title: string; url: string }[]) => void;
   onRemoveLink?: (links: { title: string; url: string }[]) => void;
+  onAddTimeLog?: (timeLogs: { date: string; minutes: number }[]) => void;
+  onRemoveTimeLog?: (timeLogs: { date: string; minutes: number }[]) => void;
 }
 
 export interface UseTaskFormStateProps {

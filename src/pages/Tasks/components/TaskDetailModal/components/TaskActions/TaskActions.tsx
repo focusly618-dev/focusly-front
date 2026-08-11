@@ -93,13 +93,17 @@ export const TaskActions = ({
       ) : (
         <Button
           disabled={disabled}
-          onClick={initialTask ? handleUpdate : handleSave}
+          onClick={
+            initialTask && initialTask.user_id !== 'google-user'
+              ? handleUpdate
+              : handleSave
+          }
           variant="contained"
           sx={saveButtonSx}
         >
           {loadingSave ? (
             <CircularProgress size={24} color="inherit" />
-          ) : initialTask ? (
+          ) : initialTask && initialTask.user_id !== 'google-user' ? (
             'Edit Task'
           ) : (
             'Create Task'

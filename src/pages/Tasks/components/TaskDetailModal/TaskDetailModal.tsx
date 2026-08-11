@@ -93,6 +93,9 @@ export const TaskDetailModal = ({
     collaborators,
     handleAddCollaborator,
     handleRemoveCollaborator,
+    timeLogs,
+    handleAddTimeLog,
+    handleRemoveTimeLog,
     isGeneratingMeet,
     handleGenerateMeet,
     handleTimerChange,
@@ -330,6 +333,9 @@ export const TaskDetailModal = ({
                 isPureGoogleTask={isPureGoogleTask}
                 timeSlotDisplay={timeSlotDisplay}
                 handleTimerChange={handleTimerChange}
+                timeLogs={timeLogs}
+                handleAddTimeLog={handleAddTimeLog}
+                handleRemoveTimeLog={handleRemoveTimeLog}
                 createdAt={initialTask?.created_at}
               />
 

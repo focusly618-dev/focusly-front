@@ -50,6 +50,7 @@ export interface Task {
     } | null;
   }[];
   links?: { title: string; url: string }[];
+  time_logs?: { date: string; minutes: number }[];
   collaborators?: {
     name: string;
     email: string;

@@ -9,17 +9,25 @@ export const useTaskCollections = ({
   initialTask,
   onAddLink,
   onRemoveLink,
+  onAddTimeLog,
+  onRemoveTimeLog,
 }: UseTaskCollectionsProps) => {
   const getInitialCollectionState = useCallback(() => {
     const defaults = {
       tags: [] as string[],
       links: [] as { title: string; url: string }[],
       collaborators: [] as { name: string; email: string; avatar?: string }[],
+      timeLogs: [] as { date: string; minutes: number }[],
     };
 
     if (!initialTask) return defaults;
 
-    const { tags = [], links = [], collaborators = [] } = initialTask;
+    const {
+      tags = [],
+      links = [],
+      collaborators = [],
+      time_logs = [],
+    } = initialTask;
 
     const parsedTags = Array.isArray(tags)
       ? tags.map((t) => (typeof t === 'string' ? t : t.name))
@@ -33,10 +41,15 @@ export const useTaskCollections = ({
       ? collaborators.map((c) => ({ ...c }))
       : [];
 
+    const parsedTimeLogs = Array.isArray(time_logs)
+      ? time_logs.map((tl) => ({ ...tl }))
+      : [];
+
     return {
       tags: parsedTags,
       links: parsedLinks,
       collaborators: parsedCollaborators,
+      timeLogs: parsedTimeLogs,
     };
   }, [initialTask]);
 
@@ -52,6 +65,9 @@ export const useTaskCollections = ({
   const [collaborators, setCollaborators] = useState<
     { name: string; email: string; avatar?: string }[]
   >(initialCollections.collaborators);
+  const [timeLogs, setTimeLogs] = useState<{ date: string; minutes: number }[]>(
+    initialCollections.timeLogs,
+  );
   const [newTag, setNewTag] = useState('');
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newLinkTitle, setNewLinkTitle] = useState('');
@@ -117,6 +133,20 @@ export const useTaskCollections = ({
     setCollaborators((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleAddTimeLog = (date: string, minutes: number) => {
+    if (minutes > 0) {
+      const updatedTimeLogs = [...timeLogs, { date, minutes }];
+      setTimeLogs(updatedTimeLogs);
+      if (onAddTimeLog) onAddTimeLog(updatedTimeLogs);
+    }
+  };
+
+  const handleRemoveTimeLog = (index: number) => {
+    const updatedTimeLogs = timeLogs.filter((_, i) => i !== index);
+    setTimeLogs(updatedTimeLogs);
+    if (onRemoveTimeLog) onRemoveTimeLog(updatedTimeLogs);
+  };
+
   return {
     tags,
     setTags,
@@ -140,6 +170,10 @@ export const useTaskCollections = ({
     handleUpdateLink,
     handleRemoveCollaborator,
     handleAddCollaborator,
+    timeLogs,
+    setTimeLogs,
+    handleAddTimeLog,
+    handleRemoveTimeLog,
     initialCollections,
   };
 };

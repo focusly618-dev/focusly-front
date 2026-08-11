@@ -4,7 +4,7 @@ import { useTaskFormState } from './useTaskFormState';
 import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
-import { getTimerSuggestions } from '../TaskDetailModal.utils';
+import { getTimerSuggestions, formatDuration } from '../TaskDetailModal.utils';
 import { sileo } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
 
@@ -68,7 +68,7 @@ export const useTaskDetailModal = ({
     onClose,
     onDelete,
     initialTask,
-    resetForm: () => { },
+    resetForm: () => {},
   });
 
   const {
@@ -94,6 +94,10 @@ export const useTaskDetailModal = ({
     setCollaborators,
     handleAddCollaborator,
     handleRemoveCollaborator,
+    timeLogs,
+    setTimeLogs,
+    handleAddTimeLog,
+    handleRemoveTimeLog,
     initialCollections,
   } = useTaskCollections({
     initialTask,
@@ -137,6 +141,52 @@ export const useTaskDetailModal = ({
         );
       }
     },
+    onAddTimeLog: (updatedTimeLogs: { date: string; minutes: number }[]) => {
+      const minutesSum = updatedTimeLogs.reduce((s, e) => s + e.minutes, 0);
+      const nextRealTime = formatDuration(minutesSum);
+      setRealTime(nextRealTime);
+      if (initialTask?.id) {
+        mutations.handleUpdate(
+          {
+            title,
+            description,
+            priority,
+            status,
+            category,
+            deadline: currentDate,
+            duration,
+            realTime: nextRealTime,
+            tags,
+            time_logs: updatedTimeLogs,
+            color,
+          },
+          false,
+        );
+      }
+    },
+    onRemoveTimeLog: (updatedTimeLogs: { date: string; minutes: number }[]) => {
+      const minutesSum = updatedTimeLogs.reduce((s, e) => s + e.minutes, 0);
+      const nextRealTime = formatDuration(minutesSum);
+      setRealTime(nextRealTime);
+      if (initialTask?.id) {
+        mutations.handleUpdate(
+          {
+            title,
+            description,
+            priority,
+            status,
+            category,
+            deadline: currentDate,
+            duration,
+            realTime: nextRealTime,
+            tags,
+            time_logs: updatedTimeLogs,
+            color,
+          },
+          false,
+        );
+      }
+    },
   });
 
   const resetForm = useCallback(() => {
@@ -153,6 +203,7 @@ export const useTaskDetailModal = ({
     setTags(initialCollections.tags);
     setLinks(initialCollections.links);
     setCollaborators(initialCollections.collaborators);
+    setTimeLogs(initialCollections.timeLogs);
     setNewTag('');
     setIsAddingTag(false);
     setIsAddingLink(false);
@@ -171,6 +222,7 @@ export const useTaskDetailModal = ({
     setTags,
     setLinks,
     setCollaborators,
+    setTimeLogs,
     setNewTag,
     setIsAddingTag,
     setIsAddingLink,
@@ -192,6 +244,7 @@ export const useTaskDetailModal = ({
       tags,
       links,
       collaborators,
+      time_logs: timeLogs,
       color,
       shouldGenerateMeet,
     });
@@ -213,6 +266,7 @@ export const useTaskDetailModal = ({
         tags,
         links,
         collaborators,
+        time_logs: timeLogs,
         color,
         shouldGenerateMeet,
       },
@@ -326,7 +380,8 @@ export const useTaskDetailModal = ({
     if (tags.length !== initialCollections.tags.length) return true;
     const initialTagsSorted = [...initialCollections.tags].sort();
     const currentTagsSorted = [...tags].sort();
-    if (JSON.stringify(initialTagsSorted) !== JSON.stringify(currentTagsSorted)) return true;
+    if (JSON.stringify(initialTagsSorted) !== JSON.stringify(currentTagsSorted))
+      return true;
 
     if (links.length !== initialCollections.links.length) return true;
     if (
@@ -335,16 +390,29 @@ export const useTaskDetailModal = ({
           l.title !== initialCollections.links[i]?.title ||
           l.url !== initialCollections.links[i]?.url,
       )
-    ) return true;
+    )
+      return true;
 
-    if (collaborators.length !== initialCollections.collaborators.length) return true;
+    if (collaborators.length !== initialCollections.collaborators.length)
+      return true;
     if (
       collaborators.some(
         (c, i) =>
           c.email !== initialCollections.collaborators[i]?.email ||
           c.name !== initialCollections.collaborators[i]?.name,
       )
-    ) return true;
+    )
+      return true;
+
+    if (timeLogs.length !== initialCollections.timeLogs.length) return true;
+    if (
+      timeLogs.some(
+        (tl, i) =>
+          tl.date !== initialCollections.timeLogs[i]?.date ||
+          tl.minutes !== initialCollections.timeLogs[i]?.minutes,
+      )
+    )
+      return true;
 
     return false;
   }, [
@@ -363,6 +431,7 @@ export const useTaskDetailModal = ({
     initialCollections,
     links,
     collaborators,
+    timeLogs,
   ]);
 
   return {
@@ -412,6 +481,9 @@ export const useTaskDetailModal = ({
     collaborators,
     handleAddCollaborator,
     handleRemoveCollaborator,
+    timeLogs,
+    handleAddTimeLog,
+    handleRemoveTimeLog,
     ...mutationsWithReset,
     handleSave: handleSaveWrapper,
     handleUpdate: handleUpdateWrapper,

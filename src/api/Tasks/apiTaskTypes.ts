@@ -55,6 +55,7 @@ export interface TaskResponse {
   filters?: TaskFilterInput;
   sort?: TaskSortInput;
   links?: { title: string; url: string }[];
+  time_logs?: { date: string; minutes: number }[];
   google_event_id?: string;
   collaborators?: {
     name: string;

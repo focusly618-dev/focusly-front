@@ -10,6 +10,7 @@ import {
   MenuItem,
   List,
   ListItemText,
+  IconButton,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -34,6 +35,7 @@ import {
   School as SchoolIcon,
   Person as PersonIcon,
   Add as AddIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { format } from 'date-fns';
@@ -58,18 +60,20 @@ import { getSelectionChipSx } from '@/pages/Home/components/CreateTaskModal/comp
 import {
   getTagColors,
   TASK_COLORS,
+  formatDuration,
+  parseDuration,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 import {
   propertiesContainerSx,
   popoverPaperSx,
   timerPopoverPaperSx,
+  timeLogPopoverPaperSx,
   colorPopoverPaperSx,
   colorGridSx,
 } from './TaskProperties.styles';
 import {
   triggerDurationError,
-  triggerRealTimeError,
   sanitizeDurationValue,
   getPriorityColor,
 } from './TaskProperties.utils';
@@ -107,6 +111,9 @@ interface TaskPropertiesProps {
     setAnchor: (el: HTMLDivElement | null) => void,
     target: HTMLDivElement,
   ) => void;
+  timeLogs: { date: string; minutes: number }[];
+  handleAddTimeLog: (date: string, minutes: number) => void;
+  handleRemoveTimeLog: (index: number) => void;
   isOwner?: boolean;
   createdAt?: string;
 }
@@ -134,9 +141,11 @@ export const TaskProperties = ({
   duration,
   setDuration,
   realTime,
-  setRealTime,
   timeSlotDisplay,
   handleTimerChange,
+  timeLogs,
+  handleAddTimeLog,
+  handleRemoveTimeLog,
   isOwner,
   createdAt,
 }: TaskPropertiesProps) => {
@@ -151,26 +160,23 @@ export const TaskProperties = ({
   const [timePickerOpen, setTimePickerOpen] = useState(false);
 
   const [durationSuggestions, setDurationSuggestions] = useState<string[]>([]);
-  const [realTimeSuggestions, setRealTimeSuggestions] = useState<string[]>([]);
   const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(
-    null,
-  );
-  const [realTimeAnchor, setRealTimeAnchor] = useState<HTMLDivElement | null>(
     null,
   );
 
   const [durationInputError, setDurationInputError] = useState<string | null>(
     null,
   );
-  const [realTimeInputError, setRealTimeInputError] = useState<string | null>(
-    null,
-  );
   const [dTimeout, setDTimeout] = useState<ReturnType<
     typeof setTimeout
   > | null>(null);
-  const [rTimeout, setRTimeout] = useState<ReturnType<
-    typeof setTimeout
-  > | null>(null);
+
+  const [timeLogAnchor, setTimeLogAnchor] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const [newLogDate, setNewLogDate] = useState<Date | null>(new Date());
+  const [newLogDatePickerOpen, setNewLogDatePickerOpen] = useState(false);
+  const [newLogDuration, setNewLogDuration] = useState('');
 
   return (
     <Box sx={propertiesContainerSx}>
@@ -714,6 +720,7 @@ export const TaskProperties = ({
                 Real Duration (Tracked)
               </Typography>
               <Box
+                onClick={(e) => isOwner && setTimeLogAnchor(e.currentTarget)}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -722,7 +729,7 @@ export const TaskProperties = ({
                   px: 1.5,
                   borderRadius: '10px',
                   border: '1px solid',
-                  borderColor: realTimeInputError ? 'error.main' : 'divider',
+                  borderColor: 'divider',
                   bgcolor: (theme) =>
                     surfaceColor(
                       theme,
@@ -731,6 +738,11 @@ export const TaskProperties = ({
                       'background.paper',
                     ),
                   minHeight: '43px',
+                  cursor: isOwner ? 'pointer' : 'default',
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    borderColor: !isOwner ? 'divider' : 'primary.main',
+                  },
                 }}
               >
                 <HistoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
@@ -738,34 +750,14 @@ export const TaskProperties = ({
                   variant="standard"
                   value={realTime}
                   disabled={!isOwner}
-                  onChange={(e) => {
-                    if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
-                      triggerRealTimeError(
-                        rTimeout,
-                        setRealTimeInputError,
-                        setRTimeout,
-                      );
-                    }
-                    const sanitizedValue = sanitizeDurationValue(
-                      e.target.value,
-                    );
-                    e.target.value = sanitizedValue;
-                    handleTimerChange(
-                      sanitizedValue,
-                      setRealTime,
-                      setRealTimeSuggestions,
-                      setRealTimeAnchor,
-                      e.currentTarget.parentElement as HTMLDivElement,
-                    );
-                  }}
-                  onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
-                  placeholder="1h 30m"
+                  placeholder="No time logged"
                   InputProps={{
                     disableUnderline: true,
-                    readOnly: !isOwner,
+                    readOnly: true,
                   }}
                   sx={{
                     flex: 1,
+                    pointerEvents: 'none',
                     '& .MuiInputBase-input': {
                       fontSize: '14px',
                       fontWeight: 600,
@@ -775,48 +767,184 @@ export const TaskProperties = ({
                   }}
                 />
                 <Popover
-                  open={Boolean(realTimeAnchor)}
-                  anchorEl={realTimeAnchor}
-                  onClose={() => setRealTimeAnchor(null)}
+                  open={Boolean(timeLogAnchor)}
+                  anchorEl={timeLogAnchor}
+                  onClose={() => setTimeLogAnchor(null)}
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                   transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  disableAutoFocus
-                  disableEnforceFocus
-                  slotProps={{ paper: { sx: timerPopoverPaperSx } }}
+                  slotProps={{ paper: { sx: timeLogPopoverPaperSx } }}
                 >
-                  <List dense sx={{ py: 0 }}>
-                    {realTimeSuggestions.map((s) => (
-                      <MenuItem
-                        key={s}
-                        onClick={() => {
-                          setRealTime(s);
-                          setRealTimeAnchor(null);
-                        }}
-                      >
-                        <ListItemText
-                          primary={s}
-                          primaryTypographyProps={{
+                  <Box onClick={(e) => e.stopPropagation()}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        color: 'text.secondary',
+                        fontSize: '11px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      Log time
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 0.75, mt: 1 }}>
+                      <Box sx={{ position: 'relative', flex: 1 }}>
+                        <Box
+                          onClick={() => setNewLogDatePickerOpen(true)}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
                             fontSize: '13px',
-                            fontWeight: 600,
+                            fontWeight: 500,
+                            py: 0.75,
+                            px: 1,
+                            borderRadius: '8px',
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <PlannedIcon
+                            sx={{ fontSize: 14, color: 'text.disabled' }}
+                          />
+                          {newLogDate ? format(newLogDate, 'MMM d') : 'Date'}
+                        </Box>
+                        <DatePicker
+                          open={newLogDatePickerOpen}
+                          onClose={() => setNewLogDatePickerOpen(false)}
+                          value={newLogDate}
+                          onChange={(newValue) => {
+                            setNewLogDate(newValue);
+                            setNewLogDatePickerOpen(false);
+                          }}
+                          slotProps={{
+                            textField: {
+                              sx: {
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                opacity: 0,
+                                pointerEvents: 'none',
+                              },
+                            },
+                            popper: {
+                              sx: datePickerPopperSx,
+                              placement: 'bottom-start',
+                            },
+                            desktopPaper: {
+                              sx: datePickerPaperSx,
+                            },
                           }}
                         />
-                      </MenuItem>
-                    ))}
-                  </List>
+                      </Box>
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        value={newLogDuration}
+                        onChange={(e) =>
+                          setNewLogDuration(
+                            sanitizeDurationValue(e.target.value),
+                          )
+                        }
+                        placeholder="2h"
+                        sx={{
+                          width: 64,
+                          '& .MuiInputBase-input': {
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            py: 0.85,
+                            px: 1,
+                          },
+                        }}
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const minutes = parseDuration(newLogDuration);
+                          if (minutes > 0 && newLogDate) {
+                            handleAddTimeLog(
+                              format(newLogDate, 'yyyy-MM-dd'),
+                              minutes,
+                            );
+                            setNewLogDuration('');
+                          }
+                        }}
+                        sx={{
+                          bgcolor: 'primary.main',
+                          color: '#fff',
+                          borderRadius: '8px',
+                          '&:hover': { bgcolor: 'primary.dark' },
+                        }}
+                      >
+                        <AddIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Box>
+
+                    {timeLogs.length > 0 ? (
+                      <List
+                        dense
+                        sx={{ py: 0, mt: 1, maxHeight: 200, overflowY: 'auto' }}
+                      >
+                        {timeLogs
+                          .map((entry, index) => ({ entry, index }))
+                          .sort((a, b) =>
+                            b.entry.date.localeCompare(a.entry.date),
+                          )
+                          .map(({ entry, index }) => (
+                            <MenuItem
+                              key={`${entry.date}-${index}`}
+                              disableRipple
+                              sx={{ px: 0.5, cursor: 'default' }}
+                            >
+                              <ListItemText
+                                primary={format(
+                                  new Date(`${entry.date}T00:00:00`),
+                                  'EEE, MMM d',
+                                )}
+                                secondary={formatDuration(entry.minutes)}
+                                primaryTypographyProps={{
+                                  fontSize: '12px',
+                                  fontWeight: 600,
+                                }}
+                                secondaryTypographyProps={{
+                                  fontSize: '12px',
+                                  fontWeight: 700,
+                                  color: 'text.primary',
+                                }}
+                              />
+                              {isOwner && (
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleRemoveTimeLog(index)}
+                                  sx={{ p: 0.3 }}
+                                >
+                                  <CloseIcon sx={{ fontSize: 14 }} />
+                                </IconButton>
+                              )}
+                            </MenuItem>
+                          ))}
+                      </List>
+                    ) : (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: 'block',
+                          mt: 1.5,
+                          mb: 0.5,
+                          color: 'text.disabled',
+                          fontStyle: 'italic',
+                        }}
+                      >
+                        No time logged yet.
+                      </Typography>
+                    )}
+                  </Box>
                 </Popover>
               </Box>
-              {realTimeInputError && (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'error.main',
-                    fontSize: '10px',
-                    ml: 0.5,
-                  }}
-                >
-                  {realTimeInputError}
-                </Typography>
-              )}
             </Box>
           </Box>
         </Box>
