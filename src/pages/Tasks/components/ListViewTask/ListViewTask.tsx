@@ -168,10 +168,23 @@ export const ListViewTask = ({
         </Box>
 
         {/* Cell 3: Title */}
-        <Box sx={{ minWidth: 0, display: 'flex', alignItems: 'center' }}>
+        <Box
+          sx={{
+            minWidth: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
           <TaskTitle variant="body1" title={task.title}>
             {task.title}
           </TaskTitle>
+          {(isAIScheduleEnabled || task.use_ai) && (
+            <AIBadge>
+              <AutoAwesomeIcon sx={{ fontSize: 13 }} />
+              <AIText>AI</AIText>
+            </AIBadge>
+          )}
         </Box>
 
         {/* Cell 3: Priority */}
@@ -349,12 +362,6 @@ export const ListViewTask = ({
                 <PlayIcon sx={{ fontSize: 20 }} />
               </FocusIconButton>
             </Tooltip>
-          )}
-          {isAIScheduleEnabled && (
-            <AIBadge>
-              <AutoAwesomeIcon sx={{ fontSize: 14 }} />
-              <AIText>AI</AIText>
-            </AIBadge>
           )}
         </Box>
       </TaskRow>
