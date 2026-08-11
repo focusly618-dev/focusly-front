@@ -10,6 +10,7 @@ import { EditorState, Compartment } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { syntaxHighlighting } from '@codemirror/language';
 import debounce from 'lodash.debounce';
+import 'katex/dist/katex.min.css';
 import { buildMarkdownExtensions } from './extensions';
 import { buildEditorTheme } from './theme/editorTheme';
 import { buildHighlightStyle } from './theme/highlightStyle';

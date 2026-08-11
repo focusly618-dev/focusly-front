@@ -14,6 +14,7 @@ import {
   Schedule as ScheduleIcon,
   AutoAwesome as AutoAwesomeIcon,
   Close as CloseIcon,
+  Google as GoogleIcon,
 } from '@mui/icons-material';
 
 import type { CalendarEventProps } from './CalendarEvent.types';
@@ -54,6 +55,11 @@ export const CalendarEvent = (props: CalendarEventProps) => {
   } = useCalendarContextMenu(event, onStartFocus);
 
   const isAiTask = event.type === 'task' && (event.resource as Task)?.use_ai;
+  const isGoogleTask =
+    event.type === 'event' ||
+    (event.type === 'task' &&
+      ((event.resource as Task)?.source === 'google' ||
+        (event.resource as Task)?.task_type === 'GoogleTask'));
   const isDraft = event.isDraft;
 
   const renderClassic = () => (
@@ -138,15 +144,20 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             >
               ✨ IA
             </Typography>
-          ) : isAiTask ? (
-            <AutoAwesomeIcon
-              sx={{
-                fontSize: 10,
-                color: 'primary.main',
-                flexShrink: 0,
-              }}
-            />
-          ) : null}
+          ) : (
+            <>
+              {isGoogleTask && (
+                <GoogleIcon
+                  sx={{ fontSize: 10, color: '#4285F4', flexShrink: 0 }}
+                />
+              )}
+              {isAiTask && (
+                <AutoAwesomeIcon
+                  sx={{ fontSize: 10, color: 'primary.main', flexShrink: 0 }}
+                />
+              )}
+            </>
+          )}
           <Box
             sx={{
               fontSize: '11px',
@@ -192,15 +203,20 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               >
                 ✨ Sugerencia
               </Typography>
-            ) : isAiTask ? (
-              <AutoAwesomeIcon
-                sx={{
-                  fontSize: 12,
-                  color: 'primary.main',
-                  flexShrink: 0,
-                }}
-              />
-            ) : null}
+            ) : (
+              <>
+                {isGoogleTask && (
+                  <GoogleIcon
+                    sx={{ fontSize: 12, color: '#4285F4', flexShrink: 0 }}
+                  />
+                )}
+                {isAiTask && (
+                  <AutoAwesomeIcon
+                    sx={{ fontSize: 12, color: 'primary.main', flexShrink: 0 }}
+                  />
+                )}
+              </>
+            )}
             <Box
               sx={{
                 overflow: 'hidden',

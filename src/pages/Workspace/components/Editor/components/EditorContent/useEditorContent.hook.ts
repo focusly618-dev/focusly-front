@@ -38,6 +38,11 @@ export const useEditorContent = ({
   const [iconAnchor, setIconAnchor] = useState<null | HTMLElement>(null);
   const [isAIProcessing, setIsAIProcessing] = useState(false);
 
+  const [aiTaskPreviewData, setAiTaskPreviewData] =
+    useState<AITaskPreviewData | null>(null);
+  const [isAITaskPreviewOpen, setIsAITaskPreviewOpen] = useState(false);
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
+
   const headerColor: HeaderColor =
     (persistedBg as HeaderColor | undefined) ?? 'none';
   const headerIcon: string = persistedEmoji ?? '';
@@ -117,7 +122,7 @@ Respond with a single raw JSON object and no extra commentary, matching this sch
 
 Text: "${selectedText}"`;
 
-    const createProcess = async () => {
+    const analyzeProcess = async () => {
       if (!user) throw new Error('User not logged in');
 
       const rawResult = await fetchEditResult(aiPrompt);
@@ -159,16 +164,79 @@ Text: "${selectedText}"`;
       const priorityLevel =
         parsed.priority === 'High' ? 4 : parsed.priority === 'Low' ? 1 : 2;
 
-      const createTaskInput = {
+      const startDate = new Date();
+      const endDate = new Date(
+        startDate.getTime() + (estimateTimer || 1800) * 1000,
+      );
+
+      const previewData: AITaskPreviewData = {
         title: parsed.title || 'AI Task',
-        notes_encrypted: parsed.description || '',
-        estimate_timer: estimateTimer,
+        description: parsed.description || selectedText,
+        priority: parsed.priority || 'Medium',
+        duration: parsed.duration || '30m',
+        startDate,
+        endDate,
+        priorityLevel,
+        estimateTimer,
+        category: 'General',
+        user_id: user.id || '',
+      };
+
+      return previewData;
+    };
+
+    try {
+      const previewData = await sileo.promise(analyzeProcess(), {
+        loading: {
+          title: 'AI Task Creator',
+          description: 'Creating summary & analyzing task...',
+          fill: 'var(--sileo-info-bg)',
+        },
+        success: {
+          title: 'Task summary ready!',
+          description: 'Review task details before scheduling.',
+          fill: 'var(--sileo-success-bg)',
+          duration: 3000,
+        },
+        error: {
+          title: 'Error creating task summary',
+          description: 'Could not generate task with AI.',
+          fill: 'var(--sileo-error-bg)',
+        },
+      });
+
+      if (previewData) {
+        setAiTaskPreviewData(previewData);
+        setIsAITaskPreviewOpen(true);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsAIProcessing(false);
+    }
+  };
+
+  const handleConfirmAITask = async (finalData: AITaskPreviewData) => {
+    if (!user) return;
+    setIsCreatingTask(true);
+    try {
+      const createTaskInput = {
+        title: finalData.title || 'AI Task',
+        notes_encrypted: finalData.description || '',
+        estimate_timer: finalData.estimateTimer,
         real_timer: 0,
         tags: [],
-        deadline: new Date().toISOString(),
-        priority_level: priorityLevel,
-        category: 'General',
-        color: '#3b82f6',
+        deadline: finalData.endDate
+          ? finalData.endDate.toISOString()
+          : new Date().toISOString(),
+        priority_level: finalData.priorityLevel,
+        category: finalData.category || 'General',
+        color:
+          finalData.priority === 'High'
+            ? '#ef4444'
+            : finalData.priority === 'Low'
+              ? '#10b981'
+              : '#3b82f6',
         links: [],
         user_id: user.id || '',
         status: 'Backlog',
@@ -186,36 +254,25 @@ Text: "${selectedText}"`;
         ],
       });
 
-      if (!data?.createTask) {
-        throw new Error('Task creation returned empty data');
-      }
-
-      return data.createTask;
-    };
-
-    try {
-      await sileo.promise(createProcess(), {
-        loading: {
-          title: 'AI Task Creator',
-          description: 'Analyzing text and creating task...',
-          fill: 'var(--sileo-info-bg)',
-        },
-        success: {
+      if (data?.createTask) {
+        sileo.success({
           title: 'Task created!',
-          description: 'New task has been added to your task list.',
+          description: 'New task has been added to your schedule.',
           fill: 'var(--sileo-success-bg)',
           duration: 3000,
-        },
-        error: {
-          title: 'Error creating task',
-          description: 'Could not create task with AI.',
-          fill: 'var(--sileo-error-bg)',
-        },
-      });
+        });
+        setIsAITaskPreviewOpen(false);
+        setAiTaskPreviewData(null);
+      }
     } catch (e) {
-      console.error(e);
+      console.error('Error creating task:', e);
+      sileo.error({
+        title: 'Error creating task',
+        description: 'Could not save task.',
+        fill: 'var(--sileo-error-bg)',
+      });
     } finally {
-      setIsAIProcessing(false);
+      setIsCreatingTask(false);
     }
   };
 
@@ -326,5 +383,10 @@ Text: "${selectedText}"`;
     handleCreateTask,
     processTextWithAI,
     isAIProcessing,
+    aiTaskPreviewData,
+    isAITaskPreviewOpen,
+    setIsAITaskPreviewOpen,
+    handleConfirmAITask,
+    isCreatingTask,
   };
 };

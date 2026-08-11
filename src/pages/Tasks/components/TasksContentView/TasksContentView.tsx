@@ -299,9 +299,6 @@ export const TasksContentView = ({
                   <TableHeaderCell className="col-actual">
                     Actual
                   </TableHeaderCell>
-                  <TableHeaderCell className="col-ai">
-                    AI Schedule
-                  </TableHeaderCell>
                   <TableHeaderCell>Actions</TableHeaderCell>
                 </TableHeader>
                 <TableBodyContainer onScroll={handleScroll}>

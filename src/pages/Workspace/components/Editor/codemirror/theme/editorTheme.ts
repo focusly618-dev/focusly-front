@@ -6,8 +6,60 @@ import { alpha, type Theme } from '@mui/material/styles';
 // apply (see extensions/livePreview/*). Kept in one Compartment so a
 // light/dark/graydark theme change reconfigures all of it in one dispatch —
 // see MarkdownEditor.tsx.
+// One color per Obsidian callout type (grouped by the semantic families
+// Obsidian itself uses) — reused for both the colored left-border/tint on
+// every line of the callout and the header's icon/title color.
+const calloutTypeColors = (theme: Theme): Record<string, string> => ({
+  note: theme.palette.info.main,
+  info: theme.palette.info.main,
+  abstract: theme.palette.info.main,
+  summary: theme.palette.info.main,
+  tldr: theme.palette.info.main,
+  tip: theme.palette.primary.main,
+  hint: theme.palette.primary.main,
+  todo: theme.palette.primary.main,
+  success: theme.palette.success.main,
+  check: theme.palette.success.main,
+  done: theme.palette.success.main,
+  question: theme.palette.warning.main,
+  help: theme.palette.warning.main,
+  faq: theme.palette.warning.main,
+  warning: theme.palette.warning.main,
+  caution: theme.palette.warning.main,
+  attention: theme.palette.warning.main,
+  failure: theme.palette.error.main,
+  fail: theme.palette.error.main,
+  missing: theme.palette.error.main,
+  danger: theme.palette.error.main,
+  error: theme.palette.error.main,
+  bug: theme.palette.error.main,
+  example: theme.palette.secondary.main,
+  quote: theme.palette.text.secondary,
+  cite: theme.palette.text.secondary,
+  important: theme.palette.secondary.main,
+});
+
 export const buildEditorTheme = (theme: Theme): Extension => {
   const isDark = theme.palette.mode === 'dark';
+  const calloutColors = calloutTypeColors(theme);
+
+  const calloutLineStyles = Object.fromEntries(
+    Object.entries(calloutColors).map(([type, color]) => [
+      `.cm-live-callout-line-${type}`,
+      {
+        borderLeft: `3px solid ${color}`,
+        paddingLeft: '10px',
+        backgroundColor: alpha(color, isDark ? 0.08 : 0.05),
+      },
+    ]),
+  );
+
+  const calloutHeaderColorStyles = Object.fromEntries(
+    Object.entries(calloutColors).map(([type, color]) => [
+      `.cm-live-callout-header.cm-live-callout-${type}`,
+      { color },
+    ]),
+  );
 
   return EditorView.theme(
     {
@@ -116,6 +168,66 @@ export const buildEditorTheme = (theme: Theme): Extension => {
       '.cm-hr-line': {
         borderTop: `1px solid ${theme.palette.divider}`,
         height: '1px',
+      },
+
+      // Tables
+      '.cm-live-table-wrapper': {
+        overflowX: 'auto',
+        margin: '10px 0',
+      },
+      '.cm-live-table': {
+        borderCollapse: 'collapse',
+        width: 'auto',
+        fontSize: '0.92em',
+      },
+      '.cm-live-table th, .cm-live-table td': {
+        border: `1px solid ${theme.palette.divider}`,
+        padding: '6px 12px',
+        textAlign: 'left',
+      },
+      '.cm-live-table th': {
+        backgroundColor: isDark
+          ? 'rgba(255, 255, 255, 0.05)'
+          : 'rgba(0, 0, 0, 0.03)',
+        fontWeight: 700,
+      },
+      '.cm-live-table tbody tr:nth-of-type(even) td': {
+        backgroundColor: isDark
+          ? 'rgba(255, 255, 255, 0.02)'
+          : 'rgba(0, 0, 0, 0.015)',
+      },
+
+      // Callouts
+      '.cm-live-callout-header': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '4px 10px 4px 8px',
+        fontWeight: 700,
+        userSelect: 'none',
+      },
+      '.cm-live-callout-icon': { fontSize: '0.95em', lineHeight: 1 },
+      '.cm-live-callout-title': { flex: 1 },
+      '.cm-live-callout-chevron': {
+        fontSize: '0.8em',
+        color: theme.palette.text.secondary,
+      },
+      ...calloutLineStyles,
+      ...calloutHeaderColorStyles,
+
+      // Math (KaTeX)
+      '.cm-live-math-block': {
+        display: 'block',
+        overflowX: 'auto',
+        margin: '10px 0',
+        padding: '6px 0',
+        textAlign: 'center',
+      },
+      '.cm-live-math-inline': { display: 'inline-block' },
+      '.cm-live-math-error': {
+        color: theme.palette.error.main,
+        fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+        fontSize: '0.85em',
       },
     },
     { dark: isDark },

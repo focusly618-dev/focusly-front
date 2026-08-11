@@ -1,10 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   LibraryContainer,
   GridContainer,
   WorkspaceCard,
-  LibraryHeader,
-  HeaderTitle,
   FolderIconCircle,
   StyledTextField,
 } from './WorkspaceLibrary.styles';
@@ -39,8 +37,6 @@ import {
   Folder as FolderFilledIcon,
   FolderOutlined as FolderOutlinedIcon,
   MoreHoriz as MoreHorizIcon,
-  Search as SearchIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import { EmptyState } from '@/components/ui';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
@@ -49,17 +45,22 @@ import type {
   ProjectGroupTypes,
 } from '../../types/workspace.types';
 import {
-  LibrarySearchHeader,
   WorkspaceCardItem,
   WorkspaceListItem,
+  WorkspaceLibraryHeader,
+  type ProjectSortOption,
 } from './components';
 import { useWorkspaceLibrary } from './hooks/useWorkspaceLibrary.hook';
 import { AllProjectsModal } from './modals/AllProjectsModal';
+import { TemplatesModal } from './modals/TemplatesModal';
 import { sileo } from '@/utils';
-import { surfaceColor } from '@/context';
 
 interface WorkspaceLibraryProps {
-  onCreate: () => void;
+  onCreate: (
+    initialTitle?: string,
+    initialContent?: string,
+    targetGroupId?: string,
+  ) => void;
   onSelect: (workspace: WorkspaceTypes) => void;
   selectedGroupId: string | null;
 }
@@ -107,6 +108,23 @@ export const WorkspaceLibrary = ({
   });
 
   const [isAllFoldersModalOpen, setIsAllFoldersModalOpen] = useState(false);
+
+  const isTemplatesModalOpen = searchParams.get('modal') === 'templates';
+
+  const handleCloseTemplatesModal = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('modal');
+    setSearchParams(newParams);
+  };
+
+  const handleSelectTemplate = (
+    title: string,
+    content: string,
+    groupId?: string,
+  ) => {
+    handleCloseTemplatesModal();
+    onCreate(title, content, groupId);
+  };
 
   const handleViewModeChange = (mode: 'gallery' | 'list' | 'grid') => {
     setViewMode(mode);
@@ -230,20 +248,73 @@ export const WorkspaceLibrary = ({
     : null;
 
   const targetGroup = groupToCustomize || activeGroup;
-
   const isInsideFolder = Boolean(selectedGroupId);
+
+  const [projectSortBy, setProjectSortBy] =
+    useState<ProjectSortOption>('recent');
+  const [projectColorFilter, setProjectColorFilter] = useState<string>('all');
+  const [noteSortBy, setNoteSortBy] = useState<
+    'recent' | 'title-asc' | 'title-desc'
+  >('recent');
+  const [noteFilterType, setNoteFilterType] = useState<
+    'all' | 'linked-task' | 'has-cover'
+  >('all');
 
   const sortedGroups = [...projectGroups].sort(
     (a: ProjectGroupTypes, b: ProjectGroupTypes) => {
+      if (projectSortBy === 'name-asc') {
+        return a.name.localeCompare(b.name);
+      }
+      if (projectSortBy === 'name-desc') {
+        return b.name.localeCompare(a.name);
+      }
+      if (projectSortBy === 'notes-count') {
+        const countA = a.workspaces?.length ?? 0;
+        const countB = b.workspaces?.length ?? 0;
+        return countB - countA;
+      }
       const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
       const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
       return dateB - dateA;
     },
   );
 
-  const filteredGroups = sortedGroups.filter((g: ProjectGroupTypes) =>
-    g.name.toLowerCase().includes(folderSearchTerm.toLowerCase()),
-  );
+  const filteredGroups = sortedGroups.filter((g: ProjectGroupTypes) => {
+    const matchesSearch = g.name
+      .toLowerCase()
+      .includes(folderSearchTerm.toLowerCase());
+    const matchesColor =
+      projectColorFilter === 'all' ||
+      (g.color && g.color.toLowerCase() === projectColorFilter.toLowerCase());
+    return matchesSearch && matchesColor;
+  });
+
+  const processedWorkspaces = useMemo(() => {
+    let result = [...workspaces];
+
+    if (noteFilterType === 'linked-task') {
+      result = result.filter((w: WorkspaceTypes) =>
+        Boolean(w.task || w.taskId),
+      );
+    } else if (noteFilterType === 'has-cover') {
+      result = result.filter(
+        (w: WorkspaceTypes) =>
+          Boolean(w.background_color) && w.background_color !== 'none',
+      );
+    }
+
+    result.sort((a: WorkspaceTypes, b: WorkspaceTypes) => {
+      if (noteSortBy === 'title-asc') {
+        return (a.title || '').localeCompare(b.title || '');
+      }
+      if (noteSortBy === 'title-desc') {
+        return (b.title || '').localeCompare(a.title || '');
+      }
+      return 0;
+    });
+
+    return result;
+  }, [workspaces, noteFilterType, noteSortBy]);
 
   return (
     <LibraryContainer sx={{ position: 'relative' }}>
@@ -346,126 +417,26 @@ export const WorkspaceLibrary = ({
         )}
       </Box>
 
-      {/* Top Page Header: Title & Action Buttons */}
-      <LibraryHeader>
-        <Box>
-          <HeaderTitle variant="h4">
-            {isInsideFolder ? activeGroup?.name : 'Projects'}
-          </HeaderTitle>
-        </Box>
-
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 1.5,
-            alignItems: 'center',
-            width: { xs: '100%', sm: 'auto' },
-          }}
-        >
-          {isInsideFolder ? (
-            <>
-              <LibrarySearchHeader
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                onClearSearch={handleClearSearch}
-                viewMode={viewMode}
-                onViewModeChange={handleViewModeChange}
-              />
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={onCreate}
-                sx={{
-                  height: '34px',
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  px: 2.5,
-                  boxShadow: 'none',
-                  width: { xs: '100%', sm: 'auto' },
-                  justifyContent: 'center',
-                  bgcolor:
-                    theme.palette.mode === 'dark' ? '#ffffff' : '#1c1c1a',
-                  color: theme.palette.mode === 'dark' ? '#0b0f14' : '#ffffff',
-                  '&:hover': {
-                    bgcolor:
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.9)'
-                        : 'rgba(28, 28, 26, 0.9)',
-                    boxShadow:
-                      theme.palette.mode === 'dark'
-                        ? '0 4px 12px rgba(255, 255, 255, 0.15)'
-                        : '0 4px 12px rgba(0, 0, 0, 0.15)',
-                  },
-                }}
-              >
-                New Note
-              </Button>
-            </>
-          ) : (
-            <>
-              <StyledTextField
-                placeholder="Search projects..."
-                value={folderSearchTerm}
-                onChange={(e) => setFolderSearchTerm(e.target.value)}
-                size="small"
-                sx={{
-                  width: '260px',
-                  flex: { xs: 1, sm: 'none' },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <SearchIcon
-                      sx={{ color: 'text.secondary', mr: 1, fontSize: 18 }}
-                    />
-                  ),
-                  endAdornment: folderSearchTerm ? (
-                    <IconButton
-                      size="small"
-                      sx={{ color: 'text.secondary', p: 0.5 }}
-                      onClick={() => setFolderSearchTerm('')}
-                    >
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  ) : null,
-                }}
-              />
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={() => setIsCreateFolderOpen(true)}
-                sx={{
-                  height: '34px',
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  px: 2.5,
-                  boxShadow: 'none',
-                  width: { xs: '100%', sm: 'auto' },
-                  justifyContent: 'center',
-                  bgcolor:
-                    theme.palette.mode === 'dark' ? '#ffffff' : '#1c1c1a',
-                  color: theme.palette.mode === 'dark' ? '#0b0f14' : '#ffffff',
-                  '&:hover': {
-                    bgcolor:
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.9)'
-                        : 'rgba(28, 28, 26, 0.9)',
-                    boxShadow:
-                      theme.palette.mode === 'dark'
-                        ? '0 4px 12px rgba(255, 255, 255, 0.15)'
-                        : '0 4px 12px rgba(0, 0, 0, 0.15)',
-                  },
-                }}
-              >
-                New Folder
-              </Button>
-            </>
-          )}
-        </Box>
-      </LibraryHeader>
+      <WorkspaceLibraryHeader
+        isInsideFolder={isInsideFolder}
+        activeGroupName={activeGroup?.name}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onClearSearch={handleClearSearch}
+        folderSearchTerm={folderSearchTerm}
+        onFolderSearchChange={setFolderSearchTerm}
+        onClearFolderSearch={() => setFolderSearchTerm('')}
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
+        projectSortBy={projectSortBy}
+        onProjectSortChange={setProjectSortBy}
+        projectColorFilter={projectColorFilter}
+        onProjectColorFilterChange={setProjectColorFilter}
+        noteSortBy={noteSortBy}
+        onNoteSortChange={setNoteSortBy}
+        noteFilterType={noteFilterType}
+        onNoteFilterChange={setNoteFilterType}
+      />
 
       {!isInsideFolder ? (
         /* Root Projects Cards Grid View */
@@ -728,26 +699,29 @@ export const WorkspaceLibrary = ({
             </Box>
           ) : (
             <GridContainer layout={viewMode}>
-              {searchTerm && !workspaces.length && !loading && (
+              {searchTerm && !processedWorkspaces.length && !loading && (
                 <EmptyState
                   title="No results found"
-                  description="No workspaces match your search term. Try a different keyword or create a new one."
+                  description="No workspaces match your search term or filter. Try adjusting your filter or search."
                   sx={{ gridColumn: '1 / -1', py: 8 }}
                 />
               )}
 
-              {!searchTerm && !workspaces.length && !loading && !error && (
-                <EmptyState
-                  icon={<PushPinIcon />}
-                  title="No workspaces yet"
-                  description="Lightweight notes to organize your strategic planning. Create your first workspace to get started."
-                  actionText="Create Workspace"
-                  onAction={onCreate}
-                  sx={{ gridColumn: '1 / -1', py: 10 }}
-                />
-              )}
+              {!searchTerm &&
+                !processedWorkspaces.length &&
+                !loading &&
+                !error && (
+                  <EmptyState
+                    icon={<PushPinIcon />}
+                    title="No workspaces yet"
+                    description="Lightweight notes to organize your strategic planning. Create your first workspace to get started."
+                    actionText="Create Workspace"
+                    onAction={onCreate}
+                    sx={{ gridColumn: '1 / -1', py: 10 }}
+                  />
+                )}
 
-              {loading && !workspaces.length
+              {loading && !processedWorkspaces.length
                 ? [1, 2, 3, 4, 5].map((i) => {
                     if (viewMode === 'list') {
                       return (
@@ -756,68 +730,34 @@ export const WorkspaceLibrary = ({
                           sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'space-between',
-                            p: '14px 16px',
-                            borderRadius: '8px',
-                            border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)'}`,
-                            bgcolor: surfaceColor(
-                              theme,
-                              'rgba(26, 31, 43, 0.4)',
-                              'rgba(36, 36, 37, 0.4)',
-                              '#ffffff',
-                            ),
                             gap: 2,
+                            p: 2,
+                            borderRadius: '12px',
+                            border: `1px solid ${theme.palette.divider}`,
+                            mb: 1,
                           }}
                         >
                           <Box
                             sx={{
-                              width: '30%',
-                              height: 16,
-                              bgcolor: 'action.hover',
-                              borderRadius: 1,
+                              width: 12,
+                              height: 12,
+                              borderRadius: '50%',
+                              bgcolor: 'action.disabledBackground',
                             }}
                           />
                           <Box
                             sx={{
-                              width: 14,
-                              height: 14,
+                              height: 16,
                               bgcolor: 'action.hover',
                               borderRadius: 1,
+                              flex: 1,
                             }}
                           />
                         </Box>
                       );
                     }
                     return (
-                      <WorkspaceCard
-                        key={i}
-                        sx={{ borderStyle: 'solid', cursor: 'default' }}
-                        compact={viewMode === 'grid'}
-                      >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            mb: 2,
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: '30%',
-                              height: 20,
-                              bgcolor: 'action.hover',
-                              borderRadius: 1,
-                            }}
-                          />
-                          <Box
-                            sx={{
-                              width: 24,
-                              height: 24,
-                              bgcolor: 'action.hover',
-                              borderRadius: '50%',
-                            }}
-                          />
-                        </Box>
+                      <WorkspaceCard key={i} viewMode={viewMode}>
                         <Box
                           sx={{
                             width: '80%',
@@ -879,7 +819,7 @@ export const WorkspaceLibrary = ({
                       </WorkspaceCard>
                     );
                   })
-                : workspaces.map((workspace: WorkspaceTypes) => {
+                : processedWorkspaces.map((workspace: WorkspaceTypes) => {
                     const group = allProjectGroups.find(
                       (g: ProjectGroupTypes) => g.id === workspace.groupId,
                     );
@@ -1477,15 +1417,19 @@ export const WorkspaceLibrary = ({
           userId: g.userId,
           color: g.color,
           workspaceCount: g.workspaces?.length ?? 0,
-          createdAt: g.createdAt,
-          updatedAt: g.updatedAt,
         }))}
-        onSelect={(groupId) => {
+        onSelectProject={(groupId) => {
           handleSelectFolder(groupId);
           setIsAllFoldersModalOpen(false);
         }}
-        selectedId={selectedGroupId}
-        onDeleteProjects={handleDeleteProjects}
+      />
+
+      <TemplatesModal
+        open={isTemplatesModalOpen}
+        onClose={handleCloseTemplatesModal}
+        projects={allProjectGroups}
+        selectedGroupId={selectedGroupId}
+        onSelectTemplate={handleSelectTemplate}
       />
     </LibraryContainer>
   );
