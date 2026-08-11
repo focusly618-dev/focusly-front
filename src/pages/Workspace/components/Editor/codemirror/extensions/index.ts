@@ -12,7 +12,7 @@ import {
 } from '@codemirror/commands';
 import { syntaxHighlighting, type HighlightStyle } from '@codemirror/language';
 import { markdownExtension } from './markdownLanguage';
-import { livePreviewPlugin } from './livePreview';
+import { livePreviewExtensions } from './livePreview';
 import { imagePasteExtension } from './imagePaste';
 
 export interface BuildMarkdownExtensionsOptions {
@@ -36,7 +36,7 @@ export const buildMarkdownExtensions = ({
   markdownExtension,
   editorThemeCompartment.of(initialEditorTheme),
   highlightCompartment.of(syntaxHighlighting(initialHighlightStyle)),
-  livePreviewPlugin,
+  ...livePreviewExtensions,
   imagePasteExtension,
   ...(placeholder ? [placeholderExt(placeholder)] : []),
 ];

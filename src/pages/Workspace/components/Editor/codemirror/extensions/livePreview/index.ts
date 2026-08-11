@@ -5,6 +5,7 @@ import {
   type DecorationSet,
   EditorView,
 } from '@codemirror/view';
+import type { Extension } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';
 import type { SyntaxNodeRef } from '@lezer/common';
 import { handleEmphasis } from './emphasis';
@@ -16,12 +17,15 @@ import { handleTaskMarker, handleTaskCheckboxMousedown } from './taskList';
 import { handleFencedCode } from './codeBlocks';
 import { handleHorizontalRule } from './horizontalRule';
 import { handleImage } from './image';
+import { handleCalloutMarker, handleCalloutToggleClick } from './callout';
+import { handleInlineMath } from './math';
+import { setCalloutFold, calloutFoldField } from './foldState';
+import { blockDecorationsField } from './blockDecorations';
 import type { Handler, Push } from './utils';
 
-// Dispatch table: one syntax-tree walk per relevant update, routed by Lezer
-// node type name to the construct-specific handler that knows how to hide/
-// reveal/style it. Adding a new construct means adding one entry here plus
-// its handler file — the walk itself never changes.
+// Dispatch table for the viewport-scoped walk: inline marks/hides and line
+// decorations only — never `block: true` (see blockDecorations.ts for the
+// constructs that need that, via a full-document StateField instead).
 const HANDLERS: Record<string, Handler> = {
   StrongEmphasis: handleEmphasis,
   Emphasis: handleEmphasis,
@@ -38,6 +42,8 @@ const HANDLERS: Record<string, Handler> = {
   FencedCode: handleFencedCode,
   HorizontalRule: handleHorizontalRule,
   Image: handleImage,
+  Blockquote: handleCalloutMarker,
+  InlineMath: handleInlineMath,
 };
 
 function buildDecorations(view: EditorView): DecorationSet {
@@ -56,7 +62,10 @@ function buildDecorations(view: EditorView): DecorationSet {
       to,
       enter(node: SyntaxNodeRef) {
         const handler = HANDLERS[node.type.name];
-        if (handler) handler(node, view, state.selection, push);
+        if (handler) {
+          const result = handler(node, view, state.selection, push);
+          if (result === false) return false;
+        }
       },
     });
   }
@@ -91,7 +100,24 @@ export const livePreviewPlugin = ViewPlugin.fromClass(
   {
     decorations: (v) => v.decorations,
     eventHandlers: {
-      mousedown: (event, view) => handleTaskCheckboxMousedown(event, view),
+      mousedown(event, view) {
+        if (handleTaskCheckboxMousedown(event, view)) return true;
+        const toggle = handleCalloutToggleClick(event);
+        if (toggle) {
+          view.dispatch({ effects: setCalloutFold.of(toggle) });
+          return true;
+        }
+        return false;
+      },
     },
   },
 );
+
+// The block-only StateField and its supporting fold-state field must be
+// installed alongside the plugin for callouts/tables/mermaid/math to render
+// at all — bundled here so extensions/index.ts only needs one import.
+export const livePreviewExtensions: Extension[] = [
+  livePreviewPlugin,
+  calloutFoldField,
+  blockDecorationsField,
+];
