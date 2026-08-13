@@ -766,7 +766,7 @@ export const WorkspaceLibrary = ({
                       );
                     }
                     return (
-                      <WorkspaceCard key={i} viewMode={viewMode}>
+                      <WorkspaceCard key={i} compact={viewMode === 'grid'}>
                         <Box
                           sx={{
                             width: '80%',
@@ -1427,7 +1427,8 @@ export const WorkspaceLibrary = ({
           color: g.color,
           workspaceCount: g.workspaces?.length ?? 0,
         }))}
-        onSelectProject={(groupId) => {
+        selectedId={selectedGroupId}
+        onSelect={(groupId) => {
           handleSelectFolder(groupId);
           setIsAllFoldersModalOpen(false);
         }}
