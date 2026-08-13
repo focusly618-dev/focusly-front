@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogTitle,
@@ -30,6 +31,7 @@ interface CalendarWeeklyPlannerModalProps {
 export const CalendarWeeklyPlannerModal: React.FC<
   CalendarWeeklyPlannerModalProps
 > = ({ open, onClose, tasks, currentDate }) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
@@ -45,9 +47,8 @@ export const CalendarWeeklyPlannerModal: React.FC<
           const pendingTasks = tasks.filter((t) => t.status !== 'Done');
           if (pendingTasks.length === 0) {
             sileo.info({
-              title: 'Weekly Planner',
-              description:
-                'No tienes tareas pendientes para planificar esta semana.',
+              title: t('calendarWeeklyPlanner.toast.noTasksTitle'),
+              description: t('calendarWeeklyPlanner.toast.noTasksDesc'),
               duration: 3000,
             });
             onClose();
@@ -60,9 +61,8 @@ export const CalendarWeeklyPlannerModal: React.FC<
         } catch (e) {
           console.error('Error fetching weekly plan:', e);
           sileo.error({
-            title: 'Error',
-            description:
-              'No se pudo obtener la planificación semanal de Lumina.',
+            title: t('common.error'),
+            description: t('calendarWeeklyPlanner.toast.fetchErrorDesc'),
             duration: 4000,
           });
           onClose();
@@ -72,7 +72,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
       };
       fetchWeeklyPlan();
     }
-  }, [open, tasks, onClose]);
+  }, [open, tasks, onClose, t]);
 
   const getDayDate = (dayName: string) => {
     const monday = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday = 1
@@ -136,18 +136,16 @@ export const CalendarWeeklyPlannerModal: React.FC<
       }
 
       sileo.success({
-        title: 'Planificación Semanal Aplicada',
-        description:
-          'Se han configurado las fechas estimadas de trabajo para tus tareas.',
+        title: t('calendarWeeklyPlanner.toast.appliedTitle'),
+        description: t('calendarWeeklyPlanner.toast.appliedDesc'),
         duration: 4000,
       });
       onClose();
     } catch (e) {
       console.error('Error applying weekly schedule:', e);
       sileo.error({
-        title: 'Error',
-        description:
-          'Ocurrió un problema al guardar las fechas de planificación.',
+        title: t('common.error'),
+        description: t('calendarWeeklyPlanner.toast.applyErrorDesc'),
         duration: 4000,
       });
     } finally {
@@ -180,7 +178,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
         }}
       >
         <AutoAwesomeIcon sx={{ color: 'primary.main' }} />
-        Focusly AI Weekly Planner
+        {t('calendarWeeklyPlanner.title')}
       </DialogTitle>
 
       <DialogContent>
@@ -197,7 +195,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
           >
             <CircularProgress color="primary" />
             <Typography variant="body2" color="text.secondary" fontWeight={500}>
-              Lumina AI está organizando tu agenda semanal...
+              {t('calendarWeeklyPlanner.loading')}
             </Typography>
           </Box>
         ) : (
@@ -228,7 +226,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
                     mb: 0.5,
                   }}
                 >
-                  🎯 Recomendación de Lumina:
+                  {t('calendarWeeklyPlanner.recommendation')}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -284,7 +282,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
                             color="text.disabled"
                             sx={{ fontStyle: 'italic' }}
                           >
-                            Sin tareas asignadas.
+                            {t('calendarWeeklyPlanner.noTasksAssigned')}
                           </Typography>
                         ) : (
                           dayItem.tasks.map((taskTitle, tIdx) => (
@@ -325,7 +323,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
             color: 'text.secondary',
           }}
         >
-          Descartar
+          {t('calendar.discard')}
         </Button>
         <Button
           onClick={handleApply}
@@ -346,7 +344,9 @@ export const CalendarWeeklyPlannerModal: React.FC<
             '&:hover': { boxShadow: 'none' },
           }}
         >
-          {applying ? 'Asignando tareas...' : 'Confirmar Plan Semanal'}
+          {applying
+            ? t('calendarWeeklyPlanner.applying')
+            : t('calendarWeeklyPlanner.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

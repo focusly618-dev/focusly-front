@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -38,6 +39,7 @@ export const AllProjectsModal = ({
   selectedId,
   onDeleteProjects,
 }: AllProjectsModalProps) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedForDelete, setSelectedForDelete] = useState<string[]>([]);
@@ -86,13 +88,13 @@ export const AllProjectsModal = ({
               fontWeight={800}
               sx={{ color: 'text.primary', mb: 0.5 }}
             >
-              All Folders
+              {t('allProjectsModal.title')}
             </Typography>
             <Typography
               variant="body2"
               sx={{ color: 'text.secondary', opacity: 0.7 }}
             >
-              Browse and select folders for your library view.
+              {t('allProjectsModal.subtitle')}
             </Typography>
           </Box>
           <IconButton onClick={onClose} sx={{ color: 'text.secondary' }}>
@@ -103,7 +105,9 @@ export const AllProjectsModal = ({
         <Box sx={{ position: 'relative', my: 3 }}>
           <StyledTextField
             fullWidth
-            placeholder={`Search across ${projects.length} folders...`}
+            placeholder={t('allProjectsModal.searchPlaceholder', {
+              count: projects.length,
+            })}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             size="small"
@@ -171,16 +175,16 @@ export const AllProjectsModal = ({
                 sx={{ color: 'text.secondary', mb: 1 }}
               >
                 {projects.length === 0
-                  ? 'No folders added yet'
-                  : 'No matching folders'}
+                  ? t('allProjectsModal.emptyNoFolders')
+                  : t('allProjectsModal.emptyNoMatch')}
               </Typography>
               <Typography
                 variant="body2"
                 sx={{ color: 'text.disabled', opacity: 0.7, maxWidth: 300 }}
               >
                 {projects.length === 0
-                  ? 'Create a custom folder in the library or sidebar to start grouping your plans.'
-                  : 'Try adjusting your search terms.'}
+                  ? t('allProjectsModal.emptyNoFoldersDesc')
+                  : t('allProjectsModal.emptyNoMatchDesc')}
               </Typography>
             </Box>
           ) : (
@@ -280,7 +284,9 @@ export const AllProjectsModal = ({
                       variant="caption"
                       sx={{ color: 'text.secondary', opacity: 0.7 }}
                     >
-                      {project.workspaceCount || 0} Items
+                      {t('allProjectsModal.items', {
+                        count: project.workspaceCount || 0,
+                      })}
                     </Typography>
                   </Box>
                   <Box
@@ -304,9 +310,12 @@ export const AllProjectsModal = ({
                             ? '#00f5ff'
                             : 'text.secondary',
                         fontSize: '10px',
+                        textTransform: 'uppercase',
                       }}
                     >
-                      {selectedId === project.id ? 'VISIBLE' : 'SELECT'}
+                      {selectedId === project.id
+                        ? t('allProjectsModal.visible')
+                        : t('allProjectsModal.select')}
                     </Typography>
                   </Box>
                 </Box>
@@ -338,7 +347,9 @@ export const AllProjectsModal = ({
                 },
               }}
             >
-              Eliminar ({selectedForDelete.length})
+              {t('allProjectsModal.deleteSelected', {
+                count: selectedForDelete.length,
+              })}
             </Button>
           ) : (
             <Box />
@@ -350,7 +361,7 @@ export const AllProjectsModal = ({
               onClick={onClose}
               sx={{ color: 'text.secondary', fontWeight: 600 }}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="contained"
@@ -368,7 +379,7 @@ export const AllProjectsModal = ({
                 },
               }}
             >
-              Apply Changes
+              {t('allProjectsModal.applyChanges')}
             </Button>
           </Box>
         </Box>

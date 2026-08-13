@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import {
   ExitModalOverlay,
@@ -17,7 +18,12 @@ interface EndSessionModalProps {
   onConfirm: () => void;
 }
 
-export const EndSessionModal: React.FC<EndSessionModalProps> = ({ open, onClose, onConfirm }) => {
+export const EndSessionModal: React.FC<EndSessionModalProps> = ({
+  open,
+  onClose,
+  onConfirm,
+}) => {
+  const { t } = useTranslation();
   if (!open) return null;
 
   return (
@@ -26,15 +32,17 @@ export const EndSessionModal: React.FC<EndSessionModalProps> = ({ open, onClose,
         <WarningIconWrapper>
           <WarningAmberRoundedIcon />
         </WarningIconWrapper>
-        <ExitModalTitle>End Focus Session?</ExitModalTitle>
+        <ExitModalTitle>{t('endSessionModal.title')}</ExitModalTitle>
         <ExitModalText>
-          Are you sure you want to end this session early?
+          {t('endSessionModal.confirmText')}
           <br />
-          Stopping now might affect your daily progress tracking and streak.
+          {t('endSessionModal.warningText')}
         </ExitModalText>
         <ExitModalActions>
-          <CancelButton onClick={onClose}>Cancel</CancelButton>
-          <EndSessionButton onClick={onConfirm}>End Session</EndSessionButton>
+          <CancelButton onClick={onClose}>{t('common.cancel')}</CancelButton>
+          <EndSessionButton onClick={onConfirm}>
+            {t('endSessionModal.endSession')}
+          </EndSessionButton>
         </ExitModalActions>
       </ExitModalCard>
     </ExitModalOverlay>

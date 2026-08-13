@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Typography, Box, Stack, CircularProgress } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { EventAvailable, CalendarMonth, Lock } from '@mui/icons-material';
 import {
   ProgressBarContainer,
@@ -29,6 +30,7 @@ import { fetchGoogleEvents } from '@/api/GoogleCalendar/googleCalendarApi';
 const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
   onNext,
 }) => {
+  const { t } = useTranslation();
   // token no longer needed here as we use useGoogleLogin for the specific scope
   const [events, setEventsLocal] = useState<GoogleCalendarEvent[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -100,8 +102,8 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
   const calendars = [
     {
       id: 'google',
-      name: 'Google Calendar',
-      desc: 'Sync events from Google',
+      name: t('onboarding.calendarConnection.googleCalendar'),
+      desc: t('onboarding.calendarConnection.syncDesc'),
       icon: <CalendarMonth sx={{ color: '#EA4335' }} />,
       bgColor: '#f0f4f8',
       darkBgColor: '#233648',
@@ -114,10 +116,10 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
       <ProgressBarContainer>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" fontWeight="500">
-            Step 2 of 4
+            {t('onboarding.progress.step', { current: 2, total: 4 })}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            50% Completed
+            {t('onboarding.progress.percentCompleted', { percent: 50 })}
           </Typography>
         </Box>
         <ProgressBarTrack>
@@ -135,10 +137,10 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
                 gutterBottom
                 sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' } }}
               >
-                Choose a provider
+                {t('onboarding.calendarConnection.chooseProvider')}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Select your calendar service to continue
+                {t('onboarding.calendarConnection.selectService')}
               </Typography>
             </Box>
 
@@ -170,7 +172,7 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
                     {isLoading && connectingProvider === cal.id ? (
                       <CircularProgress size={20} color="inherit" />
                     ) : (
-                      'Connect'
+                      t('common.connect')
                     )}
                   </ConnectButton>
                 </IntegrationCard>
@@ -190,7 +192,7 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
                 sx={{ cursor: 'pointer', '&:hover': { color: 'text.primary' } }}
                 onClick={onNext}
               >
-                Skip for now
+                {t('onboarding.calendarConnection.skipForNow')}
               </Typography>
             </Box>
           </>
@@ -230,11 +232,12 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
                 gutterBottom
                 sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' } }}
               >
-                Calendar Connected!
+                {t('onboarding.calendarConnection.connectedHeading')}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                We successfully retrieved {events.length} events from your
-                calendar.
+                {t('onboarding.calendarConnection.connectedDesc', {
+                  count: events.length,
+                })}
               </Typography>
             </Box>
 
@@ -243,7 +246,7 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
                 onClick={onNext}
                 style={{ width: 'auto', padding: '10px 40px' }}
               >
-                Continue
+                {t('onboarding.calendarConnection.continue')}
               </ConnectButton>
             </Box>
 
@@ -256,7 +259,7 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
             >
               <Lock sx={{ fontSize: 16, color: 'text.secondary' }} />
               <Typography variant="caption" color="text.secondary">
-                Your data is encrypted and private.
+                {t('onboarding.calendarConnection.privacyNote')}
               </Typography>
             </Box>
           </>

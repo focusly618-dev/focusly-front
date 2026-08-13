@@ -1,4 +1,5 @@
 import React, { useEffect, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardHeader,
@@ -28,6 +29,7 @@ import { ColorModeContext } from '@/context';
 import { useLogin } from './Login.hook';
 
 export const Login: React.FC = () => {
+  const { t } = useTranslation();
   const colorMode = useContext(ColorModeContext);
   const {
     loginGoogle,
@@ -73,7 +75,7 @@ export const Login: React.FC = () => {
         <Button
           isIconOnly
           variant="ghost"
-          aria-label="Toggle theme"
+          aria-label={t('login.toggleTheme')}
           onClick={colorMode.toggleColorMode}
           className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 shadow-sm rounded-full p-2"
         >
@@ -106,16 +108,16 @@ export const Login: React.FC = () => {
                 <EmailIcon className="text-3xl" />
               </div>
               <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                Revisa tu correo
+                {t('login.checkEmail.title')}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-                Hemos enviado un enlace de acceso a <br />
+                {t('login.checkEmail.desc')} <br />
                 <strong className="text-slate-800 dark:text-slate-200 font-semibold">
                   {email}
                 </strong>
                 .
                 <br />
-                Haz clic en el enlace para ingresar al instante.
+                {t('login.checkEmail.instructions')}
               </CardDescription>
               <Button
                 variant="outline"
@@ -123,7 +125,7 @@ export const Login: React.FC = () => {
                 className="font-medium flex items-center gap-2"
               >
                 <ArrowBackIcon className="text-sm" />
-                Volver a iniciar sesión
+                {t('login.checkEmail.back')}
               </Button>
             </CardContent>
           ) : (
@@ -131,10 +133,12 @@ export const Login: React.FC = () => {
               <CardHeader className="flex flex-col items-stretch px-8 pt-8 pb-2 gap-4">
                 <div className="text-center">
                   <CardTitle className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">
-                    {isRegistering ? 'Crear una cuenta' : 'Bienvenido de nuevo'}
+                    {isRegistering
+                      ? t('login.signUpTitle')
+                      : t('login.signInTitle')}
                   </CardTitle>
                   <CardDescription className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                    Ingresa tus datos para acceder a tu espacio de trabajo.
+                    {t('login.subtitle')}
                   </CardDescription>
                 </div>
 
@@ -149,13 +153,13 @@ export const Login: React.FC = () => {
                       id="signin"
                       className="flex-1 py-2 text-center text-sm font-semibold rounded-lg cursor-pointer transition-all data-[selected]:bg-white dark:data-[selected]:bg-slate-700 data-[selected]:shadow-sm data-[selected]:text-indigo-600 dark:data-[selected]:text-indigo-400 text-slate-600 dark:text-slate-400"
                     >
-                      Iniciar Sesión
+                      {t('login.tabs.signIn')}
                     </Tab>
                     <Tab
                       id="signup"
                       className="flex-1 py-2 text-center text-sm font-semibold rounded-lg cursor-pointer transition-all data-[selected]:bg-white dark:data-[selected]:bg-slate-700 data-[selected]:shadow-sm data-[selected]:text-indigo-600 dark:data-[selected]:text-indigo-400 text-slate-600 dark:text-slate-400"
                     >
-                      Registrarse
+                      {t('login.tabs.signUp')}
                     </Tab>
                   </TabList>
                 </Tabs>
@@ -188,13 +192,13 @@ export const Login: React.FC = () => {
                       fill="#EA4335"
                     />
                   </svg>
-                  <span>Continuar con Google</span>
+                  <span>{t('login.continueWithGoogle')}</span>
                 </Button>
 
                 <div className="flex items-center my-3 gap-3">
                   <Separator className="flex-1 bg-slate-200 dark:bg-slate-700/80 h-px" />
                   <span className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">
-                    o con correo
+                    {t('login.orWithEmail')}
                   </span>
                   <Separator className="flex-1 bg-slate-200 dark:bg-slate-700/80 h-px" />
                 </div>
@@ -210,12 +214,12 @@ export const Login: React.FC = () => {
                   {isRegistering && (
                     <div className="space-y-1.5">
                       <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                        Nombre Completo
+                        {t('login.fullName')}
                       </Label>
                       <div className="relative flex items-center">
                         <PersonIcon className="absolute left-3 text-slate-400 text-lg pointer-events-none" />
                         <Input
-                          placeholder="Ej. Juan Pérez"
+                          placeholder={t('login.fullNamePlaceholder')}
                           disabled={isLoading}
                           value={fullName}
                           onChange={handleFullNameChange}
@@ -227,12 +231,12 @@ export const Login: React.FC = () => {
 
                   <div className="space-y-1.5">
                     <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                      Correo Electrónico
+                      {t('login.email')}
                     </Label>
                     <div className="relative flex items-center">
                       <EmailIcon className="absolute left-3 text-slate-400 text-lg pointer-events-none" />
                       <Input
-                        placeholder="nombre@empresa.com"
+                        placeholder={t('login.emailPlaceholder')}
                         type="email"
                         disabled={isLoading}
                         value={email}
@@ -251,9 +255,9 @@ export const Login: React.FC = () => {
                     {isLoading ? (
                       <Spinner size="sm" color="current" />
                     ) : isRegistering ? (
-                      'Crear Cuenta'
+                      t('login.createAccount')
                     ) : (
-                      'Ingresar'
+                      t('login.signIn')
                     )}
                   </Button>
                 </form>
@@ -261,15 +265,15 @@ export const Login: React.FC = () => {
 
               <CardFooter className="px-8 pb-8 pt-2 flex flex-col items-center justify-center">
                 <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-                  {isRegistering
-                    ? '¿Ya tienes una cuenta? '
-                    : '¿No tienes una cuenta? '}
+                  {isRegistering ? t('login.hasAccount') : t('login.noAccount')}
                   <button
                     type="button"
                     onClick={toggleRegister}
                     className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline bg-transparent border-0 cursor-pointer p-0"
                   >
-                    {isRegistering ? 'Inicia sesión aquí' : 'Regístrate gratis'}
+                    {isRegistering
+                      ? t('login.signInHere')
+                      : t('login.signUpHere')}
                   </button>
                 </p>
               </CardFooter>
@@ -281,15 +285,15 @@ export const Login: React.FC = () => {
       {/* Footer Links */}
       <div className="pb-6 z-10 flex flex-wrap justify-center items-center gap-6 text-xs text-slate-400 dark:text-slate-500">
         <Link href="#" className="text-xs text-slate-500 hover:underline">
-          Términos de Servicio
+          {t('login.termsOfService')}
         </Link>
         <Link href="#" className="text-xs text-slate-500 hover:underline">
-          Política de Privacidad
+          {t('login.privacyPolicy')}
         </Link>
         <Link href="#" className="text-xs text-slate-500 hover:underline">
-          Centro de Ayuda
+          {t('login.helpCenter')}
         </Link>
-        <span>© 2026 Focusly</span>
+        <span>{t('login.copyright')}</span>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Typography, Box, Stack, Divider, Button } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { Tune, Timelapse, LocalCafe, Info } from '@mui/icons-material';
 import {
   ProgressBarContainer,
@@ -18,6 +19,7 @@ interface FocusBlocksStepProps {
 }
 
 const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const [focusLength, setFocusLength] = useState<number>(45);
   const [shortBreak, setShortBreak] = useState<number>(5);
@@ -73,10 +75,10 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
       <ProgressBarContainer>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" fontWeight="500">
-            Step 3 of 4
+            {t('onboarding.progress.step', { current: 3, total: 4 })}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            75% Completed
+            {t('onboarding.progress.percentCompleted', { percent: 75 })}
           </Typography>
         </Box>
         <ProgressBarTrack>
@@ -144,11 +146,10 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
             gutterBottom
             sx={{ fontSize: { xs: '1.75rem', md: '2rem' } }}
           >
-            Customize Focus Blocks
+            {t('onboarding.focusBlocks.heading')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Set your preferred duration for deep work sessions and breaks. We'll
-            structure your intelligent calendar around your rhythm.
+            {t('onboarding.focusBlocks.subheading')}
           </Typography>
         </Box>
 
@@ -180,10 +181,10 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
               </Box>
               <Box>
                 <Typography variant="body1" fontWeight="bold">
-                  Focus Session
+                  {t('onboarding.focusBlocks.focusSession')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Deep work duration
+                  {t('onboarding.focusBlocks.deepWorkDuration')}
                 </Typography>
               </Box>
             </Box>
@@ -199,7 +200,7 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   fontWeight="500"
                   color="text.secondary"
                 >
-                  Length
+                  {t('onboarding.focusBlocks.length')}
                 </Typography>
                 <Box
                   bgcolor="action.hover"
@@ -210,7 +211,9 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   borderColor="divider"
                 >
                   <Typography variant="body2" fontWeight="bold">
-                    {focusLength} min
+                    {t('onboarding.focusBlocks.minutes', {
+                      count: focusLength,
+                    })}
                   </Typography>
                 </Box>
               </Box>
@@ -270,10 +273,10 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
               </Box>
               <Box>
                 <Typography variant="body1" fontWeight="bold">
-                  Recovery Breaks
+                  {t('onboarding.focusBlocks.recoveryBreaks')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Rest & recharge
+                  {t('onboarding.focusBlocks.restRecharge')}
                 </Typography>
               </Box>
             </Box>
@@ -287,7 +290,7 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   mb={1}
                 >
                   <Typography variant="body2" fontWeight="500">
-                    Short Break
+                    {t('onboarding.focusBlocks.shortBreak')}
                   </Typography>
                   <Box
                     bgcolor="action.hover"
@@ -298,7 +301,9 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                     borderColor="divider"
                   >
                     <Typography variant="body2" fontWeight="bold">
-                      {shortBreak} min
+                      {t('onboarding.focusBlocks.minutes', {
+                        count: shortBreak,
+                      })}
                     </Typography>
                   </Box>
                 </Box>
@@ -315,7 +320,7 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   mt={1}
                   display="block"
                 >
-                  Taken after every focus session.
+                  {t('onboarding.focusBlocks.shortBreakNote')}
                 </Typography>
               </Box>
 
@@ -329,7 +334,7 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   mb={1}
                 >
                   <Typography variant="body2" fontWeight="500">
-                    Long Break
+                    {t('onboarding.focusBlocks.longBreak')}
                   </Typography>
                   <Box
                     bgcolor="action.hover"
@@ -340,7 +345,9 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                     borderColor="divider"
                   >
                     <Typography variant="body2" fontWeight="bold">
-                      {longBreak} min
+                      {t('onboarding.focusBlocks.minutes', {
+                        count: longBreak,
+                      })}
                     </Typography>
                   </Box>
                 </Box>
@@ -357,7 +364,7 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
                   mt={1}
                   display="block"
                 >
-                  Taken after 4 consecutive sessions.
+                  {t('onboarding.focusBlocks.longBreakNote')}
                 </Typography>
               </Box>
             </Stack>
@@ -374,11 +381,9 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
             <Info sx={{ color: 'primary.main', fontSize: 20 }} />
             <Typography variant="body2" color="text.secondary">
               <Box component="span" fontWeight="600" color="primary.main">
-                How this affects your day:{' '}
+                {t('onboarding.focusBlocks.infoLabel')}{' '}
               </Box>
-              We will look for available slots in your calendar and fill them
-              with these focus blocks, ensuring you never overwork without a
-              break.
+              {t('onboarding.focusBlocks.infoDesc')}
             </Typography>
           </Box>
         </Stack>
@@ -405,7 +410,7 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
               },
             }}
           >
-            Save & Continue
+            {t('onboarding.saveAndContinue')}
           </Button>
 
           <Button
@@ -421,7 +426,7 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
               },
             }}
           >
-            Use Pomodoro defaults (25m / 5m)
+            {t('onboarding.focusBlocks.useDefaults')}
           </Button>
         </Stack>
       </Box>

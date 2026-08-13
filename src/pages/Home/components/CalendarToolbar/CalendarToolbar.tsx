@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ToolbarProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import type { ICalendarEvent } from '../CalendarEvent';
@@ -44,6 +45,7 @@ interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
 }
 
 export const CalendarToolbar = (props: CustomToolbarProps) => {
+  const { t } = useTranslation();
   const { date, onNavigate, onNavigateAction, onMobileMenuClick } = props;
   const theme = useTheme();
 
@@ -114,7 +116,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
               display: { xs: 'none', sm: 'block' },
             }}
           >
-            Organized clarity for your deep work sessions.
+            {t('calendar.subtitle')}
           </Typography>
         </Box>
 
@@ -207,7 +209,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
           }}
         >
           <Typography variant="subtitle1" fontWeight={700}>
-            Notifications
+            {t('calendar.notifications.title')}
           </Typography>
           {unreadCount > 0 && (
             <Box
@@ -221,7 +223,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
                 borderRadius: '6px',
               }}
             >
-              {unreadCount} NEW
+              {t('calendar.notifications.new', { count: unreadCount })}
             </Box>
           )}
         </Box>
@@ -252,15 +254,14 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
                 fontWeight={600}
                 color="text.secondary"
               >
-                No notifications yet
+                {t('calendar.notifications.empty')}
               </Typography>
               <Typography
                 variant="caption"
                 color="text.disabled"
                 textAlign="center"
               >
-                You&apos;re all caught up! Notifications about tasks and focus
-                sessions will appear here.
+                {t('calendar.notifications.emptyDesc')}
               </Typography>
             </Box>
           ) : (
@@ -346,7 +347,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
                   fontSize: '0.75rem',
                 }}
               >
-                Mark all read
+                {t('calendar.notifications.markAllRead')}
               </Button>
             </Box>
           </>

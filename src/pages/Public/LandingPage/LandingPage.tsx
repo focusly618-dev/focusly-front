@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Container,
   Stack,
@@ -389,6 +390,7 @@ const AnimatedProjectMockup = () => {
 };
 
 const LandingPage: React.FC = () => {
+  const { t } = useTranslation();
   const [expandedFaq, setExpandedFaq] = useState<string | false>(false);
 
   const handleFaqChange =
@@ -399,9 +401,8 @@ const LandingPage: React.FC = () => {
   const features = [
     {
       icon: '🗂',
-      title: 'Workspaces',
-      description:
-        'Seamlessly separate personal, startup, and side projects with dedicated workspaces.',
+      title: t('landing.features.workspaces.title'),
+      description: t('landing.features.workspaces.description'),
       mock: (
         <Stack spacing={1} sx={{ p: 0.5 }}>
           <Stack direction="row" spacing={1} alignItems="center">
@@ -442,9 +443,8 @@ const LandingPage: React.FC = () => {
     },
     {
       icon: '✅',
-      title: 'Tasks',
-      description:
-        'Create lists, prioritize, add labels, tags, assignees, and due dates.',
+      title: t('landing.features.tasks.title'),
+      description: t('landing.features.tasks.description'),
       mock: (
         <Stack spacing={1} sx={{ p: 0.5 }}>
           <MockupTaskItem>
@@ -460,9 +460,8 @@ const LandingPage: React.FC = () => {
     },
     {
       icon: '📅',
-      title: 'Calendar',
-      description:
-        'Sync and unify all your tasks and focus slots directly from Google Calendar.',
+      title: t('landing.features.calendar.title'),
+      description: t('landing.features.calendar.description'),
       mock: (
         <Stack spacing={1} sx={{ p: 0.5 }}>
           <MockupCalendarEvent>
@@ -474,9 +473,8 @@ const LandingPage: React.FC = () => {
     },
     {
       icon: '📝',
-      title: 'Notes',
-      description:
-        'Markdown documentation for project specs, plans, and guidelines.',
+      title: t('landing.features.notes.title'),
+      description: t('landing.features.notes.description'),
       mock: (
         <Stack spacing={0.75} sx={{ p: 0.5 }}>
           <MockupTextLine width={100} />
@@ -487,9 +485,8 @@ const LandingPage: React.FC = () => {
     },
     {
       icon: '🤖',
-      title: 'AI Assistant',
-      description:
-        'Intelligent helper schedules focus blocks, updates statuses, and summaries files.',
+      title: t('landing.features.aiAssistant.title'),
+      description: t('landing.features.aiAssistant.description'),
       mock: (
         <Box
           sx={{
@@ -508,9 +505,8 @@ const LandingPage: React.FC = () => {
     },
     {
       icon: '📈',
-      title: 'Analytics',
-      description:
-        'Detailed metrics show focus trends and behavioral insights.',
+      title: t('landing.features.analytics.title'),
+      description: t('landing.features.analytics.description'),
       mock: (
         <Stack
           direction="row"
@@ -547,8 +543,8 @@ const LandingPage: React.FC = () => {
     },
     {
       icon: '🔔',
-      title: 'Notifications',
-      description: 'Smart updates only notify you when it actually matters.',
+      title: t('landing.features.notifications.title'),
+      description: t('landing.features.notifications.description'),
       mock: (
         <Stack direction="row" spacing={1} alignItems="center" sx={{ p: 0.5 }}>
           <NotificationsIcon sx={{ fontSize: 16, color: '#F59E0B' }} />
@@ -571,17 +567,14 @@ const LandingPage: React.FC = () => {
               <Stack spacing={3.5} alignItems="center" maxWidth={800}>
                 <NewBadge>
                   <NewBadgeText variant="caption">
-                    ✨ New: 2.0 Workspaces out now →
+                    {t('landing.newBadge')}
                   </NewBadgeText>
                 </NewBadge>
 
-                <HeroTitle variant="h1">
-                  Everything you need to stay focused.
-                </HeroTitle>
+                <HeroTitle variant="h1">{t('landing.heroTitle')}</HeroTitle>
 
                 <HeroSubtitle variant="body1">
-                  Organize projects, tasks, calendars, notes and workspaces in
-                  one beautiful productivity platform.
+                  {t('landing.heroSubtitle')}
                 </HeroSubtitle>
 
                 <Stack
@@ -595,7 +588,7 @@ const LandingPage: React.FC = () => {
                     component={NavLink}
                     to="/login"
                   >
-                    Get Started 🚀
+                    {t('landing.getStarted')}
                   </HeroPrimaryButton>
                   <HeroSecondaryButton
                     variant="outlined"
@@ -605,7 +598,7 @@ const LandingPage: React.FC = () => {
                     }}
                     startIcon={<PlayCircleOutlineIcon sx={{ fontSize: 20 }} />}
                   >
-                    Watch Demo
+                    {t('landing.watchDemo')}
                   </HeroSecondaryButton>
                 </Stack>
 
@@ -643,7 +636,7 @@ const LandingPage: React.FC = () => {
                     />
                   </Stack>
                   <Typography variant="body2" color="text.secondary">
-                    Trusted by +10,000+ creators
+                    {t('landing.trustedBy')}
                   </Typography>
                 </Stack>
               </Stack>
@@ -660,14 +653,15 @@ const LandingPage: React.FC = () => {
         <SectionWrapper id="features">
           <Container maxWidth="lg">
             <SectionHeader>
-              <Typography variant="h2">The OS for productivity.</Typography>
+              <Typography variant="h2">
+                {t('landing.features.heading')}
+              </Typography>
               <Typography
                 variant="body1"
                 color="text.secondary"
                 sx={{ mt: 1.5 }}
               >
-                Powerful downloads for high-performance teams. Simplify your
-                workflow without actual linking of subject.
+                {t('landing.features.subheading')}
               </Typography>
             </SectionHeader>
 
@@ -702,7 +696,7 @@ const LandingPage: React.FC = () => {
                       lineHeight: 1.1,
                     }}
                   >
-                    Meet your AI productivity partner.
+                    {t('landing.ai.heading')}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -712,8 +706,7 @@ const LandingPage: React.FC = () => {
                       lineHeight: 1.6,
                     }}
                   >
-                    Focusly AI acts as a smart, co-pilot engine that understands
-                    your projects, analyzes your energy, and schedules your day.
+                    {t('landing.ai.subheading')}
                   </Typography>
                   <Button
                     variant="contained"
@@ -733,7 +726,7 @@ const LandingPage: React.FC = () => {
                       },
                     }}
                   >
-                    Try Focusly AI
+                    {t('landing.ai.tryButton')}
                   </Button>
                 </Stack>
               </Grid>
@@ -742,23 +735,23 @@ const LandingPage: React.FC = () => {
                 <Grid container spacing={4}>
                   {[
                     {
-                      title: 'Create tasks from thin air',
-                      desc: 'Describe a goal, and we will structure the task list, priorities, and deadlines.',
+                      title: t('landing.ai.bullets.createTasks.title'),
+                      desc: t('landing.ai.bullets.createTasks.desc'),
                       icon: '⚡',
                     },
                     {
-                      title: 'Summarize everything',
-                      desc: 'Sync transcripts or documents, and get key action items.',
+                      title: t('landing.ai.bullets.summarize.title'),
+                      desc: t('landing.ai.bullets.summarize.desc'),
                       icon: '📝',
                     },
                     {
-                      title: 'Automate workflows',
-                      desc: 'Trigger routines based on calendar updates or tasks.',
+                      title: t('landing.ai.bullets.automate.title'),
+                      desc: t('landing.ai.bullets.automate.desc'),
                       icon: '⚙️',
                     },
                     {
-                      title: 'Instant answers',
-                      desc: 'Query your entire workspace context instantly.',
+                      title: t('landing.ai.bullets.instantAnswers.title'),
+                      desc: t('landing.ai.bullets.instantAnswers.desc'),
                       icon: '💡',
                     },
                   ].map((bullet, idx) => (
@@ -792,14 +785,16 @@ const LandingPage: React.FC = () => {
         <SectionWrapper id="how-it-works">
           <Container maxWidth="lg">
             <SectionHeader>
-              <Typography variant="h2">Streamlined for success.</Typography>
+              <Typography variant="h2">
+                {t('landing.howItWorks.heading')}
+              </Typography>
 
               <Typography
                 variant="body1"
                 color="text.secondary"
                 sx={{ mt: 1.5 }}
               >
-                Go from chaos to focus in four simple steps.
+                {t('landing.howItWorks.subheading')}
               </Typography>
             </SectionHeader>
 
@@ -829,11 +824,10 @@ const LandingPage: React.FC = () => {
                         justifyContent: { xs: 'flex-start', md: 'flex-end' },
                       }}
                     >
-                      Create Workspaces 🗂
+                      {t('landing.howItWorks.step1.title')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Set up nice, private labs for separate projects, startups,
-                      or goals.
+                      {t('landing.howItWorks.step1.desc')}
                     </Typography>
                   </Stack>
                 </Grid>
@@ -1133,11 +1127,10 @@ const LandingPage: React.FC = () => {
                         gap: 1,
                       }}
                     >
-                      Create Tasks 📝
+                      {t('landing.howItWorks.step2.title')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Break down your goals into structured checklists, assign
-                      priorities, and link items directly to workspaces.
+                      {t('landing.howItWorks.step2.desc')}
                     </Typography>
                   </Stack>
                 </Grid>
@@ -1160,11 +1153,10 @@ const LandingPage: React.FC = () => {
                         justifyContent: { xs: 'flex-start', md: 'flex-end' },
                       }}
                     >
-                      Focus Time ⚡
+                      {t('landing.howItWorks.step3.title')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Start high-focus sprints with custom timers and beautiful
-                      visual progress cards to stay in the zone.
+                      {t('landing.howItWorks.step3.desc')}
                     </Typography>
                   </Stack>
                 </Grid>
@@ -1365,10 +1357,10 @@ const LandingPage: React.FC = () => {
                         gap: 1,
                       }}
                     >
-                      Create Projects 📁
+                      {t('landing.howItWorks.step4.title')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Milestone boards track all of the fundamental elements.
+                      {t('landing.howItWorks.step4.desc')}
                     </Typography>
                   </Stack>
                 </Grid>
@@ -1381,8 +1373,7 @@ const LandingPage: React.FC = () => {
                 color="text.secondary"
                 sx={{ fontStyle: 'italic' }}
               >
-                Plus much more: Focus status 🟢, Smart Analytics 📈, Reminders
-                🔔
+                {t('landing.howItWorks.plusMore')}
               </Typography>
             </Box>
           </Container>
@@ -1392,13 +1383,15 @@ const LandingPage: React.FC = () => {
         <SectionWrapper id="pricing">
           <Container maxWidth="lg">
             <SectionHeader>
-              <Typography variant="h2">Plans for every scale.</Typography>
+              <Typography variant="h2">
+                {t('landing.pricing.heading')}
+              </Typography>
               <Typography
                 variant="body1"
                 color="text.secondary"
                 sx={{ mt: 1.5 }}
               >
-                Start free, upgrade as you grow.
+                {t('landing.pricing.subheading')}
               </Typography>
             </SectionHeader>
 
@@ -1408,10 +1401,10 @@ const LandingPage: React.FC = () => {
                 <PricingCard>
                   <Stack spacing={0.5}>
                     <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      Free
+                      {t('landing.pricing.free.name')}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Perfect for individuals.
+                      {t('landing.pricing.free.tagline')}
                     </Typography>
                   </Stack>
                   <Typography
@@ -1436,14 +1429,14 @@ const LandingPage: React.FC = () => {
                       fontWeight: 600,
                     }}
                   >
-                    Get Started
+                    {t('landing.pricing.free.cta')}
                   </Button>
                   <Stack spacing={2} pt={1.5}>
-                    {[
-                      '1 User Workspace',
-                      'Unlimited Tasks',
-                      'Basic Calendar',
-                    ].map((feat, idx) => (
+                    {(
+                      t('landing.pricing.free.features', {
+                        returnObjects: true,
+                      }) as string[]
+                    ).map((feat, idx) => (
                       <Stack
                         direction="row"
                         spacing={1.5}
@@ -1465,13 +1458,15 @@ const LandingPage: React.FC = () => {
               {/* Pro */}
               <Grid size={{ xs: 12, md: 4 }}>
                 <PricingCard featured>
-                  <PricingCardBadge>START FREE TRIAL</PricingCardBadge>
+                  <PricingCardBadge>
+                    {t('landing.pricing.pro.badge')}
+                  </PricingCardBadge>
                   <Stack spacing={0.5}>
                     <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      Pro
+                      {t('landing.pricing.pro.name')}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      For power users and professionals.
+                      {t('landing.pricing.pro.tagline')}
                     </Typography>
                   </Stack>
                   <Typography
@@ -1490,8 +1485,7 @@ const LandingPage: React.FC = () => {
                         fontWeight: 400,
                       }}
                     >
-                      {' '}
-                      / mo
+                      {t('landing.pricing.perMonth')}
                     </span>
                   </Typography>
                   <Button
@@ -1506,15 +1500,14 @@ const LandingPage: React.FC = () => {
                       fontWeight: 600,
                     }}
                   >
-                    Go Pro
+                    {t('landing.pricing.pro.cta')}
                   </Button>
                   <Stack spacing={2} pt={1.5}>
-                    {[
-                      'Unlimited Workspaces',
-                      'AI Assistant (500 runs)',
-                      'Advanced Analytics',
-                      'Google Calendar Integration',
-                    ].map((feat, idx) => (
+                    {(
+                      t('landing.pricing.pro.features', {
+                        returnObjects: true,
+                      }) as string[]
+                    ).map((feat, idx) => (
                       <Stack
                         direction="row"
                         spacing={1.5}
@@ -1538,10 +1531,10 @@ const LandingPage: React.FC = () => {
                 <PricingCard>
                   <Stack spacing={0.5}>
                     <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      Enterprise
+                      {t('landing.pricing.enterprise.name')}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      For ultimate productivity.
+                      {t('landing.pricing.enterprise.tagline')}
                     </Typography>
                   </Stack>
                   <Typography
@@ -1560,8 +1553,7 @@ const LandingPage: React.FC = () => {
                         fontWeight: 400,
                       }}
                     >
-                      {' '}
-                      / mo
+                      {t('landing.pricing.perMonth')}
                     </span>
                   </Typography>
                   <Button
@@ -1576,17 +1568,14 @@ const LandingPage: React.FC = () => {
                       fontWeight: 600,
                     }}
                   >
-                    Go Enterprise
+                    {t('landing.pricing.enterprise.cta')}
                   </Button>
                   <Stack spacing={2} pt={1.5}>
-                    {[
-                      'Unlimited Lumina AI Runs',
-                      'Priority AI Queue Processing',
-                      'Advanced Insights & Audits',
-                      'Export Workspaces (PDF/Markdown)',
-                      'Priority Support & Beta Access',
-                      'SLA & Security Protocols',
-                    ].map((feat, idx) => (
+                    {(
+                      t('landing.pricing.enterprise.features', {
+                        returnObjects: true,
+                      }) as string[]
+                    ).map((feat, idx) => (
                       <Stack
                         direction="row"
                         spacing={1.5}
@@ -1612,33 +1601,22 @@ const LandingPage: React.FC = () => {
         <SectionWrapper bgColor="rgba(255, 255, 255, 0.01)">
           <Container maxWidth="lg">
             <SectionHeader>
-              <Typography variant="h2">Trusted by the best.</Typography>
+              <Typography variant="h2">
+                {t('landing.testimonials.heading')}
+              </Typography>
             </SectionHeader>
 
             <Grid container spacing={4}>
-              {[
-                {
-                  name: 'Sarah Jenkins',
-                  role: 'Product Lead, Stripe',
-                  quote:
-                    'Focusly changed how our design team works. The timing blocks reduce project delays by almost 40%.',
-                  avatar: 'S',
-                },
-                {
-                  name: 'Alex Rivera',
-                  role: 'CTO, Linear',
-                  quote:
-                    'The calendar sync is flawless. The AI integration works like magic for organizing my daily schedule.',
-                  avatar: 'A',
-                },
-                {
-                  name: 'Marcus Chen',
-                  role: 'Founder & CEO, Raycast',
-                  quote:
-                    'The workspace separation is exactly what I needed. Minimalist, premium, and extremely fast.',
-                  avatar: 'M',
-                },
-              ].map((test, idx) => (
+              {(() => {
+                const items = t('landing.testimonials.items', {
+                  returnObjects: true,
+                }) as { role: string; quote: string }[];
+                return [
+                  { name: 'Sarah Jenkins', avatar: 'S', ...items[0] },
+                  { name: 'Alex Rivera', avatar: 'A', ...items[1] },
+                  { name: 'Marcus Chen', avatar: 'M', ...items[2] },
+                ];
+              })().map((test, idx) => (
                 <Grid size={{ xs: 12, md: 4 }} key={idx}>
                   <TestimonialCard>
                     <Stack
@@ -1697,24 +1675,16 @@ const LandingPage: React.FC = () => {
         <SectionWrapper>
           <Container maxWidth="md">
             <SectionHeader>
-              <Typography variant="h2">Common Questions</Typography>
+              <Typography variant="h2">{t('landing.faq.heading')}</Typography>
             </SectionHeader>
 
             <Box>
-              {[
-                {
-                  q: 'How does the Google Calendar integration work?',
-                  a: 'Focusly integrates with Google Calendar to sync all of your meetings and blocks instantly, preventing any double booking.',
-                },
-                {
-                  q: 'Is my data secure?',
-                  a: 'Yes, we encrypt all of your workspace data in transit and at rest, and respect your privacy.',
-                },
-                {
-                  q: 'Can I use Focusly for free?',
-                  a: 'Absolutely, our Free plan includes all core task management and calendar utilities.',
-                },
-              ].map((faq, idx) => {
+              {(
+                t('landing.faq.items', { returnObjects: true }) as {
+                  q: string;
+                  a: string;
+                }[]
+              ).map((faq, idx) => {
                 const panelId = `panel-${idx}`;
                 return (
                   <FaqAccordion
@@ -1766,7 +1736,7 @@ const LandingPage: React.FC = () => {
                   color="text.secondary"
                   sx={{ maxWidth: 300, lineHeight: 1.5 }}
                 >
-                  The open OS for high-performance teams.
+                  {t('landing.footer.tagline')}
                 </Typography>
                 <Stack direction="row" spacing={1.5}>
                   <IconButton
@@ -1808,13 +1778,19 @@ const LandingPage: React.FC = () => {
                   letterSpacing: '0.05em',
                 }}
               >
-                Product
+                {t('landing.footer.product')}
               </Typography>
               <Stack spacing={1.25}>
-                <FooterLink href="#features">Features</FooterLink>
-                <FooterLink href="#pricing">Pricing</FooterLink>
-                <FooterLink href="#">Blog</FooterLink>
-                <FooterLink href="#">Resources</FooterLink>
+                <FooterLink href="#features">
+                  {t('landing.footer.features')}
+                </FooterLink>
+                <FooterLink href="#pricing">
+                  {t('landing.footer.pricing')}
+                </FooterLink>
+                <FooterLink href="#">{t('landing.footer.blog')}</FooterLink>
+                <FooterLink href="#">
+                  {t('landing.footer.resources')}
+                </FooterLink>
               </Stack>
             </Grid>
 
@@ -1829,11 +1805,13 @@ const LandingPage: React.FC = () => {
                   letterSpacing: '0.05em',
                 }}
               >
-                Company
+                {t('landing.footer.company')}
               </Typography>
               <Stack spacing={1.25}>
-                <FooterLink href="#about-us">About Us</FooterLink>
-                <FooterLink href="#">Careers</FooterLink>
+                <FooterLink href="#about-us">
+                  {t('landing.footer.aboutUs')}
+                </FooterLink>
+                <FooterLink href="#">{t('landing.footer.careers')}</FooterLink>
               </Stack>
             </Grid>
 
@@ -1848,11 +1826,11 @@ const LandingPage: React.FC = () => {
                   letterSpacing: '0.05em',
                 }}
               >
-                Legal
+                {t('landing.footer.legal')}
               </Typography>
               <Stack spacing={1.25}>
-                <FooterLink href="#">Terms</FooterLink>
-                <FooterLink href="#">Privacy</FooterLink>
+                <FooterLink href="#">{t('landing.footer.terms')}</FooterLink>
+                <FooterLink href="#">{t('landing.footer.privacy')}</FooterLink>
               </Stack>
             </Grid>
           </Grid>
@@ -1870,8 +1848,9 @@ const LandingPage: React.FC = () => {
             }}
           >
             <Typography variant="caption" color="text.secondary">
-              © {new Date().getFullYear()} Focusly Tech. Designed to help you
-              focus.
+              {t('landing.footer.copyright', {
+                year: new Date().getFullYear(),
+              })}
             </Typography>
           </Box>
         </Container>

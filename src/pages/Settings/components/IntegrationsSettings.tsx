@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -25,6 +26,7 @@ import {
 } from '../Settings.styles';
 
 export const IntegrationsSettings = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const { user, authProvider } = useAppSelector((state) => state.auth);
@@ -52,14 +54,14 @@ export const IntegrationsSettings = () => {
         );
 
         sileo.success({
-          title: 'Google Calendar connected',
-          description: 'Your calendar and Meet access have been refreshed.',
+          title: t('integrationsSettings.toast.connectedTitle'),
+          description: t('integrationsSettings.toast.connectedDesc'),
           fill: 'var(--sileo-success-bg)',
         });
       } catch (error) {
         console.error('Error connecting Google Calendar:', error);
         sileo.error({
-          title: 'Could not connect Google Calendar',
+          title: t('integrationsSettings.toast.connectErrorTitle'),
           fill: 'var(--sileo-error-bg)',
         });
       } finally {
@@ -69,7 +71,7 @@ export const IntegrationsSettings = () => {
     onError: (error: unknown) => {
       console.error(error);
       sileo.error({
-        title: 'Google connection failed',
+        title: t('integrationsSettings.toast.connectFailedTitle'),
         fill: 'var(--sileo-error-bg)',
       });
     },
@@ -83,13 +85,12 @@ export const IntegrationsSettings = () => {
             <Box className="icon-wrapper">
               <CalendarIcon />
             </Box>
-            <Typography>Connected Apps</Typography>
+            <Typography>{t('integrationsSettings.connectedApps')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-          Manage the external accounts Focusly uses to sync your calendar and
-          generate Meet links.
+          {t('integrationsSettings.desc')}
         </Typography>
 
         <Box
@@ -129,13 +130,17 @@ export const IntegrationsSettings = () => {
                   color: 'text.primary',
                 }}
               >
-                Google Calendar & Meet
+                {t('integrationsSettings.googleCalendar')}
               </Typography>
               <Typography
                 variant="caption"
                 sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
               >
-                {isConnected ? `Connected as ${user?.email}` : 'Not connected'}
+                {isConnected
+                  ? t('integrationsSettings.connectedAs', {
+                      email: user?.email,
+                    })
+                  : t('integrationsSettings.notConnected')}
               </Typography>
             </Box>
           </Box>
@@ -145,7 +150,7 @@ export const IntegrationsSettings = () => {
               sx={{ bgcolor: 'rgba(34, 197, 94, 0.08)', color: '#22C55E' }}
             >
               <ConnectedIcon sx={{ fontSize: 12, mr: 0.5 }} />
-              Connected
+              {t('common.connected')}
             </Badge>
           ) : (
             <Button
@@ -166,7 +171,7 @@ export const IntegrationsSettings = () => {
               {isConnecting ? (
                 <CircularProgress size={16} color="inherit" />
               ) : (
-                'Connect'
+                t('integrationsSettings.connect')
               )}
             </Button>
           )}
@@ -196,7 +201,7 @@ export const IntegrationsSettings = () => {
               },
             }}
           >
-            Refresh permissions
+            {t('integrationsSettings.refreshPermissions')}
           </Button>
         )}
       </SectionCard>

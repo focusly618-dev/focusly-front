@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Box, Switch, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { BoltOutlined as EnergyIcon } from '@mui/icons-material';
 import {
   AICard,
@@ -12,6 +13,7 @@ import {
 } from '../Settings.styles';
 
 export const ScheduleSettings = () => {
+  const { t } = useTranslation();
   const [protectGoldenHours, setProtectGoldenHours] = useState(true);
 
   const switchStyles = {
@@ -34,18 +36,18 @@ export const ScheduleSettings = () => {
             <Box className="icon-wrapper" sx={{ color: '#F59E0B' }}>
               <EnergyIcon />
             </Box>
-            <Typography>Your Golden Hours</Typography>
+            <Typography>{t('scheduleSettings.title')}</Typography>
           </SectionTitle>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             <Badge
               sx={{ bgcolor: 'rgba(99, 102, 241, 0.08)', color: '#6366F1' }}
             >
-              AI BETA
+              {t('scheduleSettings.aiBeta')}
             </Badge>
             <Badge
               sx={{ bgcolor: 'rgba(34, 197, 94, 0.08)', color: '#22C55E' }}
             >
-              High Confidence
+              {t('scheduleSettings.highConfidence')}
             </Badge>
           </Box>
         </SectionHeader>
@@ -63,8 +65,7 @@ export const ScheduleSettings = () => {
             09:00 AM - 11:30 AM
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-            This is your highest energy window. Focusly schedules deep focus
-            work during this period.
+            {t('scheduleSettings.windowDesc')}
           </Typography>
 
           {/* Custom SVG Curve representing energy peaks */}
@@ -135,7 +136,7 @@ export const ScheduleSettings = () => {
               <Typography
                 sx={{ fontSize: '9px', fontWeight: 800, color: '#6366F1' }}
               >
-                ENERGY PEAK
+                {t('scheduleSettings.energyPeak')}
               </Typography>
             </Box>
             <Box
@@ -162,9 +163,11 @@ export const ScheduleSettings = () => {
           }}
         >
           <Box>
-            <SmartCardTitle>Auto-protect Golden Hours</SmartCardTitle>
+            <SmartCardTitle>
+              {t('scheduleSettings.autoProtectTitle')}
+            </SmartCardTitle>
             <SmartCardDesc>
-              Focusly will automatically protect your highest performance hours.
+              {t('scheduleSettings.autoProtectDesc')}
             </SmartCardDesc>
           </Box>
           <Switch

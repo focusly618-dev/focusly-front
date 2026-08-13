@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -24,6 +25,7 @@ import {
 } from '../Settings.styles';
 
 export const AccountSettings = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const { user, authProvider } = useAppSelector((state) => state.auth);
@@ -36,8 +38,8 @@ export const AccountSettings = () => {
   const handleSave = () => {
     dispatch(updateUser({ name: trimmedName }));
     sileo.success({
-      title: 'Profile updated',
-      description: 'Your display name has been saved.',
+      title: t('accountSettings.toast.title'),
+      description: t('accountSettings.toast.desc'),
       fill: 'var(--sileo-success-bg)',
     });
   };
@@ -73,7 +75,7 @@ export const AccountSettings = () => {
             <Box className="icon-wrapper">
               <PersonIcon />
             </Box>
-            <Typography>Profile Identity</Typography>
+            <Typography>{t('accountSettings.identity.title')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
@@ -101,13 +103,15 @@ export const AccountSettings = () => {
               ) : (
                 <MailIcon sx={{ fontSize: 12, mr: 0.5 }} />
               )}
-              {isGoogle ? 'Google Account' : 'Magic Link Sign-in'}
+              {isGoogle
+                ? t('accountSettings.identity.googleAccount')
+                : t('accountSettings.identity.magicLink')}
             </Badge>
             <Typography
               variant="caption"
               sx={{ display: 'block', color: 'text.secondary', mt: 1 }}
             >
-              Your avatar is synced from your sign-in provider.
+              {t('accountSettings.identity.avatarSynced')}
             </Typography>
           </Box>
         </Box>
@@ -123,7 +127,7 @@ export const AccountSettings = () => {
                 mb: 1,
               }}
             >
-              Display Name
+              {t('accountSettings.displayName')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
               <TextField
@@ -148,7 +152,7 @@ export const AccountSettings = () => {
                     '&:hover': { bgcolor: '#4F46E5', boxShadow: 'none' },
                   }}
                 >
-                  Save
+                  {t('common.save')}
                 </Button>
               )}
             </Box>
@@ -164,7 +168,7 @@ export const AccountSettings = () => {
                 mb: 1,
               }}
             >
-              Email Address
+              {t('accountSettings.emailAddress')}
             </Typography>
             <Typography
               sx={{
@@ -179,7 +183,7 @@ export const AccountSettings = () => {
               variant="caption"
               sx={{ color: 'text.disabled', mt: 0.5, display: 'block' }}
             >
-              Managed by your sign-in provider and can&apos;t be changed here.
+              {t('accountSettings.emailManagedBy')}
             </Typography>
           </Box>
         </Box>

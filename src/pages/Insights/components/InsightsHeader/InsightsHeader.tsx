@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Tabs, TabList, Tab } from '@heroui/react';
 import { useTheme } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   FileDownloadOutlined,
   Add,
@@ -19,7 +20,16 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
   onReset,
   periodLabel,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
+  const periodKeyMap: Record<string, string> = {
+    Daily: 'daily',
+    Weekly: 'weekly',
+    Monthly: 'monthly',
+    Yearly: 'yearly',
+  };
+  const getPeriodLabel = (period: string) =>
+    t(`insightsHeader.periods.${periodKeyMap[period] || 'yearly'}`);
   const pillBg = surfaceColor(
     theme,
     'rgba(30, 41, 59, 0.6)',
@@ -37,20 +47,13 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             className="text-2xl sm:text-3xl font-extrabold tracking-tight"
             style={{ color: theme.palette.text.primary }}
           >
-            {filter === 'Daily'
-              ? 'Daily'
-              : filter === 'Weekly'
-                ? 'Weekly'
-                : filter === 'Monthly'
-                  ? 'Monthly'
-                  : 'Yearly'}{' '}
-            Insights
+            {t('insightsHeader.title', { period: getPeriodLabel(filter) })}
           </h1>
           <p
             className="text-xs sm:text-sm mt-1"
             style={{ color: theme.palette.text.secondary }}
           >
-            Resumen de productividad y analíticas
+            {t('insightsHeader.subtitle')}
           </p>
         </div>
 
@@ -65,12 +68,12 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             }}
           >
             <FileDownloadOutlined className="text-base" />
-            <span>Exportar</span>
+            <span>{t('insightsHeader.export')}</span>
           </Button>
 
           <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-xl text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer">
             <Add className="text-base" />
-            <span>Crear Reporte</span>
+            <span>{t('insightsHeader.createReport')}</span>
           </Button>
         </div>
       </div>
@@ -109,7 +112,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
                       : 'none',
                   }}
                 >
-                  {f}
+                  {getPeriodLabel(f)}
                 </Tab>
               );
             })}
@@ -127,7 +130,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             <button
               type="button"
               onClick={() => onNavigate('prev')}
-              aria-label="Previous month"
+              aria-label={t('insightsHeader.previousMonth')}
               className="p-1 rounded-lg transition-colors cursor-pointer"
               style={{ color: theme.palette.text.secondary }}
             >
@@ -144,7 +147,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             <button
               type="button"
               onClick={() => onNavigate('next')}
-              aria-label="Next month"
+              aria-label={t('insightsHeader.nextMonth')}
               disabled={!baseDate}
               className="p-1 rounded-lg transition-colors cursor-pointer disabled:opacity-40"
               style={{ color: theme.palette.text.secondary }}
@@ -159,7 +162,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
                 className="text-[10px] font-bold hover:underline px-1 ml-1 cursor-pointer"
                 style={{ color: theme.palette.primary.main }}
               >
-                Hoy
+                {t('calendar.today')}
               </button>
             )}
           </div>

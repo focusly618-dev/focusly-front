@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { View } from 'react-big-calendar';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
 import { Box, Button, Typography, styled, Stack } from '@mui/material';
@@ -153,6 +154,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   onAIPlannerClick,
   onWeeklyPlannerClick,
 }) => {
+  const { t } = useTranslation();
   const miniWeekDays = useMemo(() => {
     const startOfSelectedWeek = startOfWeek(currentDate, { weekStartsOn: 1 }); // 1 = Monday
     return Array.from({ length: 7 }, (_, i) => addDays(startOfSelectedWeek, i));
@@ -193,7 +195,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
             sx={{ fontWeight: 800, color: 'text.primary' }}
           >
             {isSameDay(currentDate, new Date())
-              ? 'Today'
+              ? t('calendar.today')
               : format(currentDate, 'eeee')}
           </Typography>
           <Typography
@@ -212,14 +214,18 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
               className={currentView === v ? 'active' : ''}
               onClick={() => onViewChange(v as View)}
             >
-              {v.charAt(0).toUpperCase() + v.slice(1)}
+              {v === 'day'
+                ? t('calendar.day')
+                : v === 'week'
+                  ? t('calendar.week')
+                  : t('calendar.month')}
             </ToggleButton>
           ))}
         </ViewToggleContainer>
 
         {/* Add Task */}
         <AddTaskButton onClick={onAddTaskClick} startIcon={<AddIcon />}>
-          Add Task
+          {t('calendar.addTask')}
         </AddTaskButton>
 
         {/* Mini Week View Calendar */}
@@ -329,7 +335,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 fontSize: '12px',
               }}
             >
-              Awaited Tasks
+              {t('calendar.awaitedTasks')}
             </Typography>
             <Button
               variant="text"
@@ -347,7 +353,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 },
               }}
             >
-              View All
+              {t('calendar.viewAll')}
             </Button>
           </Box>
 
@@ -374,10 +380,10 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                   variant="body2"
                   sx={{ color: 'text.secondary', fontWeight: 600 }}
                 >
-                  No tasks awaited
+                  {t('calendar.noAwaitedTasks')}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.disabled' }}>
-                  Enjoy your free time!
+                  {t('calendar.freeTimeDesc')}
                 </Typography>
               </Box>
             ) : (
@@ -488,7 +494,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
               },
             }}
           >
-            Optimize Schedule
+            {t('calendar.optimizeSchedule')}
           </Button>
 
           {onWeeklyPlannerClick && (
@@ -508,7 +514,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 },
               }}
             >
-              Open Weekly Planner
+              {t('calendar.openWeeklyPlanner')}
             </Button>
           )}
         </Box>

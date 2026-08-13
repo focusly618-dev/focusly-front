@@ -1,9 +1,17 @@
 import React from 'react';
-import { Box, Typography, Stack, alpha, useTheme, CircularProgress } from '@mui/material';
-import { 
-  CameraAlt as CameraIcon, 
+import {
+  Box,
+  Typography,
+  Stack,
+  alpha,
+  useTheme,
+  CircularProgress,
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import {
+  CameraAlt as CameraIcon,
   ArrowForward as ArrowForwardIcon,
-  Person as PersonIcon 
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import {
   ProfileAvatarContainer,
@@ -20,7 +28,10 @@ interface ProfileCompletionStepProps {
   onNext: () => void;
 }
 
-const ProfileCompletionStep: React.FC<ProfileCompletionStepProps> = ({ onNext }) => {
+const ProfileCompletionStep: React.FC<ProfileCompletionStepProps> = ({
+  onNext,
+}) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const {
     fullName,
@@ -34,67 +45,115 @@ const ProfileCompletionStep: React.FC<ProfileCompletionStepProps> = ({ onNext })
     isLoading,
     handleImageClick,
     handleFileChange,
-    handleContinue
+    handleContinue,
   } = useProfileCompletion({ onNext });
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '480px', margin: '0 auto', textAlign: 'center', py: 2 }}>
-      <Typography variant="h4" fontWeight="800" gutterBottom sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' } }}>
-        Complete Your Profile
+    <Box
+      sx={{
+        width: '100%',
+        maxWidth: '480px',
+        margin: '0 auto',
+        textAlign: 'center',
+        py: 2,
+      }}
+    >
+      <Typography
+        variant="h4"
+        fontWeight="800"
+        gutterBottom
+        sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' } }}
+      >
+        {t('onboarding.profileCompletion.heading')}
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: '320px', margin: '0 auto 32px' }}>
-        Define your presence within the Focusly ecosystem.
+      <Typography
+        variant="body1"
+        color="text.secondary"
+        sx={{ mb: 4, maxWidth: '320px', margin: '0 auto 32px' }}
+      >
+        {t('onboarding.profileCompletion.subheading')}
       </Typography>
 
       <Box sx={{ mb: 4 }}>
         <ProfileAvatarContainer>
           <ProfileImage src={profileImage} onClick={handleImageClick}>
-            {!profileImage && <PersonIcon sx={{ fontSize: 40, color: alpha(theme.palette.text.primary, 0.2) }} />}
+            {!profileImage && (
+              <PersonIcon
+                sx={{
+                  fontSize: 40,
+                  color: alpha(theme.palette.text.primary, 0.2),
+                }}
+              />
+            )}
           </ProfileImage>
           <AddIconButton onClick={handleImageClick}>
             <CameraIcon sx={{ fontSize: 16 }} />
           </AddIconButton>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            hidden 
-            accept="image/*" 
-            onChange={handleFileChange} 
+          <input
+            type="file"
+            ref={fileInputRef}
+            hidden
+            accept="image/*"
+            onChange={handleFileChange}
           />
         </ProfileAvatarContainer>
-        <Typography variant="caption" fontWeight="700" color="primary.main" sx={{ letterSpacing: '1px', textTransform: 'uppercase' }}>
-          Profile Photo
+        <Typography
+          variant="caption"
+          fontWeight="700"
+          color="primary.main"
+          sx={{ letterSpacing: '1px', textTransform: 'uppercase' }}
+        >
+          {t('onboarding.profileCompletion.profilePhoto')}
         </Typography>
       </Box>
 
       <Stack spacing={3} sx={{ textAlign: 'left', mb: 4 }}>
         <Box>
-          <StyledLabel>Full Name</StyledLabel>
-          <ProfileInput 
-            placeholder="e.g., Alex Rivera" 
+          <StyledLabel>
+            {t('onboarding.profileCompletion.fullName')}
+          </StyledLabel>
+          <ProfileInput
+            placeholder={t('onboarding.profileCompletion.fullNamePlaceholder')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
           />
         </Box>
 
         <Box>
-          <StyledLabel>Job Title / Role</StyledLabel>
-          <ProfileInput 
-            placeholder="e.g., Lead Systems Architect" 
+          <StyledLabel>
+            {t('onboarding.profileCompletion.jobTitle')}
+          </StyledLabel>
+          <ProfileInput
+            placeholder={t('onboarding.profileCompletion.jobTitlePlaceholder')}
             value={jobTitle}
             onChange={(e) => setJobTitle(e.target.value)}
           />
         </Box>
 
         <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <StyledLabel sx={{ mb: 0 }}>Focus Philosophy</StyledLabel>
-            <Typography variant="caption" color="text.disabled" fontWeight="600">
-              {bio.length} / 160 MAX
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 1,
+            }}
+          >
+            <StyledLabel sx={{ mb: 0 }}>
+              {t('onboarding.profileCompletion.focusPhilosophy')}
+            </StyledLabel>
+            <Typography
+              variant="caption"
+              color="text.disabled"
+              fontWeight="600"
+            >
+              {t('onboarding.profileCompletion.charCounter', {
+                count: bio.length,
+              })}
             </Typography>
           </Box>
-          <ProfileTextArea 
-            placeholder="Briefly describe how you approach deep work..." 
+          <ProfileTextArea
+            placeholder={t('onboarding.profileCompletion.bioPlaceholder')}
             value={bio}
             onChange={(e) => setBio(e.target.value.slice(0, 160))}
           />
@@ -102,21 +161,32 @@ const ProfileCompletionStep: React.FC<ProfileCompletionStepProps> = ({ onNext })
       </Stack>
 
       <Stack spacing={2} alignItems="center">
-        <PrimaryButton onClick={handleContinue} sx={{ opacity: isLoading ? 0.7 : 1, pointerEvents: isLoading ? 'none' : 'auto' }}>
-          {isLoading ? <CircularProgress size={20} color="inherit" /> : 'Continue to Dashboard'} <ArrowForwardIcon sx={{ fontSize: 18 }} />
+        <PrimaryButton
+          onClick={handleContinue}
+          sx={{
+            opacity: isLoading ? 0.7 : 1,
+            pointerEvents: isLoading ? 'none' : 'auto',
+          }}
+        >
+          {isLoading ? (
+            <CircularProgress size={20} color="inherit" />
+          ) : (
+            t('onboarding.profileCompletion.continueToDashboard')
+          )}{' '}
+          <ArrowForwardIcon sx={{ fontSize: 18 }} />
         </PrimaryButton>
-        
-        <Typography 
-          variant="body2" 
-          color="text.secondary" 
-          sx={{ 
-            cursor: 'pointer', 
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            cursor: 'pointer',
             fontWeight: 500,
-            '&:hover': { color: 'text.primary' } 
+            '&:hover': { color: 'text.primary' },
           }}
           onClick={onNext}
         >
-          Complete later
+          {t('onboarding.profileCompletion.completeLater')}
         </Typography>
       </Stack>
     </Box>

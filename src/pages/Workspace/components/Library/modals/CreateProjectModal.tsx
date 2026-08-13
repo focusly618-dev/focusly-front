@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Box, Typography, Tooltip } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { CreateNewFolder as CreateNewFolderIcon } from '@mui/icons-material';
 import { BaseModal } from '@/components/modals';
 import { Button, TextField } from '@/components/ui';
@@ -15,32 +16,33 @@ export const CreateProjectModal = ({
   onClose,
   onCreate,
 }: CreateProjectModalProps) => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [selectedColor, setSelectedColor] = useState('#3b82f6'); // Default blue
 
   const colors = [
-    { name: 'Black', value: '#18181b' },
-    { name: 'Slate', value: '#475569' },
-    { name: 'Zinc', value: '#a1a1aa' },
-    { name: 'Dark Green', value: '#054314ff' },
-    { name: 'Purple', value: '#2d0436ff' },
-    { name: 'Blue', value: '#3b82f6' },
-    { name: 'Indigo', value: '#6366f1' },
-    { name: 'Purple', value: '#8b5cf6' },
-    { name: 'Fuchsia', value: '#d946ef' },
-    { name: 'Pink', value: '#ec4899' },
-    { name: 'Rose', value: '#f43f5e' },
-    { name: 'Red', value: '#ef4444' },
-    { name: 'Orange', value: '#f97316' },
-    { name: 'Amber', value: '#f59e0b' },
-    { name: 'Yellow', value: '#eab308' },
-    { name: 'Lime', value: '#84cc16' },
-    { name: 'Green', value: '#22c55e' },
-    { name: 'Emerald', value: '#10b981' },
-    { name: 'Teal', value: '#14b8a6' },
-    { name: 'Seafoam', value: '#5eead4' },
-    { name: 'Cyan', value: '#06b6d4' },
-    { name: 'Sky', value: '#0ea5e9' },
+    { nameKey: 'colorNames.black', value: '#18181b' },
+    { nameKey: 'colorNames.slate', value: '#475569' },
+    { nameKey: 'colorNames.zinc', value: '#a1a1aa' },
+    { nameKey: 'colorNames.darkGreen', value: '#054314ff' },
+    { nameKey: 'colorNames.purple', value: '#2d0436ff' },
+    { nameKey: 'colorNames.blue', value: '#3b82f6' },
+    { nameKey: 'colorNames.indigo', value: '#6366f1' },
+    { nameKey: 'colorNames.purple', value: '#8b5cf6' },
+    { nameKey: 'colorNames.fuchsia', value: '#d946ef' },
+    { nameKey: 'colorNames.pink', value: '#ec4899' },
+    { nameKey: 'colorNames.rose', value: '#f43f5e' },
+    { nameKey: 'colorNames.red', value: '#ef4444' },
+    { nameKey: 'colorNames.orange', value: '#f97316' },
+    { nameKey: 'colorNames.amber', value: '#f59e0b' },
+    { nameKey: 'colorNames.yellow', value: '#eab308' },
+    { nameKey: 'colorNames.lime', value: '#84cc16' },
+    { nameKey: 'colorNames.green', value: '#22c55e' },
+    { nameKey: 'colorNames.emerald', value: '#10b981' },
+    { nameKey: 'colorNames.teal', value: '#14b8a6' },
+    { nameKey: 'colorNames.seafoam', value: '#5eead4' },
+    { nameKey: 'colorNames.cyan', value: '#06b6d4' },
+    { nameKey: 'colorNames.sky', value: '#0ea5e9' },
   ];
 
   const handleCreate = () => {
@@ -54,7 +56,7 @@ export const CreateProjectModal = ({
   const modalActions = (
     <>
       <Button onClick={onClose} variant="text" sx={{ color: 'text.secondary' }}>
-        Cancel
+        {t('common.cancel')}
       </Button>
       <Button
         onClick={handleCreate}
@@ -70,7 +72,7 @@ export const CreateProjectModal = ({
           boxShadow: `0 8px 16px ${selectedColor}33`,
         }}
       >
-        Create Project
+        {t('createProjectModal.create')}
       </Button>
     </>
   );
@@ -79,8 +81,8 @@ export const CreateProjectModal = ({
     <BaseModal
       open={open}
       onClose={onClose}
-      title="Create New Project"
-      subtitle="Choose a name and color to keep your workspaces organized and beautiful."
+      title={t('createProjectModal.title')}
+      subtitle={t('createProjectModal.subtitle')}
       icon={<CreateNewFolderIcon sx={{ fontSize: 28 }} />}
       iconBgColor={selectedColor}
       actions={modalActions}
@@ -97,10 +99,10 @@ export const CreateProjectModal = ({
             letterSpacing: '0.05em',
           }}
         >
-          Project Name
+          {t('createProjectModal.projectName')}
         </Typography>
         <TextField
-          placeholder="e.g., Marketing Strategy, Q1 Plans..."
+          placeholder={t('createProjectModal.namePlaceholder')}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => {
@@ -122,11 +124,11 @@ export const CreateProjectModal = ({
             letterSpacing: '0.05em',
           }}
         >
-          Project Color
+          {t('createProjectModal.projectColor')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-          {colors.map((color) => (
-            <Tooltip key={color.value} title={color.name}>
+          {colors.map((color, idx) => (
+            <Tooltip key={`${color.value}-${idx}`} title={t(color.nameKey)}>
               <Box
                 onClick={() => setSelectedColor(color.value)}
                 sx={{

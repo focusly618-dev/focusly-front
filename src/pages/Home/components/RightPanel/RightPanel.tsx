@@ -5,6 +5,7 @@ import {
   Stack,
   IconButton,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { TrendingUp, ChevronRight, ChevronLeft } from '@mui/icons-material';
 
 import { PanelContainer, Card } from './RightPanel.styles';
@@ -15,6 +16,7 @@ interface RightPanelProps {
 }
 
 const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
+  const { t } = useTranslation();
   return (
     <PanelContainer isOpen={isOpen}>
       <Box
@@ -26,7 +28,7 @@ const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
       >
         {isOpen && (
           <Typography variant="h6" fontWeight="bold">
-            Quick Insights
+            {t('rightPanel.quickInsights')}
           </Typography>
         )}
         <IconButton
@@ -53,8 +55,9 @@ const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
                   fontWeight="700"
                   color="text.secondary"
                   letterSpacing={1}
+                  sx={{ textTransform: 'uppercase' }}
                 >
-                  PRODUCTIVITY SCORE
+                  {t('rightPanel.productivityScore')}
                 </Typography>
                 <TrendingUp sx={{ color: 'success.main', fontSize: 16 }} />
               </Stack>
@@ -71,7 +74,7 @@ const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
                 </Typography>
               </Stack>
               <Typography variant="caption" color="text.secondary">
-                You're more productive than usual this morning.
+                {t('rightPanel.moreProductive')}
               </Typography>
             </Card>
 
@@ -91,11 +94,13 @@ const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
                 >
                   ⚡
                 </Box>
-                <Typography fontWeight="700">Habit Tracker</Typography>
+                <Typography fontWeight="700">
+                  {t('rightPanel.habitTracker')}
+                </Typography>
               </Stack>
               <Stack direction="row" justifyContent="space-between" mb={1}>
                 <Typography variant="caption" color="text.secondary">
-                  Focus Time
+                  {t('rightPanel.focusTime')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   2h 45m / 4h

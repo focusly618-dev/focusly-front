@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import type { RootState } from '@/redux/store';
 import { updateUser } from '@/redux/auth/auth.slice';
 import { useNotificationSounds } from '@/hooks/useNotificationSounds';
@@ -36,6 +37,7 @@ import {
 type AlertType = 'sessionStart' | 'breakReminder' | 'sessionEnd';
 
 export const NotificationSettings = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
   const { playSound } = useNotificationSounds(0.5);
@@ -74,9 +76,7 @@ export const NotificationSettings = () => {
 
   const handlePushToggle = async () => {
     if (permissionStatus === 'denied') {
-      alert(
-        'Notifications are blocked in your browser. Please enable them in your browser site settings.',
-      );
+      alert(t('notificationSettings.pushBlockedAlert'));
       return;
     }
 
@@ -115,7 +115,7 @@ export const NotificationSettings = () => {
             <Box className="icon-wrapper">
               <CampaignIcon />
             </Box>
-            <Typography>Delivery Channels</Typography>
+            <Typography>{t('notificationSettings.channels.title')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
@@ -138,13 +138,13 @@ export const NotificationSettings = () => {
                     color: 'text.primary',
                   }}
                 >
-                  In-App Notifications
+                  {t('notificationSettings.channels.inApp.title')}
                 </Typography>
                 <Typography
                   variant="caption"
                   sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
                 >
-                  Receive focus session alerts directly in the app.
+                  {t('notificationSettings.channels.inApp.desc')}
                 </Typography>
               </Box>
             </Box>
@@ -169,14 +169,15 @@ export const NotificationSettings = () => {
                     color: 'text.primary',
                   }}
                 >
-                  Email Summary
+                  {t('notificationSettings.channels.email.title')}
                 </Typography>
                 <Typography
                   variant="caption"
                   sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
                 >
-                  Daily and weekly summaries sent to{' '}
-                  {user?.email || 'alex@email.com'}
+                  {t('notificationSettings.channels.email.desc', {
+                    email: user?.email || 'alex@email.com',
+                  })}
                 </Typography>
               </Box>
             </Box>
@@ -201,13 +202,13 @@ export const NotificationSettings = () => {
                     color: 'text.primary',
                   }}
                 >
-                  Desktop Push Notifications
+                  {t('notificationSettings.channels.push.title')}
                 </Typography>
                 <Typography
                   variant="caption"
                   sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
                 >
-                  OS-native notifications when the browser is minimized.
+                  {t('notificationSettings.channels.push.desc')}
                 </Typography>
                 {permissionStatus === 'denied' && (
                   <Typography
@@ -215,7 +216,7 @@ export const NotificationSettings = () => {
                     color="error"
                     sx={{ display: 'block', mt: 0.5, fontWeight: 700 }}
                   >
-                    ⚠️ Push notifications are blocked by your browser.
+                    {t('notificationSettings.channels.push.blocked')}
                   </Typography>
                 )}
               </Box>
@@ -236,12 +237,12 @@ export const NotificationSettings = () => {
             <Box className="icon-wrapper">
               <NotificationsActiveIcon />
             </Box>
-            <Typography>Notification Sound</Typography>
+            <Typography>{t('notificationSettings.sound.title')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-          Pick a notification chime. Click a card to preview and set it.
+          {t('notificationSettings.sound.desc')}
         </Typography>
 
         <SoundGrid>
@@ -249,18 +250,22 @@ export const NotificationSettings = () => {
             [
               {
                 id: 'taskUpcoming',
-                label: 'Classic Chime',
+                label: t('notificationSettings.sound.classicChime'),
                 icon: <NotificationsActiveIcon />,
               },
               {
                 id: 'sessionStart',
-                label: 'Digital Tone',
+                label: t('notificationSettings.sound.digitalTone'),
                 icon: <PlayArrowIcon />,
               },
-              { id: 'breakReminder', label: 'Soft Bell', icon: <CoffeeIcon /> },
+              {
+                id: 'breakReminder',
+                label: t('notificationSettings.sound.softBell'),
+                icon: <CoffeeIcon />,
+              },
               {
                 id: 'sessionEnd',
-                label: 'Success Arpeggio',
+                label: t('notificationSettings.sound.successArpeggio'),
                 icon: <CheckIcon />,
               },
             ] as { id: SoundType; label: string; icon: React.ReactNode }[]
@@ -276,7 +281,7 @@ export const NotificationSettings = () => {
                   <SoundCardIcon active={isActive}>{snd.icon}</SoundCardIcon>
                   {isActive && (
                     <Badge sx={{ fontSize: '8px', px: 1, py: 0.1 }}>
-                      Active
+                      {t('common.active')}
                     </Badge>
                   )}
                 </SoundCardHeader>
@@ -294,7 +299,7 @@ export const NotificationSettings = () => {
             <Box className="icon-wrapper">
               <TimerIcon />
             </Box>
-            <Typography>Session & Break Alerts</Typography>
+            <Typography>{t('notificationSettings.alerts.title')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
@@ -319,7 +324,7 @@ export const NotificationSettings = () => {
                     color: 'text.primary',
                   }}
                 >
-                  Session Start
+                  {t('notificationSettings.alerts.sessionStart.title')}
                 </Typography>
                 <Switch
                   checked={activeAlerts.sessionStart}
@@ -332,11 +337,13 @@ export const NotificationSettings = () => {
                 variant="caption"
                 sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
               >
-                Alert triggered 5 minutes before your scheduled deep work block.
+                {t('notificationSettings.alerts.sessionStart.desc')}
               </Typography>
               <SoundPreviewButton onClick={() => playSound('sessionStart')}>
                 <VolumeUpIcon />
-                <Typography variant="caption">Preview Sound</Typography>
+                <Typography variant="caption">
+                  {t('notificationSettings.alerts.preview')}
+                </Typography>
               </SoundPreviewButton>
             </Box>
           </AlertCardItem>
@@ -361,7 +368,7 @@ export const NotificationSettings = () => {
                     color: 'text.primary',
                   }}
                 >
-                  Break Reminder
+                  {t('notificationSettings.alerts.breakReminder.title')}
                 </Typography>
                 <Switch
                   checked={activeAlerts.breakReminder}
@@ -374,12 +381,13 @@ export const NotificationSettings = () => {
                 variant="caption"
                 sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
               >
-                Notification when energy blocks drop or a focus block is
-                complete.
+                {t('notificationSettings.alerts.breakReminder.desc')}
               </Typography>
               <SoundPreviewButton onClick={() => playSound('breakReminder')}>
                 <VolumeUpIcon />
-                <Typography variant="caption">Preview Sound</Typography>
+                <Typography variant="caption">
+                  {t('notificationSettings.alerts.preview')}
+                </Typography>
               </SoundPreviewButton>
             </Box>
           </AlertCardItem>
@@ -404,7 +412,7 @@ export const NotificationSettings = () => {
                     color: 'text.primary',
                   }}
                 >
-                  Session End
+                  {t('notificationSettings.alerts.sessionEnd.title')}
                 </Typography>
                 <Switch
                   checked={activeAlerts.sessionEnd}
@@ -417,11 +425,13 @@ export const NotificationSettings = () => {
                 variant="caption"
                 sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
               >
-                Alert triggered immediately when focus timer hits zero.
+                {t('notificationSettings.alerts.sessionEnd.desc')}
               </Typography>
               <SoundPreviewButton onClick={() => playSound('sessionEnd')}>
                 <VolumeUpIcon />
-                <Typography variant="caption">Preview Sound</Typography>
+                <Typography variant="caption">
+                  {t('notificationSettings.alerts.preview')}
+                </Typography>
               </SoundPreviewButton>
             </Box>
           </AlertCardItem>

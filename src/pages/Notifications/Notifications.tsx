@@ -1,4 +1,6 @@
 import { useQuery, useMutation } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Box,
   Typography,
@@ -35,8 +37,19 @@ interface Notification {
   type: 'info' | 'success' | 'warning';
 }
 
-const formatNotifTime = (createdAtStr: string) => {
+const LOCALE_MAP: Record<string, string> = {
+  es: 'es-ES',
+  en: 'en-US',
+  ja: 'ja-JP',
+};
+
+const formatNotifTime = (
+  createdAtStr: string,
+  t: TFunction,
+  language: string,
+) => {
   try {
+    const locale = LOCALE_MAP[language] || 'en-US';
     const date = new Date(createdAtStr);
     const now = new Date();
     const isToday = date.toDateString() === now.toDateString();
@@ -44,21 +57,21 @@ const formatNotifTime = (createdAtStr: string) => {
     yesterday.setDate(now.getDate() - 1);
     const isYesterday = date.toDateString() === yesterday.toDateString();
 
-    const timeStr = date.toLocaleTimeString('es-ES', {
+    const timeStr = date.toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit',
     });
-    const dateStr = date.toLocaleDateString('es-ES', {
+    const dateStr = date.toLocaleDateString(locale, {
       day: '2-digit',
       month: 'long',
     });
 
     if (isToday) {
-      return `Hoy a las ${timeStr}`;
+      return t('notificationsPage.timeToday', { time: timeStr });
     } else if (isYesterday) {
-      return `Ayer a las ${timeStr}`;
+      return t('notificationsPage.timeYesterday', { time: timeStr });
     } else {
-      return `${dateStr} a las ${timeStr}`;
+      return t('notificationsPage.timeOther', { date: dateStr, time: timeStr });
     }
   } catch {
     return createdAtStr;
@@ -66,6 +79,7 @@ const formatNotifTime = (createdAtStr: string) => {
 };
 
 export const Notifications = () => {
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
 
   // Load notifications from database
@@ -129,7 +143,7 @@ export const Notifications = () => {
         }}
       >
         <Typography variant="h6" color="error">
-          Ocurrió un error al cargar las notificaciones
+          {t('notificationsPage.error')}
         </Typography>
 
         <Typography variant="body2" color="text.secondary">
@@ -144,7 +158,7 @@ export const Notifications = () => {
       id: n.id,
       title: n.title,
       message: n.body,
-      time: formatNotifTime(n.createdAt),
+      time: formatNotifTime(n.createdAt, t, i18n.language),
       read: n.status === 'read',
       type: n.type as 'info' | 'success' | 'warning',
     }),
@@ -189,15 +203,15 @@ export const Notifications = () => {
             </Box>
             <Box>
               <Typography variant="h5" fontWeight={700}>
-                Notificaciones
+                {t('notificationsPage.title')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Mantente al día con tus últimas actividades
+                {t('notificationsPage.subtitle')}
               </Typography>
             </Box>
             {unreadCount > 0 && (
               <Chip
-                label={`${unreadCount} NUEVAS`}
+                label={t('notificationsPage.newBadge', { count: unreadCount })}
                 size="small"
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.15),
@@ -224,7 +238,7 @@ export const Notifications = () => {
                   color: theme.palette.primary.main,
                 }}
               >
-                Marcar todo como leído
+                {t('notificationsPage.markAllRead')}
               </Button>
               <Button
                 variant="text"
@@ -237,7 +251,7 @@ export const Notifications = () => {
                   color: '#ef4444',
                 }}
               >
-                Borrar todo
+                {t('notificationsPage.deleteAll')}
               </Button>
             </Box>
           )}
@@ -275,7 +289,7 @@ export const Notifications = () => {
                 />
               </Box>
               <Typography variant="h6" fontWeight={700} color="text.secondary">
-                No hay notificaciones aún
+                {t('notificationsPage.emptyTitle')}
               </Typography>
               <Typography
                 variant="body2"
@@ -283,8 +297,7 @@ export const Notifications = () => {
                 textAlign="center"
                 maxWidth={320}
               >
-                Cuando recibas notificaciones sobre tus tareas, sesiones de
-                enfoque o recomendaciones de IA, aparecerán aquí.
+                {t('notificationsPage.emptyDesc')}
               </Typography>
             </Box>
           </Fade>

@@ -7,6 +7,7 @@ import {
   Avatar,
   Typography,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { NavItem } from '../Sidebar.styles';
 import { TaskBar } from '../types/Sidebar.types';
 import {
@@ -24,6 +25,7 @@ interface SidebarNavigationProps {
 }
 
 export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
+  const { t } = useTranslation();
   const { activeTab, changeStatusTab, theme, isCollapsed } = sidebar;
   const handleProjectsTabClick = () => {
     // Reset search params to show all workspaces in the main component
@@ -74,7 +76,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <DailyPlanIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Daily Plan"
+            primary={t('nav.dailyPlan')}
             primaryTypographyProps={{ fontWeight: 600 }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
@@ -99,7 +101,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <TasksIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Tasks"
+            primary={t('nav.tasks')}
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
@@ -124,7 +126,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <AskAIIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Ask AI"
+            primary={t('nav.askAi')}
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
@@ -149,7 +151,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <InsightsIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Insights"
+            primary={t('nav.insights')}
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
@@ -178,7 +180,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
               opacity: 0.6,
             }}
           >
-            collections
+            {t('nav.collections')}
           </Typography>
         </Box>
       )}
@@ -207,7 +209,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <ProjectIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Projects"
+            primary={t('nav.projects')}
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
@@ -226,7 +228,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             <TemplateIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Templates"
+            primary={t('nav.templates')}
             primaryTypographyProps={{ fontWeight: 500 }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },

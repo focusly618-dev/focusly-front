@@ -1,4 +1,5 @@
 import { Typography, Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { Header, Title } from '../../Tasks.styles';
 
 interface TasksHeaderProps {
@@ -6,6 +7,7 @@ interface TasksHeaderProps {
 }
 
 export const TasksHeader = ({ children }: TasksHeaderProps) => {
+  const { t } = useTranslation();
   return (
     <Header sx={{ padding: '24px 0 16px 0', borderBottom: 'none' }}>
       <Box>
@@ -21,12 +23,12 @@ export const TasksHeader = ({ children }: TasksHeaderProps) => {
             display: 'block',
           }}
         >
-          MANAGE AND PRIORITIZE YOUR WORK
+          {t('tasksHeader.eyebrow')}
         </Typography>
         <Title
           sx={{ fontWeight: 800, fontSize: '28px', color: 'text.primary' }}
         >
-          My Tasks
+          {t('tasksHeader.title')}
         </Title>
       </Box>
       <Box
