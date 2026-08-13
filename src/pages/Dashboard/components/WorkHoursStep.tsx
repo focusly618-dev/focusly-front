@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Typography, Box, Stack, Divider, Button } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { Schedule, WbSunny, NightsStay, Lock } from '@mui/icons-material';
 import {
   ProgressBarContainer,
@@ -20,15 +21,16 @@ interface WorkHoursStepProps {
 }
 
 const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const days = [
-    { label: 'M', value: 'Mon' },
-    { label: 'T', value: 'Tue' },
-    { label: 'W', value: 'Wed' },
-    { label: 'T', value: 'Thu' },
-    { label: 'F', value: 'Fri' },
-    { label: 'S', value: 'Sat' },
-    { label: 'S', value: 'Sun' },
+    { label: t('onboarding.workHours.days.mon'), value: 'Mon' },
+    { label: t('onboarding.workHours.days.tue'), value: 'Tue' },
+    { label: t('onboarding.workHours.days.wed'), value: 'Wed' },
+    { label: t('onboarding.workHours.days.thu'), value: 'Thu' },
+    { label: t('onboarding.workHours.days.fri'), value: 'Fri' },
+    { label: t('onboarding.workHours.days.sat'), value: 'Sat' },
+    { label: t('onboarding.workHours.days.sun'), value: 'Sun' },
   ];
 
   const [selectedDays, setSelectedDays] = useState<string[]>([
@@ -76,10 +78,10 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
       <ProgressBarContainer>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" fontWeight="500">
-            Step 2 of 4
+            {t('onboarding.progress.step', { current: 2, total: 4 })}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            50% Completed
+            {t('onboarding.progress.percentCompleted', { percent: 50 })}
           </Typography>
         </Box>
         <ProgressBarTrack>
@@ -130,11 +132,10 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
             gutterBottom
             sx={{ fontSize: { xs: '1.75rem', md: '2rem' } }}
           >
-            Set Your Work Hours
+            {t('onboarding.workHours.heading')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Define your typical schedule so we can plan tasks during your most
-            productive hours without encroaching on personal time.
+            {t('onboarding.workHours.subheading')}
           </Typography>
         </Box>
 
@@ -156,10 +157,10 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
                 mb={1.5}
               >
                 <Typography variant="body2" fontWeight="bold">
-                  Work Days
+                  {t('onboarding.workHours.workDays')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Mon - Fri
+                  {t('onboarding.workHours.monToFri')}
                 </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between" gap={1}>
@@ -179,7 +180,7 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
 
             <Box>
               <Typography variant="body2" fontWeight="bold" mb={1.5}>
-                Daily Schedule
+                {t('onboarding.workHours.dailySchedule')}
               </Typography>
               <Box display="flex" gap={2}>
                 <Box width="50%">
@@ -189,7 +190,7 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
                       color="text.secondary"
                       fontWeight="500"
                     >
-                      Start Time
+                      {t('onboarding.workHours.startTime')}
                     </Typography>
                     <TimeInputContainer>
                       <WbSunny
@@ -215,7 +216,7 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
                       color="text.secondary"
                       fontWeight="500"
                     >
-                      End Time
+                      {t('onboarding.workHours.endTime')}
                     </Typography>
                     <TimeInputContainer>
                       <NightsStay
@@ -260,7 +261,7 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
             },
           }}
         >
-          Save & Continue
+          {t('onboarding.saveAndContinue')}
         </Button>
 
         <Box
@@ -281,7 +282,7 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
             }}
             onClick={onNext}
           >
-            I'll set this later
+            {t('onboarding.workHours.setLater')}
           </Typography>
           <Box
             display="flex"
@@ -296,7 +297,7 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
           >
             <Lock sx={{ fontSize: 16, color: 'text.secondary' }} />
             <Typography variant="caption" color="text.secondary">
-              Your schedule is private and encrypted.
+              {t('onboarding.workHours.privacyNote')}
             </Typography>
           </Box>
         </Box>

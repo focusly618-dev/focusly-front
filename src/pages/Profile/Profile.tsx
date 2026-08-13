@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Typography,
   Box,
@@ -27,13 +28,16 @@ import {
   Logout as LogoutIcon,
   Email as EmailIcon,
   WorkOutline as JobIcon,
+  Translate as LanguageIcon,
 } from '@mui/icons-material';
 import { useProfile } from './hooks/useProfile.hook';
 import { ScheduleSettings } from '../Settings/components/ScheduleSettings';
 import { FocusEngineSettings } from '../Settings/components/FocusEngineSettings';
 import { NotificationSettings } from '../Settings/components/NotificationSettings';
+import { LanguageSelector } from '@/components/ui';
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation();
   const {
     user,
     fullName,
@@ -72,7 +76,7 @@ const Profile: React.FC = () => {
             <BoltIcon sx={{ color: 'primary.contrastText' }} />
           </Box>
           <Typography variant="h6" fontWeight="bold">
-            Intelligent Focus
+            {t('profile.brand')}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -86,7 +90,7 @@ const Profile: React.FC = () => {
                 }}
                 onClick={cancelEdit}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="contained"
@@ -99,7 +103,7 @@ const Profile: React.FC = () => {
                   '&:hover': { bgcolor: 'primary.dark' },
                 }}
               >
-                Save Changes
+                {t('common.save')}
               </Button>
             </>
           )}
@@ -138,7 +142,7 @@ const Profile: React.FC = () => {
                 {user?.name || 'Alex Morgan'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Free Plan
+                {t('profile.plan')}
               </Typography>
             </Box>
           </UserCard>
@@ -162,28 +166,28 @@ const Profile: React.FC = () => {
               onClick={() => setActiveTab('profile')}
               startIcon={<PersonIcon />}
             >
-              General Profile
+              {t('profile.nav.general')}
             </MenuButton>
             <MenuButton
               active={activeTab === 'schedule'}
               onClick={() => setActiveTab('schedule')}
               startIcon={<ScheduleIcon />}
             >
-              Schedule & Energy
+              {t('profile.nav.schedule')}
             </MenuButton>
             <MenuButton
               active={activeTab === 'focus'}
               onClick={() => setActiveTab('focus')}
               startIcon={<BoltIcon />}
             >
-              Focus Engine
+              {t('profile.nav.focus')}
             </MenuButton>
             <MenuButton
               active={activeTab === 'notifications'}
               onClick={() => setActiveTab('notifications')}
               startIcon={<NotificationsIcon />}
             >
-              Notifications
+              {t('profile.nav.notifications')}
             </MenuButton>
           </Box>
 
@@ -200,7 +204,7 @@ const Profile: React.FC = () => {
             }}
             onClick={handleLogout}
           >
-            Log Out
+            {t('profile.nav.logout')}
           </Button>
         </Sidebar>
 
@@ -210,11 +214,10 @@ const Profile: React.FC = () => {
             <>
               <Box mb={4}>
                 <Typography variant="h4" fontWeight="bold" gutterBottom>
-                  General Profile
+                  {t('profile.general.title')}
                 </Typography>
                 <Typography color="text.secondary">
-                  Manage your personal information, account security, and basic
-                  preferences.
+                  {t('profile.general.subtitle')}
                 </Typography>
               </Box>
 
@@ -225,7 +228,7 @@ const Profile: React.FC = () => {
                 >
                   <PersonIcon sx={{ color: 'primary.main' }} />
                   <Typography variant="h6" fontWeight="bold">
-                    Profile Picture
+                    {t('profile.general.picture.title')}
                   </Typography>
                 </Box>
 
@@ -252,7 +255,7 @@ const Profile: React.FC = () => {
                   </Avatar>
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold">
-                      Your Avatar
+                      {t('profile.general.picture.avatarTitle')}
                     </Typography>
                     <Typography
                       variant="caption"
@@ -260,7 +263,7 @@ const Profile: React.FC = () => {
                       display="block"
                       mb={2}
                     >
-                      This will be displayed on your profile and in team spaces.
+                      {t('profile.general.picture.avatarDesc')}
                     </Typography>
                     <Stack direction="row" spacing={2}>
                       <Button
@@ -276,12 +279,12 @@ const Profile: React.FC = () => {
                           },
                         }}
                       >
-                        Upload New
+                        {t('profile.general.picture.upload')}
                       </Button>
                       <Button
                         sx={{ color: 'error.main', textTransform: 'none' }}
                       >
-                        Remove
+                        {t('profile.general.picture.remove')}
                       </Button>
                     </Stack>
                   </Box>
@@ -295,7 +298,7 @@ const Profile: React.FC = () => {
                 >
                   <PersonIcon sx={{ color: 'primary.main' }} />
                   <Typography variant="h6" fontWeight="bold">
-                    Personal Information
+                    {t('profile.general.personal.title')}
                   </Typography>
                 </Box>
 
@@ -308,7 +311,7 @@ const Profile: React.FC = () => {
                         mb={1}
                         display="block"
                       >
-                        Full Name
+                        {t('profile.general.personal.fullName')}
                       </Typography>
                       <DarkInput
                         fullWidth
@@ -323,7 +326,7 @@ const Profile: React.FC = () => {
                         mb={1}
                         display="block"
                       >
-                        Job Title
+                        {t('profile.general.personal.jobTitle')}
                       </Typography>
                       <DarkInput
                         fullWidth
@@ -349,7 +352,7 @@ const Profile: React.FC = () => {
                       mb={1}
                       display="block"
                     >
-                      Email Address
+                      {t('profile.general.personal.email')}
                     </Typography>
                     <DarkInput
                       fullWidth
@@ -374,7 +377,7 @@ const Profile: React.FC = () => {
                       mb={1}
                       display="block"
                     >
-                      Bio
+                      {t('profile.general.personal.bio')}
                     </Typography>
                     <DarkInput
                       fullWidth
@@ -387,12 +390,44 @@ const Profile: React.FC = () => {
                           variant="caption"
                           sx={{ color: 'text.secondary', float: 'right' }}
                         >
-                          {bio.length} / 250 characters
+                          {t('profile.general.personal.bioCounter', {
+                            count: bio.length,
+                          })}
                         </Typography>
                       }
                     />
                   </Box>
                 </Stack>
+              </SectionCard>
+
+              {/* Language Section */}
+              <SectionCard>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <LanguageIcon sx={{ color: 'primary.main' }} />
+                    <Box>
+                      <Typography variant="h6" fontWeight="bold">
+                        {t('settings.language.title')}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                      >
+                        {t('settings.language.subtitle')}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <LanguageSelector variant="full" />
+                </Box>
               </SectionCard>
             </>
           )}

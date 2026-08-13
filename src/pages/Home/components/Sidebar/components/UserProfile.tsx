@@ -3,6 +3,7 @@ import {
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
 } from '@mui/icons-material';
+import { LanguageSelector } from '@/components/ui';
 import { surfaceColor } from '@/context';
 import { TaskBar } from '../types/Sidebar.types';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
@@ -117,7 +118,14 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
         </Typography>
       </Box>
       {!isCollapsed && (
-        <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+        <Box
+          sx={{
+            display: { xs: 'none', lg: 'flex' },
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+        >
+          <LanguageSelector variant="icon" />
           <IconButton
             size="small"
             onClick={(e) => {

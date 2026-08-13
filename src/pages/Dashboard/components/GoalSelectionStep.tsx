@@ -1,5 +1,6 @@
 import React from 'react';
 import { Typography, Button, Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   CenterFocusStrong,
   Schedule,
@@ -22,38 +23,38 @@ const goals = [
   {
     id: 'focus',
     icon: <CenterFocusStrong fontSize="inherit" />,
-    title: 'Improve Focus',
-    subtitle: 'Minimize distractions & deep work',
+    titleKey: 'onboarding.goals.focus.title',
+    subtitleKey: 'onboarding.goals.focus.subtitle',
   },
   {
     id: 'time',
     icon: <Schedule fontSize="inherit" />,
-    title: 'Time Management',
-    subtitle: 'Optimize your daily schedule',
+    titleKey: 'onboarding.goals.time.title',
+    subtitleKey: 'onboarding.goals.time.subtitle',
   },
   {
     id: 'stress',
     icon: <SelfImprovement fontSize="inherit" />,
-    title: 'Reduce Stress',
-    subtitle: 'Achieve a healthier balance',
+    titleKey: 'onboarding.goals.stress.title',
+    subtitleKey: 'onboarding.goals.stress.subtitle',
   },
   {
     id: 'productivity',
     icon: <TrendingUp fontSize="inherit" />,
-    title: 'Increase Productivity',
-    subtitle: 'Get more done in less time',
+    titleKey: 'onboarding.goals.productivity.title',
+    subtitleKey: 'onboarding.goals.productivity.subtitle',
   },
   {
     id: 'organize',
     icon: <Checklist fontSize="inherit" />,
-    title: 'Organize Tasks',
-    subtitle: 'Stay on top of things',
+    titleKey: 'onboarding.goals.organize.title',
+    subtitleKey: 'onboarding.goals.organize.subtitle',
   },
   {
     id: 'other',
     icon: <MoreHoriz fontSize="inherit" />,
-    title: 'Other',
-    subtitle: 'I have a different goal',
+    titleKey: 'onboarding.goals.other.title',
+    subtitleKey: 'onboarding.goals.other.subtitle',
   },
 ];
 
@@ -68,15 +69,16 @@ const GoalSelectionStep: React.FC<GoalSelectionStepProps> = ({
   onSelectGoal,
   onNext,
 }) => {
+  const { t } = useTranslation();
   return (
     <>
       <ProgressBarContainer>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" fontWeight="500">
-            Step 1 of 4
+            {t('onboarding.progress.step', { current: 1, total: 4 })}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            25% Completed
+            {t('onboarding.progress.percentCompleted', { percent: 25 })}
           </Typography>
         </Box>
         <ProgressBarTrack>
@@ -91,17 +93,21 @@ const GoalSelectionStep: React.FC<GoalSelectionStepProps> = ({
           gutterBottom
           sx={{ fontSize: { xs: '2rem', md: '2.5rem' } }}
         >
-          What's your main goal?
+          {t('onboarding.goalSelection.heading')}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          We'll tailor your experience to help you achieve what matters most.
+          {t('onboarding.goalSelection.subheading')}
         </Typography>
       </Box>
 
       {/* Manual Grid Implementation using Flexbox */}
       <Box display="flex" flexWrap="wrap" mx={-1} px={2}>
         {goals.map((goal) => (
-          <Box key={goal.id} width={{ xs: '100%', sm: '50%', md: '33.33%' }} p={1}>
+          <Box
+            key={goal.id}
+            width={{ xs: '100%', sm: '50%', md: '33.33%' }}
+            p={1}
+          >
             <OptionCard
               elevation={0}
               selected={selectedGoal === goal.id}
@@ -109,21 +115,25 @@ const GoalSelectionStep: React.FC<GoalSelectionStepProps> = ({
             >
               <IconBox selected={selectedGoal === goal.id}>
                 {React.cloneElement(
-                  goal.icon as React.ReactElement<{ style: React.CSSProperties }>,
+                  goal.icon as React.ReactElement<{
+                    style: React.CSSProperties;
+                  }>,
                   {
                     style: { fontSize: '28px' },
-                  }
+                  },
                 )}
               </IconBox>
               <Box>
                 <Typography variant="body1" fontWeight="bold" gutterBottom>
-                  {goal.title}
+                  {t(goal.titleKey)}
                 </Typography>
                 <Typography
                   variant="body2"
-                  color={selectedGoal === goal.id ? 'text.primary' : 'text.secondary'}
+                  color={
+                    selectedGoal === goal.id ? 'text.primary' : 'text.secondary'
+                  }
                 >
-                  {goal.subtitle}
+                  {t(goal.subtitleKey)}
                 </Typography>
               </Box>
             </OptionCard>
@@ -148,7 +158,7 @@ const GoalSelectionStep: React.FC<GoalSelectionStepProps> = ({
           }}
           endIcon={<ArrowForward />}
         >
-          Next
+          {t('onboarding.next')}
         </Button>
       </Box>
     </>

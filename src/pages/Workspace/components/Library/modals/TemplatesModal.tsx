@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogTitle,
@@ -1193,6 +1194,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
   selectedGroupId = null,
   onSelectTemplate,
 }) => {
+  const { t: translate } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
@@ -1213,6 +1215,16 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
     'Productivity',
     'Systems',
   ];
+
+  const categoryLabels: Record<string, string> = {
+    All: translate('templatesModal.categories.all'),
+    'Product & Strategy': translate(
+      'templatesModal.categories.productStrategy',
+    ),
+    Engineering: translate('templatesModal.categories.engineering'),
+    Productivity: translate('templatesModal.categories.productivity'),
+    Systems: translate('templatesModal.categories.systems'),
+  };
 
   const filteredTemplates = useMemo(() => {
     return PROFESSIONAL_TEMPLATES.filter((t) => {
@@ -1282,10 +1294,10 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
           <TemplateIcon sx={{ color: 'primary.main', fontSize: 26 }} />
           <Box>
             <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-              Professional Templates Explorer
+              {translate('templatesModal.title')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              Select a template and assign it to your target project folder
+              {translate('templatesModal.subtitle')}
             </Typography>
           </Box>
         </Box>
@@ -1315,7 +1327,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
           {/* Search & Category Filter Header */}
           <Box sx={{ p: 2, pb: 1.5 }}>
             <TextField
-              placeholder="Search templates..."
+              placeholder={translate('templatesModal.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               size="small"
@@ -1339,7 +1351,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                 return (
                   <Chip
                     key={cat}
-                    label={cat}
+                    label={categoryLabels[cat] || cat}
                     size="small"
                     onClick={() => setSelectedCategory(cat)}
                     sx={{
@@ -1449,7 +1461,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                     {isSelected && (
                       <Chip
                         icon={<EyeIcon sx={{ fontSize: '12px !important' }} />}
-                        label="Previewing"
+                        label={translate('templatesModal.previewing')}
                         size="small"
                         color="primary"
                         sx={{
@@ -1492,7 +1504,10 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
             <Box>
               <Box display="flex" alignItems="center" gap={1} mb={0.5}>
                 <Chip
-                  label={activeTemplate.category}
+                  label={
+                    categoryLabels[activeTemplate.category] ||
+                    activeTemplate.category
+                  }
                   size="small"
                   sx={{
                     fontSize: '10px',
@@ -1503,7 +1518,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                   }}
                 />
                 <Typography variant="caption" color="text.secondary">
-                  Live Rendered Preview
+                  {translate('templatesModal.liveRenderedPreview')}
                 </Typography>
               </Box>
               <Typography variant="h6" fontWeight={800} fontSize="17px">
@@ -1529,7 +1544,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                   }}
                 >
                   <MenuItem value="unassigned" sx={{ fontSize: '13px' }}>
-                    <em>General / Unassigned</em>
+                    <em>{translate('templatesModal.generalUnassigned')}</em>
                   </MenuItem>
                   {projects.map((p) => (
                     <MenuItem key={p.id} value={p.id} sx={{ fontSize: '13px' }}>
@@ -1567,7 +1582,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                   },
                 }}
               >
-                Use This Template
+                {translate('templatesModal.useTemplate')}
               </Button>
             </Box>
           </Box>
@@ -1593,7 +1608,8 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                 color="text.secondary"
                 sx={{ fontSize: '12px' }}
               >
-                💡 <strong>Pro Tip</strong>: {activeTemplate.tips[0]}
+                💡 <strong>{translate('templatesModal.proTip')}</strong>:{' '}
+                {activeTemplate.tips[0]}
               </Typography>
             </Box>
           )}

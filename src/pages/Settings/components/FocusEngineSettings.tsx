@@ -9,6 +9,7 @@ import {
   useTheme,
   Stack,
 } from '@mui/material';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   BlockOutlined as BlockIcon,
   Security as StrictIcon,
@@ -35,6 +36,7 @@ import {
 } from '../Settings.styles';
 
 export const FocusEngineSettings = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   const [blockSocial, setBlockSocial] = useState(true);
@@ -102,10 +104,10 @@ export const FocusEngineSettings = () => {
             <Box className="icon-wrapper" sx={{ color: '#EF4444' }}>
               <BlockIcon />
             </Box>
-            <Typography>Focus Shield</Typography>
+            <Typography>{t('focusEngineSettings.shield.title')}</Typography>
           </SectionTitle>
           <Badge sx={{ bgcolor: 'rgba(34, 197, 94, 0.08)', color: '#22C55E' }}>
-            Active
+            {t('common.active')}
           </Badge>
         </SectionHeader>
 
@@ -136,27 +138,28 @@ export const FocusEngineSettings = () => {
               color="text.primary"
               sx={{ mb: 0.5 }}
             >
-              ¿Quieres bloquear sitios web y aplicaciones de verdad?
+              {t('focusEngineSettings.shield.bannerTitle')}
             </Typography>
             <Typography
               variant="caption"
               color="text.secondary"
               sx={{ display: 'block', lineHeight: 1.5 }}
             >
-              Para habilitar el bloqueo en tiempo real en tu navegador,
-              asegúrate de descargar nuestra extensión oficial{' '}
-              <a
-                href="#"
-                style={{
-                  color: '#6366F1',
-                  fontWeight: 600,
-                  textDecoration: 'underline',
+              <Trans
+                i18nKey="focusEngineSettings.shield.bannerDesc"
+                components={{
+                  companionLink: (
+                    <a
+                      href="#"
+                      style={{
+                        color: '#6366F1',
+                        fontWeight: 600,
+                        textDecoration: 'underline',
+                      }}
+                    />
+                  ),
                 }}
-              >
-                Focusly Guard Companion
-              </a>
-              . Una vez instalada, esta extensión bloqueará automáticamente las
-              webs distractoras de tu lista durante tus sesiones de enfoque.
+              />
             </Typography>
           </Box>
         </Box>
@@ -172,12 +175,14 @@ export const FocusEngineSettings = () => {
                 sx={{ color: blockSocial ? '#6366F1' : 'text.secondary' }}
               />
               <Box>
-                <ShieldLabel>Social Media</ShieldLabel>
+                <ShieldLabel>
+                  {t('focusEngineSettings.shield.social.label')}
+                </ShieldLabel>
                 <Typography
                   variant="caption"
                   sx={{ color: 'text.secondary', display: 'block' }}
                 >
-                  Block Twitter, Instagram, Facebook
+                  {t('focusEngineSettings.shield.social.desc')}
                 </Typography>
               </Box>
             </ShieldInfo>
@@ -201,12 +206,14 @@ export const FocusEngineSettings = () => {
                 }}
               />
               <Box>
-                <ShieldLabel>News & Media</ShieldLabel>
+                <ShieldLabel>
+                  {t('focusEngineSettings.shield.media.label')}
+                </ShieldLabel>
                 <Typography
                   variant="caption"
                   sx={{ color: 'text.secondary', display: 'block' }}
                 >
-                  Block YouTube, Netflix, Reddit
+                  {t('focusEngineSettings.shield.media.desc')}
                 </Typography>
               </Box>
             </ShieldInfo>
@@ -221,7 +228,9 @@ export const FocusEngineSettings = () => {
 
         {/* Custom Blocklist Panel */}
         <BlocklistPanel>
-          <BlocklistTitle>Blocked Websites</BlocklistTitle>
+          <BlocklistTitle>
+            {t('focusEngineSettings.shield.blocklistTitle')}
+          </BlocklistTitle>
           <Box sx={{ mb: 2 }}>
             {blockedWebsites.map((site) => (
               <BlocklistItem key={site}>
@@ -242,7 +251,7 @@ export const FocusEngineSettings = () => {
             <TextField
               size="small"
               fullWidth
-              placeholder="e.g. facebook.com"
+              placeholder={t('focusEngineSettings.shield.placeholder')}
               value={newWebsite}
               onChange={(e) => setNewWebsite(e.target.value)}
               sx={inputStyles}
@@ -268,7 +277,7 @@ export const FocusEngineSettings = () => {
                 },
               }}
             >
-              Add
+              {t('common.add')}
             </Button>
           </Box>
         </BlocklistPanel>
@@ -281,7 +290,7 @@ export const FocusEngineSettings = () => {
             <Box className="icon-wrapper" sx={{ color: '#EF4444' }}>
               <StrictIcon />
             </Box>
-            <Typography>Deep Lock Mode</Typography>
+            <Typography>{t('focusEngineSettings.deepLock.title')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
@@ -301,15 +310,13 @@ export const FocusEngineSettings = () => {
                 mb: 0.5,
               }}
             >
-              Enable Lockout System
+              {t('focusEngineSettings.deepLock.enableTitle')}
             </Typography>
             <Typography
               variant="caption"
               sx={{ color: 'text.secondary', display: 'block' }}
             >
-              When enabled, ending a focus session requires intentional, timed
-              action. This reinforces concentration habits and prevents impulse
-              cancellation.
+              {t('focusEngineSettings.deepLock.enableDesc')}
             </Typography>
           </Box>
           <Switch
@@ -327,7 +334,7 @@ export const FocusEngineSettings = () => {
             <Box className="icon-wrapper">
               <CalendarIcon />
             </Box>
-            <Typography>Calendar Protection</Typography>
+            <Typography>{t('focusEngineSettings.calendar.title')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
@@ -354,7 +361,7 @@ export const FocusEngineSettings = () => {
                   color: 'text.primary',
                 }}
               >
-                Google Calendar Sync
+                {t('focusEngineSettings.calendar.syncTitle')}
               </Typography>
               <CheckedIcon sx={{ color: '#22C55E', fontSize: 18 }} />
             </Stack>
@@ -362,12 +369,11 @@ export const FocusEngineSettings = () => {
               variant="caption"
               sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}
             >
-              Focus blocks automatically protect your calendar availability by
-              declining new meetings.
+              {t('focusEngineSettings.calendar.syncDesc')}
             </Typography>
           </Box>
           <Badge sx={{ bgcolor: 'rgba(34, 197, 94, 0.08)', color: '#22C55E' }}>
-            Connected
+            {t('common.connected')}
           </Badge>
         </Box>
       </SectionCard>

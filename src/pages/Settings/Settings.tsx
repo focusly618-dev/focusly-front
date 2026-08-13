@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Box, Typography, Avatar, Stack } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   SettingsLayout,
   SettingsSidebar,
@@ -32,6 +33,7 @@ import { AppearanceSettings } from './components/AppearanceSettings';
 import { SettingsTab } from './Settings.types';
 
 export const Settings = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.Schedule);
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -39,49 +41,43 @@ export const Settings = () => {
     switch (activeTab) {
       case SettingsTab.Schedule:
         return {
-          title: 'Schedule & Energy Rhythm',
-          description:
-            'Configure your availability, work rhythm, and let our AI optimize your peak productivity windows.',
+          title: t('settings.schedule'),
+          description: t('settings.descriptions.schedule'),
         };
       case SettingsTab.Focus:
         return {
-          title: 'Focus Control Center',
-          description:
-            'Define your focus and break block duration and manage distraction shield parameters.',
+          title: t('settings.focusEngine'),
+          description: t('settings.descriptions.focus'),
         };
       case SettingsTab.Notifications:
         return {
-          title: 'Notification Channels',
-          description:
-            'Control how and when you receive alerts for focus sessions, breaks, and digests.',
+          title: t('settings.notifications'),
+          description: t('settings.descriptions.notifications'),
         };
       case SettingsTab.Account:
         return {
-          title: 'Profile Identity',
-          description:
-            'Manage your display name, avatar, and how your account is signed in.',
+          title: t('settings.account'),
+          description: t('settings.descriptions.account'),
         };
       case SettingsTab.Integrations:
         return {
-          title: 'Connected Apps',
-          description:
-            'Manage the external accounts Focusly uses to sync your calendar and generate Meet links.',
+          title: t('settings.integrations'),
+          description: t('settings.descriptions.integrations'),
         };
       case SettingsTab.Appearance:
         return {
-          title: 'Appearance',
-          description: 'Choose how Focusly looks on this device.',
+          title: t('settings.appearance'),
+          description: t('settings.theme.subtitle'),
         };
       case SettingsTab.Security:
         return {
-          title: 'Security & Account',
-          description:
-            'Manage your authentication sessions and delete or sign out of your account.',
+          title: t('settings.security'),
+          description: t('settings.descriptions.security'),
         };
       default:
         return {
-          title: 'Productivity Profile',
-          description: 'Manage your focus system and identity preferences.',
+          title: t('settings.title'),
+          description: t('settings.descriptions.default'),
         };
     }
   };
@@ -91,31 +87,39 @@ export const Settings = () => {
   const tabs = [
     {
       id: SettingsTab.Schedule,
-      label: 'Schedule & Energy',
+      label: t('settings.schedule'),
       icon: <AccessTimeIcon />,
     },
     {
       id: SettingsTab.Focus,
-      label: 'Focus Engine',
+      label: t('settings.focusEngine'),
       icon: <PrecisionManufacturingIcon />,
     },
     {
       id: SettingsTab.Notifications,
-      label: 'Notifications',
+      label: t('settings.notifications'),
       icon: <NotificationsNoneIcon />,
     },
-    { id: SettingsTab.Account, label: 'Account', icon: <AccountIcon /> },
+    {
+      id: SettingsTab.Account,
+      label: t('settings.account'),
+      icon: <AccountIcon />,
+    },
     {
       id: SettingsTab.Integrations,
-      label: 'Integrations',
+      label: t('settings.integrations'),
       icon: <IntegrationsIcon />,
     },
     {
       id: SettingsTab.Appearance,
-      label: 'Appearance',
+      label: t('settings.appearance'),
       icon: <AppearanceIcon />,
     },
-    { id: SettingsTab.Security, label: 'Security', icon: <SecurityIcon /> },
+    {
+      id: SettingsTab.Security,
+      label: t('settings.security'),
+      icon: <SecurityIcon />,
+    },
   ];
 
   return (
@@ -183,7 +187,7 @@ export const Settings = () => {
               <Badge
                 sx={{ bgcolor: 'rgba(34, 197, 94, 0.08)', color: '#22C55E' }}
               >
-                Focus Style: Deep Work Creator
+                {t('settings.focusStyleBadge')}
               </Badge>
             </Stack>
           </Box>

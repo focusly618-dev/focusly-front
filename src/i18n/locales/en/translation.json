@@ -1,0 +1,675 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading...",
+    "actions": "Actions",
+    "close": "Close",
+    "back": "Back",
+    "add": "Add",
+    "active": "Active",
+    "connected": "Connected",
+    "error": "Error",
+    "connect": "Connect"
+  },
+  "nav": {
+    "dailyPlan": "Daily Plan",
+    "tasks": "Tasks",
+    "askAi": "Ask AI",
+    "insights": "Insights",
+    "collections": "collections",
+    "projects": "Projects",
+    "templates": "Templates",
+    "features": "Features",
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "logIn": "Log In",
+    "getStarted": "Get Started"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "appearance": "Appearance",
+    "focusEngine": "Focus Engine",
+    "integrations": "Integrations",
+    "notifications": "Notifications",
+    "schedule": "Schedule",
+    "security": "Security",
+    "theme": {
+      "title": "Theme",
+      "subtitle": "Choose how Focusly looks on this device.",
+      "light": "Light",
+      "dark": "Dark",
+      "graydark": "Gray Dark"
+    },
+    "language": {
+      "title": "Language",
+      "subtitle": "Select your preferred language for the interface.",
+      "spanish": "Español",
+      "english": "English",
+      "japanese": "日本語"
+    },
+    "descriptions": {
+      "schedule": "Configure your availability, work rhythm, and let our AI optimize your peak productivity windows.",
+      "focus": "Define your focus and break block duration and manage distraction shield parameters.",
+      "notifications": "Control how and when you receive alerts for focus sessions, breaks, and digests.",
+      "account": "Manage your display name, avatar, and how your account is signed in.",
+      "integrations": "Manage the external accounts Focusly uses to sync your calendar and generate Meet links.",
+      "security": "Manage your authentication sessions and delete or sign out of your account.",
+      "default": "Manage your focus system and identity preferences."
+    },
+    "focusStyleBadge": "Focus Style: Deep Work Creator"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "subtitle": "Organized clarity for your deep work sessions.",
+    "aiPlannerTitle": "AI Planner",
+    "aiPlannerDescription": "Lumina is looking for the best focus slots for your tasks...",
+    "noPendingTasksTitle": "Planner",
+    "noPendingTasksDesc": "You have no pending tasks to schedule.",
+    "noAvailabilityTitle": "No Availability",
+    "noAvailabilityDesc": "There are no free slots in the calendar to schedule.",
+    "noSuggestionsTitle": "Planner",
+    "noSuggestionsDesc": "No optimal time block suggestions were found.",
+    "draftGeneratedTitle": "Draft Generated",
+    "draftGeneratedDesc": "Lumina has distributed your tasks. Review, adjust, or confirm your schedule.",
+    "planningErrorTitle": "Planning Error",
+    "planningErrorDesc": "Could not generate time block proposal.",
+    "organizingBackdrop": "Lumina AI is organizing your tasks on the calendar...",
+    "draftProposed": "✨ Lumina proposed {{count}} focus blocks",
+    "discard": "Discard",
+    "confirmSchedule": "Confirm Schedule 🚀",
+    "scheduling": "Scheduling...",
+    "quickCreateTask": "Quick Create Task",
+    "showMore": "+{{count}} more",
+    "addTask": "Add Task",
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "today": "Today",
+    "awaitedTasks": "Awaited Tasks",
+    "viewAll": "View All",
+    "noAwaitedTasks": "No tasks awaited",
+    "freeTimeDesc": "Enjoy your free time!",
+    "optimizeSchedule": "Optimize Schedule",
+    "openWeeklyPlanner": "Open Weekly Planner",
+    "notifications": {
+      "title": "Notifications",
+      "new": "{{count}} NEW",
+      "empty": "No notifications yet",
+      "emptyDesc": "You're all caught up! Notifications about tasks and focus sessions will appear here.",
+      "markAllRead": "Mark all read"
+    }
+  },
+  "profile": {
+    "brand": "Intelligent Focus",
+    "plan": "Free Plan",
+    "nav": {
+      "general": "General Profile",
+      "schedule": "Schedule & Energy",
+      "focus": "Focus Engine",
+      "notifications": "Notifications",
+      "logout": "Log Out"
+    },
+    "general": {
+      "title": "General Profile",
+      "subtitle": "Manage your personal information, account security, and basic preferences.",
+      "picture": {
+        "title": "Profile Picture",
+        "avatarTitle": "Your Avatar",
+        "avatarDesc": "This will be displayed on your profile and in team spaces.",
+        "upload": "Upload New",
+        "remove": "Remove"
+      },
+      "personal": {
+        "title": "Personal Information",
+        "fullName": "Full Name",
+        "jobTitle": "Job Title",
+        "email": "Email Address",
+        "bio": "Bio",
+        "bioCounter": "{{count}} / 250 characters"
+      }
+    }
+  },
+  "scheduleSettings": {
+    "title": "Your Golden Hours",
+    "aiBeta": "AI BETA",
+    "highConfidence": "High Confidence",
+    "windowDesc": "This is your highest energy window. Focusly schedules deep focus work during this period.",
+    "energyPeak": "ENERGY PEAK",
+    "autoProtectTitle": "Auto-protect Golden Hours",
+    "autoProtectDesc": "Focusly will automatically protect your highest performance hours."
+  },
+  "focusEngineSettings": {
+    "shield": {
+      "title": "Focus Shield",
+      "bannerTitle": "Want to actually block distracting websites and apps?",
+      "bannerDesc": "To enable real-time blocking in your browser, make sure to download our official extension <companionLink>Focusly Guard Companion</companionLink>. Once installed, this extension will automatically block distracting websites from your list during your focus sessions.",
+      "social": {
+        "label": "Social Media",
+        "desc": "Block Twitter, Instagram, Facebook"
+      },
+      "media": {
+        "label": "News & Media",
+        "desc": "Block YouTube, Netflix, Reddit"
+      },
+      "blocklistTitle": "Blocked Websites",
+      "placeholder": "e.g. facebook.com"
+    },
+    "deepLock": {
+      "title": "Deep Lock Mode",
+      "enableTitle": "Enable Lockout System",
+      "enableDesc": "When enabled, ending a focus session requires intentional, timed action. This reinforces concentration habits and prevents impulse cancellation."
+    },
+    "calendar": {
+      "title": "Calendar Protection",
+      "syncTitle": "Google Calendar Sync",
+      "syncDesc": "Focus blocks automatically protect your calendar availability by declining new meetings."
+    }
+  },
+  "notificationSettings": {
+    "channels": {
+      "title": "Delivery Channels",
+      "inApp": {
+        "title": "In-App Notifications",
+        "desc": "Receive focus session alerts directly in the app."
+      },
+      "email": {
+        "title": "Email Summary",
+        "desc": "Daily and weekly summaries sent to {{email}}"
+      },
+      "push": {
+        "title": "Desktop Push Notifications",
+        "desc": "OS-native notifications when the browser is minimized.",
+        "blocked": "⚠️ Push notifications are blocked by your browser."
+      }
+    },
+    "pushBlockedAlert": "Notifications are blocked in your browser. Please enable them in your browser site settings.",
+    "sound": {
+      "title": "Notification Sound",
+      "desc": "Pick a notification chime. Click a card to preview and set it.",
+      "classicChime": "Classic Chime",
+      "digitalTone": "Digital Tone",
+      "softBell": "Soft Bell",
+      "successArpeggio": "Success Arpeggio"
+    },
+    "alerts": {
+      "title": "Session & Break Alerts",
+      "preview": "Preview Sound",
+      "sessionStart": {
+        "title": "Session Start",
+        "desc": "Alert triggered 5 minutes before your scheduled deep work block."
+      },
+      "breakReminder": {
+        "title": "Break Reminder",
+        "desc": "Notification when energy blocks drop or a focus block is complete."
+      },
+      "sessionEnd": {
+        "title": "Session End",
+        "desc": "Alert triggered immediately when focus timer hits zero."
+      }
+    }
+  },
+  "accountSettings": {
+    "identity": {
+      "title": "Profile Identity",
+      "googleAccount": "Google Account",
+      "magicLink": "Magic Link Sign-in",
+      "avatarSynced": "Your avatar is synced from your sign-in provider."
+    },
+    "displayName": "Display Name",
+    "emailAddress": "Email Address",
+    "emailManagedBy": "Managed by your sign-in provider and can't be changed here.",
+    "toast": {
+      "title": "Profile updated",
+      "desc": "Your display name has been saved."
+    }
+  },
+  "integrationsSettings": {
+    "connectedApps": "Connected Apps",
+    "desc": "Manage the external accounts Focusly uses to sync your calendar and generate Meet links.",
+    "googleCalendar": "Google Calendar & Meet",
+    "connectedAs": "Connected as {{email}}",
+    "notConnected": "Not connected",
+    "connect": "Connect",
+    "refreshPermissions": "Refresh permissions",
+    "toast": {
+      "connectedTitle": "Google Calendar connected",
+      "connectedDesc": "Your calendar and Meet access have been refreshed.",
+      "connectErrorTitle": "Could not connect Google Calendar",
+      "connectFailedTitle": "Google connection failed"
+    }
+  },
+  "securitySettings": {
+    "sessionTitle": "Account & Session",
+    "sessionDesc": "Manage your active login session for this workspace. To switch accounts or sign out, use the option below.",
+    "activeSession": "Active Session",
+    "signedInBrowser": "Signed in on this browser.",
+    "signOut": "Sign out of Focusly",
+    "signInMethod": "Sign-in Method",
+    "google": "Google",
+    "magicLink": "Magic Link",
+    "googleDesc": "You sign in with your Google account. There is no separate Focusly password to manage.",
+    "magicLinkDesc": "You sign in with a passwordless magic link sent to your email.",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "deleteAccountDesc": "Permanently remove your account and all of your data.",
+    "toast": {
+      "title": "Account deletion",
+      "desc": "Self-serve deletion is not available yet. Contact our support team to permanently delete your account and data."
+    }
+  },
+  "tasksHeader": {
+    "eyebrow": "Manage and prioritize your work",
+    "title": "My Tasks"
+  },
+  "endSessionModal": {
+    "title": "End Focus Session?",
+    "confirmText": "Are you sure you want to end this session early?",
+    "warningText": "Stopping now might affect your daily progress tracking and streak.",
+    "endSession": "End Session"
+  },
+  "insightsHeader": {
+    "title": "{{period}} Insights",
+    "periods": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "subtitle": "Productivity summary and analytics",
+    "export": "Export",
+    "createReport": "Create Report",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "subtitle": "Stay up to date with your latest activity",
+    "newBadge": "{{count}} NEW",
+    "markAllRead": "Mark all as read",
+    "deleteAll": "Delete all",
+    "error": "An error occurred while loading notifications",
+    "emptyTitle": "No notifications yet",
+    "emptyDesc": "When you receive notifications about your tasks, focus sessions, or AI recommendations, they'll appear here.",
+    "timeToday": "Today at {{time}}",
+    "timeYesterday": "Yesterday at {{time}}",
+    "timeOther": "{{date}} at {{time}}"
+  },
+  "login": {
+    "toggleTheme": "Toggle theme",
+    "checkEmail": {
+      "title": "Check your email",
+      "desc": "We've sent a sign-in link to",
+      "instructions": "Click the link to sign in instantly.",
+      "back": "Back to sign in"
+    },
+    "signUpTitle": "Create an account",
+    "signInTitle": "Welcome back",
+    "subtitle": "Enter your details to access your workspace.",
+    "tabs": {
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
+    },
+    "continueWithGoogle": "Continue with Google",
+    "orWithEmail": "or with email",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "e.g. John Smith",
+    "email": "Email Address",
+    "emailPlaceholder": "name@company.com",
+    "createAccount": "Create Account",
+    "signIn": "Sign In",
+    "noAccount": "Don't have an account? ",
+    "hasAccount": "Already have an account? ",
+    "signUpHere": "Sign up free",
+    "signInHere": "Sign in here",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "helpCenter": "Help Center",
+    "copyright": "© 2026 Focusly"
+  },
+  "rightPanel": {
+    "quickInsights": "Quick Insights",
+    "productivityScore": "Productivity Score",
+    "moreProductive": "You're more productive than usual this morning.",
+    "habitTracker": "Habit Tracker",
+    "focusTime": "Focus Time"
+  },
+  "calendarAiPlanner": {
+    "title": "AI Time Blocking Planner",
+    "loading": "Lumina AI is organizing your tasks on the calendar...",
+    "intro": "Lumina has identified the free slots in your calendar and proposes the following focus blocks for your pending tasks:",
+    "confirm": "Accept & Schedule",
+    "creating": "Creating events...",
+    "toast": {
+      "scheduledTitle": "Calendar Organized",
+      "scheduledDesc": "Your tasks have been successfully converted into time blocks.",
+      "errorDesc": "Could not save the time blocks."
+    }
+  },
+  "calendarWeeklyPlanner": {
+    "title": "Focusly AI Weekly Planner",
+    "loading": "Lumina AI is organizing your weekly schedule...",
+    "recommendation": "🎯 Lumina's Recommendation:",
+    "noTasksAssigned": "No tasks assigned.",
+    "confirm": "Confirm Weekly Plan",
+    "applying": "Assigning tasks...",
+    "toast": {
+      "noTasksTitle": "Weekly Planner",
+      "noTasksDesc": "You have no pending tasks to plan for this week.",
+      "fetchErrorDesc": "Could not get Lumina's weekly plan.",
+      "appliedTitle": "Weekly Plan Applied",
+      "appliedDesc": "Estimated work dates have been set for your tasks.",
+      "applyErrorDesc": "There was a problem saving the planning dates."
+    }
+  },
+  "onboarding": {
+    "progress": {
+      "step": "Step {{current}} of {{total}}",
+      "percentCompleted": "{{percent}}% Completed"
+    },
+    "next": "Next",
+    "saveAndContinue": "Save & Continue",
+    "goalSelection": {
+      "heading": "What's your main goal?",
+      "subheading": "We'll tailor your experience to help you achieve what matters most."
+    },
+    "goals": {
+      "focus": { "title": "Improve Focus", "subtitle": "Minimize distractions & deep work" },
+      "time": { "title": "Time Management", "subtitle": "Optimize your daily schedule" },
+      "stress": { "title": "Reduce Stress", "subtitle": "Achieve a healthier balance" },
+      "productivity": { "title": "Increase Productivity", "subtitle": "Get more done in less time" },
+      "organize": { "title": "Organize Tasks", "subtitle": "Stay on top of things" },
+      "other": { "title": "Other", "subtitle": "I have a different goal" }
+    },
+    "workHours": {
+      "heading": "Set Your Work Hours",
+      "subheading": "Define your typical schedule so we can plan tasks during your most productive hours without encroaching on personal time.",
+      "workDays": "Work Days",
+      "monToFri": "Mon - Fri",
+      "dailySchedule": "Daily Schedule",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "setLater": "I'll set this later",
+      "privacyNote": "Your schedule is private and encrypted.",
+      "days": {
+        "mon": "M",
+        "tue": "T",
+        "wed": "W",
+        "thu": "T",
+        "fri": "F",
+        "sat": "S",
+        "sun": "S"
+      }
+    },
+    "profileCompletion": {
+      "heading": "Complete Your Profile",
+      "subheading": "Define your presence within the Focusly ecosystem.",
+      "profilePhoto": "Profile Photo",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "e.g., Alex Rivera",
+      "jobTitle": "Job Title / Role",
+      "jobTitlePlaceholder": "e.g., Lead Systems Architect",
+      "focusPhilosophy": "Focus Philosophy",
+      "charCounter": "{{count}} / 160 MAX",
+      "bioPlaceholder": "Briefly describe how you approach deep work...",
+      "continueToDashboard": "Continue to Dashboard",
+      "completeLater": "Complete later"
+    },
+    "calendarConnection": {
+      "chooseProvider": "Choose a provider",
+      "selectService": "Select your calendar service to continue",
+      "googleCalendar": "Google Calendar",
+      "syncDesc": "Sync events from Google",
+      "skipForNow": "Skip for now",
+      "connectedHeading": "Calendar Connected!",
+      "connectedDesc": "We successfully retrieved {{count}} events from your calendar.",
+      "continue": "Continue",
+      "privacyNote": "Your data is encrypted and private."
+    },
+    "focusBlocks": {
+      "heading": "Customize Focus Blocks",
+      "subheading": "Set your preferred duration for deep work sessions and breaks. We'll structure your intelligent calendar around your rhythm.",
+      "focusSession": "Focus Session",
+      "deepWorkDuration": "Deep work duration",
+      "length": "Length",
+      "minutes": "{{count}} min",
+      "recoveryBreaks": "Recovery Breaks",
+      "restRecharge": "Rest & recharge",
+      "shortBreak": "Short Break",
+      "shortBreakNote": "Taken after every focus session.",
+      "longBreak": "Long Break",
+      "longBreakNote": "Taken after 4 consecutive sessions.",
+      "infoLabel": "How this affects your day:",
+      "infoDesc": "We will look for available slots in your calendar and fill them with these focus blocks, ensuring you never overwork without a break.",
+      "useDefaults": "Use Pomodoro defaults (25m / 5m)"
+    },
+    "finalSetup": {
+      "steps": {
+        "importing": "Importing tasks from integrations",
+        "analyzing": "Analyzing energy peaks & habits",
+        "finalizing": "Finalizing weekly schedule"
+      },
+      "headingPart1": "Fine-tuning your",
+      "headingGradient": "intelligent calendar...",
+      "subheading": "We are analyzing your habits to create the perfect schedule.",
+      "optimizing": "Optimizing focus blocks..."
+    }
+  },
+  "landing": {
+    "newBadge": "✨ New: 2.0 Workspaces out now →",
+    "heroTitle": "Everything you need to stay focused.",
+    "heroSubtitle": "Organize projects, tasks, calendars, notes and workspaces in one beautiful productivity platform.",
+    "getStarted": "Get Started 🚀",
+    "watchDemo": "Watch Demo",
+    "trustedBy": "Trusted by +10,000+ creators",
+    "features": {
+      "heading": "The OS for productivity.",
+      "subheading": "Powerful downloads for high-performance teams. Simplify your workflow without actual linking of subject.",
+      "workspaces": { "title": "Workspaces", "description": "Seamlessly separate personal, startup, and side projects with dedicated workspaces." },
+      "tasks": { "title": "Tasks", "description": "Create lists, prioritize, add labels, tags, assignees, and due dates." },
+      "calendar": { "title": "Calendar", "description": "Sync and unify all your tasks and focus slots directly from Google Calendar." },
+      "notes": { "title": "Notes", "description": "Markdown documentation for project specs, plans, and guidelines." },
+      "aiAssistant": { "title": "AI Assistant", "description": "Intelligent helper schedules focus blocks, updates statuses, and summaries files." },
+      "analytics": { "title": "Analytics", "description": "Detailed metrics show focus trends and behavioral insights." },
+      "notifications": { "title": "Notifications", "description": "Smart updates only notify you when it actually matters." }
+    },
+    "ai": {
+      "heading": "Meet your AI productivity partner.",
+      "subheading": "Focusly AI acts as a smart, co-pilot engine that understands your projects, analyzes your energy, and schedules your day.",
+      "tryButton": "Try Focusly AI",
+      "bullets": {
+        "createTasks": { "title": "Create tasks from thin air", "desc": "Describe a goal, and we will structure the task list, priorities, and deadlines." },
+        "summarize": { "title": "Summarize everything", "desc": "Sync transcripts or documents, and get key action items." },
+        "automate": { "title": "Automate workflows", "desc": "Trigger routines based on calendar updates or tasks." },
+        "instantAnswers": { "title": "Instant answers", "desc": "Query your entire workspace context instantly." }
+      }
+    },
+    "howItWorks": {
+      "heading": "Streamlined for success.",
+      "subheading": "Go from chaos to focus in four simple steps.",
+      "step1": { "title": "Create Workspaces 🗂", "desc": "Set up nice, private labs for separate projects, startups, or goals." },
+      "step2": { "title": "Create Tasks 📝", "desc": "Break down your goals into structured checklists, assign priorities, and link items directly to workspaces." },
+      "step3": { "title": "Focus Time ⚡", "desc": "Start high-focus sprints with custom timers and beautiful visual progress cards to stay in the zone." },
+      "step4": { "title": "Create Projects 📁", "desc": "Milestone boards track all of the fundamental elements." },
+      "plusMore": "Plus much more: Focus status 🟢, Smart Analytics 📈, Reminders 🔔"
+    },
+    "pricing": {
+      "heading": "Plans for every scale.",
+      "subheading": "Start free, upgrade as you grow.",
+      "perMonth": " / mo",
+      "free": {
+        "name": "Free",
+        "tagline": "Perfect for individuals.",
+        "cta": "Get Started",
+        "features": ["1 User Workspace", "Unlimited Tasks", "Basic Calendar"]
+      },
+      "pro": {
+        "badge": "START FREE TRIAL",
+        "name": "Pro",
+        "tagline": "For power users and professionals.",
+        "cta": "Go Pro",
+        "features": ["Unlimited Workspaces", "AI Assistant (500 runs)", "Advanced Analytics", "Google Calendar Integration"]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "tagline": "For ultimate productivity.",
+        "cta": "Go Enterprise",
+        "features": ["Unlimited Lumina AI Runs", "Priority AI Queue Processing", "Advanced Insights & Audits", "Export Workspaces (PDF/Markdown)", "Priority Support & Beta Access", "SLA & Security Protocols"]
+      }
+    },
+    "testimonials": {
+      "heading": "Trusted by the best.",
+      "items": [
+        { "role": "Product Lead, Stripe", "quote": "Focusly changed how our design team works. The timing blocks reduce project delays by almost 40%." },
+        { "role": "CTO, Linear", "quote": "The calendar sync is flawless. The AI integration works like magic for organizing my daily schedule." },
+        { "role": "Founder & CEO, Raycast", "quote": "The workspace separation is exactly what I needed. Minimalist, premium, and extremely fast." }
+      ]
+    },
+    "faq": {
+      "heading": "Common Questions",
+      "items": [
+        { "q": "How does the Google Calendar integration work?", "a": "Focusly integrates with Google Calendar to sync all of your meetings and blocks instantly, preventing any double booking." },
+        { "q": "Is my data secure?", "a": "Yes, we encrypt all of your workspace data in transit and at rest, and respect your privacy." },
+        { "q": "Can I use Focusly for free?", "a": "Absolutely, our Free plan includes all core task management and calendar utilities." }
+      ]
+    },
+    "footer": {
+      "tagline": "The open OS for high-performance teams.",
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "features": "Features",
+      "pricing": "Pricing",
+      "blog": "Blog",
+      "resources": "Resources",
+      "aboutUs": "About Us",
+      "careers": "Careers",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "copyright": "© {{year}} Focusly Tech. Designed to help you focus."
+    }
+  },
+  "colorNames": {
+    "black": "Black",
+    "slate": "Slate",
+    "zinc": "Zinc",
+    "darkGreen": "Dark Green",
+    "red": "Red",
+    "orange": "Orange",
+    "amber": "Amber",
+    "yellow": "Yellow",
+    "lime": "Lime",
+    "green": "Green",
+    "emerald": "Emerald",
+    "teal": "Teal",
+    "seafoam": "Seafoam",
+    "cyan": "Cyan",
+    "sky": "Sky",
+    "skyBlue": "Sky Blue",
+    "blue": "Blue",
+    "indigo": "Indigo",
+    "purple": "Purple",
+    "violet": "Violet",
+    "fuchsia": "Fuchsia",
+    "pink": "Pink",
+    "rose": "Rose",
+    "lightSlate": "Light Slate",
+    "mediumSlate": "Medium Slate",
+    "darkSlate": "Dark Slate"
+  },
+  "workspaceLibrary": {
+    "toast": {
+      "deleteProjectsTitle": "Remove Projects",
+      "deleteProjectsDesc": "Are you sure you want to delete the following projects: {{names}}? Workspaces inside will be unlinked but not deleted.",
+      "deletedTitle": "Projects deleted"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "folderFallback": "Folder"
+    },
+    "newFolder": "New Folder",
+    "status": {
+      "recent": "Recent",
+      "draft": "Draft"
+    },
+    "notesInside_one": "{{count}} note inside",
+    "notesInside_other": "{{count}} notes inside",
+    "lastUpdated": "Last updated: ",
+    "error": "Error loading workspaces. Please try again.",
+    "emptySearch": {
+      "title": "No results found",
+      "desc": "No workspaces match your search term or filter. Try adjusting your filter or search."
+    },
+    "emptyFolder": {
+      "title": "No workspaces yet",
+      "desc": "Lightweight notes to organize your strategic planning. Create your first workspace to get started.",
+      "action": "Create Workspace"
+    },
+    "deleteWorkspace": "Delete Workspace",
+    "renameFolder": "Rename Folder",
+    "customizeStyle": "Customize Style",
+    "deleteFolder": "Delete Folder",
+    "customizeDialog": {
+      "title": "Customize Folder"
+    },
+    "folderName": "Folder Name",
+    "iconShape": "Icon Shape",
+    "solid": "Solid",
+    "outlined": "Outlined",
+    "colorAccent": "Color Accent",
+    "createDialog": {
+      "title": "Create New Folder"
+    },
+    "namePlaceholder": "e.g. Sprint Plan, Personal, Marketing",
+    "createFolder": "Create Folder"
+  },
+  "allProjectsModal": {
+    "title": "All Folders",
+    "subtitle": "Browse and select folders for your library view.",
+    "searchPlaceholder": "Search across {{count}} folders...",
+    "emptyNoFolders": "No folders added yet",
+    "emptyNoMatch": "No matching folders",
+    "emptyNoFoldersDesc": "Create a custom folder in the library or sidebar to start grouping your plans.",
+    "emptyNoMatchDesc": "Try adjusting your search terms.",
+    "items": "{{count}} Items",
+    "visible": "Visible",
+    "select": "Select",
+    "deleteSelected": "Delete ({{count}})",
+    "applyChanges": "Apply Changes"
+  },
+  "createProjectModal": {
+    "title": "Create New Project",
+    "subtitle": "Choose a name and color to keep your workspaces organized and beautiful.",
+    "projectName": "Project Name",
+    "namePlaceholder": "e.g., Marketing Strategy, Q1 Plans...",
+    "projectColor": "Project Color",
+    "create": "Create Project"
+  },
+  "updateProjectModal": {
+    "title": "Edit Folder",
+    "subtitle": "Modify the folder name and color to better organize your workspaces.",
+    "folderColor": "Folder Color",
+    "update": "Update Folder"
+  },
+  "templatesModal": {
+    "title": "Professional Templates Explorer",
+    "subtitle": "Select a template and assign it to your target project folder",
+    "searchPlaceholder": "Search templates...",
+    "previewing": "Previewing",
+    "liveRenderedPreview": "Live Rendered Preview",
+    "generalUnassigned": "General / Unassigned",
+    "useTemplate": "Use This Template",
+    "proTip": "Pro Tip",
+    "categories": {
+      "all": "All",
+      "productStrategy": "Product & Strategy",
+      "engineering": "Engineering",
+      "productivity": "Productivity",
+      "systems": "Systems"
+    }
+  }
+}

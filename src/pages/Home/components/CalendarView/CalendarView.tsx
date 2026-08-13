@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Calendar,
   dateFnsLocalizer,
@@ -73,6 +74,7 @@ interface CalendarViewProps {
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
+  const { t } = useTranslation();
   const [isWeeklyPlannerOpen, setIsWeeklyPlannerOpen] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const {
@@ -111,9 +113,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     if (isAILoading) return;
     setIsAILoading(true);
     sileo.info({
-      title: 'Planificador IA',
-      description:
-        'Lumina está buscando los mejores espacios de enfoque para tus tareas...',
+      title: t('calendar.aiPlannerTitle'),
+      description: t('calendar.aiPlannerDescription'),
       duration: 3500,
     });
 
@@ -148,8 +149,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
 
       if (pendingTasks.length === 0) {
         sileo.info({
-          title: 'Planner',
-          description: 'No tienes tareas pendientes para agendar.',
+          title: t('calendar.noPendingTasksTitle'),
+          description: t('calendar.noPendingTasksDesc'),
           duration: 3000,
         });
         setIsAILoading(false);
@@ -158,8 +159,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
 
       if (slots.length === 0) {
         sileo.warning({
-          title: 'Sin Disponibilidad',
-          description: 'No hay espacios libres en el calendario para agendar.',
+          title: t('calendar.noAvailabilityTitle'),
+          description: t('calendar.noAvailabilityDesc'),
           duration: 3000,
         });
         setIsAILoading(false);
@@ -172,9 +173,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
 
       if (proposed.length === 0) {
         sileo.info({
-          title: 'Planner',
-          description:
-            'No se encontraron sugerencias óptimas de bloques de tiempo.',
+          title: t('calendar.noSuggestionsTitle'),
+          description: t('calendar.noSuggestionsDesc'),
           duration: 3000,
         });
         setIsAILoading(false);
@@ -202,16 +202,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       setIsCalendarInDraftMode(true);
 
       sileo.success({
-        title: 'Borrador Generado',
-        description:
-          'Lumina ha distribuido tus tareas. Revisa, ajusta o confirma tu agenda.',
+        title: t('calendar.draftGeneratedTitle'),
+        description: t('calendar.draftGeneratedDesc'),
         duration: 5000,
       });
     } catch (e) {
       console.error('Error generating AI schedule:', e);
       sileo.error({
-        title: 'Error de Planeación',
-        description: 'No se pudo generar la propuesta de bloques de tiempo.',
+        title: t('calendar.planningErrorTitle'),
+        description: t('calendar.planningErrorDesc'),
         duration: 4000,
       });
     } finally {
@@ -245,7 +244,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     }
   };
 
-  console.log(events);
   return (
     <Box
       sx={{
@@ -270,7 +268,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       >
         <CircularProgress color="inherit" />
         <Typography variant="body2" fontWeight={500}>
-          Lumina AI está organizando tus tareas en el calendario...
+          {t('calendar.organizingBackdrop')}
         </Typography>
       </Backdrop>
 
@@ -280,7 +278,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             variant="body2"
             sx={{ fontWeight: 600, color: 'text.primary' }}
           >
-            ✨ Lumina propuso {draftEvents.length} bloques de enfoque
+            {t('calendar.draftProposed', { count: draftEvents.length })}
           </Typography>
           <Stack direction="row" spacing={1}>
             <Button
@@ -302,7 +300,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                 },
               }}
             >
-              Descartar
+              {t('calendar.discard')}
             </Button>
             <Button
               variant="contained"
@@ -322,7 +320,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                 },
               }}
             >
-              {confirmingDraft ? 'Agendando...' : 'Confirmar Agenda 🚀'}
+              {confirmingDraft
+                ? t('calendar.scheduling')
+                : t('calendar.confirmSchedule')}
             </Button>
           </Stack>
         </DraftActionBar>
@@ -418,7 +418,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             onShowMore={handleShowMore}
             popup={false}
             messages={{
-              showMore: (count: number) => `+${count} más`,
+              showMore: (count: number) => t('calendar.showMore', { count }),
             }}
             formats={{
               timeGutterFormat: (
@@ -460,8 +460,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                 fontSize: '10px',
               }}
             >
-              Quick Create Task
+              {t('calendar.quickCreateTask')}
             </Typography>
+
             <Stack
               direction="row"
               spacing={1.5}

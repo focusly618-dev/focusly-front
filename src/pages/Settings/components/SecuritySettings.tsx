@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Button, alpha, useTheme } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout } from '@/redux/auth/auth.slice';
@@ -19,6 +20,7 @@ import {
 } from '../Settings.styles';
 
 export const SecuritySettings = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -32,9 +34,8 @@ export const SecuritySettings = () => {
 
   const handleDeleteAccountRequest = () => {
     sileo.info({
-      title: 'Account deletion',
-      description:
-        'Self-serve deletion is not available yet. Contact our support team to permanently delete your account and data.',
+      title: t('securitySettings.toast.title'),
+      description: t('securitySettings.toast.desc'),
       fill: 'var(--sileo-info-bg)',
     });
   };
@@ -47,13 +48,12 @@ export const SecuritySettings = () => {
             <Box className="icon-wrapper">
               <SecurityIcon />
             </Box>
-            <Typography>Account & Session</Typography>
+            <Typography>{t('securitySettings.sessionTitle')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-          Manage your active login session for this workspace. To switch
-          accounts or sign out, use the option below.
+          {t('securitySettings.sessionDesc')}
         </Typography>
 
         <Box
@@ -78,13 +78,13 @@ export const SecuritySettings = () => {
                 color: 'text.primary',
               }}
             >
-              Active Session
+              {t('securitySettings.activeSession')}
             </Typography>
             <Typography
               variant="caption"
               sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
             >
-              Signed in on this browser.
+              {t('securitySettings.signedInBrowser')}
             </Typography>
           </Box>
           <Button
@@ -104,7 +104,7 @@ export const SecuritySettings = () => {
               },
             }}
           >
-            Sign out of Focusly
+            {t('securitySettings.signOut')}
           </Button>
         </Box>
       </SectionCard>
@@ -115,7 +115,7 @@ export const SecuritySettings = () => {
             <Box className="icon-wrapper">
               {isGoogle ? <GoogleIcon /> : <MailIcon />}
             </Box>
-            <Typography>Sign-in Method</Typography>
+            <Typography>{t('securitySettings.signInMethod')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
@@ -128,12 +128,14 @@ export const SecuritySettings = () => {
               color: isGoogle ? '#4285F4' : '#6366F1',
             }}
           >
-            {isGoogle ? 'Google' : 'Magic Link'}
+            {isGoogle
+              ? t('securitySettings.google')
+              : t('securitySettings.magicLink')}
           </Badge>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {isGoogle
-              ? 'You sign in with your Google account. There is no separate Focusly password to manage.'
-              : 'You sign in with a passwordless magic link sent to your email.'}
+              ? t('securitySettings.googleDesc')
+              : t('securitySettings.magicLinkDesc')}
           </Typography>
         </Box>
       </SectionCard>
@@ -144,7 +146,7 @@ export const SecuritySettings = () => {
             <Box className="icon-wrapper" sx={{ color: '#EF4444' }}>
               <DeleteIcon />
             </Box>
-            <Typography>Danger Zone</Typography>
+            <Typography>{t('securitySettings.dangerZone')}</Typography>
           </SectionTitle>
         </SectionHeader>
 
@@ -167,13 +169,13 @@ export const SecuritySettings = () => {
                 color: 'text.primary',
               }}
             >
-              Delete Account
+              {t('securitySettings.deleteAccount')}
             </Typography>
             <Typography
               variant="caption"
               sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
             >
-              Permanently remove your account and all of your data.
+              {t('securitySettings.deleteAccountDesc')}
             </Typography>
           </Box>
           <Button
@@ -193,7 +195,7 @@ export const SecuritySettings = () => {
               },
             }}
           >
-            Delete Account
+            {t('securitySettings.deleteAccount')}
           </Button>
         </Box>
       </SectionCard>

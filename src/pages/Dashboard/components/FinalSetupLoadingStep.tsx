@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Box, Stack } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { SyncAlt, Bolt, Check } from '@mui/icons-material';
 import {
   ProgressBarTrack,
@@ -15,13 +16,16 @@ interface FinalSetupLoadingStepProps {
   onNext: () => void;
 }
 
-const FinalSetupLoadingStep: React.FC<FinalSetupLoadingStepProps> = ({ onNext }) => {
+const FinalSetupLoadingStep: React.FC<FinalSetupLoadingStepProps> = ({
+  onNext,
+}) => {
+  const { t } = useTranslation();
   const [progress, setProgress] = useState(0);
 
   const steps = [
-    { label: 'Importing tasks from integrations' },
-    { label: 'Analyzing energy peaks & habits' },
-    { label: 'Finalizing weekly schedule' },
+    { label: t('onboarding.finalSetup.steps.importing') },
+    { label: t('onboarding.finalSetup.steps.analyzing') },
+    { label: t('onboarding.finalSetup.steps.finalizing') },
   ];
 
   useEffect(() => {
@@ -119,18 +123,36 @@ const FinalSetupLoadingStep: React.FC<FinalSetupLoadingStepProps> = ({ onNext })
 
       {/* Headline & Progress */}
       <Box textAlign="center" mb={6} mt={2}>
-        <Typography variant="h3" fontWeight="bold" gutterBottom color="text.primary">
-          Fine-tuning your <br />
-          <GradientText>intelligent calendar...</GradientText>
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          gutterBottom
+          color="text.primary"
+        >
+          {t('onboarding.finalSetup.headingPart1')} <br />
+          <GradientText>
+            {t('onboarding.finalSetup.headingGradient')}
+          </GradientText>
         </Typography>
-        <Typography variant="body1" color="text.secondary" maxWidth="400px" mx="auto">
-          We are analyzing your habits to create the perfect schedule.
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          maxWidth="400px"
+          mx="auto"
+        >
+          {t('onboarding.finalSetup.subheading')}
         </Typography>
       </Box>
 
       {/* Progress Bar Section */}
       <Box width="100%" maxWidth="400px" mb={4}>
-        <Box display="flex" justifyContent="space-between" alignItems="flex-end" mb={1} px={0.5}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="flex-end"
+          mb={1}
+          px={0.5}
+        >
           <Box display="flex" alignItems="center" gap={1}>
             <Bolt
               sx={{
@@ -144,15 +166,22 @@ const FinalSetupLoadingStep: React.FC<FinalSetupLoadingStepProps> = ({ onNext })
               }}
             />
             <Typography variant="body2" fontWeight="600" color="text.primary">
-              Optimizing focus blocks...
+              {t('onboarding.finalSetup.optimizing')}
             </Typography>
           </Box>
-          <Typography variant="body1" fontWeight="bold" color="primary.main" fontFamily="monospace">
+          <Typography
+            variant="body1"
+            fontWeight="bold"
+            color="primary.main"
+            fontFamily="monospace"
+          >
             {Math.round(progress)}%
           </Typography>
         </Box>
 
-        <ProgressBarTrack sx={{ bgcolor: 'action.hover', height: '12px', padding: '2px' }}>
+        <ProgressBarTrack
+          sx={{ bgcolor: 'action.hover', height: '12px', padding: '2px' }}
+        >
           <ProgressBarFill
             width={`${progress}%`}
             sx={{
@@ -214,7 +243,8 @@ const FinalSetupLoadingStep: React.FC<FinalSetupLoadingStepProps> = ({ onNext })
                         borderRadius="50%"
                         bgcolor="primary.main"
                         sx={{
-                          animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
+                          animation:
+                            'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
                           '@keyframes ping': {
                             '75%, 100%': { transform: 'scale(2)', opacity: 0 },
                           },

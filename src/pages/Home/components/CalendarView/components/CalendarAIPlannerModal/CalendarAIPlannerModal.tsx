@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogTitle,
@@ -46,6 +47,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
   currentDate,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [scheduling, setScheduling] = useState(false);
@@ -96,8 +98,8 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
 
           if (pendingTasks.length === 0) {
             sileo.info({
-              title: 'Planner',
-              description: 'No tienes tareas pendientes para agendar.',
+              title: t('calendar.noPendingTasksTitle'),
+              description: t('calendar.noPendingTasksDesc'),
               duration: 3000,
             });
             onClose();
@@ -106,9 +108,8 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
 
           if (freeSlots.length === 0) {
             sileo.warning({
-              title: 'Sin Disponibilidad',
-              description:
-                'No hay espacios libres en el calendario para agendar.',
+              title: t('calendar.noAvailabilityTitle'),
+              description: t('calendar.noAvailabilityDesc'),
               duration: 3000,
             });
             onClose();
@@ -120,9 +121,8 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
         } catch (e) {
           console.error('Error generating AI schedule:', e);
           sileo.error({
-            title: 'Error de Planeación',
-            description:
-              'No se pudo generar la propuesta de bloques de tiempo.',
+            title: t('calendar.planningErrorTitle'),
+            description: t('calendar.planningErrorDesc'),
             duration: 4000,
           });
           onClose();
@@ -132,7 +132,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
       };
       generateSchedule();
     }
-  }, [open, tasks, events, currentDate, onClose]);
+  }, [open, tasks, events, currentDate, onClose, t]);
 
   const handleSchedule = async () => {
     if (!user?.id || proposedEvents.length === 0) return;
@@ -168,9 +168,8 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
       }
 
       sileo.success({
-        title: 'Calendario Organizado',
-        description:
-          'Tus tareas han sido convertidas en bloques de tiempo con éxito.',
+        title: t('calendarAiPlanner.toast.scheduledTitle'),
+        description: t('calendarAiPlanner.toast.scheduledDesc'),
         duration: 4000,
       });
       onSuccess();
@@ -178,8 +177,8 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
     } catch (e) {
       console.error('Error scheduling events:', e);
       sileo.error({
-        title: 'Error',
-        description: 'No se pudieron guardar los bloques de tiempo.',
+        title: t('common.error'),
+        description: t('calendarAiPlanner.toast.errorDesc'),
         duration: 4000,
       });
     } finally {
@@ -217,7 +216,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
         }}
       >
         <AutoAwesomeIcon sx={{ color: 'primary.main' }} />
-        AI Time Blocking Planner
+        {t('calendarAiPlanner.title')}
       </DialogTitle>
 
       <DialogContent>
@@ -234,15 +233,13 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
           >
             <CircularProgress color="primary" />
             <Typography variant="body2" color="text.secondary" fontWeight={500}>
-              Lumina AI está organizando tus tareas en el calendario...
+              {t('calendarAiPlanner.loading')}
             </Typography>
           </Box>
         ) : (
           <Box sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Lumina ha identificado los espacios libres en tu calendario y
-              propone los siguientes bloques de enfoque para tus tareas
-              pendientes:
+              {t('calendarAiPlanner.intro')}
             </Typography>
 
             <List
@@ -256,7 +253,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
             >
               {proposedEvents.length === 0 ? (
                 <ListItem>
-                  <ListItemText primary="No se sugirieron bloques de tiempo." />
+                  <ListItemText primary={t('calendar.noSuggestionsDesc')} />
                 </ListItem>
               ) : (
                 proposedEvents.map((item, idx) => (
@@ -329,7 +326,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
             color: 'text.secondary',
           }}
         >
-          Descartar
+          {t('calendar.discard')}
         </Button>
         <Button
           onClick={handleSchedule}
@@ -350,7 +347,9 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
             '&:hover': { boxShadow: 'none' },
           }}
         >
-          {scheduling ? 'Creando eventos...' : 'Aceptar y Agendar'}
+          {scheduling
+            ? t('calendarAiPlanner.creating')
+            : t('calendarAiPlanner.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

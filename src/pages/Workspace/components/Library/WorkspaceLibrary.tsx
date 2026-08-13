@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   LibraryContainer,
   GridContainer,
@@ -70,6 +71,7 @@ export const WorkspaceLibrary = ({
   onSelect,
   selectedGroupId,
 }: WorkspaceLibraryProps) => {
+  const { t } = useTranslation();
   const { state, actions, data } = useWorkspaceLibrary(selectedGroupId);
   const { handleOpen: handleDeleteConfirm } = useWorkspace();
 
@@ -194,18 +196,20 @@ export const WorkspaceLibrary = ({
       .join(', ');
 
     sileo.warning({
-      title: 'Remove Projects',
-      description: `Are you sure you want to delete the following projects: ${folderNames}? Workspaces inside will be unlinked but not deleted.`,
+      title: t('workspaceLibrary.toast.deleteProjectsTitle'),
+      description: t('workspaceLibrary.toast.deleteProjectsDesc', {
+        names: folderNames,
+      }),
       fill: 'var(--sileo-warning-bg)',
       button: {
-        title: 'Delete',
+        title: t('common.delete'),
         onClick: async () => {
           try {
             await Promise.all(
               ids.map((id) => deleteProjectGroup({ variables: { id } })),
             );
             sileo.success({
-              title: 'Projects deleted',
+              title: t('workspaceLibrary.toast.deletedTitle'),
               fill: 'var(--sileo-delete-bg)',
               duration: 4000,
             });
@@ -218,26 +222,26 @@ export const WorkspaceLibrary = ({
   };
 
   const AVAILABLE_COLORS = [
-    { name: 'Red', value: '#ef4444' },
-    { name: 'Orange', value: '#f97316' },
-    { name: 'Amber', value: '#f59e0b' },
-    { name: 'Yellow', value: '#eab308' },
-    { name: 'Lime', value: '#84cc16' },
-    { name: 'Green', value: '#22c55e' },
-    { name: 'Emerald', value: '#10b981' },
-    { name: 'Teal', value: '#14b8a6' },
-    { name: 'Cyan', value: '#06b6d4' },
-    { name: 'Sky Blue', value: '#0ea5e9' },
-    { name: 'Blue', value: '#3b82f6' },
-    { name: 'Indigo', value: '#6366f1' },
-    { name: 'Purple', value: '#8b5cf6' },
-    { name: 'Violet', value: '#7c3aed' },
-    { name: 'Fuchsia', value: '#d946ef' },
-    { name: 'Pink', value: '#ec4899' },
-    { name: 'Rose', value: '#f43f5e' },
-    { name: 'Light Slate', value: '#94a3b8' },
-    { name: 'Medium Slate', value: '#64748b' },
-    { name: 'Dark Slate', value: '#475569' },
+    { nameKey: 'colorNames.red', value: '#ef4444' },
+    { nameKey: 'colorNames.orange', value: '#f97316' },
+    { nameKey: 'colorNames.amber', value: '#f59e0b' },
+    { nameKey: 'colorNames.yellow', value: '#eab308' },
+    { nameKey: 'colorNames.lime', value: '#84cc16' },
+    { nameKey: 'colorNames.green', value: '#22c55e' },
+    { nameKey: 'colorNames.emerald', value: '#10b981' },
+    { nameKey: 'colorNames.teal', value: '#14b8a6' },
+    { nameKey: 'colorNames.cyan', value: '#06b6d4' },
+    { nameKey: 'colorNames.skyBlue', value: '#0ea5e9' },
+    { nameKey: 'colorNames.blue', value: '#3b82f6' },
+    { nameKey: 'colorNames.indigo', value: '#6366f1' },
+    { nameKey: 'colorNames.purple', value: '#8b5cf6' },
+    { nameKey: 'colorNames.violet', value: '#7c3aed' },
+    { nameKey: 'colorNames.fuchsia', value: '#d946ef' },
+    { nameKey: 'colorNames.pink', value: '#ec4899' },
+    { nameKey: 'colorNames.rose', value: '#f43f5e' },
+    { nameKey: 'colorNames.lightSlate', value: '#94a3b8' },
+    { nameKey: 'colorNames.mediumSlate', value: '#64748b' },
+    { nameKey: 'colorNames.darkSlate', value: '#475569' },
   ];
 
   // The active folder can be on any page of the root grid's pagination (or
@@ -348,7 +352,7 @@ export const WorkspaceLibrary = ({
           }}
           onClick={() => handleSelectFolder('')}
         >
-          Home
+          {t('workspaceLibrary.breadcrumb.home')}
         </Typography>
         <Typography
           variant="body2"
@@ -370,7 +374,7 @@ export const WorkspaceLibrary = ({
               }}
               onClick={() => handleSelectFolder('')}
             >
-              Projects
+              {t('nav.projects')}
             </Typography>
             <Typography
               variant="body2"
@@ -403,7 +407,8 @@ export const WorkspaceLibrary = ({
                   fontSize: '13px',
                 }}
               >
-                {activeGroup?.name || 'Folder'}
+                {activeGroup?.name ||
+                  t('workspaceLibrary.breadcrumb.folderFallback')}
               </Typography>
             </Box>
           </>
@@ -412,7 +417,7 @@ export const WorkspaceLibrary = ({
             variant="body2"
             sx={{ fontWeight: 700, color: 'primary.main', fontSize: '13px' }}
           >
-            Projects
+            {t('nav.projects')}
           </Typography>
         )}
       </Box>
@@ -496,7 +501,7 @@ export const WorkspaceLibrary = ({
                 variant="body2"
                 sx={{ fontWeight: 700, color: 'text.secondary' }}
               >
-                New Folder
+                {t('workspaceLibrary.newFolder')}
               </Typography>
             </Box>
 
@@ -608,7 +613,7 @@ export const WorkspaceLibrary = ({
                         display: 'block',
                       }}
                     >
-                      {`${noteCount} ${noteCount === 1 ? 'note' : 'notes'} inside`}
+                      {t('workspaceLibrary.notesInside', { count: noteCount })}
                     </Typography>
                     {group.updatedAt && (
                       <Typography
@@ -621,7 +626,7 @@ export const WorkspaceLibrary = ({
                           mt: 0.25,
                         }}
                       >
-                        Last updated:{' '}
+                        {t('workspaceLibrary.lastUpdated')}
                         {new Date(group.updatedAt).toLocaleDateString(
                           undefined,
                           { day: 'numeric', month: 'short', year: 'numeric' },
@@ -662,7 +667,11 @@ export const WorkspaceLibrary = ({
                               : 'text.secondary',
                       }}
                     >
-                      {statusLabel}
+                      {statusLabel === 'ACTIVE'
+                        ? t('common.active').toUpperCase()
+                        : statusLabel === 'RECENT'
+                          ? t('workspaceLibrary.status.recent').toUpperCase()
+                          : t('workspaceLibrary.status.draft').toUpperCase()}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -694,15 +703,15 @@ export const WorkspaceLibrary = ({
           {error ? (
             <Box sx={{ p: 4, textAlign: 'center' }}>
               <Typography color="error">
-                Error loading workspaces. Please try again.
+                {t('workspaceLibrary.error')}
               </Typography>
             </Box>
           ) : (
             <GridContainer layout={viewMode}>
               {searchTerm && !processedWorkspaces.length && !loading && (
                 <EmptyState
-                  title="No results found"
-                  description="No workspaces match your search term or filter. Try adjusting your filter or search."
+                  title={t('workspaceLibrary.emptySearch.title')}
+                  description={t('workspaceLibrary.emptySearch.desc')}
                   sx={{ gridColumn: '1 / -1', py: 8 }}
                 />
               )}
@@ -713,9 +722,9 @@ export const WorkspaceLibrary = ({
                 !error && (
                   <EmptyState
                     icon={<PushPinIcon />}
-                    title="No workspaces yet"
-                    description="Lightweight notes to organize your strategic planning. Create your first workspace to get started."
-                    actionText="Create Workspace"
+                    title={t('workspaceLibrary.emptyFolder.title')}
+                    description={t('workspaceLibrary.emptyFolder.desc')}
+                    actionText={t('workspaceLibrary.emptyFolder.action')}
                     onAction={onCreate}
                     sx={{ gridColumn: '1 / -1', py: 10 }}
                   />
@@ -912,7 +921,7 @@ export const WorkspaceLibrary = ({
           <DeleteForeverIcon
             sx={{ fontSize: 18, mr: 1.5, color: 'error.main' }}
           />
-          Delete Workspace
+          {t('workspaceLibrary.deleteWorkspace')}
         </MenuItem>
       </Menu>
 
@@ -953,7 +962,7 @@ export const WorkspaceLibrary = ({
           }}
           sx={{ fontSize: '13px', py: 1, borderRadius: '6px' }}
         >
-          Rename Folder
+          {t('workspaceLibrary.renameFolder')}
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -971,7 +980,7 @@ export const WorkspaceLibrary = ({
           }}
           sx={{ fontSize: '13px', py: 1, borderRadius: '6px' }}
         >
-          Customize Style
+          {t('workspaceLibrary.customizeStyle')}
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -988,7 +997,7 @@ export const WorkspaceLibrary = ({
             color: 'error.main',
           }}
         >
-          Delete Folder
+          {t('workspaceLibrary.deleteFolder')}
         </MenuItem>
       </Menu>
 
@@ -1010,7 +1019,7 @@ export const WorkspaceLibrary = ({
         }}
       >
         <DialogTitle sx={{ fontWeight: 800, fontSize: '1.1rem', pb: 1 }}>
-          Customize Folder
+          {t('workspaceLibrary.customizeDialog.title')}
         </DialogTitle>
         <DialogContent>
           <Typography
@@ -1024,11 +1033,11 @@ export const WorkspaceLibrary = ({
               letterSpacing: '0.05em',
             }}
           >
-            Folder Name
+            {t('workspaceLibrary.folderName')}
           </Typography>
           <StyledTextField
             fullWidth
-            placeholder="Folder Name"
+            placeholder={t('workspaceLibrary.folderName')}
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
             size="small"
@@ -1046,7 +1055,7 @@ export const WorkspaceLibrary = ({
               letterSpacing: '0.05em',
             }}
           >
-            Icon Shape
+            {t('workspaceLibrary.iconShape')}
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
             <Button
@@ -1064,7 +1073,7 @@ export const WorkspaceLibrary = ({
             >
               <FolderFilledIcon sx={{ fontSize: 24 }} />
               <Typography variant="caption" fontWeight={600}>
-                Solid
+                {t('workspaceLibrary.solid')}
               </Typography>
             </Button>
             <Button
@@ -1082,7 +1091,7 @@ export const WorkspaceLibrary = ({
             >
               <FolderOutlinedIcon sx={{ fontSize: 24 }} />
               <Typography variant="caption" fontWeight={600}>
-                Outlined
+                {t('workspaceLibrary.outlined')}
               </Typography>
             </Button>
           </Box>
@@ -1098,7 +1107,7 @@ export const WorkspaceLibrary = ({
               letterSpacing: '0.05em',
             }}
           >
-            Color Accent
+            {t('workspaceLibrary.colorAccent')}
           </Typography>
           <Box
             sx={{
@@ -1110,7 +1119,7 @@ export const WorkspaceLibrary = ({
             {AVAILABLE_COLORS.map((c) => {
               const isSelected = selectedColor === c.value;
               return (
-                <Tooltip title={c.name} key={c.value} arrow>
+                <Tooltip title={t(c.nameKey)} key={c.value} arrow>
                   <Box
                     onClick={() => setSelectedColor(c.value)}
                     sx={{
@@ -1164,7 +1173,7 @@ export const WorkspaceLibrary = ({
               color: 'text.secondary',
             }}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
@@ -1197,7 +1206,7 @@ export const WorkspaceLibrary = ({
               boxShadow: 'none',
             }}
           >
-            Save Changes
+            {t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1217,7 +1226,7 @@ export const WorkspaceLibrary = ({
         }}
       >
         <DialogTitle sx={{ fontWeight: 800, fontSize: '1.1rem', pb: 1 }}>
-          Create New Folder
+          {t('workspaceLibrary.createDialog.title')}
         </DialogTitle>
         <DialogContent>
           <Typography
@@ -1231,11 +1240,11 @@ export const WorkspaceLibrary = ({
               letterSpacing: '0.05em',
             }}
           >
-            Folder Name
+            {t('workspaceLibrary.folderName')}
           </Typography>
           <StyledTextField
             fullWidth
-            placeholder="e.g. Sprint Plan, Personal, Marketing"
+            placeholder={t('workspaceLibrary.namePlaceholder')}
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
             size="small"
@@ -1253,7 +1262,7 @@ export const WorkspaceLibrary = ({
               letterSpacing: '0.05em',
             }}
           >
-            Icon Shape
+            {t('workspaceLibrary.iconShape')}
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
             <Button
@@ -1271,7 +1280,7 @@ export const WorkspaceLibrary = ({
             >
               <FolderFilledIcon sx={{ fontSize: 24 }} />
               <Typography variant="caption" fontWeight={600}>
-                Solid
+                {t('workspaceLibrary.solid')}
               </Typography>
             </Button>
             <Button
@@ -1289,7 +1298,7 @@ export const WorkspaceLibrary = ({
             >
               <FolderOutlinedIcon sx={{ fontSize: 24 }} />
               <Typography variant="caption" fontWeight={600}>
-                Outlined
+                {t('workspaceLibrary.outlined')}
               </Typography>
             </Button>
           </Box>
@@ -1305,7 +1314,7 @@ export const WorkspaceLibrary = ({
               letterSpacing: '0.05em',
             }}
           >
-            Color Accent
+            {t('workspaceLibrary.colorAccent')}
           </Typography>
           <Box
             sx={{
@@ -1317,7 +1326,7 @@ export const WorkspaceLibrary = ({
             {AVAILABLE_COLORS.map((c) => {
               const isSelected = newFolderColor === c.value;
               return (
-                <Tooltip title={c.name} key={c.value} arrow>
+                <Tooltip title={t(c.nameKey)} key={c.value} arrow>
                   <Box
                     onClick={() => setNewFolderColor(c.value)}
                     sx={{
@@ -1371,7 +1380,7 @@ export const WorkspaceLibrary = ({
               color: 'text.secondary',
             }}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
@@ -1402,7 +1411,7 @@ export const WorkspaceLibrary = ({
               boxShadow: 'none',
             }}
           >
-            Create Folder
+            {t('workspaceLibrary.createFolder')}
           </Button>
         </DialogActions>
       </Dialog>

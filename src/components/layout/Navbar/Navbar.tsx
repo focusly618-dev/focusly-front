@@ -7,7 +7,9 @@ import {
   Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ColorModeContext } from '@/context';
+import { LanguageSelector } from '@/components/ui';
 import {
   Header,
   LogoWrapper,
@@ -19,6 +21,7 @@ import {
 } from './Navbar.styles';
 
 const Navbar: React.FC = () => {
+  const { t } = useTranslation();
   const colorMode = useContext(ColorModeContext);
 
   return (
@@ -47,13 +50,13 @@ const Navbar: React.FC = () => {
             sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}
           >
             <NavbarLink component={NavLink} to="/features">
-              Features
+              {t('nav.features')}
             </NavbarLink>
             <NavbarLink component={NavLink} to="/how-it-works">
-              How it works
+              {t('nav.howItWorks')}
             </NavbarLink>
             <NavbarLink component={NavLink} to="/pricing">
-              Pricing
+              {t('nav.pricing')}
             </NavbarLink>
             <NavbarLink
               component={NavLink}
@@ -66,12 +69,13 @@ const Navbar: React.FC = () => {
                 ml: 2,
               }}
             >
-              Log In
+              {t('nav.logIn')}
             </NavbarLink>
+            <LanguageSelector variant="icon" />
             <IconButton
               onClick={colorMode.toggleColorMode}
               color="inherit"
-              sx={{ mx: 1 }}
+              sx={{ mx: 0.5 }}
             >
               {colorMode.mode !== 'light' ? (
                 <LightModeIcon sx={{ fontSize: 20 }} />
@@ -79,7 +83,9 @@ const Navbar: React.FC = () => {
                 <DarkModeIcon sx={{ fontSize: 20 }} />
               )}
             </IconButton>
-            <GetStartedButton variant="contained">Get Started</GetStartedButton>
+            <GetStartedButton variant="contained">
+              {t('nav.getStarted')}
+            </GetStartedButton>
           </Stack>
 
           <Stack
@@ -88,6 +94,7 @@ const Navbar: React.FC = () => {
             sx={{ display: { md: 'none' } }}
             alignItems="center"
           >
+            <LanguageSelector variant="icon" />
             <IconButton onClick={colorMode.toggleColorMode} color="inherit">
               {colorMode.mode !== 'light' ? (
                 <LightModeIcon />
