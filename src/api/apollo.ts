@@ -57,6 +57,21 @@ const errorLink = onError(
   },
 );
 
+export const mergeGetTasksByUser = (
+  existing: unknown,
+  incoming: unknown,
+  { args }: { args: Record<string, unknown> | null },
+) => {
+  const offset = (args?.offset as number | undefined) ?? 0;
+  const merged = existing ? (existing as unknown[]).slice(0) : [];
+  if (Array.isArray(incoming)) {
+    for (let i = 0; i < incoming.length; ++i) {
+      merged[offset + i] = incoming[i];
+    }
+  }
+  return merged;
+};
+
 export const client = new ApolloClient({
   link: from([errorLink, httpLink]),
   cache: new InMemoryCache({
@@ -65,16 +80,7 @@ export const client = new ApolloClient({
         fields: {
           getTasksByUser: {
             keyArgs: ['userId', 'filters', 'sort'],
-            merge(existing, incoming, { args }) {
-              const offset = args?.offset ?? 0;
-              const merged = existing ? (existing as unknown[]).slice(0) : [];
-              if (Array.isArray(incoming)) {
-                for (let i = 0; i < incoming.length; ++i) {
-                  merged[offset + i] = incoming[i];
-                }
-              }
-              return merged;
-            },
+            merge: mergeGetTasksByUser,
           },
         },
       },

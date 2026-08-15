@@ -38,6 +38,48 @@ Object.defineProperty(window, 'localStorage', {
   writable: true,
 });
 
+// jsdom has no Web Audio API. NotificationSoundPlayer (src/utils/notifications
+// /notificationSounds.ts) constructs an AudioContext eagerly at module load
+// time (a singleton instantiated at import), so anything that transitively
+// imports `@/utils` — most hooks in this codebase do, via sileo/toast
+// helpers — throws immediately without this stub, unrelated to whatever
+// that test actually exercises.
+class FakeAudioParam {
+  setValueAtTime() {
+    return this;
+  }
+  linearRampToValueAtTime() {
+    return this;
+  }
+  exponentialRampToValueAtTime() {
+    return this;
+  }
+}
+
+class FakeAudioContext {
+  currentTime = 0;
+  destination = {};
+  createOscillator() {
+    return {
+      frequency: new FakeAudioParam(),
+      connect: () => {},
+      start: () => {},
+      stop: () => {},
+    };
+  }
+  createGain() {
+    return {
+      gain: new FakeAudioParam(),
+      connect: () => {},
+    };
+  }
+}
+
+Object.defineProperty(window, 'AudioContext', {
+  value: FakeAudioContext,
+  writable: true,
+});
+
 afterEach(() => {
   cleanup();
   window.localStorage.clear();
