@@ -1,17 +1,13 @@
 import { sileo } from '../notifications/sileo';
+import { getFriendlyErrorMessage } from './interpretError';
 
 export const handleMutationError = (
   error: unknown,
   fallbackMessage: string,
 ) => {
   console.error(fallbackMessage, error);
-  const message =
-    (error as { graphQLErrors?: { message?: string }[] })?.graphQLErrors?.[0]
-      ?.message ||
-    (error as { message?: string })?.message ||
-    fallbackMessage;
   sileo.error({
-    title: message,
+    title: getFriendlyErrorMessage(error, fallbackMessage),
     fill: 'var(--sileo-error-bg)',
   });
 };

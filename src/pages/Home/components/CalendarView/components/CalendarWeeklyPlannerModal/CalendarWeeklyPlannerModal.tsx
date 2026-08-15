@@ -18,7 +18,7 @@ import { useMutation } from '@apollo/client';
 import { UPDATE_TASK, GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { planWeeklyAI, type AIWeeklyPlanDayItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { startOfWeek, addDays, format } from 'date-fns';
 
 interface CalendarWeeklyPlannerModalProps {
@@ -62,7 +62,10 @@ export const CalendarWeeklyPlannerModal: React.FC<
           console.error('Error fetching weekly plan:', e);
           sileo.error({
             title: t('common.error'),
-            description: t('calendarWeeklyPlanner.toast.fetchErrorDesc'),
+            description: getFriendlyErrorMessage(
+              e,
+              t('calendarWeeklyPlanner.toast.fetchErrorDesc'),
+            ),
             duration: 4000,
           });
           onClose();
@@ -145,7 +148,10 @@ export const CalendarWeeklyPlannerModal: React.FC<
       console.error('Error applying weekly schedule:', e);
       sileo.error({
         title: t('common.error'),
-        description: t('calendarWeeklyPlanner.toast.applyErrorDesc'),
+        description: getFriendlyErrorMessage(
+          e,
+          t('calendarWeeklyPlanner.toast.applyErrorDesc'),
+        ),
         duration: 4000,
       });
     } finally {

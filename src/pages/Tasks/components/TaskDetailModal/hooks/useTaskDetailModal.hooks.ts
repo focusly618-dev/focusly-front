@@ -5,7 +5,7 @@ import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions, formatDuration } from '../TaskDetailModal.utils';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
 
 export const useTaskDetailModal = ({
@@ -313,9 +313,10 @@ export const useTaskDetailModal = ({
           fill: 'var(--sileo-error-bg)',
         });
       }
-    } catch {
+    } catch (error) {
+      console.error('Error generating Meet link:', error);
       sileo.error({
-        title: 'Error generating Meet link',
+        title: getFriendlyErrorMessage(error, 'Error generating Meet link'),
         fill: 'var(--sileo-error-bg)',
       });
     } finally {

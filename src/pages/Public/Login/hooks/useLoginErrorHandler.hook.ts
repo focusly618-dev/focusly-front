@@ -1,14 +1,13 @@
-import axios from 'axios';
+import { sileo } from '@/utils/notifications/sileo';
+import { getFriendlyErrorMessage } from '@/utils/errors/interpretError';
 
 export const useLoginErrorHandler = () => {
   const handleError = (error: unknown, context: string) => {
-    if (axios.isAxiosError(error)) {
-      alert(`${context}: ` + (error.response?.data?.message || error.message));
-    } else if (error instanceof Error) {
-      alert(`${context}: ` + error.message);
-    } else {
-      alert(`${context}: Ocurrió un error desconocido`);
-    }
+    console.error(context, error);
+    sileo.error({
+      title: getFriendlyErrorMessage(error),
+      fill: 'var(--sileo-error-bg)',
+    });
   };
 
   return { handleError };

@@ -1,6 +1,6 @@
 import { client } from '@/api/apollo';
 import { REMOVE_WORKSPACE, GET_WORKSPACES } from '../Workspace.graphql';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 
 export const useWorkspaceActions = () => {
   const handleOpen = (id: string): void => {
@@ -37,7 +37,7 @@ export const useWorkspaceActions = () => {
     } catch (error) {
       console.error('Error deleting workspace:', error);
       sileo.error({
-        title: 'Error deleting workspace',
+        title: getFriendlyErrorMessage(error, 'Error deleting workspace'),
         fill: 'var(--sileo-error-bg)',
       });
     }

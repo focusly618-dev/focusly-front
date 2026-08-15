@@ -15,6 +15,19 @@
     "error": "Error",
     "connect": "Connect"
   },
+  "errors": {
+    "network": "Couldn't connect to the server. Check your internet connection and try again.",
+    "timeout": "The request took too long to respond. Please try again.",
+    "sessionExpired": "Your session expired. Please sign in again.",
+    "notFound": "The requested item couldn't be found. It may no longer exist.",
+    "magicLinkExpired": "This sign-in link has expired. Request a new one.",
+    "magicLinkInvalid": "This sign-in link isn't valid.",
+    "googleAuthFailed": "There was a problem connecting to your Google account. Please sign in again.",
+    "googleCalendarSync": "Couldn't sync with Google Calendar. Please try again in a moment.",
+    "aiUnavailable": "The AI assistant isn't available right now. Please try again later.",
+    "emptyMessage": "Write a message before sending.",
+    "generic": "Something went wrong. Please try again later."
+  },
   "nav": {
     "dailyPlan": "Daily Plan",
     "tasks": "Tasks",
@@ -329,7 +342,8 @@
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
     "helpCenter": "Help Center",
-    "copyright": "© 2026 Focusly"
+    "copyright": "© 2026 Focusly",
+    "enterEmailWarning": "Please enter your email"
   },
   "rightPanel": {
     "quickInsights": "Quick Insights",

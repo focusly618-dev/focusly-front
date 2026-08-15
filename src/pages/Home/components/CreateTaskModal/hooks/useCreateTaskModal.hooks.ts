@@ -1,4 +1,4 @@
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../CreateTaskModal.utils';
@@ -234,9 +234,10 @@ export const useCreateTaskModal = ({
           fill: 'var(--sileo-error-bg)',
         });
       }
-    } catch {
+    } catch (error) {
+      console.error('Error generating Meet link:', error);
       sileo.error({
-        title: 'Error generating Meet link',
+        title: getFriendlyErrorMessage(error, 'Error generating Meet link'),
         fill: 'var(--sileo-error-bg)',
       });
     } finally {

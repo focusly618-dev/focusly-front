@@ -14,7 +14,7 @@ import {
   UPDATE_PROJECT_GROUP,
   DELETE_PROJECT_GROUP,
 } from '@/pages/Workspace/Workspace.graphql';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import type {
   WorkspaceTypes,
   ProjectGroupTypes,
@@ -321,7 +321,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
           } catch (error) {
             console.error('Error deleting workspace:', error);
             sileo.error({
-              title: 'Error deleting workspace',
+              title: getFriendlyErrorMessage(error, 'Error deleting workspace'),
               fill: 'var(--sileo-error-bg)',
             });
           }
