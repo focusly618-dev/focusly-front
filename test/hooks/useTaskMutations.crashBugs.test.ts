@@ -68,17 +68,13 @@ describe('useTaskMutations.handleSave (Home/CreateTaskModal) — Invalid Date cr
     expect(onSave).toHaveBeenCalledWith({ id: 'new-1' });
   });
 
-  it('TRAGIC: throws an uncaught RangeError instead of a handled error toast when deadline is an Invalid Date', async () => {
-    // getInitialState() in useTaskFormState.ts builds `currentDate` from
-    // `new Date(initialTask.deadline)` with no isNaN guard when editing a
-    // task whose deadline is a corrupted/garbage string. That Invalid Date
-    // object is truthy, so `state.deadline ? state.deadline.toISOString() : ...`
-    // takes the truthy branch and calls .toISOString() on an Invalid Date —
-    // which throws RangeError: Invalid time value. This call happens BEFORE
-    // the function's own try/catch block (which only wraps the
-    // executeCreateTask call), so the error is never routed through
-    // handleMutationError — it becomes an unhandled promise rejection that
-    // can crash the whole "Create Task" flow with zero user-facing feedback.
+  it('FIXED: no longer throws when deadline is an Invalid Date — falls back to "now" and completes the save', async () => {
+    // getInitialState() in useTaskFormState.ts now guards `new Date(deadline)`
+    // with an isNaN check, and handleSave itself also guards its own
+    // `.toISOString()` call — an Invalid Date reaching either layer no
+    // longer throws RangeError: Invalid time value; it falls back to the
+    // current time instead, and the create flow completes normally.
+    executeCreateTask.mockResolvedValue({ createTask: { id: 'new-1' } });
     const onSave = vi.fn();
     const onClose = vi.fn();
     const resetForm = vi.fn();
@@ -92,12 +88,12 @@ describe('useTaskMutations.handleSave (Home/CreateTaskModal) — Invalid Date cr
 
     await expect(
       result.current.handleSave(baseState({ deadline: invalidDate })),
-    ).rejects.toThrow(/Invalid time value/);
+    ).resolves.toBeUndefined();
 
-    // The crash happens before the try/catch, so the friendly error path
-    // is never reached — proving the user gets nothing, not even a toast.
     expect(handleMutationError).not.toHaveBeenCalled();
-    expect(executeCreateTask).not.toHaveBeenCalled();
+    expect(executeCreateTask).toHaveBeenCalledTimes(1);
+    const [createInput] = executeCreateTask.mock.calls[0];
+    expect(Number.isNaN(new Date(createInput.deadline).getTime())).toBe(false);
   });
 
   it('silently no-ops (no throw, no call) when there is no authenticated user', async () => {
@@ -144,7 +140,8 @@ describe('useTaskMutations.handleUpdate (Home/CreateTaskModal) — Invalid Date 
     expect(executeUpdateTask).toHaveBeenCalledTimes(1);
   });
 
-  it('TRAGIC: throws an uncaught RangeError instead of a handled error toast when deadline is an Invalid Date (same bug as handleSave, second occurrence)', async () => {
+  it('FIXED: no longer throws when deadline is an Invalid Date — falls back gracefully and completes the update (same fix as handleSave)', async () => {
+    executeUpdateTask.mockResolvedValue({ updateTask: { id: 'existing-1' } });
     const onSave = vi.fn();
     const onClose = vi.fn();
     const resetForm = vi.fn();
@@ -157,10 +154,10 @@ describe('useTaskMutations.handleUpdate (Home/CreateTaskModal) — Invalid Date 
 
     await expect(
       result.current.handleUpdate(baseState({ deadline: invalidDate })),
-    ).rejects.toThrow(/Invalid time value/);
+    ).resolves.toBeUndefined();
 
     expect(handleMutationError).not.toHaveBeenCalled();
-    expect(executeUpdateTask).not.toHaveBeenCalled();
+    expect(executeUpdateTask).toHaveBeenCalledTimes(1);
   });
 
   it('silently no-ops when initialTask is undefined (no throw, executeUpdateTask never called)', async () => {

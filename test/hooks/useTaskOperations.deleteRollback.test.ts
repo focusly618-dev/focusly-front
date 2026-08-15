@@ -96,17 +96,13 @@ describe('executeDeleteTask — optimistic delete with NO rollback on failure', 
     await deletePromise;
   });
 
-  it('TRAGIC: leaves the task permanently removed from Redux even when the delete mutation fails — no compensating re-add', async () => {
+  it('FIXED: restores the task to Redux when the delete mutation fails, instead of leaving it permanently gone', async () => {
     // executeDeleteTask dispatches removeTask/removeEvent BEFORE awaiting
-    // deleteTaskMutation (useTaskOperations.ts lines 171-176, mutation call
-    // at line 195). If the mutation subsequently rejects — a real network
-    // blip, a legitimate server-side validation error, anything — there is
-    // no catch/rollback here at all: the reducer already dropped the task,
-    // and this function just lets the rejection propagate. The caller
-    // sees an error (and often shows an error toast), while Redux has
-    // already told every component the task is gone. The user is left
-    // looking at contradictory signals: an error message next to a task
-    // that has already vanished from their list and calendar.
+    // deleteTaskMutation. It now snapshots the task/event beforehand and,
+    // if the mutation subsequently rejects, dispatches a rollback before
+    // re-throwing — so the caller still sees (and can show) the error, but
+    // Redux no longer disagrees with that error by having already deleted
+    // the task.
     deleteTaskMutationImpl = () =>
       Promise.reject(new Error('Task with ID task-to-delete not found'));
 
@@ -120,8 +116,9 @@ describe('executeDeleteTask — optimistic delete with NO rollback on failure', 
       result.current.executeDeleteTask('task-to-delete'),
     ).rejects.toThrow('not found');
 
-    // The task is gone from Redux regardless of the failure — no rollback.
-    expect(store.getState().task.tasks).toHaveLength(0);
+    // The task is restored after the rollback.
+    expect(store.getState().task.tasks).toHaveLength(1);
+    expect(store.getState().task.tasks[0].id).toBe('task-to-delete');
   });
 
   it('throws before dispatching anything when there is no authenticated user (safe path)', async () => {

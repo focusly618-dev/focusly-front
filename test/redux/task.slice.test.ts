@@ -148,7 +148,7 @@ describe('task.slice reducer — CRUD correctness', () => {
 });
 
 describe('task.slice reducer — adversarial / can-it-break-the-app cases', () => {
-  it('upsertTask with a task missing `id` (bypassing TS) matches an existing task that also lacks an id, silently corrupting it', () => {
+  it('FIXED: upsertTask with a task missing `id` (bypassing TS) is a no-op instead of colliding with another id-less task', () => {
     // A malformed task with no id can slip through when data comes from an
     // untyped source (e.g. a raw fetch response cast without validation).
     const corruptExisting = baseTask({ title: 'First corrupt task' });
@@ -163,11 +163,11 @@ describe('task.slice reducer — adversarial / can-it-break-the-app cases', () =
       upsertTask(corruptIncoming),
     );
 
-    // BUG: two unrelated tasks that both happen to lack an id collapse into
-    // one, because `findIndex(t => t.id === action.payload.id)` matches
-    // `undefined === undefined`. The first task silently disappears.
+    // The reducer now guards against a falsy id and no-ops entirely, so
+    // the pre-existing (equally malformed) task is left untouched rather
+    // than being silently overwritten by an unrelated task.
     expect(state.tasks).toHaveLength(1);
-    expect(state.tasks[0].title).toBe('Second corrupt task');
+    expect(state.tasks[0].title).toBe('First corrupt task');
   });
 
   it('removeTasks with duplicate ids in the payload removes the task exactly once (Set dedupes safely)', () => {

@@ -132,34 +132,38 @@ describe('mapResponseToTask — adversarial: malformed backend payloads', () => 
     expect(() => mapResponseToTask(undefined as any)).toThrow();
   });
 
-  it('produces title: undefined (not a safe fallback) when title is missing from the payload', () => {
+  it('FIXED: falls back to an empty string when title is missing, matching every other string field', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const malformed = { ...minimalValid, title: undefined } as any;
     const result = mapResponseToTask(malformed);
-    // BUG: every other string field here (`notes_encrypted`, `category`)
-    // defaults with `|| ''`/`|| 'General'`; `title` has no such guard even
-    // though `Task.title` is a required, non-optional `string` — this
-    // silently produces `undefined` where the type promises a string,
-    // which will render as the literal text "undefined" in any naive UI
-    // that does `{task.title}` without its own guard.
-    expect(result.title).toBeUndefined();
+    expect(result.title).toBe('');
   });
 
-  it('lets priority_level pass through as undefined with no default (unlike the local duplicate mapper elsewhere, which defaults to 2)', () => {
+  it('FIXED: defaults priority_level to 2 when missing, matching the local duplicate mapper elsewhere', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const malformed = { ...minimalValid, priority_level: undefined } as any;
     const result = mapResponseToTask(malformed);
-    expect(result.priority_level).toBeUndefined();
+    expect(result.priority_level).toBe(2);
   });
 
-  it('casts any garbage string straight through as `status` with zero validation', () => {
+  it('preserves an explicit priority_level of 0 (?? guards against || treating 0 as missing)', () => {
+    const result = mapResponseToTask({ ...minimalValid, priority_level: 0 });
+    expect(result.priority_level).toBe(0);
+  });
+
+  it('FIXED: falls back to "Todo" instead of accepting an arbitrary garbage `status` string', () => {
     const malformed = {
       ...minimalValid,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       status: 'TotallyMadeUpStatus' as any,
     };
     const result = mapResponseToTask(malformed);
-    expect(result.status).toBe('TotallyMadeUpStatus');
+    expect(result.status).toBe('Todo');
+  });
+
+  it('still accepts every genuinely valid status value unchanged', () => {
+    const result = mapResponseToTask({ ...minimalValid, status: 'Archived' });
+    expect(result.status).toBe('Archived');
   });
 
   it('recovers deadline to "now" instead of crashing when deadline is an invalid string', () => {
@@ -257,6 +261,14 @@ describe('mapGoogleEventToTask — adversarial: malformed Google Calendar payloa
     expect(result.source).toBe('google');
     expect(result.user_id).toBe('google-user');
     expect(result.task_type).toBe('GoogleTask');
+  });
+
+  it('FIXED: defaults a missing priority_level to 4 ("High" convention), not the orphan 3 that used to silently bump to 4 on first save', () => {
+    const result = mapGoogleEventToTask({
+      ...minimalValid,
+      priority_level: undefined,
+    });
+    expect(result.priority_level).toBe(4);
   });
 });
 

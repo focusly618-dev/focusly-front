@@ -78,9 +78,12 @@ export const useTaskFormState = ({
     const hasEstimatedStart =
       initialTask.estimated_start_date &&
       !isNaN(new Date(initialTask.estimated_start_date).getTime());
+    const parsedDeadline = new Date(deadline);
     const startInitial = hasEstimatedStart
       ? new Date(initialTask.estimated_start_date!)
-      : new Date(deadline);
+      : isNaN(parsedDeadline.getTime())
+        ? new Date()
+        : parsedDeadline;
 
     return {
       title,
@@ -135,6 +138,9 @@ export const useTaskFormState = ({
     } else if (!isValidDurationInput(duration)) {
       newErrors.duration =
         'Use up to 3 digits and formats like 30m, 2h, or 2h30m';
+      isValid = false;
+    } else if (parseDuration(duration) < 15) {
+      newErrors.duration = 'Duration must be at least 15 minutes';
       isValid = false;
     }
     setErrors(newErrors);

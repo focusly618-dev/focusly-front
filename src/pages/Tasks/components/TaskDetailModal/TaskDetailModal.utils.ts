@@ -105,7 +105,7 @@ export const getTagColors = (
   };
 };
 export const normalizeUrl = (url: string) =>
-  url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  (url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
 
 export const deduplicateLinks = (links: { title: string; url: string }[]) => {
   const seen = new Set();

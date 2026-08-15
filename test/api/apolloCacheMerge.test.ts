@@ -27,8 +27,8 @@ describe('mergeGetTasksByUser — the getTasksByUser cache typePolicy', () => {
     expect(() =>
       mergeGetTasksByUser(undefined, ['a'], { args: null }),
     ).not.toThrow();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(() =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mergeGetTasksByUser(undefined, ['a'], {} as any),
     ).not.toThrow();
   });
@@ -47,27 +47,22 @@ describe('mergeGetTasksByUser — the getTasksByUser cache typePolicy', () => {
     expect(result).toEqual(['existing']);
   });
 
-  it('BUG: a negative offset writes to negative/string-keyed indices instead of failing loudly', () => {
+  it('FIXED: a negative offset is clamped to 0 instead of writing a stray negative-keyed property', () => {
     const result = mergeGetTasksByUser(['a', 'b', 'c'], ['X'], {
       args: { offset: -1 },
     }) as unknown[];
-    // JS arrays silently accept negative numeric-looking keys as ordinary
-    // properties, not real negative indices — this does NOT throw, but it
-    // also does not do what a caller would reasonably expect ("insert one
-    // before the start"); the array's numeric length/indices are unaffected
-    // and a stray `"-1"` property is attached instead.
-    expect(result.length).toBe(3);
-    expect((result as unknown as Record<string, unknown>)['-1']).toBe('X');
+    expect(result).toEqual(['X', 'b', 'c']);
+    expect(
+      (result as unknown as Record<string, unknown>)['-1'],
+    ).toBeUndefined();
   });
 
-  it('CRASH: throws when `existing` is a non-array truthy object without `.slice`', () => {
-    // Simulates a corrupted cache entry (e.g. a previous write with the
-    // wrong shape) — `(existing as unknown[]).slice(0)` assumes `.slice`
-    // exists on anything truthy.
+  it('FIXED: a non-array truthy `existing` (corrupted cache entry) is treated as empty instead of throwing', () => {
     const corruptExisting = { foo: 1 };
-    expect(() =>
-      mergeGetTasksByUser(corruptExisting, ['a'], { args: { offset: 0 } }),
-    ).toThrow();
+    const result = mergeGetTasksByUser(corruptExisting, ['a'], {
+      args: { offset: 0 },
+    });
+    expect(result).toEqual(['a']);
   });
 
   it('propagates null/undefined elements from `incoming` straight into the merged array', () => {
@@ -77,13 +72,10 @@ describe('mergeGetTasksByUser — the getTasksByUser cache typePolicy', () => {
     expect(result).toEqual([null, undefined, 'c']);
   });
 
-  it('a string `existing` does not throw (strings have .slice) but silently produces a string, not an array', () => {
-    // Another corrupted-cache-state case: `.slice` exists on String.prototype
-    // too, so this specific malformed input limps along without crashing,
-    // masking the underlying corruption rather than surfacing it.
+  it('FIXED: a string `existing` (corrupted cache state) is treated as empty instead of silently propagating a string where an array is expected', () => {
     const result = mergeGetTasksByUser('not-an-array', [], {
       args: { offset: 0 },
     });
-    expect(result).toBe('not-an-array');
+    expect(result).toEqual([]);
   });
 });

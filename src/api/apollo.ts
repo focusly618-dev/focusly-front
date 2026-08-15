@@ -62,8 +62,12 @@ export const mergeGetTasksByUser = (
   incoming: unknown,
   { args }: { args: Record<string, unknown> | null },
 ) => {
-  const offset = (args?.offset as number | undefined) ?? 0;
-  const merged = existing ? (existing as unknown[]).slice(0) : [];
+  const rawOffset = (args?.offset as number | undefined) ?? 0;
+  // A negative offset has no sane insertion point in a plain array — treat
+  // it the same as "no offset" rather than writing a stray negative/
+  // string-keyed property.
+  const offset = rawOffset > 0 ? rawOffset : 0;
+  const merged = Array.isArray(existing) ? existing.slice(0) : [];
   if (Array.isArray(incoming)) {
     for (let i = 0; i < incoming.length; ++i) {
       merged[offset + i] = incoming[i];

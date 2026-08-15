@@ -166,8 +166,9 @@ export const useCalendarView = () => {
   });
 
   useEffect(() => {
-    if (tasksData?.tasks) {
-      const validTasks: Task[] = tasksData.tasks.map((t: TaskResponse) =>
+    const fetchedTasks = tasksData?.result?.tasks;
+    if (fetchedTasks) {
+      const validTasks: Task[] = fetchedTasks.map((t: TaskResponse) =>
         mapResponseToTask(t),
       );
       dispatch(setTasks(validTasks));
@@ -239,7 +240,7 @@ export const useCalendarView = () => {
   const hasRenderableCalendarData =
     reduxEvents.length > 0 ||
     tasks.length > 0 ||
-    (tasksData?.tasks?.length ?? 0) > 0;
+    (tasksData?.result?.tasks?.length ?? 0) > 0;
 
   const isCalendarLoading =
     !hasRenderableCalendarData &&
@@ -290,6 +291,12 @@ export const useCalendarView = () => {
       });
 
     // 2. Map Focusly Tasks (Native)
+    // Tracks tasks whose start/end had to fall back to a synthetic default
+    // because the real date data was missing/unparseable — the dedup step
+    // below never lets two such tasks merge just because they share the
+    // same fallback, even though the fallback itself is now always valid.
+    const unreliableDateTaskIds = new Set<string>();
+
     const taskEvents = tasks.map((task: Task) => {
       const desc = task.notes_encrypted || '';
       const startDateMatch = desc.match(/\[START_DATE:(.*?)\]/);
@@ -298,6 +305,14 @@ export const useCalendarView = () => {
       const hasEstimatedStart =
         task.estimated_start_date &&
         !isNaN(new Date(task.estimated_start_date).getTime());
+      // 0 is a legitimate explicit duration; only null/undefined should
+      // fall back to the 30-minute default. Negative values are clamped
+      // so an event's end can never land before its start.
+      const durationMinutes = Math.max(task.estimate_timer ?? 30, 0);
+
+      if (!hasEstimatedStart && isNaN(deadlineDate.getTime())) {
+        unreliableDateTaskIds.add(task.id);
+      }
 
       let start = hasEstimatedStart
         ? new Date(task.estimated_start_date!)
@@ -307,14 +322,19 @@ export const useCalendarView = () => {
       let end =
         hasEstimatedStart && task.estimated_end_date
           ? new Date(task.estimated_end_date)
-          : new Date(start.getTime() + (task.estimate_timer || 30) * 60000);
+          : new Date(start.getTime() + durationMinutes * 60000);
 
       if (startDateMatch && startDateMatch[1]) {
         const parsedStart = new Date(startDateMatch[1]);
         if (!isNaN(parsedStart.getTime())) {
           start = parsedStart;
-          const deadlineDate = new Date(task.deadline || new Date());
-          end = deadlineDate;
+          const parsedDeadline = task.deadline ? new Date(task.deadline) : null;
+          if (parsedDeadline && !isNaN(parsedDeadline.getTime())) {
+            end = parsedDeadline;
+          } else {
+            end = new Date(start.getTime() + durationMinutes * 60000);
+            unreliableDateTaskIds.add(task.id);
+          }
         }
       }
 
@@ -334,8 +354,20 @@ export const useCalendarView = () => {
     const mergedEventsMap = new Map<string, ICalendarEvent>();
 
     [...calendarEvents, ...taskEvents].forEach((event) => {
-      // Create a unique composite key for the event content
-      const key = `${event.title}_${event.start?.getTime()}_${event.end?.getTime()}`;
+      // Create a unique composite key for the event content. Two unrelated
+      // events should never merge just because their dates are both
+      // unreliable (either still NaN, or a synthetic fallback substituted
+      // for missing/corrupt source data) — falling back to the event's own
+      // id keeps them distinct in either case.
+      const startTime = event.start?.getTime();
+      const endTime = event.end?.getTime();
+      const hasUnreliableDate =
+        Number.isNaN(startTime) ||
+        Number.isNaN(endTime) ||
+        unreliableDateTaskIds.has(event.id);
+      const key = hasUnreliableDate
+        ? `${event.title}_${event.id}`
+        : `${event.title}_${startTime}_${endTime}`;
       const existing = mergedEventsMap.get(key);
 
       // Rule: Always prefer native 'task' type over virtual 'event' type if they overlap

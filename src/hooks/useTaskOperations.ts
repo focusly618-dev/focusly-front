@@ -12,7 +12,7 @@ import {
   UPDATE_TASK,
 } from '@/pages/Tasks/Tasks.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
-import { removeEvent } from '@/redux/calendar/calendar.slice';
+import { addEvent, removeEvent } from '@/redux/calendar/calendar.slice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
 import {
@@ -30,6 +30,8 @@ export interface MeetState {
 
 export const useTaskOperations = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const tasks = useAppSelector((state) => state.task.tasks);
+  const reduxEvents = useAppSelector((state) => state.calendar.reduxEvents);
   const dispatch = useAppDispatch();
 
   const [createTaskMutation] = useMutation(CREATE_TASK);
@@ -168,6 +170,15 @@ export const useTaskOperations = () => {
   ) => {
     if (!user?.id) throw new Error('User not authenticated');
 
+    // Snapshot whatever is about to be optimistically removed, so a failed
+    // mutation below can be rolled back instead of leaving the task gone
+    // from Redux while the user also sees an error toast.
+    const removedTask = tasks.find((t) => t.id === taskId);
+    const removedEvent = reduxEvents.find((e) => e.id === taskId);
+    const removedGoogleEvent = options?.googleEventId
+      ? reduxEvents.find((e) => e.id === options.googleEventId)
+      : undefined;
+
     // 1. Optimistic delete in Redux
     dispatch(removeTask({ id: taskId }));
     dispatch(removeEvent({ id: taskId }));
@@ -175,30 +186,41 @@ export const useTaskOperations = () => {
       dispatch(removeEvent({ id: options.googleEventId }));
     }
 
-    if (!options?.isGoogleTask) {
-      if (options?.googleEventId) {
-        try {
-          await deleteGoogleEvent(options.googleEventId);
-        } catch (err) {
-          console.warn(
-            'Failed to delete synced Google event, proceeding with platform delete',
-            err,
-          );
+    const rollback = () => {
+      if (removedTask) dispatch(upsertTask(removedTask));
+      if (removedEvent) dispatch(addEvent(removedEvent));
+      if (removedGoogleEvent) dispatch(addEvent(removedGoogleEvent));
+    };
+
+    try {
+      if (!options?.isGoogleTask) {
+        if (options?.googleEventId) {
+          try {
+            await deleteGoogleEvent(options.googleEventId);
+          } catch (err) {
+            console.warn(
+              'Failed to delete synced Google event, proceeding with platform delete',
+              err,
+            );
+          }
         }
+
+        const defaultRefetchQueries: InternalRefetchQueriesInclude = [
+          { query: GET_TASKS, variables: { userId: user.id } },
+          { query: GET_WORKSPACES, variables: { search: '' } },
+        ];
+
+        await deleteTaskMutation({
+          variables: { id: taskId },
+          refetchQueries: options?.extraRefetchQueries || defaultRefetchQueries,
+        });
+      } else {
+        const eventId = options.googleEventId || taskId;
+        await deleteGoogleEvent(eventId);
       }
-
-      const defaultRefetchQueries: InternalRefetchQueriesInclude = [
-        { query: GET_TASKS, variables: { userId: user.id } },
-        { query: GET_WORKSPACES, variables: { search: '' } },
-      ];
-
-      await deleteTaskMutation({
-        variables: { id: taskId },
-        refetchQueries: options?.extraRefetchQueries || defaultRefetchQueries,
-      });
-    } else {
-      const eventId = options.googleEventId || taskId;
-      await deleteGoogleEvent(eventId);
+    } catch (error) {
+      rollback();
+      throw error;
     }
   };
 

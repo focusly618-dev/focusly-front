@@ -105,7 +105,7 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
     // deadline renders "now" on the calendar with no indication of that.
   });
 
-  it('BUG: estimate_timer of 0 (an explicit zero-minute task) is silently treated as 30 minutes, not zero', () => {
+  it('FIXED: estimate_timer of 0 (an explicit zero-minute task) is honored as zero, not silently bumped to 30', () => {
     const { result } = renderWithTasks([
       baseTask({
         estimated_start_date: '2026-01-01T09:00:00.000Z',
@@ -116,10 +116,10 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
     const event = result.current.events.find((e) => e.id === 't-1');
     const durationMinutes =
       (event!.end.getTime() - event!.start.getTime()) / 60000;
-    expect(durationMinutes).toBe(30);
+    expect(durationMinutes).toBe(0);
   });
 
-  it('BUG: a negative estimate_timer produces an end time before the start time, with no guard', () => {
+  it('FIXED: a negative estimate_timer is clamped to zero-duration instead of putting the end before the start', () => {
     const { result } = renderWithTasks([
       baseTask({
         estimated_start_date: '2026-01-01T09:00:00.000Z',
@@ -128,41 +128,36 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
       }),
     ]);
     const event = result.current.events.find((e) => e.id === 't-1');
-    expect(event!.end.getTime()).toBeLessThan(event!.start.getTime());
+    expect(event!.end.getTime()).toBe(event!.start.getTime());
   });
 
-  it('TRAGIC: a task with a [START_DATE:] marker and a garbage deadline produces an Invalid Date `end`, silently corrupting downstream duration math', () => {
+  it('FIXED: a task with a [START_DATE:] marker and a garbage deadline now falls back to a valid `end` instead of Invalid Date', () => {
     // The `[START_DATE:...]` regex branch (used for tasks whose real start
     // time is embedded in notes_encrypted rather than estimated_start_date)
-    // recomputes `end = new Date(task.deadline || new Date())` with NO
-    // isNaN guard — unlike every other date derivation in this same memo.
+    // used to recompute `end` from `task.deadline` with no isNaN guard —
+    // it now falls back to start + the task's own duration, same as every
+    // other date derivation in this memo.
     const { result } = renderWithTasks([
       baseTask({
         id: 'corrupted-task',
         notes_encrypted: '[START_DATE:2026-01-01T09:00:00.000Z]',
         deadline: 'not-a-real-date',
+        estimate_timer: 30,
       }),
     ]);
     const event = result.current.events.find((e) => e.id === 'corrupted-task');
     expect(event).toBeDefined();
-    expect(Number.isNaN(event!.end.getTime())).toBe(true);
-    // Any later code computing (end.getTime() - start.getTime()) gets NaN,
-    // and `NaN || 0` (a pattern used in this codebase's overlap-sort logic)
-    // silently coerces that to a duration of exactly 0 — this event will
-    // misbehave in any overlap/duration-based layout or sort without ever
-    // throwing an error a developer or user could notice.
+    expect(Number.isNaN(event!.end.getTime())).toBe(false);
+    expect(event!.end.getTime() - event!.start.getTime()).toBe(30 * 60000);
   });
 
-  it('TRAGIC: two different tasks with the same title, same valid START_DATE marker, and a garbage deadline collapse into a single calendar event — one task silently vanishes', () => {
-    // The reassignment branch (`if (startDateMatch && !isNaN(parsedStart...))`)
-    // only fires when the [START_DATE:] marker itself parses successfully —
-    // when it does, `end` is recomputed from `task.deadline` with NO isNaN
-    // guard (unlike every other date derivation in this memo). Two distinct
-    // tasks sharing a title and START_DATE marker, each with its own garbage
-    // deadline, both land on `end = Invalid Date`. The dedup key is
-    // `${title}_${start.getTime()}_${end.getTime()}`; Invalid Date always
-    // stringifies its NaN getTime() identically, so both keys are equal and
-    // only one of the two genuinely different tasks survives the Map.
+  it('FIXED: two different tasks that both fall back to a synthetic end date no longer collapse into one calendar event', () => {
+    // Even though the fallback is now always a valid date, two distinct
+    // tasks sharing a title/START_DATE marker could still land on the
+    // exact same fallback start+end and collide via the content-based
+    // dedup key. unreliableDateTaskIds tracks any task whose end came from
+    // a fallback (not real data) and keys those by id instead, so this
+    // no longer happens.
     const { result } = renderWithTasks([
       baseTask({
         id: 'ghost-1',
@@ -181,8 +176,8 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
     const survivors = result.current.events.filter(
       (e) => e.title === 'Duplicate Title',
     );
-    // Two genuinely different tasks were created; only one is visible.
-    expect(survivors).toHaveLength(1);
+    // Two genuinely different tasks were created; both remain visible.
+    expect(survivors).toHaveLength(2);
   });
 
   it('two tasks with different titles but both Invalid Date `end` do NOT collide (title is part of the key)', () => {

@@ -18,12 +18,14 @@ const taskSlice = createSlice({
       state.tasks.push(action.payload);
     },
     updateTask: (state, action: PayloadAction<Task>) => {
+      if (!action.payload.id) return;
       const index = state.tasks.findIndex((t) => t.id === action.payload.id);
       if (index !== -1) {
         state.tasks[index] = action.payload;
       }
     },
     upsertTask: (state, action: PayloadAction<Task>) => {
+      if (!action.payload.id) return;
       const index = state.tasks.findIndex((t) => t.id === action.payload.id);
       if (index !== -1) {
         state.tasks[index] = action.payload;
@@ -32,6 +34,7 @@ const taskSlice = createSlice({
       }
     },
     softDeleteTask: (state, action: PayloadAction<{ id: string }>) => {
+      if (!action.payload.id) return;
       const index = state.tasks.findIndex((t) => t.id === action.payload.id);
       if (index !== -1) {
         state.tasks[index].deleted_at = new Date().toISOString();

@@ -27,19 +27,18 @@ describe('useTaskFormState (Home / CreateTaskModal variant)', () => {
     expect(Number.isNaN(result.current.currentDate!.getTime())).toBe(false);
   });
 
-  it('CRASH-ADJACENT: produces an Invalid Date for currentDate when initialTask.deadline is a garbage string', () => {
-    // No isNaN guard exists around `new Date(deadline)` in getInitialState
-    // when initializing from an existing task — this Invalid Date then
-    // flows straight into form state and, downstream, into
-    // handleSave/handleUpdate's `.toISOString()` calls (see
-    // useTaskMutations.crashBugs.test.ts for the resulting crash).
+  it('FIXED: falls back to a valid "now" currentDate instead of Invalid Date when initialTask.deadline is a garbage string', () => {
+    // getInitialState now guards `new Date(deadline)` with an isNaN check —
+    // this used to flow an Invalid Date straight into form state and,
+    // downstream, into handleSave/handleUpdate's `.toISOString()` calls
+    // (see useTaskMutations.crashBugs.test.ts for the crash that caused).
     const { result } = renderHook(() =>
       useHomeTaskFormState({
         initialTask: baseTask({ deadline: 'not-a-real-date' }),
         initialStart: null,
       }),
     );
-    expect(Number.isNaN(result.current.currentDate!.getTime())).toBe(true);
+    expect(Number.isNaN(result.current.currentDate!.getTime())).toBe(false);
   });
 
   it('validateForm rejects an empty title', () => {
@@ -111,19 +110,20 @@ describe('useTaskFormState (Home / CreateTaskModal variant)', () => {
     expect(result.current.collaborators).toHaveLength(0);
   });
 
-  it('timeSlotDisplay degrades to an empty string instead of throwing when currentDate is Invalid Date', () => {
+  it('timeSlotDisplay produces a real time range instead of Invalid Date text when the source deadline was garbage', () => {
     const { result } = renderHook(() =>
       useHomeTaskFormState({
         initialTask: baseTask({ deadline: 'garbage' }),
         initialStart: null,
       }),
     );
-    expect(result.current.timeSlotDisplay).toBe('');
+    expect(result.current.timeSlotDisplay).not.toBe('');
+    expect(result.current.timeSlotDisplay).not.toMatch(/invalid/i);
   });
 });
 
-describe('useTaskFormState (TaskDetailModal variant) — inconsistent with the Home variant', () => {
-  it('validateForm does NOT enforce a 15-minute minimum (unlike the Home variant) — a 5m duration passes here', () => {
+describe('useTaskFormState (TaskDetailModal variant) — now consistent with the Home variant', () => {
+  it('FIXED: validateForm now enforces the same >=15 minute minimum as the Home variant — a 5m duration is rejected here too', () => {
     const { result } = renderHook(() =>
       useDetailTaskFormState({ initialTask: null, initialStart: null }),
     );
@@ -135,21 +135,18 @@ describe('useTaskFormState (TaskDetailModal variant) — inconsistent with the H
     act(() => {
       isValid = result.current.validateForm();
     });
-    // BUG (cross-file inconsistency): the exact same "5m" input that the
-    // Home modal's validateForm rejects is accepted as valid here, because
-    // this variant only checks format, never the >=15min business rule.
-    expect(isValid).toBe(true);
-    expect(result.current.errors.duration).toBeUndefined();
+    expect(isValid).toBe(false);
+    expect(result.current.errors.duration).toMatch(/15 minutes/);
   });
 
-  it('also produces an Invalid Date currentDate from a garbage initialTask.deadline (same underlying bug, different code path)', () => {
+  it('FIXED: also falls back to a valid "now" currentDate from a garbage initialTask.deadline (same fix, different code path)', () => {
     const { result } = renderHook(() =>
       useDetailTaskFormState({
         initialTask: baseTask({ deadline: 'not-a-real-date' }),
         initialStart: null,
       }),
     );
-    expect(Number.isNaN(result.current.currentDate!.getTime())).toBe(true);
+    expect(Number.isNaN(result.current.currentDate!.getTime())).toBe(false);
   });
 
   it('prefers a valid estimated_start_date over a garbage deadline when both are present', () => {

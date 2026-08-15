@@ -88,6 +88,8 @@ export const useTaskFormState = ({
       )
       .trim();
 
+    const parsedDeadline = new Date(deadline);
+
     return {
       title,
       description: cleanDesc,
@@ -95,7 +97,9 @@ export const useTaskFormState = ({
       priority: getPriorityFromLevel(priority_level),
       status,
       category,
-      currentDate: new Date(deadline),
+      currentDate: isNaN(parsedDeadline.getTime())
+        ? new Date()
+        : parsedDeadline,
       duration: estimate_timer ? formatDuration(estimate_timer) : '',
       realTime: real_timer ? formatDuration(real_timer) : '',
     };

@@ -122,10 +122,21 @@ describe('deduplicateLinks / normalizeUrl', () => {
     expect(deduplicateLinks([])).toEqual([]);
   });
 
-  it('CRASH: throws on a link whose url is null/undefined instead of degrading gracefully', () => {
+  it('FIXED: a link with a null/undefined url no longer crashes the whole save — it is treated as an empty url instead', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const links = [{ title: 'Broken', url: null as any }];
-    expect(() => deduplicateLinks(links)).toThrow();
+    expect(() => deduplicateLinks(links)).not.toThrow();
+    expect(deduplicateLinks(links)).toHaveLength(1);
+  });
+
+  it('two links that both have a null/undefined url are still deduplicated against each other', () => {
+    const links = [
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      { title: 'Broken 1', url: null as any },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      { title: 'Broken 2', url: undefined as any },
+    ];
+    expect(deduplicateLinks(links)).toHaveLength(1);
   });
 
   it('normalizeUrl strips protocol and trailing slash', () => {

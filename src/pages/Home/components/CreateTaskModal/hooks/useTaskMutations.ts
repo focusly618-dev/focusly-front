@@ -78,9 +78,10 @@ export const useTaskMutations = ({
       estimate_timer: estimateTimer,
       real_timer: realTimer,
       tags: state.tags,
-      deadline: state.deadline
-        ? state.deadline.toISOString()
-        : new Date().toISOString(),
+      deadline:
+        state.deadline && !isNaN(state.deadline.getTime())
+          ? state.deadline.toISOString()
+          : new Date().toISOString(),
       priority_level: priorityLevel,
       category: state.category,
       color: state.color,
@@ -151,10 +152,11 @@ export const useTaskMutations = ({
       .replace(/\[START_DATE:(.*?)\]/g, '')
       .trim();
 
-    const deadlineISO =
-      state.deadline instanceof Date
+    const deadlineISO: string = state.deadline
+      ? !isNaN(state.deadline.getTime())
         ? state.deadline.toISOString()
-        : state.deadline || initialTask.deadline || '';
+        : initialTask.deadline || ''
+      : initialTask.deadline || '';
 
     const startDate = new Date(deadlineISO);
     const estimatedStartISO = !isNaN(startDate.getTime())
