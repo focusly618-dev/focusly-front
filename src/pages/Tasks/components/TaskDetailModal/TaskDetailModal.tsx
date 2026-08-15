@@ -13,7 +13,7 @@ import {
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
 import { useTaskDetailModal } from './hooks/useTaskDetailModal.hooks';
 import { improveTaskAI } from '@/api/AI/apiAIPlanner';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 
 // Sub-components
 import { TaskProperties } from './components/TaskProperties/TaskProperties';
@@ -174,7 +174,10 @@ export const TaskDetailModal = ({
       console.error('Error improving task:', e);
       sileo.error({
         title: 'Error de IA',
-        description: 'No se pudieron sugerir mejoras para la tarea.',
+        description: getFriendlyErrorMessage(
+          e,
+          'No se pudieron sugerir mejoras para la tarea.',
+        ),
         duration: 3000,
       });
     }

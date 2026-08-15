@@ -10,9 +10,15 @@ import {
 } from '@mui/icons-material';
 import {
   startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
   addDays,
   format,
   isSameDay,
+  isSameMonth,
+  getDay,
   startOfDay,
   endOfDay,
 } from 'date-fns';
@@ -160,6 +166,18 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
     return Array.from({ length: 7 }, (_, i) => addDays(startOfSelectedWeek, i));
   }, [currentDate]);
 
+  const miniMonthDays = useMemo(() => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  }, [currentDate]);
+
+  const selectedDayColIndex = useMemo(() => {
+    return (getDay(currentDate) + 6) % 7;
+  }, [currentDate]);
+
   const awaitedTasks = useMemo(() => {
     const dayStart = startOfDay(currentDate);
     const dayEnd = endOfDay(currentDate);
@@ -228,93 +246,186 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
           {t('calendar.addTask')}
         </AddTaskButton>
 
-        {/* Mini Week View Calendar */}
-        <Box
-          sx={{
-            p: 2,
-            borderRadius: 3,
-            border: '1px solid',
-            borderColor: 'divider',
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.01)'
-                : '#ffffff',
-          }}
-        >
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {/* Weekday letters */}
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(7, 1fr)',
-                textAlign: 'center',
-              }}
-            >
-              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => {
-                const dayDate = miniWeekDays[idx];
-                const isSelected = isSameDay(dayDate, currentDate);
-                return (
+        {/* Mini Calendar (Week vs Month) */}
+        {String(currentView).toLowerCase() === 'month' ? (
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: 'divider',
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.01)'
+                  : '#ffffff',
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {/* Weekday letters */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)',
+                  textAlign: 'center',
+                }}
+              >
+                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => (
                   <Typography
                     key={idx}
                     variant="caption"
                     sx={{
                       fontSize: '11px',
                       fontWeight: 700,
-                      color: isSelected ? 'primary.main' : 'text.disabled',
+                      color:
+                        idx === selectedDayColIndex
+                          ? 'primary.main'
+                          : 'text.disabled',
                     }}
                   >
                     {letter}
                   </Typography>
-                );
-              })}
-            </Box>
-            {/* Weekday day numbers */}
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(7, 1fr)',
-                textAlign: 'center',
-              }}
-            >
-              {miniWeekDays.map((dayDate, idx) => {
-                const isSelected = isSameDay(dayDate, currentDate);
-                const isToday = isSameDay(dayDate, new Date());
-                return (
-                  <Box
-                    key={idx}
-                    onClick={() => onDateChange(dayDate)}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: 28,
-                      width: 28,
-                      mx: 'auto',
-                      borderRadius: '50%',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      bgcolor: isSelected ? 'primary.main' : 'transparent',
-                      color: isSelected
-                        ? '#ffffff'
-                        : isToday
-                          ? 'primary.main'
-                          : 'text.primary',
-                      border: isToday && !isSelected ? '1px solid' : 'none',
-                      borderColor: 'primary.main',
-                      '&:hover': {
-                        bgcolor: isSelected ? 'primary.main' : 'action.hover',
-                      },
-                    }}
-                  >
-                    {format(dayDate, 'd')}
-                  </Box>
-                );
-              })}
+                ))}
+              </Box>
+              {/* All days of the month grid */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)',
+                  rowGap: 1,
+                  textAlign: 'center',
+                }}
+              >
+                {miniMonthDays.map((dayDate, idx) => {
+                  const isSelected = isSameDay(dayDate, currentDate);
+                  const isToday = isSameDay(dayDate, new Date());
+                  const isCurrentMonth = isSameMonth(dayDate, currentDate);
+                  return (
+                    <Box
+                      key={idx}
+                      onClick={() => onDateChange(dayDate)}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: 28,
+                        width: 28,
+                        mx: 'auto',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: isSelected || isToday ? 700 : 500,
+                        bgcolor: isSelected ? 'primary.main' : 'transparent',
+                        color: isSelected
+                          ? '#ffffff'
+                          : isToday
+                            ? 'primary.main'
+                            : isCurrentMonth
+                              ? 'text.primary'
+                              : 'text.disabled',
+                        opacity: isCurrentMonth ? 1 : 0.4,
+                        border: isToday && !isSelected ? '1px solid' : 'none',
+                        borderColor: 'primary.main',
+                        transition: 'all 0.15s ease-in-out',
+                        '&:hover': {
+                          bgcolor: isSelected ? 'primary.main' : 'action.hover',
+                        },
+                      }}
+                    >
+                      {format(dayDate, 'd')}
+                    </Box>
+                  );
+                })}
+              </Box>
             </Box>
           </Box>
-        </Box>
-
+        ) : (
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: 'divider',
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.01)'
+                  : '#ffffff',
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {/* Weekday letters */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)',
+                  textAlign: 'center',
+                }}
+              >
+                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => {
+                  const dayDate = miniWeekDays[idx];
+                  const isSelected = isSameDay(dayDate, currentDate);
+                  return (
+                    <Typography
+                      key={idx}
+                      variant="caption"
+                      sx={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: isSelected ? 'primary.main' : 'text.disabled',
+                      }}
+                    >
+                      {letter}
+                    </Typography>
+                  );
+                })}
+              </Box>
+              {/* Weekday day numbers */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)',
+                  textAlign: 'center',
+                }}
+              >
+                {miniWeekDays.map((dayDate, idx) => {
+                  const isSelected = isSameDay(dayDate, currentDate);
+                  const isToday = isSameDay(dayDate, new Date());
+                  return (
+                    <Box
+                      key={idx}
+                      onClick={() => onDateChange(dayDate)}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: 28,
+                        width: 28,
+                        mx: 'auto',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        bgcolor: isSelected ? 'primary.main' : 'transparent',
+                        color: isSelected
+                          ? '#ffffff'
+                          : isToday
+                            ? 'primary.main'
+                            : 'text.primary',
+                        border: isToday && !isSelected ? '1px solid' : 'none',
+                        borderColor: 'primary.main',
+                        transition: 'all 0.15s ease-in-out',
+                        '&:hover': {
+                          bgcolor: isSelected ? 'primary.main' : 'action.hover',
+                        },
+                      }}
+                    >
+                      {format(dayDate, 'd')}
+                    </Box>
+                  );
+                })}
+              </Box>
+            </Box>
+          </Box>
+        )}
         {/* Awaited Tasks Section */}
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <Box

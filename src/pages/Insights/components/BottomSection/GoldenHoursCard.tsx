@@ -30,7 +30,7 @@ import {
   type TimelineBlock,
 } from '@/api/AI/apiAIInsights';
 import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
 
 export interface GoldenHoursCardProps {
@@ -208,8 +208,10 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
       console.error('Error analyzing patterns:', err);
       sileo.error({
         title: 'Error de Análisis',
-        description:
+        description: getFriendlyErrorMessage(
+          err,
           'No pudimos analizar tus patrones de productividad en este momento.',
+        ),
         duration: 4000,
       });
     } finally {
@@ -255,7 +257,10 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
       console.error('Error applying recommendation action:', err);
       sileo.error({
         title: 'Error al aplicar cambio',
-        description: 'No pudimos reagendar la tarea en este momento.',
+        description: getFriendlyErrorMessage(
+          err,
+          'No pudimos reagendar la tarea en este momento.',
+        ),
         duration: 4000,
       });
     }

@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLoginForm } from './hooks/useLoginForm.hook';
 import { useLoginAuth } from './hooks/useLoginAuth.hook';
 import { useLoginErrorHandler } from './hooks/useLoginErrorHandler.hook';
+import { sileo } from '@/utils/notifications/sileo';
 
 export const useLogin = () => {
+  const { t } = useTranslation();
   const { handleError } = useLoginErrorHandler();
   const [linkSent, setLinkSent] = useState(false);
   const form = useLoginForm();
@@ -17,7 +20,10 @@ export const useLogin = () => {
 
   const onSignIn = async () => {
     if (!form.email) {
-      alert('Please enter your email');
+      sileo.warning({
+        title: t('login.enterEmailWarning'),
+        fill: 'var(--sileo-warning-bg)',
+      });
       return;
     }
 

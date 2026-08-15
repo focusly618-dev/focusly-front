@@ -24,7 +24,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { planCalendarAI, type AITimeBlockItem } from '@/api/AI/apiAIPlanner';
 import { createTimeBlock } from '@/api/TimeBlocks/timeBlocksApi';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { format, startOfDay, addDays } from 'date-fns';
 import { useMutation } from '@apollo/client';
 import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
@@ -122,7 +122,10 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
           console.error('Error generating AI schedule:', e);
           sileo.error({
             title: t('calendar.planningErrorTitle'),
-            description: t('calendar.planningErrorDesc'),
+            description: getFriendlyErrorMessage(
+              e,
+              t('calendar.planningErrorDesc'),
+            ),
             duration: 4000,
           });
           onClose();
@@ -178,7 +181,10 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
       console.error('Error scheduling events:', e);
       sileo.error({
         title: t('common.error'),
-        description: t('calendarAiPlanner.toast.errorDesc'),
+        description: getFriendlyErrorMessage(
+          e,
+          t('calendarAiPlanner.toast.errorDesc'),
+        ),
         duration: 4000,
       });
     } finally {

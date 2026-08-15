@@ -49,7 +49,7 @@ import {
   priorityCircleSx,
   PRIORITY_COLORS,
 } from '../CalendarEvent/CalendarEvent.styles';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 
 // Types
 import type { Task } from '@/redux/tasks/task.types';
@@ -210,7 +210,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       console.error('Error generating AI schedule:', e);
       sileo.error({
         title: t('calendar.planningErrorTitle'),
-        description: t('calendar.planningErrorDesc'),
+        description: getFriendlyErrorMessage(
+          e,
+          t('calendar.planningErrorDesc'),
+        ),
         duration: 4000,
       });
     } finally {

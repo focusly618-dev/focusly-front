@@ -9,7 +9,7 @@ import {
 } from '@/pages/Tasks/Tasks.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import type { Task } from '@/redux/tasks/task.types';
 import { format } from 'date-fns';
 
@@ -124,7 +124,7 @@ export const useCalendarContextMenu = (
     } catch (error) {
       console.error('Failed to duplicate task:', error);
       sileo.error({
-        title: 'Failed to duplicate task',
+        title: getFriendlyErrorMessage(error, 'Failed to duplicate task'),
         fill: 'var(--sileo-error-bg)',
       });
     }
@@ -158,7 +158,7 @@ export const useCalendarContextMenu = (
     } catch (error) {
       console.error('Failed to update priority:', error);
       sileo.error({
-        title: 'Failed to update priority',
+        title: getFriendlyErrorMessage(error, 'Failed to update priority'),
         fill: 'var(--sileo-error-bg)',
       });
     }
@@ -209,7 +209,7 @@ export const useCalendarContextMenu = (
       }
       console.error('Failed to delete task:', error);
       sileo.error({
-        title: 'Failed to delete task',
+        title: getFriendlyErrorMessage(error, 'Failed to delete task'),
         fill: 'var(--sileo-error-bg)',
       });
     }
@@ -228,7 +228,7 @@ export const useCalendarContextMenu = (
     } catch (error) {
       console.error('Failed to delete Google event:', error);
       sileo.error({
-        title: 'Failed to delete event',
+        title: getFriendlyErrorMessage(error, 'Failed to delete event'),
         fill: 'var(--sileo-error-bg)',
       });
     }

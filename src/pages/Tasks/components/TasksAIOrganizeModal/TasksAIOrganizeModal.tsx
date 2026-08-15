@@ -25,7 +25,7 @@ import { useMutation } from '@apollo/client';
 import { UPDATE_TASK, GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { organizeTasksAI, type AIPlanItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
 
 interface TasksAIOrganizeModalProps {
@@ -56,7 +56,10 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
           console.error('Error organizing tasks:', e);
           sileo.error({
             title: 'Error de Planificador',
-            description: 'No se pudo obtener la planificación optimizada.',
+            description: getFriendlyErrorMessage(
+              e,
+              'No se pudo obtener la planificación optimizada.',
+            ),
             duration: 4000,
           });
           onClose();
@@ -120,7 +123,10 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
       console.error('Error applying AI plan:', e);
       sileo.error({
         title: 'Error',
-        description: 'Hubo un problema al aplicar las prioridades en lote.',
+        description: getFriendlyErrorMessage(
+          e,
+          'Hubo un problema al aplicar las prioridades en lote.',
+        ),
         duration: 4000,
       });
     } finally {

@@ -5,7 +5,12 @@ import type {
   UseEditorContentProps,
   UseEditorContentReturn,
 } from './useEditorContent.types';
-import { colorPalette, type HeaderColor, sileo } from '@/utils';
+import {
+  colorPalette,
+  type HeaderColor,
+  sileo,
+  getFriendlyErrorMessage,
+} from '@/utils';
 import { fetchEditResult } from '@/api/AI/apiAI';
 import {
   CREATE_TASK,
@@ -269,7 +274,7 @@ Text: "${selectedText}"`;
       console.error('Error creating task:', e);
       sileo.error({
         title: 'Error creating task',
-        description: 'Could not save task.',
+        description: getFriendlyErrorMessage(e, 'Could not save task.'),
         fill: 'var(--sileo-error-bg)',
       });
     } finally {

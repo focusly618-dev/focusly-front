@@ -26,7 +26,7 @@ import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 import type { RootState } from '@/redux/store';
 import { removeTask, setTasks, updateTask } from '@/redux/tasks/task.slice';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { useMutation, useQuery } from '@apollo/client';
 import {
   addDays,
@@ -567,7 +567,7 @@ export const useCalendarView = () => {
     } catch (err) {
       console.error('Error deleting task:', err);
       sileo.error({
-        title: 'Error deleting task',
+        title: getFriendlyErrorMessage(err, 'Error deleting task'),
         fill: 'var(--sileo-error-bg)',
         duration: 4000,
       });
@@ -640,8 +640,10 @@ export const useCalendarView = () => {
     } catch (e) {
       console.error('Error confirming draft events:', e);
       sileo.error({
-        title: 'Error',
-        description: 'No se pudieron guardar todas las sugerencias.',
+        title: getFriendlyErrorMessage(
+          e,
+          'No se pudieron guardar todas las sugerencias.',
+        ),
         duration: 4000,
       });
     } finally {
@@ -717,7 +719,9 @@ export const useCalendarView = () => {
         if (originalEvent) {
           dispatch(updateEvent(originalEvent));
         }
-        sileo.error({ title: 'Error rescheduling task' });
+        sileo.error({
+          title: getFriendlyErrorMessage(err, 'Error rescheduling task'),
+        });
       }
       return;
     }
@@ -783,7 +787,9 @@ export const useCalendarView = () => {
       if (originalTask) {
         dispatch(updateTask(originalTask));
       }
-      sileo.error({ title: 'Error rescheduling task' });
+      sileo.error({
+        title: getFriendlyErrorMessage(err, 'Error rescheduling task'),
+      });
     }
   };
 
@@ -838,7 +844,9 @@ export const useCalendarView = () => {
         if (originalEvent) {
           dispatch(updateEvent(originalEvent));
         }
-        sileo.error({ title: 'Error rescheduling task' });
+        sileo.error({
+          title: getFriendlyErrorMessage(err, 'Error rescheduling task'),
+        });
       }
       return;
     }
@@ -897,6 +905,9 @@ export const useCalendarView = () => {
       if (originalTask) {
         dispatch(updateTask(originalTask));
       }
+      sileo.error({
+        title: getFriendlyErrorMessage(err, 'Error rescheduling task'),
+      });
     }
   };
 
