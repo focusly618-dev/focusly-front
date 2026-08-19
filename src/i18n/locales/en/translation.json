@@ -387,18 +387,6 @@
     },
     "next": "Next",
     "saveAndContinue": "Save & Continue",
-    "goalSelection": {
-      "heading": "What's your main goal?",
-      "subheading": "We'll tailor your experience to help you achieve what matters most."
-    },
-    "goals": {
-      "focus": { "title": "Improve Focus", "subtitle": "Minimize distractions & deep work" },
-      "time": { "title": "Time Management", "subtitle": "Optimize your daily schedule" },
-      "stress": { "title": "Reduce Stress", "subtitle": "Achieve a healthier balance" },
-      "productivity": { "title": "Increase Productivity", "subtitle": "Get more done in less time" },
-      "organize": { "title": "Organize Tasks", "subtitle": "Stay on top of things" },
-      "other": { "title": "Other", "subtitle": "I have a different goal" }
-    },
     "workHours": {
       "heading": "Set Your Work Hours",
       "subheading": "Define your typical schedule so we can plan tasks during your most productive hours without encroaching on personal time.",

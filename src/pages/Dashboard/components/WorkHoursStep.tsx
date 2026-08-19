@@ -65,7 +65,7 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
               endTime,
             },
           },
-        } as unknown as Partial<UserResponse>);
+        } as Partial<UserResponse>);
       } catch (error) {
         console.error('Failed to save work hours', error);
       }
@@ -78,14 +78,14 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
       <ProgressBarContainer>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" fontWeight="500">
-            {t('onboarding.progress.step', { current: 2, total: 4 })}
+            {t('onboarding.progress.step', { current: 3, total: 4 })}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {t('onboarding.progress.percentCompleted', { percent: 50 })}
+            {t('onboarding.progress.percentCompleted', { percent: 75 })}
           </Typography>
         </Box>
         <ProgressBarTrack>
-          <ProgressBarFill width="50%" />
+          <ProgressBarFill width="75%" />
         </ProgressBarTrack>
       </ProgressBarContainer>
 

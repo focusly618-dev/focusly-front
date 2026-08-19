@@ -75,14 +75,14 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
       <ProgressBarContainer>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" fontWeight="500">
-            {t('onboarding.progress.step', { current: 3, total: 4 })}
+            {t('onboarding.progress.step', { current: 4, total: 4 })}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {t('onboarding.progress.percentCompleted', { percent: 75 })}
+            {t('onboarding.progress.percentCompleted', { percent: 100 })}
           </Typography>
         </Box>
         <ProgressBarTrack>
-          <ProgressBarFill width="75%" />
+          <ProgressBarFill width="100%" />
         </ProgressBarTrack>
       </ProgressBarContainer>
 

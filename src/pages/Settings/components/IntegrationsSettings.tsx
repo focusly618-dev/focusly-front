@@ -13,6 +13,7 @@ import { login } from '@/redux/auth/auth.slice';
 import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 import axios from '@/api/axiosInstance';
 import { sileo } from '@/utils';
+import { UserUpdate, type UserResponse, type UserSettings } from '@/api/User/apiUser';
 import {
   CalendarMonth as CalendarIcon,
   SyncOutlined as SyncIcon,
@@ -31,7 +32,9 @@ export const IntegrationsSettings = () => {
   const dispatch = useAppDispatch();
   const { user, authProvider } = useAppSelector((state) => state.auth);
   const [isConnecting, setIsConnecting] = useState(false);
-  const isConnected = authProvider === AuthProviders.google;
+  const isConnected =
+    authProvider === AuthProviders.google &&
+    Boolean((user?.settings as UserSettings | undefined)?.calendarConnected);
 
   const connectGoogle = useGoogleLogin({
     flow: 'auth-code',
@@ -45,9 +48,17 @@ export const IntegrationsSettings = () => {
           code: codeResponse.code,
         });
 
+        const currentSettings = (response.data.user.settings ?? {}) as Record<
+          string,
+          unknown
+        >;
+        const updatedUser = await UserUpdate(response.data.user.id, {
+          settings: { ...currentSettings, calendarConnected: true },
+        } as Partial<UserResponse>);
+
         dispatch(
           login({
-            user: response.data.user,
+            user: updatedUser,
             isLogged: true,
             provider: AuthProviders.google,
           }),

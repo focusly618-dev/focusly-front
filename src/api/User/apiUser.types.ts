@@ -3,12 +3,19 @@ export interface Timestamp {
   _nanoseconds: number;
 }
 
+export interface WorkHoursConfig {
+  selectedDays: string[];
+  startTime: string;
+  endTime: string;
+}
+
 export interface UserSettings {
   breakDurationPref: number;
-  workHoursConfig: Record<string, unknown>;
+  workHoursConfig: WorkHoursConfig;
   notificationsEnabled: boolean;
   blockedAppsList: string[];
   focusDurationPref: number;
+  calendarConnected: boolean;
 }
 
 export interface UserResponse {

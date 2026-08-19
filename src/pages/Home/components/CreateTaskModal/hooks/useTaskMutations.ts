@@ -52,6 +52,13 @@ export const useTaskMutations = ({
       if (res) {
         meetLink = res.meetLink;
         createdGoogleEventId = res.googleEventId;
+      } else {
+        sileo.warning({
+          title: 'Could not generate Meet link',
+          description:
+            'The task will be saved without it. Make sure you are signed in with Google.',
+          duration: 4000,
+        });
       }
     }
 

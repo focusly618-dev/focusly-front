@@ -5,6 +5,7 @@ import reducer, {
   updateEvent,
   removeEvent,
   incrementSyncVersion,
+  resetCalendar,
 } from '@/redux/calendar/calendar.slice';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 
@@ -79,6 +80,17 @@ describe('calendar.slice reducer', () => {
     const corruptState = { reduxEvents: [], syncVersion: undefined as any };
     const state = reducer(corruptState, incrementSyncVersion());
     expect(state.syncVersion).toBe(1);
+  });
+
+  it('resetCalendar wipes events and syncVersion together — regression guard for the cross-account leak on logout', () => {
+    // Without this, a previous account's Google Calendar events stayed in
+    // Redux after logout (no reset action existed at all) and rendered
+    // briefly for whichever account logged in next, on the same browser.
+    const state = reducer(
+      { reduxEvents: [baseEvent(), baseEvent({ id: 'ev-2' })], syncVersion: 7 },
+      resetCalendar(),
+    );
+    expect(state).toEqual({ reduxEvents: [], syncVersion: 0 });
   });
 });
 

@@ -387,18 +387,6 @@
     },
     "next": "次へ",
     "saveAndContinue": "保存して続ける",
-    "goalSelection": {
-      "heading": "主な目標は何ですか？",
-      "subheading": "あなたが最も重視することを達成できるよう、体験をカスタマイズします。"
-    },
-    "goals": {
-      "focus": { "title": "集中力を高める", "subtitle": "気を散らす要因を減らしてディープワークを行う" },
-      "time": { "title": "時間管理", "subtitle": "毎日のスケジュールを最適化する" },
-      "stress": { "title": "ストレスを減らす", "subtitle": "より健康的なバランスを実現する" },
-      "productivity": { "title": "生産性を高める", "subtitle": "短時間でより多くのことをこなす" },
-      "organize": { "title": "タスクを整理する", "subtitle": "物事を把握し続ける" },
-      "other": { "title": "その他", "subtitle": "別の目標があります" }
-    },
     "workHours": {
       "heading": "勤務時間を設定",
       "subheading": "生産性が最も高い時間帯にタスクを計画できるよう、あなたの通常のスケジュールを設定してください。プライベートな時間を妨げることはありません。",

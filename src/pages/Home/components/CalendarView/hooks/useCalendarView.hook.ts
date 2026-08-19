@@ -24,6 +24,7 @@ import {
 } from '@/redux/calendar/calendar.slice';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 import type { RootState } from '@/redux/store';
+import type { UserSettings } from '@/api/User/apiUser.types';
 import { removeTask, setTasks, updateTask } from '@/redux/tasks/task.slice';
 import type { Task } from '@/redux/tasks/task.types';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
@@ -175,8 +176,13 @@ export const useCalendarView = () => {
     }
   }, [tasksData, dispatch]);
 
+  const isCalendarConnected = Boolean(
+    (user?.settings as UserSettings | undefined)?.calendarConnected,
+  );
+
   const shouldRestoreGoogleCalendar =
     user?.authProvider === 'google' &&
+    isCalendarConnected &&
     Boolean(user?.id) &&
     reduxEvents.length === 0 &&
     resolvedGoogleCalendarUserId !== user.id;
@@ -185,7 +191,7 @@ export const useCalendarView = () => {
 
   // Fetch Google Calendar Events when the range or user changes
   useEffect(() => {
-    if (user?.authProvider !== 'google' || !user?.id) {
+    if (user?.authProvider !== 'google' || !user?.id || !isCalendarConnected) {
       return;
     }
 
@@ -214,6 +220,7 @@ export const useCalendarView = () => {
     dispatch,
     user?.id,
     user?.authProvider,
+    isCalendarConnected,
     dateRange.start,
     dateRange.end,
     syncVersion,
@@ -223,7 +230,7 @@ export const useCalendarView = () => {
   // arrive (e.g. an unreachable webhook URL), so this re-triggers the fetch above
   // on a timer as a safety net while the calendar is open, independent of it.
   useEffect(() => {
-    if (user?.authProvider !== 'google' || !user?.id) {
+    if (user?.authProvider !== 'google' || !user?.id || !isCalendarConnected) {
       return;
     }
 
@@ -235,7 +242,7 @@ export const useCalendarView = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [dispatch, user?.id, user?.authProvider]);
+  }, [dispatch, user?.id, user?.authProvider, isCalendarConnected]);
 
   const hasRenderableCalendarData =
     reduxEvents.length > 0 ||
@@ -956,6 +963,39 @@ export const useCalendarView = () => {
     };
   };
 
+  const workHoursConfig = (user?.settings as UserSettings | undefined)
+    ?.workHoursConfig;
+
+  const slotPropGetter = (date: Date) => {
+    if (
+      !workHoursConfig?.startTime ||
+      !workHoursConfig?.endTime ||
+      !workHoursConfig?.selectedDays?.length
+    ) {
+      return {};
+    }
+
+    const dayShortNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const [startHour, startMinute] = workHoursConfig.startTime
+      .split(':')
+      .map(Number);
+    const [endHour, endMinute] = workHoursConfig.endTime
+      .split(':')
+      .map(Number);
+    const slotMinutes = date.getHours() * 60 + date.getMinutes();
+    const isWorkingDay = workHoursConfig.selectedDays.includes(
+      dayShortNames[date.getDay()],
+    );
+    const isWithinHours =
+      slotMinutes >= startHour * 60 + startMinute &&
+      slotMinutes < endHour * 60 + endMinute;
+
+    if (!isWorkingDay || !isWithinHours) {
+      return { className: 'non-working-hour-slot' };
+    }
+    return {};
+  };
+
   return {
     events,
     currentView,
@@ -982,6 +1022,8 @@ export const useCalendarView = () => {
     closeSlotContextMenu,
     scrollToTime,
     dayPropGetter,
+    slotPropGetter,
+    workHoursConfig,
     handleAddTaskClick,
     draftEvents,
     setDraftEvents,

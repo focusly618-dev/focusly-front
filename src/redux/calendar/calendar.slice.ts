@@ -39,6 +39,10 @@ export const calendarSlice = createSlice({
     incrementSyncVersion: (state) => {
       state.syncVersion = (state.syncVersion || 0) + 1;
     },
+    resetCalendar: (state) => {
+      state.reduxEvents = [];
+      state.syncVersion = 0;
+    },
   },
 });
 
@@ -48,6 +52,7 @@ export const {
   updateEvent,
   removeEvent,
   incrementSyncVersion,
+  resetCalendar,
 } = calendarSlice.actions;
 
 export default calendarSlice.reducer;
