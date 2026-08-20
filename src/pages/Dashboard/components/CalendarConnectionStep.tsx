@@ -26,6 +26,7 @@ import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 import { setEvents } from '@/redux/calendar/calendar.slice';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 import { fetchGoogleEvents } from '@/api/GoogleCalendar/googleCalendarApi';
+import { UserUpdate, type UserResponse } from '@/api/User/apiUser';
 
 const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
   onNext,
@@ -76,10 +77,21 @@ const CalendarConnectionStep: React.FC<CalendarConnectionStepProps> = ({
           code: codeResponse.code,
         });
 
+        // Logging in with Google already grants calendar scope server-side,
+        // so this explicit flag is what actually distinguishes "connected"
+        // from "skipped" for the rest of the app (see useCalendarView.hook.ts).
+        const currentSettings = (response.data.user.settings ?? {}) as Record<
+          string,
+          unknown
+        >;
+        const updatedUser = await UserUpdate(response.data.user.id, {
+          settings: { ...currentSettings, calendarConnected: true },
+        } as Partial<UserResponse>);
+
         // Update Redux with the new user info (which now has the calendar linked)
         dispatch(
           login({
-            user: response.data.user,
+            user: updatedUser,
             isLogged: true,
             provider: AuthProviders.google,
           }),

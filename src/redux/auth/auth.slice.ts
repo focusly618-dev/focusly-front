@@ -5,6 +5,8 @@ import {
 } from '@reduxjs/toolkit';
 import { logoutUser } from '@/api/Auth/authApi';
 import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
+import { resetTask } from '@/redux/tasks/task.slice';
+import { resetCalendar } from '@/redux/calendar/calendar.slice';
 
 interface User {
   id: string;
@@ -70,6 +72,19 @@ export const logout = createAsyncThunk<void, LogoutReason | undefined>(
     } finally {
       dispatch(setSessionExpiredNotice(reason === 'expired'));
       dispatch(clearAuth());
+      dispatch(resetTask());
+      dispatch(resetCalendar());
+      // Prevent the next login (possibly a different account) from
+      // momentarily rendering this session's cached queries/entities.
+      // Dynamic import: apollo.ts imports the store itself (to read auth
+      // state for its link chain), so a static import here would create
+      // store.ts -> auth.slice.ts -> apollo.ts -> store.ts, a circular
+      // import that throws "Cannot access 'authReducer' before
+      // initialization" at module load. The dynamic import defers
+      // resolution until the thunk actually runs, after both modules have
+      // finished initializing.
+      const { client } = await import('@/api/apollo');
+      await client.clearStore();
     }
   },
 );

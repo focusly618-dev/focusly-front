@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import type { TaskStatus } from '@/redux/tasks/task.types';
+import type { UserSettings } from '@/api/User/apiUser.types';
 import { useFocusModeTimer } from './useFocusModeTimer.hook';
 import { useFocusModeTasks } from './useFocusModeTasks.hook';
 import { useFocusModeActions } from './useFocusModeActions.hook';
@@ -36,7 +37,10 @@ export const useFocusMode = ({
     },
   });
 
-  const initialMinutes = tasks.activeItem?.estimate_timer || 25;
+  const initialMinutes =
+    tasks.activeItem?.estimate_timer ||
+    (user?.settings as UserSettings | undefined)?.focusDurationPref ||
+    25;
   const timer = useFocusModeTimer({
     initialMinutes,
     isActive,

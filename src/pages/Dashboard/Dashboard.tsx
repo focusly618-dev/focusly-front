@@ -8,7 +8,6 @@ import {
   MainCard,
   StepWrapper,
 } from './Dashboard.styles';
-import GoalSelectionStep from './components/GoalSelectionStep';
 import CalendarConnectionStep from './components/CalendarConnectionStep';
 import WorkHoursStep from './components/WorkHoursStep';
 import FocusBlocksStep from './components/FocusBlocksStep';
@@ -23,7 +22,6 @@ import { FocuslyLogo } from '@/components/ui';
 
 const Dashboard: React.FC = () => {
   const [step, setStep] = useState<number>(1);
-  const [selectedGoal, setSelectedGoal] = useState<string>('');
   const dispatch = useAppDispatch();
   const { onboardingCompleted } = useAppSelector((state) => state.auth);
 
@@ -37,15 +35,11 @@ const Dashboard: React.FC = () => {
     setStep((prev) => prev + 1);
   };
 
-  const handleGoalSelect = (id: string) => {
-    setSelectedGoal(id);
-  };
-
   const handleFinalSetupComplete = () => {
     dispatch(completeOnboarding());
   };
 
-  if (step === 7) {
+  if (step === 6) {
     return <Home />;
   }
 
@@ -68,7 +62,7 @@ const Dashboard: React.FC = () => {
             Focusly
           </Typography>
         </Stack>
-        {step < 5 && (
+        {step < 4 && (
           <Typography
             variant="body2"
             color="text.secondary"
@@ -92,30 +86,21 @@ const Dashboard: React.FC = () => {
           )}
           {step === 2 && (
             <StepWrapper key="step2">
-              <GoalSelectionStep
-                selectedGoal={selectedGoal}
-                onSelectGoal={handleGoalSelect}
-                onNext={handleNext}
-              />
+              <CalendarConnectionStep onNext={handleNext} />
             </StepWrapper>
           )}
           {step === 3 && (
             <StepWrapper key="step3">
-              <CalendarConnectionStep onNext={handleNext} />
+              <WorkHoursStep onNext={handleNext} />
             </StepWrapper>
           )}
           {step === 4 && (
             <StepWrapper key="step4">
-              <WorkHoursStep onNext={handleNext} />
+              <FocusBlocksStep onNext={handleNext} />
             </StepWrapper>
           )}
           {step === 5 && (
             <StepWrapper key="step5">
-              <FocusBlocksStep onNext={handleNext} />
-            </StepWrapper>
-          )}
-          {step === 6 && (
-            <StepWrapper key="step6">
               <FinalSetupLoadingStep onNext={handleFinalSetupComplete} />
             </StepWrapper>
           )}

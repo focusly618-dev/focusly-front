@@ -387,18 +387,6 @@
     },
     "next": "Siguiente",
     "saveAndContinue": "Guardar y Continuar",
-    "goalSelection": {
-      "heading": "¿Cuál es tu objetivo principal?",
-      "subheading": "Adaptaremos tu experiencia para ayudarte a lograr lo que más importa."
-    },
-    "goals": {
-      "focus": { "title": "Mejorar el Enfoque", "subtitle": "Minimizar distracciones y trabajo profundo" },
-      "time": { "title": "Gestión del Tiempo", "subtitle": "Optimiza tu horario diario" },
-      "stress": { "title": "Reducir el Estrés", "subtitle": "Lograr un equilibrio más saludable" },
-      "productivity": { "title": "Aumentar la Productividad", "subtitle": "Haz más en menos tiempo" },
-      "organize": { "title": "Organizar Tareas", "subtitle": "Mantente al tanto de todo" },
-      "other": { "title": "Otro", "subtitle": "Tengo un objetivo diferente" }
-    },
     "workHours": {
       "heading": "Define tu Horario de Trabajo",
       "subheading": "Define tu horario habitual para que podamos planificar tareas durante tus horas más productivas sin invadir tu tiempo personal.",

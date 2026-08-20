@@ -126,6 +126,9 @@ export const CalendarContainer = styled(Box, {
         borderBottom: '1px solid transparent !important',
       },
     },
+    '& .rbc-time-slot.non-working-hour-slot': {
+      backgroundColor: `${isDark ? 'rgba(0, 0, 0, 0.18)' : 'rgba(0, 0, 0, 0.035)'} !important`,
+    },
     // ── Hide all-day row ──
     '& .rbc-time-view .rbc-allday-cell': {
       display: 'none',

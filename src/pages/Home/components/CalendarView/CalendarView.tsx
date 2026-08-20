@@ -95,6 +95,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     handleNavigateAction,
     scrollToTime,
     dayPropGetter,
+    slotPropGetter,
+    workHoursConfig,
     handleAddTaskClick,
     tasks,
     draftEvents,
@@ -123,9 +125,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       const slots: { start: string; end: string }[] = [];
       const startDay = startOfDay(currentDate);
 
+      const dayShortNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const [startHour] = (workHoursConfig?.startTime ?? '09:00')
+        .split(':')
+        .map(Number);
+      const [endHour] = (workHoursConfig?.endTime ?? '18:00')
+        .split(':')
+        .map(Number);
+      const workDays = workHoursConfig?.selectedDays;
+
       for (let d = 0; d < 3; d++) {
         const day = addDays(startDay, d);
-        for (let hour = 9; hour < 18; hour++) {
+        if (workDays?.length && !workDays.includes(dayShortNames[day.getDay()])) {
+          continue;
+        }
+        for (let hour = startHour; hour < endHour; hour++) {
           const slotStart = new Date(day);
           slotStart.setHours(hour, 0, 0, 0);
           const slotEnd = new Date(day);
@@ -376,6 +390,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             onEventResize={handleEventResize}
             scrollToTime={scrollToTime}
             dayPropGetter={dayPropGetter}
+            slotPropGetter={slotPropGetter}
             resizable
             selectable
             showAllEvents={false}
