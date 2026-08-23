@@ -35,7 +35,6 @@ export const HeaderCenter = styled(Box)(({ theme }) => ({
   flex: '1 1 auto',
   minWidth: '220px',
   flexShrink: 1,
-  maxWidth: '480px',
   padding: '0 8px',
   [theme.breakpoints.down('md')]: {
     padding: 0,

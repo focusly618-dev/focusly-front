@@ -117,7 +117,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       {actionText && onAction && (
         <Button
           variant="contained"
-          onClick={onAction}
+          onClick={() => onAction()}
           sx={{
             textTransform: 'none',
             bgcolor: 'primary.main',

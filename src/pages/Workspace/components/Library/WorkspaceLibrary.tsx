@@ -95,7 +95,8 @@ export const WorkspaceLibrary = ({
     setGroupPage,
   } = actions;
 
-  const { workspaces, projectGroups, allProjectGroups, loading, error } = data;
+  const { workspaces, projectGroups, allProjectGroups, totalWorkspaces, loading, error } =
+    data;
 
   const theme = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -441,6 +442,10 @@ export const WorkspaceLibrary = ({
         onNoteSortChange={setNoteSortBy}
         noteFilterType={noteFilterType}
         onNoteFilterChange={setNoteFilterType}
+        onCreate={() =>
+          onCreate(undefined, undefined, selectedGroupId ?? undefined)
+        }
+        hasMultipleWorkspaces={totalWorkspaces > 1}
       />
 
       {!isInsideFolder ? (
@@ -725,7 +730,9 @@ export const WorkspaceLibrary = ({
                     title={t('workspaceLibrary.emptyFolder.title')}
                     description={t('workspaceLibrary.emptyFolder.desc')}
                     actionText={t('workspaceLibrary.emptyFolder.action')}
-                    onAction={onCreate}
+                    onAction={() =>
+                      onCreate(undefined, undefined, selectedGroupId ?? undefined)
+                    }
                     sx={{ gridColumn: '1 / -1', py: 10 }}
                   />
                 )}

@@ -28,7 +28,7 @@ import type {
 export const MarkdownEditor = forwardRef<
   MarkdownEditorRef,
   MarkdownEditorProps
->(({ initialValue, onChange, placeholder }, ref) => {
+>(({ initialValue, onChange, placeholder, onSelectionChange }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const theme = useTheme();
@@ -40,6 +40,11 @@ export const MarkdownEditor = forwardRef<
     () => debounce((value: string) => onChange(value), 200),
     [onChange],
   );
+
+  // "Latest ref" pattern so the mount-once updateListener below always calls
+  // the current callback without needing to reconfigure the editor.
+  const onSelectionChangeRef = useRef(onSelectionChange);
+  onSelectionChangeRef.current = onSelectionChange;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -57,6 +62,12 @@ export const MarkdownEditor = forwardRef<
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             debouncedOnChange(update.state.doc.toString());
+          }
+          if (update.selectionSet) {
+            const range = update.state.selection.main;
+            onSelectionChangeRef.current?.(
+              range.empty ? '' : update.state.sliceDoc(range.from, range.to),
+            );
           }
         }),
       ],

@@ -43,6 +43,7 @@ export const GraphSettingsMenu: React.FC<GraphSettingsMenuProps> = ({
             borderRadius: '14px',
             mt: 0.5,
             width: 260,
+            height: 300,
             boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
             border: '1px solid',
             borderColor: 'divider',

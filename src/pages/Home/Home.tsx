@@ -5,7 +5,6 @@ import { Tasks } from '../Tasks/Tasks';
 import { TaskBar } from './components/Sidebar/types/Sidebar.types';
 import { Insights } from '../Insights/Insights';
 import Workspace from '../Workspace/Workspace';
-import { ChatAI } from '@/components/chat';
 import { FocusMode } from './components/FocusMode/FocusMode';
 import { TaskDetailModal } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal';
 import { useHome } from './hooks/useHome.hook';
@@ -89,23 +88,6 @@ export const Home = () => {
           {activeTab === TaskBar.Settings && <Settings />}
           {activeTab === TaskBar.AskAI && <AskAI />}
         </MainContent>
-        <Box id="joyride-chat-ai" sx={{ display: { xs: 'none', md: 'block' } }}>
-          {activeTab !== TaskBar.AskAI && (
-            <ChatAI
-              rightOffset={
-                activeTab === TaskBar.DailyPlan
-                  ? 340
-                  : activeTab === TaskBar.Workspace && isWorkspaceEditorOpen
-                    ? isWorkspaceSidebarOpen
-                      ? 352
-                      : 92
-                    : activeTab === TaskBar.Workspace
-                      ? 32
-                      : 92
-              }
-            />
-          )}
-        </Box>
       </LayoutContainer>
 
       <FocusMode

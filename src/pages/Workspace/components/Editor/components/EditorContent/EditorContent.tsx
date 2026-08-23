@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useEditorContent } from './useEditorContent.hook';
 import {
   Box,
@@ -68,6 +68,7 @@ import { colorPalette } from '@/utils';
 import { CuteRobotIcon } from '@/components/ui';
 import { MarkdownEditor } from '../../codemirror/MarkdownEditor';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
+import { EditorAskAI } from '../EditorAskAI/EditorAskAI';
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
@@ -99,6 +100,7 @@ export const EditorContent = ({
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
   const editorSurfaceRef = useRef<HTMLDivElement>(null);
+  const [liveSelectedText, setLiveSelectedText] = useState('');
 
   const {
     menuAnchor,
@@ -501,13 +503,17 @@ export const EditorContent = ({
           id="joyride-editor-area"
           ref={editorSurfaceRef}
           onContextMenu={handleContextMenu}
-          style={{ position: 'relative' }}
+          // Reserve room below the last line so it can scroll clear of the
+          // fixed "Ask Lumina" button instead of ending up hidden behind it
+          // — that button sits on top of the viewport, not in document flow.
+          style={{ position: 'relative', paddingBottom: '96px' }}
         >
           <MarkdownEditor
             ref={markdownEditorRef}
             initialValue={initialMarkdown}
             onChange={onChange}
             placeholder="Start writing..."
+            onSelectionChange={setLiveSelectedText}
           />
 
           {isAIProcessing && (
@@ -577,6 +583,11 @@ export const EditorContent = ({
               </Box>
             </Box>
           )}
+
+          <EditorAskAI
+            markdownEditorRef={markdownEditorRef}
+            selectedText={liveSelectedText}
+          />
         </MarkdownEditorSurface>
       </Box>
 

@@ -594,6 +594,7 @@
       "folderFallback": "Carpeta"
     },
     "newFolder": "Nueva Carpeta",
+    "newWorkspace": "Nuevo Workspace",
     "status": {
       "recent": "Reciente",
       "draft": "Borrador"

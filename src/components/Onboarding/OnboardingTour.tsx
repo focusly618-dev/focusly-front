@@ -116,11 +116,6 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onTabChange }) =
       content: 'Predecimos tus niveles de energía según tus hábitos para ayudarte a evitar el agotamiento.',
       placement: 'top',
     },
-    {
-      target: '#joyride-chat-ai',
-      content: '¿Necesitas ayuda? Nuestra IA puede ayudarte a organizar tareas o darte consejos de productividad.',
-      placement: 'left',
-    },
   ];
 
   const handleJoyrideCallback = (data: CallBackProps) => {

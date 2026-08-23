@@ -594,6 +594,7 @@
       "folderFallback": "フォルダ"
     },
     "newFolder": "新しいフォルダ",
+    "newWorkspace": "新しいワークスペース",
     "status": {
       "recent": "最近",
       "draft": "下書き"
