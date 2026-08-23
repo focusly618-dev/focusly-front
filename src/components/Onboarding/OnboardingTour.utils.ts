@@ -1,5 +1,13 @@
 import type { Step } from 'react-joyride';
 
+export const ONBOARDING_LOCALE = {
+  back: 'Atrás',
+  close: 'Cerrar',
+  last: 'Finalizar',
+  next: 'Siguiente',
+  skip: 'Saltar tour',
+};
+
 export const getOnboardingSteps = (): Step[] => [
   {
     target: '#joyride-logo',

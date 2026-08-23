@@ -1,4 +1,24 @@
 import { styled, Box, Typography, Button } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
+
+export const sparklesIconSx: SxProps<Theme> = { fontSize: 28 };
+
+export const arrowIconSx: SxProps<Theme> = { fontSize: 18 };
+
+export const acceptButtonWrapperSx: SxProps<Theme> = {
+  width: '100%',
+  mt: 1,
+  p: '4px',
+  border: '1px solid rgba(59, 130, 246, 0.4)',
+  borderRadius: '16px',
+};
+
+export const lightningIconSx: SxProps<Theme> = {
+  color: '#4ade80',
+  fontSize: 16,
+};
+
+export const syncIconSx: SxProps<Theme> = { color: '#60a5fa', fontSize: 16 };
 
 export const ModalContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#0f1115' : '#ffffff',

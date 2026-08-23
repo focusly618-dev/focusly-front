@@ -21,6 +21,16 @@ import {
   bulletTextSx,
   bulletSubTextStyle,
   ctaButtonSx,
+  headerRowSx,
+  logoTitleRowSx,
+  closeIconButtonSx,
+  closeIconSx,
+  introBoxSx,
+  introTextSx,
+  plansContainerSx,
+  priceSuffixSx,
+  dividerSx,
+  featuresListSx,
 } from './UpgradeModal.styles';
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({
@@ -45,45 +55,28 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       }}
     >
       {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
-      >
-        <Box display="flex" alignItems="center" gap={1}>
+      <Box sx={headerRowSx}>
+        <Box sx={logoTitleRowSx}>
           <LuminaAnimatedFace size={24} />
           <Typography variant="subtitle1" fontWeight={750} color="text.primary">
             Mejorar Plan de Focusly
           </Typography>
         </Box>
-        <IconButton
-          size="small"
-          onClick={onClose}
-          sx={{ color: 'text.secondary' }}
-        >
-          <CloseIcon sx={{ fontSize: 18 }} />
+        <IconButton size="small" onClick={onClose} sx={closeIconButtonSx}>
+          <CloseIcon sx={closeIconSx} />
         </IconButton>
       </Box>
 
       {/* Main Intro */}
-      <Box mb={3}>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ lineHeight: 1.6 }}
-        >
+      <Box sx={introBoxSx}>
+        <Typography variant="body2" color="text.secondary" sx={introTextSx}>
           Elige el plan que mejor se adapte a tu ritmo de trabajo y desbloquea
           el poder del asistente de IA.
         </Typography>
       </Box>
 
       {/* Plans Container */}
-      <Box
-        display="grid"
-        gridTemplateColumns={{ xs: '1fr', sm: '1fr', md: 'repeat(3, 1fr)' }}
-        gap={3.5}
-      >
+      <Box sx={plansContainerSx}>
         {UPGRADE_PLANS.map((plan) => (
           <Box key={plan.id} sx={planCardSx(plan.featured ? 'featured' : 'default')}>
             <Box>
@@ -123,13 +116,13 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ ml: 0.5 }}
+                  sx={priceSuffixSx}
                 >
                   {plan.priceSuffix}
                 </Typography>
               </Typography>
-              <Divider sx={{ mb: 2 }} />
-              <Box display="flex" flexDirection="column" gap={1.75} mb={3}>
+              <Divider sx={dividerSx} />
+              <Box sx={featuresListSx}>
                 {plan.features.map((feature, index) => (
                   <Box key={index} sx={bulletRowSx}>
                     <Typography component="span" sx={bulletEmojiSx}>

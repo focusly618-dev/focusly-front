@@ -4,6 +4,18 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import { getIcon } from './NotificationToaster.utils';
+import {
+  ToasterContainer,
+  NotificationRow,
+  NotificationIconWrapper,
+  NotificationContent,
+  NotificationTitle,
+  NotificationDescription,
+  NotificationActionRow,
+  actionButtonStyle,
+  closeButtonStyle,
+  closeIconStyle,
+} from './NotificationToaster.styles';
 
 export const NotificationToaster: React.FC = () => {
   const [list, setList] = useState<Notification[]>([]);
@@ -15,76 +27,28 @@ export const NotificationToaster: React.FC = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '24px',
-        right: '24px',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        pointerEvents: 'none',
-      }}
-    >
+    <ToasterContainer>
       {list.map((notification) => (
-        <div
+        <NotificationRow
           key={notification.id}
           className={`motion-notification ${
             notification.dismissing ? 'motion-slide-out' : 'motion-slide-in'
           }`}
-          style={{
-            pointerEvents: 'auto',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '14px',
-          }}
         >
-          <div
-            className="motion-notification-icon-wrapper"
-            style={{ marginTop: '2px' }}
-          >
+          <NotificationIconWrapper className="motion-notification-icon-wrapper">
             {getIcon(notification.type)}
-          </div>
-          <div
-            style={{
-              flex: 1,
-              minWidth: 0,
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <div
-              className="motion-notification-title"
-              style={{
-                wordBreak: 'break-word',
-                whiteSpace: 'pre-wrap',
-                textAlign: 'left',
-              }}
-            >
+          </NotificationIconWrapper>
+          <NotificationContent>
+            <NotificationTitle className="motion-notification-title">
               {notification.title}
-            </div>
+            </NotificationTitle>
             {notification.description && (
-              <div
-                className="motion-notification-body"
-                style={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  marginTop: '4px',
-                  textAlign: 'left',
-                }}
-              >
+              <NotificationDescription className="motion-notification-body">
                 {notification.description}
-              </div>
+              </NotificationDescription>
             )}
             {notification.button && (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  marginTop: '10px',
-                }}
-              >
+              <NotificationActionRow>
                 <Button
                   variant="contained"
                   size="small"
@@ -93,36 +57,25 @@ export const NotificationToaster: React.FC = () => {
                     notification.button?.onClick();
                     sileo.dismiss(notification.id);
                   }}
-                  style={{
-                    fontWeight: 600,
-                    fontSize: '12px',
-                    textTransform: 'none',
-                    borderRadius: '8px',
-                    boxShadow: 'none',
-                    padding: '4px 12px',
-                  }}
+                  style={actionButtonStyle}
                 >
                   {notification.button.title}
                 </Button>
-              </div>
+              </NotificationActionRow>
             )}
-          </div>
+          </NotificationContent>
           {notification.type !== 'loading' && (
             <IconButton
               size="small"
               className="motion-notification-close-btn"
               onClick={() => sileo.dismiss(notification.id)}
-              style={{
-                padding: '4px',
-                marginLeft: '4px',
-                marginTop: '2px',
-              }}
+              style={closeButtonStyle}
             >
-              <CloseRoundedIcon style={{ fontSize: '18px' }} />
+              <CloseRoundedIcon style={closeIconStyle} />
             </IconButton>
           )}
-        </div>
+        </NotificationRow>
       ))}
-    </div>
+    </ToasterContainer>
   );
 };

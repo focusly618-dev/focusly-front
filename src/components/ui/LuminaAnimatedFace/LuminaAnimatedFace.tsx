@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type { LuminaAnimatedFaceProps } from './LuminaAnimatedFace.types';
+import { svgRootStyle } from './LuminaAnimatedFace.styles';
 
 /**
  * A custom Notion-style animated face icon modeled after the user's marshmallow character.
@@ -25,7 +26,7 @@ export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
       viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ overflow: 'visible' }}
+      style={svgRootStyle}
     >
       <defs>
         {/* Style sheet containing animations */}

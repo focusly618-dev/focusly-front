@@ -8,11 +8,14 @@ import {
   cancelButtonSx,
   descriptionBoxSx,
   descriptionTextSx,
+  actionsContainerSx,
+  deleteIconSx,
+  modalSx,
 } from './modalDelete.styles';
 
 export const ModalDelete = ({ title, description, open, onClose, onConfirm }: ModalItemsProps) => {
   const modalActions = (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, width: '100%' }}>
+    <Box sx={actionsContainerSx}>
       <Button
         variant="contained"
         fullWidth
@@ -39,10 +42,10 @@ export const ModalDelete = ({ title, description, open, onClose, onConfirm }: Mo
       onClose={onClose}
       title={title}
       subtitle="Confirming permanent deletion"
-      icon={<WarningRoundedIcon sx={{ color: '#f24848' }} />}
+      icon={<WarningRoundedIcon sx={deleteIconSx} />}
       iconBgColor="rgba(242, 72, 72, 0.15)"
       actions={modalActions}
-      sx={{ bgcolor: '#151c28', border: '1px solid #283447' }}
+      sx={modalSx}
     >
       <Box sx={descriptionBoxSx}>
         <Typography variant="body2" sx={descriptionTextSx}>

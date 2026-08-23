@@ -24,3 +24,19 @@ export const descriptionTextSx: SxProps<Theme> = {
   color: '#cbd5e1',
   lineHeight: 1.6,
 };
+
+export const actionsContainerSx: SxProps<Theme> = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 1.5,
+  width: '100%',
+};
+
+export const deleteIconSx: SxProps<Theme> = {
+  color: '#f24848',
+};
+
+export const modalSx: SxProps<Theme> = {
+  bgcolor: '#151c28',
+  border: '1px solid #283447',
+};

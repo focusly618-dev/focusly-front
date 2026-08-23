@@ -10,6 +10,16 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import type { BaseModalProps } from './BaseModal.types';
+import {
+  dialogPaperSx,
+  titleRowSx,
+  titleLeftSx,
+  iconBoxSx,
+  subtitleSx,
+  closeButtonSx,
+  contentSx,
+  actionsSx,
+} from './BaseModal.styles';
 
 export const BaseModal: React.FC<BaseModalProps> = ({
   open,
@@ -32,53 +42,20 @@ export const BaseModal: React.FC<BaseModalProps> = ({
       maxWidth={maxWidth}
       fullWidth={fullWidth}
       PaperProps={{
-        sx: {
-          borderRadius: '24px',
-          backgroundImage: 'none',
-          bgcolor: 'background.paper',
-          p: 1,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-          ...sx,
-        },
+        sx: dialogPaperSx(sx),
       }}
     >
       {(title || !hideCloseButton) && (
-        <DialogTitle
-          sx={{
-            fontWeight: 800,
-            fontSize: '1.4rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            pt: 3,
-            pb: 2,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {icon && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 110,
-                  height: 60,
-                  borderRadius: '16px',
-                  bgcolor: iconBgColor || 'primary.main',
-                  color: 'white',
-                  boxShadow: iconBgColor ? `0 8px 16px ${iconBgColor}44` : 'none',
-                }}
-              >
-                {icon}
-              </Box>
-            )}
+        <DialogTitle sx={titleRowSx}>
+          <Box sx={titleLeftSx}>
+            {icon && <Box sx={iconBoxSx(iconBgColor)}>{icon}</Box>}
             <Box>
               {title && <Typography variant="inherit">{title}</Typography>}
               {subtitle && (
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ opacity: 0.8, fontSize: '0.95rem', fontWeight: 400 }}
+                  sx={subtitleSx}
                 >
                   {subtitle}
                 </Typography>
@@ -86,20 +63,16 @@ export const BaseModal: React.FC<BaseModalProps> = ({
             </Box>
           </Box>
           {!hideCloseButton && (
-            <IconButton onClick={onClose} sx={{ color: 'text.secondary' }}>
+            <IconButton onClick={onClose} sx={closeButtonSx}>
               <CloseIcon />
             </IconButton>
           )}
         </DialogTitle>
       )}
-      <DialogContent sx={{ pb: actions ? 1 : 3 }}>
+      <DialogContent sx={contentSx(Boolean(actions))}>
         {children}
       </DialogContent>
-      {actions && (
-        <DialogActions sx={{ p: 4, pt: 1 }}>
-          {actions}
-        </DialogActions>
-      )}
+      {actions && <DialogActions sx={actionsSx}>{actions}</DialogActions>}
     </Dialog>
   );
 };

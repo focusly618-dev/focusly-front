@@ -16,6 +16,9 @@ import {
   FeatureCard,
   FeatureText,
   AcceptButton,
+  sparklesIconSx,
+  arrowIconSx,
+  acceptButtonWrapperSx,
 } from './ReleaseModal.styles';
 
 export const ReleaseModal = () => {
@@ -66,7 +69,7 @@ export const ReleaseModal = () => {
     >
       <ModalContainer>
         <IconWrapper>
-          <SparklesIcon sx={{ fontSize: 28 }} />
+          <SparklesIcon sx={sparklesIconSx} />
         </IconWrapper>
 
         <Title>{releaseData.title}</Title>
@@ -81,17 +84,9 @@ export const ReleaseModal = () => {
           </FeatureCard>
         ))}
 
-        <Box
-          sx={{
-            width: '100%',
-            mt: 1,
-            p: '4px',
-            border: '1px solid rgba(59, 130, 246, 0.4)',
-            borderRadius: '16px',
-          }}
-        >
+        <Box sx={acceptButtonWrapperSx}>
           <AcceptButton onClick={handleAccept} disableElevation>
-            Accept <ArrowForwardIcon sx={{ fontSize: 18 }} />
+            Accept <ArrowForwardIcon sx={arrowIconSx} />
           </AcceptButton>
         </Box>
       </ModalContainer>

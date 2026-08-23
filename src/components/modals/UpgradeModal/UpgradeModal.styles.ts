@@ -72,6 +72,56 @@ export const bulletSubTextStyle: CSSProperties = {
   color: 'var(--mui-palette-text-secondary)',
 };
 
+export const headerRowSx: SxProps<Theme> = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  mb: 2,
+};
+
+export const logoTitleRowSx: SxProps<Theme> = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 1,
+};
+
+export const closeIconButtonSx: SxProps<Theme> = {
+  color: 'text.secondary',
+};
+
+export const closeIconSx: SxProps<Theme> = {
+  fontSize: 18,
+};
+
+export const introBoxSx: SxProps<Theme> = {
+  mb: 3,
+};
+
+export const introTextSx: SxProps<Theme> = {
+  lineHeight: 1.6,
+};
+
+export const plansContainerSx: SxProps<Theme> = {
+  display: 'grid',
+  gridTemplateColumns: { xs: '1fr', sm: '1fr', md: 'repeat(3, 1fr)' },
+  gap: 3.5,
+};
+
+export const priceSuffixSx: SxProps<Theme> = {
+  ml: 0.5,
+};
+
+export const dividerSx: SxProps<Theme> = {
+  mb: 2,
+};
+
+export const featuresListSx: SxProps<Theme> = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 1.75,
+  mb: 3,
+};
+
 export const ctaButtonSx = (
   planId: 'free' | 'pro' | 'elite',
 ): SxProps<Theme> => {

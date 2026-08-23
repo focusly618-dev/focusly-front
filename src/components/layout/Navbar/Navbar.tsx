@@ -18,6 +18,13 @@ import {
   NavbarLink,
   GetStartedButton,
   MobileMenuButton,
+  topStackSx,
+  logoLinkSx,
+  desktopNavStackSx,
+  mobileNavStackSx,
+  loginLinkSx,
+  iconSx,
+  themeToggleSx,
 } from './Navbar.styles';
 
 const Navbar: React.FC = () => {
@@ -31,24 +38,16 @@ const Navbar: React.FC = () => {
           direction="row"
           justifyContent="space-between"
           alignItems="center"
-          sx={{ height: 64 }}
+          sx={topStackSx}
         >
-          <LogoWrapper
-            component={NavLink}
-            to="/"
-            sx={{ textDecoration: 'none', color: 'inherit' }}
-          >
+          <LogoWrapper component={NavLink} to="/" sx={logoLinkSx}>
             <LogoIconWrapper>
-              <AutoAwesomeIcon sx={{ fontSize: 20 }} />
+              <AutoAwesomeIcon sx={iconSx} />
             </LogoIconWrapper>
             <LogoText variant="h6">Focusly</LogoText>
           </LogoWrapper>
 
-          <Stack
-            direction="row"
-            spacing={4}
-            sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}
-          >
+          <Stack direction="row" spacing={4} sx={desktopNavStackSx}>
             <NavbarLink component={NavLink} to="/features">
               {t('nav.features')}
             </NavbarLink>
@@ -58,29 +57,19 @@ const Navbar: React.FC = () => {
             <NavbarLink component={NavLink} to="/pricing">
               {t('nav.pricing')}
             </NavbarLink>
-            <NavbarLink
-              component={NavLink}
-              to="/login"
-              sx={{
-                color: 'text.primary',
-                textTransform: 'none',
-                fontWeight: 500,
-                fontSize: '0.875rem',
-                ml: 2,
-              }}
-            >
+            <NavbarLink component={NavLink} to="/login" sx={loginLinkSx}>
               {t('nav.logIn')}
             </NavbarLink>
             <LanguageSelector variant="icon" />
             <IconButton
               onClick={colorMode.toggleColorMode}
               color="inherit"
-              sx={{ mx: 0.5 }}
+              sx={themeToggleSx}
             >
               {colorMode.mode !== 'light' ? (
-                <LightModeIcon sx={{ fontSize: 20 }} />
+                <LightModeIcon sx={iconSx} />
               ) : (
-                <DarkModeIcon sx={{ fontSize: 20 }} />
+                <DarkModeIcon sx={iconSx} />
               )}
             </IconButton>
             <GetStartedButton variant="contained">
@@ -91,7 +80,7 @@ const Navbar: React.FC = () => {
           <Stack
             direction="row"
             spacing={1}
-            sx={{ display: { md: 'none' } }}
+            sx={mobileNavStackSx}
             alignItems="center"
           >
             <LanguageSelector variant="icon" />

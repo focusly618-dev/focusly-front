@@ -4,6 +4,7 @@ import {
 } from '@mui/icons-material';
 
 import packageJson from '../../../package.json';
+import { lightningIconSx, syncIconSx } from './ReleaseModal.styles';
 
 export const CURRENT_RELEASE_VERSION = packageJson.version;
 
@@ -16,11 +17,11 @@ export const releaseData = {
     "System performance improvements and critical bug fixes for better reliability. We've optimized the kinetic engine for even smoother deep work transitions.",
   features: [
     {
-      icon: <LightningIcon sx={{ color: '#4ade80', fontSize: 16 }} />,
+      icon: <LightningIcon sx={lightningIconSx} />,
       text: '30% faster dashboard load times',
     },
     {
-      icon: <SyncIcon sx={{ color: '#60a5fa', fontSize: 16 }} />,
+      icon: <SyncIcon sx={syncIconSx} />,
       text: 'Calendar sync integrity patch',
     },
   ],
