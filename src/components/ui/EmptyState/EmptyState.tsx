@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  type SxProps,
-  type Theme,
-} from '@mui/material';
+import { Box, Typography, Button, type SxProps, type Theme } from '@mui/material';
 import { SearchOff as SearchOffIcon } from '@mui/icons-material';
 
 import {
@@ -17,15 +11,7 @@ import {
   descriptionSx,
   actionButtonSx,
 } from './EmptyState.styles';
-
-interface EmptyStateProps {
-  icon?: React.ReactNode;
-  title: string;
-  description?: string;
-  actionText?: string;
-  onAction?: () => void;
-  sx?: SxProps<Theme>;
-}
+import type { EmptyStateProps } from './EmptyState.types';
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
   icon,
