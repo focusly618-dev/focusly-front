@@ -1,12 +1,6 @@
 import React from 'react';
 
-interface CuteRobotIconProps {
-  size?: number;
-  /** 'full' = animated mascot SVG. 'mini' = compact 1-color version for bubbles */
-  variant?: 'full' | 'mini';
-  primaryColor?: string;
-  eyeColor?: string;
-}
+import type { CuteRobotIconProps } from './CuteRobotIcon.types';
 
 /**
  * A warm, friendly robot mascot with glowing cyan eyes, a digital smile, and

@@ -10,10 +10,13 @@ import {
 } from '@/pages/Workspace/Workspace.styles';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import BoltIcon from '@mui/icons-material/Bolt';
-
-interface WorkspaceEmptyStateProps {
-  onCreate: () => void;
-}
+import type { WorkspaceEmptyStateProps } from './WorkspaceEmptyState.types';
+import {
+  robotIconInnerSx,
+  lightningIconInnerSx,
+  titleSx,
+  descriptionSx,
+} from './WorkspaceEmptyState.styles';
 
 export const WorkspaceEmptyState = ({ onCreate }: WorkspaceEmptyStateProps) => {
   return (
@@ -22,36 +25,19 @@ export const WorkspaceEmptyState = ({ onCreate }: WorkspaceEmptyStateProps) => {
         <IllustrationContainer>
           <Box position="relative">
             <RobotIcon>
-              <SmartToyIcon sx={{ fontSize: 40, color: 'info.main' }} />
+              <SmartToyIcon sx={robotIconInnerSx} />
             </RobotIcon>
             <LightningBadge>
-              <BoltIcon sx={{ fontSize: 14, color: 'background.default' }} />
+              <BoltIcon sx={lightningIconInnerSx} />
             </LightningBadge>
           </Box>
         </IllustrationContainer>
 
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 700,
-            mb: 2,
-            textAlign: 'center',
-            color: 'text.primary',
-          }}
-        >
+        <Typography variant="h4" sx={titleSx}>
           Start Your First Strategic Plan
         </Typography>
 
-        <Typography
-          variant="body1"
-          sx={{
-            color: 'text.secondary',
-            mb: 4,
-            textAlign: 'center',
-            maxWidth: 500,
-            lineHeight: 1.6,
-          }}
-        >
+        <Typography variant="body1" sx={descriptionSx}>
           Use headers, code blocks, and lists to document your thoughts. Link
           this page to a task to sync with your schedule.
         </Typography>

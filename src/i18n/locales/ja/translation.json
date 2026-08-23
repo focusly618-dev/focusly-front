@@ -231,7 +231,8 @@
       "title": "プロフィール情報",
       "googleAccount": "Google アカウント",
       "magicLink": "マジックリンク・サインイン",
-      "avatarSynced": "アバターはサインインプロバイダーから同期されます。"
+      "avatarHint": "写真をクリックして新しい画像をアップロードします。",
+      "removeAvatar": "写真を削除"
     },
     "displayName": "表示名",
     "emailAddress": "メールアドレス",

@@ -43,6 +43,7 @@ const ProfileCompletionStep: React.FC<ProfileCompletionStepProps> = ({
     profileImage,
     fileInputRef,
     isLoading,
+    isUploadingImage,
     handleImageClick,
     handleFileChange,
     handleContinue,
@@ -76,24 +77,35 @@ const ProfileCompletionStep: React.FC<ProfileCompletionStepProps> = ({
 
       <Box sx={{ mb: 4 }}>
         <ProfileAvatarContainer>
-          <ProfileImage src={profileImage} onClick={handleImageClick}>
-            {!profileImage && (
-              <PersonIcon
-                sx={{
-                  fontSize: 40,
-                  color: alpha(theme.palette.text.primary, 0.2),
-                }}
-              />
+          <ProfileImage
+            src={profileImage}
+            onClick={isUploadingImage ? undefined : handleImageClick}
+            sx={{ cursor: isUploadingImage ? 'default' : 'pointer' }}
+          >
+            {isUploadingImage ? (
+              <CircularProgress size={28} color="inherit" />
+            ) : (
+              !profileImage && (
+                <PersonIcon
+                  sx={{
+                    fontSize: 40,
+                    color: alpha(theme.palette.text.primary, 0.2),
+                  }}
+                />
+              )
             )}
           </ProfileImage>
-          <AddIconButton onClick={handleImageClick}>
+          <AddIconButton
+            onClick={isUploadingImage ? undefined : handleImageClick}
+            sx={{ cursor: isUploadingImage ? 'default' : 'pointer' }}
+          >
             <CameraIcon sx={{ fontSize: 16 }} />
           </AddIconButton>
           <input
             type="file"
             ref={fileInputRef}
             hidden
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             onChange={handleFileChange}
           />
         </ProfileAvatarContainer>

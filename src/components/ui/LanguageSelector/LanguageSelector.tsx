@@ -15,10 +15,16 @@ import {
   changeLanguage,
   type SupportedLanguage,
 } from '@/i18n';
-
-interface LanguageSelectorProps {
-  variant?: 'icon' | 'full';
-}
+import type { LanguageSelectorProps } from './LanguageSelector.types';
+import {
+  iconTriggerSx,
+  iconSx,
+  fullTriggerSx,
+  secondaryIconSx,
+  labelSx,
+  menuPaperSx,
+  menuItemIconSx,
+} from './LanguageSelector.styles';
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   variant = 'icon',
@@ -52,30 +58,14 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           onClick={handleClick}
           color="inherit"
           aria-label={t('settings.language.title')}
-          sx={{ mx: 0.5 }}
+          sx={iconTriggerSx}
         >
-          <TranslateIcon sx={{ fontSize: 20 }} />
+          <TranslateIcon sx={iconSx} />
         </IconButton>
       ) : (
-        <Box
-          onClick={handleClick}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            cursor: 'pointer',
-            px: 1.5,
-            py: 0.75,
-            borderRadius: 1,
-            border: '1px solid',
-            borderColor: 'divider',
-            '&:hover': {
-              backgroundColor: 'action.hover',
-            },
-          }}
-        >
-          <TranslateIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+        <Box onClick={handleClick} sx={fullTriggerSx}>
+          <TranslateIcon sx={secondaryIconSx} />
+          <Typography variant="body2" sx={labelSx}>
             {currentLang.flag} {currentLang.nativeLabel}
           </Typography>
         </Box>
@@ -90,11 +80,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         slotProps={{
           paper: {
             elevation: 3,
-            sx: {
-              minWidth: 150,
-              mt: 1,
-              borderRadius: 2,
-            },
+            sx: menuPaperSx,
           },
         }}
       >
@@ -104,7 +90,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             selected={i18n.language === option.code}
             onClick={() => handleSelectLanguage(option.code)}
           >
-            <ListItemIcon sx={{ fontSize: '1.2rem', minWidth: '32px' }}>
+            <ListItemIcon sx={menuItemIconSx}>
               {option.flag}
             </ListItemIcon>
             <ListItemText

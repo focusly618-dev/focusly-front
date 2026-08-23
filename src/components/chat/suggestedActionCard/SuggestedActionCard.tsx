@@ -14,13 +14,22 @@ import {
   Add as AddIcon,
 } from '@mui/icons-material';
 
-import { type ParsedLuminaAction } from '@/utils';
-import { surfaceColor } from '@/context';
 import { useSuggestedActionCard } from './useSuggestedActionCard.hook';
-
-interface SuggestedActionCardProps {
-  action: ParsedLuminaAction;
-}
+import type { SuggestedActionCardProps } from './suggestedActionCard.types';
+import {
+  cardSx,
+  cardContentSx,
+  headerRowSx,
+  detailsTextSx,
+  errorTextSx,
+  actionsRowSx,
+  completedRowSx,
+  successRowSx,
+  successIconSx,
+  outlinedActionButtonSx,
+  addIconSx,
+  primaryActionButtonSx,
+} from './suggestedActionCard.styles';
 
 export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
   action,
@@ -39,36 +48,16 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
   } = useSuggestedActionCard(action);
 
   return (
-    <Card
-      sx={{
-        mt: 1.5,
-        mb: 0.5,
-        borderRadius: '12px',
-        border: `1px solid ${theme.palette.divider}`,
-        background: surfaceColor(
-          theme,
-          'linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%)',
-          'linear-gradient(135deg, rgba(42, 42, 44, 0.5) 0%, rgba(36, 36, 37, 0.3) 100%)',
-          'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.6) 100%)',
-        ),
-        backdropFilter: 'blur(8px)',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-        overflow: 'hidden',
-      }}
-    >
-      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-        <Box display="flex" alignItems="center" gap={1.2} mb={1}>
+    <Card sx={cardSx(theme)}>
+      <CardContent sx={cardContentSx}>
+        <Box sx={headerRowSx}>
           {getActionIcon()}
           <Typography variant="subtitle2" fontWeight={800} color="text.primary">
             {getActionTitle()} Suggestion
           </Typography>
         </Box>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mb: 2, fontSize: '13px' }}
-        >
+        <Typography variant="body2" color="text.secondary" sx={detailsTextSx}>
           {getActionDetails()}
         </Typography>
 
@@ -77,22 +66,17 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
             variant="caption"
             color="error.main"
             display="block"
-            sx={{ mb: 2 }}
+            sx={errorTextSx}
           >
             {errorMessage}
           </Typography>
         )}
 
-        <Box display="flex" justifyContent="flex-end" alignItems="center">
+        <Box sx={actionsRowSx}>
           {isCompleted ? (
-            <Box display="flex" alignItems="center" gap={1.5}>
-              <Box
-                display="flex"
-                alignItems="center"
-                gap={0.8}
-                sx={{ color: 'success.main' }}
-              >
-                <CheckCircleIcon sx={{ fontSize: 16 }} />
+            <Box sx={completedRowSx}>
+              <Box sx={successRowSx}>
+                <CheckCircleIcon sx={successIconSx} />
                 <Typography variant="caption" fontWeight={700}>
                   {action.type === 'INSERT_TO_WORKSPACE'
                     ? 'Inserted Successfully!'
@@ -114,20 +98,7 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
                         workspaceId: createdId,
                       })
                     }
-                    sx={{
-                      textTransform: 'none',
-                      fontWeight: 700,
-                      fontSize: '10px',
-                      borderRadius: '6px',
-                      py: 0.2,
-                      px: 1.2,
-                      borderColor: 'primary.main',
-                      color: 'primary.main',
-                      '&:hover': {
-                        borderColor: 'primary.dark',
-                        bgcolor: 'rgba(59, 130, 246, 0.08)',
-                      },
-                    }}
+                    sx={outlinedActionButtonSx}
                   >
                     Open Workspace
                   </Button>
@@ -144,20 +115,7 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
                       return newParams;
                     });
                   }}
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    fontSize: '10px',
-                    borderRadius: '6px',
-                    py: 0.2,
-                    px: 1.2,
-                    borderColor: 'primary.main',
-                    color: 'primary.main',
-                    '&:hover': {
-                      borderColor: 'primary.dark',
-                      bgcolor: 'rgba(59, 130, 246, 0.08)',
-                    },
-                  }}
+                  sx={outlinedActionButtonSx}
                 >
                   View Task
                 </Button>
@@ -173,17 +131,10 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
                 isLoading ? (
                   <CircularProgress size={12} color="inherit" />
                 ) : (
-                  <AddIcon sx={{ fontSize: 14 }} />
+                  <AddIcon sx={addIconSx} />
                 )
               }
-              sx={{
-                textTransform: 'none',
-                fontWeight: 700,
-                fontSize: '11px',
-                borderRadius: '6px',
-                px: 2.5,
-                boxShadow: `0 4px 12px ${theme.palette.primary.main}20`,
-              }}
+              sx={primaryActionButtonSx(theme)}
             >
               {isLoading
                 ? action.type === 'INSERT_TO_WORKSPACE'

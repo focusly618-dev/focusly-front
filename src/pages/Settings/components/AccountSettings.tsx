@@ -6,16 +6,20 @@ import {
   Avatar,
   Button,
   TextField,
+  IconButton,
+  CircularProgress,
   useTheme,
 } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { updateUser } from '@/redux/auth/auth.slice';
 import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 import { sileo } from '@/utils';
+import { useAvatarUpload } from '@/hooks/useAvatarUpload.hook';
 import {
   PersonOutline as PersonIcon,
   Google as GoogleIcon,
   MailOutline as MailIcon,
+  CameraAlt as CameraIcon,
 } from '@mui/icons-material';
 import {
   SectionCard,
@@ -30,6 +34,14 @@ export const AccountSettings = () => {
   const dispatch = useAppDispatch();
   const { user, authProvider } = useAppSelector((state) => state.auth);
   const [name, setName] = useState(user?.name || '');
+
+  const {
+    fileInputRef,
+    isUploadingImage,
+    handleImageClick,
+    handleFileChange,
+    handleRemoveImage,
+  } = useAvatarUpload();
 
   const isGoogle = authProvider === AuthProviders.google;
   const trimmedName = name.trim();
@@ -80,15 +92,60 @@ export const AccountSettings = () => {
         </SectionHeader>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 4 }}>
-          <Avatar
-            src={user?.picture || ''}
-            alt={user?.name || 'User'}
-            sx={{
-              width: 72,
-              height: 72,
-              border: '2px solid rgba(99, 102, 241, 0.2)',
-            }}
-          />
+          <Box sx={{ position: 'relative', width: 72, height: 72 }}>
+            <Avatar
+              src={user?.picture || ''}
+              alt={user?.name || 'User'}
+              onClick={isUploadingImage ? undefined : handleImageClick}
+              sx={{
+                width: 72,
+                height: 72,
+                border: '2px solid rgba(99, 102, 241, 0.2)',
+                cursor: isUploadingImage ? 'default' : 'pointer',
+              }}
+            />
+            {isUploadingImage ? (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  bgcolor: 'rgba(0,0,0,0.4)',
+                }}
+              >
+                <CircularProgress size={24} sx={{ color: '#fff' }} />
+              </Box>
+            ) : (
+              <IconButton
+                size="small"
+                onClick={handleImageClick}
+                sx={{
+                  position: 'absolute',
+                  bottom: -2,
+                  right: -2,
+                  width: 26,
+                  height: 26,
+                  bgcolor: '#6366F1',
+                  color: '#fff',
+                  border: '2px solid',
+                  borderColor: 'background.paper',
+                  '&:hover': { bgcolor: '#4F46E5' },
+                }}
+              >
+                <CameraIcon sx={{ fontSize: 14 }} />
+              </IconButton>
+            )}
+            <input
+              type="file"
+              ref={fileInputRef}
+              hidden
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+            />
+          </Box>
           <Box>
             <Badge
               sx={{
@@ -111,8 +168,26 @@ export const AccountSettings = () => {
               variant="caption"
               sx={{ display: 'block', color: 'text.secondary', mt: 1 }}
             >
-              {t('accountSettings.identity.avatarSynced')}
+              {t('accountSettings.identity.avatarHint')}
             </Typography>
+            {user?.picture && (
+              <Button
+                size="small"
+                disabled={isUploadingImage}
+                onClick={handleRemoveImage}
+                sx={{
+                  textTransform: 'none',
+                  color: 'error.main',
+                  fontSize: '0.75rem',
+                  minWidth: 0,
+                  px: 0,
+                  mt: 0.5,
+                  '&:hover': { bgcolor: 'transparent', color: 'error.dark' },
+                }}
+              >
+                {t('accountSettings.identity.removeAvatar')}
+              </Button>
+            )}
           </Box>
         </Box>
 

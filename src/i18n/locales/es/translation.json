@@ -231,7 +231,8 @@
       "title": "Identidad de Perfil",
       "googleAccount": "Cuenta de Google",
       "magicLink": "Inicio de Sesión por Enlace Mágico",
-      "avatarSynced": "Tu avatar se sincroniza desde tu proveedor de inicio de sesión."
+      "avatarHint": "Haz clic en tu foto para subir una nueva.",
+      "removeAvatar": "Eliminar foto"
     },
     "displayName": "Nombre Visible",
     "emailAddress": "Correo Electrónico",

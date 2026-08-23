@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { updateUser as updateReduxUser } from '@/redux/auth/auth.slice';
 import axios from '@/api/axiosInstance';
+import { uploadAvatarFile } from '@/api/User/apiUser';
+import { sileo, getFriendlyErrorMessage } from '@/utils';
 
 interface UseProfileCompletionProps {
   onNext: () => void;
@@ -15,20 +17,40 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
   const [jobTitle, setJobTitle] = useState((user?.jobTitle as string) || '');
   const [bio, setBio] = useState((user?.bio as string) || '');
   const [profileImage, setProfileImage] = useState(user?.picture || '');
+  // What actually gets persisted via UserUpdate — a bare MinIO object key
+  // after a fresh upload, or whatever `picture` already held (a Google
+  // photo URL, or a previously-uploaded key) if the user never changes it.
+  const [pictureToSave, setPictureToSave] = useState(user?.picture || '');
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
-      // In a real scenario, you'd upload to S3/Cloudinary here and get a remote URL
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const { objectKey, previewUrl } = await uploadAvatarFile(file);
+      setProfileImage(previewUrl);
+      setPictureToSave(objectKey);
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      sileo.error({
+        title: 'No se pudo subir la imagen',
+        description: getFriendlyErrorMessage(
+          error,
+          'Intenta con otra imagen o vuelve a intentarlo.',
+        ),
+      });
+    } finally {
+      setIsUploadingImage(false);
+      event.target.value = '';
     }
   };
 
@@ -41,7 +63,7 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
         name: fullName,
         jobTitle,
         bio,
-        picture: profileImage
+        picture: pictureToSave
       };
 
       // Send to backend
@@ -69,6 +91,7 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
     profileImage,
     fileInputRef,
     isLoading,
+    isUploadingImage,
     handleImageClick,
     handleFileChange,
     handleContinue

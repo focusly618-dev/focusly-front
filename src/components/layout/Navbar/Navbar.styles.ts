@@ -9,6 +9,7 @@ import {
   Button,
   IconButton,
 } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { surfaceColor } from '@/context';
 
@@ -135,3 +136,37 @@ export const NavLoginButton = styled(Button)({
   fontWeight: 500,
   color: 'inherit',
 });
+
+export const topStackSx: SxProps<Theme> = {
+  height: 64,
+};
+
+export const logoLinkSx: SxProps<Theme> = {
+  textDecoration: 'none',
+  color: 'inherit',
+};
+
+export const desktopNavStackSx: SxProps<Theme> = {
+  display: { xs: 'none', md: 'flex' },
+  alignItems: 'center',
+};
+
+export const mobileNavStackSx: SxProps<Theme> = {
+  display: { md: 'none' },
+};
+
+export const loginLinkSx: SxProps<Theme> = {
+  color: 'text.primary',
+  textTransform: 'none',
+  fontWeight: 500,
+  fontSize: '0.875rem',
+  ml: 2,
+};
+
+export const iconSx: SxProps<Theme> = {
+  fontSize: 20,
+};
+
+export const themeToggleSx: SxProps<Theme> = {
+  mx: 0.5,
+};

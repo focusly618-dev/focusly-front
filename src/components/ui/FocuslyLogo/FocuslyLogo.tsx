@@ -1,21 +1,11 @@
-import { Box, type SvgIconProps } from '@mui/material';
+import { Box } from '@mui/material';
 
-interface FocuslyLogoProps extends SvgIconProps {
-  size?: number;
-}
+import type { FocuslyLogoProps } from './FocuslyLogo.types';
+import { containerSx } from './FocuslyLogo.styles';
 
 export const FocuslyLogo = ({ size = 24, sx }: FocuslyLogoProps) => {
   return (
-    <Box
-      sx={{
-        width: size,
-        height: size,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        ...sx,
-      }}
-    >
+    <Box sx={containerSx(size, sx)}>
       <svg
         width="100%"
         height="100%"
