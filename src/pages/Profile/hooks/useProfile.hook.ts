@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { logout } from '@/redux/auth/auth.slice';
+import { useAvatarUpload } from '@/hooks/useAvatarUpload.hook';
 
 export const useProfile = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -13,6 +14,14 @@ export const useProfile = () => {
   const [bio, setBio] = useState(
     'Focused on building intuitive user interfaces and optimizing productivity workflows.'
   );
+
+  const {
+    fileInputRef,
+    isUploadingImage,
+    handleImageClick,
+    handleFileChange,
+    handleRemoveImage,
+  } = useAvatarUpload();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -42,5 +51,10 @@ export const useProfile = () => {
     handleLogout,
     getInitials,
     cancelEdit,
+    fileInputRef,
+    isUploadingImage,
+    handleImageClick,
+    handleFileChange,
+    handleRemoveImage,
   };
 };

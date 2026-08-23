@@ -231,7 +231,8 @@
       "title": "Profile Identity",
       "googleAccount": "Google Account",
       "magicLink": "Magic Link Sign-in",
-      "avatarSynced": "Your avatar is synced from your sign-in provider."
+      "avatarHint": "Click your photo to upload a new one.",
+      "removeAvatar": "Remove photo"
     },
     "displayName": "Display Name",
     "emailAddress": "Email Address",

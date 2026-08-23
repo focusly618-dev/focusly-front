@@ -8,6 +8,7 @@ import {
   Stack,
   InputAdornment,
   SvgIcon,
+  CircularProgress,
   type SvgIconProps,
 } from '@mui/material';
 import {
@@ -51,6 +52,11 @@ const Profile: React.FC = () => {
     handleLogout,
     getInitials,
     cancelEdit,
+    fileInputRef,
+    isUploadingImage,
+    handleImageClick,
+    handleFileChange,
+    handleRemoveImage,
   } = useProfile();
 
   const [activeTab, setActiveTab] = useState<
@@ -233,26 +239,44 @@ const Profile: React.FC = () => {
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <Avatar
-                    src={user?.picture}
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      bgcolor: '#a7f3d0',
-                      color: '#065f46',
-                      fontSize: '2rem',
-                    }}
-                  >
-                    <img
-                      alt="avatar"
-                      src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
+                  <Box sx={{ position: 'relative', width: 80, height: 80 }}>
+                    <Avatar
+                      src={user?.picture}
+                      onClick={isUploadingImage ? undefined : handleImageClick}
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        bgcolor: '#a7f3d0',
+                        color: '#065f46',
+                        fontSize: '2rem',
+                        cursor: isUploadingImage ? 'default' : 'pointer',
                       }}
+                    >
+                      {getInitials(user?.name)}
+                    </Avatar>
+                    {isUploadingImage && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          inset: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '50%',
+                          bgcolor: 'rgba(0,0,0,0.4)',
+                        }}
+                      >
+                        <CircularProgress size={28} sx={{ color: '#fff' }} />
+                      </Box>
+                    )}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      hidden
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleFileChange}
                     />
-                  </Avatar>
+                  </Box>
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold">
                       {t('profile.general.picture.avatarTitle')}
@@ -268,6 +292,8 @@ const Profile: React.FC = () => {
                     <Stack direction="row" spacing={2}>
                       <Button
                         variant="outlined"
+                        disabled={isUploadingImage}
+                        onClick={handleImageClick}
                         sx={{
                           color: 'text.secondary',
                           borderColor: 'divider',
@@ -282,6 +308,8 @@ const Profile: React.FC = () => {
                         {t('profile.general.picture.upload')}
                       </Button>
                       <Button
+                        disabled={isUploadingImage || !user?.picture}
+                        onClick={handleRemoveImage}
                         sx={{ color: 'error.main', textTransform: 'none' }}
                       >
                         {t('profile.general.picture.remove')}
