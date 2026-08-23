@@ -125,19 +125,19 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
   const SIDEBAR_MIN = 300;
   const SIDEBAR_MAX = 380;
   const GRAPH_MIN = 340;
-  const GRAPH_MAX = 860;
+  const GRAPH_MAX = 1400;
 
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem('workspace_sidebar_width');
     const width = saved ? parseInt(saved, 10) : 340;
     return Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, width));
   });
-  // The local graph benefits from a lot more room than task metadata ever
+  // The note map benefits from a lot more room than task metadata ever
   // needs — a separate width lets dragging the same handle "extend" just
   // that tab, instead of permanently widening the sidebar for every view.
   const [graphPanelWidth, setGraphPanelWidth] = useState(() => {
     const saved = localStorage.getItem('workspace_sidebar_graph_width');
-    const width = saved ? parseInt(saved, 10) : 460;
+    const width = saved ? parseInt(saved, 10) : 700;
     return Math.max(GRAPH_MIN, Math.min(GRAPH_MAX, width));
   });
   const [isDragging, setIsDragging] = useState(false);
@@ -204,7 +204,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     activeInsightView === 'outline'
       ? 'OUTLINE'
       : activeInsightView === 'graph'
-        ? 'LOCAL GRAPH'
+        ? 'MAPA DE NOTAS'
         : 'TASK DETAILS';
 
   return (
@@ -322,7 +322,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                 </IconButton>
               </Tooltip>
               <Tooltip
-                title="Local graph — how this note's headings connect to the task"
+                title="Mapa de notas — cómo se conectan los encabezados de esta nota con la tarea"
                 placement="bottom"
               >
                 <IconButton

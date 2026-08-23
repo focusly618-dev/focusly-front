@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
+  Button,
   IconButton,
   Menu,
   MenuItem,
@@ -20,6 +22,7 @@ import {
   Description as DescriptionIcon,
   Palette as PaletteIcon,
   Check as CheckIcon,
+  Add as AddIcon,
 } from '@mui/icons-material';
 import {
   LibraryHeader,
@@ -54,6 +57,7 @@ export interface WorkspaceLibraryHeaderProps {
   noteFilterType: 'all' | 'linked-task' | 'has-cover';
   onNoteFilterChange: (type: 'all' | 'linked-task' | 'has-cover') => void;
   onCreate?: () => void;
+  hasMultipleWorkspaces?: boolean;
 }
 
 const PROJECT_COLORS = [
@@ -85,7 +89,10 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
   onNoteSortChange,
   noteFilterType,
   onNoteFilterChange,
+  onCreate,
+  hasMultipleWorkspaces,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const [filterMenuAnchor, setFilterMenuAnchor] = useState<null | HTMLElement>(
@@ -347,6 +354,26 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
               </Box>
             </Menu>
           </Box>
+        )}
+
+        {onCreate && hasMultipleWorkspaces && (
+          <Button
+            onClick={onCreate}
+            variant="contained"
+            startIcon={<AddIcon sx={{ fontSize: 18 }} />}
+            sx={{
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 700,
+              fontSize: '13px',
+              px: 2,
+              boxShadow: 'none',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            {t('workspaceLibrary.newWorkspace')}
+          </Button>
         )}
       </Box>
     </LibraryHeader>

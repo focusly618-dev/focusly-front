@@ -80,6 +80,25 @@ Object.defineProperty(window, 'AudioContext', {
   writable: true,
 });
 
+// pdfjs-dist's canvas module references DOMMatrix at import time (used for
+// page-rendering transforms); jsdom doesn't implement it, so anything that
+// imports documentConverters.ts (Import Content modal) throws at module
+// load. A minimal stub is enough — these tests never render an actual PDF
+// page, only exercise the xlsx/dispatch conversion paths.
+class FakeDOMMatrix {
+  a = 1;
+  b = 0;
+  c = 0;
+  d = 1;
+  e = 0;
+  f = 0;
+}
+
+Object.defineProperty(window, 'DOMMatrix', {
+  value: FakeDOMMatrix,
+  writable: true,
+});
+
 afterEach(() => {
   cleanup();
   window.localStorage.clear();

@@ -11,7 +11,8 @@ export interface GraphNode {
   x: number;
   y: number;
   label: string;
-  level: 0 | 1;
+  // 0 = root (the task/note itself), 1-6 = heading depth (# through ######)
+  level: number;
   pos: number | null;
 }
 

@@ -1,5 +1,6 @@
 import type { EditorView } from '@codemirror/view';
 import type { MarkdownEditorRef } from './MarkdownEditor.types';
+import { buildDiff, resolveDiff, setPendingDiff } from './extensions/diffReview';
 
 // All BlockNote call sites (AI text-actions menu, the Lumina chat
 // insert-content event) used to reach into `editor.document`/`insertBlocks`
@@ -61,4 +62,19 @@ export const createImperativeApi = (
   },
   getValue: () => getView()?.state.doc.toString() ?? '',
   focus: () => getView()?.focus(),
+  showDiff: (proposedText) => {
+    const view = getView();
+    if (!view) return;
+    const originalText = view.state.doc.toString();
+    const { combinedText, ranges } = buildDiff(originalText, proposedText);
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: combinedText },
+      effects: setPendingDiff.of(ranges),
+    });
+  },
+  resolveDiff: (resolution) => {
+    const view = getView();
+    if (!view) return;
+    resolveDiff(view, resolution);
+  },
 });

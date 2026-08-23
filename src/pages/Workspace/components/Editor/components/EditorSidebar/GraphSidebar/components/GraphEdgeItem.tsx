@@ -5,7 +5,10 @@ import type {
   GraphNode,
   GraphSettings,
 } from '../NoteGraphView.types';
-import { calculateTrimmedEdgeTarget } from '../utils/graphLayout.utils';
+import {
+  baseRadiusForLevel,
+  calculateTrimmedEdgeTarget,
+} from '../utils/graphLayout.utils';
 
 interface GraphEdgeItemProps {
   edge: GraphEdge;
@@ -29,7 +32,7 @@ export const GraphEdgeItem: React.FC<GraphEdgeItemProps> = ({
   const active =
     !neighborIds || (neighborIds.has(edge.from) && neighborIds.has(edge.to));
 
-  const targetRadius = to.level === 0 ? 17 : 12;
+  const targetRadius = baseRadiusForLevel(to.level);
   const { trimmedX, trimmedY } = calculateTrimmedEdgeTarget(
     from,
     to,

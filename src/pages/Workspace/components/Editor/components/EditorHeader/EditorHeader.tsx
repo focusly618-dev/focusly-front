@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import {
   CheckCircleOutline as CheckCircleIcon,
   Mic as MicIcon,
@@ -8,6 +9,10 @@ import {
   AutoAwesome as AutoAwesomeIcon,
   Translate as TranslateIcon,
   VisibilityOutlined as EyeIcon,
+  MoreHoriz as MoreHorizIcon,
+  FileUpload as ImportIcon,
+  FileDownload as ExportIcon,
+  Description as DescriptionIcon,
 } from '@mui/icons-material';
 import {
   CircularProgress,
@@ -17,11 +22,17 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  ListItemIcon,
   ListItemText,
   Button,
+  Badge,
+  Divider,
 } from '@mui/material';
 
 import { SearchPalette } from '../SearchPalette/SearchPalette';
+import { ImportContentModal } from './components/ImportContentModal/ImportContentModal';
+import { convertMarkdownToDocx } from './documentExporters';
+import { sileo } from '@/utils';
 import {
   HeaderLeft,
   HeaderCenter,
@@ -51,6 +62,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     onToggleCentered,
     onToggleSidebar,
     onStartFocus,
+    markdownEditorRef,
   } = props;
 
   const {
@@ -64,6 +76,42 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     handleTargetSelect,
     getLanguageLabel,
   } = useEditorHeader(props);
+
+  const [toolsAnchor, setToolsAnchor] = useState<HTMLElement | null>(null);
+  const toolsButtonRef = useRef<HTMLButtonElement>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [exportAnchor, setExportAnchor] = useState<HTMLElement | null>(null);
+
+  const downloadBlob = (blob: Blob, extension: string) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${(selectTask?.title || 'note').replace(/[^\w-]+/g, '_')}.${extension}`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExport = async (format: 'md' | 'docx') => {
+    setExportAnchor(null);
+    const markdown = markdownEditorRef?.current?.getValue() ?? '';
+
+    if (format === 'md') {
+      downloadBlob(new Blob([markdown], { type: 'text/markdown' }), 'md');
+      return;
+    }
+
+    try {
+      const blob = await convertMarkdownToDocx(markdown);
+      downloadBlob(blob, 'docx');
+    } catch (error) {
+      console.error('Failed to export document as Word:', error);
+      sileo.error({
+        title: 'Export failed',
+        description: 'Could not generate the Word document.',
+        fill: 'var(--sileo-error-bg)',
+      });
+    }
+  };
 
   return (
     <StyledEditorHeader>
@@ -124,40 +172,6 @@ export const EditorHeader = (props: EditorHeaderProps) => {
       </HeaderCenter>
 
       <HeaderRight sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-        {/* Detect Language Button */}
-        <Button
-          onClick={(e) => setSourceAnchor(e.currentTarget)}
-          startIcon={<AutoAwesomeIcon sx={{ fontSize: 14 }} />}
-          sx={{
-            height: '34px',
-            px: 1.5,
-            borderRadius: '8px',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.12)'
-                : '#e2e8f0',
-            color: 'text.primary',
-            fontSize: '12px',
-            fontWeight: 600,
-            textTransform: 'none',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
-            '&:hover': {
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.08)'
-                  : '#f8fafc',
-            },
-          }}
-        >
-          {sourceLanguage === 'auto'
-            ? 'Detect Language'
-            : getLanguageLabel(sourceLanguage)}
-        </Button>
-
         {/* Target Language Button */}
         <Button
           onClick={(e) => setTargetAnchor(e.currentTarget)}
@@ -190,72 +204,52 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           {getLanguageLabel(targetLanguage)}
         </Button>
 
-        {/* Focus Mode Button - Opens Focus Mode Modal */}
-        <Button
-          onClick={() => {
-            if (onStartFocus) {
-              onStartFocus(selectTask);
-            } else if (onToggleCentered) {
-              onToggleCentered();
-            }
-          }}
-          startIcon={<FlashOnIcon sx={{ fontSize: 16 }} />}
-          sx={{
-            height: '34px',
-            px: 2,
-            borderRadius: '10px',
-            bgcolor: '#4f46e5',
-            color: '#ffffff',
-            fontSize: '12px',
-            fontWeight: 700,
-            textTransform: 'none',
-            boxShadow: '0 2px 8px rgba(79, 70, 229, 0.25)',
-            '&:hover': {
-              bgcolor: '#4338ca',
-              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
-            },
-          }}
-        >
-          Focus Mode
-        </Button>
-
-        {/* Dictation Microphone Button */}
+        {/* Editor Tools: Detect Language, Dictation, Focus Mode */}
         <IconButton
-          onClick={toggleListening}
+          ref={toolsButtonRef}
+          onClick={(e) => setToolsAnchor(e.currentTarget)}
           size="small"
           sx={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            color: isListening ? 'error.main' : 'text.secondary',
-            bgcolor: isListening ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
             border: '1px solid',
-            borderColor: isListening ? 'error.main' : 'divider',
-            animation: isListening ? 'pulse 1.5s infinite ease-in-out' : 'none',
-            '@keyframes pulse': {
-              '0%': {
-                transform: 'scale(1)',
-                boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.3)',
-              },
-              '70%': {
-                transform: 'scale(1.08)',
-                boxShadow: '0 0 0 6px rgba(239, 68, 68, 0)',
-              },
-              '100%': {
-                transform: 'scale(1)',
-                boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)',
-              },
-            },
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : '#e2e8f0',
+            color: 'text.primary',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : '#ffffff',
             '&:hover': {
-              bgcolor: isListening ? 'rgba(239, 68, 68, 0.15)' : 'action.hover',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : '#f8fafc',
             },
           }}
         >
-          {isListening ? (
-            <MicIcon sx={{ fontSize: 16 }} />
-          ) : (
-            <MicOffIcon sx={{ fontSize: 16 }} />
-          )}
+          <Badge
+            variant="dot"
+            color="error"
+            invisible={!isListening}
+            sx={{
+              '& .MuiBadge-dot': {
+                animation: isListening
+                  ? 'pulse 1.5s infinite ease-in-out'
+                  : 'none',
+              },
+              '@keyframes pulse': {
+                '0%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.5)' },
+                '70%': { boxShadow: '0 0 0 4px rgba(239, 68, 68, 0)' },
+                '100%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)' },
+              },
+            }}
+          >
+            <MoreHorizIcon sx={{ fontSize: 18 }} />
+          </Badge>
         </IconButton>
 
         {/* Save Status Indicator */}
@@ -339,6 +333,151 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             ) : null}
           </Box>
         </Fade>
+
+        {/* Editor Tools Menu (Detect Language / Dictation / Focus Mode) */}
+        <Menu
+          anchorEl={toolsAnchor}
+          open={Boolean(toolsAnchor)}
+          onClose={() => setToolsAnchor(null)}
+          PaperProps={{
+            sx: {
+              borderRadius: '10px',
+              mt: 0.5,
+              minWidth: '190px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              border: '1px solid',
+              borderColor: 'divider',
+            },
+          }}
+        >
+          <MenuItem
+            onClick={() => {
+              setToolsAnchor(null);
+              setSourceAnchor(toolsButtonRef.current);
+            }}
+          >
+            <ListItemIcon>
+              <AutoAwesomeIcon sx={{ fontSize: 18 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                sourceLanguage === 'auto'
+                  ? 'Detect Language'
+                  : getLanguageLabel(sourceLanguage)
+              }
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              toggleListening();
+              setToolsAnchor(null);
+            }}
+          >
+            <ListItemIcon>
+              {isListening ? (
+                <MicIcon sx={{ fontSize: 18, color: 'error.main' }} />
+              ) : (
+                <MicOffIcon sx={{ fontSize: 18 }} />
+              )}
+            </ListItemIcon>
+            <ListItemText
+              primary={isListening ? 'Stop Dictation' : 'Start Dictation'}
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setToolsAnchor(null);
+              if (onStartFocus) {
+                onStartFocus(selectTask);
+              } else if (onToggleCentered) {
+                onToggleCentered();
+              }
+            }}
+          >
+            <ListItemIcon>
+              <FlashOnIcon sx={{ fontSize: 18 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Focus Mode"
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+
+          <Divider sx={{ my: 0.5 }} />
+
+          <MenuItem
+            onClick={() => {
+              setToolsAnchor(null);
+              setIsImportModalOpen(true);
+            }}
+          >
+            <ListItemIcon>
+              <ImportIcon sx={{ fontSize: 18 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Import Document"
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setToolsAnchor(null);
+              setExportAnchor(toolsButtonRef.current);
+            }}
+          >
+            <ListItemIcon>
+              <ExportIcon sx={{ fontSize: 18 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Export Document"
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+        </Menu>
+
+        <ImportContentModal
+          open={isImportModalOpen}
+          onClose={() => setIsImportModalOpen(false)}
+          markdownEditorRef={markdownEditorRef}
+        />
+
+        {/* Export format selection Menu */}
+        <Menu
+          anchorEl={exportAnchor}
+          open={Boolean(exportAnchor)}
+          onClose={() => setExportAnchor(null)}
+          PaperProps={{
+            sx: {
+              borderRadius: '10px',
+              mt: 0.5,
+              minWidth: '190px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              border: '1px solid',
+              borderColor: 'divider',
+            },
+          }}
+        >
+          <MenuItem onClick={() => handleExport('md')}>
+            <ListItemIcon>
+              <ExportIcon sx={{ fontSize: 18 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Markdown (.md)"
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+          <MenuItem onClick={() => handleExport('docx')}>
+            <ListItemIcon>
+              <DescriptionIcon sx={{ fontSize: 18 }} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Word (.docx)"
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+        </Menu>
 
         {/* Source Language selection Menu */}
         <Menu

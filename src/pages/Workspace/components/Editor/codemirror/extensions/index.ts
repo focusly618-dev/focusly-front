@@ -14,6 +14,7 @@ import { syntaxHighlighting, type HighlightStyle } from '@codemirror/language';
 import { markdownExtension } from './markdownLanguage';
 import { livePreviewExtensions } from './livePreview';
 import { imagePasteExtension } from './imagePaste';
+import { diffReviewExtensions } from './diffReview';
 
 export interface BuildMarkdownExtensionsOptions {
   editorThemeCompartment: Compartment;
@@ -38,5 +39,6 @@ export const buildMarkdownExtensions = ({
   highlightCompartment.of(syntaxHighlighting(initialHighlightStyle)),
   ...livePreviewExtensions,
   imagePasteExtension,
+  ...diffReviewExtensions,
   ...(placeholder ? [placeholderExt(placeholder)] : []),
 ];

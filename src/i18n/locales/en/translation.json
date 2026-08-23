@@ -594,6 +594,7 @@
       "folderFallback": "Folder"
     },
     "newFolder": "New Folder",
+    "newWorkspace": "New Workspace",
     "status": {
       "recent": "Recent",
       "draft": "Draft"
