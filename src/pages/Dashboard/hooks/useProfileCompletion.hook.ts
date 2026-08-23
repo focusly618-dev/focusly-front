@@ -17,6 +17,10 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
   const [jobTitle, setJobTitle] = useState((user?.jobTitle as string) || '');
   const [bio, setBio] = useState((user?.bio as string) || '');
   const [profileImage, setProfileImage] = useState(user?.picture || '');
+  // What actually gets persisted via UserUpdate — a bare MinIO object key
+  // after a fresh upload, or whatever `picture` already held (a Google
+  // photo URL, or a previously-uploaded key) if the user never changes it.
+  const [pictureToSave, setPictureToSave] = useState(user?.picture || '');
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
@@ -32,8 +36,9 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
 
     setIsUploadingImage(true);
     try {
-      const publicUrl = await uploadAvatarFile(file);
-      setProfileImage(publicUrl);
+      const { objectKey, previewUrl } = await uploadAvatarFile(file);
+      setProfileImage(previewUrl);
+      setPictureToSave(objectKey);
     } catch (error) {
       console.error('Error uploading avatar:', error);
       sileo.error({
@@ -58,7 +63,7 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
         name: fullName,
         jobTitle,
         bio,
-        picture: profileImage
+        picture: pictureToSave
       };
 
       // Send to backend

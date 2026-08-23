@@ -25,7 +25,8 @@ export const UserUpdate = async (
 
 interface PresignAvatarUploadResponse {
   upload_url: string;
-  public_url: string;
+  object_key: string;
+  preview_url: string;
 }
 
 export const presignAvatarUpload = async (
@@ -37,8 +38,18 @@ export const presignAvatarUpload = async (
   return response.data;
 };
 
-export const uploadAvatarFile = async (file: File): Promise<string> => {
-  const { upload_url, public_url } = await presignAvatarUpload(file.type);
+export interface UploadedAvatar {
+  // Host-agnostic key — this is what should be persisted via UserUpdate's
+  // `picture` field, never the preview URL (the backend resolves the key
+  // into a full URL on every read, so the DB never bakes in a storage host).
+  objectKey: string;
+  // Absolute URL for showing an immediate preview client-side only.
+  previewUrl: string;
+}
+
+export const uploadAvatarFile = async (file: File): Promise<UploadedAvatar> => {
+  const { upload_url, object_key, preview_url } =
+    await presignAvatarUpload(file.type);
 
   await fetch(upload_url, {
     method: 'PUT',
@@ -46,5 +57,5 @@ export const uploadAvatarFile = async (file: File): Promise<string> => {
     headers: { 'Content-Type': file.type },
   });
 
-  return public_url;
+  return { objectKey: object_key, previewUrl: preview_url };
 };
