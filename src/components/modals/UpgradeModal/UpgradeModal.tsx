@@ -10,11 +10,18 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import { sileo } from '@/utils';
 import { LuminaAnimatedFace } from '@/components/ui';
-
-interface UpgradeModalProps {
-  open: boolean;
-  onClose: () => void;
-}
+import type { UpgradeModalProps } from './UpgradeModal.types';
+import { UPGRADE_PLANS } from './UpgradeModal.utils';
+import {
+  dialogPaperSx,
+  planCardSx,
+  popularBadgeSx,
+  bulletRowSx,
+  bulletEmojiSx,
+  bulletTextSx,
+  bulletSubTextStyle,
+  ctaButtonSx,
+} from './UpgradeModal.styles';
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   open,
@@ -34,18 +41,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       open={open}
       onClose={onClose}
       PaperProps={{
-        sx: {
-          borderRadius: '12px',
-          p: 3.5,
-          width: '840px',
-          maxWidth: 'calc(100vw - 32px)',
-          bgcolor: (theme) =>
-            theme.palette.mode === 'dark' ? '#191919' : '#ffffff',
-          backgroundImage: 'none',
-          boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.25)',
-          border: '1px solid',
-          borderColor: 'divider',
-        },
+        sx: dialogPaperSx,
       }}
     >
       {/* Header */}
@@ -88,551 +84,91 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
         gridTemplateColumns={{ xs: '1fr', sm: '1fr', md: 'repeat(3, 1fr)' }}
         gap={3.5}
       >
-        {/* Free Plan */}
-        <Box
-          flex={1}
-          minWidth="220px"
-          sx={{
-            p: 2.2,
-            borderRadius: '8px',
-            border: '1px solid',
-            borderColor: 'divider',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.01)'
-                : 'rgba(0,0,0,0.005)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box>
-            <Typography
-              variant="subtitle2"
-              fontWeight={700}
-              mb={0.5}
-              color="text.primary"
-            >
-              Focusly Free
-            </Typography>
-            <Typography
-              variant="h5"
-              fontWeight={800}
-              mb={2}
-              color="text.primary"
-            >
-              $0
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ ml: 0.5 }}
-              >
-                / siempre gratis
-              </Typography>
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Box display="flex" flexDirection="column" gap={1.75} mb={3}>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
+        {UPGRADE_PLANS.map((plan) => (
+          <Box key={plan.id} sx={planCardSx(plan.featured ? 'featured' : 'default')}>
+            <Box>
+              {plan.popular ? (
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={0.5}
                 >
-                  📋
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={800}
+                    color="primary.main"
+                  >
+                    {plan.name}
+                  </Typography>
+                  <Box sx={popularBadgeSx}>POPULAR</Box>
+                </Box>
+              ) : (
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={700}
+                  mb={0.5}
+                  color="text.primary"
+                >
+                  {plan.name}
                 </Typography>
+              )}
+              <Typography
+                variant="h5"
+                fontWeight={plan.featured ? 850 : 800}
+                mb={2}
+                color="text.primary"
+              >
+                {plan.price}
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
+                  sx={{ ml: 0.5 }}
                 >
-                  Límite de 4 conversaciones
+                  {plan.priceSuffix}
                 </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  ⚡
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  Respuestas básicas del asistente
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  ❌
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  Sin IA en el editor de workspaces
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-
-          <Button
-            disabled
-            fullWidth
-            variant="outlined"
-            sx={{
-              textTransform: 'none',
-              fontWeight: 600,
-              borderRadius: '6px',
-              color: 'text.disabled',
-              borderColor: 'divider',
-              fontSize: '11px',
-            }}
-          >
-            Plan Actual
-          </Button>
-        </Box>
-
-        {/* Pro Plan */}
-        <Box
-          flex={1}
-          minWidth="220px"
-          sx={{
-            p: 2.2,
-            borderRadius: '8px',
-            border: '2px solid',
-            borderColor: 'primary.main',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(99, 102, 241, 0.04)'
-                : 'rgba(99, 102, 241, 0.01)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            boxShadow: '0 4px 16px rgba(99, 102, 241, 0.08)',
-          }}
-        >
-          <Box>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={0.5}
-            >
-              <Typography
-                variant="subtitle2"
-                fontWeight={800}
-                color="primary.main"
-              >
-                Focusly Pro
               </Typography>
-              <Box
-                sx={{
-                  px: 1,
-                  py: 0.25,
-                  borderRadius: '4px',
-                  bgcolor: 'primary.main',
-                  color: 'primary.contrastText',
-                  fontSize: '8px',
-                  fontWeight: 800,
-                }}
-              >
-                POPULAR
+              <Divider sx={{ mb: 2 }} />
+              <Box display="flex" flexDirection="column" gap={1.75} mb={3}>
+                {plan.features.map((feature, index) => (
+                  <Box key={index} sx={bulletRowSx}>
+                    <Typography component="span" sx={bulletEmojiSx}>
+                      {feature.emoji}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={bulletTextSx(feature.highlighted)}
+                    >
+                      {feature.boldText ? (
+                        <>
+                          <strong>{feature.boldText}</strong>
+                          <br />
+                          <span style={bulletSubTextStyle}>
+                            {feature.subText}
+                          </span>
+                        </>
+                      ) : (
+                        feature.text
+                      )}
+                    </Typography>
+                  </Box>
+                ))}
               </Box>
             </Box>
-            <Typography
-              variant="h5"
-              fontWeight={850}
-              mb={2}
-              color="text.primary"
+
+            <Button
+              fullWidth
+              disabled={plan.cta.disabled}
+              variant={plan.cta.variant}
+              onClick={
+                plan.cta.disabled ? undefined : () => handleUpgrade(plan.name)
+              }
+              sx={ctaButtonSx(plan.id)}
             >
-              $8
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ ml: 0.5 }}
-              >
-                / mes
-              </Typography>
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Box display="flex" flexDirection="column" gap={1.75} mb={3}>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  ✨
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  Chats ilimitados con IA
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  📝
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  <strong>Editor de workspaces con IA</strong>
-                  <br />
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: 'var(--mui-palette-text-secondary)',
-                    }}
-                  >
-                    (Genera y expande textos)
-                  </span>
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  🧠
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  Contexto avanzado de tareas
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  📅
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  <strong>Hábitos inteligentes</strong>
-                  <br />
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: 'var(--mui-palette-text-secondary)',
-                    }}
-                  >
-                    (Optimización diaria de rutinas)
-                  </span>
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  📂
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  <strong>Exportación rápida</strong>
-                  <br />
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: 'var(--mui-palette-text-secondary)',
-                    }}
-                  >
-                    (Descarga notas en Markdown y PDF)
-                  </span>
-                </Typography>
-              </Box>
-            </Box>
+              {plan.cta.label}
+            </Button>
           </Box>
-
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => handleUpgrade('Focusly Pro')}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 700,
-              borderRadius: '6px',
-              bgcolor: 'primary.main',
-              color: 'primary.contrastText',
-              boxShadow: 'none',
-              fontSize: '11px',
-              '&:hover': {
-                bgcolor: 'primary.dark',
-                boxShadow: 'none',
-              },
-            }}
-          >
-            Pagar y Desbloquear
-          </Button>
-        </Box>
-
-        {/* Max/Elite Plan */}
-        <Box
-          flex={1}
-          minWidth="220px"
-          sx={{
-            p: 2.2,
-            borderRadius: '8px',
-            border: '1px solid',
-            borderColor: 'divider',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.01)'
-                : 'rgba(0,0,0,0.005)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box>
-            <Typography
-              variant="subtitle2"
-              fontWeight={700}
-              mb={0.5}
-              color="text.primary"
-            >
-              Focusly Elite
-            </Typography>
-            <Typography
-              variant="h5"
-              fontWeight={800}
-              mb={2}
-              color="text.primary"
-            >
-              $15
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ ml: 0.5 }}
-              >
-                / mes
-              </Typography>
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Box display="flex" flexDirection="column" gap={1.75} mb={3}>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  🚀
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  Respuestas rápidas prioritarias
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  🪄
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  <strong>IA en Editor ilimitada</strong>
-                  <br />
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: 'var(--mui-palette-text-secondary)',
-                    }}
-                  >
-                    (Fórmulas, traducción y bloques)
-                  </span>
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  👥
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  Trabajo en equipo colaborativo
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  📈
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  Insights profundos de productividad
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  🛡️
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  <strong>Historial de versiones</strong>
-                  <br />
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: 'var(--mui-palette-text-secondary)',
-                    }}
-                  >
-                    (Respaldos automáticos de workspaces)
-                  </span>
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  🎙️
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  <strong>Notas por voz con IA</strong>
-                  <br />
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: 'var(--mui-palette-text-secondary)',
-                    }}
-                  >
-                    (Transcripción de audios a tareas)
-                  </span>
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  🚀
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  <strong>Modelos de IA premium</strong>
-                  <br />
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: 'var(--mui-palette-text-secondary)',
-                    }}
-                  >
-                    (Acceso a Claude 3 Opus y Gemini Pro)
-                  </span>
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="flex-start" gap={1}>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '13px', lineHeight: 1.3 }}
-                >
-                  🎨
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.primary"
-                  fontWeight={600}
-                  sx={{ fontSize: '11px', lineHeight: 1.4 }}
-                >
-                  <strong>Personalización completa</strong>
-                  <br />
-                  <span
-                    style={{
-                      fontWeight: 400,
-                      color: 'var(--mui-palette-text-secondary)',
-                    }}
-                  >
-                    (Temas y branding a tu medida)
-                  </span>
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => handleUpgrade('Focusly Elite')}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 700,
-              borderRadius: '6px',
-              borderColor: 'primary.main',
-              color: 'primary.main',
-              fontSize: '11px',
-              '&:hover': {
-                borderColor: 'primary.dark',
-                bgcolor: 'rgba(99, 102, 241, 0.04)',
-              },
-            }}
-          >
-            Mejorar a Elite
-          </Button>
-        </Box>
+        ))}
       </Box>
     </Dialog>
   );

@@ -1,8 +1,6 @@
-import { Box, type SvgIconProps } from '@mui/material';
+import { Box } from '@mui/material';
 
-interface FocuslyLogoProps extends SvgIconProps {
-  size?: number;
-}
+import type { FocuslyLogoProps } from './FocuslyLogo.types';
 
 export const FocuslyLogo = ({ size = 24, sx }: FocuslyLogoProps) => {
   return (

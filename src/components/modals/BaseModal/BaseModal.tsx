@@ -7,25 +7,9 @@ import {
   IconButton,
   Typography,
   Box,
-  type SxProps,
-  type Theme,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-
-export interface BaseModalProps {
-  open: boolean;
-  onClose: () => void;
-  title?: string;
-  subtitle?: string;
-  children: React.ReactNode;
-  actions?: React.ReactNode;
-  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
-  fullWidth?: boolean;
-  hideCloseButton?: boolean;
-  icon?: React.ReactNode;
-  iconBgColor?: string;
-  sx?: SxProps<Theme>;
-}
+import type { BaseModalProps } from './BaseModal.types';
 
 export const BaseModal: React.FC<BaseModalProps> = ({
   open,

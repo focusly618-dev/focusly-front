@@ -15,10 +15,7 @@ import {
   changeLanguage,
   type SupportedLanguage,
 } from '@/i18n';
-
-interface LanguageSelectorProps {
-  variant?: 'icon' | 'full';
-}
+import type { LanguageSelectorProps } from './LanguageSelector.types';
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   variant = 'icon',

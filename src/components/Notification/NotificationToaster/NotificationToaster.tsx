@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { sileo, type Notification, type NotificationType } from '@/utils';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded';
-import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
-import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import { sileo, type Notification } from '@/utils';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
+import { getIcon } from './NotificationToaster.utils';
 
 export const NotificationToaster: React.FC = () => {
   const [list, setList] = useState<Notification[]>([]);
@@ -17,36 +13,6 @@ export const NotificationToaster: React.FC = () => {
       setList(notifications);
     });
   }, []);
-
-  const getIcon = (type: NotificationType) => {
-    switch (type) {
-      case 'success':
-        return (
-          <CheckCircleRoundedIcon
-            style={{ color: '#10b981', fontSize: '22px' }}
-          />
-        );
-      case 'error':
-        return (
-          <ErrorRoundedIcon style={{ color: '#ef4444', fontSize: '22px' }} />
-        );
-      case 'warning':
-        return (
-          <WarningRoundedIcon style={{ color: '#f59e0b', fontSize: '22px' }} />
-        );
-      case 'info':
-        return (
-          <InfoRoundedIcon style={{ color: '#3b82f6', fontSize: '22px' }} />
-        );
-      case 'loading':
-        return (
-          <CircularProgress
-            size={20}
-            style={{ color: 'var(--sileo-spinner-color)' }}
-          />
-        );
-    }
-  };
 
   return (
     <div

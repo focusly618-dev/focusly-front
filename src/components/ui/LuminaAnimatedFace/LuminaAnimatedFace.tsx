@@ -1,10 +1,6 @@
 import React from 'react';
 
-interface LuminaAnimatedFaceProps {
-  size?: number;
-  primaryColor?: string;
-  secondaryColor?: string;
-}
+import type { LuminaAnimatedFaceProps } from './LuminaAnimatedFace.types';
 
 /**
  * A custom Notion-style animated face icon modeled after the user's marshmallow character.

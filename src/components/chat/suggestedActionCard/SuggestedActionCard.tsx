@@ -14,13 +14,9 @@ import {
   Add as AddIcon,
 } from '@mui/icons-material';
 
-import { type ParsedLuminaAction } from '@/utils';
 import { surfaceColor } from '@/context';
 import { useSuggestedActionCard } from './useSuggestedActionCard.hook';
-
-interface SuggestedActionCardProps {
-  action: ParsedLuminaAction;
-}
+import type { SuggestedActionCardProps } from './suggestedActionCard.types';
 
 export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
   action,

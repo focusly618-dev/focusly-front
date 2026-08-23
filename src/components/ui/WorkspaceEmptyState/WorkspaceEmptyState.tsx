@@ -10,10 +10,7 @@ import {
 } from '@/pages/Workspace/Workspace.styles';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import BoltIcon from '@mui/icons-material/Bolt';
-
-interface WorkspaceEmptyStateProps {
-  onCreate: () => void;
-}
+import type { WorkspaceEmptyStateProps } from './WorkspaceEmptyState.types';
 
 export const WorkspaceEmptyState = ({ onCreate }: WorkspaceEmptyStateProps) => {
   return (
