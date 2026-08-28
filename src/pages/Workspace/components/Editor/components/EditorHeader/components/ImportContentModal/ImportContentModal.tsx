@@ -217,7 +217,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
       onClose={handleClose}
       title="Import Content"
       subtitle="Bring your existing documents and data into your Focusly workspace."
-      maxWidth="sm"
+      maxWidth={750}
       actions={modalActions}
     >
       <input
@@ -247,7 +247,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
               ? 'rgba(255,255,255,0.12)'
               : 'rgba(0,0,0,0.12)',
           borderRadius: '16px',
-          p: 4,
+          p: 2.5,
           textAlign: 'center',
           cursor: 'pointer',
           bgcolor: isDragOver
@@ -260,14 +260,13 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
         }}
       >
         <CloudUploadIcon
-          sx={{ fontSize: 36, color: 'text.secondary', mb: 1 }}
+          sx={{ fontSize: 28, color: 'text.secondary', mb: 0.5 }}
         />
         <Typography variant="body1" fontWeight={700}>
           Drag & drop files here, or click to browse
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Supports ZIP, PDF, DOCX, XLSX, MD, and TXT files. Maximum file size
-          is 50MB per document.
+          Supports PDF, DOCX, XLSX, MD, and TXT files. Max 50MB per document.
         </Typography>
       </Box>
 
@@ -313,8 +312,8 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
         sx={{
           fontWeight: 700,
           color: 'text.secondary',
-          mt: 3,
-          mb: 1.5,
+          mt: 2,
+          mb: 1,
           display: 'block',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
@@ -326,8 +325,9 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
       <Box
         sx={{
           display: 'grid',
+          width: '100%',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: 1.5,
+          gap: 1,
         }}
       >
         {IMPORT_SOURCES.map((source) => (
@@ -338,7 +338,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 1.25,
-              p: 1.5,
+              p: 1.15,
               borderRadius: '10px',
               border: '1px solid',
               borderColor: isDark
