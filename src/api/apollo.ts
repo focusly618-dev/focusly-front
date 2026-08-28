@@ -16,18 +16,25 @@ const httpLink = createHttpLink({
   credentials: 'include',
 });
 
+interface GraphQLErrorLike {
+  message: string;
+  extensions?: Record<string, unknown>;
+}
+
+const looksUnauthorized = (errors?: readonly GraphQLErrorLike[]) =>
+  !!errors?.some(
+    ({ message, extensions }) =>
+      message.includes('Unauthorized') ||
+      message.includes('not authenticated') ||
+      extensions?.code === 'UNAUTHENTICATED' ||
+      (extensions?.response as { statusCode?: number } | undefined)
+        ?.statusCode === 401,
+  );
+
 const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
     const isUnauthorized =
-      (graphQLErrors &&
-        graphQLErrors.some(
-          ({ message, extensions }) =>
-            message.includes('Unauthorized') ||
-            message.includes('not authenticated') ||
-            extensions?.code === 'UNAUTHENTICATED' ||
-            (extensions?.response as { statusCode?: number } | undefined)
-              ?.statusCode === 401,
-        )) ||
+      looksUnauthorized(graphQLErrors) ||
       (networkError &&
         'statusCode' in networkError &&
         networkError.statusCode === 401);
@@ -46,7 +53,25 @@ const errorLink = onError(
       return new Observable((observer) => {
         refreshAuthToken(user.id)
           .then(() => {
-            forward(operation).subscribe(observer);
+            // Manually inspecting the retried result (rather than piping
+            // `forward(operation)` straight to `observer`) matters: a
+            // retry's errors don't re-enter this onError handler — Apollo
+            // only calls it for the ORIGINAL request in the chain — so
+            // without this check, a token that's still rejected right
+            // after a "successful" refresh (e.g. the account was removed,
+            // or the refresh endpoint lied) would silently hand the caller
+            // a stale "still unauthorized" error forever, with no logout
+            // and no session-expired notice ever firing.
+            forward(operation).subscribe({
+              next: (result) => {
+                if (looksUnauthorized(result.errors)) {
+                  store.dispatch(logout('expired'));
+                }
+                observer.next(result);
+              },
+              error: (err) => observer.error(err),
+              complete: () => observer.complete(),
+            });
           })
           .catch((refreshError) => {
             store.dispatch(logout('expired'));

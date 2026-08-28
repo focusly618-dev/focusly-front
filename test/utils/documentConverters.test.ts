@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import * as XLSX from 'xlsx';
 import {
   getConverter,
-  convertXlsxToMarkdown,
   readFileAsText,
 } from '@/pages/Workspace/components/Editor/components/EditorHeader/components/ImportContentModal/documentConverters';
 
@@ -27,9 +25,9 @@ describe('getConverter — extension dispatch', () => {
     expect(getConverter(makeFile('legacy.doc'))).toBeNull();
   });
 
-  it('routes .xlsx and .xls to the Excel converter', () => {
-    expect(getConverter(makeFile('sheet.xlsx'))).toBe(convertXlsxToMarkdown);
-    expect(getConverter(makeFile('sheet.xls'))).toBe(convertXlsxToMarkdown);
+  it('returns null for .xlsx/.xls — Excel import was removed (naive row-1-as-header conversion produced garbled output on real report exports)', () => {
+    expect(getConverter(makeFile('sheet.xlsx'))).toBeNull();
+    expect(getConverter(makeFile('sheet.xls'))).toBeNull();
   });
 
   it('routes .pdf to the PDF converter', () => {
@@ -40,72 +38,5 @@ describe('getConverter — extension dispatch', () => {
     expect(getConverter(makeFile('archive.zip'))).toBeNull();
     expect(getConverter(makeFile('photo.jpg'))).toBeNull();
     expect(getConverter(makeFile('noextension'))).toBeNull();
-  });
-});
-
-describe('convertXlsxToMarkdown — real workbook conversion', () => {
-  const bufferToFile = (buffer: ArrayBuffer, name: string) =>
-    new File([buffer], name, {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-
-  it('converts a single-sheet workbook into a markdown table with the real header and rows', async () => {
-    const workbook = XLSX.utils.book_new();
-    const sheet = XLSX.utils.aoa_to_sheet([
-      ['Name', 'Score'],
-      ['Alice', 90],
-      ['Bob', 85],
-    ]);
-    XLSX.utils.book_append_sheet(workbook, sheet, 'Sheet1');
-    const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
-
-    const markdown = await convertXlsxToMarkdown(
-      bufferToFile(buffer, 'scores.xlsx'),
-    );
-
-    expect(markdown).toContain('## Sheet1');
-    expect(markdown).toContain('| Name | Score |');
-    expect(markdown).toContain('| --- | --- |');
-    expect(markdown).toContain('| Alice | 90 |');
-    expect(markdown).toContain('| Bob | 85 |');
-  });
-
-  it('converts every sheet in a multi-sheet workbook, each under its own heading', async () => {
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.aoa_to_sheet([['A'], ['1']]),
-      'First',
-    );
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.aoa_to_sheet([['B'], ['2']]),
-      'Second',
-    );
-    const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
-
-    const markdown = await convertXlsxToMarkdown(
-      bufferToFile(buffer, 'multi.xlsx'),
-    );
-
-    expect(markdown).toContain('## First');
-    expect(markdown).toContain('## Second');
-  });
-
-  it('marks a genuinely empty sheet instead of producing a header-only broken table', async () => {
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.aoa_to_sheet([]),
-      'Blank',
-    );
-    const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
-
-    const markdown = await convertXlsxToMarkdown(
-      bufferToFile(buffer, 'blank.xlsx'),
-    );
-
-    expect(markdown).toContain('## Blank');
-    expect(markdown).toContain('_Empty sheet_');
   });
 });
