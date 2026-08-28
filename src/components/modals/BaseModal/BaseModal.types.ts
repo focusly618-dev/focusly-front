@@ -8,7 +8,7 @@ export interface BaseModalProps {
   subtitle?: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
-  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number;
   fullWidth?: boolean;
   hideCloseButton?: boolean;
   icon?: React.ReactNode;

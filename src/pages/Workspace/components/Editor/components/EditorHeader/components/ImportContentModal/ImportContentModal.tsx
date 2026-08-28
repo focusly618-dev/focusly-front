@@ -2,9 +2,7 @@ import { useRef, useState } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
 import {
   CloudUpload as CloudUploadIcon,
-  Description as GoogleDocsIcon,
   Article as WordIcon,
-  TableChart as ExcelIcon,
   PictureAsPdf as PdfIcon,
   Code as MarkdownIcon,
   InsertDriveFileOutlined as FileIcon,
@@ -25,6 +23,7 @@ interface ImportContentModalProps {
 interface ImportSource {
   id: string;
   label: string;
+  description?: string;
   icon: React.ReactNode;
   color: string;
   accept: string;
@@ -33,27 +32,12 @@ interface ImportSource {
 
 const IMPORT_SOURCES: ImportSource[] = [
   {
-    id: 'google',
-    label: 'Google Docs / Drive',
-    icon: <GoogleDocsIcon sx={{ fontSize: 20 }} />,
-    color: '#4285F4',
-    accept: '',
-    supported: false,
-  },
-  {
     id: 'word',
-    label: 'Microsoft Word',
+    label: 'Word & Google Docs',
+    description: 'Import and convert .docx — export Google Docs as Word first',
     icon: <WordIcon sx={{ fontSize: 20 }} />,
     color: '#2B579A',
     accept: '.docx',
-    supported: true,
-  },
-  {
-    id: 'excel',
-    label: 'Microsoft Excel',
-    icon: <ExcelIcon sx={{ fontSize: 20 }} />,
-    color: '#217346',
-    accept: '.xls,.xlsx',
     supported: true,
   },
   {
@@ -109,7 +93,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
 
   const handleBrowseClick = (accept?: string) => {
     if (fileInputRef.current) {
-      fileInputRef.current.accept = accept || '.zip,.pdf,.docx,.xlsx,.md,.txt';
+      fileInputRef.current.accept = accept || '.zip,.pdf,.docx,.md,.txt';
       fileInputRef.current.click();
     }
   };
@@ -191,7 +175,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
     if (unsupportedCount > 0) {
       sileo.info({
         title: 'Some files were skipped',
-        description: `${unsupportedCount} file${unsupportedCount > 1 ? 's' : ''} in a format we don't convert yet (legacy .doc, .zip, or Google Docs/Drive).`,
+        description: `${unsupportedCount} file${unsupportedCount > 1 ? 's' : ''} in a format we don't convert yet (Excel, legacy .doc, or .zip).`,
         fill: 'var(--sileo-info-bg)',
       });
     }
@@ -224,7 +208,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
       onClose={handleClose}
       title="Import Content"
       subtitle="Bring your existing documents and data into your Focusly workspace."
-      maxWidth="sm"
+      maxWidth={750}
       actions={modalActions}
     >
       <input
@@ -254,7 +238,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
               ? 'rgba(255,255,255,0.12)'
               : 'rgba(0,0,0,0.12)',
           borderRadius: '16px',
-          p: 4,
+          p: 2.5,
           textAlign: 'center',
           cursor: 'pointer',
           bgcolor: isDragOver
@@ -267,14 +251,13 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
         }}
       >
         <CloudUploadIcon
-          sx={{ fontSize: 36, color: 'text.secondary', mb: 1 }}
+          sx={{ fontSize: 28, color: 'text.secondary', mb: 0.5 }}
         />
         <Typography variant="body1" fontWeight={700}>
           Drag & drop files here, or click to browse
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Supports ZIP, PDF, DOCX, XLSX, MD, and TXT files. Maximum file size
-          is 50MB per document.
+          Supports PDF, DOCX, MD, and TXT files. Max 50MB per document.
         </Typography>
       </Box>
 
@@ -320,8 +303,8 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
         sx={{
           fontWeight: 700,
           color: 'text.secondary',
-          mt: 3,
-          mb: 1.5,
+          mt: 2,
+          mb: 1,
           display: 'block',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
@@ -333,8 +316,9 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
       <Box
         sx={{
           display: 'grid',
+          width: '100%',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: 1.5,
+          gap: 1,
         }}
       >
         {IMPORT_SOURCES.map((source) => (
@@ -345,7 +329,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 1.25,
-              p: 1.5,
+              p: 1.15,
               borderRadius: '10px',
               border: '1px solid',
               borderColor: isDark
@@ -378,9 +362,10 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
                 {source.label}
               </Typography>
               <Typography variant="caption" color="text.secondary" noWrap>
-                {source.supported
-                  ? 'Import and convert to Focusly format'
-                  : 'Coming soon'}
+                {source.description ??
+                  (source.supported
+                    ? 'Import and convert to Focusly format'
+                    : 'Coming soon')}
               </Typography>
             </Box>
           </Box>

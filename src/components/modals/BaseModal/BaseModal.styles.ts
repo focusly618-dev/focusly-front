@@ -1,11 +1,15 @@
 import type { SxProps, Theme } from '@mui/material';
 
-export const dialogPaperSx = (sx?: SxProps<Theme>): SxProps<Theme> => ({
+export const dialogPaperSx = (
+  sx?: SxProps<Theme>,
+  numericMaxWidth?: number,
+): SxProps<Theme> => ({
   borderRadius: '24px',
   backgroundImage: 'none',
   bgcolor: 'background.paper',
   p: 1,
   boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+  ...(numericMaxWidth !== undefined && { maxWidth: `${numericMaxWidth}px` }),
   ...sx,
 });
 

@@ -28,21 +28,26 @@ export const BaseModal: React.FC<BaseModalProps> = ({
   subtitle,
   children,
   actions,
-  maxWidth = 'xs',
+  maxWidth = 750,
   fullWidth = true,
   hideCloseButton = false,
   icon,
   iconBgColor,
   sx,
 }) => {
+  const isNumericMaxWidth = typeof maxWidth === 'number';
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth={maxWidth}
+      // A numeric maxWidth isn't one of MUI's breakpoint keys — Dialog can't
+      // size to it directly, so we disable Dialog's own constraint and size
+      // the Paper ourselves via dialogPaperSx instead.
+      maxWidth={isNumericMaxWidth ? false : maxWidth}
       fullWidth={fullWidth}
       PaperProps={{
-        sx: dialogPaperSx(sx),
+        sx: dialogPaperSx(sx, isNumericMaxWidth ? maxWidth : undefined),
       }}
     >
       {(title || !hideCloseButton) && (

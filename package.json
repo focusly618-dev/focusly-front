@@ -81,8 +81,7 @@
     "sweetalert2": "^11.26.24",
     "temporal-polyfill": "^0.3.0",
     "turndown": "^7.2.4",
-    "uuid": "^13.0.0",
-    "xlsx": "^0.18.5"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
