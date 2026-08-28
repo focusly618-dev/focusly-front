@@ -3,7 +3,6 @@ import { Box, Typography, useTheme } from '@mui/material';
 import {
   CloudUpload as CloudUploadIcon,
   Article as WordIcon,
-  TableChart as ExcelIcon,
   PictureAsPdf as PdfIcon,
   Code as MarkdownIcon,
   InsertDriveFileOutlined as FileIcon,
@@ -39,14 +38,6 @@ const IMPORT_SOURCES: ImportSource[] = [
     icon: <WordIcon sx={{ fontSize: 20 }} />,
     color: '#2B579A',
     accept: '.docx',
-    supported: true,
-  },
-  {
-    id: 'excel',
-    label: 'Microsoft Excel',
-    icon: <ExcelIcon sx={{ fontSize: 20 }} />,
-    color: '#217346',
-    accept: '.xls,.xlsx',
     supported: true,
   },
   {
@@ -102,7 +93,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
 
   const handleBrowseClick = (accept?: string) => {
     if (fileInputRef.current) {
-      fileInputRef.current.accept = accept || '.zip,.pdf,.docx,.xlsx,.md,.txt';
+      fileInputRef.current.accept = accept || '.zip,.pdf,.docx,.md,.txt';
       fileInputRef.current.click();
     }
   };
@@ -184,7 +175,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
     if (unsupportedCount > 0) {
       sileo.info({
         title: 'Some files were skipped',
-        description: `${unsupportedCount} file${unsupportedCount > 1 ? 's' : ''} in a format we don't convert yet (legacy .doc or .zip).`,
+        description: `${unsupportedCount} file${unsupportedCount > 1 ? 's' : ''} in a format we don't convert yet (Excel, legacy .doc, or .zip).`,
         fill: 'var(--sileo-info-bg)',
       });
     }
@@ -266,7 +257,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
           Drag & drop files here, or click to browse
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Supports PDF, DOCX, XLSX, MD, and TXT files. Max 50MB per document.
+          Supports PDF, DOCX, MD, and TXT files. Max 50MB per document.
         </Typography>
       </Box>
 
