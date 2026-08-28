@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
 import {
   CloudUpload as CloudUploadIcon,
-  Description as GoogleDocsIcon,
   Article as WordIcon,
   TableChart as ExcelIcon,
   PictureAsPdf as PdfIcon,
@@ -25,6 +24,7 @@ interface ImportContentModalProps {
 interface ImportSource {
   id: string;
   label: string;
+  description?: string;
   icon: React.ReactNode;
   color: string;
   accept: string;
@@ -33,16 +33,9 @@ interface ImportSource {
 
 const IMPORT_SOURCES: ImportSource[] = [
   {
-    id: 'google',
-    label: 'Google Docs / Drive',
-    icon: <GoogleDocsIcon sx={{ fontSize: 20 }} />,
-    color: '#4285F4',
-    accept: '',
-    supported: false,
-  },
-  {
     id: 'word',
-    label: 'Microsoft Word',
+    label: 'Word & Google Docs',
+    description: 'Import and convert .docx — export Google Docs as Word first',
     icon: <WordIcon sx={{ fontSize: 20 }} />,
     color: '#2B579A',
     accept: '.docx',
@@ -191,7 +184,7 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
     if (unsupportedCount > 0) {
       sileo.info({
         title: 'Some files were skipped',
-        description: `${unsupportedCount} file${unsupportedCount > 1 ? 's' : ''} in a format we don't convert yet (legacy .doc, .zip, or Google Docs/Drive).`,
+        description: `${unsupportedCount} file${unsupportedCount > 1 ? 's' : ''} in a format we don't convert yet (legacy .doc or .zip).`,
         fill: 'var(--sileo-info-bg)',
       });
     }
@@ -378,9 +371,10 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
                 {source.label}
               </Typography>
               <Typography variant="caption" color="text.secondary" noWrap>
-                {source.supported
-                  ? 'Import and convert to Focusly format'
-                  : 'Coming soon'}
+                {source.description ??
+                  (source.supported
+                    ? 'Import and convert to Focusly format'
+                    : 'Coming soon')}
               </Typography>
             </Box>
           </Box>
