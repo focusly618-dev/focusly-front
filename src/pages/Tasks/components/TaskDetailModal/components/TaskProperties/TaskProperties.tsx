@@ -38,7 +38,7 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 import { surfaceColor } from '@/context';
 import {
   propertyRowSx,
@@ -116,6 +116,7 @@ interface TaskPropertiesProps {
   handleRemoveTimeLog: (index: number) => void;
   isOwner?: boolean;
   createdAt?: string;
+  deadline?: string;
 }
 
 export const TaskProperties = ({
@@ -148,6 +149,7 @@ export const TaskProperties = ({
   handleRemoveTimeLog,
   isOwner,
   createdAt,
+  deadline,
 }: TaskPropertiesProps) => {
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(
@@ -177,6 +179,17 @@ export const TaskProperties = ({
   const [newLogDate, setNewLogDate] = useState<Date | null>(new Date());
   const [newLogDatePickerOpen, setNewLogDatePickerOpen] = useState(false);
   const [newLogDuration, setNewLogDuration] = useState('');
+
+  // The auto-scheduler can move a task's planned slot to a different day
+  // than its actual due date (e.g. bumping a weekend deadline to the next
+  // working day). `currentDate` here reflects the scheduled slot — show the
+  // real due date alongside it whenever the two fall on different days, so
+  // this never looks like it silently disagrees with the "Due Date" shown
+  // in the task list.
+  const deadlineDate =
+    deadline && !isNaN(new Date(deadline).getTime()) ? new Date(deadline) : null;
+  const hasDifferentDueDate =
+    deadlineDate && currentDate && !isSameDay(deadlineDate, currentDate);
 
   return (
     <Box sx={propertiesContainerSx}>
@@ -435,7 +448,7 @@ export const TaskProperties = ({
                   fontWeight: 600,
                 }}
               >
-                Date
+                Scheduled Date
               </Typography>
               <Box sx={{ position: 'relative' }}>
                 <Box
@@ -471,6 +484,19 @@ export const TaskProperties = ({
                   <PlannedIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
                   {currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
                 </Box>
+                {hasDifferentDueDate && deadlineDate && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: 'block',
+                      mt: 0.5,
+                      fontSize: '11px',
+                      color: 'text.secondary',
+                    }}
+                  >
+                    Due {format(deadlineDate, 'PPP')}
+                  </Typography>
+                )}
                 <DatePicker
                   open={datePickerOpen}
                   onClose={() => setDatePickerOpen(false)}

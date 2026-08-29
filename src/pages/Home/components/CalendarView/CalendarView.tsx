@@ -22,7 +22,11 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 // Components
 import { CalendarToolbar } from '../CalendarToolbar';
 import { CalendarHeader } from '../CalendarHeader';
-import { CalendarEvent, type ICalendarEvent } from '../CalendarEvent';
+import {
+  CalendarEvent,
+  CalendarEventSkeleton,
+  type ICalendarEvent,
+} from '../CalendarEvent';
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
 import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
@@ -79,6 +83,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const {
     events,
+    skeletonEvents,
+    isCalendarLoading,
     currentView,
     currentDate,
     handleOnChangeView,
@@ -377,7 +383,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         >
           <DnDCalendar
             localizer={localizer}
-            events={events}
+            events={isCalendarLoading ? [...events, ...skeletonEvents] : events}
             startAccessor="start"
             endAccessor="end"
             view={currentView}
@@ -388,6 +394,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             onSelectEvent={handleSelectEvent}
             onEventDrop={handleEventDrop}
             onEventResize={handleEventResize}
+            draggableAccessor={(event: ICalendarEvent) => event.type !== 'skeleton'}
+            resizableAccessor={(event: ICalendarEvent) => event.type !== 'skeleton'}
             scrollToTime={scrollToTime}
             dayPropGetter={dayPropGetter}
             slotPropGetter={slotPropGetter}
@@ -408,14 +416,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               ),
               header: CalendarHeader,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              event: (props: any) => (
-                <CalendarEvent
-                  {...props}
-                  onStartFocus={onStartFocus}
-                  currentView={currentView}
-                  onDeleteDraft={handleDeleteDraft}
-                />
-              ),
+              event: (props: any) =>
+                props.event.type === 'skeleton' ? (
+                  <CalendarEventSkeleton
+                    colorIndex={Number(props.event.id.split('-')[1]) || 0}
+                  />
+                ) : (
+                  <CalendarEvent
+                    {...props}
+                    onStartFocus={onStartFocus}
+                    currentView={currentView}
+                    onDeleteDraft={handleDeleteDraft}
+                  />
+                ),
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               timeSlotWrapper: (props: any) => (
                 <CalendarSlotWrapper

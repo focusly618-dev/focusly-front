@@ -98,6 +98,13 @@ export const useTasksFilters = (
       // Filter by date range
       if (dateRange !== 'all') {
         result = result.filter((task) => {
+          // Bucket by the same date the calendar positions this task on
+          // (useCalendarView.hook.ts also prefers estimated_start_date),
+          // so a task the auto-scheduler moved off its deadline (e.g. bumped
+          // from a weekend deadline to the next working day) lands in the
+          // same Today/Week/Month bucket here as it does on the calendar.
+          // The per-row "Due Date" column (ListViewTask.tsx) still shows the
+          // raw deadline regardless — that's independent, informational.
           const dateToUse =
             task.estimated_start_date ||
             task.deadline ||

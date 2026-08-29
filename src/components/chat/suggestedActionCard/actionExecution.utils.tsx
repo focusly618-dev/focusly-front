@@ -178,6 +178,10 @@ export const executeSingleAction = async (
           user_id: ctx.userId,
           status: 'Backlog',
           use_ai: true,
+          // The user picked this exact day on purpose (a day-by-day plan,
+          // including deliberate weekend days) — never let the
+          // auto-scheduler move it to a different "working day".
+          skip_scheduling: true,
         },
       },
       refetchQueries: [
