@@ -42,6 +42,10 @@ export const Tasks = ({
     setSearchTerm,
     dateRange,
     setDateRange,
+    referenceDate,
+    goToPreviousPeriod,
+    goToNextPeriod,
+    periodLabel,
 
     activeSort,
     activeFilters,
@@ -156,6 +160,10 @@ export const Tasks = ({
             filteredTasks={filteredTasks}
             dateRange={dateRange}
             setDateRange={setDateRange}
+            referenceDate={referenceDate}
+            periodLabel={periodLabel}
+            onGoToPreviousPeriod={goToPreviousPeriod}
+            onGoToNextPeriod={goToNextPeriod}
             setViewMode={setViewMode}
           />
 

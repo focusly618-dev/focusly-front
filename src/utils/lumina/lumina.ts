@@ -1,27 +1,48 @@
 import type { LuminaActionPayload, ParsedLuminaAction } from './lumina.types';
 
-export const parseLuminaAction = (
+const ACTION_TAG_REGEX = /\[ACTION:\s*([A-Z_]+)\s*(\{.*?\})\]/gs;
+// Matches the opening of a tag that hasn't closed yet (still streaming in
+// token by token) — used to hide the raw fragment instead of flashing it.
+const PENDING_ACTION_MARKER = /\[ACTION:/;
+
+/**
+ * A plan spanning several days/weeks (e.g. a month-long research plan)
+ * legitimately emits one ACTION tag per task — extract every one of them,
+ * not just the first, so the user sees the whole plan, not one task.
+ */
+export const parseLuminaActions = (
   text: string,
-): { cleanText: string; action: ParsedLuminaAction | null } => {
-  const regex = /\[ACTION:\s*([A-Z_]+)\s*(\{.*?\})\]/s;
-  const match = text.match(regex);
-  if (!match) {
-    return { cleanText: text, action: null };
+): {
+  cleanText: string;
+  actions: ParsedLuminaAction[];
+  hasPendingAction: boolean;
+} => {
+  const actions: ParsedLuminaAction[] = [];
+  const regex = new RegExp(ACTION_TAG_REGEX);
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    try {
+      actions.push({
+        type: match[1] as ParsedLuminaAction['type'],
+        payload: JSON.parse(match[2]) as LuminaActionPayload,
+      });
+    } catch (e) {
+      console.error('Failed to parse Lumina Action JSON:', e);
+    }
   }
 
-  const cleanText = text.replace(regex, '').trim();
-  try {
-    const actionType = match[1] as ParsedLuminaAction['type'];
-    const payload = JSON.parse(match[2]) as LuminaActionPayload;
-    return {
-      cleanText,
-      action: {
-        type: actionType,
-        payload,
-      },
-    };
-  } catch (e) {
-    console.error('Failed to parse Lumina Action JSON:', e);
-    return { cleanText: text, action: null };
-  }
+  const strippedText = text.replace(new RegExp(ACTION_TAG_REGEX), '').trim();
+
+  // Anything left after stripping every *complete* tag can only be a tag
+  // that's still being generated (opened with "[ACTION:" but not yet
+  // closed) — cut it from what's shown and flag it so the caller can
+  // render a loading state instead of raw, half-typed JSON.
+  const pendingIndex = strippedText.search(PENDING_ACTION_MARKER);
+  const hasPendingAction = pendingIndex !== -1;
+  const cleanText = hasPendingAction
+    ? strippedText.slice(0, pendingIndex).trim()
+    : strippedText;
+
+  return { cleanText, actions, hasPendingAction };
 };

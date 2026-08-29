@@ -1,11 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  isToday,
+  isSameDay,
+  isSameWeek,
+  isSameMonth,
   isWithinInterval,
   startOfWeek,
   endOfWeek,
   startOfMonth,
   endOfMonth,
+  addDays,
+  subDays,
+  addWeeks,
+  subWeeks,
+  addMonths,
+  subMonths,
+  format,
 } from 'date-fns';
 import type {
   TaskResponse,
@@ -31,14 +40,56 @@ export const useTasksFilters = (
     undefined,
   );
 
-  const [dateRange, setDateRange] = useState<DateRangeFilter>(() => {
+  const [dateRange, setDateRangeState] = useState<DateRangeFilter>(() => {
     const saved = localStorage.getItem('tasksDateRange');
     return (saved as DateRangeFilter) || 'all';
   });
+  const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
 
   useEffect(() => {
     localStorage.setItem('tasksDateRange', dateRange);
   }, [dateRange]);
+
+  const setDateRange = useCallback((range: DateRangeFilter) => {
+    setDateRangeState(range);
+    setReferenceDate(new Date());
+  }, []);
+
+  const goToPreviousPeriod = useCallback(() => {
+    setReferenceDate((prev) => {
+      if (dateRange === 'today') return subDays(prev, 1);
+      if (dateRange === 'this_week') return subWeeks(prev, 1);
+      if (dateRange === 'this_month') return subMonths(prev, 1);
+      return prev;
+    });
+  }, [dateRange]);
+
+  const goToNextPeriod = useCallback(() => {
+    setReferenceDate((prev) => {
+      if (dateRange === 'today') return addDays(prev, 1);
+      if (dateRange === 'this_week') return addWeeks(prev, 1);
+      if (dateRange === 'this_month') return addMonths(prev, 1);
+      return prev;
+    });
+  }, [dateRange]);
+
+  let periodLabel: string;
+  const realNow = new Date();
+  if (dateRange === 'today') {
+    periodLabel = isSameDay(referenceDate, realNow)
+      ? 'Today'
+      : format(referenceDate, 'EEE, MMM d');
+  } else if (dateRange === 'this_week') {
+    periodLabel = isSameWeek(referenceDate, realNow, { weekStartsOn: 1 })
+      ? 'This Week'
+      : `${format(startOfWeek(referenceDate, { weekStartsOn: 1 }), 'MMM d')} – ${format(endOfWeek(referenceDate, { weekStartsOn: 1 }), 'MMM d')}`;
+  } else if (dateRange === 'this_month') {
+    periodLabel = isSameMonth(referenceDate, realNow)
+      ? 'This Month'
+      : format(referenceDate, 'MMMM yyyy');
+  } else {
+    periodLabel = 'All Tasks';
+  }
 
   const applyLocalFilters = useCallback(
     (tasksToFilter: TaskResponse[]) => {
@@ -57,23 +108,22 @@ export const useTasksFilters = (
           if (!dateToUse) return false;
 
           const taskDate = new Date(dateToUse);
-          const now = new Date();
 
           if (dateRange === 'today') {
-            return isToday(taskDate);
+            return isSameDay(taskDate, referenceDate);
           }
 
           if (dateRange === 'this_week') {
-            const start = startOfWeek(now, { weekStartsOn: 1 });
-            const end = endOfWeek(now, { weekStartsOn: 1 });
+            const start = startOfWeek(referenceDate, { weekStartsOn: 1 });
+            const end = endOfWeek(referenceDate, { weekStartsOn: 1 });
             return isWithinInterval(taskDate, { start, end });
           }
 
           if (dateRange === 'this_month') {
-            const startMonth = startOfMonth(now);
-            const startWeek = startOfWeek(now, { weekStartsOn: 1 });
+            const startMonth = startOfMonth(referenceDate);
+            const startWeek = startOfWeek(referenceDate, { weekStartsOn: 1 });
             const start = startWeek < startMonth ? startWeek : startMonth;
-            const end = endOfMonth(now);
+            const end = endOfMonth(referenceDate);
             return isWithinInterval(taskDate, { start, end });
           }
 
@@ -113,6 +163,7 @@ export const useTasksFilters = (
     },
     [
       dateRange,
+      referenceDate,
       searchTerm,
       activeFilterState?.statuses?.length,
       activeFilterState?.categories,
@@ -204,6 +255,10 @@ export const useTasksFilters = (
     activeSort,
     dateRange,
     setDateRange,
+    referenceDate,
+    goToPreviousPeriod,
+    goToNextPeriod,
+    periodLabel,
 
     handleApplySort,
     handleApplyFilters,

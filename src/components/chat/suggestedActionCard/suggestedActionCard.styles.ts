@@ -1,4 +1,5 @@
 import type { SxProps, Theme } from '@mui/material';
+import { alpha } from '@mui/material';
 import { surfaceColor } from '@/context';
 
 export const cardSx = (theme: Theme): SxProps<Theme> => ({
@@ -29,10 +30,45 @@ export const headerRowSx: SxProps<Theme> = {
   mb: 1,
 };
 
-export const detailsTextSx: SxProps<Theme> = {
+export const previewBoxSx = (theme: Theme): SxProps<Theme> => ({
   mb: 2,
-  fontSize: '13px',
+  p: 1.4,
+  borderRadius: '8px',
+  border: `1px solid ${theme.palette.divider}`,
+  bgcolor: alpha(theme.palette.background.default, 0.4),
+});
+
+export const previewTitleSx: SxProps<Theme> = {
+  fontSize: '13.5px',
+  lineHeight: 1.4,
 };
+
+export const previewDescriptionSx: SxProps<Theme> = {
+  fontSize: '12.5px',
+  lineHeight: 1.45,
+  mt: 0.4,
+};
+
+export const previewMetaRowSx: SxProps<Theme> = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 0.8,
+  mt: 1,
+  flexWrap: 'wrap',
+};
+
+export const metaChipSx = (color?: string): SxProps<Theme> => ({
+  height: 20,
+  fontSize: '10.5px',
+  fontWeight: 700,
+  borderRadius: '5px',
+  color: color || 'text.secondary',
+  bgcolor: color ? alpha(color, 0.14) : 'action.hover',
+  '& .MuiChip-icon': {
+    color: color || 'inherit',
+    ml: 0.5,
+  },
+});
 
 export const errorTextSx: SxProps<Theme> = {
   mb: 2,

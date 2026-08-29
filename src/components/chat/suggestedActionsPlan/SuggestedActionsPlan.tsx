@@ -1,0 +1,187 @@
+import React from 'react';
+import {
+  Card,
+  CardContent,
+  Box,
+  Typography,
+  Button,
+  Dialog,
+  IconButton,
+  Chip,
+  CircularProgress,
+  useTheme,
+} from '@mui/material';
+import {
+  Close as CloseIcon,
+  EventNote as EventNoteIcon,
+  CheckCircle as CheckCircleIcon,
+  ErrorOutline as ErrorOutlineIcon,
+  Add as AddIcon,
+} from '@mui/icons-material';
+import { cardSx } from '../suggestedActionCard/suggestedActionCard.styles';
+import {
+  getActionPreviewData,
+  getActionTitle,
+} from '../suggestedActionCard/actionExecution.utils';
+import { useSuggestedActionsPlan } from './useSuggestedActionsPlan.hook';
+import type { SuggestedActionsPlanProps } from './SuggestedActionsPlan.types';
+import {
+  summaryCardContentSx,
+  summaryTextRowSx,
+  previewButtonSx,
+  dialogPaperSx,
+  dialogHeaderSx,
+  dialogListSx,
+  planRowSx,
+  planRowDateChipSx,
+  planRowTitleSx,
+  dialogFooterSx,
+  createAllButtonSx,
+} from './SuggestedActionsPlan.styles';
+
+export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
+  actions,
+}) => {
+  const theme = useTheme();
+  const {
+    open,
+    setOpen,
+    isCompleted,
+    isCreating,
+    itemStatuses,
+    errorMessage,
+    handleCreateAll,
+  } = useSuggestedActionsPlan(actions);
+
+  const previews = actions.map((action) => getActionPreviewData(action));
+
+  return (
+    <>
+      <Card sx={cardSx(theme)}>
+        <CardContent sx={summaryCardContentSx}>
+          <Box sx={summaryTextRowSx}>
+            <EventNoteIcon
+              sx={{ fontSize: 20, color: theme.palette.primary.main }}
+            />
+            <Box minWidth={0}>
+              <Typography
+                variant="subtitle2"
+                fontWeight={800}
+                color="text.primary"
+              >
+                Plan sugerido · {actions.length} tareas
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {isCompleted
+                  ? 'Ya agregado a tu calendario'
+                  : 'Revisa las fechas antes de agregarlas'}
+              </Typography>
+            </Box>
+          </Box>
+
+          {isCompleted ? (
+            <Chip
+              size="small"
+              icon={<CheckCircleIcon sx={{ fontSize: 14 }} />}
+              label="Creadas"
+              color="success"
+              variant="outlined"
+            />
+          ) : (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setOpen(true)}
+              sx={previewButtonSx}
+            >
+              Preview
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{ sx: dialogPaperSx }}
+      >
+        <Box sx={dialogHeaderSx}>
+          <Typography variant="subtitle1" fontWeight={800} color="text.primary">
+            Plan sugerido · {actions.length} tareas
+          </Typography>
+          <IconButton size="small" onClick={() => setOpen(false)}>
+            <CloseIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+
+        <Box sx={dialogListSx}>
+          {actions.map((action, idx) => {
+            const preview = previews[idx];
+            const status = itemStatuses[idx];
+            return (
+              <Box key={idx} sx={planRowSx}>
+                {preview.dateLabel ? (
+                  <Chip
+                    size="small"
+                    label={preview.dateLabel}
+                    sx={planRowDateChipSx(theme.palette.primary.main)}
+                  />
+                ) : (
+                  <Chip
+                    size="small"
+                    label={getActionTitle(action)}
+                    sx={planRowDateChipSx(theme.palette.text.secondary)}
+                  />
+                )}
+                <Typography sx={planRowTitleSx} color="text.primary">
+                  {preview.title || getActionTitle(action)}
+                </Typography>
+                {status === 'creating' && (
+                  <CircularProgress size={14} sx={{ flexShrink: 0 }} />
+                )}
+                {status === 'done' && (
+                  <CheckCircleIcon
+                    sx={{ fontSize: 16, color: 'success.main', flexShrink: 0 }}
+                  />
+                )}
+                {status === 'error' && (
+                  <ErrorOutlineIcon
+                    sx={{ fontSize: 16, color: 'error.main', flexShrink: 0 }}
+                  />
+                )}
+              </Box>
+            );
+          })}
+        </Box>
+
+        <Box sx={dialogFooterSx}>
+          {errorMessage && (
+            <Typography variant="caption" color="error.main">
+              {errorMessage}
+            </Typography>
+          )}
+          <Button
+            variant="contained"
+            fullWidth
+            disabled={isCreating || isCompleted}
+            onClick={handleCreateAll}
+            startIcon={
+              isCreating ? (
+                <CircularProgress size={14} color="inherit" />
+              ) : (
+                <AddIcon sx={{ fontSize: 16 }} />
+              )
+            }
+            sx={createAllButtonSx}
+          >
+            {isCompleted
+              ? 'Ya creadas'
+              : isCreating
+                ? 'Creando...'
+                : `Crear las ${actions.length} tareas`}
+          </Button>
+        </Box>
+      </Dialog>
+    </>
+  );
+};

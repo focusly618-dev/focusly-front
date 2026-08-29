@@ -29,5 +29,9 @@ export interface TasksControlsBarProps {
   filteredTasks: TaskResponse[];
   dateRange: DateRangeFilter;
   setDateRange: (range: DateRangeFilter) => void;
+  referenceDate: Date;
+  periodLabel: string;
+  onGoToPreviousPeriod: () => void;
+  onGoToNextPeriod: () => void;
   setViewMode: (mode: 'list' | 'grid' | 'board' | 'workload') => void;
 }

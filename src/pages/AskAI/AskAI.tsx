@@ -37,8 +37,13 @@ import {
   type AIConversation,
 } from '@/api/AI/apiAI';
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
+import { SuggestedActionsPlan } from '@/components/chat/suggestedActionsPlan/SuggestedActionsPlan';
 import { UpgradeModal } from '@/components/modals';
-import { parseLuminaAction, sileo } from '@/utils';
+import {
+  parseLuminaActions,
+  sileo,
+  type ParsedLuminaAction,
+} from '@/utils';
 import { surfaceColor } from '@/context';
 import {
   AskAIContainer,
@@ -53,6 +58,7 @@ import {
   UserAvatar,
   MessageBubble,
   TypingIndicator,
+  LuminaWorkingIndicator,
   InputWrapper,
   InputBox,
   StyledInput,
@@ -70,6 +76,12 @@ interface Message {
   sender: 'user' | 'ai';
   text: string;
   html?: string;
+  // Populated only for messages loaded from history — the backend already
+  // parsed these out of the raw `[ACTION: ...]` tags before they ever left
+  // the server, so we don't need (and shouldn't rely on) client-side regex
+  // parsing of persisted content. A single AI reply can suggest several
+  // tasks (e.g. one per week of a month-long plan), hence the array.
+  actions?: ParsedLuminaAction[];
 }
 
 // ─── Suggestion cards data ────────────────────────────────────────────────────
@@ -383,6 +395,7 @@ export const AskAI: React.FC = () => {
           sender: m.role === 'user' ? 'user' : 'ai',
           text: m.content,
           html: renderMarkdown(m.content, theme.palette.mode === 'dark', theme),
+          actions: m.actions ?? [],
         })),
       );
     } catch (err) {
@@ -853,9 +866,21 @@ export const AskAI: React.FC = () => {
               <Box display="flex" flexDirection="column" gap={1.5} py={3}>
                 {messages.map((msg) => {
                   const isUser = msg.sender === 'user';
-                  const { cleanText, action } = parseLuminaAction(msg.text);
+                  const {
+                    cleanText,
+                    actions: liveActions,
+                    hasPendingAction: livePendingAction,
+                  } = parseLuminaActions(msg.text);
+                  // Historical messages already carry the backend-parsed
+                  // actions; only fall back to the client-side regex (and
+                  // its "still streaming a tag" flag) for the message
+                  // currently being streamed in.
+                  const actions =
+                    msg.actions !== undefined ? msg.actions : liveActions;
+                  const hasPendingAction =
+                    msg.actions === undefined && livePendingAction;
 
-                  if (!isUser && !cleanText.trim()) {
+                  if (!isUser && !cleanText.trim() && !hasPendingAction) {
                     return null;
                   }
 
@@ -896,18 +921,35 @@ export const AskAI: React.FC = () => {
                           }}
                         >
                           <MessageBubble isUser={isUser}>
-                            {cleanHtml ? (
-                              <div
-                                dangerouslySetInnerHTML={{ __html: cleanHtml }}
-                                style={{ lineHeight: 1.65, fontSize: '14px' }}
-                              />
-                            ) : (
-                              <Typography
-                                variant="body2"
-                                sx={{ whiteSpace: 'pre-wrap' }}
+                            {cleanText &&
+                              (cleanHtml ? (
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: cleanHtml,
+                                  }}
+                                  style={{ lineHeight: 1.65, fontSize: '14px' }}
+                                />
+                              ) : (
+                                <Typography
+                                  variant="body2"
+                                  sx={{ whiteSpace: 'pre-wrap' }}
+                                >
+                                  {cleanText}
+                                </Typography>
+                              ))}
+                            {hasPendingAction && (
+                              <LuminaWorkingIndicator
+                                sx={cleanText ? { mt: 1 } : undefined}
                               >
-                                {cleanText}
-                              </Typography>
+                                <span className="shimmer-text">
+                                  Lumina está trabajando
+                                </span>
+                                <span className="pulse-dots">
+                                  <span className="pulse-dot" />
+                                  <span className="pulse-dot" />
+                                  <span className="pulse-dot" />
+                                </span>
+                              </LuminaWorkingIndicator>
                             )}
                           </MessageBubble>
                           <Tooltip title="Regenerate/Retry" placement="top">
@@ -930,8 +972,11 @@ export const AskAI: React.FC = () => {
                             </IconButton>
                           </Tooltip>
                         </Box>
-                        {!isUser && action && (
-                          <SuggestedActionCard action={action} />
+                        {!isUser && actions.length === 1 && (
+                          <SuggestedActionCard action={actions[0]} />
+                        )}
+                        {!isUser && actions.length > 1 && (
+                          <SuggestedActionsPlan actions={actions} />
                         )}
                       </Box>
 

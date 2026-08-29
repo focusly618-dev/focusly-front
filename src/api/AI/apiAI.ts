@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '@/config/env.config';
 import axios from 'axios';
 import type { AIMessage, AITaskContext } from './apiAI.types';
+import type { ParsedLuminaAction } from '@/utils/lumina/lumina.types';
 
 const getAIEndpoint = () => {
   const isDev = import.meta.env.DEV;
@@ -216,6 +217,7 @@ export interface ConversationMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  actions?: ParsedLuminaAction[];
   createdAt: string;
 }
 

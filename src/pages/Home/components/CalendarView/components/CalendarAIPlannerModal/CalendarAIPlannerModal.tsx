@@ -142,31 +142,47 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
     setScheduling(true);
     try {
       for (const item of proposedEvents) {
+        const targetTask = item.taskId
+          ? tasks.find((t) => t.id === item.taskId)
+          : undefined;
+
+        // The LLM only picks a start time within a free slot — it must
+        // never be trusted to also compute the end time by hand. It has
+        // hallucinated multi-day spans (e.g. a 3h task ending 25h later)
+        // when asked to do that arithmetic itself. The task's own
+        // estimate_timer (minutes) is already known, so derive endTime
+        // deterministically instead of using item.endTime verbatim.
+        const startDate = new Date(item.startTime);
+        const durationMinutes = targetTask?.estimate_timer || 30;
+        const endTime =
+          targetTask && !Number.isNaN(startDate.getTime())
+            ? new Date(
+                startDate.getTime() + durationMinutes * 60000,
+              ).toISOString()
+            : item.endTime;
+
         // 1. Crear el TimeBlock en BD
         await createTimeBlock({
           userId: user.id,
           taskId: item.taskId,
           startTime: item.startTime,
-          endTime: item.endTime,
+          endTime,
           blockType: 'Focus_Block',
           source: 'App',
           title: item.title,
         });
 
         // 2. Mover la tarea al nuevo slot en el calendario
-        if (item.taskId) {
-          const targetTask = tasks.find((t) => t.id === item.taskId);
-          if (targetTask) {
-            await updateTaskMutation({
-              variables: {
-                updateTaskInput: {
-                  id: targetTask.id,
-                  estimated_start_date: item.startTime,
-                  estimated_end_date: item.endTime,
-                },
+        if (targetTask) {
+          await updateTaskMutation({
+            variables: {
+              updateTaskInput: {
+                id: targetTask.id,
+                estimated_start_date: item.startTime,
+                estimated_end_date: endTime,
               },
-            });
-          }
+            },
+          });
         }
       }
 
