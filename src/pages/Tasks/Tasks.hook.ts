@@ -9,11 +9,15 @@ import { useTasksMutations } from '@/pages/Tasks/hooks/useTasksMutations.hook';
 import { useTasksUI } from '@/pages/Tasks/hooks/useTasksUI.hook';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
+// The table reveals rows progressively (24 at a time, see
+// useTasksContentView) but the server has no real "next page" wiring yet, so
+// we fetch a limit high enough to cover a user's whole task list in one
+// request rather than silently capping it at a handful of rows.
+const TASKS_FETCH_LIMIT = 500;
+
 export const useTasks = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [, setSearchParams] = useSearchParams();
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
   const [tagSearchTerm, setTagSearchTerm] = useState('');
 
   // ── View & UI local state ──────────────────────────────────────────
@@ -37,21 +41,32 @@ export const useTasks = () => {
     const merged = {
       ...filterLogic.activeFilters,
       ...filterLogic.dateRangeFilter,
+      // Send the search box to the server too, so it can find matches
+      // outside whatever page/window has already been fetched.
+      ...(filterLogic.searchTerm ? { searchTerm: filterLogic.searchTerm } : {}),
     };
     return Object.keys(merged).length > 0 ? merged : undefined;
-  }, [filterLogic.activeFilters, filterLogic.dateRangeFilter]);
+  }, [
+    filterLogic.activeFilters,
+    filterLogic.dateRangeFilter,
+    filterLogic.searchTerm,
+  ]);
 
   const data = useTasksData({
     userId: user?.id,
     filters: queryFilters,
     sort: filterLogic.activeSort,
-    offset: page * pageSize,
-    limit: pageSize,
+    offset: 0,
+    limit: TASKS_FETCH_LIMIT,
   });
 
   const mutations = useTasksMutations({
     userId: user?.id,
     tasks: data.tasks,
+    filters: queryFilters,
+    sort: filterLogic.activeSort,
+    offset: 0,
+    limit: TASKS_FETCH_LIMIT,
     onSuccess: ui.triggerToast,
   });
 
@@ -157,10 +172,6 @@ export const useTasks = () => {
     pendingTasksCount: data.pendingTasksCount,
     filteredTasks,
     tags,
-    page,
-    setPage,
-    pageSize,
-    setPageSize,
 
     // Filters & search
     searchTerm: filterLogic.searchTerm,

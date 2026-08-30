@@ -64,10 +64,6 @@ export const Tasks = ({
     handleApplySort,
     handleFinishOnboarding,
     deleteTasks,
-    page,
-    setPage,
-    pageSize,
-    setPageSize,
   } = useTasks();
 
   const isAIScheduleEnabled = isAIScheduleEnabledProp;
@@ -235,13 +231,6 @@ export const Tasks = ({
               searchTerm={searchTerm}
               dateRange={dateRange}
               totalCount={totalCount}
-              page={page}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={(newSize) => {
-                setPageSize(newSize);
-                setPage(0);
-              }}
             />
           </Box>
         </MainContent>

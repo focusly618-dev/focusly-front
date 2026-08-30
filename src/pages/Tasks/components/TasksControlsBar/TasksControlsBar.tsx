@@ -277,6 +277,7 @@ export const TasksControlsBar = ({
               },
             }}
           >
+            <MenuItem value="all">All Tasks</MenuItem>
             <MenuItem value="today">Today</MenuItem>
             <MenuItem value="this_week">This Week</MenuItem>
             <MenuItem value="this_month">This Month</MenuItem>

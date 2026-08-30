@@ -5,7 +5,11 @@ import {
   GET_TASKS_TITLES,
   DELETE_TASKS,
 } from '@/pages/Tasks/Tasks.graphql';
-import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import type {
+  TaskResponse,
+  TaskFilterInput,
+  TaskSortInput,
+} from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import {
   upsertTask as upsertTaskRedux,
@@ -17,11 +21,19 @@ import { handleMutationError } from '@/utils';
 interface UseTasksMutationsProps {
   userId?: string;
   tasks: TaskResponse[];
+  filters?: TaskFilterInput;
+  sort?: TaskSortInput;
+  offset?: number;
+  limit?: number;
   onSuccess?: (message: string, subMessage: string) => void;
 }
 
 export const useTasksMutations = ({
   userId,
+  filters,
+  sort,
+  offset = 0,
+  limit = 24,
   onSuccess,
 }: UseTasksMutationsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
@@ -60,6 +72,7 @@ export const useTasksMutations = ({
         title,
         notes_encrypted,
         status,
+        estimate_timer,
         estimate_minutes,
         deadline,
         priority_level,
@@ -79,7 +92,9 @@ export const useTasksMutations = ({
             title,
             notes_encrypted,
             status,
-            estimate_timer: estimate_minutes,
+            // The table row field is estimate_timer; estimate_minutes is only
+            // a fallback for callers still using the legacy field name.
+            estimate_timer: estimate_timer ?? estimate_minutes,
             real_timer,
             duration: null,
             priority_level,
@@ -96,7 +111,10 @@ export const useTasksMutations = ({
           },
         },
         refetchQueries: [
-          { query: GET_TASKS, variables: { userId } },
+          {
+            query: GET_TASKS,
+            variables: { userId, filters: filters || null, sort: sort || null, offset, limit },
+          },
           {
             query: GET_TASKS_TITLES,
             variables: { userId, limit: 24, offset: 0 },
@@ -128,7 +146,10 @@ export const useTasksMutations = ({
           cache.gc();
         },
         refetchQueries: [
-          { query: GET_TASKS, variables: { userId } },
+          {
+            query: GET_TASKS,
+            variables: { userId, filters: filters || null, sort: sort || null, offset, limit },
+          },
           {
             query: GET_TASKS_TITLES,
             variables: { userId, limit: 24, offset: 0 },
