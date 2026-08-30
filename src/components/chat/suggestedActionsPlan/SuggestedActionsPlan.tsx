@@ -60,6 +60,12 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
   } = useSuggestedActionsPlan(actions);
 
   const previews = actions.map((action) => getActionPreviewData(action));
+  // A batch made entirely of moves ("compress my week", "add a break
+  // between these") reads very differently from a batch of brand-new
+  // items — labeling it "Create 5 tasks" would repeat the exact
+  // create-vs-edit confusion this action type exists to fix.
+  const isRescheduleOnly =
+    actions.length > 0 && actions.every((a) => a.type === 'UPDATE_TASK');
 
   return (
     <>
@@ -75,12 +81,17 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                 fontWeight={800}
                 color="text.primary"
               >
-                Plan sugerido · {actions.length} tareas
+                {isRescheduleOnly ? 'Cambios sugeridos' : 'Plan sugerido'} ·{' '}
+                {actions.length} tareas
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {isCompleted
-                  ? 'Ya agregado a tu calendario'
-                  : 'Revisa las fechas antes de agregarlas'}
+                  ? isRescheduleOnly
+                    ? 'Ya movidas en tu calendario'
+                    : 'Ya agregado a tu calendario'
+                  : isRescheduleOnly
+                    ? 'Revisa los nuevos horarios antes de aplicarlos'
+                    : 'Revisa las fechas antes de agregarlas'}
               </Typography>
             </Box>
           </Box>
@@ -113,7 +124,8 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
       >
         <Box sx={dialogHeaderSx}>
           <Typography variant="subtitle1" fontWeight={800} color="text.primary">
-            Plan sugerido · {actions.length} tareas
+            {isRescheduleOnly ? 'Cambios sugeridos' : 'Plan sugerido'} ·{' '}
+            {actions.length} tareas
           </Typography>
           <IconButton size="small" onClick={() => setOpen(false)}>
             <CloseIcon sx={{ fontSize: 18 }} />
@@ -217,10 +229,16 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
             sx={createAllButtonSx}
           >
             {isCompleted
-              ? 'Ya creadas'
+              ? isRescheduleOnly
+                ? 'Ya movidas'
+                : 'Ya creadas'
               : isCreating
-                ? 'Creando...'
-                : `Crear las ${actions.length} tareas`}
+                ? isRescheduleOnly
+                  ? 'Moviendo...'
+                  : 'Creando...'
+                : isRescheduleOnly
+                  ? `Mover las ${actions.length} tareas`
+                  : `Crear las ${actions.length} tareas`}
           </Button>
         </Box>
       </Dialog>

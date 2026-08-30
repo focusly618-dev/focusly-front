@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useAppSelector } from '@/redux/hooks';
-import { CREATE_TASK } from '@/pages/Tasks/Tasks.graphql';
+import { CREATE_TASK, UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import {
   CREATE_PROJECT_GROUP,
   CREATE_WORKSPACE,
@@ -25,6 +25,7 @@ export const useSuggestedActionsPlan = (actions: ParsedLuminaAction[]) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const [createTask] = useMutation(CREATE_TASK);
+  const [updateTask] = useMutation(UPDATE_TASK);
   const [createWorkspace] = useMutation(CREATE_WORKSPACE);
   const [createProjectGroup] = useMutation(CREATE_PROJECT_GROUP);
 
@@ -47,6 +48,7 @@ export const useSuggestedActionsPlan = (actions: ParsedLuminaAction[]) => {
         await executeSingleAction(actions[i], {
           userId: user.id,
           createTask,
+          updateTask,
           createWorkspace,
           createProjectGroup,
         });

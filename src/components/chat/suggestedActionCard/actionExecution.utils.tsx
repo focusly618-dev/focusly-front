@@ -4,6 +4,7 @@ import {
   Folder as FolderIcon,
   Description as DescriptionIcon,
   Assignment as AssignmentIcon,
+  EventRepeat as RescheduleIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
@@ -95,6 +96,7 @@ export const formatDateLabel = (date: Date): string =>
 
 export const getActionTitle = (action: ParsedLuminaAction): string => {
   if (action.type === 'CREATE_TASK') return 'Create Task';
+  if (action.type === 'UPDATE_TASK') return 'Reschedule Task';
   if (action.type === 'CREATE_WORKSPACE') return 'Create Workspace';
   if (action.type === 'CREATE_NOTE') return 'Create Note';
   if (action.type === 'INSERT_TO_WORKSPACE') return 'Insert into Workspace';
@@ -117,6 +119,18 @@ export const getActionPreviewData = (
       durationLabel: formatDuration(estimateTimer),
       priorityLabel: PRIORITY_LABELS[priorityLevel] || 'Medium',
       priorityColor: PRIORITY_COLORS[priorityLevel] || PRIORITY_COLORS[2],
+    };
+  }
+  if (action.type === 'UPDATE_TASK') {
+    const start = parseDeadline(
+      action.payload.estimated_start_date || action.payload.deadline,
+    );
+    return {
+      title: action.payload.title || 'Existing task',
+      dateLabel: start ? formatDateLabel(start) : undefined,
+      durationLabel: action.payload.estimate_timer
+        ? formatDuration(normalizeEstimateTimer(action.payload.estimate_timer))
+        : undefined,
     };
   }
   if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE') {
@@ -144,6 +158,7 @@ export const getActionIcon = (
 ): ReactNode => {
   const sx = { fontSize: 20, color };
   if (action.type === 'CREATE_TASK') return <AssignmentIcon sx={sx} />;
+  if (action.type === 'UPDATE_TASK') return <RescheduleIcon sx={sx} />;
   if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE')
     return <DescriptionIcon sx={sx} />;
   if (action.type === 'INSERT_TO_WORKSPACE')
@@ -157,6 +172,7 @@ type MutateFunction = MutationFunction<any, OperationVariables>;
 export interface ActionExecutionContext {
   userId: string;
   createTask: MutateFunction;
+  updateTask: MutateFunction;
   createWorkspace: MutateFunction;
   createProjectGroup: MutateFunction;
 }
@@ -220,6 +236,53 @@ export const executeSingleAction = async (
       ],
     });
     return { id: res.data?.createTask?.id };
+  }
+
+  if (action.type === 'UPDATE_TASK') {
+    if (!action.payload.id) {
+      throw new Error('UPDATE_TASK is missing the id of the task to move');
+    }
+
+    const updateTaskInput: Record<string, unknown> = { id: action.payload.id };
+
+    if (action.payload.title !== undefined) {
+      updateTaskInput.title = action.payload.title;
+    }
+    if (action.payload.notes_encrypted !== undefined) {
+      updateTaskInput.notes_encrypted = action.payload.notes_encrypted;
+    }
+    if (action.payload.priority_level !== undefined) {
+      updateTaskInput.priority_level = action.payload.priority_level;
+    }
+    if (action.payload.estimate_timer !== undefined) {
+      updateTaskInput.estimate_timer = normalizeEstimateTimer(
+        Number(action.payload.estimate_timer),
+      );
+    }
+    if (action.payload.deadline) {
+      const deadline = parseDeadline(action.payload.deadline);
+      if (deadline) updateTaskInput.deadline = deadline.toISOString();
+    }
+    if (action.payload.estimated_start_date) {
+      const start = parseDeadline(action.payload.estimated_start_date);
+      if (start) updateTaskInput.estimated_start_date = start.toISOString();
+    }
+    if (action.payload.estimated_end_date) {
+      const end = parseDeadline(action.payload.estimated_end_date);
+      if (end) updateTaskInput.estimated_end_date = end.toISOString();
+    }
+
+    const res = await ctx.updateTask({
+      variables: { updateTaskInput },
+      refetchQueries: [
+        { query: GET_TASKS, variables: { userId: ctx.userId } },
+        {
+          query: GET_TASKS_TITLES,
+          variables: { userId: ctx.userId, limit: 24, offset: 0 },
+        },
+      ],
+    });
+    return { id: res.data?.updateTask?.id };
   }
 
   if (action.type === 'CREATE_WORKSPACE') {

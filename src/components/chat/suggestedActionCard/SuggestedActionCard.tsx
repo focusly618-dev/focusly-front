@@ -13,6 +13,7 @@ import {
 import {
   CheckCircle as CheckCircleIcon,
   Add as AddIcon,
+  EventRepeat as RescheduleIcon,
   Schedule as ScheduleIcon,
   Flag as FlagIcon,
   CalendarToday as CalendarTodayIcon,
@@ -152,7 +153,9 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
                     ? 'Inserted Successfully!'
                     : action.type === 'CREATE_NOTE'
                       ? 'Note Created Successfully!'
-                      : 'Created Successfully!'}
+                      : action.type === 'UPDATE_TASK'
+                        ? 'Moved Successfully!'
+                        : 'Created Successfully!'}
                 </Typography>
               </Box>
 
@@ -174,7 +177,9 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
                   </Button>
                 )}
 
-              {createdId && action.type === 'CREATE_TASK' && (
+              {createdId &&
+                (action.type === 'CREATE_TASK' ||
+                  action.type === 'UPDATE_TASK') && (
                 <Button
                   variant="outlined"
                   size="small"
@@ -200,6 +205,8 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
               startIcon={
                 isLoading ? (
                   <CircularProgress size={12} color="inherit" />
+                ) : action.type === 'UPDATE_TASK' ? (
+                  <RescheduleIcon sx={addIconSx} />
                 ) : (
                   <AddIcon sx={addIconSx} />
                 )
@@ -209,10 +216,14 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
               {isLoading
                 ? action.type === 'INSERT_TO_WORKSPACE'
                   ? 'Inserting...'
-                  : 'Creating...'
+                  : action.type === 'UPDATE_TASK'
+                    ? 'Moving...'
+                    : 'Creating...'
                 : action.type === 'INSERT_TO_WORKSPACE'
                   ? 'Insert into Note'
-                  : 'Create'}
+                  : action.type === 'UPDATE_TASK'
+                    ? 'Move'
+                    : 'Create'}
             </Button>
           )}
         </Box>

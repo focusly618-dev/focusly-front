@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useTheme } from '@mui/material';
 import { useAppSelector } from '@/redux/hooks';
-import { CREATE_TASK } from '@/pages/Tasks/Tasks.graphql';
+import { CREATE_TASK, UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import {
   CREATE_PROJECT_GROUP,
   CREATE_WORKSPACE,
@@ -35,12 +35,14 @@ export const useSuggestedActionCard = (
   const [errorMessage, setErrorMessage] = useState('');
 
   const [createTask, { loading: taskLoading }] = useMutation(CREATE_TASK);
+  const [updateTask, { loading: updateTaskLoading }] =
+    useMutation(UPDATE_TASK);
   const [createWorkspace, { loading: wsLoading }] =
     useMutation(CREATE_WORKSPACE);
   const [createProjectGroup, { loading: groupLoading }] =
     useMutation(CREATE_PROJECT_GROUP);
 
-  const isLoading = taskLoading || wsLoading || groupLoading;
+  const isLoading = taskLoading || updateTaskLoading || wsLoading || groupLoading;
 
   const handleExecute = async () => {
     if (!user) {
@@ -53,6 +55,7 @@ export const useSuggestedActionCard = (
       const { id } = await executeSingleAction(action, {
         userId: user.id,
         createTask,
+        updateTask,
         createWorkspace,
         createProjectGroup,
       });
