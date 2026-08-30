@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   isSameDay,
   isSameWeek,
   isSameMonth,
-  isWithinInterval,
+  startOfDay,
+  endOfDay,
   startOfWeek,
   endOfWeek,
   startOfMonth,
@@ -91,52 +92,50 @@ export const useTasksFilters = (
     periodLabel = 'All Tasks';
   }
 
+  // Sent to the backend as TaskFilterInput.startDate/endDate so the
+  // Today/Week/Month navigation queries the server for the right slice of
+  // tasks instead of fetching everything and filtering it in the browser.
+  // The backend's own date filter (tasks_service.py's
+  // _apply_filters_and_sorting) already checks the same field priority
+  // (estimated_start_date, falling back to deadline) this page's filtering
+  // used before, so moving the boundary here doesn't change which tasks
+  // match — it just computes those same boundaries once and lets the
+  // server do the filtering.
+  const dateRangeFilter = useMemo((): {
+    startDate?: string;
+    endDate?: string;
+  } => {
+    if (dateRange === 'today') {
+      return {
+        startDate: startOfDay(referenceDate).toISOString(),
+        endDate: endOfDay(referenceDate).toISOString(),
+      };
+    }
+    if (dateRange === 'this_week') {
+      return {
+        startDate: startOfWeek(referenceDate, { weekStartsOn: 1 }).toISOString(),
+        endDate: endOfWeek(referenceDate, { weekStartsOn: 1 }).toISOString(),
+      };
+    }
+    if (dateRange === 'this_month') {
+      const startMonth = startOfMonth(referenceDate);
+      const startWeek = startOfWeek(referenceDate, { weekStartsOn: 1 });
+      const start = startWeek < startMonth ? startWeek : startMonth;
+      return {
+        startDate: start.toISOString(),
+        endDate: endOfMonth(referenceDate).toISOString(),
+      };
+    }
+    return {};
+  }, [dateRange, referenceDate]);
+
   const applyLocalFilters = useCallback(
     (tasksToFilter: TaskResponse[]) => {
+      // Date-range filtering (Today/Week/Month) is done server-side now —
+      // see dateRangeFilter above, sent as TaskFilterInput.startDate/endDate
+      // — so `tasksToFilter` here has already been restricted to the right
+      // window; nothing left to do for it in the browser.
       let result = tasksToFilter;
-
-      // Filter by date range
-      if (dateRange !== 'all') {
-        result = result.filter((task) => {
-          // Bucket by the same date the calendar positions this task on
-          // (useCalendarView.hook.ts also prefers estimated_start_date),
-          // so a task the auto-scheduler moved off its deadline (e.g. bumped
-          // from a weekend deadline to the next working day) lands in the
-          // same Today/Week/Month bucket here as it does on the calendar.
-          // The per-row "Due Date" column (ListViewTask.tsx) still shows the
-          // raw deadline regardless — that's independent, informational.
-          const dateToUse =
-            task.estimated_start_date ||
-            task.deadline ||
-            task.completed_at ||
-            task.created_at ||
-            task.updated_at;
-
-          if (!dateToUse) return false;
-
-          const taskDate = new Date(dateToUse);
-
-          if (dateRange === 'today') {
-            return isSameDay(taskDate, referenceDate);
-          }
-
-          if (dateRange === 'this_week') {
-            const start = startOfWeek(referenceDate, { weekStartsOn: 1 });
-            const end = endOfWeek(referenceDate, { weekStartsOn: 1 });
-            return isWithinInterval(taskDate, { start, end });
-          }
-
-          if (dateRange === 'this_month') {
-            const startMonth = startOfMonth(referenceDate);
-            const startWeek = startOfWeek(referenceDate, { weekStartsOn: 1 });
-            const start = startWeek < startMonth ? startWeek : startMonth;
-            const end = endOfMonth(referenceDate);
-            return isWithinInterval(taskDate, { start, end });
-          }
-
-          return true;
-        });
-      }
 
       if (searchTerm) {
         result = result.filter(
@@ -168,14 +167,7 @@ export const useTasksFilters = (
 
       return result;
     },
-    [
-      dateRange,
-      referenceDate,
-      searchTerm,
-      activeFilterState?.statuses?.length,
-      activeFilterState?.categories,
-      viewMode,
-    ],
+    [searchTerm, activeFilterState?.statuses?.length, activeFilterState?.categories, viewMode],
   );
 
   const handleApplySort = (sort: SortState) => {
@@ -266,6 +258,7 @@ export const useTasksFilters = (
     goToPreviousPeriod,
     goToNextPeriod,
     periodLabel,
+    dateRangeFilter,
 
     handleApplySort,
     handleApplyFilters,

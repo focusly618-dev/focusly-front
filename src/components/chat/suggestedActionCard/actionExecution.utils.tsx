@@ -59,16 +59,31 @@ export const truncate = (text: string, max: number): string =>
   text.length > max ? `${text.slice(0, max).trim()}…` : text;
 
 /** Parses the LLM-supplied "deadline" (ISO date, e.g. "2026-09-07"); null if missing/invalid. */
+// The system prompt only ever asks the model for a bare "YYYY-MM-DD" — no
+// time of day — so every deadline anchors here. 9 AM matches the app's own
+// default working hours (see scheduler_service.py's workingHours default)
+// and this user's stated productive window, giving created tasks a sensible
+// visible start time instead of a literal "12:00 AM".
+const DEFAULT_DEADLINE_HOUR = 9;
+
 export const parseDeadline = (value?: string): Date | null => {
   if (!value) return null;
   // A bare YYYY-MM-DD date must be read as a *local* calendar date, not UTC
   // midnight — `new Date('2026-09-07')` parses as UTC, which lands on the
   // previous day in any timezone behind UTC (e.g. Sep 6 in Mexico/Central
-  // Time instead of the intended Sep 7).
+  // Time instead of the intended Sep 7). It also has no time of day, so we
+  // anchor it to DEFAULT_DEADLINE_HOUR rather than midnight — otherwise a
+  // task's estimated_start_date/estimated_end_date (derived from this) ends
+  // up showing as "12:00 AM - 1:30 AM" on the calendar.
   const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (dateOnlyMatch) {
     const [, year, month, day] = dateOnlyMatch;
-    const local = new Date(Number(year), Number(month) - 1, Number(day));
+    const local = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      DEFAULT_DEADLINE_HOUR,
+    );
     return Number.isNaN(local.getTime()) ? null : local;
   }
   const parsed = new Date(value);
@@ -180,7 +195,19 @@ export const executeSingleAction = async (
           use_ai: true,
           // The user picked this exact day on purpose (a day-by-day plan,
           // including deliberate weekend days) — never let the
-          // auto-scheduler move it to a different "working day".
+          // auto-scheduler move it. skip_scheduling only protects THIS
+          // create call; it does not stick. Any later Google Calendar sync
+          // (sync_calendar → run_scheduling_pipeline) reschedules every
+          // "freely assignable" task for the user with no skip_scheduling
+          // awareness at all, and migration_service.py only excludes a task
+          // from that sweep once BOTH estimated_start_date AND
+          // estimated_end_date are set — so we set both explicitly here,
+          // matching the deadline/duration we just asked for. That's what
+          // makes the protection durable, not just true at creation time.
+          estimated_start_date: deadline.toISOString(),
+          estimated_end_date: new Date(
+            deadline.getTime() + estimateTimer * 60000,
+          ).toISOString(),
           skip_scheduling: true,
         },
       },

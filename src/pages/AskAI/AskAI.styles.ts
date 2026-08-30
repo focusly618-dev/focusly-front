@@ -198,10 +198,12 @@ export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
 
 /* ── Typing indicator ──────────────────────────────────────────────────────── */
 
+// Bubble shell for the "Lumina is working" status while waiting for the
+// first token — the shimmer text + pulse dots inside come from
+// LuminaWorkingIndicator below.
 export const TypingIndicator = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '5px',
   padding: '10px 14px',
   borderRadius: '16px 16px 16px 4px',
   border: `1px solid ${theme.palette.divider}`,
@@ -210,19 +212,6 @@ export const TypingIndicator = styled(Box)(({ theme }) => ({
       ? 'rgba(255,255,255,0.02)'
       : 'rgba(0,0,0,0.015)',
   width: 'fit-content',
-  '@keyframes dotBounce': {
-    '0%, 80%, 100%': { transform: 'translateY(0)', opacity: 0.4 },
-    '40%': { transform: 'translateY(-4px)', opacity: 1 },
-  },
-  '& .dot': {
-    width: '5px',
-    height: '5px',
-    borderRadius: '50%',
-    backgroundColor: theme.palette.text.secondary,
-    animation: 'dotBounce 1.2s ease-in-out infinite',
-    '&:nth-of-type(2)': { animationDelay: '0.2s' },
-    '&:nth-of-type(3)': { animationDelay: '0.4s' },
-  },
 }));
 
 /* ── "Lumina is working" inline indicator (shown while an [ACTION:...] tag

@@ -17,6 +17,8 @@ import {
   CheckCircle as CheckCircleIcon,
   ErrorOutline as ErrorOutlineIcon,
   Add as AddIcon,
+  Schedule as ScheduleIcon,
+  Flag as FlagIcon,
 } from '@mui/icons-material';
 import { cardSx } from '../suggestedActionCard/suggestedActionCard.styles';
 import {
@@ -33,8 +35,12 @@ import {
   dialogHeaderSx,
   dialogListSx,
   planRowSx,
+  planRowHeaderSx,
   planRowDateChipSx,
   planRowTitleSx,
+  planRowDescriptionSx,
+  planRowMetaRowSx,
+  planRowMetaChipSx,
   dialogFooterSx,
   createAllButtonSx,
 } from './SuggestedActionsPlan.styles';
@@ -120,34 +126,70 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
             const status = itemStatuses[idx];
             return (
               <Box key={idx} sx={planRowSx}>
-                {preview.dateLabel ? (
-                  <Chip
-                    size="small"
-                    label={preview.dateLabel}
-                    sx={planRowDateChipSx(theme.palette.primary.main)}
-                  />
-                ) : (
-                  <Chip
-                    size="small"
-                    label={getActionTitle(action)}
-                    sx={planRowDateChipSx(theme.palette.text.secondary)}
-                  />
+                <Box sx={planRowHeaderSx}>
+                  {preview.dateLabel ? (
+                    <Chip
+                      size="small"
+                      label={preview.dateLabel}
+                      sx={planRowDateChipSx(theme.palette.primary.main)}
+                    />
+                  ) : (
+                    <Chip
+                      size="small"
+                      label={getActionTitle(action)}
+                      sx={planRowDateChipSx(theme.palette.text.secondary)}
+                    />
+                  )}
+                  <Typography sx={planRowTitleSx} color="text.primary">
+                    {preview.title || getActionTitle(action)}
+                  </Typography>
+                  {status === 'creating' && (
+                    <CircularProgress size={14} sx={{ flexShrink: 0 }} />
+                  )}
+                  {status === 'done' && (
+                    <CheckCircleIcon
+                      sx={{
+                        fontSize: 16,
+                        color: 'success.main',
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
+                  {status === 'error' && (
+                    <ErrorOutlineIcon
+                      sx={{ fontSize: 16, color: 'error.main', flexShrink: 0 }}
+                    />
+                  )}
+                </Box>
+
+                {(preview.description || preview.contentPreview) && (
+                  <Typography
+                    sx={planRowDescriptionSx}
+                    color="text.secondary"
+                  >
+                    {preview.description || preview.contentPreview}
+                  </Typography>
                 )}
-                <Typography sx={planRowTitleSx} color="text.primary">
-                  {preview.title || getActionTitle(action)}
-                </Typography>
-                {status === 'creating' && (
-                  <CircularProgress size={14} sx={{ flexShrink: 0 }} />
-                )}
-                {status === 'done' && (
-                  <CheckCircleIcon
-                    sx={{ fontSize: 16, color: 'success.main', flexShrink: 0 }}
-                  />
-                )}
-                {status === 'error' && (
-                  <ErrorOutlineIcon
-                    sx={{ fontSize: 16, color: 'error.main', flexShrink: 0 }}
-                  />
+
+                {(preview.durationLabel || preview.priorityLabel) && (
+                  <Box sx={planRowMetaRowSx}>
+                    {preview.durationLabel && (
+                      <Chip
+                        size="small"
+                        icon={<ScheduleIcon />}
+                        label={preview.durationLabel}
+                        sx={planRowMetaChipSx()}
+                      />
+                    )}
+                    {preview.priorityLabel && (
+                      <Chip
+                        size="small"
+                        icon={<FlagIcon />}
+                        label={preview.priorityLabel}
+                        sx={planRowMetaChipSx(preview.priorityColor)}
+                      />
+                    )}
+                  </Box>
                 )}
               </Box>
             );

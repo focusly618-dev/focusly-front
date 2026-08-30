@@ -29,9 +29,21 @@ export const useTasks = () => {
   const ui = useTasksUI();
   const filterLogic = useTasksFilters(viewMode);
 
+  // The Today/Week/Month arrows navigate dateRangeFilter (startDate/endDate)
+  // — merge it into the query's filters so the server returns only the
+  // tasks for the active window, instead of fetching everything and
+  // filtering client-side.
+  const queryFilters = useMemo(() => {
+    const merged = {
+      ...filterLogic.activeFilters,
+      ...filterLogic.dateRangeFilter,
+    };
+    return Object.keys(merged).length > 0 ? merged : undefined;
+  }, [filterLogic.activeFilters, filterLogic.dateRangeFilter]);
+
   const data = useTasksData({
     userId: user?.id,
-    filters: filterLogic.activeFilters,
+    filters: queryFilters,
     sort: filterLogic.activeSort,
     offset: page * pageSize,
     limit: pageSize,

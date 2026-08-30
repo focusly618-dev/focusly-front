@@ -263,7 +263,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     setSearchParams(newParams);
 
     reset({
-      title: initialTitle || 'Untitled Strategic Plan',
+      title: initialTitle || '',
       taskId: undefined,
       content: initialContent || '[]',
       id: undefined,

@@ -330,6 +330,19 @@ const formatUpdateTime = (dateStr: string) => {
   }
 };
 
+// Rotates while waiting for the first token of a reply — reflects, roughly,
+// the context-building steps the backend actually does before the LLM call
+// (see build_context() in focusly-workflows) so the wait doesn't look idle.
+const LAST_CONVERSATION_STORAGE_KEY = 'focusly_ai_last_conversation_id';
+
+const LUMINA_STATUS_MESSAGES = [
+  'Lumina se está conectando',
+  'Leyendo tus tareas',
+  'Revisando tus workspaces y folders',
+  'Consultando tu calendario',
+  'Analizando el contexto',
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const AskAI: React.FC = () => {
@@ -340,6 +353,7 @@ export const AskAI: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [statusMessageIndex, setStatusMessageIndex] = useState(0);
   const [conversations, setConversations] = useState<AIConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
@@ -408,6 +422,29 @@ export const AskAI: React.FC = () => {
     setMessages([]);
   };
 
+  // Remember which conversation was open so navigating away and back (e.g.
+  // to Tasks/Calendar) resumes it instead of always landing on a blank new
+  // chat — the reply itself already finished generating and was saved
+  // server-side regardless of whether this page was mounted to show it.
+  useEffect(() => {
+    if (activeConversationId) {
+      localStorage.setItem(LAST_CONVERSATION_STORAGE_KEY, activeConversationId);
+    } else {
+      localStorage.removeItem(LAST_CONVERSATION_STORAGE_KEY);
+    }
+  }, [activeConversationId]);
+
+  useEffect(() => {
+    const lastId = localStorage.getItem(LAST_CONVERSATION_STORAGE_KEY);
+    if (lastId) {
+      handleSelectConversation(lastId);
+    }
+    // Restore once on mount only — re-running this on every render (e.g. if
+    // handleSelectConversation were in the deps) would refetch the same
+    // conversation's messages repeatedly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleDeleteConversation = async (id: string) => {
     try {
       await deleteAIConversation(id);
@@ -430,6 +467,19 @@ export const AskAI: React.FC = () => {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
+
+  // Rotate the "what Lumina is doing" status text while waiting for the
+  // first token of a reply (index is reset to 0 where sendMessage sets
+  // isTyping, right before the request goes out).
+  useEffect(() => {
+    if (!isTyping) return;
+    const intervalId = setInterval(() => {
+      setStatusMessageIndex(
+        (prev) => (prev + 1) % LUMINA_STATUS_MESSAGES.length,
+      );
+    }, 1400);
+    return () => clearInterval(intervalId);
+  }, [isTyping]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -519,6 +569,7 @@ export const AskAI: React.FC = () => {
       }
       setInputValue('');
       setIsTyping(true);
+      setStatusMessageIndex(0);
 
       const aiMsgId = `ai-${Date.now()}`;
       const aiMsg: Message = {
@@ -1013,9 +1064,16 @@ export const AskAI: React.FC = () => {
                       />
                     </AvatarWrapper>
                     <TypingIndicator>
-                      <div className="dot" />
-                      <div className="dot" />
-                      <div className="dot" />
+                      <LuminaWorkingIndicator>
+                        <span className="shimmer-text">
+                          {LUMINA_STATUS_MESSAGES[statusMessageIndex]}
+                        </span>
+                        <span className="pulse-dots">
+                          <span className="pulse-dot" />
+                          <span className="pulse-dot" />
+                          <span className="pulse-dot" />
+                        </span>
+                      </LuminaWorkingIndicator>
                     </TypingIndicator>
                   </MessageRow>
                 )}

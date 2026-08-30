@@ -56,12 +56,22 @@ export const dialogListSx: SxProps<Theme> = {
 
 export const planRowSx: SxProps<Theme> = {
   display: 'flex',
-  alignItems: 'center',
-  gap: 1.2,
+  flexDirection: 'column',
+  gap: 0.5,
   px: 1.5,
   py: 1,
   borderRadius: '8px',
+  '&:not(:last-of-type)': {
+    borderBottom: '1px solid',
+    borderColor: 'divider',
+  },
   '&:hover': { bgcolor: 'action.hover' },
+};
+
+export const planRowHeaderSx: SxProps<Theme> = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 1.2,
 };
 
 export const planRowDateChipSx = (color: string): SxProps<Theme> => ({
@@ -77,6 +87,7 @@ export const planRowDateChipSx = (color: string): SxProps<Theme> => ({
 
 export const planRowTitleSx: SxProps<Theme> = {
   fontSize: '12.5px',
+  fontWeight: 600,
   lineHeight: 1.4,
   flex: 1,
   minWidth: 0,
@@ -84,6 +95,36 @@ export const planRowTitleSx: SxProps<Theme> = {
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 };
+
+export const planRowDescriptionSx: SxProps<Theme> = {
+  fontSize: '11.5px',
+  lineHeight: 1.4,
+  pl: '92px', // aligns under the title, past the date chip's width + gap
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};
+
+export const planRowMetaRowSx: SxProps<Theme> = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 0.6,
+  pl: '92px',
+};
+
+export const planRowMetaChipSx = (color?: string): SxProps<Theme> => ({
+  height: 18,
+  fontSize: '9.5px',
+  fontWeight: 700,
+  borderRadius: '4px',
+  color: color || 'text.secondary',
+  bgcolor: color ? alpha(color, 0.14) : 'action.hover',
+  '& .MuiChip-icon': {
+    color: color || 'inherit',
+    ml: 0.5,
+    fontSize: '11px',
+  },
+});
 
 export const dialogFooterSx: SxProps<Theme> = {
   px: 2.5,

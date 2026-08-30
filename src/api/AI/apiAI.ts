@@ -66,6 +66,15 @@ export const fetchEditResult = async (prompt: string): Promise<string> => {
   return result.trim();
 };
 
+export const generateWorkspaceTitle = async (
+  plainTextContent: string,
+): Promise<string> => {
+  const raw = await fetchEditResult(
+    `Generate a short, specific title (3-7 words, no quotes, no trailing punctuation) for a document that starts like this:\n\n${plainTextContent.slice(0, 1500)}`,
+  );
+  return raw.replace(/^["'“”]+|["'“”]+$/g, '').trim();
+};
+
 export const EDIT_PROPOSAL_START = '<<<FOCUSLY_PROPOSED_EDIT>>>';
 export const EDIT_PROPOSAL_END = '<<<END_PROPOSED_EDIT>>>';
 
@@ -83,7 +92,9 @@ ${EDIT_PROPOSAL_START}
 (full revised document markdown here)
 ${EDIT_PROPOSAL_END}
 
-If the user is just asking a question and not requesting an edit, do not include that block at all — just answer normally.`;
+This explicitly includes any request to save, insert, write, add, or keep something directly in this document/note/editor (e.g. "agrégalo a la nota", "escríbelo en el documento", "guárdalo aquí", "ponlo en el editor", "add this to my note") — treat that exactly like an edit request and use the block above right away, merging the new content into the existing document. Do not just ask for permission first when the user has already asked for this explicitly.
+
+If the user has NOT asked for an edit — they're just asking a question, or you are the one offering to save something for them — do not include that block. Answering normally and asking "¿quieres que lo agregue a la nota?" is fine, but do not assume a "sí" in the next message; the user has a button in the UI to add your last reply to the document themselves at any time, so you don't need to chase confirmation across turns.`;
 
 export const fetchAssistantResult = async (
   messages: AIMessage[],
