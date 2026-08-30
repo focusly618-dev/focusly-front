@@ -299,7 +299,10 @@ export const TasksContentView = ({
                   <TableHeaderCell className="col-actual">
                     Actual
                   </TableHeaderCell>
-                  <TableHeaderCell>Actions</TableHeaderCell>
+                  <TableHeaderCell className="col-ai">AI</TableHeaderCell>
+                  <TableHeaderCell sx={{ justifyContent: 'center' }}>
+                    Actions
+                  </TableHeaderCell>
                 </TableHeader>
                 <TableBodyContainer onScroll={handleScroll}>
                   {displayedTasks.slice(0, limit).map((task) => (

@@ -340,6 +340,7 @@ export const TaskDetailModal = ({
                 handleAddTimeLog={handleAddTimeLog}
                 handleRemoveTimeLog={handleRemoveTimeLog}
                 createdAt={initialTask?.created_at}
+                deadline={initialTask?.deadline}
               />
 
               <TaskResources

@@ -13,6 +13,7 @@ import {
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import { surfaceColor } from '@/context';
+import { UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import { CardAvatarCircle, BadgeChip } from '../WorkspaceLibrary.styles';
 import { iconMap } from '../constants/library.constants';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
@@ -170,7 +171,7 @@ export const WorkspaceListItem = ({
             color: 'text.primary',
           }}
         >
-          {workspace.title}
+          {workspace.title || UNTITLED_WORKSPACE_TITLE}
         </Typography>
       </Box>
 

@@ -6,6 +6,7 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import { UNTITLED_WORKSPACE_TITLE } from '@/utils';
 
 interface TaskWorkspacesProps {
   workspaces?: {
@@ -99,7 +100,7 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({
               </Box>
               <Box sx={{ textAlign: 'left' }}>
                 <Typography variant="body2" fontWeight={700}>
-                  {ws.title}
+                  {ws.title || UNTITLED_WORKSPACE_TITLE}
                 </Typography>
                 {ws.folder && (
                   <Typography

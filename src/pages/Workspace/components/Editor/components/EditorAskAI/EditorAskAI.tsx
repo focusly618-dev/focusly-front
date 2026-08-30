@@ -1,7 +1,9 @@
 import { useRef, type RefObject } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   Box,
+  Button,
   IconButton,
   InputBase,
   Typography,
@@ -15,6 +17,7 @@ import {
   Check as CheckIcon,
   AutoFixHigh as StyleIcon,
   Summarize as SummarizeIcon,
+  NoteAdd as NoteAddIcon,
 } from '@mui/icons-material';
 import { LuminaAnimatedFace } from '@/components/ui';
 import { useEditorAskAI } from './useEditorAskAI.hook';
@@ -93,6 +96,98 @@ const noteMarkdownComponents = {
       {children}
     </Box>
   ),
+  // Fenced code blocks (```...```) come through as <pre><code>...</code></pre>
+  // — the `code` override above already handles the inner element, this
+  // just gives the block itself a monospace background instead of the
+  // browser's unstyled default.
+  pre: ({ children }: { children?: React.ReactNode }) => (
+    <Box
+      component="pre"
+      sx={{
+        m: 0,
+        mb: 0.75,
+        p: 1,
+        borderRadius: '8px',
+        bgcolor: 'action.hover',
+        overflowX: 'auto',
+        fontSize: '0.85em',
+        lineHeight: 1.5,
+        '& code': { bgcolor: 'transparent', p: 0 },
+      }}
+    >
+      {children}
+    </Box>
+  ),
+  h1: ({ children }: { children?: React.ReactNode }) => (
+    <Typography variant="subtitle1" fontWeight={800} sx={{ mb: 0.75, mt: 1 }}>
+      {children}
+    </Typography>
+  ),
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <Typography variant="subtitle2" fontWeight={800} sx={{ mb: 0.75, mt: 1 }}>
+      {children}
+    </Typography>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => (
+    <Typography
+      variant="body2"
+      fontWeight={700}
+      sx={{ mb: 0.5, mt: 0.75 }}
+    >
+      {children}
+    </Typography>
+  ),
+  // GFM tables (needs remarkGfm, passed to <ReactMarkdown> below) — without
+  // these overrides a table renders with zero borders/spacing via the
+  // browser's bare defaults, which reads as "not styled at all".
+  table: ({ children }: { children?: React.ReactNode }) => (
+    <Box
+      sx={{
+        overflowX: 'auto',
+        mb: 0.75,
+        borderRadius: '8px',
+        border: '1px solid',
+        borderColor: 'divider',
+      }}
+    >
+      <Box
+        component="table"
+        sx={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontSize: '0.85em',
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
+  ),
+  thead: ({ children }: { children?: React.ReactNode }) => (
+    <Box component="thead" sx={{ bgcolor: 'action.hover' }}>
+      {children}
+    </Box>
+  ),
+  tr: ({ children }: { children?: React.ReactNode }) => (
+    <Box
+      component="tr"
+      sx={{ '&:not(:last-of-type)': { borderBottom: '1px solid', borderColor: 'divider' } }}
+    >
+      {children}
+    </Box>
+  ),
+  th: ({ children }: { children?: React.ReactNode }) => (
+    <Box
+      component="th"
+      sx={{ textAlign: 'left', fontWeight: 700, px: 1, py: 0.6 }}
+    >
+      {children}
+    </Box>
+  ),
+  td: ({ children }: { children?: React.ReactNode }) => (
+    <Box component="td" sx={{ px: 1, py: 0.6, verticalAlign: 'top' }}>
+      {children}
+    </Box>
+  ),
 };
 
 export const EditorAskAI: React.FC<EditorAskAIProps> = ({
@@ -115,6 +210,7 @@ export const EditorAskAI: React.FC<EditorAskAIProps> = ({
     handleSubmit,
     handleQuickAction,
     handleResolveDiff,
+    handleInsertNote,
   } = useEditorAskAI({ markdownEditorRef });
 
   const glowBg = isDark ? '#1e1b4b' : '#e0f2fe';
@@ -170,10 +266,37 @@ export const EditorAskAI: React.FC<EditorAskAIProps> = ({
           }}
         >
           {note && (
-            <Box sx={{ mb: hasPendingDiff ? 1 : 0 }}>
-              <ReactMarkdown components={noteMarkdownComponents}>
+            <Box
+              sx={{
+                maxHeight: '45vh',
+                overflowY: 'auto',
+                mb: hasPendingDiff ? 1 : 0,
+              }}
+            >
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={noteMarkdownComponents}
+              >
                 {note}
               </ReactMarkdown>
+            </Box>
+          )}
+          {note && !hasPendingDiff && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                size="small"
+                onClick={handleInsertNote}
+                startIcon={<NoteAddIcon sx={{ fontSize: 15 }} />}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '11.5px',
+                  borderRadius: '8px',
+                  color: theme.palette.primary.main,
+                }}
+              >
+                Agregar a la nota
+              </Button>
             </Box>
           )}
           {hasPendingDiff && (

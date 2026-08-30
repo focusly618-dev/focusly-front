@@ -198,10 +198,12 @@ export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
 
 /* ── Typing indicator ──────────────────────────────────────────────────────── */
 
+// Bubble shell for the "Lumina is working" status while waiting for the
+// first token — the shimmer text + pulse dots inside come from
+// LuminaWorkingIndicator below.
 export const TypingIndicator = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '5px',
   padding: '10px 14px',
   borderRadius: '16px 16px 16px 4px',
   border: `1px solid ${theme.palette.divider}`,
@@ -210,18 +212,46 @@ export const TypingIndicator = styled(Box)(({ theme }) => ({
       ? 'rgba(255,255,255,0.02)'
       : 'rgba(0,0,0,0.015)',
   width: 'fit-content',
-  '@keyframes dotBounce': {
-    '0%, 80%, 100%': { transform: 'translateY(0)', opacity: 0.4 },
-    '40%': { transform: 'translateY(-4px)', opacity: 1 },
+}));
+
+/* ── "Lumina is working" inline indicator (shown while an [ACTION:...] tag
+   is still streaming in, instead of the raw tag text) ──────────────────── */
+
+export const LuminaWorkingIndicator = styled(Box)(({ theme }) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '7px',
+  '@keyframes luminaShimmer': {
+    '0%': { backgroundPosition: '160% 0' },
+    '100%': { backgroundPosition: '-160% 0' },
   },
-  '& .dot': {
-    width: '5px',
-    height: '5px',
+  '& .shimmer-text': {
+    fontSize: '13px',
+    fontWeight: 600,
+    backgroundImage: `linear-gradient(90deg, ${theme.palette.text.disabled} 35%, ${theme.palette.text.primary} 50%, ${theme.palette.text.disabled} 65%)`,
+    backgroundSize: '260% 100%',
+    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text',
+    color: 'transparent',
+    animation: 'luminaShimmer 1.6s linear infinite',
+  },
+  '@keyframes luminaPulseDot': {
+    '0%, 100%': { opacity: 0.3, transform: 'scale(0.8)' },
+    '50%': { opacity: 1, transform: 'scale(1)' },
+  },
+  '& .pulse-dots': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '3px',
+  },
+  '& .pulse-dot': {
+    width: '4px',
+    height: '4px',
     borderRadius: '50%',
-    backgroundColor: theme.palette.text.secondary,
-    animation: 'dotBounce 1.2s ease-in-out infinite',
-    '&:nth-of-type(2)': { animationDelay: '0.2s' },
-    '&:nth-of-type(3)': { animationDelay: '0.4s' },
+    backgroundColor: theme.palette.primary.main,
+    animation: 'luminaPulseDot 1s ease-in-out infinite',
+    '&:nth-of-type(2)': { animationDelay: '0.15s' },
+    '&:nth-of-type(3)': { animationDelay: '0.3s' },
   },
 }));
 

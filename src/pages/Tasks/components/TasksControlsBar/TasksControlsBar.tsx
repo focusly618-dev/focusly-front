@@ -1,4 +1,4 @@
-import { Typography, Box, Select, MenuItem } from '@mui/material';
+import { Typography, Box, Select, MenuItem, IconButton } from '@mui/material';
 import { surfaceColor } from '@/context';
 import {
   Search as SearchIcon,
@@ -8,6 +8,8 @@ import {
   ViewList as ViewListIcon,
   ViewColumn as ViewColumnIcon,
   Balance as BalanceIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import {
   ControlsBar,
@@ -41,6 +43,9 @@ export const TasksControlsBar = ({
   filteredTasks,
   dateRange,
   setDateRange,
+  periodLabel,
+  onGoToPreviousPeriod,
+  onGoToNextPeriod,
   setViewMode,
 }: TasksControlsBarProps) => {
   const pendingCount = filteredTasks
@@ -241,9 +246,23 @@ export const TasksControlsBar = ({
             }}
           />
 
+          <IconButton
+            onClick={onGoToPreviousPeriod}
+            disabled={dateRange === 'all'}
+            size="small"
+            sx={{
+              p: 0.25,
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
+            }}
+          >
+            <ChevronLeftIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+
           <Select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value as DateRangeFilter)}
+            renderValue={() => periodLabel}
             size="small"
             variant="standard"
             disableUnderline
@@ -258,10 +277,24 @@ export const TasksControlsBar = ({
               },
             }}
           >
+            <MenuItem value="all">All Tasks</MenuItem>
             <MenuItem value="today">Today</MenuItem>
             <MenuItem value="this_week">This Week</MenuItem>
             <MenuItem value="this_month">This Month</MenuItem>
           </Select>
+
+          <IconButton
+            onClick={onGoToNextPeriod}
+            disabled={dateRange === 'all'}
+            size="small"
+            sx={{
+              p: 0.25,
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
+            }}
+          >
+            <ChevronRightIcon sx={{ fontSize: 18 }} />
+          </IconButton>
         </Box>
       </Box>
 

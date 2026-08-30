@@ -114,6 +114,21 @@ export const useEditorAskAI = ({ markdownEditorRef }: UseEditorAskAIProps) => {
     });
   };
 
+  // Manual fallback for whenever Lumina replies with a plain note instead of
+  // a full EDIT_PROPOSAL diff (e.g. it just offered "¿quieres que lo agregue
+  // a la nota?" in text) — the user doesn't have to reply "sí" and hope the
+  // next turn proposes an edit; this appends the note itself, right now.
+  const handleInsertNote = () => {
+    if (!note || !markdownEditorRef.current) return;
+    markdownEditorRef.current.insertAtEnd(note);
+    setNote(null);
+    sileo.success({
+      title: 'Agregado a tu documento',
+      fill: 'var(--sileo-success-bg)',
+      duration: 2200,
+    });
+  };
+
   return {
     isOpen,
     open,
@@ -126,5 +141,6 @@ export const useEditorAskAI = ({ markdownEditorRef }: UseEditorAskAIProps) => {
     handleSubmit,
     handleQuickAction,
     handleResolveDiff,
+    handleInsertNote,
   };
 };

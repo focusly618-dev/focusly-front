@@ -39,6 +39,7 @@ import {
   isSameDay,
   startOfDay,
   startOfMonth,
+  startOfWeek,
   subDays,
   subMonths,
   subWeeks,
@@ -130,8 +131,7 @@ export const useCalendarView = () => {
     mouseY: number;
     date: Date;
   } | null>(null);
-  const [resolvedGoogleCalendarUserId, setResolvedGoogleCalendarUserId] =
-    useState<string | null>(null);
+  const [isFetchingGoogleEvents, setIsFetchingGoogleEvents] = useState(false);
 
   // New Task Modal State moved to URL parameters
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
@@ -180,14 +180,12 @@ export const useCalendarView = () => {
     (user?.settings as UserSettings | undefined)?.calendarConnected,
   );
 
-  const shouldRestoreGoogleCalendar =
-    user?.authProvider === 'google' &&
-    isCalendarConnected &&
-    Boolean(user?.id) &&
-    reduxEvents.length === 0 &&
-    resolvedGoogleCalendarUserId !== user.id;
-
-  const isGoogleEventsLoading = shouldRestoreGoogleCalendar;
+  // True for the whole lifetime of any /google-calendar/events fetch —
+  // including re-fetches triggered by date-range navigation or the polling
+  // fallback below, not just the very first load — so the calendar can show
+  // a loading state whenever that request is slow, not only when there's no
+  // Google data at all yet.
+  const isGoogleEventsLoading = isFetchingGoogleEvents;
 
   // Fetch Google Calendar Events when the range or user changes
   useEffect(() => {
@@ -196,7 +194,7 @@ export const useCalendarView = () => {
     }
 
     let isMounted = true;
-    setResolvedGoogleCalendarUserId(null); // Mark as loading for this range
+    setIsFetchingGoogleEvents(true);
 
     fetchGoogleEvents(dateRange.start, dateRange.end)
       .then((events) => {
@@ -209,7 +207,7 @@ export const useCalendarView = () => {
       })
       .finally(() => {
         if (isMounted) {
-          setResolvedGoogleCalendarUserId(user.id);
+          setIsFetchingGoogleEvents(false);
         }
       });
 
@@ -244,14 +242,18 @@ export const useCalendarView = () => {
     };
   }, [dispatch, user?.id, user?.authProvider, isCalendarConnected]);
 
-  const hasRenderableCalendarData =
-    reduxEvents.length > 0 ||
-    tasks.length > 0 ||
-    (tasksData?.result?.tasks?.length ?? 0) > 0;
+  // Loading must be tracked per-source: tasks and Google events can resolve at
+  // different times (e.g. tasks served instantly from the Apollo cache while
+  // the Google events fetch is still in flight), so a single combined flag
+  // would go permanently false the moment either source has any data, hiding
+  // the still-pending loading state of the other source.
+  const hasRenderableTasks =
+    tasks.length > 0 || (tasksData?.result?.tasks?.length ?? 0) > 0;
+  const hasRenderableGoogleEvents = reduxEvents.length > 0;
 
   const isCalendarLoading =
-    !hasRenderableCalendarData &&
-    (isTasksQueryLoading || isGoogleEventsLoading);
+    (!hasRenderableTasks && isTasksQueryLoading) ||
+    (!hasRenderableGoogleEvents && isGoogleEventsLoading);
   const events = useMemo(() => {
     // 1. Prepare a set of all synced Google Event IDs for efficient deduplication
     // We store both exact normalized IDs and base IDs to catch series imports.
@@ -428,6 +430,53 @@ export const useCalendarView = () => {
     return result;
   }, [reduxEvents, tasks, isCalendarInDraftMode, draftEvents]);
 
+  // Synthetic placeholder events shown instead of `events` while the
+  // calendar's real data is still loading (see `isCalendarLoading`). These
+  // are never persisted anywhere and are excluded from selection/drag/resize
+  // via their `type: 'skeleton'` discriminator.
+  const skeletonEvents = useMemo<ICalendarEvent[]>(() => {
+    const makeSlot = (base: Date, startHour: number, startMinute: number, endHour: number, endMinute: number) => {
+      const start = new Date(base);
+      start.setHours(startHour, startMinute, 0, 0);
+      const end = new Date(base);
+      end.setHours(endHour, endMinute, 0, 0);
+      return { start, end };
+    };
+
+    let slots: { start: Date; end: Date }[];
+
+    if (currentView === Views.DAY) {
+      slots = [
+        makeSlot(currentDate, 9, 0, 10, 0),
+        makeSlot(currentDate, 11, 30, 12, 30),
+        makeSlot(currentDate, 14, 0, 15, 30),
+      ];
+    } else if (currentView === Views.WEEK) {
+      const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+      slots = [
+        makeSlot(addDays(weekStart, 0), 9, 0, 10, 0),
+        makeSlot(addDays(weekStart, 2), 11, 0, 12, 30),
+        makeSlot(addDays(weekStart, 4), 14, 0, 15, 0),
+      ];
+    } else {
+      const monthStart = startOfMonth(currentDate);
+      slots = [
+        makeSlot(addDays(monthStart, 4), 10, 0, 11, 0),
+        makeSlot(addDays(monthStart, 13), 10, 0, 11, 0),
+        makeSlot(addDays(monthStart, 21), 10, 0, 11, 0),
+      ];
+    }
+
+    return slots.map((slot, index) => ({
+      id: `skeleton-${index}`,
+      title: '',
+      start: slot.start,
+      end: slot.end,
+      allDay: false,
+      type: 'skeleton' as const,
+    }));
+  }, [currentView, currentDate]);
+
   const handleOnChangeView = (selectedView: View) => {
     updateUrlParams(selectedView, currentDate);
   };
@@ -512,6 +561,8 @@ export const useCalendarView = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSelectEvent = (event: ICalendarEvent | any) => {
+    if (event?.type === 'skeleton') return;
+
     const activeTab = searchParams.get('tab') || 'DailyPlan';
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set('tab', activeTab);
@@ -998,6 +1049,7 @@ export const useCalendarView = () => {
 
   return {
     events,
+    skeletonEvents,
     currentView,
     currentDate,
     isCalendarLoading,

@@ -37,8 +37,13 @@ import {
   type AIConversation,
 } from '@/api/AI/apiAI';
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
+import { SuggestedActionsPlan } from '@/components/chat/suggestedActionsPlan/SuggestedActionsPlan';
 import { UpgradeModal } from '@/components/modals';
-import { parseLuminaAction, sileo } from '@/utils';
+import {
+  parseLuminaActions,
+  sileo,
+  type ParsedLuminaAction,
+} from '@/utils';
 import { surfaceColor } from '@/context';
 import {
   AskAIContainer,
@@ -53,6 +58,7 @@ import {
   UserAvatar,
   MessageBubble,
   TypingIndicator,
+  LuminaWorkingIndicator,
   InputWrapper,
   InputBox,
   StyledInput,
@@ -70,6 +76,12 @@ interface Message {
   sender: 'user' | 'ai';
   text: string;
   html?: string;
+  // Populated only for messages loaded from history — the backend already
+  // parsed these out of the raw `[ACTION: ...]` tags before they ever left
+  // the server, so we don't need (and shouldn't rely on) client-side regex
+  // parsing of persisted content. A single AI reply can suggest several
+  // tasks (e.g. one per week of a month-long plan), hence the array.
+  actions?: ParsedLuminaAction[];
 }
 
 // ─── Suggestion cards data ────────────────────────────────────────────────────
@@ -318,6 +330,19 @@ const formatUpdateTime = (dateStr: string) => {
   }
 };
 
+// Rotates while waiting for the first token of a reply — reflects, roughly,
+// the context-building steps the backend actually does before the LLM call
+// (see build_context() in focusly-workflows) so the wait doesn't look idle.
+const LAST_CONVERSATION_STORAGE_KEY = 'focusly_ai_last_conversation_id';
+
+const LUMINA_STATUS_MESSAGES = [
+  'Lumina se está conectando',
+  'Leyendo tus tareas',
+  'Revisando tus workspaces y folders',
+  'Consultando tu calendario',
+  'Analizando el contexto',
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const AskAI: React.FC = () => {
@@ -328,6 +353,7 @@ export const AskAI: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [statusMessageIndex, setStatusMessageIndex] = useState(0);
   const [conversations, setConversations] = useState<AIConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
@@ -383,6 +409,7 @@ export const AskAI: React.FC = () => {
           sender: m.role === 'user' ? 'user' : 'ai',
           text: m.content,
           html: renderMarkdown(m.content, theme.palette.mode === 'dark', theme),
+          actions: m.actions ?? [],
         })),
       );
     } catch (err) {
@@ -394,6 +421,29 @@ export const AskAI: React.FC = () => {
     setActiveConversationId(null);
     setMessages([]);
   };
+
+  // Remember which conversation was open so navigating away and back (e.g.
+  // to Tasks/Calendar) resumes it instead of always landing on a blank new
+  // chat — the reply itself already finished generating and was saved
+  // server-side regardless of whether this page was mounted to show it.
+  useEffect(() => {
+    if (activeConversationId) {
+      localStorage.setItem(LAST_CONVERSATION_STORAGE_KEY, activeConversationId);
+    } else {
+      localStorage.removeItem(LAST_CONVERSATION_STORAGE_KEY);
+    }
+  }, [activeConversationId]);
+
+  useEffect(() => {
+    const lastId = localStorage.getItem(LAST_CONVERSATION_STORAGE_KEY);
+    if (lastId) {
+      handleSelectConversation(lastId);
+    }
+    // Restore once on mount only — re-running this on every render (e.g. if
+    // handleSelectConversation were in the deps) would refetch the same
+    // conversation's messages repeatedly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleDeleteConversation = async (id: string) => {
     try {
@@ -417,6 +467,19 @@ export const AskAI: React.FC = () => {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
+
+  // Rotate the "what Lumina is doing" status text while waiting for the
+  // first token of a reply (index is reset to 0 where sendMessage sets
+  // isTyping, right before the request goes out).
+  useEffect(() => {
+    if (!isTyping) return;
+    const intervalId = setInterval(() => {
+      setStatusMessageIndex(
+        (prev) => (prev + 1) % LUMINA_STATUS_MESSAGES.length,
+      );
+    }, 1400);
+    return () => clearInterval(intervalId);
+  }, [isTyping]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -506,6 +569,7 @@ export const AskAI: React.FC = () => {
       }
       setInputValue('');
       setIsTyping(true);
+      setStatusMessageIndex(0);
 
       const aiMsgId = `ai-${Date.now()}`;
       const aiMsg: Message = {
@@ -853,9 +917,21 @@ export const AskAI: React.FC = () => {
               <Box display="flex" flexDirection="column" gap={1.5} py={3}>
                 {messages.map((msg) => {
                   const isUser = msg.sender === 'user';
-                  const { cleanText, action } = parseLuminaAction(msg.text);
+                  const {
+                    cleanText,
+                    actions: liveActions,
+                    hasPendingAction: livePendingAction,
+                  } = parseLuminaActions(msg.text);
+                  // Historical messages already carry the backend-parsed
+                  // actions; only fall back to the client-side regex (and
+                  // its "still streaming a tag" flag) for the message
+                  // currently being streamed in.
+                  const actions =
+                    msg.actions !== undefined ? msg.actions : liveActions;
+                  const hasPendingAction =
+                    msg.actions === undefined && livePendingAction;
 
-                  if (!isUser && !cleanText.trim()) {
+                  if (!isUser && !cleanText.trim() && !hasPendingAction) {
                     return null;
                   }
 
@@ -896,18 +972,35 @@ export const AskAI: React.FC = () => {
                           }}
                         >
                           <MessageBubble isUser={isUser}>
-                            {cleanHtml ? (
-                              <div
-                                dangerouslySetInnerHTML={{ __html: cleanHtml }}
-                                style={{ lineHeight: 1.65, fontSize: '14px' }}
-                              />
-                            ) : (
-                              <Typography
-                                variant="body2"
-                                sx={{ whiteSpace: 'pre-wrap' }}
+                            {cleanText &&
+                              (cleanHtml ? (
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: cleanHtml,
+                                  }}
+                                  style={{ lineHeight: 1.65, fontSize: '14px' }}
+                                />
+                              ) : (
+                                <Typography
+                                  variant="body2"
+                                  sx={{ whiteSpace: 'pre-wrap' }}
+                                >
+                                  {cleanText}
+                                </Typography>
+                              ))}
+                            {hasPendingAction && (
+                              <LuminaWorkingIndicator
+                                sx={cleanText ? { mt: 1 } : undefined}
                               >
-                                {cleanText}
-                              </Typography>
+                                <span className="shimmer-text">
+                                  Lumina está trabajando
+                                </span>
+                                <span className="pulse-dots">
+                                  <span className="pulse-dot" />
+                                  <span className="pulse-dot" />
+                                  <span className="pulse-dot" />
+                                </span>
+                              </LuminaWorkingIndicator>
                             )}
                           </MessageBubble>
                           <Tooltip title="Regenerate/Retry" placement="top">
@@ -930,8 +1023,11 @@ export const AskAI: React.FC = () => {
                             </IconButton>
                           </Tooltip>
                         </Box>
-                        {!isUser && action && (
-                          <SuggestedActionCard action={action} />
+                        {!isUser && actions.length === 1 && (
+                          <SuggestedActionCard action={actions[0]} />
+                        )}
+                        {!isUser && actions.length > 1 && (
+                          <SuggestedActionsPlan actions={actions} />
                         )}
                       </Box>
 
@@ -968,9 +1064,16 @@ export const AskAI: React.FC = () => {
                       />
                     </AvatarWrapper>
                     <TypingIndicator>
-                      <div className="dot" />
-                      <div className="dot" />
-                      <div className="dot" />
+                      <LuminaWorkingIndicator>
+                        <span className="shimmer-text">
+                          {LUMINA_STATUS_MESSAGES[statusMessageIndex]}
+                        </span>
+                        <span className="pulse-dots">
+                          <span className="pulse-dot" />
+                          <span className="pulse-dot" />
+                          <span className="pulse-dot" />
+                        </span>
+                      </LuminaWorkingIndicator>
                     </TypingIndicator>
                   </MessageRow>
                 )}

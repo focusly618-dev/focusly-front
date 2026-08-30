@@ -13,6 +13,7 @@ import {
 import { colorPaletteMap, iconMap } from '../constants/library.constants';
 import type { WorkspaceTypes } from '../../../types/workspace.types';
 import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import { UNTITLED_WORKSPACE_TITLE } from '@/utils';
 
 interface WorkspaceCardItemProps {
   workspace: WorkspaceTypes;
@@ -223,7 +224,7 @@ export const WorkspaceCardItem = ({
             },
           }}
         >
-          {workspace.title}
+          {workspace.title || UNTITLED_WORKSPACE_TITLE}
         </Typography>
 
         <Typography

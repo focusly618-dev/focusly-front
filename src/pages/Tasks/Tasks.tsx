@@ -42,6 +42,10 @@ export const Tasks = ({
     setSearchTerm,
     dateRange,
     setDateRange,
+    referenceDate,
+    goToPreviousPeriod,
+    goToNextPeriod,
+    periodLabel,
 
     activeSort,
     activeFilters,
@@ -60,10 +64,6 @@ export const Tasks = ({
     handleApplySort,
     handleFinishOnboarding,
     deleteTasks,
-    page,
-    setPage,
-    pageSize,
-    setPageSize,
   } = useTasks();
 
   const isAIScheduleEnabled = isAIScheduleEnabledProp;
@@ -156,6 +156,10 @@ export const Tasks = ({
             filteredTasks={filteredTasks}
             dateRange={dateRange}
             setDateRange={setDateRange}
+            referenceDate={referenceDate}
+            periodLabel={periodLabel}
+            onGoToPreviousPeriod={goToPreviousPeriod}
+            onGoToNextPeriod={goToNextPeriod}
             setViewMode={setViewMode}
           />
 
@@ -227,13 +231,6 @@ export const Tasks = ({
               searchTerm={searchTerm}
               dateRange={dateRange}
               totalCount={totalCount}
-              page={page}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={(newSize) => {
-                setPageSize(newSize);
-                setPage(0);
-              }}
             />
           </Box>
         </MainContent>

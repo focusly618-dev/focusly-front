@@ -1,11 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  isToday,
-  isWithinInterval,
+  isSameDay,
+  isSameWeek,
+  isSameMonth,
+  startOfDay,
+  endOfDay,
   startOfWeek,
   endOfWeek,
   startOfMonth,
   endOfMonth,
+  addDays,
+  subDays,
+  addWeeks,
+  subWeeks,
+  addMonths,
+  subMonths,
+  format,
 } from 'date-fns';
 import type {
   TaskResponse,
@@ -31,55 +41,101 @@ export const useTasksFilters = (
     undefined,
   );
 
-  const [dateRange, setDateRange] = useState<DateRangeFilter>(() => {
+  const [dateRange, setDateRangeState] = useState<DateRangeFilter>(() => {
     const saved = localStorage.getItem('tasksDateRange');
     return (saved as DateRangeFilter) || 'all';
   });
+  const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
 
   useEffect(() => {
     localStorage.setItem('tasksDateRange', dateRange);
   }, [dateRange]);
 
+  const setDateRange = useCallback((range: DateRangeFilter) => {
+    setDateRangeState(range);
+    setReferenceDate(new Date());
+  }, []);
+
+  const goToPreviousPeriod = useCallback(() => {
+    setReferenceDate((prev) => {
+      if (dateRange === 'today') return subDays(prev, 1);
+      if (dateRange === 'this_week') return subWeeks(prev, 1);
+      if (dateRange === 'this_month') return subMonths(prev, 1);
+      return prev;
+    });
+  }, [dateRange]);
+
+  const goToNextPeriod = useCallback(() => {
+    setReferenceDate((prev) => {
+      if (dateRange === 'today') return addDays(prev, 1);
+      if (dateRange === 'this_week') return addWeeks(prev, 1);
+      if (dateRange === 'this_month') return addMonths(prev, 1);
+      return prev;
+    });
+  }, [dateRange]);
+
+  let periodLabel: string;
+  const realNow = new Date();
+  if (dateRange === 'today') {
+    periodLabel = isSameDay(referenceDate, realNow)
+      ? 'Today'
+      : format(referenceDate, 'EEE, MMM d');
+  } else if (dateRange === 'this_week') {
+    periodLabel = isSameWeek(referenceDate, realNow, { weekStartsOn: 1 })
+      ? 'This Week'
+      : `${format(startOfWeek(referenceDate, { weekStartsOn: 1 }), 'MMM d')} – ${format(endOfWeek(referenceDate, { weekStartsOn: 1 }), 'MMM d')}`;
+  } else if (dateRange === 'this_month') {
+    periodLabel = isSameMonth(referenceDate, realNow)
+      ? 'This Month'
+      : format(referenceDate, 'MMMM yyyy');
+  } else {
+    periodLabel = 'All Tasks';
+  }
+
+  // Sent to the backend as TaskFilterInput.startDate/endDate so the
+  // Today/Week/Month navigation queries the server for the right slice of
+  // tasks instead of fetching everything and filtering it in the browser.
+  // The backend's own date filter (tasks_service.py's
+  // _apply_filters_and_sorting) already checks the same field priority
+  // (estimated_start_date, falling back to deadline) this page's filtering
+  // used before, so moving the boundary here doesn't change which tasks
+  // match — it just computes those same boundaries once and lets the
+  // server do the filtering.
+  const dateRangeFilter = useMemo((): {
+    startDate?: string;
+    endDate?: string;
+  } => {
+    if (dateRange === 'today') {
+      return {
+        startDate: startOfDay(referenceDate).toISOString(),
+        endDate: endOfDay(referenceDate).toISOString(),
+      };
+    }
+    if (dateRange === 'this_week') {
+      return {
+        startDate: startOfWeek(referenceDate, { weekStartsOn: 1 }).toISOString(),
+        endDate: endOfWeek(referenceDate, { weekStartsOn: 1 }).toISOString(),
+      };
+    }
+    if (dateRange === 'this_month') {
+      const startMonth = startOfMonth(referenceDate);
+      const startWeek = startOfWeek(referenceDate, { weekStartsOn: 1 });
+      const start = startWeek < startMonth ? startWeek : startMonth;
+      return {
+        startDate: start.toISOString(),
+        endDate: endOfMonth(referenceDate).toISOString(),
+      };
+    }
+    return {};
+  }, [dateRange, referenceDate]);
+
   const applyLocalFilters = useCallback(
     (tasksToFilter: TaskResponse[]) => {
+      // Date-range filtering (Today/Week/Month) is done server-side now —
+      // see dateRangeFilter above, sent as TaskFilterInput.startDate/endDate
+      // — so `tasksToFilter` here has already been restricted to the right
+      // window; nothing left to do for it in the browser.
       let result = tasksToFilter;
-
-      // Filter by date range
-      if (dateRange !== 'all') {
-        result = result.filter((task) => {
-          const dateToUse =
-            task.estimated_start_date ||
-            task.deadline ||
-            task.completed_at ||
-            task.created_at ||
-            task.updated_at;
-
-          if (!dateToUse) return false;
-
-          const taskDate = new Date(dateToUse);
-          const now = new Date();
-
-          if (dateRange === 'today') {
-            return isToday(taskDate);
-          }
-
-          if (dateRange === 'this_week') {
-            const start = startOfWeek(now, { weekStartsOn: 1 });
-            const end = endOfWeek(now, { weekStartsOn: 1 });
-            return isWithinInterval(taskDate, { start, end });
-          }
-
-          if (dateRange === 'this_month') {
-            const startMonth = startOfMonth(now);
-            const startWeek = startOfWeek(now, { weekStartsOn: 1 });
-            const start = startWeek < startMonth ? startWeek : startMonth;
-            const end = endOfMonth(now);
-            return isWithinInterval(taskDate, { start, end });
-          }
-
-          return true;
-        });
-      }
 
       if (searchTerm) {
         result = result.filter(
@@ -111,13 +167,7 @@ export const useTasksFilters = (
 
       return result;
     },
-    [
-      dateRange,
-      searchTerm,
-      activeFilterState?.statuses?.length,
-      activeFilterState?.categories,
-      viewMode,
-    ],
+    [searchTerm, activeFilterState?.statuses?.length, activeFilterState?.categories, viewMode],
   );
 
   const handleApplySort = (sort: SortState) => {
@@ -204,6 +254,11 @@ export const useTasksFilters = (
     activeSort,
     dateRange,
     setDateRange,
+    referenceDate,
+    goToPreviousPeriod,
+    goToNextPeriod,
+    periodLabel,
+    dateRangeFilter,
 
     handleApplySort,
     handleApplyFilters,

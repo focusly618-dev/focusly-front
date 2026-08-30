@@ -6,12 +6,16 @@ import {
   Typography,
   Button,
   Box,
+  Chip,
   CircularProgress,
   useTheme,
 } from '@mui/material';
 import {
   CheckCircle as CheckCircleIcon,
   Add as AddIcon,
+  Schedule as ScheduleIcon,
+  Flag as FlagIcon,
+  CalendarToday as CalendarTodayIcon,
 } from '@mui/icons-material';
 
 import { useSuggestedActionCard } from './useSuggestedActionCard.hook';
@@ -20,7 +24,11 @@ import {
   cardSx,
   cardContentSx,
   headerRowSx,
-  detailsTextSx,
+  previewBoxSx,
+  previewTitleSx,
+  previewDescriptionSx,
+  previewMetaRowSx,
+  metaChipSx,
   errorTextSx,
   actionsRowSx,
   completedRowSx,
@@ -43,9 +51,11 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
     handleExecute,
     getActionIcon,
     getActionTitle,
-    getActionDetails,
+    getActionPreview,
     isLoading,
   } = useSuggestedActionCard(action);
+
+  const preview = getActionPreview();
 
   return (
     <Card sx={cardSx(theme)}>
@@ -57,9 +67,69 @@ export const SuggestedActionCard: React.FC<SuggestedActionCardProps> = ({
           </Typography>
         </Box>
 
-        <Typography variant="body2" color="text.secondary" sx={detailsTextSx}>
-          {getActionDetails()}
-        </Typography>
+        <Box sx={previewBoxSx(theme)}>
+          {preview.title && (
+            <Typography
+              variant="body2"
+              fontWeight={700}
+              color="text.primary"
+              sx={previewTitleSx}
+            >
+              {preview.title}
+            </Typography>
+          )}
+
+          {preview.description && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={previewDescriptionSx}
+            >
+              {preview.description}
+            </Typography>
+          )}
+
+          {preview.contentPreview && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={previewDescriptionSx}
+            >
+              {preview.contentPreview}
+            </Typography>
+          )}
+
+          {(preview.dateLabel ||
+            preview.durationLabel ||
+            preview.priorityLabel) && (
+            <Box sx={previewMetaRowSx}>
+              {preview.dateLabel && (
+                <Chip
+                  size="small"
+                  icon={<CalendarTodayIcon sx={{ fontSize: 13 }} />}
+                  label={preview.dateLabel}
+                  sx={metaChipSx(theme.palette.primary.main)}
+                />
+              )}
+              {preview.durationLabel && (
+                <Chip
+                  size="small"
+                  icon={<ScheduleIcon sx={{ fontSize: 13 }} />}
+                  label={preview.durationLabel}
+                  sx={metaChipSx()}
+                />
+              )}
+              {preview.priorityLabel && (
+                <Chip
+                  size="small"
+                  icon={<FlagIcon sx={{ fontSize: 13 }} />}
+                  label={preview.priorityLabel}
+                  sx={metaChipSx(preview.priorityColor)}
+                />
+              )}
+            </Box>
+          )}
+        </Box>
 
         {errorMessage && (
           <Typography

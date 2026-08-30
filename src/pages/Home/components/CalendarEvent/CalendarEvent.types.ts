@@ -8,7 +8,7 @@ export interface ICalendarEvent {
   end: Date;
   allDay?: boolean;
   resource?: Task | GoogleCalendarEvent;
-  type: 'task' | 'event';
+  type: 'task' | 'event' | 'skeleton';
   overlapIndex?: number;
   provider?: string;
   isDraft?: boolean;

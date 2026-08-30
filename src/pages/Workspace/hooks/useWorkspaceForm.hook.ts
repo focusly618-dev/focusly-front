@@ -5,6 +5,13 @@ import debounce from 'lodash.debounce';
 import { CREATE_WORKSPACE, UPDATE_WORKSPACE } from '../Workspace.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
+import { generateWorkspaceTitle } from '@/api/AI/apiAI';
+import { stripMarkdown } from '@/components/chat/suggestedActionCard/actionExecution.utils';
+
+// Below this many characters of actual (non-markdown) text, there isn't
+// enough signal yet for a meaningful AI title — wait for more content
+// instead of spending a request on "Untitled"-tier input.
+const MIN_CONTENT_LENGTH_FOR_AUTO_TITLE = 40;
 
 export const useWorkspaceForm = () => {
   const [createWorkspace] = useMutation(CREATE_WORKSPACE, {
@@ -77,10 +84,7 @@ export const useWorkspaceForm = () => {
             },
           });
         } else {
-          if (
-            data.title === 'Untitled Strategic Plan' &&
-            data.content === '[]'
-          ) {
+          if (!data.title?.trim() && data.content === '[]') {
             safeSetSaveState('idle');
             return;
           }
@@ -188,6 +192,39 @@ export const useWorkspaceForm = () => {
       debouncedSave.flush();
     };
   }, [debouncedSave]);
+
+  // Auto-title: once a workspace with no title (typed or otherwise) has
+  // enough real content, ask the AI for a short title instead of leaving it
+  // blank forever. Runs at most once per workspace — a title the user later
+  // clears back out won't be regenerated.
+  const titleGenerationRef = useRef<{ id?: string; attempted: boolean }>({
+    id: values.id,
+    attempted: false,
+  });
+
+  useEffect(() => {
+    if (titleGenerationRef.current.id === values.id) return;
+    titleGenerationRef.current = { id: values.id, attempted: false };
+  }, [values.id]);
+
+  useEffect(() => {
+    if (titleGenerationRef.current.attempted) return;
+    if (values.title?.trim()) return;
+
+    const plainText = stripMarkdown(values.content ?? '');
+    if (plainText.length < MIN_CONTENT_LENGTH_FOR_AUTO_TITLE) return;
+
+    titleGenerationRef.current.attempted = true;
+    generateWorkspaceTitle(plainText)
+      .then((generated) => {
+        if (generated && isMountedRef.current) {
+          setValue('title', generated, { shouldDirty: true });
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to auto-generate workspace title:', err);
+      });
+  }, [values.id, values.title, values.content, setValue]);
 
   return {
     register,
