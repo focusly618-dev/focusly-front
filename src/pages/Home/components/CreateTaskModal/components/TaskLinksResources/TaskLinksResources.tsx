@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import {
   Link as LinkIcon,
+  LinkOff as LinkOffIcon,
   Launch as LaunchIcon,
   Close as CloseIcon,
   Add as AddIcon,
@@ -80,6 +81,20 @@ export const TaskLinksResources = ({
   const showCollaboratorSection =
     hasMeetLink && (isAddingCollaborator || collaborators.length > 0);
 
+  const showEmptyLinks = () => {
+    return (
+      <Box display="flex" alignItems="center" gap={1}>
+        <LinkOffIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+        <Typography
+          variant="caption"
+          sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}
+        >
+          Sin enlaces ni recursos
+        </Typography>
+      </Box>
+    );
+  };
+
   return (
     <Box sx={{ px: 4, mb: 4 }}>
       {/* Links & Resources Header */}
@@ -89,15 +104,19 @@ export const TaskLinksResources = ({
         justifyContent="space-between"
         mb={1.5}
       >
-        <Box display="flex" alignItems="center" gap={1}>
-          <LinkIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-          <Typography
-            variant="caption"
-            sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}
-          >
-            Links and resources
-          </Typography>
-        </Box>
+        {links.length === 0 ? (
+          showEmptyLinks()
+        ) : (
+          <Box display="flex" alignItems="center" gap={1}>
+            <LinkIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}
+            >
+              Links and resources
+            </Typography>
+          </Box>
+        )}
         <Box display="flex" alignItems="center" gap={1}>
           {/* Add Meet Button */}
           <Button

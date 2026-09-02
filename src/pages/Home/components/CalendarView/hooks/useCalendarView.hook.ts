@@ -44,7 +44,7 @@ import {
   subMonths,
   subWeeks,
 } from 'date-fns';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Views, type View } from 'react-big-calendar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
@@ -242,6 +242,32 @@ export const useCalendarView = () => {
     };
   }, [dispatch, user?.id, user?.authProvider, isCalendarConnected]);
 
+  const isDeletingRef = useRef(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const prevTasksCount = useRef(tasks.length);
+  const hasInitialTasksLoaded = useRef(false);
+
+  useEffect(() => {
+    if (tasksData !== undefined) {
+      hasInitialTasksLoaded.current = true;
+    }
+  }, [tasksData]);
+
+  useEffect(() => {
+    // Si la cantidad de tareas disminuyó, se eliminó una tarea en el calendario
+    if (tasks.length < prevTasksCount.current) {
+      isDeletingRef.current = true;
+      setIsDeleting(true);
+      const timer = setTimeout(() => {
+        isDeletingRef.current = false;
+        setIsDeleting(false);
+      }, 2500);
+      prevTasksCount.current = tasks.length;
+      return () => clearTimeout(timer);
+    }
+    prevTasksCount.current = tasks.length;
+  }, [tasks.length]);
+
   // Loading must be tracked per-source: tasks and Google events can resolve at
   // different times (e.g. tasks served instantly from the Apollo cache while
   // the Google events fetch is still in flight), so a single combined flag
@@ -252,8 +278,10 @@ export const useCalendarView = () => {
   const hasRenderableGoogleEvents = reduxEvents.length > 0;
 
   const isCalendarLoading =
-    (!hasRenderableTasks && isTasksQueryLoading) ||
-    (!hasRenderableGoogleEvents && isGoogleEventsLoading);
+    !isDeleting &&
+    !isDeletingRef.current &&
+    ((!hasInitialTasksLoaded.current && !hasRenderableTasks && isTasksQueryLoading) ||
+      (!hasRenderableGoogleEvents && isGoogleEventsLoading));
   const events = useMemo(() => {
     // 1. Prepare a set of all synced Google Event IDs for efficient deduplication
     // We store both exact normalized IDs and base IDs to catch series imports.
@@ -588,6 +616,8 @@ export const useCalendarView = () => {
   };
 
   const handleDeleteTask = async (taskId: string) => {
+    isDeletingRef.current = true;
+    setIsDeleting(true);
     const taskObj = tasks.find((t) => t.id === taskId);
     const virtualEvent = reduxEvents.find((e) => e.id === taskId);
     const initialTask = taskObj || virtualEvent;
@@ -602,6 +632,8 @@ export const useCalendarView = () => {
             "You can't delete the task because you are not the owner",
           duration: 3000,
         });
+        isDeletingRef.current = false;
+        setIsDeleting(false);
         return;
       }
     }
@@ -661,6 +693,11 @@ export const useCalendarView = () => {
         fill: 'var(--sileo-error-bg)',
         duration: 4000,
       });
+    } finally {
+      setTimeout(() => {
+        isDeletingRef.current = false;
+        setIsDeleting(false);
+      }, 2500);
     }
   };
 

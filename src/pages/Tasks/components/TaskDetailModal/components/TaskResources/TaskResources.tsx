@@ -20,6 +20,7 @@ import {
   Launch as LaunchIcon,
   Close as CloseIcon,
   PersonAdd as PersonAddIcon,
+  LinkOff as LinkOffIcon,
 } from '@mui/icons-material';
 import {
   resourcesContainerSx,
@@ -125,28 +126,46 @@ export const TaskResources = ({
   const showCollaboratorSection =
     hasMeetLink && (isAddingCollaborator || collaborators.length > 0);
 
+  const showEmptyLinks = () => {
+    return (
+      <Box display="flex" alignItems="center" gap={1}>
+        <LinkOffIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+        <Typography
+          variant="caption"
+          sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}
+        >
+          Sin enlaces ni recursos
+        </Typography>
+      </Box>
+    );
+  };
   return (
     <Box sx={resourcesContainerSx}>
       <Box
         sx={resourcesHeaderSx(isLinksExpanded)}
         onClick={() => setIsLinksExpanded(!isLinksExpanded)}
       >
-        <Box display="flex" alignItems="center" gap={1}>
-          <LinkIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              fontSize: '13px',
-              fontWeight: 500,
-            }}
-          >
-            Links and resources
-          </Typography>
-          {!isLinksExpanded && links.length > 0 && (
-            <Box sx={resourceCountSx}>{links.length}</Box>
-          )}
-        </Box>
+
+        {links.length === 0 ? (
+          showEmptyLinks()
+        ) : (
+          <Box display="flex" alignItems="center" gap={1}>
+            <LinkIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              Links and resources
+            </Typography>
+            {!isLinksExpanded && links.length > 0 && (
+              <Box sx={resourceCountSx}>{links.length}</Box>
+            )}
+          </Box>
+        )}
         <Box display="flex" alignItems="center" gap={0.5}>
           <IconButton
             size="small"
@@ -203,7 +222,7 @@ export const TaskResources = ({
                     </AnimatePresence>
                   </Button>
 
-                  {/* Add Collaborators Button (PersonAddIcon) */}
+
                   {hasMeetLink && (
                     <Button
                       size="small"

@@ -165,7 +165,7 @@ export const TaskDescription = ({
             </>
           )}
 
-          {description.trim().length > 0 && (
+          {description.trim().length > 0 && !isReadOnly && (
             <Button
               size="small"
               onClick={() => setIsPreview(!isPreview)}
@@ -239,11 +239,10 @@ export const TaskDescription = ({
               padding: '2px 6px',
               borderRadius: '4px',
               fontWeight: 600,
-              border: `1px solid ${
-                theme.palette.mode === 'dark'
-                  ? 'rgba(250, 204, 21, 0.45)'
-                  : 'rgba(234, 179, 8, 0.5)'
-              }`,
+              border: `1px solid ${theme.palette.mode === 'dark'
+                ? 'rgba(250, 204, 21, 0.45)'
+                : 'rgba(234, 179, 8, 0.5)'
+                }`,
             },
             '& strong': {
               fontWeight: 700,

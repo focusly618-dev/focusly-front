@@ -37,7 +37,7 @@ const Transition = React.forwardRef(function Transition(
 export const TaskDetailModal = ({
   open,
   onClose,
-  onSave = () => {},
+  onSave = () => { },
   initialStart = null,
   initialEnd = null,
   initialTask,
@@ -235,13 +235,13 @@ export const TaskDetailModal = ({
               transition: 'background-color 0.2s, width 0.2s !important',
             },
             '& .ps__rail-y:hover .ps__thumb-y, & .ps__rail-y.ps--clicking .ps__thumb-y':
-              {
-                backgroundColor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.3) !important'
-                    : 'rgba(0, 0, 0, 0.25) !important',
-                width: '8px !important',
-              },
+            {
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.3) !important'
+                  : 'rgba(0, 0, 0, 0.25) !important',
+              width: '8px !important',
+            },
           }}
         >
           <PerfectScrollbar
