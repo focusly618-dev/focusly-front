@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   isSameDay,
   isSameWeek,
@@ -30,6 +31,10 @@ export type DateRangeFilter = 'today' | 'this_week' | 'this_month' | 'all';
 export const useTasksFilters = (
   viewMode?: 'list' | 'grid' | 'board' | 'workload',
 ) => {
+  const [searchParams] = useSearchParams();
+  const urlDateRange = searchParams.get('dateRange') as DateRangeFilter | null;
+  const urlFilter = searchParams.get('filter');
+
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<
     TaskFilterInput | undefined
@@ -42,10 +47,20 @@ export const useTasksFilters = (
   );
 
   const [dateRange, setDateRangeState] = useState<DateRangeFilter>(() => {
+    if (urlDateRange && ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)) {
+      return urlDateRange;
+    }
     const saved = localStorage.getItem('tasksDateRange');
     return (saved as DateRangeFilter) || 'all';
   });
   const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
+
+  useEffect(() => {
+    if (urlDateRange && ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)) {
+      setDateRangeState(urlDateRange);
+      setReferenceDate(new Date());
+    }
+  }, [urlDateRange]);
 
   useEffect(() => {
     localStorage.setItem('tasksDateRange', dateRange);
@@ -165,9 +180,15 @@ export const useTasksFilters = (
         result = result.filter((task) => task.status !== 'Done');
       }
 
+      if (urlFilter === 'inbox') {
+        result = result.filter(
+          (task) => !task.deadline && !task.estimated_start_date,
+        );
+      }
+
       return result;
     },
-    [searchTerm, activeFilterState?.statuses?.length, activeFilterState?.categories, viewMode],
+    [searchTerm, activeFilterState?.statuses?.length, activeFilterState?.categories, viewMode, urlFilter],
   );
 
   const handleApplySort = (sort: SortState) => {

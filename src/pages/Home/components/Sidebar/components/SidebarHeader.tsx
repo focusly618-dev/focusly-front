@@ -43,7 +43,7 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
   } = sidebar;
 
   return (
-    <Box sx={{ px: isCollapsed ? 1 : { xs: 0, lg: 3 } }}>
+    <Box sx={{ px: isCollapsed ? 0.75 : { xs: 0, lg: 1.25 } }}>
       <Logo
         id="joyride-logo"
         as="div"
@@ -53,18 +53,23 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
             ? 'center'
             : { xs: 'center', lg: 'space-between' },
           alignItems: 'center',
-          px: isCollapsed ? 0 : { xs: 2, lg: 0 },
-          gap: isCollapsed ? 1.5 : 0,
-          paddingBottom: isCollapsed ? '12px' : undefined,
+          px: isCollapsed ? 0 : { xs: 1, lg: 0 },
+          gap: isCollapsed ? 1 : 0,
+          paddingBottom: isCollapsed ? '6px' : undefined,
         }}
       >
         {/* Logo + Name */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FocuslyLogo size={30} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+          <FocuslyLogo size={22} />
           {!isCollapsed && (
             <Box
               component="span"
-              sx={{ display: { xs: 'none', lg: 'inline' } }}
+              sx={{
+                display: { xs: 'none', lg: 'inline' },
+                fontSize: '0.95rem',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+              }}
             >
               Focusly
             </Box>
@@ -77,7 +82,7 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
             display: { xs: 'none', lg: 'flex' },
             flexDirection: isCollapsed ? 'column' : 'row',
             alignItems: 'center',
-            gap: 0.5,
+            gap: 0.25,
           }}
         >
           {/* Notification button — hidden when collapsed */}
@@ -85,20 +90,20 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
             <IconButton
               size="small"
               onClick={handleNotifOpen}
-              sx={{ color: 'text.secondary' }}
+              sx={{ color: 'text.secondary', p: 0.5 }}
             >
               <Badge
                 badgeContent={unreadCount}
                 color="primary"
                 sx={{
                   '& .MuiBadge-badge': {
-                    fontSize: 9,
-                    height: 16,
-                    minWidth: 16,
+                    fontSize: 8,
+                    height: 14,
+                    minWidth: 14,
                   },
                 }}
               >
-                <NotificationsNoneIcon sx={{ fontSize: 20 }} />
+                <NotificationsNoneIcon sx={{ fontSize: 17 }} />
               </Badge>
             </IconButton>
           )}
@@ -109,7 +114,8 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
             onClick={toggleCollapse}
             sx={{
               color: 'text.secondary',
-              borderRadius: '8px',
+              borderRadius: '6px',
+              p: 0.5,
               transition: 'all 0.2s ease',
               '&:hover': {
                 color: theme.palette.primary.main,
@@ -121,9 +127,9 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
             }}
           >
             {isCollapsed ? (
-              <ChevronRightIcon sx={{ fontSize: 20 }} />
+              <ChevronRightIcon sx={{ fontSize: 17 }} />
             ) : (
-              <ChevronLeftIcon sx={{ fontSize: 20 }} />
+              <ChevronLeftIcon sx={{ fontSize: 17 }} />
             )}
           </IconButton>
         </Box>

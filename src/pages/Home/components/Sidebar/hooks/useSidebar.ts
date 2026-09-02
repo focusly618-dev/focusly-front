@@ -55,6 +55,55 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     });
   };
 
+  // Tasks counts & expansion (Akiflow style)
+  const tasks = useAppSelector((state) => state.task.tasks || []);
+
+  const [isTasksExpanded, setIsTasksExpanded] = useState(() => {
+    return localStorage.getItem('sidebar-tasks-expanded') !== 'false';
+  });
+
+  const toggleTasksExpanded = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setIsTasksExpanded((prev) => {
+      const next = !prev;
+      localStorage.setItem('sidebar-tasks-expanded', String(next));
+      return next;
+    });
+  };
+
+  const taskCounts = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('en-CA');
+
+    let inbox = 0;
+    let today = 0;
+    let upcoming = 0;
+
+    tasks.forEach((t) => {
+      if (t.status === 'Done' || t.deleted_at) return;
+
+      const dateToUse = t.deadline || t.estimated_start_date;
+      if (!dateToUse) {
+        inbox++;
+        return;
+      }
+
+      const taskDateStr = new Date(dateToUse).toLocaleDateString('en-CA');
+      if (taskDateStr <= todayStr) {
+        today++;
+      } else {
+        upcoming++;
+      }
+    });
+
+    return {
+      inbox,
+      today,
+      upcoming,
+      total: inbox + today + upcoming,
+    };
+  }, [tasks]);
+
   // Workspaces Queries & Mutations
   const { data: workspacesData } = useQuery(GET_WORKSPACES, {
     variables: { search: '' },
@@ -498,6 +547,9 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     handleRenameGroupSubmit,
     isCollapsed,
     toggleCollapse,
+    taskCounts,
+    isTasksExpanded,
+    toggleTasksExpanded,
   };
 };
 

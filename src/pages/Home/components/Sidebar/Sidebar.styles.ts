@@ -4,8 +4,8 @@ import { surfaceColor } from '@/context';
 export const SidebarContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'collapsed',
 })<{ collapsed?: boolean }>(({ theme, collapsed }) => ({
-  width: collapsed ? 80 : 260,
-  transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  width: collapsed ? 58 : 205,
+  transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
   backgroundColor: surfaceColor(theme, '#111827', '#19191A', '#f1f5f9'),
   backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
   borderRight:
@@ -19,7 +19,7 @@ export const SidebarContainer = styled(Box, {
   flexShrink: 0,
   overflow: 'hidden',
   [theme.breakpoints.down('lg')]: {
-    width: 80,
+    width: 58,
   },
   [theme.breakpoints.down('md')]: {
     width: 'fit-content',
@@ -50,14 +50,14 @@ export const SidebarContainer = styled(Box, {
 
 export const Logo = styled(Typography)(({ theme }) => ({
   fontWeight: 800,
-  fontSize: '1.25rem',
+  fontSize: '0.95rem',
   color: theme.palette.text.primary,
-  padding: '0px 0px 20px 0px',
+  padding: '0',
   display: 'flex',
-  margin: '20px 0px 20px 0px',
+  margin: '10px 0 6px 0',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: 8,
+  gap: 6,
 }));
 
 export const AddTaskButton = styled(Button)(({ theme }) => ({
@@ -70,9 +70,9 @@ export const AddTaskButton = styled(Button)(({ theme }) => ({
   color: theme.palette.text.primary,
   textTransform: 'none',
   justifyContent: 'center',
-  padding: '16px',
-  margin: '20px',
-  borderRadius: 12,
+  padding: '8px 12px',
+  margin: '8px 12px',
+  borderRadius: 8,
   alignItems: 'center',
   textAlign: 'center',
   boxShadow:
@@ -92,11 +92,13 @@ export const AddTaskButton = styled(Button)(({ theme }) => ({
 export const NavItem = styled(ListItemButton, {
   shouldForwardProp: (prop) => prop !== 'active',
 })<{ active?: boolean }>(({ theme, active }) => ({
-  borderRadius: 8,
-  marginBottom: 4,
+  borderRadius: 6,
+  marginBottom: 2,
+  padding: '5px 8px',
+  minHeight: 32,
   backgroundColor: active ? theme.palette.primary.main : 'transparent',
   color: active ? '#ffffff' : theme.palette.text.secondary,
-  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
     backgroundColor: active
       ? theme.palette.primary.dark
@@ -107,12 +109,17 @@ export const NavItem = styled(ListItemButton, {
   },
   '& .MuiListItemIcon-root': {
     color: 'inherit',
-    minWidth: 40,
+    minWidth: 26,
+    display: 'flex',
+    alignItems: 'center',
+    '& .MuiSvgIcon-root': {
+      fontSize: 17,
+    },
   },
   [theme.breakpoints.down('lg')]: {
     justifyContent: 'center',
-    paddingLeft: 16,
-    paddingRight: 16,
+    paddingLeft: 6,
+    paddingRight: 6,
     '& .MuiListItemIcon-root': {
       minWidth: 'auto',
       display: 'flex',
@@ -126,7 +133,7 @@ export const NavItem = styled(ListItemButton, {
       active && theme.palette.mode === 'dark'
         ? '3px solid #6366f1'
         : '3px solid transparent',
-    padding: '8px 12px',
+    padding: '6px 10px',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -136,6 +143,73 @@ export const NavItem = styled(ListItemButton, {
       minWidth: 'auto',
       marginRight: 0,
     },
+  },
+}));
+
+export const SubNavItem = styled(ListItemButton, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
+  borderRadius: 6,
+  marginBottom: 2,
+  padding: '4px 8px 4px 18px',
+  minHeight: 28,
+  backgroundColor: active
+    ? theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.08)'
+      : 'rgba(0, 0, 0, 0.05)'
+    : 'transparent',
+  color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+  transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:hover': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(0, 0, 0, 0.03)',
+    color: theme.palette.text.primary,
+  },
+  '& .MuiListItemIcon-root': {
+    color: 'inherit',
+    minWidth: 22,
+    display: 'flex',
+    alignItems: 'center',
+    '& .MuiSvgIcon-root': {
+      fontSize: 15,
+    },
+  },
+}));
+
+export const NavCountBadge = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
+  fontSize: '10px',
+  fontWeight: 700,
+  lineHeight: 1,
+  padding: '2px 5px',
+  borderRadius: '10px',
+  minWidth: 16,
+  textAlign: 'center',
+  backgroundColor: active
+    ? 'rgba(255, 255, 255, 0.25)'
+    : theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.08)'
+      : 'rgba(0, 0, 0, 0.06)',
+  color: active ? '#ffffff' : theme.palette.text.secondary,
+  marginLeft: 'auto',
+  transition: 'all 0.15s ease',
+}));
+
+export const CategoryHeader = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  fontSize: '9.5px',
+  opacity: 0.6,
+  padding: '0 8px',
+  marginTop: '12px',
+  marginBottom: '4px',
+  [theme.breakpoints.down('md')]: {
+    display: 'none',
   },
 }));
 
