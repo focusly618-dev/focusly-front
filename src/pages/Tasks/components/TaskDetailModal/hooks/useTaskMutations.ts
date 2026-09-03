@@ -12,7 +12,6 @@ import {
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type {
   TaskData,
-  TaskInput,
   UseTaskMutationsProps,
 } from '../types/TaskDetailModal.types';
 import type { PriorityType } from '../TaskDetailModal.utils';
@@ -76,16 +75,22 @@ export const useTaskMutations = ({
       links.push({ title: 'Google Meet', url: meetLink });
     }
 
+    const hasValidDeadline =
+      state.deadline && !isNaN(state.deadline.getTime());
+    const deadlineISO = hasValidDeadline ? state.deadline!.toISOString() : '';
+    const endDateISO = hasValidDeadline
+      ? new Date(
+        state.deadline!.getTime() + (estimateTimer || 25) * 60000,
+      ).toISOString()
+      : undefined;
+
     const commonInput = {
       title: state.title,
       notes_encrypted: `${cleanDesc} [COLOR:${state.color}]`,
       estimate_timer: estimateTimer,
       real_timer: realTimer,
       tags: state.tags,
-      deadline:
-        state.deadline && !isNaN(state.deadline.getTime())
-          ? state.deadline.toISOString()
-          : new Date().toISOString(),
+      deadline: deadlineISO,
       priority_level: priorityLevel,
       category: state.category,
       color: state.color,
@@ -93,24 +98,21 @@ export const useTaskMutations = ({
       collaborators: state.collaborators,
     };
 
-    const deadlineISO =
-      state.deadline && !isNaN(state.deadline.getTime())
-        ? state.deadline.toISOString()
-        : new Date().toISOString();
-    const endDateISO = new Date(
-      (state.deadline?.getTime() || Date.now()) + (estimateTimer || 25) * 60000,
-    ).toISOString();
+    const targetStatus = hasValidDeadline
+      ? (state.status === 'Backlog' ? 'Todo' : state.status || 'Todo')
+      : 'Backlog';
 
-    const createInput: TaskInput = {
+    const createInput: Record<string, unknown> = {
       ...commonInput,
       user_id: user.id || '',
-      status: state.status || 'Backlog',
+      status: targetStatus,
       google_event_id:
         createdGoogleEventId ||
         (initialTask as { google_event_id?: string })?.google_event_id,
-      estimated_start_date: deadlineISO,
+      estimated_start_date: hasValidDeadline ? deadlineISO : undefined,
       estimated_end_date: endDateISO,
       time_logs: state.time_logs || [],
+      skip_scheduling: !hasValidDeadline,
     };
 
     try {
@@ -164,18 +166,20 @@ export const useTaskMutations = ({
     const currentDeadline: string = state.deadline
       ? !isNaN(state.deadline.getTime())
         ? state.deadline.toISOString()
-        : initialTask.deadline || ''
-      : initialTask.deadline || '';
+        : ''
+      : '';
 
-    const startDate = new Date(currentDeadline);
-    const estimatedStartISO = !isNaN(startDate.getTime())
-      ? startDate.toISOString()
-      : undefined;
-    const estimatedEndISO = !isNaN(startDate.getTime())
-      ? new Date(
+    const startDate = currentDeadline ? new Date(currentDeadline) : null;
+    const estimatedStartISO =
+      startDate && !isNaN(startDate.getTime())
+        ? startDate.toISOString()
+        : null;
+    const estimatedEndISO =
+      startDate && !isNaN(startDate.getTime())
+        ? new Date(
           startDate.getTime() + (estimateTimer || 30) * 60000,
         ).toISOString()
-      : undefined;
+        : null;
 
     // Define which fields to compare and how
     const configs: Record<
@@ -302,6 +306,7 @@ export const useTaskMutations = ({
           fill: 'var(--sileo-update-bg)',
         });
         onSave(data.updateTask);
+        resetForm();
         if (shouldClose) onClose();
       }
     } catch (e) {

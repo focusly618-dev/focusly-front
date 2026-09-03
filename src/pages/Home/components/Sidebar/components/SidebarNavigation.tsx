@@ -28,7 +28,6 @@ import {
   TodayOutlined as TodayIcon,
   CalendarMonthOutlined as UpcomingIcon,
   ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 
@@ -58,10 +57,13 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
   const isInboxActive =
     currentTab === TaskBar.Tasks && currentFilter === 'inbox';
   const isTodayActive =
-    currentTab === TaskBar.Tasks && currentDateRange === 'today';
+    currentTab === TaskBar.Tasks &&
+    (currentFilter === 'today' || currentDateRange === 'today');
   const isUpcomingActive =
     currentTab === TaskBar.Tasks &&
-    (currentDateRange === 'this_week' || currentDateRange === 'upcoming');
+    (currentFilter === 'upcoming' ||
+      currentDateRange === 'this_week' ||
+      currentDateRange === 'upcoming');
   const isAskAIActive = currentTab === TaskBar.AskAI;
   const isInsightsActive = currentTab === TaskBar.Insights;
   const isProjectsActive =
@@ -266,7 +268,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                 onClick={() => {
                   const newParams = new URLSearchParams();
                   newParams.set('tab', TaskBar.Tasks);
-                  newParams.set('dateRange', 'today');
+                  newParams.set('filter', 'today');
                   sidebar.setSearchParams(newParams);
                   changeStatusTab(TaskBar.Tasks, newParams);
                 }}
@@ -294,7 +296,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                 onClick={() => {
                   const newParams = new URLSearchParams();
                   newParams.set('tab', TaskBar.Tasks);
-                  newParams.set('dateRange', 'this_week');
+                  newParams.set('filter', 'upcoming');
                   sidebar.setSearchParams(newParams);
                   changeStatusTab(TaskBar.Tasks, newParams);
                 }}

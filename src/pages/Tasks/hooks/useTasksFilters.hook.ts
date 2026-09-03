@@ -56,11 +56,13 @@ export const useTasksFilters = (
   const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
 
   useEffect(() => {
-    if (urlDateRange && ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)) {
+    if (urlFilter === 'inbox' || urlFilter === 'upcoming') {
+      setDateRangeState('all');
+    } else if (urlDateRange && ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)) {
       setDateRangeState(urlDateRange);
       setReferenceDate(new Date());
     }
-  }, [urlDateRange]);
+  }, [urlDateRange, urlFilter]);
 
   useEffect(() => {
     localStorage.setItem('tasksDateRange', dateRange);
@@ -120,6 +122,9 @@ export const useTasksFilters = (
     startDate?: string;
     endDate?: string;
   } => {
+    if (urlFilter === 'inbox' || urlFilter === 'upcoming') {
+      return {};
+    }
     if (dateRange === 'today') {
       return {
         startDate: startOfDay(referenceDate).toISOString(),
@@ -142,7 +147,7 @@ export const useTasksFilters = (
       };
     }
     return {};
-  }, [dateRange, referenceDate]);
+  }, [dateRange, referenceDate, urlFilter]);
 
   const applyLocalFilters = useCallback(
     (tasksToFilter: TaskResponse[]) => {
@@ -181,9 +186,55 @@ export const useTasksFilters = (
       }
 
       if (urlFilter === 'inbox') {
-        result = result.filter(
-          (task) => !task.deadline && !task.estimated_start_date,
-        );
+        result = result.filter((task) => {
+          const hasEstimatedStart =
+            task.estimated_start_date &&
+            !isNaN(new Date(task.estimated_start_date).getTime());
+          const hasValidDeadline =
+            task.deadline && !isNaN(new Date(task.deadline).getTime());
+          return (
+            (!hasEstimatedStart && !hasValidDeadline) ||
+            (task.status === 'Backlog' && !hasEstimatedStart)
+          );
+        });
+      } else if (urlFilter === 'today') {
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        result = result.filter((task) => {
+          if (task.status === 'Done' || (task as unknown as { deleted_at?: string }).deleted_at) return false;
+          const hasEstimatedStart =
+            task.estimated_start_date &&
+            !isNaN(new Date(task.estimated_start_date).getTime());
+          const hasValidDeadline =
+            task.deadline && !isNaN(new Date(task.deadline).getTime());
+          if (
+            (!hasEstimatedStart && !hasValidDeadline) ||
+            (task.status === 'Backlog' && !hasEstimatedStart)
+          ) {
+            return false;
+          }
+          const dateToUse = (task.estimated_start_date || task.deadline)!;
+          const taskDateStr = new Date(dateToUse).toLocaleDateString('en-CA');
+          return taskDateStr <= todayStr;
+        });
+      } else if (urlFilter === 'upcoming') {
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        result = result.filter((task) => {
+          if (task.status === 'Done' || (task as unknown as { deleted_at?: string }).deleted_at) return false;
+          const hasEstimatedStart =
+            task.estimated_start_date &&
+            !isNaN(new Date(task.estimated_start_date).getTime());
+          const hasValidDeadline =
+            task.deadline && !isNaN(new Date(task.deadline).getTime());
+          if (
+            (!hasEstimatedStart && !hasValidDeadline) ||
+            (task.status === 'Backlog' && !hasEstimatedStart)
+          ) {
+            return false;
+          }
+          const dateToUse = (task.estimated_start_date || task.deadline)!;
+          const taskDateStr = new Date(dateToUse).toLocaleDateString('en-CA');
+          return taskDateStr > todayStr;
+        });
       }
 
       return result;

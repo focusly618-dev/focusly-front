@@ -193,7 +193,7 @@ export const NavCountBadge = styled(Box, {
     : theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, 0.08)'
       : 'rgba(0, 0, 0, 0.06)',
-  color: active ? '#ffffff' : theme.palette.text.secondary,
+  color: active ? '#000000ff' : theme.palette.text.secondary,
   marginLeft: 'auto',
   transition: 'all 0.15s ease',
 }));

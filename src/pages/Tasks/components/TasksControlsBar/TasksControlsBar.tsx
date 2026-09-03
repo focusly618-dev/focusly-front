@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import { Typography, Box, Select, MenuItem, IconButton } from '@mui/material';
 import { surfaceColor } from '@/context';
 import {
@@ -48,6 +49,11 @@ export const TasksControlsBar = ({
   onGoToNextPeriod,
   setViewMode,
 }: TasksControlsBarProps) => {
+  const [searchParams] = useSearchParams();
+  const urlFilter = searchParams.get('filter');
+  const urlDateRange = searchParams.get('dateRange');
+  const hideDateSelector = Boolean(urlFilter || urlDateRange);
+
   const pendingCount = filteredTasks
     ? filteredTasks.filter((t) => t.status !== 'Done').length
     : 0;
@@ -234,67 +240,71 @@ export const TasksControlsBar = ({
             <span>{completedCount} Completed</span>
           </Typography>
 
-          <Box
-            sx={{
-              width: '1px',
-              height: '18px',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.15)'
-                  : '#bfdbfe',
-              mx: 2,
-            }}
-          />
+          {!hideDateSelector && (
+            <>
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '18px',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.15)'
+                      : '#bfdbfe',
+                  mx: 2,
+                }}
+              />
 
-          <IconButton
-            onClick={onGoToPreviousPeriod}
-            disabled={dateRange === 'all'}
-            size="small"
-            sx={{
-              p: 0.25,
-              color: (theme) =>
-                theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
-            }}
-          >
-            <ChevronLeftIcon sx={{ fontSize: 18 }} />
-          </IconButton>
+              <IconButton
+                onClick={onGoToPreviousPeriod}
+                disabled={dateRange === 'all'}
+                size="small"
+                sx={{
+                  p: 0.25,
+                  color: (theme) =>
+                    theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
+                }}
+              >
+                <ChevronLeftIcon sx={{ fontSize: 18 }} />
+              </IconButton>
 
-          <Select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value as DateRangeFilter)}
-            renderValue={() => periodLabel}
-            size="small"
-            variant="standard"
-            disableUnderline
-            sx={{
-              fontSize: '12px',
-              fontWeight: 700,
-              color: (theme) =>
-                theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
-              '& .MuiSelect-select': {
-                py: 0,
-                pr: '20px !important',
-              },
-            }}
-          >
-            <MenuItem value="all">All Tasks</MenuItem>
-            <MenuItem value="today">Today</MenuItem>
-            <MenuItem value="this_week">This Week</MenuItem>
-            <MenuItem value="this_month">This Month</MenuItem>
-          </Select>
+              <Select
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value as DateRangeFilter)}
+                renderValue={() => periodLabel}
+                size="small"
+                variant="standard"
+                disableUnderline
+                sx={{
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  color: (theme) =>
+                    theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
+                  '& .MuiSelect-select': {
+                    py: 0,
+                    pr: '20px !important',
+                  },
+                }}
+              >
+                <MenuItem value="all">All Tasks</MenuItem>
+                <MenuItem value="today">Today</MenuItem>
+                <MenuItem value="this_week">This Week</MenuItem>
+                <MenuItem value="this_month">This Month</MenuItem>
+              </Select>
 
-          <IconButton
-            onClick={onGoToNextPeriod}
-            disabled={dateRange === 'all'}
-            size="small"
-            sx={{
-              p: 0.25,
-              color: (theme) =>
-                theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
-            }}
-          >
-            <ChevronRightIcon sx={{ fontSize: 18 }} />
-          </IconButton>
+              <IconButton
+                onClick={onGoToNextPeriod}
+                disabled={dateRange === 'all'}
+                size="small"
+                sx={{
+                  p: 0.25,
+                  color: (theme) =>
+                    theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
+                }}
+              >
+                <ChevronRightIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </>
+          )}
         </Box>
       </Box>
 

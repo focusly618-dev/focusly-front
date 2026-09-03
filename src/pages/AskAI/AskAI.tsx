@@ -520,7 +520,7 @@ export const AskAI: React.FC = () => {
       (curr.estimated_end_date &&
         prev.estimated_end_date &&
         curr.estimated_end_date > prev.estimated_end_date) ||
-      (!prev.title && curr.title)
+        (!prev.title && curr.title)
         ? curr
         : prev,
     tasks[0],
@@ -587,14 +587,14 @@ export const AskAI: React.FC = () => {
           history,
           biggestTask
             ? {
-                title: biggestTask.title,
-                description: biggestTask.notes_encrypted || '',
-                status: biggestTask.status || 'Todo',
-                priority_level: biggestTask.priority_level ?? 0,
-                estimate_timer: biggestTask.estimate_timer ?? 0,
-                real_timer: biggestTask.real_timer ?? undefined,
-                deadline: biggestTask.deadline || '',
-              }
+              title: biggestTask.title,
+              description: biggestTask.notes_encrypted || '',
+              status: biggestTask.status || 'Todo',
+              priority_level: biggestTask.priority_level ?? 0,
+              estimate_timer: biggestTask.estimate_timer ?? 0,
+              real_timer: biggestTask.real_timer ?? undefined,
+              deadline: biggestTask.deadline || '',
+            }
             : null,
           undefined,
           selectedModel,
@@ -618,14 +618,14 @@ export const AskAI: React.FC = () => {
             prev.map((msg) =>
               msg.id === aiMsgId
                 ? {
-                    ...msg,
-                    text: accumulatedText,
-                    html: renderMarkdown(
-                      accumulatedText,
-                      theme.palette.mode === 'dark',
-                      theme,
-                    ),
-                  }
+                  ...msg,
+                  text: accumulatedText,
+                  html: renderMarkdown(
+                    accumulatedText,
+                    theme.palette.mode === 'dark',
+                    theme,
+                  ),
+                }
                 : msg,
             ),
           );
@@ -642,10 +642,10 @@ export const AskAI: React.FC = () => {
           prev.map((msg) =>
             msg.id === aiMsgId
               ? {
-                  ...msg,
-                  text: 'Lo siento, ha ocurrido un error al generar la respuesta.',
-                  html: '<p style="color: red;">Error generating response.</p>',
-                }
+                ...msg,
+                text: 'Lo siento, ha ocurrido un error al generar la respuesta.',
+                html: '<p style="color: red;">Error generating response.</p>',
+              }
               : msg,
           ),
         );
@@ -937,10 +937,10 @@ export const AskAI: React.FC = () => {
 
                   const cleanHtml = msg.html
                     ? renderMarkdown(
-                        cleanText,
-                        theme.palette.mode === 'dark',
-                        theme,
-                      )
+                      cleanText,
+                      theme.palette.mode === 'dark',
+                      theme,
+                    )
                     : undefined;
 
                   return (
@@ -1411,20 +1411,18 @@ export const AskAI: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   px: 2,
-                  py: 1.5,
-                  borderRadius: '12px',
+                  py: 1.5, borderRadius: '12px',
                   cursor: 'pointer',
                   mb: 1.2,
                   bgcolor: isActive
                     ? (theme) =>
-                        surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff')
+                      surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff')
                     : 'transparent',
-                  border: '1px solid transparent',
                   borderColor: isActive
                     ? (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.05)'
-                          : 'rgba(0, 0, 0, 0.04)'
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.05)'
+                        : 'rgba(0, 0, 0, 0.04)'
                     : 'transparent',
                   color: 'text.primary',
                   boxShadow: isActive ? '0 4px 20px rgba(0,0,0,0.04)' : 'none',

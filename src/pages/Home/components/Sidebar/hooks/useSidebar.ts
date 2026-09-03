@@ -82,12 +82,21 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     tasks.forEach((t) => {
       if (t.status === 'Done' || t.deleted_at) return;
 
-      const dateToUse = t.deadline || t.estimated_start_date;
-      if (!dateToUse) {
+      const hasEstimatedStart =
+        t.estimated_start_date &&
+        !isNaN(new Date(t.estimated_start_date).getTime());
+      const hasValidDeadline =
+        t.deadline && !isNaN(new Date(t.deadline).getTime());
+
+      if (
+        (!hasEstimatedStart && !hasValidDeadline) ||
+        (t.status === 'Backlog' && !hasEstimatedStart)
+      ) {
         inbox++;
         return;
       }
 
+      const dateToUse = (t.estimated_start_date || t.deadline)!;
       const taskDateStr = new Date(dateToUse).toLocaleDateString('en-CA');
       if (taskDateStr <= todayStr) {
         today++;

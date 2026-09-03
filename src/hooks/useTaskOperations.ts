@@ -112,6 +112,7 @@ export const useTaskOperations = () => {
     if (!user?.id) throw new Error('User not authenticated');
 
     const defaultRefetchQueries: InternalRefetchQueriesInclude = [
+      'GetTasksByUserPaginated',
       { query: GET_TASKS, variables: { userId: user.id } },
       {
         query: GET_TASKS_TITLES,
@@ -142,6 +143,7 @@ export const useTaskOperations = () => {
     if (!user?.id) throw new Error('User not authenticated');
 
     const defaultRefetchQueries: InternalRefetchQueriesInclude = [
+      'GetTasksByUserPaginated',
       { query: GET_TASKS, variables: { userId: user.id } },
     ];
 
