@@ -80,6 +80,7 @@ export const Tasks = ({
     headerEyebrow,
     addButtonLabel,
     contextualInitialStart,
+    showAIOrganize,
   } = useMemo(() => {
     if (urlFilter === 'inbox') {
       return {
@@ -87,6 +88,7 @@ export const Tasks = ({
         headerEyebrow: 'Bandeja de Entrada',
         addButtonLabel: 'Add to Inbox',
         contextualInitialStart: null,
+        showAIOrganize: false,
       };
     }
     if (urlFilter === 'today' || dateRange === 'today') {
@@ -95,6 +97,7 @@ export const Tasks = ({
         headerEyebrow: 'Plan de Hoy',
         addButtonLabel: 'Add Task for Today',
         contextualInitialStart: new Date(),
+        showAIOrganize: false,
       };
     }
     if (urlFilter === 'upcoming' || dateRange === 'this_week' || dateRange === 'this_month') {
@@ -103,6 +106,7 @@ export const Tasks = ({
         headerEyebrow: 'Próximas Tareas',
         addButtonLabel: 'Add Upcoming Task',
         contextualInitialStart: addDays(new Date(), 1),
+        showAIOrganize: false,
       };
     }
     return {
@@ -110,6 +114,7 @@ export const Tasks = ({
       headerEyebrow: undefined,
       addButtonLabel: 'Add New Task',
       contextualInitialStart: null,
+      showAIOrganize: true,
     };
   }, [urlFilter, dateRange]);
 
@@ -219,24 +224,26 @@ export const Tasks = ({
           >
             <TasksHeader title={headerTitle} eyebrow={headerEyebrow}>
               <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-                <Button
-                  variant="contained"
-                  onClick={() => setIsAIPlannerOpen(true)}
-                  startIcon={<AutoAwesomeIcon />}
-                  sx={{
-                    borderRadius: '10px',
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    boxShadow: 'none',
-                    height: 36,
-                    bgcolor: '#6366f1',
-                    '&:hover': { bgcolor: '#4f46e5', boxShadow: 'none' },
-                    fontSize: '0.8rem',
-                    px: 2,
-                  }}
-                >
-                  AI Organize
-                </Button>
+                {showAIOrganize && (
+                  <Button
+                    variant="contained"
+                    onClick={() => setIsAIPlannerOpen(true)}
+                    startIcon={<AutoAwesomeIcon />}
+                    sx={{
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      boxShadow: 'none',
+                      height: 36,
+                      bgcolor: '#6366f1',
+                      '&:hover': { bgcolor: '#4f46e5', boxShadow: 'none' },
+                      fontSize: '0.8rem',
+                      px: 2,
+                    }}
+                  >
+                    AI Organize
+                  </Button>
+                )}
                 <Button
                   variant="contained"
                   onClick={() => setIsCreateTaskModalOpen(true)}

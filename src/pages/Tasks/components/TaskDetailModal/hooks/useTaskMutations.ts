@@ -9,6 +9,7 @@ import {
   parseDuration,
   parseRealTime,
   getPriorityLevel,
+  buildCreateTaskPayload,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type {
   TaskData,
@@ -32,93 +33,47 @@ export const useTaskMutations = ({
     executeDeleteTask,
   } = useTaskOperations();
 
+  const resolveGoogleMeet = async (
+    state: TaskData & { shouldGenerateMeet?: boolean },
+  ): Promise<{ meetLink: string | null; googleEventId?: string }> => {
+    const needsMeet =
+      state.shouldGenerateMeet ||
+      (state.collaborators && state.collaborators.length > 0);
+    if (!needsMeet) return { meetLink: null, googleEventId: undefined };
+
+    const res = await generateMeetLinkNow(undefined, state);
+    if (res) {
+      return { meetLink: res.meetLink, googleEventId: res.googleEventId };
+    }
+
+    sileo.warning({
+      title: 'Could not generate Meet link',
+      description:
+        'The task will be saved without it. Make sure you are signed in with Google.',
+      duration: 4000,
+    });
+    return { meetLink: null, googleEventId: undefined };
+  };
+
   const handleSave = async (
     state: TaskData & { color: string; shouldGenerateMeet?: boolean },
   ) => {
-    if (!user) return;
+    if (!user?.id) return;
     setLoadingSave(true);
 
-    let meetLink: string | null = null;
-    let createdGoogleEventId: string | undefined = undefined;
-
-    if (
-      state.shouldGenerateMeet ||
-      (state.collaborators && state.collaborators.length > 0)
-    ) {
-      const res = await generateMeetLinkNow(undefined, state);
-      if (res) {
-        meetLink = res.meetLink;
-        createdGoogleEventId = res.googleEventId;
-      } else {
-        sileo.warning({
-          title: 'Could not generate Meet link',
-          description:
-            'The task will be saved without it. Make sure you are signed in with Google.',
-          duration: 4000,
-        });
-      }
-    }
-
-    const estimateTimer = parseDuration(state.duration);
-    const realTimer = parseRealTime(state.realTime || '');
-    const priorityLevel = getPriorityLevel(state.priority as PriorityType);
-
-    const cleanDesc = (state.description || '')
-      .replace(/\[COLOR:(.*?)\]/g, '')
-      .replace(/\[START_DATE:(.*?)\]/g, '')
-      .trim();
-
-    const links = deduplicateLinks(state.links || []).map(
-      (l: { title: string; url: string }) => ({ title: l.title, url: l.url }),
-    );
-    if (meetLink && !links.some((l) => l.url === meetLink)) {
-      links.push({ title: 'Google Meet', url: meetLink });
-    }
-
-    const hasValidDeadline =
-      state.deadline && !isNaN(state.deadline.getTime());
-    const deadlineISO = hasValidDeadline ? state.deadline!.toISOString() : '';
-    const endDateISO = hasValidDeadline
-      ? new Date(
-        state.deadline!.getTime() + (estimateTimer || 25) * 60000,
-      ).toISOString()
-      : undefined;
-
-    const commonInput = {
-      title: state.title,
-      notes_encrypted: `${cleanDesc} [COLOR:${state.color}]`,
-      estimate_timer: estimateTimer,
-      real_timer: realTimer,
-      tags: state.tags,
-      deadline: deadlineISO,
-      priority_level: priorityLevel,
-      category: state.category,
-      color: state.color,
-      links,
-      collaborators: state.collaborators,
-    };
-
-    const targetStatus = hasValidDeadline
-      ? (state.status === 'Backlog' ? 'Todo' : state.status || 'Todo')
-      : 'Backlog';
-
-    const createInput: Record<string, unknown> = {
-      ...commonInput,
-      user_id: user.id || '',
-      status: targetStatus,
-      google_event_id:
-        createdGoogleEventId ||
-        (initialTask as { google_event_id?: string })?.google_event_id,
-      estimated_start_date: hasValidDeadline ? deadlineISO : undefined,
-      estimated_end_date: endDateISO,
-      time_logs: state.time_logs || [],
-      skip_scheduling: !hasValidDeadline,
-    };
-
     try {
-      const data = await executeCreateTask(
-        createInput as unknown as Record<string, unknown>,
-      );
+      const { meetLink, googleEventId } = await resolveGoogleMeet(state);
+
+      const createInput = buildCreateTaskPayload({
+        state,
+        userId: user.id,
+        meetLink,
+        googleEventId,
+        initialGoogleEventId: (initialTask as { google_event_id?: string })
+          ?.google_event_id,
+      });
+
+      const data = await executeCreateTask(createInput);
       if (data?.createTask) {
         sileo.success({
           title: 'Task created',
@@ -130,8 +85,9 @@ export const useTaskMutations = ({
       }
     } catch (e) {
       handleMutationError(e, 'Error al crear la tarea');
+    } finally {
+      setLoadingSave(false);
     }
-    setLoadingSave(false);
   };
 
   const handleUpdate = async (

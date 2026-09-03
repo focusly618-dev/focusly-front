@@ -1,3 +1,5 @@
+import type { BuildCreateTaskPayloadParams } from './types/TaskDetailModal.types';
+
 export const parseDuration = (d: string | undefined | null): number => {
   if (!d || typeof d !== 'string') return 0;
 
@@ -136,4 +138,66 @@ export const getTimerSuggestions = (val: string) => {
     }
   }
   return suggestions;
+};
+
+export const buildCreateTaskPayload = ({
+  state,
+  userId,
+  meetLink,
+  googleEventId,
+  initialGoogleEventId,
+}: BuildCreateTaskPayloadParams): Record<string, unknown> => {
+  const estimateTimer = parseDuration(state.duration);
+  const realTimer = parseRealTime(state.realTime || '');
+  const priorityLevel = getPriorityLevel(state.priority as PriorityType);
+
+  const cleanDesc = (state.description || '')
+    .replace(/\[COLOR:(.*?)\]/g, '')
+    .replace(/\[START_DATE:(.*?)\]/g, '')
+    .trim();
+
+  const links = deduplicateLinks(state.links || []).map((l) => ({
+    title: l.title,
+    url: l.url,
+  }));
+  if (meetLink && !links.some((l) => l.url === meetLink)) {
+    links.push({ title: 'Google Meet', url: meetLink });
+  }
+
+  const hasValidDeadline = Boolean(
+    state.deadline && !isNaN(state.deadline.getTime()),
+  );
+  const deadlineISO = hasValidDeadline ? state.deadline!.toISOString() : '';
+  const endDateISO = hasValidDeadline
+    ? new Date(
+      state.deadline!.getTime() + (estimateTimer || 25) * 60000,
+    ).toISOString()
+    : undefined;
+
+  const targetStatus = hasValidDeadline
+    ? state.status === 'Backlog'
+      ? 'Todo'
+      : state.status || 'Todo'
+    : 'Backlog';
+
+  return {
+    title: state.title,
+    notes_encrypted: `${cleanDesc} [COLOR:${state.color}]`,
+    estimate_timer: estimateTimer,
+    real_timer: realTimer,
+    tags: state.tags,
+    deadline: deadlineISO,
+    priority_level: priorityLevel,
+    category: state.category,
+    color: state.color,
+    links,
+    collaborators: state.collaborators,
+    user_id: userId,
+    status: targetStatus,
+    google_event_id: googleEventId || initialGoogleEventId,
+    estimated_start_date: hasValidDeadline ? deadlineISO : undefined,
+    estimated_end_date: endDateISO,
+    time_logs: state.time_logs || [],
+    skip_scheduling: !hasValidDeadline,
+  };
 };
