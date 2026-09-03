@@ -1,9 +1,9 @@
 import type { BuildCreateTaskPayloadParams } from './types/TaskDetailModal.types';
 
-export const parseDuration = (d: string | undefined | null): number => {
-  if (!d || typeof d !== 'string') return 0;
+export const parseDuration = (duration: string | undefined | null): number => {
+  if (!duration || typeof duration !== 'string') return 0;
 
-  const norm = d.toLowerCase().trim();
+  const norm = duration.toLowerCase().trim();
   if (!norm) return 0;
 
   const shortMatch = norm.match(/^(\d{1,3})(h|m)?$/i);
