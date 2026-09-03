@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   isSameDay,
@@ -46,7 +46,7 @@ export const useTasksFilters = (
     undefined,
   );
 
-  const [dateRange, setDateRangeState] = useState<DateRangeFilter>(() => {
+  const [internalDateRange, setInternalDateRange] = useState<DateRangeFilter>(() => {
     if (urlDateRange && ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)) {
       return urlDateRange;
     }
@@ -55,22 +55,23 @@ export const useTasksFilters = (
   });
   const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
 
-  useEffect(() => {
+  const dateRange: DateRangeFilter = useMemo(() => {
     if (urlFilter === 'inbox' || urlFilter === 'upcoming') {
-      setDateRangeState('all');
-    } else if (urlDateRange && ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)) {
-      setDateRangeState(urlDateRange);
-      setReferenceDate(new Date());
+      return 'all';
     }
-  }, [urlDateRange, urlFilter]);
-
-  useEffect(() => {
-    localStorage.setItem('tasksDateRange', dateRange);
-  }, [dateRange]);
+    if (
+      urlDateRange &&
+      ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)
+    ) {
+      return urlDateRange;
+    }
+    return internalDateRange;
+  }, [urlFilter, urlDateRange, internalDateRange]);
 
   const setDateRange = useCallback((range: DateRangeFilter) => {
-    setDateRangeState(range);
+    setInternalDateRange(range);
     setReferenceDate(new Date());
+    localStorage.setItem('tasksDateRange', range);
   }, []);
 
   const goToPreviousPeriod = useCallback(() => {
