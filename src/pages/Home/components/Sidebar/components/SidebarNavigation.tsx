@@ -5,10 +5,15 @@ import {
   ListItemText,
   Box,
   Avatar,
-  Typography,
+  Collapse,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { NavItem } from '../Sidebar.styles';
+import {
+  NavItem,
+  SubNavItem,
+  NavCountBadge,
+  CategoryHeader,
+} from '../Sidebar.styles';
 import { TaskBar } from '../types/Sidebar.types';
 import {
   DailyPlanIcon,
@@ -17,7 +22,13 @@ import {
   InsightsIcon,
   ProjectIcon,
 } from '@/components/ui';
-import { DescriptionOutlined as TemplateIcon } from '@mui/icons-material';
+import {
+  DescriptionOutlined as TemplateIcon,
+  InboxOutlined as InboxIcon,
+  TodayOutlined as TodayIcon,
+  CalendarMonthOutlined as UpcomingIcon,
+  ExpandMore as ExpandMoreIcon,
+} from '@mui/icons-material';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 
 interface SidebarNavigationProps {
@@ -26,9 +37,42 @@ interface SidebarNavigationProps {
 
 export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
   const { t } = useTranslation();
-  const { activeTab, changeStatusTab, theme, isCollapsed } = sidebar;
+  const {
+    activeTab,
+    changeStatusTab,
+    theme,
+    isCollapsed,
+    taskCounts,
+    isTasksExpanded,
+    toggleTasksExpanded,
+  } = sidebar;
+
+  const currentTab = activeTab;
+  const currentFilter = sidebar.searchParams.get('filter');
+  const currentDateRange = sidebar.searchParams.get('dateRange');
+
+  const isDailyPlanActive = currentTab === TaskBar.DailyPlan;
+  const isTasksActive =
+    currentTab === TaskBar.Tasks && !currentFilter && !currentDateRange;
+  const isInboxActive =
+    currentTab === TaskBar.Tasks && currentFilter === 'inbox';
+  const isTodayActive =
+    currentTab === TaskBar.Tasks &&
+    (currentFilter === 'today' || currentDateRange === 'today');
+  const isUpcomingActive =
+    currentTab === TaskBar.Tasks &&
+    (currentFilter === 'upcoming' ||
+      currentDateRange === 'this_week' ||
+      currentDateRange === 'upcoming');
+  const isAskAIActive = currentTab === TaskBar.AskAI;
+  const isInsightsActive = currentTab === TaskBar.Insights;
+  const isProjectsActive =
+    currentTab === TaskBar.Workspace && !sidebar.searchParams.get('modal');
+  const isTemplatesActive =
+    currentTab === TaskBar.Workspace &&
+    sidebar.searchParams.get('modal') === 'templates';
+
   const handleProjectsTabClick = () => {
-    // Reset search params to show all workspaces in the main component
     const newParams = new URLSearchParams();
     newParams.set('tab', TaskBar.Workspace);
     sidebar.setSearchParams(newParams);
@@ -46,8 +90,8 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
   return (
     <List
       sx={{
-        padding: '16px',
-        marginTop: '-30px',
+        padding: '4px 6px',
+        marginTop: 0,
         [theme.breakpoints.down('md')]: {
           padding: 0,
           marginTop: 0,
@@ -59,6 +103,12 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
         },
       }}
     >
+      {/* ── AGENDA CATEGORY ── */}
+      {!isCollapsed && (
+        <CategoryHeader sx={{ mt: 0.5 }}>{t('nav.agenda')}</CategoryHeader>
+      )}
+
+      {/* Daily Plan */}
       <ListItem
         disablePadding
         sx={{
@@ -69,7 +119,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       >
         <NavItem
           id="joyride-daily-plan"
-          active={activeTab === TaskBar.DailyPlan}
+          active={isDailyPlanActive}
           onClick={() => changeStatusTab(TaskBar.DailyPlan)}
         >
           <ListItemIcon>
@@ -77,16 +127,23 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           </ListItemIcon>
           <ListItemText
             primary={t('nav.dailyPlan')}
-            primaryTypographyProps={{ fontWeight: 600 }}
+            primaryTypographyProps={{
+              fontSize: '12.5px',
+              fontWeight: isDailyPlanActive ? 600 : 500,
+            }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
         </NavItem>
       </ListItem>
+
+      {/* Tasks & GTD Sub-Items */}
       <ListItem
         disablePadding
         sx={{
+          flexDirection: 'column',
+          alignItems: 'stretch',
           [theme.breakpoints.down('md')]: {
             width: 'auto',
           },
@@ -94,21 +151,183 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       >
         <NavItem
           id="joyride-tasks"
-          active={activeTab === TaskBar.Tasks}
-          onClick={() => changeStatusTab(TaskBar.Tasks)}
+          active={isTasksActive}
+          onClick={() => {
+            const newParams = new URLSearchParams();
+            newParams.set('tab', TaskBar.Tasks);
+            sidebar.setSearchParams(newParams);
+            changeStatusTab(TaskBar.Tasks, newParams);
+          }}
         >
           <ListItemIcon>
             <TasksIcon />
           </ListItemIcon>
           <ListItemText
             primary={t('nav.tasks')}
-            primaryTypographyProps={{ fontWeight: 500 }}
+            primaryTypographyProps={{
+              fontSize: '12.5px',
+              fontWeight: isTasksActive ? 600 : 500,
+            }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
+          {!isCollapsed && (
+            <Box
+              sx={{
+                display: { xs: 'none', lg: 'flex' },
+                alignItems: 'center',
+                gap: 0.5,
+                ml: 'auto',
+              }}
+            >
+              {taskCounts.total > 0 && (
+                <NavCountBadge active={isTasksActive}>
+                  {taskCounts.total}
+                </NavCountBadge>
+              )}
+              <Box
+                onClick={toggleTasksExpanded}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: '2px',
+                  borderRadius: '4px',
+                  color: isTasksActive ? '#ffffff' : 'text.secondary',
+                  opacity: 0.8,
+                  '&:hover': {
+                    opacity: 1,
+                    bgcolor: isTasksActive
+                      ? 'rgba(255,255,255,0.2)'
+                      : 'action.hover',
+                  },
+                }}
+              >
+                <ExpandMoreIcon
+                  sx={{
+                    fontSize: 14,
+                    transform: isTasksExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
         </NavItem>
+
+        {/* Sub-items: Inbox, Today, Upcoming */}
+        {!isCollapsed && (
+          <Collapse
+            in={isTasksExpanded}
+            timeout={220}
+            unmountOnExit
+            sx={{
+              display: { xs: 'none', lg: 'block' },
+              width: '100%',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                mt: '1px',
+                mb: '2px',
+              }}
+            >
+              {/* Inbox */}
+              <SubNavItem
+                active={isInboxActive}
+                onClick={() => {
+                  const newParams = new URLSearchParams();
+                  newParams.set('tab', TaskBar.Tasks);
+                  newParams.set('filter', 'inbox');
+                  sidebar.setSearchParams(newParams);
+                  changeStatusTab(TaskBar.Tasks, newParams);
+                }}
+              >
+                <ListItemIcon>
+                  <InboxIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={t('nav.inbox')}
+                  primaryTypographyProps={{
+                    fontSize: '11.5px',
+                    fontWeight: isInboxActive ? 600 : 500,
+                  }}
+                />
+                {taskCounts.inbox > 0 && (
+                  <NavCountBadge active={isInboxActive}>
+                    {taskCounts.inbox}
+                  </NavCountBadge>
+                )}
+              </SubNavItem>
+
+              {/* Today */}
+              <SubNavItem
+                active={isTodayActive}
+                onClick={() => {
+                  const newParams = new URLSearchParams();
+                  newParams.set('tab', TaskBar.Tasks);
+                  newParams.set('filter', 'today');
+                  sidebar.setSearchParams(newParams);
+                  changeStatusTab(TaskBar.Tasks, newParams);
+                }}
+              >
+                <ListItemIcon>
+                  <TodayIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={t('nav.today')}
+                  primaryTypographyProps={{
+                    fontSize: '11.5px',
+                    fontWeight: isTodayActive ? 600 : 500,
+                  }}
+                />
+                {taskCounts.today > 0 && (
+                  <NavCountBadge active={isTodayActive}>
+                    {taskCounts.today}
+                  </NavCountBadge>
+                )}
+              </SubNavItem>
+
+              {/* Upcoming */}
+              <SubNavItem
+                active={isUpcomingActive}
+                onClick={() => {
+                  const newParams = new URLSearchParams();
+                  newParams.set('tab', TaskBar.Tasks);
+                  newParams.set('filter', 'upcoming');
+                  sidebar.setSearchParams(newParams);
+                  changeStatusTab(TaskBar.Tasks, newParams);
+                }}
+              >
+                <ListItemIcon>
+                  <UpcomingIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={t('nav.upcoming')}
+                  primaryTypographyProps={{
+                    fontSize: '11.5px',
+                    fontWeight: isUpcomingActive ? 600 : 500,
+                  }}
+                />
+                {taskCounts.upcoming > 0 && (
+                  <NavCountBadge active={isUpcomingActive}>
+                    {taskCounts.upcoming}
+                  </NavCountBadge>
+                )}
+              </SubNavItem>
+            </Box>
+          </Collapse>
+        )}
       </ListItem>
+
+      {/* ── INTELLIGENCE CATEGORY ── */}
+      {!isCollapsed && (
+        <CategoryHeader>{t('nav.intelligence')}</CategoryHeader>
+      )}
+
+      {/* Ask AI */}
       <ListItem
         disablePadding
         sx={{
@@ -119,7 +338,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       >
         <NavItem
           id="joyride-ask-ai"
-          active={activeTab === TaskBar.AskAI}
+          active={isAskAIActive}
           onClick={() => changeStatusTab(TaskBar.AskAI)}
         >
           <ListItemIcon>
@@ -127,13 +346,18 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           </ListItemIcon>
           <ListItemText
             primary={t('nav.askAi')}
-            primaryTypographyProps={{ fontWeight: 500 }}
+            primaryTypographyProps={{
+              fontSize: '12.5px',
+              fontWeight: isAskAIActive ? 600 : 500,
+            }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
         </NavItem>
       </ListItem>
+
+      {/* Insights */}
       <ListItem
         disablePadding
         sx={{
@@ -144,7 +368,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       >
         <NavItem
           id="joyride-insights"
-          active={activeTab === TaskBar.Insights}
+          active={isInsightsActive}
           onClick={() => changeStatusTab(TaskBar.Insights)}
         >
           <ListItemIcon>
@@ -152,7 +376,10 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           </ListItemIcon>
           <ListItemText
             primary={t('nav.insights')}
-            primaryTypographyProps={{ fontWeight: 500 }}
+            primaryTypographyProps={{
+              fontSize: '12.5px',
+              fontWeight: isInsightsActive ? 600 : 500,
+            }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
@@ -160,29 +387,9 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
         </NavItem>
       </ListItem>
 
-      {/* Collections Category Header */}
+      {/* ── WORKSPACE CATEGORY ── */}
       {!isCollapsed && (
-        <Box
-          sx={{
-            px: 2,
-            mt: 2.5,
-            mb: 1.5,
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              fontSize: '10px',
-              opacity: 0.6,
-            }}
-          >
-            {t('nav.collections')}
-          </Typography>
-        </Box>
+        <CategoryHeader>{t('nav.workspace')}</CategoryHeader>
       )}
 
       <ListItem
@@ -199,10 +406,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       >
         <NavItem
           id="joyride-workspace"
-          active={
-            activeTab === TaskBar.Workspace &&
-            !sidebar.searchParams.get('modal')
-          }
+          active={isProjectsActive}
           onClick={handleProjectsTabClick}
         >
           <ListItemIcon>
@@ -210,7 +414,10 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           </ListItemIcon>
           <ListItemText
             primary={t('nav.projects')}
-            primaryTypographyProps={{ fontWeight: 500 }}
+            primaryTypographyProps={{
+              fontSize: '12.5px',
+              fontWeight: 500,
+            }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
@@ -218,10 +425,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
         </NavItem>
         <NavItem
           id="joyride-templates"
-          active={
-            activeTab === TaskBar.Workspace &&
-            sidebar.searchParams.get('modal') === 'templates'
-          }
+          active={isTemplatesActive}
           onClick={handleTemplatesTabClick}
         >
           <ListItemIcon>
@@ -229,7 +433,10 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           </ListItemIcon>
           <ListItemText
             primary={t('nav.templates')}
-            primaryTypographyProps={{ fontWeight: 500 }}
+            primaryTypographyProps={{
+              fontSize: '12.5px',
+              fontWeight: 500,
+            }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}

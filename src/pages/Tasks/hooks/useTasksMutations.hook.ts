@@ -47,7 +47,7 @@ export const useTasksMutations = ({
     notes_encrypted: t.notes_encrypted || '',
     estimate_timer: t.estimate_timer || 0,
     priority_level: t.priority_level || 2,
-    deadline: t.deadline || new Date().toISOString(),
+    deadline: t.deadline || '',
     status: t.status || 'Todo',
     category: t.category || 'General',
     created_at: t.created_at || new Date().toISOString(),

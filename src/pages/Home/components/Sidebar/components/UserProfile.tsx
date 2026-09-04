@@ -20,15 +20,15 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
       id="joyride-user-profile"
       onClick={() => changeStatusTab(TaskBar.Settings)}
       sx={{
-        p: { xs: '8px', lg: isCollapsed ? '8px' : '12px 16px' },
-        borderRadius: '16px',
-        mx: { xs: 1.5, lg: 2 },
-        mb: 2,
+        p: { xs: '6px', lg: isCollapsed ? '6px' : '6px 8px' },
+        borderRadius: '10px',
+        mx: { xs: 0.75, lg: 1 },
+        mb: 1.25,
         display: 'flex',
         flexDirection: isCollapsed ? 'column' : { xs: 'column', lg: 'row' },
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 1.5,
+        gap: 1,
         cursor: 'pointer',
         border: { xs: 'none', lg: '1px solid' },
         borderColor:
@@ -46,7 +46,7 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
         },
         backdropFilter: { xs: 'none', lg: 'blur(10px)' },
         boxShadow: 'none',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         flexShrink: 0,
         '&:hover': {
           backgroundColor: {
@@ -59,7 +59,7 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
             ),
           },
           borderColor: theme.palette.primary.main,
-          transform: 'translateY(-2px)',
+          transform: 'translateY(-1px)',
           '& .profile-avatar': {
             transform: 'scale(1.05)',
             borderColor: theme.palette.primary.main,
@@ -72,15 +72,15 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
         src={user?.picture}
         alt={user?.name}
         sx={{
-          width: 36,
-          height: 36,
-          border: '2px solid',
+          width: 28,
+          height: 28,
+          border: '1.5px solid',
           borderColor:
             theme.palette.mode === 'dark'
               ? 'rgba(255, 255, 255, 0.12)'
               : 'rgba(0, 0, 0, 0.08)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         {user?.name?.charAt(0)}
@@ -94,12 +94,13 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
       >
         <Typography
           variant="body2"
-          fontWeight="800"
+          fontWeight="700"
           color="text.primary"
           noWrap
           sx={{
-            fontSize: '13.5px',
+            fontSize: '12px',
             letterSpacing: '-0.01em',
+            lineHeight: 1.2,
           }}
         >
           {user?.name || 'User Name'}
@@ -110,8 +111,9 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
           noWrap
           sx={{
             display: 'block',
-            fontSize: '11px',
-            opacity: 0.8,
+            fontSize: '10px',
+            opacity: 0.75,
+            lineHeight: 1.2,
           }}
         >
           View Profile
@@ -122,7 +124,7 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
           sx={{
             display: { xs: 'none', lg: 'flex' },
             alignItems: 'center',
-            gap: 0.5,
+            gap: 0.25,
           }}
         >
           <LanguageSelector variant="icon" />
@@ -133,8 +135,8 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
               colorMode.toggleColorMode();
             }}
             sx={{
-              width: 30,
-              height: 30,
+              width: 24,
+              height: 24,
               color: colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
               bgcolor: alpha(
                 colorMode.mode === 'dark' ? '#fbbf24' : '#3b82f6',
@@ -151,9 +153,9 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
             }}
           >
             {colorMode.mode === 'dark' ? (
-              <LightModeIcon sx={{ fontSize: 16 }} />
+              <LightModeIcon sx={{ fontSize: 14 }} />
             ) : (
-              <DarkModeIcon sx={{ fontSize: 16 }} />
+              <DarkModeIcon sx={{ fontSize: 14 }} />
             )}
           </IconButton>
         </Box>

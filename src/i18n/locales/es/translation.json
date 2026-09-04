@@ -29,11 +29,17 @@
     "generic": "Ocurrió un error inesperado. Intenta de nuevo más tarde."
   },
   "nav": {
+    "agenda": "Agenda",
     "dailyPlan": "Plan Diario",
     "tasks": "Tareas",
+    "inbox": "Bandeja",
+    "today": "Hoy",
+    "upcoming": "Próximos",
+    "intelligence": "Inteligencia",
     "askAi": "Consultar IA",
     "insights": "Estadísticas",
-    "collections": "colecciones",
+    "workspace": "Espacios",
+    "collections": "Colecciones",
     "projects": "Proyectos",
     "templates": "Plantillas",
     "features": "Características",

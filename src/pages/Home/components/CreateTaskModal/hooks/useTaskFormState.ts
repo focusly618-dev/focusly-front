@@ -167,10 +167,7 @@ export const useTaskFormState = ({
       newErrors.title = 'Title is required';
       isValid = false;
     }
-    if (!duration.trim()) {
-      newErrors.duration = 'Duration is required';
-      isValid = false;
-    } else {
+    if (duration.trim()) {
       const durationMinutes = parseDuration(duration);
       if (!isValidDurationInput(duration) || durationMinutes < 15) {
         newErrors.duration = 'Duration must be at least 15 minutes';

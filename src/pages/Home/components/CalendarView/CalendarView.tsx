@@ -299,7 +299,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         <DraftActionBar>
           <Typography
             variant="body2"
-            sx={{ fontWeight: 600, color: 'text.primary' }}
+            sx={{
+              fontWeight: 600,
+              color: 'text.primary',
+              fontSize: '13px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+            }}
           >
             {t('calendar.draftProposed', { count: draftEvents.length })}
           </Typography>
@@ -318,7 +325,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                 borderColor: 'divider',
                 '&:hover': {
                   borderColor: 'error.light',
-                  bgcolor: 'rgba(239, 68, 68, 0.04)',
+                  bgcolor: 'rgba(239, 68, 68, 0.06)',
                   color: 'error.main',
                 },
               }}
@@ -336,10 +343,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                 fontWeight: 700,
                 fontSize: '0.75rem',
                 bgcolor: 'primary.main',
-                boxShadow: 'none',
+                boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)',
                 '&:hover': {
                   bgcolor: 'primary.dark',
-                  boxShadow: 'none',
+                  boxShadow: '0 4px 12px rgba(124, 58, 237, 0.35)',
                 },
               }}
             >
@@ -535,7 +542,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
-            width: '320px',
+            width: '260px',
             boxSizing: 'border-box',
             backgroundColor: (theme) =>
               surfaceColor(theme, '#0f172a', '#19191A', '#faf9f6'),

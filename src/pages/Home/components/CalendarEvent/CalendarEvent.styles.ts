@@ -52,38 +52,64 @@ export const EventContainer = styled(Box, {
 }>(({ theme, variant, isMeeting, isDraft }) => {
   const isDark = theme.palette.mode === 'dark';
 
-  // ── Draft card (dashed border, pulse animation) ──
+  // ── Draft card (solid surface, left accent, dashed outline, luminous glow) ──
   if (isDraft) {
     const borderColor = variant.main;
+    const isDefaultColor = variant.main === DEFAULT_COLOR.main;
+
+    const baseBg = isDefaultColor
+      ? surfaceColor(theme, '#1e293b', '#242425', '#ffffff')
+      : surfaceColor(theme, '#1e293b', '#242425', '#ffffff');
+
+    const textColor = isDark ? alpha('#ffffff', 0.95) : '#1e293b';
+
     return {
-      backgroundColor: isDark
-        ? alpha(borderColor, 0.1)
-        : alpha(borderColor, 0.05),
-      color: isDark ? alpha('#ffffff', 0.9) : '#4a5568',
+      backgroundColor: baseBg,
+      backgroundImage: isDark
+        ? `linear-gradient(135deg, ${alpha(borderColor, 0.16)} 0%, ${alpha('#1e293b', 0.95)} 100%)`
+        : `linear-gradient(135deg, ${alpha(borderColor, 0.1)} 0%, #ffffff 100%)`,
+      color: textColor,
       height: '100%',
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
-      padding: '2px 6px',
+      padding: '2px 8px',
       overflow: 'hidden',
       cursor: 'pointer',
       zIndex: 1,
-      boxShadow: 'none',
       borderRadius: '6px',
-      border: `2px dashed ${borderColor}`,
-      opacity: 0.75,
-      animation: 'draftPulse 2s infinite ease-in-out',
-      '@keyframes draftPulse': {
-        '0%': { opacity: 0.65 },
-        '50%': { opacity: 0.85 },
-        '100%': { opacity: 0.65 },
+      border: `1.5px dashed ${alpha(borderColor, isDark ? 0.6 : 0.45)}`,
+      borderLeft: `3.5px solid ${borderColor}`,
+      boxShadow: isDark
+        ? `0 2px 8px ${alpha(borderColor, 0.15)}`
+        : `0 2px 8px ${alpha(borderColor, 0.1)}`,
+      transition: 'all 0.2s ease',
+      animation: 'draftGlow 2.5s infinite ease-in-out',
+      '@keyframes draftGlow': {
+        '0%': {
+          boxShadow: isDark
+            ? `0 0 0 0 ${alpha(borderColor, 0.3)}`
+            : `0 0 0 0 ${alpha(borderColor, 0.2)}`,
+        },
+        '50%': {
+          boxShadow: isDark
+            ? `0 0 10px 1px ${alpha(borderColor, 0.28)}`
+            : `0 0 10px 1px ${alpha(borderColor, 0.18)}`,
+        },
+        '100%': {
+          boxShadow: isDark
+            ? `0 0 0 0 ${alpha(borderColor, 0.3)}`
+            : `0 0 0 0 ${alpha(borderColor, 0.2)}`,
+        },
       },
       '&:hover': {
-        opacity: 0.95,
-        backgroundColor: isDark
-          ? alpha(borderColor, 0.25)
-          : alpha(borderColor, 0.15),
+        zIndex: 50,
+        boxShadow: isDark
+          ? `0 4px 14px ${alpha(borderColor, 0.3)}`
+          : `0 4px 14px ${alpha(borderColor, 0.2)}`,
+        border: `1.5px dashed ${alpha(borderColor, 0.9)}`,
+        borderLeft: `3.5px solid ${borderColor}`,
       },
     };
   }

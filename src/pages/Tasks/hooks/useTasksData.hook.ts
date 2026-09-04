@@ -43,6 +43,7 @@ export const useTasksData = ({
     data,
     loading: isLoading,
     error,
+    refetch,
   } = useQuery(GET_TASKS_PAGINATED, {
     variables: queryVariables,
     fetchPolicy: 'cache-and-network',
@@ -87,5 +88,6 @@ export const useTasksData = ({
     isLoading,
     completedTasksCount,
     pendingTasksCount,
+    refetch,
   };
 };

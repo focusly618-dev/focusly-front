@@ -29,11 +29,17 @@
     "generic": "Something went wrong. Please try again later."
   },
   "nav": {
+    "agenda": "Agenda",
     "dailyPlan": "Daily Plan",
     "tasks": "Tasks",
+    "inbox": "Inbox",
+    "today": "Today",
+    "upcoming": "Upcoming",
+    "intelligence": "Intelligence",
     "askAi": "Ask AI",
     "insights": "Insights",
-    "collections": "collections",
+    "workspace": "Workspaces",
+    "collections": "Collections",
     "projects": "Projects",
     "templates": "Templates",
     "features": "Features",

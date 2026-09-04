@@ -90,7 +90,7 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
     expect(event!.end.toISOString()).toBe('2026-01-01T09:30:00.000Z');
   });
 
-  it('falls back to "now" (not a crash) when both deadline and estimated_start_date are null', () => {
+  it('filters out unscheduled tasks when both deadline and estimated_start_date are null', () => {
     const { result } = renderWithTasks([
       baseTask({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -99,10 +99,7 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
       }),
     ]);
     const event = result.current.events.find((e) => e.id === 't-1');
-    expect(event).toBeDefined();
-    expect(Number.isNaN(event!.start.getTime())).toBe(false);
-    // Silent wrong-placement, not a crash — a task that legitimately had no
-    // deadline renders "now" on the calendar with no indication of that.
+    expect(event).toBeUndefined();
   });
 
   it('FIXED: estimate_timer of 0 (an explicit zero-minute task) is honored as zero, not silently bumped to 30', () => {

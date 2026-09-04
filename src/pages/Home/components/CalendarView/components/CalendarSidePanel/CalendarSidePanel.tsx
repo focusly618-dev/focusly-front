@@ -28,7 +28,7 @@ import { surfaceColor } from '@/context';
 
 // Styled Components
 const PanelContainer = styled(Box)(({ theme }) => ({
-  width: '320px',
+  width: '255px',
   borderLeft: `1px solid ${theme.palette.divider}`,
   backgroundColor: surfaceColor(
     theme,
@@ -50,16 +50,16 @@ const AddTaskButton = styled(Button)({
   color: '#ffffff',
   textTransform: 'none',
   fontWeight: 600,
-  fontSize: '14px',
-  padding: '12px 16px',
-  borderRadius: 12,
-  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)',
+  fontSize: '12.5px',
+  padding: '7px 12px',
+  borderRadius: 8,
+  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)',
   transition: 'all 0.2s ease-in-out',
-  gap: 8,
+  gap: 6,
   '&:hover': {
     backgroundColor: '#2563eb',
     transform: 'translateY(-1px)',
-    boxShadow: '0 6px 16px rgba(59, 130, 246, 0.35)',
+    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.35)',
   },
 });
 
@@ -70,10 +70,10 @@ const ViewToggleContainer = styled(Box)(({ theme }) => ({
     'rgba(42, 42, 44, 0.7)',
     'rgba(0, 0, 0, 0.04)',
   ),
-  borderRadius: '12px',
-  padding: '4px',
+  borderRadius: '8px',
+  padding: '2px',
   display: 'flex',
-  gap: '8px',
+  gap: '3px',
   border: `1px solid ${
     theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, 0.08)'
@@ -90,9 +90,9 @@ const ToggleButton = styled(Button)(({ theme }) => ({
       : theme.palette.text.secondary,
   textTransform: 'none',
   fontWeight: 600,
-  fontSize: '12px',
-  padding: '8px 16px',
-  borderRadius: '8px',
+  fontSize: '11.5px',
+  padding: '5px 8px',
+  borderRadius: '6px',
   border: 'none',
   boxShadow: 'none',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -110,8 +110,8 @@ const ToggleButton = styled(Button)(({ theme }) => ({
       theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.primary.main,
     boxShadow:
       theme.palette.mode === 'dark'
-        ? '0 4px 12px rgba(59, 130, 246, 0.4)'
-        : '0 2px 4px rgba(0, 0, 0, 0.06)',
+        ? '0 2px 8px rgba(59, 130, 246, 0.4)'
+        : '0 1px 3px rgba(0, 0, 0, 0.06)',
   },
 }));
 
@@ -193,10 +193,10 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
       <PerfectScrollbar
         options={{ wheelPropagation: true }}
         style={{
-          padding: '24px',
+          padding: '14px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '28px',
+          gap: '16px',
           height: '100%',
         }}
       >
@@ -209,16 +209,15 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
           }}
         >
           <Typography
-            variant="h5"
-            sx={{ fontWeight: 800, color: 'text.primary' }}
+            sx={{ fontWeight: 800, fontSize: '1.1rem', color: 'text.primary' }}
           >
             {isSameDay(currentDate, new Date())
               ? t('calendar.today')
               : format(currentDate, 'eeee')}
           </Typography>
           <Typography
-            variant="body2"
-            sx={{ fontWeight: 600, color: 'text.secondary' }}
+            variant="caption"
+            sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '11.5px' }}
           >
             {format(currentDate, 'd MMMM')}
           </Typography>
@@ -242,7 +241,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
         </ViewToggleContainer>
 
         {/* Add Task */}
-        <AddTaskButton onClick={onAddTaskClick} startIcon={<AddIcon />}>
+        <AddTaskButton onClick={onAddTaskClick} startIcon={<AddIcon sx={{ fontSize: 16 }} />}>
           {t('calendar.addTask')}
         </AddTaskButton>
 
@@ -250,8 +249,8 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
         {String(currentView).toLowerCase() === 'month' ? (
           <Box
             sx={{
-              p: 2,
-              borderRadius: 3,
+              p: 1.25,
+              borderRadius: 1,
               border: '1px solid',
               borderColor: 'divider',
               backgroundColor: (theme) =>
@@ -260,7 +259,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                   : '#ffffff',
             }}
           >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {/* Weekday letters */}
               <Box
                 sx={{
@@ -274,7 +273,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                     key={idx}
                     variant="caption"
                     sx={{
-                      fontSize: '11px',
+                      fontSize: '10px',
                       fontWeight: 700,
                       color:
                         idx === selectedDayColIndex
@@ -291,7 +290,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(7, 1fr)',
-                  rowGap: 1,
+                  rowGap: 0.5,
                   textAlign: 'center',
                 }}
               >
@@ -307,12 +306,12 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        height: 28,
-                        width: 28,
+                        height: 24,
+                        width: 24,
                         mx: 'auto',
                         borderRadius: '50%',
                         cursor: 'pointer',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: isSelected || isToday ? 700 : 500,
                         bgcolor: isSelected ? 'primary.main' : 'transparent',
                         color: isSelected
@@ -341,8 +340,8 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
         ) : (
           <Box
             sx={{
-              p: 2,
-              borderRadius: 3,
+              p: 1.25,
+              borderRadius: 1,
               border: '1px solid',
               borderColor: 'divider',
               backgroundColor: (theme) =>
@@ -351,7 +350,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                   : '#ffffff',
             }}
           >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {/* Weekday letters */}
               <Box
                 sx={{
@@ -368,7 +367,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       key={idx}
                       variant="caption"
                       sx={{
-                        fontSize: '11px',
+                        fontSize: '10px',
                         fontWeight: 700,
                         color: isSelected ? 'primary.main' : 'text.disabled',
                       }}
@@ -397,12 +396,12 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        height: 28,
-                        width: 28,
+                        height: 24,
+                        width: 24,
                         mx: 'auto',
                         borderRadius: '50%',
                         cursor: 'pointer',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: 700,
                         bgcolor: isSelected ? 'primary.main' : 'transparent',
                         color: isSelected
@@ -433,7 +432,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              mb: 2,
+              mb: 1.25,
             }}
           >
             <Typography
@@ -442,8 +441,8 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 fontWeight: 700,
                 color: 'text.secondary',
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontSize: '12px',
+                letterSpacing: '0.06em',
+                fontSize: '10px',
               }}
             >
               {t('calendar.awaitedTasks')}
@@ -454,7 +453,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
-                fontSize: '12px',
+                fontSize: '11px',
                 color: 'primary.main',
                 p: 0,
                 minWidth: 0,
@@ -469,31 +468,31 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
           </Box>
 
           <Stack
-            spacing={1.5}
+            spacing={1}
             sx={{
               overflowY: 'auto',
-              maxHeight: '350px',
+              maxHeight: '280px',
               pr: 0.5,
             }}
           >
             {awaitedTasks.length === 0 ? (
               <Box
                 sx={{
-                  py: 4,
-                  px: 2,
+                  py: 3,
+                  px: 1.5,
                   textAlign: 'center',
                   border: '1px dashed',
                   borderColor: 'divider',
-                  borderRadius: 3,
+                  borderRadius: 1,
                 }}
               >
                 <Typography
                   variant="body2"
-                  sx={{ color: 'text.secondary', fontWeight: 600 }}
+                  sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '12px' }}
                 >
                   {t('calendar.noAwaitedTasks')}
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '10.5px' }}>
                   {t('calendar.freeTimeDesc')}
                 </Typography>
               </Box>
@@ -518,8 +517,8 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      p: 1.5,
-                      borderRadius: 3,
+                      p: 1,
+                      borderRadius: 1,
                       bgcolor: (theme) =>
                         theme.palette.mode === 'dark'
                           ? 'rgba(255, 255, 255, 0.02)'
@@ -527,7 +526,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       border: '1px solid',
                       borderColor: 'divider',
                       cursor: 'pointer',
-                      transition: 'all 0.2s',
+                      transition: 'all 0.15s',
                       '&:hover': {
                         borderColor: 'primary.main',
                         bgcolor: 'action.hover',
@@ -539,14 +538,14 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 1.5,
+                        gap: 1,
                         minWidth: 0,
                       }}
                     >
                       <Box
                         sx={{
-                          width: 8,
-                          height: 8,
+                          width: 6,
+                          height: 6,
                           borderRadius: '50%',
                           bgcolor: categoryColor,
                           flexShrink: 0,
@@ -557,8 +556,10 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                           variant="body2"
                           noWrap
                           sx={{
-                            fontWeight: 700,
+                            fontWeight: 600,
                             color: 'text.primary',
+                            fontSize: '12px',
+                            lineHeight: 1.2,
                             mb: 0.2,
                           }}
                         >
@@ -566,14 +567,14 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ color: 'text.secondary' }}
+                          sx={{ color: 'text.secondary', fontSize: '10.5px', lineHeight: 1.1 }}
                         >
                           {timeString}
                         </Typography>
                       </Box>
                     </Box>
                     <ChevronRight
-                      sx={{ fontSize: 18, color: 'text.disabled' }}
+                      sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0 }}
                     />
                   </Box>
                 );
@@ -584,24 +585,24 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
 
         {/* Optimize Schedule / Weekly Planner Buttons */}
         <Box
-          sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 'auto' }}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mt: 'auto' }}
         >
           <Button
             variant="contained"
             onClick={onAIPlannerClick}
-            startIcon={<AutoAwesomeIcon sx={{ fontSize: 16 }} />}
+            startIcon={<AutoAwesomeIcon sx={{ fontSize: 14 }} />}
             sx={{
               textTransform: 'none',
-              borderRadius: '14px',
-              py: 1.5,
+              borderRadius: '8px',
+              py: 0.9,
               fontWeight: 700,
-              fontSize: '14px',
+              fontSize: '12.5px',
               bgcolor: '#4f46e5',
               color: '#ffffff',
-              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)',
+              boxShadow: '0 2px 8px rgba(79, 70, 229, 0.25)',
               '&:hover': {
                 bgcolor: '#4338ca',
-                boxShadow: '0 6px 16px rgba(79, 70, 229, 0.35)',
+                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
               },
             }}
           >
@@ -614,10 +615,10 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
               onClick={onWeeklyPlannerClick}
               sx={{
                 textTransform: 'none',
-                borderRadius: '14px',
-                py: 1,
+                borderRadius: '8px',
+                py: 0.5,
                 fontWeight: 600,
-                fontSize: '13px',
+                fontSize: '11.5px',
                 color: 'text.secondary',
                 '&:hover': {
                   bgcolor: 'action.hover',

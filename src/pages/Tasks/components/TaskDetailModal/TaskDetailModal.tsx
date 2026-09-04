@@ -390,7 +390,7 @@ export const TaskDetailModal = ({
           loadingSave={loadingSave}
           isReadOnly={isReadOnly}
           handleImproveTask={handleImproveTask}
-          disabled={!title.trim() || !duration.trim()}
+          disabled={!title.trim()}
         />
       </Dialog>
     </LocalizationProvider>

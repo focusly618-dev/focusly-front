@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   isSameDay,
   isSameWeek,
@@ -30,6 +31,10 @@ export type DateRangeFilter = 'today' | 'this_week' | 'this_month' | 'all';
 export const useTasksFilters = (
   viewMode?: 'list' | 'grid' | 'board' | 'workload',
 ) => {
+  const [searchParams] = useSearchParams();
+  const urlDateRange = searchParams.get('dateRange') as DateRangeFilter | null;
+  const urlFilter = searchParams.get('filter');
+
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<
     TaskFilterInput | undefined
@@ -41,19 +46,32 @@ export const useTasksFilters = (
     undefined,
   );
 
-  const [dateRange, setDateRangeState] = useState<DateRangeFilter>(() => {
+  const [internalDateRange, setInternalDateRange] = useState<DateRangeFilter>(() => {
+    if (urlDateRange && ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)) {
+      return urlDateRange;
+    }
     const saved = localStorage.getItem('tasksDateRange');
     return (saved as DateRangeFilter) || 'all';
   });
   const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
 
-  useEffect(() => {
-    localStorage.setItem('tasksDateRange', dateRange);
-  }, [dateRange]);
+  const dateRange: DateRangeFilter = useMemo(() => {
+    if (urlFilter === 'inbox' || urlFilter === 'upcoming') {
+      return 'all';
+    }
+    if (
+      urlDateRange &&
+      ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)
+    ) {
+      return urlDateRange;
+    }
+    return internalDateRange;
+  }, [urlFilter, urlDateRange, internalDateRange]);
 
   const setDateRange = useCallback((range: DateRangeFilter) => {
-    setDateRangeState(range);
+    setInternalDateRange(range);
     setReferenceDate(new Date());
+    localStorage.setItem('tasksDateRange', range);
   }, []);
 
   const goToPreviousPeriod = useCallback(() => {
@@ -105,6 +123,9 @@ export const useTasksFilters = (
     startDate?: string;
     endDate?: string;
   } => {
+    if (urlFilter === 'inbox' || urlFilter === 'upcoming') {
+      return {};
+    }
     if (dateRange === 'today') {
       return {
         startDate: startOfDay(referenceDate).toISOString(),
@@ -127,7 +148,7 @@ export const useTasksFilters = (
       };
     }
     return {};
-  }, [dateRange, referenceDate]);
+  }, [dateRange, referenceDate, urlFilter]);
 
   const applyLocalFilters = useCallback(
     (tasksToFilter: TaskResponse[]) => {
@@ -165,9 +186,61 @@ export const useTasksFilters = (
         result = result.filter((task) => task.status !== 'Done');
       }
 
+      if (urlFilter === 'inbox') {
+        result = result.filter((task) => {
+          const hasEstimatedStart =
+            task.estimated_start_date &&
+            !isNaN(new Date(task.estimated_start_date).getTime());
+          const hasValidDeadline =
+            task.deadline && !isNaN(new Date(task.deadline).getTime());
+          return (
+            (!hasEstimatedStart && !hasValidDeadline) ||
+            (task.status === 'Backlog' && !hasEstimatedStart)
+          );
+        });
+      } else if (urlFilter === 'today') {
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        result = result.filter((task) => {
+          if (task.status === 'Done' || (task as unknown as { deleted_at?: string }).deleted_at) return false;
+          const hasEstimatedStart =
+            task.estimated_start_date &&
+            !isNaN(new Date(task.estimated_start_date).getTime());
+          const hasValidDeadline =
+            task.deadline && !isNaN(new Date(task.deadline).getTime());
+          if (
+            (!hasEstimatedStart && !hasValidDeadline) ||
+            (task.status === 'Backlog' && !hasEstimatedStart)
+          ) {
+            return false;
+          }
+          const dateToUse = (task.estimated_start_date || task.deadline)!;
+          const taskDateStr = new Date(dateToUse).toLocaleDateString('en-CA');
+          return taskDateStr <= todayStr;
+        });
+      } else if (urlFilter === 'upcoming') {
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        result = result.filter((task) => {
+          if (task.status === 'Done' || (task as unknown as { deleted_at?: string }).deleted_at) return false;
+          const hasEstimatedStart =
+            task.estimated_start_date &&
+            !isNaN(new Date(task.estimated_start_date).getTime());
+          const hasValidDeadline =
+            task.deadline && !isNaN(new Date(task.deadline).getTime());
+          if (
+            (!hasEstimatedStart && !hasValidDeadline) ||
+            (task.status === 'Backlog' && !hasEstimatedStart)
+          ) {
+            return false;
+          }
+          const dateToUse = (task.estimated_start_date || task.deadline)!;
+          const taskDateStr = new Date(dateToUse).toLocaleDateString('en-CA');
+          return taskDateStr > todayStr;
+        });
+      }
+
       return result;
     },
-    [searchTerm, activeFilterState?.statuses?.length, activeFilterState?.categories, viewMode],
+    [searchTerm, activeFilterState?.statuses?.length, activeFilterState?.categories, viewMode, urlFilter],
   );
 
   const handleApplySort = (sort: SortState) => {

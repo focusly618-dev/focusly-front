@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Header, Title } from '../../Tasks.styles';
 
 interface TasksHeaderProps {
+  title?: string;
+  eyebrow?: string;
   children?: React.ReactNode;
 }
 
-export const TasksHeader = ({ children }: TasksHeaderProps) => {
+export const TasksHeader = ({ title, eyebrow, children }: TasksHeaderProps) => {
   const { t } = useTranslation();
   return (
     <Header sx={{ padding: '24px 0 16px 0', borderBottom: 'none' }}>
@@ -23,12 +25,12 @@ export const TasksHeader = ({ children }: TasksHeaderProps) => {
             display: 'block',
           }}
         >
-          {t('tasksHeader.eyebrow')}
+          {eyebrow || t('tasksHeader.eyebrow')}
         </Typography>
         <Title
           sx={{ fontWeight: 800, fontSize: '28px', color: 'text.primary' }}
         >
-          {t('tasksHeader.title')}
+          {title || t('tasksHeader.title')}
         </Title>
       </Box>
       <Box

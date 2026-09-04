@@ -334,9 +334,24 @@ export const useCalendarView = () => {
     // same fallback, even though the fallback itself is now always valid.
     const unreliableDateTaskIds = new Set<string>();
 
-    const taskEvents = tasks.map((task: Task) => {
-      const desc = task.notes_encrypted || '';
-      const startDateMatch = desc.match(/\[START_DATE:(.*?)\]/);
+    const taskEvents = tasks
+      .filter((task: Task) => {
+        const hasEstimatedStart =
+          task.estimated_start_date &&
+          !isNaN(new Date(task.estimated_start_date).getTime());
+        const hasValidDeadline =
+          task.deadline && !isNaN(new Date(task.deadline).getTime());
+        const desc = task.notes_encrypted || '';
+        const hasStartDateMarker = /\[START_DATE:(.*?)\]/.test(desc);
+
+        if (!hasEstimatedStart && !hasValidDeadline && !hasStartDateMarker) return false;
+        if (task.status === 'Backlog' && !hasEstimatedStart && !hasStartDateMarker) return false;
+
+        return true;
+      })
+      .map((task: Task) => {
+        const desc = task.notes_encrypted || '';
+        const startDateMatch = desc.match(/\[START_DATE:(.*?)\]/);
 
       const deadlineDate = task.deadline ? new Date(task.deadline) : new Date();
       const hasEstimatedStart =

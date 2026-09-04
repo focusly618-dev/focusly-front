@@ -389,20 +389,19 @@ export const DraftActionBar = styled(Box)(({ theme }) => {
     display: 'flex',
     alignItems: 'center',
     gap: theme.spacing(3),
-    padding: theme.spacing(1.5, 3),
+    padding: theme.spacing(1.25, 2.75),
     borderRadius: '9999px',
-    backgroundColor: surfaceColor(
-      theme,
-      'rgba(30, 41, 59, 0.75)',
-      'rgba(36, 36, 37, 0.75)',
-      'rgba(255, 255, 255, 0.85)',
-    ),
+    backgroundColor: isDark
+      ? 'rgba(28, 28, 30, 0.94)'
+      : 'rgba(255, 255, 255, 0.96)',
     border: '1px solid',
-    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
-    backdropFilter: 'blur(16px)',
+    borderColor: isDark
+      ? 'rgba(168, 85, 247, 0.35)'
+      : 'rgba(124, 58, 237, 0.22)',
+    backdropFilter: 'blur(20px)',
     boxShadow: isDark
-      ? '0 10px 30px -10px rgba(0,0,0,0.5), 0 1px 3px rgba(255,255,255,0.05)'
-      : '0 10px 30px -10px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.02)',
+      ? '0 12px 32px -4px rgba(0, 0, 0, 0.65), 0 0 16px 1px rgba(168, 85, 247, 0.18)'
+      : '0 12px 32px -4px rgba(0, 0, 0, 0.12), 0 0 16px 1px rgba(124, 58, 237, 0.1)',
     animation: 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
     '@keyframes slideDown': {
       '0%': { transform: 'translate(-50%, -20px)', opacity: 0 },

@@ -55,6 +55,64 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     });
   };
 
+  // Tasks counts & expansion (Akiflow style)
+  const tasks = useAppSelector((state) => state.task.tasks || []);
+
+  const [isTasksExpanded, setIsTasksExpanded] = useState(() => {
+    return localStorage.getItem('sidebar-tasks-expanded') !== 'false';
+  });
+
+  const toggleTasksExpanded = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setIsTasksExpanded((prev) => {
+      const next = !prev;
+      localStorage.setItem('sidebar-tasks-expanded', String(next));
+      return next;
+    });
+  };
+
+  const taskCounts = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('en-CA');
+
+    let inbox = 0;
+    let today = 0;
+    let upcoming = 0;
+
+    tasks.forEach((t) => {
+      if (t.status === 'Done' || t.deleted_at) return;
+
+      const hasEstimatedStart =
+        t.estimated_start_date &&
+        !isNaN(new Date(t.estimated_start_date).getTime());
+      const hasValidDeadline =
+        t.deadline && !isNaN(new Date(t.deadline).getTime());
+
+      if (
+        (!hasEstimatedStart && !hasValidDeadline) ||
+        (t.status === 'Backlog' && !hasEstimatedStart)
+      ) {
+        inbox++;
+        return;
+      }
+
+      const dateToUse = (t.estimated_start_date || t.deadline)!;
+      const taskDateStr = new Date(dateToUse).toLocaleDateString('en-CA');
+      if (taskDateStr <= todayStr) {
+        today++;
+      } else {
+        upcoming++;
+      }
+    });
+
+    return {
+      inbox,
+      today,
+      upcoming,
+      total: inbox + today + upcoming,
+    };
+  }, [tasks]);
+
   // Workspaces Queries & Mutations
   const { data: workspacesData } = useQuery(GET_WORKSPACES, {
     variables: { search: '' },
@@ -498,6 +556,9 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     handleRenameGroupSubmit,
     isCollapsed,
     toggleCollapse,
+    taskCounts,
+    isTasksExpanded,
+    toggleTasksExpanded,
   };
 };
 

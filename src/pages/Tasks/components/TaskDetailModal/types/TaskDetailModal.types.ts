@@ -18,6 +18,15 @@ export interface TaskData {
   collaborators?: { name: string; email: string; avatar?: string }[];
 }
 
+
+export interface BuildCreateTaskPayloadParams {
+  state: TaskData & { color: string };
+  userId: string;
+  meetLink: string | null;
+  googleEventId?: string;
+  initialGoogleEventId?: string;
+}
+
 export interface TaskDetailModalProps {
   open: boolean;
   onClose: () => void;

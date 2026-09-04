@@ -130,7 +130,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     real_timer: t.real_timer,
     duration: t.duration,
     priority_level: t.priority_level ?? 2,
-    deadline: safeISO(t.deadline) || new Date().toISOString(),
+    deadline: safeISO(t.deadline) || '',
     status: mapStatus(t.status, 'Todo'),
     category: t.category || 'General',
     color: t.color,

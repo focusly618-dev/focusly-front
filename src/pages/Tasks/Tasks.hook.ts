@@ -227,5 +227,6 @@ export const useTasks = () => {
     setPriorityFilter: filterLogic.setPriorityFilter,
     setStatusFilter: filterLogic.setStatusFilter,
     statusCounts,
+    refetchTasks: data.refetch,
   };
 };

@@ -122,8 +122,8 @@ describe('useTaskFormState (Home / CreateTaskModal variant)', () => {
   });
 });
 
-describe('useTaskFormState (TaskDetailModal variant) — now consistent with the Home variant', () => {
-  it('FIXED: validateForm now enforces the same >=15 minute minimum as the Home variant — a 5m duration is rejected here too', () => {
+describe('useTaskFormState (TaskDetailModal variant) — custom behavior for task details', () => {
+  it('allows duration under 15 minutes in TaskDetailModal variant', () => {
     const { result } = renderHook(() =>
       useDetailTaskFormState({ initialTask: null, initialStart: null }),
     );
@@ -131,22 +131,22 @@ describe('useTaskFormState (TaskDetailModal variant) — now consistent with the
       result.current.setTitle('Valid title');
       result.current.setDuration('5m');
     });
-    let isValid = true;
+    let isValid = false;
     act(() => {
       isValid = result.current.validateForm();
     });
-    expect(isValid).toBe(false);
-    expect(result.current.errors.duration).toMatch(/15 minutes/);
+    expect(isValid).toBe(true);
+    expect(result.current.errors.duration).toBeUndefined();
   });
 
-  it('FIXED: also falls back to a valid "now" currentDate from a garbage initialTask.deadline (same fix, different code path)', () => {
+  it('defaults currentDate to null when initialTask has an invalid deadline and no estimated_start_date', () => {
     const { result } = renderHook(() =>
       useDetailTaskFormState({
         initialTask: baseTask({ deadline: 'not-a-real-date' }),
         initialStart: null,
       }),
     );
-    expect(Number.isNaN(result.current.currentDate!.getTime())).toBe(false);
+    expect(result.current.currentDate).toBeNull();
   });
 
   it('prefers a valid estimated_start_date over a garbage deadline when both are present', () => {

@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo, useRef } from 'react';
 import type { UseTaskDetailModalProps } from '../types/TaskDetailModal.types';
 import { useTaskFormState } from './useTaskFormState';
 import { useTaskCollections } from './useTaskCollections';
@@ -63,12 +63,14 @@ export const useTaskDetailModal = ({
   } = useTaskFormState({ initialStart, initialEnd, initialTask });
   const [shouldGenerateMeet, setShouldGenerateMeet] = useState(false);
 
+  const resetFormRef = useRef<() => void>(() => {});
+
   const mutations = useTaskMutations({
     onSave,
     onClose,
     onDelete,
     initialTask,
-    resetForm: () => {},
+    resetForm: () => resetFormRef.current(),
   });
 
   const {
@@ -207,6 +209,7 @@ export const useTaskDetailModal = ({
     setNewTag('');
     setIsAddingTag(false);
     setIsAddingLink(false);
+    setErrors({});
   }, [
     initialState,
     initialCollections,
@@ -226,7 +229,10 @@ export const useTaskDetailModal = ({
     setNewTag,
     setIsAddingTag,
     setIsAddingLink,
+    setErrors,
   ]);
+
+  resetFormRef.current = resetForm;
 
   const mutationsWithReset = { ...mutations, resetForm };
 

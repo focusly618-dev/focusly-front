@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { addDays, addMinutes } from 'date-fns';
 import { Typography, Box, LinearProgress, Button } from '@mui/material';
 import {
   AutoAwesome as AutoAwesomeIcon,
@@ -64,10 +66,57 @@ export const Tasks = ({
     handleApplySort,
     handleFinishOnboarding,
     deleteTasks,
+    refetchTasks,
   } = useTasks();
 
   const isAIScheduleEnabled = isAIScheduleEnabledProp;
   const setIsAIScheduleEnabled = setIsAIScheduleEnabledProp;
+
+  const [searchParams] = useSearchParams();
+  const urlFilter = searchParams.get('filter');
+
+  const {
+    headerTitle,
+    headerEyebrow,
+    addButtonLabel,
+    contextualInitialStart,
+    showAIOrganize,
+  } = useMemo(() => {
+    if (urlFilter === 'inbox') {
+      return {
+        headerTitle: 'Inbox',
+        headerEyebrow: 'Bandeja de Entrada',
+        addButtonLabel: 'Add to Inbox',
+        contextualInitialStart: null,
+        showAIOrganize: false,
+      };
+    }
+    if (urlFilter === 'today' || dateRange === 'today') {
+      return {
+        headerTitle: 'Today',
+        headerEyebrow: 'Plan de Hoy',
+        addButtonLabel: 'Add Task for Today',
+        contextualInitialStart: new Date(),
+        showAIOrganize: false,
+      };
+    }
+    if (urlFilter === 'upcoming' || dateRange === 'this_week' || dateRange === 'this_month') {
+      return {
+        headerTitle: 'Upcoming',
+        headerEyebrow: 'Próximas Tareas',
+        addButtonLabel: 'Add Upcoming Task',
+        contextualInitialStart: addDays(new Date(), 1),
+        showAIOrganize: false,
+      };
+    }
+    return {
+      headerTitle: undefined,
+      headerEyebrow: undefined,
+      addButtonLabel: 'Add New Task',
+      contextualInitialStart: null,
+      showAIOrganize: true,
+    };
+  }, [urlFilter, dateRange]);
 
   const onboardingSteps: Step[] = [
     {
@@ -173,26 +222,28 @@ export const Tasks = ({
               minHeight: 0,
             }}
           >
-            <TasksHeader>
+            <TasksHeader title={headerTitle} eyebrow={headerEyebrow}>
               <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-                <Button
-                  variant="contained"
-                  onClick={() => setIsAIPlannerOpen(true)}
-                  startIcon={<AutoAwesomeIcon />}
-                  sx={{
-                    borderRadius: '10px',
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    boxShadow: 'none',
-                    height: 36,
-                    bgcolor: '#6366f1',
-                    '&:hover': { bgcolor: '#4f46e5', boxShadow: 'none' },
-                    fontSize: '0.8rem',
-                    px: 2,
-                  }}
-                >
-                  AI Organize
-                </Button>
+                {showAIOrganize && (
+                  <Button
+                    variant="contained"
+                    onClick={() => setIsAIPlannerOpen(true)}
+                    startIcon={<AutoAwesomeIcon />}
+                    sx={{
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      boxShadow: 'none',
+                      height: 36,
+                      bgcolor: '#6366f1',
+                      '&:hover': { bgcolor: '#4f46e5', boxShadow: 'none' },
+                      fontSize: '0.8rem',
+                      px: 2,
+                    }}
+                  >
+                    AI Organize
+                  </Button>
+                )}
                 <Button
                   variant="contained"
                   onClick={() => setIsCreateTaskModalOpen(true)}
@@ -209,7 +260,7 @@ export const Tasks = ({
                     px: 2,
                   }}
                 >
-                  Add New Task
+                  {addButtonLabel}
                 </Button>
               </Box>
             </TasksHeader>
@@ -248,9 +299,16 @@ export const Tasks = ({
         <CreateTaskModal
           open={isCreateTaskModalOpen}
           onClose={() => setIsCreateTaskModalOpen(false)}
-          onSave={() => setIsCreateTaskModalOpen(false)}
-          initialStart={null}
-          initialEnd={null}
+          onSave={() => {
+            setIsCreateTaskModalOpen(false);
+            refetchTasks();
+          }}
+          initialStart={contextualInitialStart}
+          initialEnd={
+            contextualInitialStart
+              ? addMinutes(contextualInitialStart, 30)
+              : null
+          }
         />
       </TasksContainer>
     </LocalizationProvider>

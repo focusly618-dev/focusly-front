@@ -477,12 +477,48 @@ export const TaskProperties = ({
                     },
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     gap: 1.25,
                     pointerEvents: !isOwner ? 'none' : 'auto',
                   }}
                 >
-                  <PlannedIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-                  {currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                    <PlannedIcon
+                      sx={{
+                        fontSize: 16,
+                        color: currentDate ? 'primary.main' : 'text.disabled',
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        fontSize: '13.5px',
+                        fontWeight: 500,
+                        color: currentDate ? 'text.primary' : 'text.secondary',
+                      }}
+                    >
+                      {currentDate ? format(currentDate, 'PPP') : 'Sin fecha (Inbox)'}
+                    </Typography>
+                  </Box>
+                  {currentDate && isOwner && (
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentDate(null);
+                      }}
+                      sx={{
+                        p: 0.25,
+                        color: 'text.secondary',
+                        '&:hover': {
+                          color: 'error.main',
+                          bgcolor: 'rgba(239, 68, 68, 0.1)',
+                        },
+                      }}
+                      title="Quitar fecha (Guardar en Inbox)"
+                    >
+                      <CloseIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  )}
                 </Box>
                 {hasDifferentDueDate && deadlineDate && (
                   <Typography
@@ -529,88 +565,90 @@ export const TaskProperties = ({
               </Box>
             </Box>
 
-            {/* Start Time */}
-            <Box display="flex" flexDirection="column" gap={0.5}>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.secondary',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                }}
-              >
-                Start Time
-              </Typography>
-              <Box sx={{ position: 'relative' }}>
-                <Box
-                  onClick={() => isOwner && setTimePickerOpen(true)}
+            {/* Start Time - Shown only when date is assigned */}
+            {currentDate && (
+              <Box display="flex" flexDirection="column" gap={0.5}>
+                <Typography
+                  variant="caption"
                   sx={{
-                    cursor: !isOwner ? 'default' : 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    color: 'text.primary',
-                    py: 1,
-                    px: 1.5,
-                    borderRadius: '10px',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    bgcolor: (theme) =>
-                      surfaceColor(
-                        theme,
-                        '#1A1F2B',
-                        '#1F1F20',
-                        'background.paper',
-                      ),
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      borderColor: !isOwner ? 'divider' : 'primary.main',
-                      bgcolor: !isOwner ? 'transparent' : 'action.hover',
-                    },
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1.25,
-                    pointerEvents: !isOwner ? 'none' : 'auto',
+                    color: 'text.secondary',
+                    fontSize: '12px',
+                    fontWeight: 600,
                   }}
                 >
-                  <AccessTimeIcon
-                    sx={{ fontSize: 16, color: 'text.disabled' }}
-                  />
-                  {currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
-                </Box>
-                <TimePicker
-                  open={timePickerOpen}
-                  onClose={() => setTimePickerOpen(false)}
-                  value={currentDate}
-                  onChange={(newValue) => {
-                    setCurrentDate(newValue);
-                    setTimePickerOpen(false);
-                  }}
-                  slotProps={{
-                    textField: {
-                      sx: {
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        opacity: 0,
-                        pointerEvents: 'none',
+                  Start Time
+                </Typography>
+                <Box sx={{ position: 'relative' }}>
+                  <Box
+                    onClick={() => isOwner && setTimePickerOpen(true)}
+                    sx={{
+                      cursor: !isOwner ? 'default' : 'pointer',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: 'text.primary',
+                      py: 1,
+                      px: 1.5,
+                      borderRadius: '10px',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      bgcolor: (theme) =>
+                        surfaceColor(
+                          theme,
+                          '#1A1F2B',
+                          '#1F1F20',
+                          'background.paper',
+                        ),
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: !isOwner ? 'divider' : 'primary.main',
+                        bgcolor: !isOwner ? 'transparent' : 'action.hover',
                       },
-                    },
-                    popper: {
-                      sx: timePickerPopperSx,
-                      placement: 'bottom-start',
-                    },
-                    desktopPaper: {
-                      sx: timePickerPaperSx,
-                    },
-                    layout: {
-                      sx: timePickerLayoutSx,
-                    },
-                  }}
-                />
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.25,
+                      pointerEvents: !isOwner ? 'none' : 'auto',
+                    }}
+                  >
+                    <AccessTimeIcon
+                      sx={{ fontSize: 16, color: 'text.disabled' }}
+                    />
+                    {currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
+                  </Box>
+                  <TimePicker
+                    open={timePickerOpen}
+                    onClose={() => setTimePickerOpen(false)}
+                    value={currentDate}
+                    onChange={(newValue) => {
+                      setCurrentDate(newValue);
+                      setTimePickerOpen(false);
+                    }}
+                    slotProps={{
+                      textField: {
+                        sx: {
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          opacity: 0,
+                          pointerEvents: 'none',
+                        },
+                      },
+                      popper: {
+                        sx: timePickerPopperSx,
+                        placement: 'bottom-start',
+                      },
+                      desktopPaper: {
+                        sx: timePickerPaperSx,
+                      },
+                      layout: {
+                        sx: timePickerLayoutSx,
+                      },
+                    }}
+                  />
+                </Box>
               </Box>
-            </Box>
+            )}
           </Box>
 
           {/* Column 2: Durations */}

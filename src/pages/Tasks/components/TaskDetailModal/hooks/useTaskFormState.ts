@@ -36,9 +36,9 @@ export const useTaskFormState = ({
       description: '',
       color: '#1e293b',
       priority: getPriorityFromLevel(2),
-      status: 'Backlog' as Task['status'],
+      status: (initialStart ? 'Todo' : 'Backlog') as Task['status'],
       category: 'General',
-      currentDate: initialStart || new Date(),
+      currentDate: initialStart || null,
       duration: calculatedDuration,
       realTime: '00:00',
     };
@@ -78,12 +78,14 @@ export const useTaskFormState = ({
     const hasEstimatedStart =
       initialTask.estimated_start_date &&
       !isNaN(new Date(initialTask.estimated_start_date).getTime());
-    const parsedDeadline = new Date(deadline);
+    const parsedDeadline = deadline ? new Date(deadline) : null;
+    const hasValidDeadline = parsedDeadline && !isNaN(parsedDeadline.getTime());
+
     const startInitial = hasEstimatedStart
       ? new Date(initialTask.estimated_start_date!)
-      : isNaN(parsedDeadline.getTime())
-        ? new Date()
-        : parsedDeadline;
+      : hasValidDeadline && initialTask.status !== 'Backlog'
+        ? parsedDeadline
+        : null;
 
     return {
       title,
@@ -132,15 +134,9 @@ export const useTaskFormState = ({
       newErrors.title = 'Title is required';
       isValid = false;
     }
-    if (!duration.trim()) {
-      newErrors.duration = 'Duration is required';
-      isValid = false;
-    } else if (!isValidDurationInput(duration)) {
+    if (duration.trim() && !isValidDurationInput(duration)) {
       newErrors.duration =
         'Use up to 3 digits and formats like 30m, 2h, or 2h30m';
-      isValid = false;
-    } else if (parseDuration(duration) < 15) {
-      newErrors.duration = 'Duration must be at least 15 minutes';
       isValid = false;
     }
     setErrors(newErrors);

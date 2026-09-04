@@ -93,10 +93,14 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             right: 2,
             padding: '2px',
             color: 'text.secondary',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.06)'
+                : 'rgba(0, 0, 0, 0.04)',
             zIndex: 10,
             '&:hover': {
               color: 'error.main',
-              bgcolor: 'rgba(239, 68, 68, 0.08)',
+              bgcolor: 'rgba(239, 68, 68, 0.12)',
             },
           }}
         >
@@ -121,7 +125,8 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             sx={{
               fontSize: '10px',
               fontWeight: 600,
-              opacity: 0.85,
+              opacity: isDraft ? 0.9 : 0.85,
+              color: isDraft ? 'text.secondary' : 'inherit',
               whiteSpace: 'nowrap',
               flexShrink: 0,
             }}
@@ -134,8 +139,17 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               sx={{
                 fontSize: '8px',
                 fontWeight: 700,
-                color: 'primary.main',
-                bgcolor: 'rgba(124, 58, 237, 0.1)',
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? '#c084fc' : '#7c3aed',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(168, 85, 247, 0.18)'
+                    : 'rgba(124, 58, 237, 0.08)',
+                border: '1px solid',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(168, 85, 247, 0.3)'
+                    : 'rgba(124, 58, 237, 0.2)',
                 px: 0.5,
                 py: 0.1,
                 borderRadius: '3px',
@@ -166,6 +180,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               flexGrow: 1,
+              color: isDraft ? 'text.primary' : 'inherit',
             }}
           >
             {event.title}
@@ -174,7 +189,15 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       ) : (
         /* ── Normal event (≥ 40 min): time above, title below ── */
         <>
-          <Box sx={{ fontSize: '11px', fontWeight: 500, mb: 0.5 }}>
+          <Box
+            sx={{
+              fontSize: '10px',
+              fontWeight: 600,
+              mb: 0.5,
+              color: isDraft ? 'text.secondary' : 'inherit',
+              opacity: isDraft ? 0.9 : 0.85,
+            }}
+          >
             {timeRange}
           </Box>
           <Box
@@ -191,14 +214,24 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               <Typography
                 component="span"
                 sx={{
-                  fontSize: '8px',
+                  fontSize: '9px',
                   fontWeight: 700,
-                  color: 'primary.main',
-                  bgcolor: 'rgba(124, 58, 237, 0.1)',
+                  color: (theme) =>
+                    theme.palette.mode === 'dark' ? '#c084fc' : '#7c3aed',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(168, 85, 247, 0.18)'
+                      : 'rgba(124, 58, 237, 0.08)',
+                  border: '1px solid',
+                  borderColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(168, 85, 247, 0.3)'
+                      : 'rgba(124, 58, 237, 0.2)',
                   px: 0.5,
-                  py: 0.1,
-                  borderRadius: '3px',
+                  py: 0.15,
+                  borderRadius: '4px',
                   flexShrink: 0,
+                  lineHeight: 1.2,
                 }}
               >
                 ✨ Sugerencia
@@ -219,10 +252,13 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             )}
             <Box
               sx={{
+                fontSize: '12px',
+                fontWeight: 600,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 flexGrow: 1,
+                color: isDraft ? 'text.primary' : 'inherit',
               }}
             >
               {event.title}

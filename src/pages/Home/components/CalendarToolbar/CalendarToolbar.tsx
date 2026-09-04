@@ -19,7 +19,6 @@ import {
   alpha,
   useTheme,
 } from '@mui/material';
-import { format } from 'date-fns';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ToolbarProps } from 'react-big-calendar';
@@ -46,7 +45,7 @@ interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
 
 export const CalendarToolbar = (props: CustomToolbarProps) => {
   const { t } = useTranslation();
-  const { date, onNavigate, onNavigateAction, onMobileMenuClick } = props;
+  const { onNavigate, onNavigateAction, onMobileMenuClick } = props;
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -94,31 +93,7 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
             theme.palette.mode === 'dark' ? 'transparent' : '#ffffff',
         }}
       >
-        {/* Left side: Month Year Title & Subtitle */}
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 800,
-              color: 'text.primary',
-              letterSpacing: '-0.02em',
-              fontSize: { xs: '24px', md: '28px' },
-            }}
-          >
-            {format(date, 'MMMM yyyy')}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: 'text.secondary',
-              mt: 0.5,
-              fontSize: '13px',
-              display: { xs: 'none', sm: 'block' },
-            }}
-          >
-            {t('calendar.subtitle')}
-          </Typography>
-        </Box>
+
 
         {/* Right side: Navigation Arrows */}
         <Stack direction="row" spacing={1.5} alignItems="center">
