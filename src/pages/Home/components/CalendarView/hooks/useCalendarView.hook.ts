@@ -341,9 +341,11 @@ export const useCalendarView = () => {
           !isNaN(new Date(task.estimated_start_date).getTime());
         const hasValidDeadline =
           task.deadline && !isNaN(new Date(task.deadline).getTime());
+        const desc = task.notes_encrypted || '';
+        const hasStartDateMarker = /\[START_DATE:(.*?)\]/.test(desc);
 
-        if (!hasEstimatedStart && !hasValidDeadline) return false;
-        if (task.status === 'Backlog' && !hasEstimatedStart) return false;
+        if (!hasEstimatedStart && !hasValidDeadline && !hasStartDateMarker) return false;
+        if (task.status === 'Backlog' && !hasEstimatedStart && !hasStartDateMarker) return false;
 
         return true;
       })
