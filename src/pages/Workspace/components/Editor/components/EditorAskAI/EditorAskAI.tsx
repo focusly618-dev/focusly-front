@@ -19,7 +19,7 @@ import {
   Summarize as SummarizeIcon,
   NoteAdd as NoteAddIcon,
 } from '@mui/icons-material';
-import { LuminaAnimatedFace } from '@/components/ui';
+import { LuminaAnimatedFace, LuminaOrb } from '@/components/ui';
 import { useEditorAskAI } from './useEditorAskAI.hook';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 
@@ -447,7 +447,7 @@ export const EditorAskAI: React.FC<EditorAskAIProps> = ({
               }}
             />
             {isLoading ? (
-              <CircularProgress size={18} sx={{ mr: 0.5 }} />
+              <LuminaOrb size={20} state="thinking" sx={{ mr: 0.5 }} />
             ) : (
               <IconButton
                 size="small"

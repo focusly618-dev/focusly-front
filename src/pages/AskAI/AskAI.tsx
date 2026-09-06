@@ -10,6 +10,12 @@ import {
   MenuItem,
   Divider,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  CircularProgress,
 } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
 import {
@@ -23,10 +29,13 @@ import {
   Build as ToolIcon,
   FlashOn as LightningIcon,
   BarChart as ChartIcon,
+  WarningAmberRounded as WarningIcon,
+  ChatBubbleOutline as ChatIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector } from '@/redux/hooks';
-import { LuminaAnimatedFace, ClaudeIcon, GeminiIcon } from '@/components/ui';
+import { LuminaAnimatedFace, LuminaOrb, ClaudeIcon, GeminiIcon } from '@/components/ui';
 import { useQuery } from '@apollo/client';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
@@ -346,6 +355,7 @@ const LUMINA_STATUS_MESSAGES = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const AskAI: React.FC = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
   const { tasks } = useAppSelector((state) => state.task);
@@ -358,6 +368,11 @@ export const AskAI: React.FC = () => {
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
   >(null);
+  const [conversationToDelete, setConversationToDelete] = useState<{
+    id: string;
+    title?: string;
+  } | null>(null);
+  const [isDeletingConversation, setIsDeletingConversation] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState('claude-3-5-sonnet');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
@@ -446,6 +461,7 @@ export const AskAI: React.FC = () => {
   }, []);
 
   const handleDeleteConversation = async (id: string) => {
+    setIsDeletingConversation(true);
     try {
       await deleteAIConversation(id);
       if (activeConversationId === id) {
@@ -458,8 +474,17 @@ export const AskAI: React.FC = () => {
         fill: 'var(--sileo-delete-bg)',
         duration: 3000,
       });
+      setConversationToDelete(null);
     } catch (err) {
+      sileo.error({
+        title: 'Error deleting conversation',
+        description: 'The conversation could not be removed, try again.',
+        fill: 'var(--sileo-error-bg)',
+        duration: 3000,
+      });
       console.error('Error deleting conversation:', err);
+    } finally {
+      setIsDeletingConversation(false);
     }
   };
 
@@ -1058,8 +1083,9 @@ export const AskAI: React.FC = () => {
                 {isTyping && (
                   <MessageRow>
                     <AvatarWrapper>
-                      <LuminaAnimatedFace
-                        size={22}
+                      <LuminaOrb
+                        size={26}
+                        state="thinking"
                         primaryColor={primaryColor}
                       />
                     </AvatarWrapper>
@@ -1475,7 +1501,10 @@ export const AskAI: React.FC = () => {
                   size="small"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDeleteConversation(c.id);
+                    setConversationToDelete({
+                      id: c.id,
+                      title: c.title,
+                    });
                   }}
                   sx={{
                     p: 0.25,
@@ -1588,6 +1617,175 @@ export const AskAI: React.FC = () => {
         open={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
       />
+
+      {/* Confirmation Modal to delete AI conversation */}
+      <Dialog
+        open={Boolean(conversationToDelete)}
+        onClose={() => {
+          if (!isDeletingConversation) {
+            setConversationToDelete(null);
+          }
+        }}
+        PaperProps={{
+          sx: {
+            borderRadius: '18px',
+            p: 1,
+            maxWidth: '420px',
+            width: '100%',
+            bgcolor: theme.palette.mode === 'dark' ? '#18181b' : '#ffffff',
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow:
+              theme.palette.mode === 'dark'
+                ? '0 24px 48px rgba(0, 0, 0, 0.6)'
+                : '0 24px 48px rgba(0, 0, 0, 0.12)',
+            backgroundImage: 'none',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            pt: 2,
+            px: 2.5,
+            pb: 1,
+            fontWeight: 700,
+            fontSize: '17px',
+          }}
+        >
+          <Box
+            sx={{
+              width: 36,
+              height: 36,
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(239, 68, 68, 0.15)'
+                  : 'rgba(239, 68, 68, 0.1)',
+              color: theme.palette.error.main,
+              flexShrink: 0,
+            }}
+          >
+            <WarningIcon sx={{ fontSize: 22 }} />
+          </Box>
+          <Typography variant="h6" sx={{ fontSize: '17px', fontWeight: 700 }}>
+            {t('askAi.deleteModalTitle', '¿Eliminar conversación?')}
+          </Typography>
+        </DialogTitle>
+
+        <DialogContent sx={{ px: 2.5, py: 1 }}>
+          <DialogContentText
+            sx={{
+              color: 'text.secondary',
+              fontSize: '14px',
+              lineHeight: 1.5,
+            }}
+          >
+            {t(
+              'askAi.deleteModalDesc',
+              '¿Estás seguro de que deseas eliminar esta conversación con Lumina? Esta acción no se puede deshacer y se borrarán todos sus mensajes.'
+            )}
+          </DialogContentText>
+
+          {conversationToDelete?.title && (
+            <Box
+              sx={{
+                mt: 1.75,
+                p: 1.25,
+                borderRadius: '10px',
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.03)'
+                    : 'rgba(0, 0, 0, 0.025)',
+                border: `1px solid ${theme.palette.divider}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <ChatIcon
+                sx={{
+                  fontSize: 16,
+                  color: 'text.secondary',
+                  opacity: 0.8,
+                  flexShrink: 0,
+                }}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: 'text.primary',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {conversationToDelete.title}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ px: 2.5, pb: 2, pt: 1.5, gap: 1 }}>
+          <Button
+            onClick={() => setConversationToDelete(null)}
+            disabled={isDeletingConversation}
+            variant="outlined"
+            sx={{
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '13.5px',
+              px: 2,
+              borderColor: theme.palette.divider,
+              color: 'text.secondary',
+              '&:hover': {
+                borderColor: theme.palette.text.disabled,
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.03)',
+              },
+            }}
+          >
+            {t('common.cancel', 'Cancelar')}
+          </Button>
+          <Button
+            onClick={() => {
+              if (conversationToDelete) {
+                handleDeleteConversation(conversationToDelete.id);
+              }
+            }}
+            disabled={isDeletingConversation}
+            variant="contained"
+            color="error"
+            sx={{
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '13.5px',
+              px: 2.5,
+              boxShadow: 'none',
+              minWidth: '85px',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+              },
+            }}
+          >
+            {isDeletingConversation ? (
+              <CircularProgress size={18} color="inherit" />
+            ) : (
+              t('common.delete', 'Eliminar')
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AskAIContainer>
   );
 };

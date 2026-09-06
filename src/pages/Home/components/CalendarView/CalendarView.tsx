@@ -30,6 +30,7 @@ import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePa
 import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
 import type { AITimeBlockItem } from '@/api/AI/apiAIPlanner';
 import { surfaceColor } from '@/context';
+import { LuminaOrb } from '@/components/ui';
 
 // Material UI
 import {
@@ -275,17 +276,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     >
       <Backdrop
         sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 2,
           color: '#fff',
-          zIndex: (theme) => theme.zIndex.drawer + 1200,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.45)',
+          backdropFilter: 'blur(8px)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2,
+          alignItems: 'center',
+          gap: 2.5,
         }}
         open={isAILoading}
       >
-        <CircularProgress color="inherit" />
+        <LuminaOrb size={80} state="thinking" />
         <Typography variant="body2" fontWeight={500}>
           {t('calendar.organizingBackdrop')}
         </Typography>
