@@ -236,20 +236,6 @@ export const CalendarContainer = styled(Box, {
       },
     },
 
-    // ── Toolbar buttons ──
-    '& .rbc-toolbar button': {
-      color: textPrimary,
-      borderColor: divider,
-      '&:hover': {
-        backgroundColor: theme.palette.action.hover,
-      },
-      '&.rbc-active': {
-        backgroundColor: `${theme.palette.primary.main} !important`,
-        color: '#ffffff',
-        boxShadow: 'none',
-      },
-    },
-
     // ── Show more link ──
     '& .rbc-show-more': {
       color: theme.palette.primary.main,

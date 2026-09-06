@@ -4,7 +4,6 @@ import {
   Calendar,
   dateFnsLocalizer,
   Views,
-  type ToolbarProps,
 } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
@@ -20,7 +19,6 @@ import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Components
-import { CalendarToolbar } from '../CalendarToolbar';
 import { CalendarHeader } from '../CalendarHeader';
 import {
   CalendarEvent,
@@ -93,12 +91,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     handleSelectEvent,
     handleEventDrop,
     handleEventResize,
-    isFocusSessionActive,
     handleShowMore,
     slotContextMenu,
     handleSlotContextMenu,
     closeSlotContextMenu,
-    handleNavigateAction,
     scrollToTime,
     dayPropGetter,
     slotPropGetter,
@@ -390,6 +386,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         >
           <DnDCalendar
             localizer={localizer}
+            toolbar={false}
             events={isCalendarLoading ? [...events, ...skeletonEvents] : events}
             startAccessor="start"
             endAccessor="end"
@@ -413,14 +410,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             dayLayoutAlgorithm="overlap"
             showMultiDayTimes={true}
             components={{
-              toolbar: (props: ToolbarProps<ICalendarEvent>) => (
-                <CalendarToolbar
-                  {...props}
-                  isSessionActive={isFocusSessionActive}
-                  onNavigateAction={handleNavigateAction}
-                  onMobileMenuClick={() => setIsSidePanelOpen(true)}
-                />
-              ),
               header: CalendarHeader,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               event: (props: any) =>

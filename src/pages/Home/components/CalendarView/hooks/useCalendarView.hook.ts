@@ -31,8 +31,6 @@ import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { useMutation, useQuery } from '@apollo/client';
 import {
   addDays,
-  addMonths,
-  addWeeks,
   endOfDay,
   endOfMonth,
   format,
@@ -41,15 +39,12 @@ import {
   startOfMonth,
   startOfWeek,
   subDays,
-  subMonths,
-  subWeeks,
 } from 'date-fns';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Views, type View } from 'react-big-calendar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import type { ICalendarEvent } from '../../CalendarEvent';
-import type { CalendarNavigateAction } from '../calendarView.types';
 
 export const useCalendarView = () => {
   const dispatch = useDispatch();
@@ -528,65 +523,6 @@ export const useCalendarView = () => {
     updateUrlParams(currentView, newDate);
   };
 
-  const handleNavigateAction = (action: CalendarNavigateAction) => {
-    if (action === 'TODAY') {
-      const today = new Date();
-      updateUrlParams(currentView, today);
-      // Find the first task of the day to scroll to
-      const todayStart = startOfDay(today);
-      const todayEnd = endOfDay(today);
-
-      const todayTasks = events.filter((event) => {
-        const eventStart = event.start?.getTime() || 0;
-        return (
-          eventStart >= todayStart.getTime() && eventStart <= todayEnd.getTime()
-        );
-      });
-
-      if (todayTasks.length > 0) {
-        const firstTask = todayTasks.sort(
-          (a, b) => (a.start?.getTime() || 0) - (b.start?.getTime() || 0),
-        )[0];
-
-        if (firstTask.start) {
-          setScrollToTime(firstTask.start);
-        }
-      }
-      return;
-    }
-
-    if (currentView === Views.MONTH) {
-      updateUrlParams(
-        currentView,
-        action === 'NEXT'
-          ? addMonths(currentDate, 1)
-          : subMonths(currentDate, 1),
-      );
-      return;
-    }
-
-    if (currentView === Views.WEEK) {
-      updateUrlParams(
-        currentView,
-        action === 'NEXT' ? addWeeks(currentDate, 1) : subWeeks(currentDate, 1),
-      );
-      return;
-    }
-
-    if (currentView === Views.DAY) {
-      updateUrlParams(
-        currentView,
-        action === 'NEXT' ? addDays(currentDate, 1) : subDays(currentDate, 1),
-      );
-      return;
-    }
-
-    updateUrlParams(
-      currentView,
-      action === 'NEXT' ? addDays(currentDate, 1) : subDays(currentDate, 1),
-    );
-  };
-
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set('action', 'create');
@@ -715,9 +651,6 @@ export const useCalendarView = () => {
       }, 2500);
     }
   };
-
-  const [isFocusModeOpen, setIsFocusModeOpen] = useState(false);
-  const [isFocusSessionActive, setIsFocusSessionActive] = useState(false);
 
   const handleSlotContextMenu = (e: React.MouseEvent, date: Date) => {
     e.preventDefault();
@@ -1107,17 +1040,12 @@ export const useCalendarView = () => {
     isCalendarLoading,
     handleOnChangeView,
     handleOnNavigate,
-    handleNavigateAction,
     handleSelectSlot,
     handleSelectEvent,
     handleEventDrop,
     handleEventResize,
     handleDeleteTask,
     handleModalClose,
-    isFocusModeOpen,
-    setIsFocusModeOpen,
-    isFocusSessionActive,
-    setIsFocusSessionActive,
     handleShowMore,
     tasks,
     refetchTasks,
