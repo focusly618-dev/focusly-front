@@ -239,6 +239,7 @@ export const useCalendarView = () => {
 
   const isDeletingRef = useRef(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingTaskIds, setDeletingTaskIds] = useState<string[]>([]);
   const prevTasksCount = useRef(tasks.length);
   const hasInitialTasksLoaded = useRef(false);
 
@@ -569,6 +570,7 @@ export const useCalendarView = () => {
   const handleDeleteTask = async (taskId: string) => {
     isDeletingRef.current = true;
     setIsDeleting(true);
+    setDeletingTaskIds((prev) => (prev.includes(taskId) ? prev : [...prev, taskId]));
     const taskObj = tasks.find((t) => t.id === taskId);
     const virtualEvent = reduxEvents.find((e) => e.id === taskId);
     const initialTask = taskObj || virtualEvent;
@@ -585,15 +587,9 @@ export const useCalendarView = () => {
         });
         isDeletingRef.current = false;
         setIsDeleting(false);
+        setDeletingTaskIds((prev) => prev.filter((id) => id !== taskId));
         return;
       }
-    }
-
-    // 1. Optimistic Delete in Redux
-    dispatch(removeTask({ id: taskId }));
-    dispatch(removeEvent({ id: taskId })); // Also remove from virtual state
-    if (taskObj?.google_event_id) {
-      dispatch(removeEvent({ id: taskObj.google_event_id }));
     }
 
     try {
@@ -630,6 +626,13 @@ export const useCalendarView = () => {
         await deleteGoogleEvent(googleEventId);
       }
 
+      // Remove from Redux after network delete completes
+      dispatch(removeTask({ id: taskId }));
+      dispatch(removeEvent({ id: taskId }));
+      if (taskObj?.google_event_id) {
+        dispatch(removeEvent({ id: taskObj.google_event_id }));
+      }
+
       handleModalClose();
 
       sileo.success({
@@ -645,10 +648,9 @@ export const useCalendarView = () => {
         duration: 4000,
       });
     } finally {
-      setTimeout(() => {
-        isDeletingRef.current = false;
-        setIsDeleting(false);
-      }, 2500);
+      isDeletingRef.current = false;
+      setIsDeleting(false);
+      setDeletingTaskIds((prev) => prev.filter((id) => id !== taskId));
     }
   };
 
@@ -1065,5 +1067,6 @@ export const useCalendarView = () => {
     confirmDraftEvents,
     clearDraftEvents,
     confirmingDraft,
+    deletingTaskIds,
   };
 };

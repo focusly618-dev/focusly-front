@@ -25,8 +25,10 @@ import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 export const useCalendarContextMenu = (
   event: ICalendarEvent,
   onStartFocus?: (task: Task) => void,
+  onDeleteTaskProp?: (taskId: string) => Promise<void> | void,
 ): UseCalendarContextMenuReturn => {
   const { user } = useAppSelector((state) => state.auth);
+  const { tasks } = useAppSelector((state) => state.task);
   const dispatch = useAppDispatch();
 
   const isReadOnly = useMemo(() => {
@@ -34,12 +36,18 @@ export const useCalendarContextMenu = (
     if (!user) return true;
 
     const resourceAny = event.resource as {
+      is_owner?: boolean;
       task_type?: string;
       google_event_id?: string;
       organizer_email?: string;
       user_id?: string;
       source?: string;
     };
+
+    if (typeof resourceAny.is_owner === 'boolean') {
+      return !resourceAny.is_owner;
+    }
+
     // Check Google Calendar event ownership
     if (
       resourceAny.source === 'google' ||
@@ -47,13 +55,13 @@ export const useCalendarContextMenu = (
       event.type === 'event'
     ) {
       const organizerEmail = resourceAny.organizer_email;
-      if (organizerEmail) {
-        return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
+      if (organizerEmail && user.email) {
+        return organizerEmail.toLowerCase() !== user.email.toLowerCase();
       }
     }
 
     // Check Focusly task ownership
-    if (resourceAny.user_id && resourceAny.user_id !== user.id) {
+    if (resourceAny.user_id && user.id && resourceAny.user_id !== user.id) {
       return true;
     }
 
@@ -63,6 +71,7 @@ export const useCalendarContextMenu = (
   const [createTask] = useMutation(CREATE_TASK);
   const [updateTask] = useMutation(UPDATE_TASK);
   const [deleteTask] = useMutation(DELETE_TASK);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
@@ -167,6 +176,7 @@ export const useCalendarContextMenu = (
   const handleDeleteTask = async (taskId: string) => {
     if (!user || isReadOnly) return;
 
+    setIsDeleting(true);
     try {
       // Platform Task — Delete from BOTH Google Calendar (if synced) and Platform DB
       const taskObj = event.resource as Task | undefined;
@@ -212,14 +222,29 @@ export const useCalendarContextMenu = (
         title: getFriendlyErrorMessage(error, 'Failed to delete task'),
         fill: 'var(--sileo-error-bg)',
       });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const handleDeleteGoogleEvent = async (eventId: string) => {
     if (isReadOnly) return;
+    setIsDeleting(true);
     try {
-      await deleteGoogleEvent(eventId);
+      const googleRes = event.resource as GoogleCalendarEvent | undefined;
+      const targetGoogleId =
+        googleRes?.google_event_id || googleRes?.id || eventId;
+      await deleteGoogleEvent(targetGoogleId);
       dispatch(removeEvent({ id: eventId }));
+      if (googleRes?.id && googleRes.id !== eventId) {
+        dispatch(removeEvent({ id: googleRes.id }));
+      }
+      if (
+        googleRes?.google_event_id &&
+        googleRes.google_event_id !== eventId
+      ) {
+        dispatch(removeEvent({ id: googleRes.google_event_id }));
+      }
       sileo.success({
         title: 'Event deleted',
         fill: 'var(--sileo-delete-bg)',
@@ -231,6 +256,8 @@ export const useCalendarContextMenu = (
         title: getFriendlyErrorMessage(error, 'Failed to delete event'),
         fill: 'var(--sileo-error-bg)',
       });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -255,17 +282,34 @@ export const useCalendarContextMenu = (
     handleClose();
   };
 
-  const onDelete = (e: React.MouseEvent) => {
+  const onDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (event.type === 'task') {
-      const realTaskId = (event.resource as Task)?.id || event.id;
-      if (realTaskId) {
-        handleDeleteTask(realTaskId);
-      }
-    } else if (event.id) {
-      handleDeleteGoogleEvent(event.id);
-    }
     handleClose();
+    setIsDeleting(true);
+
+    const resourceAny = event.resource as {
+      id?: string;
+      google_event_id?: string;
+    } | undefined;
+
+    const targetId =
+      event.type === 'task'
+        ? (resourceAny?.id || event.id)
+        : (resourceAny?.google_event_id || resourceAny?.id || event.id);
+
+    try {
+      if (onDeleteTaskProp) {
+        await onDeleteTaskProp(targetId);
+      } else if (event.type === 'task') {
+        await handleDeleteTask(targetId);
+      } else {
+        await handleDeleteGoogleEvent(targetId);
+      }
+    } catch (err) {
+      console.error('Failed to delete calendar item:', err);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const onPriorityChange = (e: React.MouseEvent, level: number) => {
@@ -278,10 +322,60 @@ export const useCalendarContextMenu = (
 
   const handleOnStartFocus = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onStartFocus && event.type === 'task' && event.resource) {
-      onStartFocus(event.resource as Task);
-    }
     handleClose();
+
+    if (!onStartFocus) return;
+
+    let targetTask: Task | null = null;
+    if (event.type === 'task' && event.resource) {
+      targetTask = event.resource as Task;
+    }
+
+    if (!targetTask) {
+      const found = tasks.find(
+        (t) =>
+          t.id === event.id ||
+          (t.google_event_id &&
+            (t.google_event_id === event.id ||
+              t.google_event_id ===
+                (event.resource as GoogleCalendarEvent)?.google_event_id)),
+      );
+      if (found) {
+        targetTask = found;
+      }
+    }
+
+    if (!targetTask) {
+      const durationMinutes = Math.max(
+        15,
+        Math.round(
+          ((event.end?.getTime() || 0) - (event.start?.getTime() || 0)) / 60000,
+        ) || 30,
+      );
+
+      targetTask = {
+        id: event.id,
+        title: event.title || 'Focus Session',
+        status: 'Pending',
+        priority_level: 2,
+        notes_encrypted: '',
+        estimate_timer: durationMinutes,
+        real_timer: 0,
+        deadline: (event.end || new Date()).toISOString(),
+        estimated_start_date: (event.start || new Date()).toISOString(),
+        is_owner: true,
+        user_id: user?.id || '',
+        category: 'Work',
+        tags: [],
+        links: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+    }
+
+    if (targetTask) {
+      onStartFocus(targetTask);
+    }
   };
 
   const VIDEO_CALL_DOMAINS =
@@ -332,5 +426,6 @@ export const useCalendarContextMenu = (
     contextMenu,
     setContextMenu,
     isReadOnly,
+    isDeleting,
   };
 };

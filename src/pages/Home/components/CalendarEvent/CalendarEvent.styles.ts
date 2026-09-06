@@ -185,6 +185,7 @@ export const EventContainer = styled(Box, {
   return {
     backgroundColor: finalBgColor,
     color: textColor,
+    position: 'relative',
     height: '100%',
     width: '100%',
     display: 'flex',

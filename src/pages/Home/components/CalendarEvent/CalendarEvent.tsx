@@ -7,6 +7,7 @@ import {
   Stack,
   alpha,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import {
   ContentCopy as DuplicateIcon,
@@ -30,7 +31,13 @@ import {
 } from './CalendarEvent.styles';
 
 export const CalendarEvent = (props: CalendarEventProps) => {
-  const { event, onStartFocus, onDeleteDraft } = props;
+  const {
+    event,
+    onStartFocus,
+    onDeleteDraft,
+    isDeleting: propIsDeleting,
+    onDeleteTask,
+  } = props;
   const variant = getEventColor(event as { id?: string });
   const formatTime = (date: Date) => {
     return getMinutes(date) === 0
@@ -52,7 +59,10 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     currentPriority,
     contextMenu,
     isReadOnly,
-  } = useCalendarContextMenu(event, onStartFocus);
+    isDeleting: contextIsDeleting,
+  } = useCalendarContextMenu(event, onStartFocus, onDeleteTask);
+
+  const isDeleting = Boolean(propIsDeleting || contextIsDeleting);
 
   const isAiTask = event.type === 'task' && (event.resource as Task)?.use_ai;
   const isGoogleTask =
@@ -68,7 +78,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       isMeeting={isMeeting}
       isDraft={isDraft}
       onContextMenu={
-        isDraft
+        isDraft || isDeleting
           ? (e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -77,35 +87,71 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       }
       sx={{
         position: 'relative',
-        pr: isDraft ? '24px' : '6px',
+        pr: isDraft || isDeleting ? '24px' : '6px',
+        opacity: isDeleting ? 0.6 : 1,
+        pointerEvents: isDeleting ? 'none' : 'auto',
+        transition: 'opacity 0.2s ease, filter 0.2s ease',
+        cursor: isDeleting ? 'wait' : 'pointer',
       }}
     >
-      {isDraft && onDeleteDraft && (
-        <IconButton
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDeleteDraft(event.id);
-          }}
+      {isDeleting ? (
+        <Box
           sx={{
             position: 'absolute',
             top: 2,
             right: 2,
-            padding: '2px',
-            color: 'text.secondary',
+            width: 18,
+            height: 18,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
             bgcolor: (theme) =>
               theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.06)'
-                : 'rgba(0, 0, 0, 0.04)',
-            zIndex: 10,
-            '&:hover': {
-              color: 'error.main',
-              bgcolor: 'rgba(239, 68, 68, 0.12)',
-            },
+                ? 'rgba(0, 0, 0, 0.65)'
+                : 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 30,
+            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
           }}
         >
-          <CloseIcon sx={{ fontSize: 12 }} />
-        </IconButton>
+          <CircularProgress
+            size={12}
+            thickness={5}
+            sx={{
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? '#f87171' : '#ef4444',
+            }}
+          />
+        </Box>
+      ) : (
+        isDraft && onDeleteDraft && (
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteDraft(event.id);
+            }}
+            sx={{
+              position: 'absolute',
+              top: 2,
+              right: 2,
+              padding: '2px',
+              color: 'text.secondary',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.06)'
+                  : 'rgba(0, 0, 0, 0.04)',
+              zIndex: 10,
+              '&:hover': {
+                color: 'error.main',
+                bgcolor: 'rgba(239, 68, 68, 0.12)',
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 12 }} />
+          </IconButton>
+        )
       )}
 
       {isShortEvent ? (

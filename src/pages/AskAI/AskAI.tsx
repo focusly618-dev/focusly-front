@@ -31,6 +31,7 @@ import {
   BarChart as ChartIcon,
   WarningAmberRounded as WarningIcon,
   ChatBubbleOutline as ChatIcon,
+  AttachFile as AttachFileIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
@@ -78,7 +79,24 @@ import {
   ModelBadgeButton,
 } from './AskAI.styles';
 
+import {
+  convertPdfToMarkdown,
+  convertDocxToMarkdown,
+  readFileAsText,
+} from '@/pages/Workspace/components/Editor/components/EditorHeader/components/ImportContentModal/documentConverters';
+
 // ─── Types ───────────────────────────────────────────────────────────────────
+
+export interface AttachedFileMeta {
+  name: string;
+  size?: number;
+  type?: string;
+}
+
+export interface AttachedFile extends AttachedFileMeta {
+  id: string;
+  content: string;
+}
 
 interface Message {
   id: string;
@@ -91,6 +109,7 @@ interface Message {
   // parsing of persisted content. A single AI reply can suggest several
   // tasks (e.g. one per week of a month-long plan), hence the array.
   actions?: ParsedLuminaAction[];
+  attachedFiles?: AttachedFileMeta[];
 }
 
 // ─── Suggestion cards data ────────────────────────────────────────────────────
@@ -359,6 +378,7 @@ export const AskAI: React.FC = () => {
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
   const { tasks } = useAppSelector((state) => state.task);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -382,6 +402,8 @@ export const AskAI: React.FC = () => {
   const [contextMenuLevel, setContextMenuLevel] = useState<
     'main' | 'tasks' | 'workspaces'
   >('main');
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
   const inputBoxRef = useRef<HTMLDivElement>(null);
 
   const { data: workspacesData, loading: workspacesLoading } = useQuery(
@@ -551,6 +573,77 @@ export const AskAI: React.FC = () => {
     tasks[0],
   );
 
+  const handleOpenFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsProcessingFile(true);
+    const newFiles: AttachedFile[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.size > 20 * 1024 * 1024) {
+        sileo.error({
+          title: 'File too large',
+          description: `${file.name} exceeds 20MB limit`,
+          fill: 'var(--sileo-error-bg)',
+          duration: 3500,
+        });
+        continue;
+      }
+
+      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+
+      try {
+        let content = '';
+        if (extension === 'pdf') {
+          content = await convertPdfToMarkdown(file);
+        } else if (extension === 'docx') {
+          content = await convertDocxToMarkdown(file);
+        } else {
+          content = await readFileAsText(file);
+        }
+
+        newFiles.push({
+          id: `file-${Date.now()}-${i}`,
+          name: file.name,
+          size: file.size,
+          type: file.type || extension,
+          content,
+        });
+      } catch (err) {
+        console.error('Failed to read file:', file.name, err);
+        sileo.error({
+          title: 'Failed to read file',
+          description: `Could not parse ${file.name}`,
+          fill: 'var(--sileo-error-bg)',
+          duration: 3500,
+        });
+      }
+    }
+
+    if (newFiles.length > 0) {
+      setAttachedFiles((prev) => [...prev, ...newFiles]);
+      sileo.success({
+        title:
+          newFiles.length === 1
+            ? 'File attached'
+            : `${newFiles.length} files attached`,
+        description: newFiles.map((f) => f.name).join(', '),
+        duration: 3000,
+      });
+    }
+
+    setIsProcessingFile(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const selectContext = (ctx: AIContextSelector) => {
     setSelectedContext(ctx);
     setContextAnchor(null);
@@ -562,7 +655,10 @@ export const AskAI: React.FC = () => {
 
   const sendMessage = useCallback(
     async (text: string, customHistory?: Message[]) => {
-      if (!text.trim()) return;
+      const trimmedText = text.trim();
+      const currentFiles = [...attachedFiles];
+
+      if (!trimmedText && currentFiles.length === 0) return;
 
       if (FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && !activeConversationId) {
         if (conversations.length >= 4) {
@@ -571,10 +667,35 @@ export const AskAI: React.FC = () => {
         }
       }
 
+      let promptContent = trimmedText;
+      if (currentFiles.length > 0) {
+        const filesBlock = currentFiles
+          .map(
+            (f) =>
+              `=== ATTACHED FILE: ${f.name} ===\n${f.content || '(empty file)'}\n=== END OF FILE ===`,
+          )
+          .join('\n\n');
+
+        if (promptContent) {
+          promptContent = `${promptContent}\n\n${filesBlock}`;
+        } else {
+          promptContent = `Please review and analyze the following attached file(s):\n\n${filesBlock}`;
+        }
+      }
+
+      const displayUserText =
+        trimmedText ||
+        `Uploaded: ${currentFiles.map((f) => f.name).join(', ')}`;
+
       const userMsg: Message = {
         id: `user-${Date.now()}`,
         sender: 'user',
-        text: text.trim(),
+        text: displayUserText,
+        attachedFiles: currentFiles.map((f) => ({
+          name: f.name,
+          size: f.size,
+          type: f.type,
+        })),
       };
 
       const baseHistory = customHistory || messages;
@@ -584,7 +705,7 @@ export const AskAI: React.FC = () => {
             m.sender === 'user' ? ('user' as const) : ('assistant' as const),
           content: m.text,
         })),
-        { role: 'user' as const, content: text.trim() },
+        { role: 'user' as const, content: promptContent },
       ];
 
       if (!customHistory) {
@@ -593,6 +714,7 @@ export const AskAI: React.FC = () => {
         setMessages([...customHistory, userMsg]);
       }
       setInputValue('');
+      setAttachedFiles([]);
       setIsTyping(true);
       setStatusMessageIndex(0);
 
@@ -685,6 +807,7 @@ export const AskAI: React.FC = () => {
       theme,
       selectedModel,
       selectedContext,
+      attachedFiles,
     ],
   );
 
@@ -719,7 +842,9 @@ export const AskAI: React.FC = () => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage(inputValue);
+      if (inputValue.trim() || attachedFiles.length > 0) {
+        sendMessage(inputValue);
+      }
     }
   };
 
@@ -997,6 +1122,41 @@ export const AskAI: React.FC = () => {
                           }}
                         >
                           <MessageBubble isUser={isUser}>
+                            {msg.attachedFiles && msg.attachedFiles.length > 0 && (
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: 0.8,
+                                  mb: cleanText ? 1 : 0,
+                                }}
+                              >
+                                {msg.attachedFiles.map((file, idx) => (
+                                  <Chip
+                                    key={idx}
+                                    icon={
+                                      <AttachFileIcon
+                                        sx={{ fontSize: '13px !important' }}
+                                      />
+                                    }
+                                    label={file.name}
+                                    size="small"
+                                    sx={{
+                                      fontSize: '11px',
+                                      fontWeight: 600,
+                                      borderRadius: '6px',
+                                      bgcolor: isUser
+                                        ? 'rgba(255, 255, 255, 0.15)'
+                                        : (t) =>
+                                            t.palette.mode === 'dark'
+                                              ? 'rgba(255, 255, 255, 0.08)'
+                                              : 'rgba(0, 0, 0, 0.05)',
+                                      color: 'inherit',
+                                    }}
+                                  />
+                                ))}
+                              </Box>
+                            )}
                             {cleanText &&
                               (cleanHtml ? (
                                 <div
@@ -1317,46 +1477,122 @@ export const AskAI: React.FC = () => {
           </Menu>
 
           <InputBox elevation={0} ref={inputBoxRef}>
-            <IconButton
-              size="small"
-              onClick={() => {
-                setContextAnchor(inputBoxRef.current);
-                setContextMenuLevel('main');
-              }}
-              sx={{
-                color: selectedContext ? 'primary.main' : 'text.secondary',
-                mr: 1,
-                alignSelf: 'center',
-                '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
-              }}
-            >
-              <AtIcon sx={{ fontSize: 20 }} />
-            </IconButton>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              multiple
+              accept=".pdf,.docx,.txt,.md,.csv,.json,.js,.jsx,.ts,.tsx,.py,.html,.css"
+              style={{ display: 'none' }}
+            />
 
-            {selectedContext && (
-              <Chip
-                label={`@${selectedContext.title}`}
-                onDelete={() => setSelectedContext(null)}
-                color="primary"
-                variant="outlined"
-                size="small"
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, alignSelf: 'center' }}>
+              <Tooltip title="Reference context (@)">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setContextAnchor(inputBoxRef.current);
+                    setContextMenuLevel('main');
+                  }}
+                  sx={{
+                    color: selectedContext ? 'primary.main' : 'text.secondary',
+                    '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
+                  }}
+                >
+                  <AtIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Attach files (PDF, DOCX, TXT, MD, CSV, Code)">
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={handleOpenFile}
+                    disabled={isProcessingFile}
+                    sx={{
+                      color: attachedFiles.length > 0 ? 'primary.main' : 'text.secondary',
+                      '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
+                    }}
+                  >
+                    {isProcessingFile ? (
+                      <CircularProgress size={18} thickness={5} sx={{ color: 'primary.main' }} />
+                    ) : (
+                      <AttachFileIcon sx={{ fontSize: 20 }} />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+
+            {/* Context & Attached Files Chips */}
+            {(selectedContext || attachedFiles.length > 0) && (
+              <Box
                 sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 0.8,
                   mr: 1,
-                  borderRadius: '6px',
-                  fontWeight: 700,
-                  maxWidth: '150px',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(99, 102, 241, 0.15)'
-                      : 'rgba(99, 102, 241, 0.05)',
-                  borderColor: 'primary.main',
+                  maxWidth: { xs: '200px', sm: '320px', md: '450px' },
                 }}
-              />
+              >
+                {selectedContext && (
+                  <Chip
+                    label={`@${selectedContext.title}`}
+                    onDelete={() => setSelectedContext(null)}
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      borderRadius: '6px',
+                      fontWeight: 700,
+                      maxWidth: '140px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(99, 102, 241, 0.15)'
+                          : 'rgba(99, 102, 241, 0.05)',
+                      borderColor: 'primary.main',
+                    }}
+                  />
+                )}
+                {attachedFiles.map((f) => (
+                  <Chip
+                    key={f.id}
+                    icon={<AttachFileIcon sx={{ fontSize: '13px !important' }} />}
+                    label={f.name}
+                    onDelete={() =>
+                      setAttachedFiles((prev) =>
+                        prev.filter((item) => item.id !== f.id),
+                      )
+                    }
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: '6px',
+                      fontWeight: 600,
+                      fontSize: '11px',
+                      maxWidth: '160px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.06)'
+                          : 'rgba(0, 0, 0, 0.04)',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.15)'
+                          : 'rgba(0, 0, 0, 0.12)',
+                    }}
+                  />
+                ))}
+              </Box>
             )}
 
             <StyledInput
               inputRef={inputRef}
-              placeholder="Ask Lumina anything…"
+              placeholder={
+                attachedFiles.length > 0
+                  ? 'Ask a question about the attached file(s)…'
+                  : 'Ask Lumina anything…'
+              }
               value={inputValue}
               onChange={(e) => {
                 const val = e.target.value;
@@ -1374,9 +1610,13 @@ export const AskAI: React.FC = () => {
               autoComplete="off"
             />
             <SendButton
-              active={!!inputValue.trim()}
+              active={!!inputValue.trim() || attachedFiles.length > 0}
               onClick={() => sendMessage(inputValue)}
-              disabled={!inputValue.trim() || isTyping}
+              disabled={
+                (!inputValue.trim() && attachedFiles.length === 0) ||
+                isTyping ||
+                isProcessingFile
+              }
               size="small"
             >
               <SendIcon sx={{ fontSize: 18 }} />

@@ -41,7 +41,6 @@ import {
   Drawer,
   Backdrop,
   Button,
-  CircularProgress,
 } from '@mui/material';
 
 // Styles & Hooks
@@ -110,6 +109,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     confirmDraftEvents,
     clearDraftEvents,
     confirmingDraft,
+    deletingTaskIds,
+    handleDeleteTask,
   } = useCalendarView();
 
   const [isAILoading, setIsAILoading] = useState(false);
@@ -425,6 +426,28 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                     onStartFocus={onStartFocus}
                     currentView={currentView}
                     onDeleteDraft={handleDeleteDraft}
+                    onDeleteTask={handleDeleteTask}
+                    isDeleting={
+                      deletingTaskIds?.includes(props.event.id) ||
+                      Boolean(
+                        props.event.resource &&
+                          'id' in props.event.resource &&
+                          deletingTaskIds?.includes(
+                            (props.event.resource as { id: string }).id,
+                          ),
+                      ) ||
+                      Boolean(
+                        props.event.resource &&
+                          'google_event_id' in props.event.resource &&
+                          deletingTaskIds?.includes(
+                            (
+                              props.event.resource as {
+                                google_event_id: string;
+                              }
+                            ).google_event_id,
+                          ),
+                      )
+                    }
                   />
                 ),
               // eslint-disable-next-line @typescript-eslint/no-explicit-any

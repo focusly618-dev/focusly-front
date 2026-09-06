@@ -25,6 +25,8 @@ export interface CalendarEventProps {
   onStartFocus?: (task: Task) => void;
   currentView?: string;
   onDeleteDraft?: (id: string) => void;
+  isDeleting?: boolean;
+  onDeleteTask?: (taskId: string) => Promise<void> | void;
 }
 
 export interface UseCalendarContextMenuReturn {
@@ -48,4 +50,5 @@ export interface UseCalendarContextMenuReturn {
   contextMenu: { mouseX: number; mouseY: number } | null;
   setContextMenu: (position: { mouseX: number; mouseY: number } | null) => void;
   isReadOnly?: boolean;
+  isDeleting: boolean;
 }
