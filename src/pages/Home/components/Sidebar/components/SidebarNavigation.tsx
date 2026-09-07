@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
   List,
   ListItem,
@@ -7,6 +8,7 @@ import {
   Avatar,
   Collapse,
 } from '@mui/material';
+import { aiStreamService } from '@/services/aiStreamService';
 import { useTranslation } from 'react-i18next';
 import {
   NavItem,
@@ -66,6 +68,17 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       currentDateRange === 'upcoming');
   const isAskAIActive = currentTab === TaskBar.AskAI;
   const isInsightsActive = currentTab === TaskBar.Insights;
+
+  const [isAIGenerating, setIsAIGenerating] = useState(() =>
+    aiStreamService.isGenerating(),
+  );
+
+  useEffect(() => {
+    const unsub = aiStreamService.subscribe(() => {
+      setIsAIGenerating(aiStreamService.isGenerating());
+    });
+    return unsub;
+  }, []);
   const isProjectsActive =
     currentTab === TaskBar.Workspace && !sidebar.searchParams.get('modal');
   const isTemplatesActive =
@@ -206,7 +219,9 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                 <ExpandMoreIcon
                   sx={{
                     fontSize: 14,
-                    transform: isTasksExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transform: isTasksExpanded
+                      ? 'rotate(180deg)'
+                      : 'rotate(0deg)',
                     transition: 'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 />
@@ -323,9 +338,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       </ListItem>
 
       {/* ── INTELLIGENCE CATEGORY ── */}
-      {!isCollapsed && (
-        <CategoryHeader>{t('nav.intelligence')}</CategoryHeader>
-      )}
+      {!isCollapsed && <CategoryHeader>{t('nav.intelligence')}</CategoryHeader>}
 
       {/* Ask AI */}
       <ListItem
@@ -341,8 +354,27 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           active={isAskAIActive}
           onClick={() => changeStatusTab(TaskBar.AskAI)}
         >
-          <ListItemIcon>
+          <ListItemIcon sx={{ position: 'relative' }}>
             <AskAIIcon />
+            {isAIGenerating && !isAskAIActive && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 2,
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  bgcolor: '#a855f7',
+                  boxShadow: '0 0 8px #a855f7',
+                  animation: 'askAiNavPulse 1.5s infinite ease-in-out',
+                  '@keyframes askAiNavPulse': {
+                    '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                    '50%': { transform: 'scale(1.4)', opacity: 0.6 },
+                  },
+                }}
+              />
+            )}
           </ListItemIcon>
           <ListItemText
             primary={t('nav.askAi')}
@@ -388,9 +420,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       </ListItem>
 
       {/* ── WORKSPACE CATEGORY ── */}
-      {!isCollapsed && (
-        <CategoryHeader>{t('nav.workspace')}</CategoryHeader>
-      )}
+      {!isCollapsed && <CategoryHeader>{t('nav.workspace')}</CategoryHeader>}
 
       <ListItem
         disablePadding

@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '@/config/env.config';
 import axios from 'axios';
+import { format } from 'date-fns';
 import type { AIMessage, AITaskContext } from './apiAI.types';
 import type { ParsedLuminaAction } from '@/utils/lumina/lumina.types';
 
@@ -179,6 +180,8 @@ export const fetchChatStreamResponse = async (
         conversationId,
         contextType,
         contextId,
+        clientTime: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
       }),
       signal: abortSignal,
     });
