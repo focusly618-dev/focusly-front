@@ -4,8 +4,10 @@ export interface StreamableMessage {
   id: string;
   sender?: string;
   text: string;
+  rawContent?: string;
   html?: string;
-  [key: string]: unknown;
+  actions?: unknown;
+  attachedFiles?: unknown;
 }
 
 export interface AIStreamEvent {
@@ -42,7 +44,6 @@ class AIStreamService {
   };
 
   private listeners = new Set<AIStreamListener>();
-  private activeReader: ReadableStreamDefaultReader<Uint8Array> | null = null;
 
   getState(): Readonly<AIStreamState> {
     return { ...this.state };
@@ -99,7 +100,6 @@ class AIStreamService {
     try {
       const stream = await streamPromise;
       const reader = stream.getReader();
-      this.activeReader = reader;
       const decoder = new TextDecoder();
 
       while (true) {
@@ -159,8 +159,6 @@ class AIStreamService {
         activeMessages: this.state.activeMessages,
       });
       throw err;
-    } finally {
-      this.activeReader = null;
     }
   }
 

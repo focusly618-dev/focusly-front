@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
 import { Box, useTheme } from '@mui/material';
 import { LuminaAnimatedFace } from '../LuminaAnimatedFace';
 import type { LuminaOrbProps } from './LuminaOrb.types';
@@ -15,7 +21,11 @@ export const LuminaOrb: React.FC<LuminaOrbProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasWebGPU, setHasWebGPU] = useState<boolean>(() => {
-    return typeof navigator !== 'undefined' && 'gpu' in navigator && !!navigator.gpu;
+    return (
+      typeof navigator !== 'undefined' &&
+      'gpu' in navigator &&
+      !!(navigator as unknown as { gpu?: unknown }).gpu
+    );
   });
 
   const resolvedPrimary = primaryColor || theme.palette.primary.main;
@@ -24,38 +34,38 @@ export const LuminaOrb: React.FC<LuminaOrbProps> = ({
 
   // Check WebGPU availability at mount
   useEffect(() => {
-    if (typeof navigator === 'undefined' || !navigator.gpu) {
+    if (
+      typeof navigator === 'undefined' ||
+      !(navigator as unknown as { gpu?: unknown }).gpu
+    ) {
       setHasWebGPU(false);
     }
   }, []);
 
-  const syncState = useCallback(
-    (targetState: string) => {
-      const iframe = iframeRef.current;
-      if (!iframe || !iframe.contentWindow) return;
+  const syncState = useCallback((targetState: string) => {
+    const iframe = iframeRef.current;
+    if (!iframe || !iframe.contentWindow) return;
 
-      try {
-        const win = iframe.contentWindow as unknown as {
-          liquidOrb?: { setState: (s: string) => void };
-        };
-        if (win.liquidOrb && typeof win.liquidOrb.setState === 'function') {
-          win.liquidOrb.setState(targetState);
-        }
-      } catch {
-        // Ignore cross-origin issues
+    try {
+      const win = iframe.contentWindow as unknown as {
+        liquidOrb?: { setState: (s: string) => void };
+      };
+      if (win.liquidOrb && typeof win.liquidOrb.setState === 'function') {
+        win.liquidOrb.setState(targetState);
       }
+    } catch {
+      // Ignore cross-origin issues
+    }
 
-      try {
-        iframe.contentWindow.postMessage(
-          { type: 'SET_ORB_STATE', state: targetState },
-          '*'
-        );
-      } catch {
-        // Ignore errors
-      }
-    },
-    []
-  );
+    try {
+      iframe.contentWindow.postMessage(
+        { type: 'SET_ORB_STATE', state: targetState },
+        '*',
+      );
+    } catch {
+      // Ignore errors
+    }
+  }, []);
 
   const syncTheme = useCallback(
     (primary: string, secondary: string, mode: string) => {
@@ -76,13 +86,13 @@ export const LuminaOrb: React.FC<LuminaOrbProps> = ({
       try {
         iframe.contentWindow.postMessage(
           { type: 'SET_ORB_THEME', primary, secondary, mode },
-          '*'
+          '*',
         );
       } catch {
         // Ignore errors
       }
     },
-    []
+    [],
   );
 
   // Synchronize state on prop change or iframe load
