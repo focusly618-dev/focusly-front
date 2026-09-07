@@ -1,4 +1,11 @@
-import { Box, Typography, Popover, Stack, MenuItem } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Popover,
+  Stack,
+  MenuItem,
+  Tooltip,
+} from '@mui/material';
 import type { Theme } from '@mui/material/styles';
 import { Flag as FlagIcon } from '@mui/icons-material';
 import {
@@ -8,7 +15,7 @@ import {
   PRIORITY_LIST,
   CATEGORY_LIST,
 } from '../TaskIcons';
-import { TASK_COLORS } from '../../CreateTaskModal.utils';
+import { PASTEL_COLORS, getColorName } from '../../CreateTaskModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 import { surfaceColor } from '@/context';
 
@@ -182,37 +189,107 @@ export const TaskPopovers = ({
         sx: {
           ...popoverPaperSx,
           borderRadius: '16px',
+          p: 1.75,
+          minWidth: 260,
+          maxWidth: 290,
         },
       }}
     >
       <Box
         sx={{
-          p: 2,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(6, 1fr)',
-          gap: 1.5,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mb: 1.5,
+          px: 0.5,
         }}
       >
-        {TASK_COLORS.map((c) => (
+        <Typography
+          sx={{
+            fontSize: '11px',
+            fontWeight: 700,
+            color: 'text.secondary',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
+          Color de la tarea
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
           <Box
-            key={c}
-            onClick={() => {
-              setColor(c);
-              setColorAnchor(null);
-            }}
             sx={{
-              width: 28,
-              height: 28,
+              width: 10,
+              height: 10,
               borderRadius: '50%',
-              bgcolor: c,
-              cursor: 'pointer',
-              border: color === c ? '2px solid white' : 'none',
-              outline: color === c ? '1px solid black' : 'none',
-              transition: 'transform 0.2s',
-              '&:hover': { transform: 'scale(1.1)' },
+              bgcolor: color || 'transparent',
+              border: '1px solid',
+              borderColor: 'divider',
             }}
           />
-        ))}
+          <Typography
+            sx={{ fontSize: '11.5px', fontWeight: 600, color: 'text.primary' }}
+          >
+            {getColorName(color) || 'Personalizado'}
+          </Typography>
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: 1.25,
+          justifyItems: 'center',
+        }}
+      >
+        {PASTEL_COLORS.map((item) => {
+          const isSelected = color?.toUpperCase() === item.value.toUpperCase();
+          return (
+            <Tooltip key={item.value} title={item.name} arrow placement="top">
+              <Box
+                onClick={() => {
+                  setColor(item.value);
+                  setColorAnchor(null);
+                }}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  bgcolor: item.value,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: isSelected
+                    ? '2px solid'
+                    : '1.5px solid rgba(0,0,0,0.1)',
+                  borderColor: isSelected ? 'text.primary' : 'rgba(0,0,0,0.1)',
+                  boxShadow: isSelected
+                    ? '0 0 0 2px rgba(0,0,0,0.1)'
+                    : '0 1px 2px rgba(0,0,0,0.05)',
+                  transition: 'all 0.15s ease',
+                  transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+                  '&:hover': {
+                    transform: 'scale(1.16)',
+                    boxShadow: '0 3px 8px rgba(0,0,0,0.15)',
+                  },
+                }}
+              >
+                {isSelected && (
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: 'text.primary',
+                      opacity: 0.8,
+                    }}
+                  />
+                )}
+              </Box>
+            </Tooltip>
+          );
+        })}
       </Box>
     </Popover>
   </>

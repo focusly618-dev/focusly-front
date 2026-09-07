@@ -120,20 +120,21 @@ const getCategoryColor = (category: string) => {
   switch (normCategory) {
     case 'deep work':
     case 'research':
-      return '#8b5cf6'; // purple
-    case 'meeting':
-    case 'planning':
-      return '#3b82f6'; // blue
-    case 'design':
-    case 'learning':
-      return '#f59e0b'; // orange
     case 'development':
     case 'dev':
-      return '#2563eb'; // dark blue
+      return '#94a3b8'; // slate
+    case 'meeting':
+    case 'planning':
+      return '#8eaab5'; // steel mist
+    case 'design':
+    case 'learning':
+      return '#d4b28c'; // warm sand
     case 'marketing':
-      return '#ef4444'; // red
+    case 'wellness':
+    case 'salud':
+      return '#86a789'; // sage
     default:
-      return '#6b7280'; // grey
+      return '#71717a'; // zinc
   }
 };
 
@@ -147,6 +148,8 @@ interface CalendarSidePanelProps {
   onEventSelect: (event: ICalendarEvent) => void;
   onAIPlannerClick?: () => void;
   onWeeklyPlannerClick?: () => void;
+  hoveredEventId?: string | null;
+  onHoverEvent?: (eventId: string | null) => void;
 }
 
 export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
@@ -159,6 +162,8 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   onEventSelect,
   onAIPlannerClick,
   onWeeklyPlannerClick,
+  hoveredEventId,
+  onHoverEvent,
 }) => {
   const { t } = useTranslation();
   const miniWeekDays = useMemo(() => {
@@ -217,7 +222,11 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
           </Typography>
           <Typography
             variant="caption"
-            sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '11.5px' }}
+            sx={{
+              fontWeight: 600,
+              color: 'text.secondary',
+              fontSize: '11.5px',
+            }}
           >
             {format(currentDate, 'd MMMM')}
           </Typography>
@@ -241,7 +250,10 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
         </ViewToggleContainer>
 
         {/* Add Task */}
-        <AddTaskButton onClick={onAddTaskClick} startIcon={<AddIcon sx={{ fontSize: 16 }} />}>
+        <AddTaskButton
+          onClick={onAddTaskClick}
+          startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+        >
           {t('calendar.addTask')}
         </AddTaskButton>
 
@@ -488,11 +500,18 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
               >
                 <Typography
                   variant="body2"
-                  sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '12px' }}
+                  sx={{
+                    color: 'text.secondary',
+                    fontWeight: 600,
+                    fontSize: '12px',
+                  }}
                 >
                   {t('calendar.noAwaitedTasks')}
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '10.5px' }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.disabled', fontSize: '10.5px' }}
+                >
                   {t('calendar.freeTimeDesc')}
                 </Typography>
               </Box>
@@ -500,37 +519,98 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
               awaitedTasks.map((event) => {
                 const isTask = event.type === 'task';
                 const task = isTask
-                  ? (event.resource as { category?: string; status?: string })
+                  ? (event.resource as {
+                      id?: string;
+                      google_event_id?: string;
+                      category?: string;
+                      status?: string;
+                      color?: string;
+                      notes_encrypted?: string;
+                    })
                   : null;
                 const category = task ? task.category || 'General' : 'Meeting';
-                const categoryColor = getCategoryColor(category);
+                const taskCustomColor =
+                  task?.color && task.color !== '#1e293b'
+                    ? task.color
+                    : (() => {
+                        const match =
+                          task?.notes_encrypted?.match(/\[COLOR:(.*?)\]/);
+                        return match && match[1] && match[1] !== '#1e293b'
+                          ? match[1]
+                          : undefined;
+                      })();
+                const categoryColor =
+                  taskCustomColor || getCategoryColor(category);
 
                 const formatTime = (date: Date) =>
                   format(new Date(date), 'hh:mm a');
                 const timeString = `${formatTime(event.start)} - ${formatTime(event.end)}`;
 
+                const isHovered =
+                  hoveredEventId !== null &&
+                  (event.id === hoveredEventId ||
+                    task?.id === hoveredEventId ||
+                    task?.google_event_id === hoveredEventId);
+
                 return (
                   <Box
                     key={event.id}
                     onClick={() => onEventSelect(event)}
+                    onMouseEnter={() => onHoverEvent?.(event.id)}
+                    onMouseLeave={() => onHoverEvent?.(null)}
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       p: 1,
                       borderRadius: 1,
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.02)'
-                          : '#ffffff',
+                      bgcolor: isHovered
+                        ? (theme) => {
+                            const isDark = theme.palette.mode === 'dark';
+                            const isGray =
+                              (theme as { appMode?: string }).appMode ===
+                              'graydark';
+                            return isDark
+                              ? isGray
+                                ? '#28282b'
+                                : '#222225'
+                              : '#f1f5f9';
+                          }
+                        : (theme) => {
+                            const isDark = theme.palette.mode === 'dark';
+                            const isGray =
+                              (theme as { appMode?: string }).appMode ===
+                              'graydark';
+                            return isDark
+                              ? isGray
+                                ? '#202022'
+                                : '#171719'
+                              : '#ffffff';
+                          },
                       border: '1px solid',
-                      borderColor: 'divider',
+                      borderColor: isHovered
+                        ? (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? '#94a3b8'
+                              : '#64748b'
+                        : 'divider',
                       cursor: 'pointer',
-                      transition: 'all 0.15s',
+                      transition:
+                        'background-color 0.15s ease, border-color 0.15s ease',
                       '&:hover': {
-                        borderColor: 'primary.main',
-                        bgcolor: 'action.hover',
-                        transform: 'translateX(2px)',
+                        borderColor: (theme) =>
+                          theme.palette.mode === 'dark' ? '#94a3b8' : '#64748b',
+                        bgcolor: (theme) => {
+                          const isDark = theme.palette.mode === 'dark';
+                          const isGray =
+                            (theme as { appMode?: string }).appMode ===
+                            'graydark';
+                          return isDark
+                            ? isGray
+                              ? '#28282b'
+                              : '#222225'
+                            : '#f1f5f9';
+                        },
                       },
                     }}
                   >
@@ -557,7 +637,11 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                           noWrap
                           sx={{
                             fontWeight: 600,
-                            color: 'text.primary',
+                            color: (theme) =>
+                              (theme as { appMode?: string }).appMode ===
+                              'graydark'
+                                ? '#f8fafc'
+                                : 'text.primary',
                             fontSize: '12px',
                             lineHeight: 1.2,
                             mb: 0.2,
@@ -567,14 +651,26 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ color: 'text.secondary', fontSize: '10.5px', lineHeight: 1.1 }}
+                          sx={{
+                            color: (theme) =>
+                              (theme as { appMode?: string }).appMode ===
+                              'graydark'
+                                ? '#cbd5e1'
+                                : 'text.secondary',
+                            fontSize: '10.5px',
+                            lineHeight: 1.1,
+                          }}
                         >
                           {timeString}
                         </Typography>
                       </Box>
                     </Box>
                     <ChevronRight
-                      sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0 }}
+                      sx={{
+                        fontSize: 16,
+                        color: 'text.disabled',
+                        flexShrink: 0,
+                      }}
                     />
                   </Box>
                 );
@@ -585,7 +681,12 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
 
         {/* Optimize Schedule / Weekly Planner Buttons */}
         <Box
-          sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mt: 'auto' }}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.75,
+            mt: 'auto',
+          }}
         >
           <Button
             variant="contained"

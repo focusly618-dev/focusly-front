@@ -27,6 +27,7 @@ export interface CalendarEventProps {
   onDeleteDraft?: (id: string) => void;
   isDeleting?: boolean;
   onDeleteTask?: (taskId: string) => Promise<void> | void;
+  isHighlighted?: boolean;
 }
 
 export interface UseCalendarContextMenuReturn {

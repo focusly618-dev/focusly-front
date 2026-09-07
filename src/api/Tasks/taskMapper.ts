@@ -133,7 +133,12 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     deadline: safeISO(t.deadline) || '',
     status: mapStatus(t.status, 'Todo'),
     category: t.category || 'General',
-    color: t.color,
+    color:
+      t.color ||
+      (() => {
+        const match = t.notes_encrypted?.match(/\[COLOR:(.*?)\]/);
+        return match ? match[1] : undefined;
+      })(),
     created_at: safeISO(t.created_at) || new Date().toISOString(),
     updated_at: safeISO(t.updated_at) || new Date().toISOString(),
     completed_at: safeISO(t.completed_at),

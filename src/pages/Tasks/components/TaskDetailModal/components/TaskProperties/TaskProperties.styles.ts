@@ -121,12 +121,13 @@ export const timeLogPopoverPaperSx = {
 export const colorPopoverPaperSx = {
   borderRadius: '16px',
   mt: 1,
-  boxShadow: 'none',
+  boxShadow: '0 10px 30px rgba(0,0,0,0.2), 0 0 0 1px rgba(128,128,128,0.15)',
 };
 
 export const colorGridSx = {
-  p: 2,
+  p: 0.5,
   display: 'grid',
-  gridTemplateColumns: 'repeat(6, 1fr)',
-  gap: 1.5,
+  gridTemplateColumns: 'repeat(5, 1fr)',
+  gap: 1.25,
+  justifyItems: 'center',
 };

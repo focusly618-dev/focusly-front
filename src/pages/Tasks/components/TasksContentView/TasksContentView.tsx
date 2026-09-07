@@ -32,6 +32,7 @@ import {
   TableHeaderCell,
   TableBodyContainer,
 } from '../ListViewTask/ListViewTask.styles';
+import { TaskPaginator } from '../TaskPaginator';
 
 import type { TasksContentViewProps } from './TasksContentView.types';
 import { useTasksContentView } from './useTasksContentView.hook';
@@ -61,8 +62,11 @@ export const TasksContentView = ({
     isDeleting,
     selectedStatus,
     setSelectedStatus,
-    limit,
-    setLimit,
+    page,
+    setPage,
+    pageSize,
+    totalPages,
+    paginatedTasks,
     isListView,
     handleToggleSelect,
     tabs,
@@ -76,7 +80,6 @@ export const TasksContentView = ({
     handleConfirmDelete,
     handleCancelDelete,
     handleClearSelection,
-    handleScroll,
   } = useTasksContentView({
     filteredTasks,
     viewMode,
@@ -194,30 +197,63 @@ export const TasksContentView = ({
         </GridTaskContainer>
       ) : (
         <>
-          <StatusTabsContainer>
-            {tabs.map((tab) => {
-              const count = tabCounts[tab.id] || 0;
-              return (
-                <StatusTabButton
-                  key={tab.id}
-                  active={selectedStatus === tab.id}
-                  tabColor={tab.color}
-                  onClick={() => {
-                    setSelectedStatus(tab.id);
-                    setLimit(24);
-                  }}
-                >
-                  {tab.label}
-                  <TabCountBadge
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: (theme) =>
+                `1px solid ${
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.08)'
+                    : '#e2e8f0'
+                }`,
+              mb: 2,
+              gap: 2,
+              flexWrap: { xs: 'wrap', md: 'nowrap' },
+            }}
+          >
+            <StatusTabsContainer
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                borderBottom: 'none',
+                mb: 0,
+              }}
+            >
+              {tabs.map((tab) => {
+                const count = tabCounts[tab.id] || 0;
+                return (
+                  <StatusTabButton
+                    key={tab.id}
                     active={selectedStatus === tab.id}
                     tabColor={tab.color}
+                    onClick={() => {
+                      setSelectedStatus(tab.id);
+                      setPage(1);
+                    }}
                   >
-                    {count}
-                  </TabCountBadge>
-                </StatusTabButton>
-              );
-            })}
-          </StatusTabsContainer>
+                    {tab.label}
+                    <TabCountBadge
+                      active={selectedStatus === tab.id}
+                      tabColor={tab.color}
+                    >
+                      {count}
+                    </TabCountBadge>
+                  </StatusTabButton>
+                );
+              })}
+            </StatusTabsContainer>
+
+            <TaskPaginator
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={displayedTasks.length}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              isLoading={isLoading}
+            />
+          </Box>
 
           <TableWrapper>
             {showEmptyStateTasks ? (
@@ -304,8 +340,8 @@ export const TasksContentView = ({
                     Actions
                   </TableHeaderCell>
                 </TableHeader>
-                <TableBodyContainer onScroll={handleScroll}>
-                  {displayedTasks.slice(0, limit).map((task) => (
+                <TableBodyContainer>
+                  {paginatedTasks.map((task) => (
                     <ListViewTask
                       key={task.id}
                       task={task}
@@ -331,37 +367,6 @@ export const TasksContentView = ({
                         title={`No tasks in ${activeTab.label}`}
                         description="Move a task here or change tabs to see tasks."
                       />
-                    </Box>
-                  )}
-                  {displayedTasks.length > limit && (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        padding: '16px',
-                        backgroundColor: 'transparent',
-                      }}
-                    >
-                      <Button
-                        size="small"
-                        onClick={() => setLimit((prev) => prev + 24)}
-                        sx={{
-                          textTransform: 'none',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          color: activeTab.color,
-                          backgroundColor: `${activeTab.color}0a`,
-                          borderRadius: '8px',
-                          px: 3,
-                          py: 0.5,
-                          '&:hover': {
-                            backgroundColor: `${activeTab.color}15`,
-                          },
-                        }}
-                      >
-                        Show More ({displayedTasks.length - limit} remaining)
-                      </Button>
                     </Box>
                   )}
                 </TableBodyContainer>
