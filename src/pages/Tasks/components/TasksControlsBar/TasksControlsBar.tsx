@@ -51,6 +51,7 @@ export const TasksControlsBar = ({
 }: TasksControlsBarProps) => {
   const [searchParams] = useSearchParams();
   const urlFilter = searchParams.get('filter');
+  const urlTab = searchParams.get('tab');
   const urlDateRange = searchParams.get('dateRange');
   const hideDateSelector = Boolean(urlFilter || urlDateRange);
 
@@ -307,51 +308,51 @@ export const TasksControlsBar = ({
           )}
         </Box>
       </Box>
-
-      {/* Right Side: View Mode Switcher */}
-      <ViewToggleGroup
-        id="joyride-tasks-view-toggle"
-        sx={{
-          borderRadius: '24px',
-          border: (theme) =>
-            `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`,
-          bgcolor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255,255,255,0.02)'
-              : '#ffffff',
-          overflow: 'hidden',
-          p: '2px',
-        }}
-      >
-        <ViewToggleButton
-          active={viewMode === 'list'}
-          onClick={() => setViewMode('list')}
-          sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
+      {!urlFilter && urlTab && (
+        <ViewToggleGroup
+          id="joyride-tasks-view-toggle"
+          sx={{
+            borderRadius: '24px',
+            border: (theme) =>
+              `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`,
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.02)'
+                : '#ffffff',
+            overflow: 'hidden',
+            p: '2px',
+          }}
         >
-          <ViewListIcon fontSize="small" />
-        </ViewToggleButton>
-        <ViewToggleButton
-          active={viewMode === 'grid'}
-          onClick={() => setViewMode('grid')}
-          sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
-        >
-          <GridViewIcon fontSize="small" />
-        </ViewToggleButton>
-        <ViewToggleButton
-          active={viewMode === 'board'}
-          onClick={() => setViewMode('board')}
-          sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
-        >
-          <ViewColumnIcon fontSize="small" />
-        </ViewToggleButton>
-        <ViewToggleButton
-          active={viewMode === 'workload'}
-          onClick={() => setViewMode('workload')}
-          sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
-        >
-          <BalanceIcon fontSize="small" />
-        </ViewToggleButton>
-      </ViewToggleGroup>
+          <ViewToggleButton
+            active={viewMode === 'list'}
+            onClick={() => setViewMode('list')}
+            sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
+          >
+            <ViewListIcon fontSize="small" />
+          </ViewToggleButton>
+          <ViewToggleButton
+            active={viewMode === 'grid'}
+            onClick={() => setViewMode('grid')}
+            sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
+          >
+            <GridViewIcon fontSize="small" />
+          </ViewToggleButton>
+          <ViewToggleButton
+            active={viewMode === 'board'}
+            onClick={() => setViewMode('board')}
+            sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
+          >
+            <ViewColumnIcon fontSize="small" />
+          </ViewToggleButton>
+          <ViewToggleButton
+            active={viewMode === 'workload'}
+            onClick={() => setViewMode('workload')}
+            sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
+          >
+            <BalanceIcon fontSize="small" />
+          </ViewToggleButton>
+        </ViewToggleGroup>
+      )}
     </ControlsBar>
   );
 };

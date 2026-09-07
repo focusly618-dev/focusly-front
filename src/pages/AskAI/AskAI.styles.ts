@@ -321,9 +321,9 @@ export const SendButton = styled(IconButton)<{ active?: boolean }>(
     transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
     '&:hover': active
       ? {
-          backgroundColor: theme.palette.primary.dark,
-          transform: 'scale(1.08)',
-        }
+        backgroundColor: theme.palette.primary.dark,
+        transform: 'scale(1.08)',
+      }
       : {},
   }),
 );

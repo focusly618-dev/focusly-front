@@ -33,7 +33,7 @@ export const calendarSlice = createSlice({
     },
     removeEvent: (state, action: PayloadAction<{ id: string }>) => {
       state.reduxEvents = state.reduxEvents.filter(
-        (e) => e.id !== action.payload.id,
+        (e) => e.id !== action.payload.id && e.google_event_id !== action.payload.id,
       );
     },
     incrementSyncVersion: (state) => {

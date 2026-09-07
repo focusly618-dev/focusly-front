@@ -10,6 +10,12 @@ import {
   MenuItem,
   Divider,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  CircularProgress,
 } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
 import {
@@ -23,10 +29,19 @@ import {
   Build as ToolIcon,
   FlashOn as LightningIcon,
   BarChart as ChartIcon,
+  WarningAmberRounded as WarningIcon,
+  ChatBubbleOutline as ChatIcon,
+  AttachFile as AttachFileIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector } from '@/redux/hooks';
-import { LuminaAnimatedFace, ClaudeIcon, GeminiIcon } from '@/components/ui';
+import {
+  LuminaAnimatedFace,
+  LuminaOrb,
+  ClaudeIcon,
+  GeminiIcon,
+} from '@/components/ui';
 import { useQuery } from '@apollo/client';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
@@ -39,11 +54,8 @@ import {
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
 import { SuggestedActionsPlan } from '@/components/chat/suggestedActionsPlan/SuggestedActionsPlan';
 import { UpgradeModal } from '@/components/modals';
-import {
-  parseLuminaActions,
-  sileo,
-  type ParsedLuminaAction,
-} from '@/utils';
+import { aiStreamService } from '@/services/aiStreamService';
+import { parseLuminaActions, sileo, type ParsedLuminaAction } from '@/utils';
 import { surfaceColor } from '@/context';
 import {
   AskAIContainer,
@@ -69,12 +81,30 @@ import {
   ModelBadgeButton,
 } from './AskAI.styles';
 
+import {
+  convertPdfToMarkdown,
+  convertDocxToMarkdown,
+  readFileAsText,
+} from '@/pages/Workspace/components/Editor/components/EditorHeader/components/ImportContentModal/documentConverters';
+
 // ─── Types ───────────────────────────────────────────────────────────────────
+
+export interface AttachedFileMeta {
+  name: string;
+  size?: number;
+  type?: string;
+}
+
+interface AttachedFile extends AttachedFileMeta {
+  id: string;
+  content: string;
+}
 
 interface Message {
   id: string;
   sender: 'user' | 'ai';
   text: string;
+  rawContent?: string;
   html?: string;
   // Populated only for messages loaded from history — the backend already
   // parsed these out of the raw `[ACTION: ...]` tags before they ever left
@@ -82,7 +112,46 @@ interface Message {
   // parsing of persisted content. A single AI reply can suggest several
   // tasks (e.g. one per week of a month-long plan), hence the array.
   actions?: ParsedLuminaAction[];
+  attachedFiles?: AttachedFileMeta[];
 }
+
+const parseAttachedFilesFromContent = (
+  rawContent: string,
+): {
+  cleanText: string;
+  attachedFiles?: AttachedFileMeta[];
+} => {
+  if (!rawContent || !rawContent.includes('ATTACHED FILE:')) {
+    return { cleanText: rawContent };
+  }
+
+  const attachedFiles: AttachedFileMeta[] = [];
+  const fileBlockRegex =
+    /(?:===|---)\s*ATTACHED FILE:\s*([^\n\r]+?)\s*(?:===|---)\n?[\s\S]*?(?:===|---)\s*END OF FILE\s*(?:===|---)/gi;
+
+  let match: RegExpExecArray | null;
+  while ((match = fileBlockRegex.exec(rawContent)) !== null) {
+    const fileName = match[1]?.trim();
+    if (fileName) {
+      attachedFiles.push({
+        name: fileName,
+      });
+    }
+  }
+
+  let cleanText = rawContent.replace(fileBlockRegex, '').trim();
+
+  if (
+    cleanText === 'Please review and analyze the following attached file(s):'
+  ) {
+    cleanText = '';
+  }
+
+  return {
+    cleanText,
+    attachedFiles: attachedFiles.length > 0 ? attachedFiles : undefined,
+  };
+};
 
 // ─── Suggestion cards data ────────────────────────────────────────────────────
 
@@ -346,18 +415,32 @@ const LUMINA_STATUS_MESSAGES = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const AskAI: React.FC = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
   const { tasks } = useAppSelector((state) => state.task);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (aiStreamService.isGenerating()) {
+      return aiStreamService.getActiveMessages() as unknown as Message[];
+    }
+    return [];
+  });
   const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState<boolean>(() =>
+    aiStreamService.isGenerating(),
+  );
   const [statusMessageIndex, setStatusMessageIndex] = useState(0);
   const [conversations, setConversations] = useState<AIConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
   >(null);
+  const [conversationToDelete, setConversationToDelete] = useState<{
+    id: string;
+    title?: string;
+  } | null>(null);
+  const [isDeletingConversation, setIsDeletingConversation] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState('claude-3-5-sonnet');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
@@ -367,6 +450,8 @@ export const AskAI: React.FC = () => {
   const [contextMenuLevel, setContextMenuLevel] = useState<
     'main' | 'tasks' | 'workspaces'
   >('main');
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
   const inputBoxRef = useRef<HTMLDivElement>(null);
 
   const { data: workspacesData, loading: workspacesLoading } = useQuery(
@@ -404,13 +489,24 @@ export const AskAI: React.FC = () => {
     try {
       const msgs = await getAIConversationMessages(conversationId);
       setMessages(
-        msgs.map((m) => ({
-          id: m.id,
-          sender: m.role === 'user' ? 'user' : 'ai',
-          text: m.content,
-          html: renderMarkdown(m.content, theme.palette.mode === 'dark', theme),
-          actions: m.actions ?? [],
-        })),
+        msgs.map((m) => {
+          const isUser = m.role === 'user';
+          const { cleanText, attachedFiles: parsedFiles } = isUser
+            ? parseAttachedFilesFromContent(m.content)
+            : { cleanText: m.content, attachedFiles: undefined };
+
+          return {
+            id: m.id,
+            sender: isUser ? 'user' : 'ai',
+            text: cleanText,
+            rawContent: m.content,
+            html: cleanText
+              ? renderMarkdown(cleanText, theme.palette.mode === 'dark', theme)
+              : '',
+            actions: m.actions ?? [],
+            attachedFiles: parsedFiles,
+          };
+        }),
       );
     } catch (err) {
       console.error('Error loading conversation messages:', err);
@@ -434,7 +530,83 @@ export const AskAI: React.FC = () => {
     }
   }, [activeConversationId]);
 
+  // Subscribe to background AI stream service
   useEffect(() => {
+    const unsubscribe = aiStreamService.subscribe((event) => {
+      if (event.type === 'chunk') {
+        setIsTyping(false);
+        setMessages((prev) => {
+          const exists = prev.some((m) => m.id === event.aiMsgId);
+          if (!exists) {
+            return [
+              ...prev,
+              {
+                id: event.aiMsgId,
+                sender: 'ai',
+                text: event.accumulatedText,
+                html: renderMarkdown(
+                  event.accumulatedText,
+                  theme.palette.mode === 'dark',
+                  theme,
+                ),
+              },
+            ];
+          }
+          return prev.map((msg) =>
+            msg.id === event.aiMsgId
+              ? {
+                  ...msg,
+                  text: event.accumulatedText,
+                  html: renderMarkdown(
+                    event.accumulatedText,
+                    theme.palette.mode === 'dark',
+                    theme,
+                  ),
+                }
+              : msg,
+          );
+        });
+      } else if (event.type === 'done') {
+        setIsTyping(false);
+        getAIConversations()
+          .then((updatedConvs) => {
+            setConversations(updatedConvs);
+            if (!activeConversationId && updatedConvs.length > 0) {
+              setActiveConversationId(updatedConvs[0].id);
+            }
+          })
+          .catch(console.error);
+      } else if (event.type === 'error') {
+        setIsTyping(false);
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === event.aiMsgId
+              ? {
+                  ...msg,
+                  text: 'Lo siento, ha ocurrido un error al generar la respuesta.',
+                  html: '<p style="color: red;">Error generating response.</p>',
+                }
+              : msg,
+          ),
+        );
+      }
+    });
+
+    return unsubscribe;
+  }, [theme, activeConversationId]);
+
+  useEffect(() => {
+    if (aiStreamService.isGenerating()) {
+      const activeState = aiStreamService.getState();
+      if (
+        activeState.conversationId &&
+        activeState.conversationId !== 'new_chat'
+      ) {
+        setActiveConversationId(activeState.conversationId);
+      }
+      return;
+    }
+
     const lastId = localStorage.getItem(LAST_CONVERSATION_STORAGE_KEY);
     if (lastId) {
       handleSelectConversation(lastId);
@@ -446,6 +618,7 @@ export const AskAI: React.FC = () => {
   }, []);
 
   const handleDeleteConversation = async (id: string) => {
+    setIsDeletingConversation(true);
     try {
       await deleteAIConversation(id);
       if (activeConversationId === id) {
@@ -458,8 +631,17 @@ export const AskAI: React.FC = () => {
         fill: 'var(--sileo-delete-bg)',
         duration: 3000,
       });
+      setConversationToDelete(null);
     } catch (err) {
+      sileo.error({
+        title: 'Error deleting conversation',
+        description: 'The conversation could not be removed, try again.',
+        fill: 'var(--sileo-error-bg)',
+        duration: 3000,
+      });
       console.error('Error deleting conversation:', err);
+    } finally {
+      setIsDeletingConversation(false);
     }
   };
 
@@ -520,11 +702,84 @@ export const AskAI: React.FC = () => {
       (curr.estimated_end_date &&
         prev.estimated_end_date &&
         curr.estimated_end_date > prev.estimated_end_date) ||
-        (!prev.title && curr.title)
+      (!prev.title && curr.title)
         ? curr
         : prev,
     tasks[0],
   );
+
+  const handleOpenFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsProcessingFile(true);
+    const newFiles: AttachedFile[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.size > 20 * 1024 * 1024) {
+        sileo.error({
+          title: 'File too large',
+          description: `${file.name} exceeds 20MB limit`,
+          fill: 'var(--sileo-error-bg)',
+          duration: 3500,
+        });
+        continue;
+      }
+
+      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+
+      try {
+        let content = '';
+        if (extension === 'pdf') {
+          content = await convertPdfToMarkdown(file);
+        } else if (extension === 'docx') {
+          content = await convertDocxToMarkdown(file);
+        } else {
+          content = await readFileAsText(file);
+        }
+
+        newFiles.push({
+          id: `file-${Date.now()}-${i}`,
+          name: file.name,
+          size: file.size,
+          type: file.type || extension,
+          content,
+        });
+      } catch (err) {
+        console.error('Failed to read file:', file.name, err);
+        sileo.error({
+          title: 'Failed to read file',
+          description: `Could not parse ${file.name}`,
+          fill: 'var(--sileo-error-bg)',
+          duration: 3500,
+        });
+      }
+    }
+
+    if (newFiles.length > 0) {
+      setAttachedFiles((prev) => [...prev, ...newFiles]);
+      sileo.success({
+        title:
+          newFiles.length === 1
+            ? 'File attached'
+            : `${newFiles.length} files attached`,
+        description: newFiles.map((f) => f.name).join(', '),
+        duration: 3000,
+      });
+    }
+
+    setIsProcessingFile(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const selectContext = (ctx: AIContextSelector) => {
     setSelectedContext(ctx);
@@ -537,7 +792,10 @@ export const AskAI: React.FC = () => {
 
   const sendMessage = useCallback(
     async (text: string, customHistory?: Message[]) => {
-      if (!text.trim()) return;
+      const trimmedText = text.trim();
+      const currentFiles = [...attachedFiles];
+
+      if (!trimmedText && currentFiles.length === 0) return;
 
       if (FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && !activeConversationId) {
         if (conversations.length >= 4) {
@@ -546,10 +804,36 @@ export const AskAI: React.FC = () => {
         }
       }
 
+      let promptContent = trimmedText;
+      if (currentFiles.length > 0) {
+        const filesBlock = currentFiles
+          .map(
+            (f) =>
+              `=== ATTACHED FILE: ${f.name} ===\n${f.content || '(empty file)'}\n=== END OF FILE ===`,
+          )
+          .join('\n\n');
+
+        if (promptContent) {
+          promptContent = `${promptContent}\n\n${filesBlock}`;
+        } else {
+          promptContent = `Please review and analyze the following attached file(s):\n\n${filesBlock}`;
+        }
+      }
+
+      const displayUserText =
+        trimmedText ||
+        `Uploaded: ${currentFiles.map((f) => f.name).join(', ')}`;
+
       const userMsg: Message = {
         id: `user-${Date.now()}`,
         sender: 'user',
-        text: text.trim(),
+        text: displayUserText,
+        rawContent: promptContent,
+        attachedFiles: currentFiles.map((f) => ({
+          name: f.name,
+          size: f.size,
+          type: f.type,
+        })),
       };
 
       const baseHistory = customHistory || messages;
@@ -557,9 +841,9 @@ export const AskAI: React.FC = () => {
         ...baseHistory.map((m) => ({
           role:
             m.sender === 'user' ? ('user' as const) : ('assistant' as const),
-          content: m.text,
+          content: m.rawContent || m.text,
         })),
-        { role: 'user' as const, content: text.trim() },
+        { role: 'user' as const, content: promptContent },
       ];
 
       if (!customHistory) {
@@ -568,6 +852,7 @@ export const AskAI: React.FC = () => {
         setMessages([...customHistory, userMsg]);
       }
       setInputValue('');
+      setAttachedFiles([]);
       setIsTyping(true);
       setStatusMessageIndex(0);
 
@@ -581,20 +866,23 @@ export const AskAI: React.FC = () => {
 
       setMessages((prev) => [...prev, aiMsg]);
 
-      let accumulatedText = '';
+      const initialActiveList = !customHistory
+        ? [...messages, userMsg, aiMsg]
+        : [...customHistory, userMsg, aiMsg];
+
       try {
-        const stream = await fetchChatStreamResponse(
+        const streamPromise = fetchChatStreamResponse(
           history,
           biggestTask
             ? {
-              title: biggestTask.title,
-              description: biggestTask.notes_encrypted || '',
-              status: biggestTask.status || 'Todo',
-              priority_level: biggestTask.priority_level ?? 0,
-              estimate_timer: biggestTask.estimate_timer ?? 0,
-              real_timer: biggestTask.real_timer ?? undefined,
-              deadline: biggestTask.deadline || '',
-            }
+                title: biggestTask.title,
+                description: biggestTask.notes_encrypted || '',
+                status: biggestTask.status || 'Todo',
+                priority_level: biggestTask.priority_level ?? 0,
+                estimate_timer: biggestTask.estimate_timer ?? 0,
+                real_timer: biggestTask.real_timer ?? undefined,
+                deadline: biggestTask.deadline || '',
+              }
             : null,
           undefined,
           selectedModel,
@@ -604,48 +892,26 @@ export const AskAI: React.FC = () => {
         );
         setSelectedContext(null);
 
-        const reader = stream.getReader();
-        const decoder = new TextDecoder();
-        setIsTyping(false);
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          accumulatedText += chunk;
-
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === aiMsgId
-                ? {
-                  ...msg,
-                  text: accumulatedText,
-                  html: renderMarkdown(
-                    accumulatedText,
-                    theme.palette.mode === 'dark',
-                    theme,
-                  ),
-                }
-                : msg,
-            ),
-          );
-        }
-
-        const updatedConvs = await getAIConversations();
-        setConversations(updatedConvs);
-        if (!activeConversationId && updatedConvs.length > 0) {
-          setActiveConversationId(updatedConvs[0].id);
-        }
+        aiStreamService
+          .startStream(
+            activeConversationId || 'new_chat',
+            aiMsgId,
+            streamPromise,
+            initialActiveList,
+          )
+          .catch((err) => {
+            console.error('Error in aiStreamService.startStream:', err);
+          });
       } catch (err) {
-        console.error('Error fetching stream response:', err);
+        console.error('Error starting stream response:', err);
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === aiMsgId
               ? {
-                ...msg,
-                text: 'Lo siento, ha ocurrido un error al generar la respuesta.',
-                html: '<p style="color: red;">Error generating response.</p>',
-              }
+                  ...msg,
+                  text: 'Lo siento, ha ocurrido un error al generar la respuesta.',
+                  html: '<p style="color: red;">Error generating response.</p>',
+                }
               : msg,
           ),
         );
@@ -657,9 +923,9 @@ export const AskAI: React.FC = () => {
       biggestTask,
       activeConversationId,
       conversations,
-      theme,
       selectedModel,
       selectedContext,
+      attachedFiles,
     ],
   );
 
@@ -694,7 +960,9 @@ export const AskAI: React.FC = () => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage(inputValue);
+      if (inputValue.trim() || attachedFiles.length > 0) {
+        sendMessage(inputValue);
+      }
     }
   };
 
@@ -918,10 +1186,27 @@ export const AskAI: React.FC = () => {
                 {messages.map((msg) => {
                   const isUser = msg.sender === 'user';
                   const {
+                    cleanText: parsedCleanText,
+                    attachedFiles: fallbackFiles,
+                  } =
+                    isUser &&
+                    (msg.text.includes('ATTACHED FILE:') ||
+                      (msg.rawContent && !msg.attachedFiles))
+                      ? parseAttachedFilesFromContent(
+                          msg.rawContent || msg.text,
+                        )
+                      : { cleanText: msg.text, attachedFiles: undefined };
+
+                  const displayFiles =
+                    msg.attachedFiles && msg.attachedFiles.length > 0
+                      ? msg.attachedFiles
+                      : fallbackFiles;
+
+                  const {
                     cleanText,
                     actions: liveActions,
                     hasPendingAction: livePendingAction,
-                  } = parseLuminaActions(msg.text);
+                  } = parseLuminaActions(parsedCleanText);
                   // Historical messages already carry the backend-parsed
                   // actions; only fall back to the client-side regex (and
                   // its "still streaming a tag" flag) for the message
@@ -934,14 +1219,28 @@ export const AskAI: React.FC = () => {
                   if (!isUser && !cleanText.trim() && !hasPendingAction) {
                     return null;
                   }
+                  if (
+                    isUser &&
+                    !cleanText.trim() &&
+                    (!displayFiles || displayFiles.length === 0)
+                  ) {
+                    return null;
+                  }
 
-                  const cleanHtml = msg.html
-                    ? renderMarkdown(
-                      cleanText,
-                      theme.palette.mode === 'dark',
-                      theme,
-                    )
-                    : undefined;
+                  const cleanHtml =
+                    msg.html && !isUser
+                      ? renderMarkdown(
+                          cleanText,
+                          theme.palette.mode === 'dark',
+                          theme,
+                        )
+                      : isUser && cleanText
+                        ? renderMarkdown(
+                            cleanText,
+                            theme.palette.mode === 'dark',
+                            theme,
+                          )
+                        : undefined;
 
                   return (
                     <MessageRow key={msg.id} isUser={isUser}>
@@ -972,6 +1271,41 @@ export const AskAI: React.FC = () => {
                           }}
                         >
                           <MessageBubble isUser={isUser}>
+                            {displayFiles && displayFiles.length > 0 && (
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: 0.8,
+                                  mb: cleanText ? 1 : 0,
+                                }}
+                              >
+                                {displayFiles.map((file, idx) => (
+                                  <Chip
+                                    key={idx}
+                                    icon={
+                                      <AttachFileIcon
+                                        sx={{ fontSize: '13px !important' }}
+                                      />
+                                    }
+                                    label={file.name}
+                                    size="small"
+                                    sx={{
+                                      fontSize: '11px',
+                                      fontWeight: 600,
+                                      borderRadius: '6px',
+                                      bgcolor: isUser
+                                        ? 'rgba(255, 255, 255, 0.15)'
+                                        : (t) =>
+                                            t.palette.mode === 'dark'
+                                              ? 'rgba(255, 255, 255, 0.08)'
+                                              : 'rgba(0, 0, 0, 0.05)',
+                                      color: 'inherit',
+                                    }}
+                                  />
+                                ))}
+                              </Box>
+                            )}
                             {cleanText &&
                               (cleanHtml ? (
                                 <div
@@ -1058,8 +1392,9 @@ export const AskAI: React.FC = () => {
                 {isTyping && (
                   <MessageRow>
                     <AvatarWrapper>
-                      <LuminaAnimatedFace
-                        size={22}
+                      <LuminaOrb
+                        size={26}
+                        state="thinking"
                         primaryColor={primaryColor}
                       />
                     </AvatarWrapper>
@@ -1291,46 +1626,138 @@ export const AskAI: React.FC = () => {
           </Menu>
 
           <InputBox elevation={0} ref={inputBoxRef}>
-            <IconButton
-              size="small"
-              onClick={() => {
-                setContextAnchor(inputBoxRef.current);
-                setContextMenuLevel('main');
-              }}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              multiple
+              accept=".pdf,.docx,.txt,.md,.csv,.json,.js,.jsx,.ts,.tsx,.py,.html,.css"
+              style={{ display: 'none' }}
+            />
+
+            <Box
               sx={{
-                color: selectedContext ? 'primary.main' : 'text.secondary',
-                mr: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
                 alignSelf: 'center',
-                '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
               }}
             >
-              <AtIcon sx={{ fontSize: 20 }} />
-            </IconButton>
+              <Tooltip title="Reference context (@)">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setContextAnchor(inputBoxRef.current);
+                    setContextMenuLevel('main');
+                  }}
+                  sx={{
+                    color: selectedContext ? 'primary.main' : 'text.secondary',
+                    '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
+                  }}
+                >
+                  <AtIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+              </Tooltip>
 
-            {selectedContext && (
-              <Chip
-                label={`@${selectedContext.title}`}
-                onDelete={() => setSelectedContext(null)}
-                color="primary"
-                variant="outlined"
-                size="small"
+              <Tooltip title="Attach files (PDF, DOCX, TXT, MD, CSV, Code)">
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={handleOpenFile}
+                    disabled={isProcessingFile}
+                    sx={{
+                      color:
+                        attachedFiles.length > 0
+                          ? 'primary.main'
+                          : 'text.secondary',
+                      '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
+                    }}
+                  >
+                    {isProcessingFile ? (
+                      <CircularProgress
+                        size={18}
+                        thickness={5}
+                        sx={{ color: 'primary.main' }}
+                      />
+                    ) : (
+                      <AttachFileIcon sx={{ fontSize: 20 }} />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+
+            {/* Context & Attached Files Chips */}
+            {(selectedContext || attachedFiles.length > 0) && (
+              <Box
                 sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 0.8,
                   mr: 1,
-                  borderRadius: '6px',
-                  fontWeight: 700,
-                  maxWidth: '150px',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(99, 102, 241, 0.15)'
-                      : 'rgba(99, 102, 241, 0.05)',
-                  borderColor: 'primary.main',
+                  maxWidth: { xs: '200px', sm: '320px', md: '450px' },
                 }}
-              />
+              >
+                {selectedContext && (
+                  <Chip
+                    label={`@${selectedContext.title}`}
+                    onDelete={() => setSelectedContext(null)}
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      borderRadius: '6px',
+                      fontWeight: 700,
+                      maxWidth: '140px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(99, 102, 241, 0.15)'
+                          : 'rgba(99, 102, 241, 0.05)',
+                      borderColor: 'primary.main',
+                    }}
+                  />
+                )}
+                {attachedFiles.map((f) => (
+                  <Chip
+                    key={f.id}
+                    icon={
+                      <AttachFileIcon sx={{ fontSize: '13px !important' }} />
+                    }
+                    label={f.name}
+                    onDelete={() =>
+                      setAttachedFiles((prev) =>
+                        prev.filter((item) => item.id !== f.id),
+                      )
+                    }
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: '6px',
+                      fontWeight: 600,
+                      fontSize: '11px',
+                      maxWidth: '160px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.06)'
+                          : 'rgba(0, 0, 0, 0.04)',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.15)'
+                          : 'rgba(0, 0, 0, 0.12)',
+                    }}
+                  />
+                ))}
+              </Box>
             )}
 
             <StyledInput
               inputRef={inputRef}
-              placeholder="Ask Lumina anything…"
+              placeholder={
+                attachedFiles.length > 0
+                  ? 'Ask a question about the attached file(s)…'
+                  : 'Ask Lumina anything…'
+              }
               value={inputValue}
               onChange={(e) => {
                 const val = e.target.value;
@@ -1348,9 +1775,13 @@ export const AskAI: React.FC = () => {
               autoComplete="off"
             />
             <SendButton
-              active={!!inputValue.trim()}
+              active={!!inputValue.trim() || attachedFiles.length > 0}
               onClick={() => sendMessage(inputValue)}
-              disabled={!inputValue.trim() || isTyping}
+              disabled={
+                (!inputValue.trim() && attachedFiles.length === 0) ||
+                isTyping ||
+                isProcessingFile
+              }
               size="small"
             >
               <SendIcon sx={{ fontSize: 18 }} />
@@ -1411,18 +1842,19 @@ export const AskAI: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   px: 2,
-                  py: 1.5, borderRadius: '12px',
+                  py: 1.5,
+                  borderRadius: '12px',
                   cursor: 'pointer',
                   mb: 1.2,
                   bgcolor: isActive
                     ? (theme) =>
-                      surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff')
+                        surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff')
                     : 'transparent',
                   borderColor: isActive
                     ? (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.05)'
-                        : 'rgba(0, 0, 0, 0.04)'
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(0, 0, 0, 0.04)'
                     : 'transparent',
                   color: 'text.primary',
                   boxShadow: isActive ? '0 4px 20px rgba(0,0,0,0.04)' : 'none',
@@ -1475,7 +1907,10 @@ export const AskAI: React.FC = () => {
                   size="small"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDeleteConversation(c.id);
+                    setConversationToDelete({
+                      id: c.id,
+                      title: c.title,
+                    });
                   }}
                   sx={{
                     p: 0.25,
@@ -1588,6 +2023,175 @@ export const AskAI: React.FC = () => {
         open={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
       />
+
+      {/* Confirmation Modal to delete AI conversation */}
+      <Dialog
+        open={Boolean(conversationToDelete)}
+        onClose={() => {
+          if (!isDeletingConversation) {
+            setConversationToDelete(null);
+          }
+        }}
+        PaperProps={{
+          sx: {
+            borderRadius: '18px',
+            p: 1,
+            maxWidth: '420px',
+            width: '100%',
+            bgcolor: theme.palette.mode === 'dark' ? '#18181b' : '#ffffff',
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow:
+              theme.palette.mode === 'dark'
+                ? '0 24px 48px rgba(0, 0, 0, 0.6)'
+                : '0 24px 48px rgba(0, 0, 0, 0.12)',
+            backgroundImage: 'none',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            pt: 2,
+            px: 2.5,
+            pb: 1,
+            fontWeight: 700,
+            fontSize: '17px',
+          }}
+        >
+          <Box
+            sx={{
+              width: 36,
+              height: 36,
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(239, 68, 68, 0.15)'
+                  : 'rgba(239, 68, 68, 0.1)',
+              color: theme.palette.error.main,
+              flexShrink: 0,
+            }}
+          >
+            <WarningIcon sx={{ fontSize: 22 }} />
+          </Box>
+          <Typography variant="h6" sx={{ fontSize: '17px', fontWeight: 700 }}>
+            {t('askAi.deleteModalTitle', '¿Eliminar conversación?')}
+          </Typography>
+        </DialogTitle>
+
+        <DialogContent sx={{ px: 2.5, py: 1 }}>
+          <DialogContentText
+            sx={{
+              color: 'text.secondary',
+              fontSize: '14px',
+              lineHeight: 1.5,
+            }}
+          >
+            {t(
+              'askAi.deleteModalDesc',
+              '¿Estás seguro de que deseas eliminar esta conversación con Lumina? Esta acción no se puede deshacer y se borrarán todos sus mensajes.',
+            )}
+          </DialogContentText>
+
+          {conversationToDelete?.title && (
+            <Box
+              sx={{
+                mt: 1.75,
+                p: 1.25,
+                borderRadius: '10px',
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.03)'
+                    : 'rgba(0, 0, 0, 0.025)',
+                border: `1px solid ${theme.palette.divider}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <ChatIcon
+                sx={{
+                  fontSize: 16,
+                  color: 'text.secondary',
+                  opacity: 0.8,
+                  flexShrink: 0,
+                }}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: 'text.primary',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {conversationToDelete.title}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ px: 2.5, pb: 2, pt: 1.5, gap: 1 }}>
+          <Button
+            onClick={() => setConversationToDelete(null)}
+            disabled={isDeletingConversation}
+            variant="outlined"
+            sx={{
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '13.5px',
+              px: 2,
+              borderColor: theme.palette.divider,
+              color: 'text.secondary',
+              '&:hover': {
+                borderColor: theme.palette.text.disabled,
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.03)',
+              },
+            }}
+          >
+            {t('common.cancel', 'Cancelar')}
+          </Button>
+          <Button
+            onClick={() => {
+              if (conversationToDelete) {
+                handleDeleteConversation(conversationToDelete.id);
+              }
+            }}
+            disabled={isDeletingConversation}
+            variant="contained"
+            color="error"
+            sx={{
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '13.5px',
+              px: 2.5,
+              boxShadow: 'none',
+              minWidth: '85px',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+              },
+            }}
+          >
+            {isDeletingConversation ? (
+              <CircularProgress size={18} color="inherit" />
+            ) : (
+              t('common.delete', 'Eliminar')
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AskAIContainer>
   );
 };

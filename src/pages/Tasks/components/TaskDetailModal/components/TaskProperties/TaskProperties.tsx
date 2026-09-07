@@ -784,7 +784,10 @@ export const TaskProperties = ({
                 Real Duration (Tracked)
               </Typography>
               <Box
-                onClick={(e) => isOwner && setTimeLogAnchor(e.currentTarget)}
+                onClick={(e) => {
+                  if (!isOwner) return;
+                  setTimeLogAnchor((prev) => (prev ? null : e.currentTarget));
+                }}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -830,15 +833,24 @@ export const TaskProperties = ({
                     },
                   }}
                 />
-                <Popover
-                  open={Boolean(timeLogAnchor)}
-                  anchorEl={timeLogAnchor}
-                  onClose={() => setTimeLogAnchor(null)}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  slotProps={{ paper: { sx: timeLogPopoverPaperSx } }}
-                >
-                  <Box onClick={(e) => e.stopPropagation()}>
+              </Box>
+              <Popover
+                open={Boolean(timeLogAnchor)}
+                anchorEl={timeLogAnchor}
+                onClose={() => setTimeLogAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                slotProps={{ paper: { sx: timeLogPopoverPaperSx } }}
+              >
+                <Box onClick={(e) => e.stopPropagation()}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 0.5,
+                    }}
+                  >
                     <Typography
                       variant="caption"
                       sx={{
@@ -851,7 +863,19 @@ export const TaskProperties = ({
                     >
                       Log time
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 0.75, mt: 1 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => setTimeLogAnchor(null)}
+                      sx={{
+                        p: 0.25,
+                        color: 'text.secondary',
+                        '&:hover': { color: 'text.primary' },
+                      }}
+                    >
+                      <CloseIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 0.75, mt: 1 }}>
                       <Box sx={{ position: 'relative', flex: 1 }}>
                         <Box
                           onClick={() => setNewLogDatePickerOpen(true)}
@@ -1008,7 +1032,6 @@ export const TaskProperties = ({
                     )}
                   </Box>
                 </Popover>
-              </Box>
             </Box>
           </Box>
         </Box>

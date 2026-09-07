@@ -31,25 +31,18 @@ import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { useMutation, useQuery } from '@apollo/client';
 import {
   addDays,
-  addMonths,
-  addWeeks,
-  endOfDay,
   endOfMonth,
   format,
   isSameDay,
-  startOfDay,
   startOfMonth,
   startOfWeek,
   subDays,
-  subMonths,
-  subWeeks,
 } from 'date-fns';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Views, type View } from 'react-big-calendar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import type { ICalendarEvent } from '../../CalendarEvent';
-import type { CalendarNavigateAction } from '../calendarView.types';
 
 export const useCalendarView = () => {
   const dispatch = useDispatch();
@@ -81,7 +74,7 @@ export const useCalendarView = () => {
     return new Date();
   }, [searchParams]);
 
-  const [scrollToTime, setScrollToTime] = useState<Date | undefined>(undefined);
+  const [scrollToTime] = useState<Date | undefined>(undefined);
   const [flashingDate, setFlashingDate] = useState<Date | null>(null);
   const [draftEvents, setDraftEvents] = useState<ICalendarEvent[]>([]);
   const [isCalendarInDraftMode, setIsCalendarInDraftMode] = useState(false);
@@ -244,6 +237,7 @@ export const useCalendarView = () => {
 
   const isDeletingRef = useRef(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingTaskIds, setDeletingTaskIds] = useState<string[]>([]);
   const prevTasksCount = useRef(tasks.length);
   const hasInitialTasksLoaded = useRef(false);
 
@@ -280,7 +274,9 @@ export const useCalendarView = () => {
   const isCalendarLoading =
     !isDeleting &&
     !isDeletingRef.current &&
-    ((!hasInitialTasksLoaded.current && !hasRenderableTasks && isTasksQueryLoading) ||
+    ((!hasInitialTasksLoaded.current &&
+      !hasRenderableTasks &&
+      isTasksQueryLoading) ||
       (!hasRenderableGoogleEvents && isGoogleEventsLoading));
   const events = useMemo(() => {
     // 1. Prepare a set of all synced Google Event IDs for efficient deduplication
@@ -344,8 +340,14 @@ export const useCalendarView = () => {
         const desc = task.notes_encrypted || '';
         const hasStartDateMarker = /\[START_DATE:(.*?)\]/.test(desc);
 
-        if (!hasEstimatedStart && !hasValidDeadline && !hasStartDateMarker) return false;
-        if (task.status === 'Backlog' && !hasEstimatedStart && !hasStartDateMarker) return false;
+        if (!hasEstimatedStart && !hasValidDeadline && !hasStartDateMarker)
+          return false;
+        if (
+          task.status === 'Backlog' &&
+          !hasEstimatedStart &&
+          !hasStartDateMarker
+        )
+          return false;
 
         return true;
       })
@@ -353,53 +355,57 @@ export const useCalendarView = () => {
         const desc = task.notes_encrypted || '';
         const startDateMatch = desc.match(/\[START_DATE:(.*?)\]/);
 
-      const deadlineDate = task.deadline ? new Date(task.deadline) : new Date();
-      const hasEstimatedStart =
-        task.estimated_start_date &&
-        !isNaN(new Date(task.estimated_start_date).getTime());
-      // 0 is a legitimate explicit duration; only null/undefined should
-      // fall back to the 30-minute default. Negative values are clamped
-      // so an event's end can never land before its start.
-      const durationMinutes = Math.max(task.estimate_timer ?? 30, 0);
+        const deadlineDate = task.deadline
+          ? new Date(task.deadline)
+          : new Date();
+        const hasEstimatedStart =
+          task.estimated_start_date &&
+          !isNaN(new Date(task.estimated_start_date).getTime());
+        // 0 is a legitimate explicit duration; only null/undefined should
+        // fall back to the 30-minute default. Negative values are clamped
+        // so an event's end can never land before its start.
+        const durationMinutes = Math.max(task.estimate_timer ?? 30, 0);
 
-      if (!hasEstimatedStart && isNaN(deadlineDate.getTime())) {
-        unreliableDateTaskIds.add(task.id);
-      }
+        if (!hasEstimatedStart && isNaN(deadlineDate.getTime())) {
+          unreliableDateTaskIds.add(task.id);
+        }
 
-      let start = hasEstimatedStart
-        ? new Date(task.estimated_start_date!)
-        : isNaN(deadlineDate.getTime())
-          ? new Date()
-          : deadlineDate;
-      let end =
-        hasEstimatedStart && task.estimated_end_date
-          ? new Date(task.estimated_end_date)
-          : new Date(start.getTime() + durationMinutes * 60000);
+        let start = hasEstimatedStart
+          ? new Date(task.estimated_start_date!)
+          : isNaN(deadlineDate.getTime())
+            ? new Date()
+            : deadlineDate;
+        let end =
+          hasEstimatedStart && task.estimated_end_date
+            ? new Date(task.estimated_end_date)
+            : new Date(start.getTime() + durationMinutes * 60000);
 
-      if (startDateMatch && startDateMatch[1]) {
-        const parsedStart = new Date(startDateMatch[1]);
-        if (!isNaN(parsedStart.getTime())) {
-          start = parsedStart;
-          const parsedDeadline = task.deadline ? new Date(task.deadline) : null;
-          if (parsedDeadline && !isNaN(parsedDeadline.getTime())) {
-            end = parsedDeadline;
-          } else {
-            end = new Date(start.getTime() + durationMinutes * 60000);
-            unreliableDateTaskIds.add(task.id);
+        if (startDateMatch && startDateMatch[1]) {
+          const parsedStart = new Date(startDateMatch[1]);
+          if (!isNaN(parsedStart.getTime())) {
+            start = parsedStart;
+            const parsedDeadline = task.deadline
+              ? new Date(task.deadline)
+              : null;
+            if (parsedDeadline && !isNaN(parsedDeadline.getTime())) {
+              end = parsedDeadline;
+            } else {
+              end = new Date(start.getTime() + durationMinutes * 60000);
+              unreliableDateTaskIds.add(task.id);
+            }
           }
         }
-      }
 
-      return {
-        id: task.id,
-        title: task.title,
-        start,
-        end,
-        allDay: false,
-        resource: task,
-        type: 'task' as const,
-      };
-    });
+        return {
+          id: task.id,
+          title: task.title,
+          start,
+          end,
+          allDay: false,
+          resource: task,
+          type: 'task' as const,
+        };
+      });
 
     // Final Content-Based Deduplication (The "Double-Check" Layer)
     // Even if IDs don't match, we merge events with the same title, start, and end times.
@@ -478,7 +484,13 @@ export const useCalendarView = () => {
   // are never persisted anywhere and are excluded from selection/drag/resize
   // via their `type: 'skeleton'` discriminator.
   const skeletonEvents = useMemo<ICalendarEvent[]>(() => {
-    const makeSlot = (base: Date, startHour: number, startMinute: number, endHour: number, endMinute: number) => {
+    const makeSlot = (
+      base: Date,
+      startHour: number,
+      startMinute: number,
+      endHour: number,
+      endMinute: number,
+    ) => {
       const start = new Date(base);
       start.setHours(startHour, startMinute, 0, 0);
       const end = new Date(base);
@@ -528,65 +540,6 @@ export const useCalendarView = () => {
     updateUrlParams(currentView, newDate);
   };
 
-  const handleNavigateAction = (action: CalendarNavigateAction) => {
-    if (action === 'TODAY') {
-      const today = new Date();
-      updateUrlParams(currentView, today);
-      // Find the first task of the day to scroll to
-      const todayStart = startOfDay(today);
-      const todayEnd = endOfDay(today);
-
-      const todayTasks = events.filter((event) => {
-        const eventStart = event.start?.getTime() || 0;
-        return (
-          eventStart >= todayStart.getTime() && eventStart <= todayEnd.getTime()
-        );
-      });
-
-      if (todayTasks.length > 0) {
-        const firstTask = todayTasks.sort(
-          (a, b) => (a.start?.getTime() || 0) - (b.start?.getTime() || 0),
-        )[0];
-
-        if (firstTask.start) {
-          setScrollToTime(firstTask.start);
-        }
-      }
-      return;
-    }
-
-    if (currentView === Views.MONTH) {
-      updateUrlParams(
-        currentView,
-        action === 'NEXT'
-          ? addMonths(currentDate, 1)
-          : subMonths(currentDate, 1),
-      );
-      return;
-    }
-
-    if (currentView === Views.WEEK) {
-      updateUrlParams(
-        currentView,
-        action === 'NEXT' ? addWeeks(currentDate, 1) : subWeeks(currentDate, 1),
-      );
-      return;
-    }
-
-    if (currentView === Views.DAY) {
-      updateUrlParams(
-        currentView,
-        action === 'NEXT' ? addDays(currentDate, 1) : subDays(currentDate, 1),
-      );
-      return;
-    }
-
-    updateUrlParams(
-      currentView,
-      action === 'NEXT' ? addDays(currentDate, 1) : subDays(currentDate, 1),
-    );
-  };
-
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set('action', 'create');
@@ -633,6 +586,9 @@ export const useCalendarView = () => {
   const handleDeleteTask = async (taskId: string) => {
     isDeletingRef.current = true;
     setIsDeleting(true);
+    setDeletingTaskIds((prev) =>
+      prev.includes(taskId) ? prev : [...prev, taskId],
+    );
     const taskObj = tasks.find((t) => t.id === taskId);
     const virtualEvent = reduxEvents.find((e) => e.id === taskId);
     const initialTask = taskObj || virtualEvent;
@@ -649,15 +605,9 @@ export const useCalendarView = () => {
         });
         isDeletingRef.current = false;
         setIsDeleting(false);
+        setDeletingTaskIds((prev) => prev.filter((id) => id !== taskId));
         return;
       }
-    }
-
-    // 1. Optimistic Delete in Redux
-    dispatch(removeTask({ id: taskId }));
-    dispatch(removeEvent({ id: taskId })); // Also remove from virtual state
-    if (taskObj?.google_event_id) {
-      dispatch(removeEvent({ id: taskObj.google_event_id }));
     }
 
     try {
@@ -694,6 +644,13 @@ export const useCalendarView = () => {
         await deleteGoogleEvent(googleEventId);
       }
 
+      // Remove from Redux after network delete completes
+      dispatch(removeTask({ id: taskId }));
+      dispatch(removeEvent({ id: taskId }));
+      if (taskObj?.google_event_id) {
+        dispatch(removeEvent({ id: taskObj.google_event_id }));
+      }
+
       handleModalClose();
 
       sileo.success({
@@ -709,15 +666,11 @@ export const useCalendarView = () => {
         duration: 4000,
       });
     } finally {
-      setTimeout(() => {
-        isDeletingRef.current = false;
-        setIsDeleting(false);
-      }, 2500);
+      isDeletingRef.current = false;
+      setIsDeleting(false);
+      setDeletingTaskIds((prev) => prev.filter((id) => id !== taskId));
     }
   };
-
-  const [isFocusModeOpen, setIsFocusModeOpen] = useState(false);
-  const [isFocusSessionActive, setIsFocusSessionActive] = useState(false);
 
   const handleSlotContextMenu = (e: React.MouseEvent, date: Date) => {
     e.preventDefault();
@@ -1082,9 +1035,7 @@ export const useCalendarView = () => {
     const [startHour, startMinute] = workHoursConfig.startTime
       .split(':')
       .map(Number);
-    const [endHour, endMinute] = workHoursConfig.endTime
-      .split(':')
-      .map(Number);
+    const [endHour, endMinute] = workHoursConfig.endTime.split(':').map(Number);
     const slotMinutes = date.getHours() * 60 + date.getMinutes();
     const isWorkingDay = workHoursConfig.selectedDays.includes(
       dayShortNames[date.getDay()],
@@ -1107,17 +1058,12 @@ export const useCalendarView = () => {
     isCalendarLoading,
     handleOnChangeView,
     handleOnNavigate,
-    handleNavigateAction,
     handleSelectSlot,
     handleSelectEvent,
     handleEventDrop,
     handleEventResize,
     handleDeleteTask,
     handleModalClose,
-    isFocusModeOpen,
-    setIsFocusModeOpen,
-    isFocusSessionActive,
-    setIsFocusSessionActive,
     handleShowMore,
     tasks,
     refetchTasks,
@@ -1137,5 +1083,6 @@ export const useCalendarView = () => {
     confirmDraftEvents,
     clearDraftEvents,
     confirmingDraft,
+    deletingTaskIds,
   };
 };

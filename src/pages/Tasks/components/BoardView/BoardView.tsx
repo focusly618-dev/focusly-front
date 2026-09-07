@@ -30,11 +30,15 @@ import { SortableTaskCard } from './SortableTaskCard.tsx';
 import {
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
   Assignment as AssignmentIcon,
+  EventAvailable as EventAvailableIcon,
   AccessTime as AccessTimeIcon,
+  PauseCircleOutline as PauseCircleOutlineIcon,
+  Visibility as VisibilityIcon,
   CheckCircle as CheckCircleIcon,
+  History as HistoryIcon,
+  Archive as ArchiveIcon,
 } from '@mui/icons-material';
 
-// Define the 4 columns requested
 const COLUMNS = [
   {
     id: 'Todo',
@@ -51,6 +55,13 @@ const COLUMNS = [
     Icon: AssignmentIcon,
   },
   {
+    id: 'Scheduled',
+    title: 'Scheduled',
+    color: '#8b5cf6',
+    badge: '#581c87',
+    Icon: EventAvailableIcon,
+  },
+  {
     id: 'Pending',
     title: 'Pending',
     color: '#a855f7',
@@ -58,11 +69,39 @@ const COLUMNS = [
     Icon: AccessTimeIcon,
   },
   {
+    id: 'Review',
+    title: 'Review',
+    color: '#06b6d4',
+    badge: '#155e75',
+    Icon: VisibilityIcon,
+  },
+  {
+    id: 'On Hold',
+    title: 'On Hold',
+    color: '#ef4444',
+    badge: '#991b1b',
+    Icon: PauseCircleOutlineIcon,
+  },
+  {
     id: 'Done',
     title: 'Done',
     color: '#f43f5e',
     badge: '#881337',
     Icon: CheckCircleIcon,
+  },
+  {
+    id: 'Backlog',
+    title: 'Backlog',
+    color: '#64748b',
+    badge: '#334155',
+    Icon: HistoryIcon,
+  },
+  {
+    id: 'Archived',
+    title: 'Archived',
+    color: '#4b5563',
+    badge: '#1f2937',
+    Icon: ArchiveIcon,
   },
 ] as const;
 
@@ -90,24 +129,20 @@ export const BoardView = ({
 
   // Group optimistic tasks by column for immediate UI feedback
   const tasksByColumn = useMemo(() => {
-    const grouped = {
-      Todo: [] as TaskResponse[],
-      Planning: [] as TaskResponse[],
-      Pending: [] as TaskResponse[],
-      Done: [] as TaskResponse[],
-    };
+    const grouped = COLUMNS.reduce(
+      (acc, col) => {
+        acc[col.id] = [];
+        return acc;
+      },
+      {} as Record<ColumnId, TaskResponse[]>,
+    );
 
     optimisticTasks.forEach((task) => {
-      const status = task.status;
-      if (
-        status === 'Planning' ||
-        status === 'Pending' ||
-        status === 'Done' ||
-        status === 'Todo'
-      ) {
+      const status = (task.status || 'Todo') as ColumnId;
+      if (grouped[status]) {
         grouped[status].push(task);
       } else {
-        grouped['Todo'].push(task);
+        grouped['Todo']?.push(task);
       }
     });
 
@@ -187,8 +222,6 @@ export const BoardView = ({
     [activeId, optimisticTasks],
   );
 
-  console.log(COLUMNS);
-
   return (
     <DndContext
       sensors={sensors}
@@ -208,13 +241,7 @@ export const BoardView = ({
                 sx={{
                   backgroundColor: (theme: Theme) =>
                     theme.palette.mode === 'dark'
-                      ? column.id === 'Todo'
-                        ? 'rgba(59, 130, 246, 0.15)'
-                        : column.id === 'Planning'
-                          ? 'rgba(234, 179, 8, 0.15)'
-                          : column.id === 'Pending'
-                            ? 'rgba(168, 85, 247, 0.15)'
-                            : 'rgba(244, 63, 94, 0.15)'
+                      ? `${column.color}26`
                       : column.badge,
                   color: (theme: Theme) =>
                     theme.palette.mode === 'dark' ? column.color : 'white',
@@ -222,7 +249,7 @@ export const BoardView = ({
                   padding: '2px 8px',
                 }}
               >
-                {tasksByColumn[column.id].length}
+                {tasksByColumn[column.id]?.length || 0}
               </TaskCountBadge>
             </ColumnHeader>
 

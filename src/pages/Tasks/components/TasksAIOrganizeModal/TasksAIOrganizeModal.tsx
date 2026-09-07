@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import { useMutation } from '@apollo/client';
 import { UPDATE_TASK, GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
+import { LuminaOrb } from '@/components/ui';
 import { organizeTasksAI, type AIPlanItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
@@ -189,10 +190,10 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               py: 8,
-              gap: 2,
+              gap: 2.5,
             }}
           >
-            <CircularProgress color="primary" />
+            <LuminaOrb size={72} state="thinking" />
             <Typography variant="body2" color="text.secondary" fontWeight={500}>
               Lumina AI está analizando tus tareas y prioridades...
             </Typography>

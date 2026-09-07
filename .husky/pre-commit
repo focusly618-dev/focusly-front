@@ -1,11 +1,16 @@
 #!/usr/bin/env sh
 
+# If running under Rosetta x86_64 translation on Apple Silicon, re-exec as native arm64
+if [ "$(uname -m)" = "x86_64" ] && [ "$(sysctl -n sysctl.proc_translated 2>/dev/null)" = "1" ]; then
+  exec arch -arm64 /bin/sh "$0" "$@"
+fi
+
+# Prioritize modern system git and package managers over legacy /usr/local/bin binaries
+export PATH="/opt/homebrew/bin:/usr/bin:$PATH:/usr/local/bin"
+
 # Resolve node/yarn paths across macOS, Linux, and Windows (Git Bash)
 if ! command -v yarn >/dev/null 2>&1; then
-  # 1. Prepend common macOS/Linux binary paths
-  export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
-
-  # 2. Source user shell profiles to load environment managers (nvm, volta, fnm, etc.)
+  # Source user shell profiles to load environment managers (nvm, volta, fnm, etc.)
   for profile in "$HOME/.bash_profile" "$HOME/.profile" "$HOME/.bashrc" "$HOME/.zshrc"; do
     if [ -f "$profile" ]; then
       . "$profile"

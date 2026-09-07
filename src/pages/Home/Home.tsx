@@ -12,6 +12,7 @@ import { Settings } from '../Settings/Settings';
 import type { Task } from '@/redux/tasks/task.types';
 import { OnboardingTour } from '@/components/Onboarding';
 import { AskAI } from '../AskAI/AskAI';
+import { AIGeneratingIndicator } from '@/components/AI/AIGeneratingIndicator';
 
 const LayoutContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -97,6 +98,12 @@ export const Home = () => {
         task={activeFocusTask}
         onActiveChange={setIsFocusModeActive}
       />
+
+      {activeTab !== TaskBar.AskAI && (
+        <AIGeneratingIndicator
+          onOpenChat={() => changeStatusTab(TaskBar.AskAI)}
+        />
+      )}
 
       {isEditModalOpen && (
         <TaskDetailModal
