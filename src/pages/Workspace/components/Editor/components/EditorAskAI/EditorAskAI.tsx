@@ -8,7 +8,6 @@ import {
   InputBase,
   Typography,
   useTheme,
-  CircularProgress,
   Grow,
 } from '@mui/material';
 import {
@@ -129,11 +128,7 @@ const noteMarkdownComponents = {
     </Typography>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <Typography
-      variant="body2"
-      fontWeight={700}
-      sx={{ mb: 0.5, mt: 0.75 }}
-    >
+    <Typography variant="body2" fontWeight={700} sx={{ mb: 0.5, mt: 0.75 }}>
       {children}
     </Typography>
   ),
@@ -170,7 +165,12 @@ const noteMarkdownComponents = {
   tr: ({ children }: { children?: React.ReactNode }) => (
     <Box
       component="tr"
-      sx={{ '&:not(:last-of-type)': { borderBottom: '1px solid', borderColor: 'divider' } }}
+      sx={{
+        '&:not(:last-of-type)': {
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        },
+      }}
     >
       {children}
     </Box>
@@ -320,11 +320,7 @@ export const EditorAskAI: React.FC<EditorAskAIProps> = ({
                 }}
               >
                 <CloseIcon sx={{ fontSize: 16 }} />
-                <Typography
-                  variant="caption"
-                  fontWeight={700}
-                  sx={{ ml: 0.5 }}
-                >
+                <Typography variant="caption" fontWeight={700} sx={{ ml: 0.5 }}>
                   Descartar
                 </Typography>
               </IconButton>
@@ -340,11 +336,7 @@ export const EditorAskAI: React.FC<EditorAskAIProps> = ({
                 }}
               >
                 <CheckIcon sx={{ fontSize: 16 }} />
-                <Typography
-                  variant="caption"
-                  fontWeight={700}
-                  sx={{ ml: 0.5 }}
-                >
+                <Typography variant="caption" fontWeight={700} sx={{ ml: 0.5 }}>
                   Aceptar
                 </Typography>
               </IconButton>

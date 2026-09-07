@@ -63,7 +63,7 @@ const formatTimeSinceCompletion = (dateString: string | undefined) => {
   return `${years}y ago`;
 };
 
-export const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
+const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
   Todo: <StatusBadge statusColor="#3b82f6" />,
   Planning: <StatusBadge statusColor="#8b5cf6" />,
   Pending: <StatusBadge statusColor="#f59e0b" />,
@@ -254,9 +254,9 @@ export const ListViewTask = ({
                 {task.status === 'Done'
                   ? formatTimeSinceCompletion(task.updated_at)
                   : new Date(task.deadline!).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  })}
+                      month: 'short',
+                      day: 'numeric',
+                    })}
               </span>
             </DateChip>
           ) : (
