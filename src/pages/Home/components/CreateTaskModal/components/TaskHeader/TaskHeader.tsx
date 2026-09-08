@@ -31,9 +31,9 @@ export const TaskHeader = ({
 
   const iconSx = {
     ...headerIconSx,
-    color: hasColor ? '#fff' : 'primary.main',
+    color: hasColor ? '#1e293b' : 'primary.main',
     '&:hover': {
-      backgroundColor: hasColor ? 'rgba(255, 255, 255, 0.2)' : 'action.hover',
+      backgroundColor: hasColor ? 'rgba(0, 0, 0, 0.08)' : 'action.hover',
     },
   };
 
@@ -45,7 +45,7 @@ export const TaskHeader = ({
         alignItems: 'center',
         px: 3,
         ...(hasColor ? { pt: 1, pb: 20, margin: '15px' } : { pt: 2, pb: 1 }),
-        color: hasColor ? '#fff' : 'text.secondary',
+        color: hasColor ? '#1e293b' : 'text.secondary',
         backgroundColor: hasColor ? color : 'transparent',
         borderTopLeftRadius: '8px',
         borderTopRightRadius: '8px',

@@ -15,7 +15,7 @@ export const headerContainerSx = (isCustomColor: boolean, color: string) => ({
         pt: 2,
         pb: 1,
       }),
-  color: isCustomColor ? '#fff' : 'text.secondary',
+  color: isCustomColor ? '#1e293b' : 'text.secondary',
   backgroundColor: isCustomColor ? color : 'transparent',
   borderTopLeftRadius: '8px',
   borderTopRightRadius: '8px',
@@ -23,10 +23,8 @@ export const headerContainerSx = (isCustomColor: boolean, color: string) => ({
 
 export const headerIconButtonSx = (isCustomColor: boolean) => ({
   ...headerIconSx,
-  color: isCustomColor ? '#fff' : 'text.secondary',
+  color: isCustomColor ? '#1e293b' : 'text.secondary',
   '&:hover': {
-    backgroundColor: isCustomColor
-      ? 'rgba(255, 255, 255, 0.2)'
-      : 'action.hover',
+    backgroundColor: isCustomColor ? 'rgba(0, 0, 0, 0.08)' : 'action.hover',
   },
 });

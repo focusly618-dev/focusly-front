@@ -151,7 +151,7 @@ export const AvatarWrapper = styled(Box)(({ theme }) => ({
   marginTop: '2px',
 }));
 
-export const UserAvatar = styled(Box)(({ theme }) => ({
+export const UserAvatar = styled(Box)(() => ({
   width: '32px',
   height: '32px',
   borderRadius: '50%',
@@ -159,7 +159,6 @@ export const UserAvatar = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: theme.palette.primary.main,
   color: '#fff',
   fontSize: '13px',
   fontWeight: 700,
@@ -321,9 +320,9 @@ export const SendButton = styled(IconButton)<{ active?: boolean }>(
     transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
     '&:hover': active
       ? {
-        backgroundColor: theme.palette.primary.dark,
-        transform: 'scale(1.08)',
-      }
+          backgroundColor: theme.palette.primary.dark,
+          transform: 'scale(1.08)',
+        }
       : {},
   }),
 );

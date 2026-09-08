@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { STATUS_SECTIONS } from './TasksContentView.types';
@@ -16,6 +16,7 @@ export const useTasksContentView = ({
 }: UseTasksContentViewProps) => {
   const { user } = useAppSelector((state) => state.auth);
 
+  const PAGE_SIZE = 24;
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(),
   );
@@ -24,6 +25,7 @@ export const useTasksContentView = ({
   const [prevViewMode, setPrevViewMode] = useState(viewMode);
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
   const [limit, setLimit] = useState(24);
+  const [page, setPage] = useState(1);
 
   // Sync state if view mode changes
   if (viewMode !== prevViewMode) {
@@ -31,6 +33,7 @@ export const useTasksContentView = ({
     setSelectedTaskIds(new Set());
     setIsConfirmOpen(false);
     setSelectedStatus('All');
+    setPage(1);
   }
 
   const isListView =
@@ -95,9 +98,22 @@ export const useTasksContentView = ({
     return filteredTasks.filter(activeTab.filter);
   }, [filteredTasks, activeTab]);
 
+  const totalPages = Math.max(1, Math.ceil(displayedTasks.length / PAGE_SIZE));
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  const paginatedTasks = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return displayedTasks.slice(start, start + PAGE_SIZE);
+  }, [displayedTasks, page, PAGE_SIZE]);
+
   const selectableDisplayedTasks = useMemo(() => {
-    return displayedTasks.filter((t) => !isTaskReadOnly(t));
-  }, [displayedTasks, isTaskReadOnly]);
+    return paginatedTasks.filter((t) => !isTaskReadOnly(t));
+  }, [paginatedTasks, isTaskReadOnly]);
 
   const isAllSelected = useMemo(() => {
     if (selectableDisplayedTasks.length === 0) return false;
@@ -181,6 +197,11 @@ export const useTasksContentView = ({
     setSelectedStatus,
     limit,
     setLimit,
+    page,
+    setPage,
+    pageSize: PAGE_SIZE,
+    totalPages,
+    paginatedTasks,
     isListView,
     isTaskReadOnly,
     handleToggleSelect,

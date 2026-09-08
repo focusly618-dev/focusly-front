@@ -11,6 +11,7 @@ import {
   List,
   ListItemText,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -59,7 +60,8 @@ import {
 import { getSelectionChipSx } from '@/pages/Home/components/CreateTaskModal/components/TaskProperties/TaskProperties.utils';
 import {
   getTagColors,
-  TASK_COLORS,
+  PASTEL_COLORS,
+  getColorName,
   formatDuration,
   parseDuration,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
@@ -160,6 +162,10 @@ export const TaskProperties = ({
   );
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
+  const [hoveredColor, setHoveredColor] = useState<{
+    value: string;
+    name: string;
+  } | null>(null);
 
   const [durationSuggestions, setDurationSuggestions] = useState<string[]>([]);
   const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(
@@ -187,7 +193,9 @@ export const TaskProperties = ({
   // this never looks like it silently disagrees with the "Due Date" shown
   // in the task list.
   const deadlineDate =
-    deadline && !isNaN(new Date(deadline).getTime()) ? new Date(deadline) : null;
+    deadline && !isNaN(new Date(deadline).getTime())
+      ? new Date(deadline)
+      : null;
   const hasDifferentDueDate =
     deadlineDate && currentDate && !isSameDay(deadlineDate, currentDate);
 
@@ -482,7 +490,9 @@ export const TaskProperties = ({
                     pointerEvents: !isOwner ? 'none' : 'auto',
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}
+                  >
                     <PlannedIcon
                       sx={{
                         fontSize: 16,
@@ -496,7 +506,9 @@ export const TaskProperties = ({
                         color: currentDate ? 'text.primary' : 'text.secondary',
                       }}
                     >
-                      {currentDate ? format(currentDate, 'PPP') : 'Sin fecha (Inbox)'}
+                      {currentDate
+                        ? format(currentDate, 'PPP')
+                        : 'Sin fecha (Inbox)'}
                     </Typography>
                   </Box>
                   {currentDate && isOwner && (
@@ -612,7 +624,9 @@ export const TaskProperties = ({
                     <AccessTimeIcon
                       sx={{ fontSize: 16, color: 'text.disabled' }}
                     />
-                    {currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
+                    {currentDate
+                      ? format(currentDate, 'hh:mm a')
+                      : 'Pick a time'}
                   </Box>
                   <TimePicker
                     open={timePickerOpen}
@@ -876,162 +890,160 @@ export const TaskProperties = ({
                     </IconButton>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 0.75, mt: 1 }}>
-                      <Box sx={{ position: 'relative', flex: 1 }}>
-                        <Box
-                          onClick={() => setNewLogDatePickerOpen(true)}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.5,
-                            fontSize: '13px',
-                            fontWeight: 500,
-                            py: 0.75,
-                            px: 1,
-                            borderRadius: '8px',
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          <PlannedIcon
-                            sx={{ fontSize: 14, color: 'text.disabled' }}
-                          />
-                          {newLogDate ? format(newLogDate, 'MMM d') : 'Date'}
-                        </Box>
-                        <DatePicker
-                          open={newLogDatePickerOpen}
-                          onClose={() => setNewLogDatePickerOpen(false)}
-                          value={newLogDate}
-                          onChange={(newValue) => {
-                            setNewLogDate(newValue);
-                            setNewLogDatePickerOpen(false);
-                          }}
-                          slotProps={{
-                            textField: {
-                              sx: {
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                opacity: 0,
-                                pointerEvents: 'none',
-                              },
-                            },
-                            popper: {
-                              sx: datePickerPopperSx,
-                              placement: 'bottom-start',
-                            },
-                            desktopPaper: {
-                              sx: datePickerPaperSx,
-                            },
-                          }}
-                        />
-                      </Box>
-                      <TextField
-                        variant="outlined"
-                        size="small"
-                        value={newLogDuration}
-                        onChange={(e) =>
-                          setNewLogDuration(
-                            sanitizeDurationValue(e.target.value),
-                          )
-                        }
-                        placeholder="2h"
+                    <Box sx={{ position: 'relative', flex: 1 }}>
+                      <Box
+                        onClick={() => setNewLogDatePickerOpen(true)}
                         sx={{
-                          width: 64,
-                          '& .MuiInputBase-input': {
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            py: 0.85,
-                            px: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          py: 0.75,
+                          px: 1,
+                          borderRadius: '8px',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <PlannedIcon
+                          sx={{ fontSize: 14, color: 'text.disabled' }}
+                        />
+                        {newLogDate ? format(newLogDate, 'MMM d') : 'Date'}
+                      </Box>
+                      <DatePicker
+                        open={newLogDatePickerOpen}
+                        onClose={() => setNewLogDatePickerOpen(false)}
+                        value={newLogDate}
+                        onChange={(newValue) => {
+                          setNewLogDate(newValue);
+                          setNewLogDatePickerOpen(false);
+                        }}
+                        slotProps={{
+                          textField: {
+                            sx: {
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              width: '100%',
+                              height: '100%',
+                              opacity: 0,
+                              pointerEvents: 'none',
+                            },
+                          },
+                          popper: {
+                            sx: datePickerPopperSx,
+                            placement: 'bottom-start',
+                          },
+                          desktopPaper: {
+                            sx: datePickerPaperSx,
                           },
                         }}
                       />
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          const minutes = parseDuration(newLogDuration);
-                          if (minutes > 0 && newLogDate) {
-                            handleAddTimeLog(
-                              format(newLogDate, 'yyyy-MM-dd'),
-                              minutes,
-                            );
-                            setNewLogDuration('');
-                          }
-                        }}
-                        sx={{
-                          bgcolor: 'primary.main',
-                          color: '#fff',
-                          borderRadius: '8px',
-                          '&:hover': { bgcolor: 'primary.dark' },
-                        }}
-                      >
-                        <AddIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
                     </Box>
-
-                    {timeLogs.length > 0 ? (
-                      <List
-                        dense
-                        sx={{ py: 0, mt: 1, maxHeight: 200, overflowY: 'auto' }}
-                      >
-                        {timeLogs
-                          .map((entry, index) => ({ entry, index }))
-                          .sort((a, b) =>
-                            b.entry.date.localeCompare(a.entry.date),
-                          )
-                          .map(({ entry, index }) => (
-                            <MenuItem
-                              key={`${entry.date}-${index}`}
-                              disableRipple
-                              sx={{ px: 0.5, cursor: 'default' }}
-                            >
-                              <ListItemText
-                                primary={format(
-                                  new Date(`${entry.date}T00:00:00`),
-                                  'EEE, MMM d',
-                                )}
-                                secondary={formatDuration(entry.minutes)}
-                                primaryTypographyProps={{
-                                  fontSize: '12px',
-                                  fontWeight: 600,
-                                }}
-                                secondaryTypographyProps={{
-                                  fontSize: '12px',
-                                  fontWeight: 700,
-                                  color: 'text.primary',
-                                }}
-                              />
-                              {isOwner && (
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleRemoveTimeLog(index)}
-                                  sx={{ p: 0.3 }}
-                                >
-                                  <CloseIcon sx={{ fontSize: 14 }} />
-                                </IconButton>
-                              )}
-                            </MenuItem>
-                          ))}
-                      </List>
-                    ) : (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: 'block',
-                          mt: 1.5,
-                          mb: 0.5,
-                          color: 'text.disabled',
-                          fontStyle: 'italic',
-                        }}
-                      >
-                        No time logged yet.
-                      </Typography>
-                    )}
+                    <TextField
+                      variant="outlined"
+                      size="small"
+                      value={newLogDuration}
+                      onChange={(e) =>
+                        setNewLogDuration(sanitizeDurationValue(e.target.value))
+                      }
+                      placeholder="2h"
+                      sx={{
+                        width: 64,
+                        '& .MuiInputBase-input': {
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          py: 0.85,
+                          px: 1,
+                        },
+                      }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        const minutes = parseDuration(newLogDuration);
+                        if (minutes > 0 && newLogDate) {
+                          handleAddTimeLog(
+                            format(newLogDate, 'yyyy-MM-dd'),
+                            minutes,
+                          );
+                          setNewLogDuration('');
+                        }
+                      }}
+                      sx={{
+                        bgcolor: 'primary.main',
+                        color: '#fff',
+                        borderRadius: '8px',
+                        '&:hover': { bgcolor: 'primary.dark' },
+                      }}
+                    >
+                      <AddIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
                   </Box>
-                </Popover>
+
+                  {timeLogs.length > 0 ? (
+                    <List
+                      dense
+                      sx={{ py: 0, mt: 1, maxHeight: 200, overflowY: 'auto' }}
+                    >
+                      {timeLogs
+                        .map((entry, index) => ({ entry, index }))
+                        .sort((a, b) =>
+                          b.entry.date.localeCompare(a.entry.date),
+                        )
+                        .map(({ entry, index }) => (
+                          <MenuItem
+                            key={`${entry.date}-${index}`}
+                            disableRipple
+                            sx={{ px: 0.5, cursor: 'default' }}
+                          >
+                            <ListItemText
+                              primary={format(
+                                new Date(`${entry.date}T00:00:00`),
+                                'EEE, MMM d',
+                              )}
+                              secondary={formatDuration(entry.minutes)}
+                              primaryTypographyProps={{
+                                fontSize: '12px',
+                                fontWeight: 600,
+                              }}
+                              secondaryTypographyProps={{
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                color: 'text.primary',
+                              }}
+                            />
+                            {isOwner && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleRemoveTimeLog(index)}
+                                sx={{ p: 0.3 }}
+                              >
+                                <CloseIcon sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            )}
+                          </MenuItem>
+                        ))}
+                    </List>
+                  ) : (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        mt: 1.5,
+                        mb: 0.5,
+                        color: 'text.disabled',
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      No time logged yet.
+                    </Typography>
+                  )}
+                </Box>
+              </Popover>
             </Box>
           </Box>
         </Box>
@@ -1296,31 +1308,118 @@ export const TaskProperties = ({
       <Popover
         open={Boolean(colorAnchor)}
         anchorEl={colorAnchor}
-        onClose={() => setColorAnchor(null)}
+        onClose={() => {
+          setColorAnchor(null);
+          setHoveredColor(null);
+        }}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        PaperProps={{ sx: colorPopoverPaperSx }}
+        PaperProps={{
+          sx: {
+            ...colorPopoverPaperSx,
+            p: 1.75,
+            minWidth: 260,
+            maxWidth: 290,
+          },
+        }}
       >
-        <Box sx={colorGridSx}>
-          {TASK_COLORS.map((c: string) => (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 1.5,
+            px: 0.5,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: '11px',
+              fontWeight: 700,
+              color: 'text.secondary',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            Color de la tarea
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
             <Box
-              key={c}
-              onClick={() => {
-                setColor(c);
-                setColorAnchor(null);
-              }}
               sx={{
-                width: 28,
-                height: 28,
+                width: 10,
+                height: 10,
                 borderRadius: '50%',
-                bgcolor: c,
-                cursor: 'pointer',
-                border: color === c ? '2px solid white' : 'none',
-                outline: color === c ? '1px solid black' : 'none',
-                transition: 'transform 0.2s',
-                '&:hover': { transform: 'scale(1.1)' },
+                bgcolor: hoveredColor?.value || color || 'transparent',
+                border: '1px solid',
+                borderColor: 'divider',
               }}
             />
-          ))}
+            <Typography
+              sx={{
+                fontSize: '11.5px',
+                fontWeight: 600,
+                color: 'text.primary',
+              }}
+            >
+              {hoveredColor?.name || getColorName(color) || 'Personalizado'}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box sx={colorGridSx}>
+          {PASTEL_COLORS.map((item) => {
+            const isSelected =
+              color?.toUpperCase() === item.value.toUpperCase();
+            return (
+              <Tooltip key={item.value} title={item.name} arrow placement="top">
+                <Box
+                  onClick={() => {
+                    setColor(item.value);
+                    setColorAnchor(null);
+                    setHoveredColor(null);
+                  }}
+                  onMouseEnter={() => setHoveredColor(item)}
+                  onMouseLeave={() => setHoveredColor(null)}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    bgcolor: item.value,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: isSelected
+                      ? '2px solid'
+                      : '1.5px solid rgba(0,0,0,0.1)',
+                    borderColor: isSelected
+                      ? 'text.primary'
+                      : 'rgba(0,0,0,0.1)',
+                    boxShadow: isSelected
+                      ? '0 0 0 2px rgba(0,0,0,0.1)'
+                      : '0 1px 2px rgba(0,0,0,0.05)',
+                    transition: 'all 0.15s ease',
+                    transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+                    '&:hover': {
+                      transform: 'scale(1.16)',
+                      boxShadow: '0 3px 8px rgba(0,0,0,0.15)',
+                    },
+                  }}
+                >
+                  {isSelected && (
+                    <Box
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        bgcolor: 'text.primary',
+                        opacity: 0.8,
+                      }}
+                    />
+                  )}
+                </Box>
+              </Tooltip>
+            );
+          })}
         </Box>
       </Popover>
     </Box>
