@@ -86,75 +86,8 @@ export const TasksContentView = ({
     deleteTasks,
   });
 
-  // Loading skeletons
-  if (isLoading && filteredTasks.length === 0) {
-    return (
-      <AnimatedContainer
-        id="joyride-tasks-list"
-        key={viewMode}
-        sx={
-          isListView
-            ? {
-                flex: 1,
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-                paddingTop: 0,
-                minHeight: 0,
-              }
-            : {
-                padding: '16px 24px',
-              }
-        }
-      >
-        <TasksSkeletons viewMode={viewMode} />
-      </AnimatedContainer>
-    );
-  }
-
   const showEmptyStateTasks = tasks.length === 0;
   const showEmptyStateFiltered = filteredTasks.length === 0;
-
-  // Non-list view early returns for empty states
-  if (!isListView) {
-    if (showEmptyStateTasks) {
-      return (
-        <AnimatedContainer
-          id="joyride-tasks-list"
-          key={viewMode}
-          sx={{
-            padding: '16px 24px',
-          }}
-        >
-          <EmptyState
-            icon={<CheckBoxIcon />}
-            title="No tasks yet"
-            description="Plan your day and boost your productivity. Create your first task to see it here."
-          />
-        </AnimatedContainer>
-      );
-    }
-
-    if (showEmptyStateFiltered) {
-      return (
-        <AnimatedContainer
-          id="joyride-tasks-list"
-          key={viewMode}
-          sx={{
-            padding: '16px 24px',
-          }}
-        >
-          <EmptyState
-            title="No tasks match your search"
-            description="Try a different keyword or filter to find what you're looking for, or create a new task above."
-            actionText="Clear all filters"
-            onAction={() => setSearchTerm('')}
-          />
-        </AnimatedContainer>
-      );
-    }
-  }
 
   return (
     <AnimatedContainer
@@ -176,7 +109,22 @@ export const TasksContentView = ({
             }
       }
     >
-      {viewMode === 'workload' ? (
+      {!isListView && isLoading && filteredTasks.length === 0 ? (
+        <TasksSkeletons viewMode={viewMode} />
+      ) : !isListView && showEmptyStateTasks ? (
+        <EmptyState
+          icon={<CheckBoxIcon />}
+          title="No tasks yet"
+          description="Plan your day and boost your productivity. Create your first task to see it here."
+        />
+      ) : !isListView && showEmptyStateFiltered ? (
+        <EmptyState
+          title="No tasks match your search"
+          description="Try a different keyword or filter to find what you're looking for, or create a new task above."
+          actionText="Clear all filters"
+          onAction={() => setSearchTerm('')}
+        />
+      ) : viewMode === 'workload' ? (
         <WorkloadDashboard filteredTasks={filteredTasks} />
       ) : viewMode === 'board' ? (
         <BoardView
@@ -256,7 +204,9 @@ export const TasksContentView = ({
           </Box>
 
           <TableWrapper>
-            {showEmptyStateTasks ? (
+            {isLoading && filteredTasks.length === 0 ? (
+              <TasksSkeletons viewMode={viewMode} />
+            ) : showEmptyStateTasks ? (
               <Box
                 sx={{
                   display: 'flex',

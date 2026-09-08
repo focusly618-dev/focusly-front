@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   isSameDay,
@@ -36,6 +36,15 @@ export const useTasksFilters = (
   const urlFilter = searchParams.get('filter');
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(debounceTimerRef.current);
+  }, [searchTerm]);
   const [activeFilters, setActiveFilters] = useState<
     TaskFilterInput | undefined
   >(undefined);
@@ -46,13 +55,18 @@ export const useTasksFilters = (
     undefined,
   );
 
-  const [internalDateRange, setInternalDateRange] = useState<DateRangeFilter>(() => {
-    if (urlDateRange && ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)) {
-      return urlDateRange;
-    }
-    const saved = localStorage.getItem('tasksDateRange');
-    return (saved as DateRangeFilter) || 'all';
-  });
+  const [internalDateRange, setInternalDateRange] = useState<DateRangeFilter>(
+    () => {
+      if (
+        urlDateRange &&
+        ['today', 'this_week', 'this_month', 'all'].includes(urlDateRange)
+      ) {
+        return urlDateRange;
+      }
+      const saved = localStorage.getItem('tasksDateRange');
+      return (saved as DateRangeFilter) || 'all';
+    },
+  );
   const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
 
   const dateRange: DateRangeFilter = useMemo(() => {
@@ -134,7 +148,9 @@ export const useTasksFilters = (
     }
     if (dateRange === 'this_week') {
       return {
-        startDate: startOfWeek(referenceDate, { weekStartsOn: 1 }).toISOString(),
+        startDate: startOfWeek(referenceDate, {
+          weekStartsOn: 1,
+        }).toISOString(),
         endDate: endOfWeek(referenceDate, { weekStartsOn: 1 }).toISOString(),
       };
     }
@@ -158,13 +174,15 @@ export const useTasksFilters = (
       // window; nothing left to do for it in the browser.
       let result = tasksToFilter;
 
-      if (searchTerm) {
+      if (debouncedSearchTerm) {
         result = result.filter(
           (task) =>
-            task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            task.title
+              .toLowerCase()
+              .includes(debouncedSearchTerm.toLowerCase()) ||
             task.notes_encrypted
               ?.toLowerCase()
-              .includes(searchTerm.toLowerCase()),
+              .includes(debouncedSearchTerm.toLowerCase()),
         );
       }
 
@@ -201,7 +219,11 @@ export const useTasksFilters = (
       } else if (urlFilter === 'today') {
         const todayStr = new Date().toLocaleDateString('en-CA');
         result = result.filter((task) => {
-          if (task.status === 'Done' || (task as unknown as { deleted_at?: string }).deleted_at) return false;
+          if (
+            task.status === 'Done' ||
+            (task as unknown as { deleted_at?: string }).deleted_at
+          )
+            return false;
           const hasEstimatedStart =
             task.estimated_start_date &&
             !isNaN(new Date(task.estimated_start_date).getTime());
@@ -220,7 +242,11 @@ export const useTasksFilters = (
       } else if (urlFilter === 'upcoming') {
         const todayStr = new Date().toLocaleDateString('en-CA');
         result = result.filter((task) => {
-          if (task.status === 'Done' || (task as unknown as { deleted_at?: string }).deleted_at) return false;
+          if (
+            task.status === 'Done' ||
+            (task as unknown as { deleted_at?: string }).deleted_at
+          )
+            return false;
           const hasEstimatedStart =
             task.estimated_start_date &&
             !isNaN(new Date(task.estimated_start_date).getTime());
@@ -240,7 +266,13 @@ export const useTasksFilters = (
 
       return result;
     },
-    [searchTerm, activeFilterState?.statuses?.length, activeFilterState?.categories, viewMode, urlFilter],
+    [
+      debouncedSearchTerm,
+      activeFilterState?.statuses?.length,
+      activeFilterState?.categories,
+      viewMode,
+      urlFilter,
+    ],
   );
 
   const handleApplySort = (sort: SortState) => {
@@ -321,6 +353,7 @@ export const useTasksFilters = (
 
   return {
     searchTerm,
+    debouncedSearchTerm,
     setSearchTerm,
     activeFilters,
     activeFilterState,

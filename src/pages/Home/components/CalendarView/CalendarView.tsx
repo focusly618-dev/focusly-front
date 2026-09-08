@@ -140,15 +140,63 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
   }, [currentDate, i18n.language]);
 
   useEffect(() => {
-    const updateTimeIndicator = () => {
+    const BADGE_ID = 'rbc-time-badge-live';
+
+    const updateTimeBadge = () => {
       const indicator = document.querySelector('.rbc-current-time-indicator');
-      if (indicator) {
-        indicator.setAttribute('data-time', format(new Date(), 'h:mm a'));
+      const gutter = document.querySelector('.rbc-time-gutter');
+      if (!indicator || !gutter) return;
+
+      // Get the indicator's vertical position relative to .rbc-time-content
+      const timeContent = indicator.closest('.rbc-time-content');
+      if (!timeContent) return;
+
+      const contentRect = timeContent.getBoundingClientRect();
+      const indicatorRect = indicator.getBoundingClientRect();
+      const topOffset =
+        indicatorRect.top - contentRect.top + timeContent.scrollTop;
+
+      // Create or reuse the badge element
+      let badge = document.getElementById(BADGE_ID);
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.id = BADGE_ID;
+        badge.className = 'rbc-time-badge';
+        // Place it inside the gutter's first timeslot-group parent for proper positioning
+        const gutterColumn = gutter as HTMLElement;
+        gutterColumn.style.position = 'relative';
+        gutterColumn.appendChild(badge);
       }
+
+      badge.textContent = format(new Date(), 'h:mm a');
+      badge.style.top = `${topOffset}px`;
     };
-    updateTimeIndicator();
-    const interval = setInterval(updateTimeIndicator, 20000);
-    return () => clearInterval(interval);
+
+    // Initial + delayed retry
+    updateTimeBadge();
+    const retryTimeout = setTimeout(updateTimeBadge, 500);
+    const interval = setInterval(updateTimeBadge, 20000);
+
+    // Re-sync when the library re-renders the indicator
+    const observer = new MutationObserver(() => {
+      requestAnimationFrame(updateTimeBadge);
+    });
+    const timeContent = document.querySelector('.rbc-time-content');
+    if (timeContent) {
+      observer.observe(timeContent, { childList: true, subtree: true });
+    }
+
+    // Re-sync on scroll (the indicator moves with scroll)
+    const handleScroll = () => requestAnimationFrame(updateTimeBadge);
+    timeContent?.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      clearTimeout(retryTimeout);
+      clearInterval(interval);
+      observer.disconnect();
+      timeContent?.removeEventListener('scroll', handleScroll);
+      document.getElementById(BADGE_ID)?.remove();
+    };
   }, [currentView, currentDate]);
 
   const [isAILoading, setIsAILoading] = useState(false);
