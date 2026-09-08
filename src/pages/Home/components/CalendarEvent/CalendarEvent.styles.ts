@@ -354,7 +354,8 @@ export const EventContainer = styled(Box, {
     boxShadow: isDark
       ? '0 1px 3px rgba(0, 0, 0, 0.2)'
       : '0 1px 2px rgba(0, 0, 0, 0.03)',
-    transition: 'background-color 0.15s ease, border-color 0.15s ease',
+    transition:
+      'background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.25s ease',
     borderRadius: '8px',
     border: `1px solid ${colors.border}`,
     boxSizing: 'border-box',
@@ -365,6 +366,18 @@ export const EventContainer = styled(Box, {
         ? '0 2px 6px rgba(0, 0, 0, 0.3)'
         : '0 2px 6px rgba(0, 0, 0, 0.06)',
       zIndex: 20,
+    },
+    '&[data-expanded="true"]': {
+      height: 'auto !important',
+      minHeight: '100% !important',
+      overflow: 'visible !important',
+      zIndex: '50 !important',
+    },
+    '&[data-active-expanded="true"]': {
+      zIndex: '300 !important',
+      boxShadow: isDark
+        ? '0 8px 24px -2px rgba(0, 0, 0, 0.45)'
+        : '0 8px 20px -2px rgba(0, 0, 0, 0.12)',
     },
   };
 });

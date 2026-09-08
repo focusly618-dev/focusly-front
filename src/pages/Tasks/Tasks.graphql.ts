@@ -40,6 +40,13 @@ export const GET_TASKS_TITLES = gql`
         date
         minutes
       }
+      subtasks {
+        id
+        title
+        completed
+        completed_at
+        estimate_timer
+      }
       workspace {
         id
         title
@@ -87,6 +94,13 @@ export const UPDATE_TASK = gql`
         date
         minutes
       }
+      subtasks {
+        id
+        title
+        completed
+        completed_at
+        estimate_timer
+      }
       priority_level
     }
   }
@@ -131,6 +145,13 @@ export const CREATE_TASK = gql`
       time_logs {
         date
         minutes
+      }
+      subtasks {
+        id
+        title
+        completed
+        completed_at
+        estimate_timer
       }
       priority_level
     }
@@ -215,6 +236,13 @@ export const GET_TASKS_PAGINATED = gql`
         time_logs {
           date
           minutes
+        }
+        subtasks {
+          id
+          title
+          completed
+          completed_at
+          estimate_timer
         }
         workspace {
           id

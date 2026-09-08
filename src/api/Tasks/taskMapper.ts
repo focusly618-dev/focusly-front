@@ -145,6 +145,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     deleted_at: safeISO(t.deleted_at),
     links: t.links || [],
     time_logs: t.time_logs || [],
+    subtasks: t.subtasks || [],
     task_type: (t.task_type || 'PlatformTask') as 'GoogleTask' | 'PlatformTask',
     google_event_id: normalizeGoogleId(t.google_event_id),
     source: (t.source || 'platform') as 'google' | 'platform',

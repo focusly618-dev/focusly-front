@@ -9,6 +9,14 @@ export type TaskStatus =
   | 'Scheduled'
   | 'Archived';
 
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+  completed_at?: string | null;
+  estimate_timer?: number | null;
+}
+
 export interface Task {
   /** PK */
   id: string;
@@ -51,6 +59,7 @@ export interface Task {
   }[];
   links?: { title: string; url: string }[];
   time_logs?: { date: string; minutes: number }[];
+  subtasks?: Subtask[];
   collaborators?: {
     name: string;
     email: string;

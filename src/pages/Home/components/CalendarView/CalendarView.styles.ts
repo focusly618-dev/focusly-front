@@ -229,6 +229,24 @@ export const CalendarContainer = styled(Box, {
     '& .rbc-event:has([data-highlighted="true"])': {
       zIndex: '1000 !important' as unknown as number,
     },
+    '& .rbc-event:has([data-expanded="true"])': {
+      zIndex: '50 !important' as unknown as number,
+      overflow: 'visible !important',
+      height: 'auto !important',
+    },
+    '& .rbc-event:has([data-expanded="true"]) .rbc-event-content': {
+      overflow: 'visible !important',
+      height: 'auto !important',
+    },
+    '& .rbc-event:has([data-active-expanded="true"])': {
+      zIndex: '300 !important' as unknown as number,
+      overflow: 'visible !important',
+      height: 'auto !important',
+    },
+    '& .rbc-event:has([data-active-expanded="true"]) .rbc-event-content': {
+      overflow: 'visible !important',
+      height: 'auto !important',
+    },
 
     // ── Current time indicator (Active Timeline Line & Badge) ──
     '& .rbc-current-time-indicator': {

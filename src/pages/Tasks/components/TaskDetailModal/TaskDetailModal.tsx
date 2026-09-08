@@ -26,6 +26,7 @@ import { getColorName } from './TaskDetailModal.utils';
 
 // Sub-components
 import { TaskProperties } from './components/TaskProperties/TaskProperties';
+import { TaskSubtasks } from './components/TaskSubtasks';
 import { TaskHeader } from './components/TaskHeader/TaskHeader';
 import { TaskResources } from './components/TaskResources/TaskResources';
 import { TaskDescription } from './components/TaskDescription/TaskDescription';
@@ -105,6 +106,11 @@ export const TaskDetailModal = ({
     timeLogs,
     handleAddTimeLog,
     handleRemoveTimeLog,
+    subtasks,
+    handleAddSubtask,
+    handleToggleSubtask,
+    handleRemoveSubtask,
+    handleUpdateSubtask,
     isGeneratingMeet,
     handleGenerateMeet,
     handleTimerChange,
@@ -151,9 +157,9 @@ export const TaskDetailModal = ({
 
       if (mode === 'subtasks' || mode === 'all') {
         if (res.subtasks && res.subtasks.length > 0) {
-          const checklistText =
-            '\n\nChecklist:\n' + res.subtasks.map((s) => `☐ ${s}`).join('\n');
-          setDescription((description || '') + checklistText);
+          res.subtasks.forEach((s) => {
+            handleAddSubtask(s);
+          });
         }
       }
 
@@ -373,6 +379,16 @@ export const TaskDetailModal = ({
                 handleRemoveTimeLog={handleRemoveTimeLog}
                 createdAt={initialTask?.created_at}
                 deadline={initialTask?.deadline}
+              />
+
+              <TaskSubtasks
+                subtasks={subtasks}
+                onAddSubtask={handleAddSubtask}
+                onToggleSubtask={handleToggleSubtask}
+                onRemoveSubtask={handleRemoveSubtask}
+                onUpdateSubtask={handleUpdateSubtask}
+                onImproveWithAI={() => handleImproveTask('subtasks')}
+                isReadOnly={isReadOnly}
               />
 
               <TaskResources

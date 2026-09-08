@@ -16,6 +16,7 @@ import {
   Flag as FlagIcon,
   RadioButtonUnchecked as UncheckedIcon,
   CheckCircle as CheckedIcon,
+  FormatListBulletedRounded as SubtasksIcon,
 } from '@mui/icons-material';
 
 import {
@@ -125,6 +126,10 @@ export const ListViewTask = ({
   const realMin = task.real_timer || 0;
   const isOverLimit = estimateMin > 0 && realMin > estimateMin;
 
+  const subtasksTotal = task.subtasks?.length || 0;
+  const subtasksDone = task.subtasks?.filter((s) => s.completed).length || 0;
+  const allSubtasksDone = subtasksTotal > 0 && subtasksDone === subtasksTotal;
+
   return (
     <>
       <TaskRow
@@ -179,6 +184,42 @@ export const ListViewTask = ({
           <TaskTitle variant="body1" title={task.title}>
             {task.title}
           </TaskTitle>
+          {subtasksTotal > 0 && (
+            <Tooltip
+              title={`${subtasksDone} of ${subtasksTotal} subtasks completed`}
+            >
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  px: '6px',
+                  py: '1px',
+                  borderRadius: '10px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  bgcolor: allSubtasksDone
+                    ? 'rgba(16, 185, 129, 0.12)'
+                    : (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.06)',
+                  color: allSubtasksDone ? '#10b981' : 'text.secondary',
+                  border: '1px solid',
+                  borderColor: allSubtasksDone
+                    ? 'rgba(16, 185, 129, 0.25)'
+                    : 'transparent',
+                  flexShrink: 0,
+                  userSelect: 'none',
+                }}
+              >
+                <SubtasksIcon sx={{ fontSize: 12 }} />
+                <span>
+                  {subtasksDone}/{subtasksTotal}
+                </span>
+              </Box>
+            </Tooltip>
+          )}
           {(isAIScheduleEnabled || task.use_ai) && (
             <AIBadge>
               <AutoAwesomeIcon sx={{ fontSize: 13 }} />

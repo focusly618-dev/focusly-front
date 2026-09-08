@@ -442,7 +442,7 @@ export const AskAI: React.FC = () => {
   } | null>(null);
   const [isDeletingConversation, setIsDeletingConversation] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('claude-3-5-sonnet');
+  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
   const [selectedContext, setSelectedContext] =
     useState<AIContextSelector | null>(null);
@@ -465,6 +465,9 @@ export const AskAI: React.FC = () => {
 
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chatScrollAreaRef = useRef<HTMLDivElement>(null);
+  const isAtBottomRef = useRef(true);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
 
   const hasMessages = messages.length > 0;
 
@@ -645,10 +648,47 @@ export const AskAI: React.FC = () => {
     }
   };
 
-  // Auto-scroll to latest message
+  // Auto-scroll to latest message, respecting user scroll position
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!isAtBottomRef.current) return;
+
+    const el = chatScrollAreaRef.current;
+    if (el) {
+      if (isTyping) {
+        // Direct scrollTop during streaming avoids smooth animation queue lag & fighting user scroll
+        el.scrollTop = el.scrollHeight;
+      } else {
+        endRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      endRef.current?.scrollIntoView({
+        behavior: isTyping ? 'auto' : 'smooth',
+      });
+    }
   }, [messages, isTyping]);
+
+  const handleChatScroll = useCallback(() => {
+    const el = chatScrollAreaRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    const isNearBottom = distanceFromBottom <= 120;
+    isAtBottomRef.current = isNearBottom;
+    setShowScrollBottom(!isNearBottom);
+  }, []);
+
+  const handleScrollToBottom = useCallback(() => {
+    isAtBottomRef.current = true;
+    setShowScrollBottom(false);
+    const el = chatScrollAreaRef.current;
+    if (el) {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: 'smooth',
+      });
+    } else {
+      endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   // Rotate the "what Lumina is doing" status text while waiting for the
   // first token of a reply (index is reset to 0 where sendMessage sets
@@ -865,6 +905,14 @@ export const AskAI: React.FC = () => {
       };
 
       setMessages((prev) => [...prev, aiMsg]);
+      isAtBottomRef.current = true;
+      setShowScrollBottom(false);
+      requestAnimationFrame(() => {
+        if (chatScrollAreaRef.current) {
+          chatScrollAreaRef.current.scrollTop =
+            chatScrollAreaRef.current.scrollHeight;
+        }
+      });
 
       const initialActiveList = !customHistory
         ? [...messages, userMsg, aiMsg]
@@ -1089,7 +1137,7 @@ export const AskAI: React.FC = () => {
         </ChatHeader>
 
         {/* ── Scrollable chat area ── */}
-        <ChatScrollArea>
+        <ChatScrollArea ref={chatScrollAreaRef} onScroll={handleChatScroll}>
           <CenteredColumn>
             {/* ── Welcome screen (shown when no messages) ── */}
             {!hasMessages && (
@@ -1418,6 +1466,55 @@ export const AskAI: React.FC = () => {
             )}
           </CenteredColumn>
         </ChatScrollArea>
+
+        {/* ── Floating scroll to bottom button ── */}
+        {showScrollBottom && (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 112,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 30,
+              pointerEvents: 'auto',
+            }}
+          >
+            <Tooltip title="Ir al mensaje más reciente">
+              <Button
+                variant="contained"
+                onClick={handleScrollToBottom}
+                startIcon={<ArrowDownIcon />}
+                size="small"
+                sx={{
+                  borderRadius: '20px',
+                  textTransform: 'none',
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  px: 2,
+                  py: 0.6,
+                  bgcolor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(36, 36, 41, 0.92)'
+                      : 'rgba(255, 255, 255, 0.92)',
+                  color: 'text.primary',
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
+                  border: '1px solid',
+                  borderColor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.1)'
+                      : 'rgba(0, 0, 0, 0.08)',
+                  '&:hover': {
+                    bgcolor:
+                      theme.palette.mode === 'dark' ? '#2e2e35' : '#f0f0f2',
+                  },
+                }}
+              >
+                Ir al final
+              </Button>
+            </Tooltip>
+          </Box>
+        )}
 
         {/* ── Sticky bottom input ── */}
         <InputWrapper>

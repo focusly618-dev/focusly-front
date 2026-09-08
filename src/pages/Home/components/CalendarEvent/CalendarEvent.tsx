@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Menu,
@@ -15,6 +15,9 @@ import {
   DeleteOutline as DeleteIcon,
   Schedule as ScheduleIcon,
   Close as CloseIcon,
+  KeyboardArrowDownRounded as ArrowDownIcon,
+  CheckCircleRounded as CheckedIcon,
+  RadioButtonUncheckedRounded as UncheckedIcon,
 } from '@mui/icons-material';
 
 import type { CalendarEventProps } from './CalendarEvent.types';
@@ -41,9 +44,26 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     onDeleteTask,
     currentView,
     isHighlighted,
+    onToggleSubtask,
+    isExpanded: propIsExpanded,
+    onToggleExpand,
   } = props;
 
+  const [localExpanded, setLocalExpanded] = useState(false);
+  const isExpanded =
+    propIsExpanded !== undefined ? propIsExpanded : localExpanded;
+
   const eventRef = useRef<HTMLDivElement | null>(null);
+
+  const handleToggleDropdown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onToggleExpand) {
+      onToggleExpand();
+    } else {
+      setLocalExpanded((prev) => !prev);
+    }
+  };
 
   useEffect(() => {
     if (isHighlighted && eventRef.current) {
@@ -114,6 +134,33 @@ export const CalendarEvent = (props: CalendarEventProps) => {
         (event.resource as Task)?.task_type === 'GoogleTask'));
   const isDraft = event.isDraft;
 
+  const subtasks = taskResource?.subtasks || [];
+  const hasSubtasks = event.type === 'task' && subtasks.length > 0;
+  const completedSubtasksCount = subtasks.filter((s) => s.completed).length;
+  const totalSubtasksCount = subtasks.length;
+
+  // Keep the card expanded during the close animation so it doesn't
+  // instantly clip the wrapper's closing transition
+  const [isClosing, setIsClosing] = useState(false);
+  const [prevExpanded, setPrevExpanded] = useState(isExpanded);
+
+  // Synchronously detect closing transition in state adjustment during render (React recommended pattern)
+  if (prevExpanded !== isExpanded) {
+    setPrevExpanded(isExpanded);
+    if (prevExpanded && !isExpanded && hasSubtasks) {
+      setIsClosing(true);
+    }
+  }
+
+  useEffect(() => {
+    if (isClosing) {
+      const timer = setTimeout(() => setIsClosing(false), 260);
+      return () => clearTimeout(timer);
+    }
+  }, [isClosing]);
+
+  const keepExpanded = isExpanded || isClosing;
+
   const renderClassic = () => {
     const isCustom = variant.isCustom;
     const contrast = isCustom ? getContrastTextColor(variant.main) : null;
@@ -137,10 +184,271 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       return theme.palette.mode === 'dark' ? '#94a3b8' : '#64748b';
     };
 
+    const renderSubtasksDropdownTrigger = () => {
+      if (!hasSubtasks || isMonthView) return null;
+
+      return (
+        <Box
+          component="button"
+          type="button"
+          onClick={handleToggleDropdown}
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.35,
+            px: 0.65,
+            py: 0.2,
+            borderRadius: '5px',
+            cursor: 'pointer',
+            border: '1px solid',
+            outline: 'none',
+            bgcolor: (theme) =>
+              isExpanded
+                ? theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.16)'
+                  : 'rgba(0, 0, 0, 0.1)'
+                : theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : 'rgba(0, 0, 0, 0.05)',
+            borderColor: (theme) =>
+              isExpanded
+                ? theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.3)'
+                  : 'rgba(0, 0, 0, 0.2)'
+                : theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.14)'
+                  : 'rgba(0, 0, 0, 0.08)',
+            color: (theme) =>
+              theme.palette.mode === 'dark' ? '#f1f5f9' : '#1e293b',
+            fontSize: '9.5px',
+            fontWeight: 700,
+            lineHeight: 1,
+            flexShrink: 0,
+            transition: 'all 0.15s ease',
+            '&:hover': {
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.22)'
+                  : 'rgba(0, 0, 0, 0.14)',
+              borderColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.4)'
+                  : 'rgba(0, 0, 0, 0.28)',
+            },
+          }}
+        >
+          <Box component="span" sx={{ userSelect: 'none' }}>
+            {completedSubtasksCount}/{totalSubtasksCount}
+          </Box>
+          <ArrowDownIcon
+            sx={{
+              fontSize: 13,
+              transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+        </Box>
+      );
+    };
+
+    const renderSubtasksPanel = () => {
+      if (!hasSubtasks) return null;
+
+      return (
+        // Outer wrapper: controls expand/collapse animation with CSS grid rows
+        <Box
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          sx={{
+            display: 'grid',
+            gridTemplateRows: isExpanded ? '1fr' : '0fr',
+            opacity: isExpanded ? 1 : 0,
+            transition:
+              'grid-template-rows 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease',
+            width: '100%',
+          }}
+        >
+          {/* Direct child with minHeight 0 and overflow hidden allows grid row to animate between 0 and full content height */}
+          <Box
+            sx={{
+              minHeight: 0,
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                pt: 0.75,
+                borderTop: '1px solid',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.12)'
+                    : 'rgba(0, 0, 0, 0.09)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '3px',
+                width: '100%',
+                cursor: 'default',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  px: 0.25,
+                  mb: 0.2,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: subtextColor,
+                  }}
+                >
+                  Subtareas ({completedSubtasksCount}/{totalSubtasksCount})
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                  maxHeight: '142px',
+                  overflowY: subtasks.length > 5 ? 'auto' : 'visible',
+                  pr: subtasks.length > 5 ? 0.5 : 0,
+                  scrollbarWidth: 'thin',
+                  '&::-webkit-scrollbar': { width: '4px' },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : 'rgba(0, 0, 0, 0.15)',
+                    borderRadius: '2px',
+                  },
+                }}
+              >
+                {subtasks.map((subtask) => (
+                  <Box
+                    key={subtask.id}
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (onToggleSubtask && taskResource) {
+                        onToggleSubtask(taskResource.id, subtask.id);
+                      }
+                    }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.6,
+                      p: '3.5px 6px',
+                      borderRadius: '5px',
+                      cursor: onToggleSubtask ? 'pointer' : 'default',
+                      bgcolor: (theme) =>
+                        subtask.completed
+                          ? theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.02)'
+                            : 'rgba(0, 0, 0, 0.02)'
+                          : theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.06)'
+                            : 'rgba(255, 255, 255, 0.65)',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        subtask.completed
+                          ? 'transparent'
+                          : theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.08)'
+                            : 'rgba(0, 0, 0, 0.06)',
+                      transition: 'all 0.15s ease',
+                      '&:hover': onToggleSubtask
+                        ? {
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.12)'
+                                : 'rgba(255, 255, 255, 0.95)',
+                            borderColor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.18)'
+                                : 'rgba(0, 0, 0, 0.12)',
+                          }
+                        : undefined,
+                    }}
+                  >
+                    {subtask.completed ? (
+                      <CheckedIcon
+                        sx={{ fontSize: 13, color: '#10b981', flexShrink: 0 }}
+                      />
+                    ) : (
+                      <UncheckedIcon
+                        sx={{
+                          fontSize: 13,
+                          color: subtextColor,
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+
+                    <Typography
+                      sx={{
+                        fontSize: '10.5px',
+                        fontWeight: 500,
+                        color: subtask.completed ? subtextColor : titleColor,
+                        textDecoration: subtask.completed
+                          ? 'line-through'
+                          : 'none',
+                        lineHeight: 1.2,
+                        flex: 1,
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {subtask.title}
+                    </Typography>
+
+                    {Boolean(subtask.estimate_timer) && (
+                      <Typography
+                        sx={{
+                          fontSize: '9px',
+                          fontWeight: 600,
+                          color: subtextColor,
+                          flexShrink: 0,
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.07)'
+                              : 'rgba(0, 0, 0, 0.05)',
+                          px: 0.5,
+                          py: 0.1,
+                          borderRadius: '3px',
+                        }}
+                      >
+                        {subtask.estimate_timer}m
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      );
+    };
+
     return (
       <EventContainer
         ref={eventRef}
         data-highlighted={isHighlighted ? 'true' : undefined}
+        data-expanded={hasSubtasks && keepExpanded ? 'true' : undefined}
+        data-active-expanded={hasSubtasks && isExpanded ? 'true' : undefined}
+        data-closing={
+          hasSubtasks && !isExpanded && keepExpanded ? 'true' : undefined
+        }
         variant={variant}
         isCustomColor={variant.isCustom}
         semanticTheme={semanticTheme}
@@ -156,6 +464,13 @@ export const CalendarEvent = (props: CalendarEventProps) => {
         }
         sx={{
           position: 'relative',
+          ...(hasSubtasks &&
+            keepExpanded && {
+              height: 'auto !important',
+              minHeight: '100% !important',
+              overflow: 'visible !important',
+              zIndex: isExpanded ? 300 : 50,
+            }),
           p: isMonthView
             ? '2px 6px'
             : isWeekView
@@ -348,18 +663,30 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             >
               {event.title}
             </Typography>
-            <Typography
-              variant="caption"
+            <Box
               sx={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: subtextColor,
-                whiteSpace: 'nowrap',
-                lineHeight: 1.2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 0.5,
+                width: '100%',
+                mt: 'auto',
               }}
             >
-              {formatTime(event.start)} - {formatTime(event.end)}
-            </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 600,
+                  color: subtextColor,
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1.2,
+                }}
+              >
+                {formatTime(event.start)} - {formatTime(event.end)}
+              </Typography>
+              {renderSubtasksDropdownTrigger()}
+            </Box>
           </Box>
         ) : durationMinutes < 55 ? (
           durationMinutes <= 20 ? (
@@ -368,42 +695,55 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 gap: 0.75,
                 width: '100%',
-                height: '100%',
+                height: isExpanded ? 'auto' : '100%',
                 minWidth: 0,
-                overflow: 'hidden',
+                overflow: isExpanded ? 'visible' : 'hidden',
                 whiteSpace: 'nowrap',
               }}
             >
-              <Typography
-                component="span"
+              <Box
                 sx={{
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  color: subtextColor,
-                  flexShrink: 0,
-                  lineHeight: 1,
-                }}
-              >
-                {formatTime(event.start)}
-              </Typography>
-              <Typography
-                component="span"
-                noWrap
-                sx={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: titleColor,
-                  lineHeight: 1.2,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.75,
                   minWidth: 0,
+                  overflow: 'hidden',
+                  flex: 1,
                 }}
               >
-                {event.title}
-              </Typography>
+                <Typography
+                  component="span"
+                  sx={{
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    color: subtextColor,
+                    flexShrink: 0,
+                    lineHeight: 1,
+                  }}
+                >
+                  {formatTime(event.start)}
+                </Typography>
+                <Typography
+                  component="span"
+                  noWrap
+                  sx={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: titleColor,
+                    lineHeight: 1.2,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    flex: 1,
+                    minWidth: 0,
+                  }}
+                >
+                  {event.title}
+                </Typography>
+              </Box>
+              {renderSubtasksDropdownTrigger()}
             </Box>
           ) : (
             /* ── Medium / Short Task (21 - 54 min): Title on Top, Time on Bottom ── */
@@ -521,6 +861,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                       {secondaryTag}
                     </Box>
                   )}
+                  {renderSubtasksDropdownTrigger()}
                 </Box>
               </Box>
             </Box>
@@ -650,6 +991,8 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                   </Box>
                 )}
               </Box>
+
+              {renderSubtasksDropdownTrigger()}
             </Box>
 
             {/* Title */}
@@ -785,6 +1128,8 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             )}
           </Box>
         )}
+
+        {renderSubtasksPanel()}
       </EventContainer>
     );
   };

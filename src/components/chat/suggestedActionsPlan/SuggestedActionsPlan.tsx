@@ -175,10 +175,7 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                 </Box>
 
                 {(preview.description || preview.contentPreview) && (
-                  <Typography
-                    sx={planRowDescriptionSx}
-                    color="text.secondary"
-                  >
+                  <Typography sx={planRowDescriptionSx} color="text.secondary">
                     {preview.description || preview.contentPreview}
                   </Typography>
                 )}
@@ -201,6 +198,66 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                         sx={planRowMetaChipSx(preview.priorityColor)}
                       />
                     )}
+                  </Box>
+                )}
+
+                {preview.subtasks && preview.subtasks.length > 0 && (
+                  <Box
+                    sx={{
+                      mt: 1,
+                      pt: 0.8,
+                      borderTop: `1px dashed ${theme.palette.divider}`,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      fontWeight={700}
+                      color="text.secondary"
+                      sx={{ display: 'block', mb: 0.4, fontSize: '10.5px' }}
+                    >
+                      Subtareas ({preview.subtasks.length}):
+                    </Typography>
+                    {preview.subtasks.map((st, sIdx) => (
+                      <Box
+                        key={sIdx}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.8,
+                          py: 0.2,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: '50%',
+                            bgcolor: theme.palette.primary.main,
+                            opacity: 0.7,
+                            flexShrink: 0,
+                          }}
+                        />
+                        <Typography
+                          variant="caption"
+                          color="text.primary"
+                          sx={{ flex: 1, fontSize: '11px' }}
+                        >
+                          {st.title}
+                        </Typography>
+                        {st.durationLabel && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontSize: '10px',
+                              color: 'text.secondary',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {st.durationLabel}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
                   </Box>
                 )}
               </Box>
