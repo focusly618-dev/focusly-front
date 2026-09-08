@@ -1,3 +1,5 @@
+import type { Subtask } from '@/redux/tasks/task.types';
+
 export interface TaskFilterInput {
   status?: (
     | 'Todo'
@@ -56,6 +58,7 @@ export interface TaskResponse {
   sort?: TaskSortInput;
   links?: { title: string; url: string }[];
   time_logs?: { date: string; minutes: number }[];
+  subtasks?: Subtask[];
   google_event_id?: string;
   collaborators?: {
     name: string;
@@ -105,6 +108,7 @@ export interface updateTask {
     | 'Archived';
   estimated_start_date?: string;
   estimated_end_date?: string;
+  subtasks?: Subtask[];
   use_ai?: boolean;
 }
 
@@ -126,6 +130,7 @@ export interface CreateTaskRequest {
     | 'Scheduled'
     | 'Archived';
   tags: string[];
+  subtasks?: Subtask[];
   estimated_start_date?: string;
   estimated_end_date?: string;
   use_ai?: boolean;

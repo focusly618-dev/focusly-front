@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import type { Subtask } from '@/redux/tasks/task.types';
 import {
   deduplicateLinks,
   normalizeUrl,
@@ -11,6 +12,7 @@ export const useTaskCollections = ({
   onRemoveLink,
   onAddTimeLog,
   onRemoveTimeLog,
+  onSubtasksChange,
 }: UseTaskCollectionsProps) => {
   const getInitialCollectionState = useCallback(() => {
     const defaults = {
@@ -18,6 +20,7 @@ export const useTaskCollections = ({
       links: [] as { title: string; url: string }[],
       collaborators: [] as { name: string; email: string; avatar?: string }[],
       timeLogs: [] as { date: string; minutes: number }[],
+      subtasks: [] as Subtask[],
     };
 
     if (!initialTask) return defaults;
@@ -27,6 +30,7 @@ export const useTaskCollections = ({
       links = [],
       collaborators = [],
       time_logs = [],
+      subtasks = [],
     } = initialTask;
 
     const parsedTags = Array.isArray(tags)
@@ -45,11 +49,16 @@ export const useTaskCollections = ({
       ? time_logs.map((tl) => ({ ...tl }))
       : [];
 
+    const parsedSubtasks = Array.isArray(subtasks)
+      ? subtasks.map((s) => ({ ...s }))
+      : [];
+
     return {
       tags: parsedTags,
       links: parsedLinks,
       collaborators: parsedCollaborators,
       timeLogs: parsedTimeLogs,
+      subtasks: parsedSubtasks,
     };
   }, [initialTask]);
 
@@ -67,6 +76,9 @@ export const useTaskCollections = ({
   >(initialCollections.collaborators);
   const [timeLogs, setTimeLogs] = useState<{ date: string; minutes: number }[]>(
     initialCollections.timeLogs,
+  );
+  const [subtasks, setSubtasks] = useState<Subtask[]>(
+    initialCollections.subtasks,
   );
   const [newTag, setNewTag] = useState('');
   const [isAddingTag, setIsAddingTag] = useState(false);
@@ -147,6 +159,60 @@ export const useTaskCollections = ({
     if (onRemoveTimeLog) onRemoveTimeLog(updatedTimeLogs);
   };
 
+  const handleAddSubtask = (title: string, estimateTimer?: number) => {
+    const trimmed = title.trim();
+    if (!trimmed) return;
+    const newSubtask: Subtask = {
+      id:
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `sub-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      title: trimmed,
+      completed: false,
+      completed_at: null,
+      estimate_timer: estimateTimer || null,
+    };
+    const updated = [...subtasks, newSubtask];
+    setSubtasks(updated);
+    if (onSubtasksChange) onSubtasksChange(updated);
+    return newSubtask;
+  };
+
+  const handleToggleSubtask = (id: string) => {
+    const updated = subtasks.map((s) => {
+      if (s.id !== id) return s;
+      const nextCompleted = !s.completed;
+      return {
+        ...s,
+        completed: nextCompleted,
+        completed_at: nextCompleted ? new Date().toISOString() : null,
+      };
+    });
+    setSubtasks(updated);
+    if (onSubtasksChange) onSubtasksChange(updated);
+  };
+
+  const handleRemoveSubtask = (id: string) => {
+    const updated = subtasks.filter((s) => s.id !== id);
+    setSubtasks(updated);
+    if (onSubtasksChange) onSubtasksChange(updated);
+  };
+
+  const handleUpdateSubtask = (id: string, newTitle: string) => {
+    const trimmed = newTitle.trim();
+    if (!trimmed) return;
+    const updated = subtasks.map((s) =>
+      s.id === id ? { ...s, title: trimmed } : s,
+    );
+    setSubtasks(updated);
+    if (onSubtasksChange) onSubtasksChange(updated);
+  };
+
+  const handleReorderSubtasks = (reordered: Subtask[]) => {
+    setSubtasks(reordered);
+    if (onSubtasksChange) onSubtasksChange(reordered);
+  };
+
   return {
     tags,
     setTags,
@@ -174,6 +240,13 @@ export const useTaskCollections = ({
     setTimeLogs,
     handleAddTimeLog,
     handleRemoveTimeLog,
+    subtasks,
+    setSubtasks,
+    handleAddSubtask,
+    handleToggleSubtask,
+    handleRemoveSubtask,
+    handleUpdateSubtask,
+    handleReorderSubtasks,
     initialCollections,
   };
 };

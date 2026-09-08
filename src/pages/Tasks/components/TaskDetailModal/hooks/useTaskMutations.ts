@@ -127,14 +127,12 @@ export const useTaskMutations = ({
 
     const startDate = currentDeadline ? new Date(currentDeadline) : null;
     const estimatedStartISO =
-      startDate && !isNaN(startDate.getTime())
-        ? startDate.toISOString()
-        : null;
+      startDate && !isNaN(startDate.getTime()) ? startDate.toISOString() : null;
     const estimatedEndISO =
       startDate && !isNaN(startDate.getTime())
         ? new Date(
-          startDate.getTime() + (estimateTimer || 30) * 60000,
-        ).toISOString()
+            startDate.getTime() + (estimateTimer || 30) * 60000,
+          ).toISOString()
         : null;
 
     // Define which fields to compare and how
@@ -219,6 +217,24 @@ export const useTaskMutations = ({
         key: 'time_logs',
         val: state.time_logs || [],
         initial: initialTask.time_logs || [],
+        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+      },
+      subtasks: {
+        key: 'subtasks',
+        val: (state.subtasks || []).map((s) => ({
+          id: s.id,
+          title: s.title,
+          completed: Boolean(s.completed),
+          completed_at: s.completed_at || null,
+          estimate_timer: s.estimate_timer || null,
+        })),
+        initial: (initialTask.subtasks || []).map((s) => ({
+          id: s.id,
+          title: s.title,
+          completed: Boolean(s.completed),
+          completed_at: s.completed_at || null,
+          estimate_timer: s.estimate_timer || null,
+        })),
         isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
       },
       estimatedStartDate: {

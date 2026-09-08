@@ -1,4 +1,4 @@
-import type { Task } from '@/redux/tasks/task.types';
+import type { Task, Subtask } from '@/redux/tasks/task.types';
 
 export interface TaskData {
   id?: string;
@@ -11,13 +11,13 @@ export interface TaskData {
   tags: string[];
   links?: { title: string; url: string }[];
   time_logs?: { date: string; minutes: number }[];
+  subtasks?: Subtask[];
   google_event_id?: string;
   status?: Task['status'];
   realTime?: string;
   shouldGenerateMeet?: boolean;
   collaborators?: { name: string; email: string; avatar?: string }[];
 }
-
 
 export interface BuildCreateTaskPayloadParams {
   state: TaskData & { color: string };
@@ -68,6 +68,7 @@ export interface TaskInput {
   user_id?: string;
   collaborators?: { name: string; email: string; avatar?: string }[];
   time_logs?: { date: string; minutes: number }[];
+  subtasks?: Subtask[];
   estimated_start_date?: string;
   estimated_end_date?: string;
 }
@@ -78,6 +79,7 @@ export interface UseTaskCollectionsProps {
   onRemoveLink?: (links: { title: string; url: string }[]) => void;
   onAddTimeLog?: (timeLogs: { date: string; minutes: number }[]) => void;
   onRemoveTimeLog?: (timeLogs: { date: string; minutes: number }[]) => void;
+  onSubtasksChange?: (subtasks: Subtask[]) => void;
 }
 
 export interface UseTaskFormStateProps {

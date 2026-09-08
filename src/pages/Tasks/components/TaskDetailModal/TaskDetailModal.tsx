@@ -17,6 +17,7 @@ import { sileo, getFriendlyErrorMessage } from '@/utils';
 
 // Sub-components
 import { TaskProperties } from './components/TaskProperties/TaskProperties';
+import { TaskSubtasks } from './components/TaskSubtasks';
 import { TaskHeader } from './components/TaskHeader/TaskHeader';
 import { TaskResources } from './components/TaskResources/TaskResources';
 import { TaskDescription } from './components/TaskDescription/TaskDescription';
@@ -37,7 +38,7 @@ const Transition = React.forwardRef(function Transition(
 export const TaskDetailModal = ({
   open,
   onClose,
-  onSave = () => { },
+  onSave = () => {},
   initialStart = null,
   initialEnd = null,
   initialTask,
@@ -96,6 +97,11 @@ export const TaskDetailModal = ({
     timeLogs,
     handleAddTimeLog,
     handleRemoveTimeLog,
+    subtasks,
+    handleAddSubtask,
+    handleToggleSubtask,
+    handleRemoveSubtask,
+    handleUpdateSubtask,
     isGeneratingMeet,
     handleGenerateMeet,
     handleTimerChange,
@@ -142,9 +148,9 @@ export const TaskDetailModal = ({
 
       if (mode === 'subtasks' || mode === 'all') {
         if (res.subtasks && res.subtasks.length > 0) {
-          const checklistText =
-            '\n\nChecklist:\n' + res.subtasks.map((s) => `☐ ${s}`).join('\n');
-          setDescription((description || '') + checklistText);
+          res.subtasks.forEach((s) => {
+            handleAddSubtask(s);
+          });
         }
       }
 
@@ -235,13 +241,13 @@ export const TaskDetailModal = ({
               transition: 'background-color 0.2s, width 0.2s !important',
             },
             '& .ps__rail-y:hover .ps__thumb-y, & .ps__rail-y.ps--clicking .ps__thumb-y':
-            {
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.3) !important'
-                  : 'rgba(0, 0, 0, 0.25) !important',
-              width: '8px !important',
-            },
+              {
+                backgroundColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.3) !important'
+                    : 'rgba(0, 0, 0, 0.25) !important',
+                width: '8px !important',
+              },
           }}
         >
           <PerfectScrollbar
@@ -341,6 +347,16 @@ export const TaskDetailModal = ({
                 handleRemoveTimeLog={handleRemoveTimeLog}
                 createdAt={initialTask?.created_at}
                 deadline={initialTask?.deadline}
+              />
+
+              <TaskSubtasks
+                subtasks={subtasks}
+                onAddSubtask={handleAddSubtask}
+                onToggleSubtask={handleToggleSubtask}
+                onRemoveSubtask={handleRemoveSubtask}
+                onUpdateSubtask={handleUpdateSubtask}
+                onImproveWithAI={() => handleImproveTask('subtasks')}
+                isReadOnly={isReadOnly}
               />
 
               <TaskResources

@@ -1,5 +1,6 @@
 import { useCallback, useState, useMemo, useRef } from 'react';
 import type { UseTaskDetailModalProps } from '../types/TaskDetailModal.types';
+import type { Subtask } from '@/redux/tasks/task.types';
 import { useTaskFormState } from './useTaskFormState';
 import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
@@ -100,9 +101,39 @@ export const useTaskDetailModal = ({
     setTimeLogs,
     handleAddTimeLog,
     handleRemoveTimeLog,
+    subtasks,
+    setSubtasks,
+    handleAddSubtask,
+    handleToggleSubtask,
+    handleRemoveSubtask,
+    handleUpdateSubtask,
+    handleReorderSubtasks,
     initialCollections,
   } = useTaskCollections({
     initialTask,
+    onSubtasksChange: (updatedSubtasks: Subtask[]) => {
+      if (initialTask?.id) {
+        mutations.handleUpdate(
+          {
+            title,
+            description,
+            priority,
+            status,
+            category,
+            deadline: currentDate,
+            duration,
+            realTime,
+            tags,
+            links,
+            collaborators,
+            time_logs: timeLogs,
+            subtasks: updatedSubtasks,
+            color,
+          },
+          false,
+        );
+      }
+    },
     onAddLink: (updatedLinks: { title: string; url: string }[]) => {
       if (initialTask?.id) {
         mutations.handleUpdate(
@@ -206,6 +237,7 @@ export const useTaskDetailModal = ({
     setLinks(initialCollections.links);
     setCollaborators(initialCollections.collaborators);
     setTimeLogs(initialCollections.timeLogs);
+    setSubtasks(initialCollections.subtasks);
     setNewTag('');
     setIsAddingTag(false);
     setIsAddingLink(false);
@@ -226,6 +258,7 @@ export const useTaskDetailModal = ({
     setLinks,
     setCollaborators,
     setTimeLogs,
+    setSubtasks,
     setNewTag,
     setIsAddingTag,
     setIsAddingLink,
@@ -251,6 +284,7 @@ export const useTaskDetailModal = ({
       links,
       collaborators,
       time_logs: timeLogs,
+      subtasks,
       color,
       shouldGenerateMeet,
     });
@@ -273,6 +307,7 @@ export const useTaskDetailModal = ({
         links,
         collaborators,
         time_logs: timeLogs,
+        subtasks,
         color,
         shouldGenerateMeet,
       },
@@ -491,6 +526,13 @@ export const useTaskDetailModal = ({
     timeLogs,
     handleAddTimeLog,
     handleRemoveTimeLog,
+    subtasks,
+    setSubtasks,
+    handleAddSubtask,
+    handleToggleSubtask,
+    handleRemoveSubtask,
+    handleUpdateSubtask,
+    handleReorderSubtasks,
     ...mutationsWithReset,
     handleSave: handleSaveWrapper,
     handleUpdate: handleUpdateWrapper,

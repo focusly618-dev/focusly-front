@@ -3,6 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { Box, Typography } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import SubtasksIcon from '@mui/icons-material/FormatListBulletedRounded';
 import { Tag } from '../GridViewTask/GridViewTask.styles';
 import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import { memo, useMemo } from 'react';
@@ -208,7 +209,38 @@ export const SortableTaskCard = memo(
                 </Typography>
               </Box>
             ) : (
-              <Box /> // Empty box to maintain flex layout
+              <Box />
+            )}
+
+            {task.subtasks && task.subtasks.length > 0 && (
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={0.4}
+                sx={{
+                  color:
+                    task.subtasks.filter((s) => s.completed).length ===
+                    task.subtasks.length
+                      ? '#10b981'
+                      : 'text.secondary',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  bgcolor:
+                    task.subtasks.filter((s) => s.completed).length ===
+                    task.subtasks.length
+                      ? 'rgba(16, 185, 129, 0.12)'
+                      : 'action.hover',
+                  px: 0.8,
+                  py: 0.2,
+                  borderRadius: '6px',
+                }}
+              >
+                <SubtasksIcon sx={{ fontSize: 13 }} />
+                <span>
+                  {task.subtasks.filter((s) => s.completed).length}/
+                  {task.subtasks.length}
+                </span>
+              </Box>
             )}
 
             {/* Placeholder Avatar - matching mockup */}

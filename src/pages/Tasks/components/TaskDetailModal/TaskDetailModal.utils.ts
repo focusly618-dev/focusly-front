@@ -170,8 +170,8 @@ export const buildCreateTaskPayload = ({
   const deadlineISO = hasValidDeadline ? state.deadline!.toISOString() : '';
   const endDateISO = hasValidDeadline
     ? new Date(
-      state.deadline!.getTime() + (estimateTimer || 25) * 60000,
-    ).toISOString()
+        state.deadline!.getTime() + (estimateTimer || 25) * 60000,
+      ).toISOString()
     : undefined;
 
   const targetStatus = hasValidDeadline
@@ -198,6 +198,13 @@ export const buildCreateTaskPayload = ({
     estimated_start_date: hasValidDeadline ? deadlineISO : undefined,
     estimated_end_date: endDateISO,
     time_logs: state.time_logs || [],
+    subtasks: (state.subtasks || []).map((s) => ({
+      id: s.id,
+      title: s.title,
+      completed: Boolean(s.completed),
+      completed_at: s.completed_at || null,
+      estimate_timer: s.estimate_timer || null,
+    })),
     skip_scheduling: !hasValidDeadline,
   };
 };
