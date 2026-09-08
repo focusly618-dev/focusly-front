@@ -35,26 +35,42 @@ export const parseRealTime = (time: string): number => {
   return parseDuration(time);
 };
 
-export const TASK_COLORS = [
-  '#f44336',
-  '#e91e63',
-  '#9c27b0',
-  '#673ab7',
-  '#3f51b5',
-  '#2196f3',
-  '#03a9f4',
-  '#00bcd4',
-  '#009688',
-  '#4caf50',
-  '#8bc34a',
-  '#cddc39',
-  '#ffeb3b',
-  '#ffc107',
-  '#ff9800',
-  '#ff5722',
-  '#795548',
-  '#607d8b',
+export interface TaskColorOption {
+  value: string;
+  name: string;
+}
+
+export const PASTEL_COLORS: TaskColorOption[] = [
+  { value: '#BAE6FD', name: 'Cielo' },
+  { value: '#DDD6FE', name: 'Lavanda' },
+  { value: '#A7F3D0', name: 'Menta' },
+  { value: '#C2D6C4', name: 'Salvia' },
+  { value: '#FED7AA', name: 'Melocotón' },
+  { value: '#FBCFE8', name: 'Rosa Pálido' },
+  { value: '#FECDD3', name: 'Cerezo' },
+  { value: '#FDE68A', name: 'Vainilla' },
+  { value: '#E9D5FF', name: 'Lila' },
+  { value: '#99F6E4', name: 'Eucalipto' },
+  { value: '#FCD34D', name: 'Miel' },
+  { value: '#FFD1BA', name: 'Coral Suave' },
+  { value: '#C6D8DF', name: 'Bruma' },
+  { value: '#D4B8E5', name: 'Malva' },
+  { value: '#E8DCB8', name: 'Arena' },
+  { value: '#C7D2FE', name: 'Periwinkle' },
+  { value: '#B5D5C5', name: 'Musgo' },
+  { value: '#F3C5B5', name: 'Terracota' },
+  { value: '#CBD5E1', name: 'Pizarra' },
+  { value: '#EDE0D4', name: 'Almendra' },
 ];
+
+export const TASK_COLORS = PASTEL_COLORS.map((c) => c.value);
+
+export const getColorName = (hex?: string): string | undefined => {
+  if (!hex) return undefined;
+  const upper = hex.toUpperCase();
+  const match = PASTEL_COLORS.find((c) => c.value.toUpperCase() === upper);
+  return match?.name;
+};
 
 export type PriorityType = 'High' | 'Med' | 'Low' | 'No priority';
 

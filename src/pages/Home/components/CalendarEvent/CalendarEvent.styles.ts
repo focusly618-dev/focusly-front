@@ -1,41 +1,252 @@
 import { Box, styled, alpha } from '@mui/material';
 import type { Task } from '@/redux/tasks/task.types';
-import { surfaceColor } from '@/context';
 
-// Priority-based color palette — refined, slightly desaturated for elegance
+// Priority-based soft pastel color palette — elegant, non-saturated pastels
 export const PRIORITY_COLORS: Record<number, { main: string }> = {
-  1: { main: '#34D399' }, // Low → Emerald
-  2: { main: '#60A5FA' }, // Medium → Sky blue
-  3: { main: '#FBBF24' }, // High → Amber
-  4: { main: '#F87171' }, // Critical → Coral red
+  1: { main: '#D1FAE5' }, // Low → Verde salvia pastel
+  2: { main: '#DBEAFE' }, // Medium → Azul cielo pastel
+  3: { main: '#FEF3C7' }, // High → Ámbar suave pastel
+  4: { main: '#FEE2E2' }, // Critical → Rosa suave pastel
 };
 
-const GOOGLE_EVENT_COLOR = { main: '#22D3EE' }; // Cyan for Google events
-const DEFAULT_COLOR = { main: '#A78BFA' }; // Lavender fallback (indicates no color assigned)
+const GOOGLE_EVENT_COLOR = { main: '#CFFAFE' }; // Cyan pastel for Google events
+export const DEFAULT_COLOR = { main: '#E0E7FF' }; // Lavanda suave pastel fallback (no tan saturado)
 
 export const getEventColor = (event: {
   id?: string;
   type?: string;
   resource?: unknown;
-}) => {
-  if (event.type === 'event') return GOOGLE_EVENT_COLOR;
+}): { main: string; isCustom: boolean } => {
+  if (event.type === 'event')
+    return { main: GOOGLE_EVENT_COLOR.main, isCustom: false };
 
-  const task = event.resource as Task | undefined;
+  const task = event.resource as (Task & { color?: string }) | undefined;
 
-  // 1. Check for custom color tag in notes
+  // 1. Check for custom color directly on task
+  if (task?.color && task.color !== '#1e293b' && task.color !== '') {
+    return { main: task.color, isCustom: true };
+  }
+
+  // 2. Check for custom color tag in notes_encrypted
   if (task?.notes_encrypted) {
     const colorMatch = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
-    if (colorMatch && colorMatch[1]) {
-      return { main: colorMatch[1] };
+    if (
+      colorMatch &&
+      colorMatch[1] &&
+      colorMatch[1] !== '#1e293b' &&
+      colorMatch[1] !== ''
+    ) {
+      return { main: colorMatch[1], isCustom: true };
     }
   }
 
-  // 2. Fallback to priority color
-  if (task?.priority_level) {
-    return PRIORITY_COLORS[task.priority_level] || DEFAULT_COLOR;
+  // 3. Fallback to priority pastel color (soft, non-saturated pastel)
+  if (task?.priority_level && PRIORITY_COLORS[task.priority_level]) {
+    return {
+      main: PRIORITY_COLORS[task.priority_level].main,
+      isCustom: true,
+    };
   }
 
-  return DEFAULT_COLOR;
+  // 4. Default soft pastel color for any task without color (Lavanda suave)
+  return { main: DEFAULT_COLOR.main, isCustom: true };
+};
+
+import type { Theme } from '@mui/material';
+import type { SemanticTheme } from './calendarSemanticTheme';
+
+export const darkenHex = (hex: string, factor: number): string => {
+  let clean = hex.replace('#', '').trim();
+  if (clean.length === 3)
+    clean = clean
+      .split('')
+      .map((c) => c + c)
+      .join('');
+  const num = parseInt(clean, 16);
+  if (isNaN(num)) return hex;
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  const mult = Math.max(0, Math.min(1, 1 - factor));
+  const toHex = (n: number) =>
+    Math.round(n * mult)
+      .toString(16)
+      .padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
+export const lightenHex = (hex: string, factor: number): string => {
+  let clean = hex.replace('#', '').trim();
+  if (clean.length === 3)
+    clean = clean
+      .split('')
+      .map((c) => c + c)
+      .join('');
+  const num = parseInt(clean, 16);
+  if (isNaN(num)) return hex;
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  const mult = Math.max(0, Math.min(1, factor));
+  const toHex = (n: number) =>
+    Math.round(n + (255 - n) * mult)
+      .toString(16)
+      .padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
+export const blendHex = (
+  hex: string,
+  bgHex: string,
+  weight: number,
+): string => {
+  const parse = (h: string) => {
+    let clean = h.replace('#', '').trim();
+    if (clean.length === 3) {
+      clean = clean
+        .split('')
+        .map((c) => c + c)
+        .join('');
+    }
+    const num = parseInt(clean, 16);
+    return isNaN(num)
+      ? [200, 200, 200]
+      : [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+  };
+
+  const [r1, g1, b1] = parse(hex);
+  const [r2, g2, b2] = parse(bgHex);
+
+  const w = Math.min(Math.max(weight, 0), 1);
+  const r = Math.round(w * r1 + (1 - w) * r2);
+  const g = Math.round(w * g1 + (1 - w) * g2);
+  const b = Math.round(w * b1 + (1 - w) * b2);
+
+  const toHex = (n: number) => n.toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
+export const getContrastTextColor = (hex: string) => {
+  let clean = hex.replace('#', '').trim();
+  if (clean.length === 3)
+    clean = clean
+      .split('')
+      .map((c) => c + c)
+      .join('');
+  const num = parseInt(clean, 16);
+  if (isNaN(num)) {
+    return {
+      primary: '#090d16',
+      secondary: '#1e293b',
+      chipBg: '#e2e8f0',
+      chipBorder: '#cbd5e1',
+      chipText: '#090d16',
+      isDarkBg: false,
+    };
+  }
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  // Perceived brightness formula (YIQ standard)
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  const isLight = yiq >= 140;
+
+  return {
+    primary: isLight ? '#090d16' : '#ffffff', // Extremely dark slate/black on light, pure white on dark
+    secondary: isLight ? '#1e293b' : '#f1f5f9', // Dark slate on light, soft white on dark
+    chipBg: isLight ? darkenHex(hex, 0.1) : lightenHex(hex, 0.18),
+    chipBorder: isLight ? darkenHex(hex, 0.22) : lightenHex(hex, 0.35),
+    chipText: isLight ? '#090d16' : '#ffffff',
+    isDarkBg: !isLight,
+  };
+};
+
+export const resolveEventColors = (
+  theme: Theme,
+  semanticTheme?: SemanticTheme,
+  fallbackMain?: string,
+  isCustomColor?: boolean,
+) => {
+  const isDark = theme.palette.mode === 'dark';
+  const isGray = (theme as { appMode?: string }).appMode === 'graydark';
+
+  // If the task has a custom/default color assigned:
+  // Dynamically calculate high-contrast text and chips so all text is 100% visible and sharp
+  if (isCustomColor && fallbackMain) {
+    const hex = fallbackMain;
+    const contrast = getContrastTextColor(hex);
+
+    return {
+      bg: hex, // Exact solid pastel color
+      border: contrast.isDarkBg ? lightenHex(hex, 0.2) : darkenHex(hex, 0.14),
+      hover: contrast.isDarkBg ? lightenHex(hex, 0.08) : darkenHex(hex, 0.04),
+      tagBg: contrast.chipBg,
+      tagBorder: contrast.chipBorder,
+      tagColor: contrast.chipText,
+      textColor: contrast.primary,
+      secondaryColor: contrast.secondary,
+    };
+  }
+
+  if (semanticTheme) {
+    const bg = isGray
+      ? semanticTheme.bgGray
+      : isDark
+        ? semanticTheme.bgDark
+        : semanticTheme.bgLight;
+
+    const border = isGray
+      ? semanticTheme.borderGray
+      : isDark
+        ? semanticTheme.borderDark
+        : semanticTheme.borderLight;
+
+    const hover = isGray
+      ? semanticTheme.hoverGray
+      : isDark
+        ? semanticTheme.hoverDark
+        : semanticTheme.hoverLight;
+
+    return {
+      bg,
+      border,
+      hover,
+      tagBg: isDark ? semanticTheme.tagBgDark : semanticTheme.tagBgLight,
+      tagBorder: isDark
+        ? semanticTheme.tagBorderDark
+        : semanticTheme.tagBorderLight,
+      tagColor: isDark
+        ? semanticTheme.tagColorDark
+        : semanticTheme.tagColorLight,
+      textColor: isDark
+        ? semanticTheme.textColorDark
+        : semanticTheme.textColorLight,
+    };
+  }
+
+  // Fallback when no semanticTheme
+  const main = fallbackMain || '#94a3b8';
+  if (isDark) {
+    const surface = isGray ? '#19191A' : '#0F0F10';
+    return {
+      bg: isGray ? '#1f242b' : '#141820',
+      border: blendHex(main, surface, 0.32),
+      hover: isGray ? '#252b34' : '#1b212c',
+      tagBg: isGray ? '#282f3a' : '#1c222c',
+      tagBorder: isGray ? '#3b4759' : '#2b3648',
+      tagColor: '#cbd5e1',
+      textColor: '#f1f5f9',
+    };
+  }
+  return {
+    bg: '#ffffff',
+    border: blendHex(main, '#ffffff', 0.4),
+    hover: '#f8fafc',
+    tagBg: '#f1f5f9',
+    tagBorder: '#e2e8f0',
+    tagColor: '#475569',
+    textColor: '#0f172a',
+  };
 };
 
 export const EventContainer = styled(Box, {
@@ -43,169 +254,117 @@ export const EventContainer = styled(Box, {
     prop !== 'variant' &&
     prop !== 'isMeeting' &&
     prop !== 'overlapIndex' &&
-    prop !== 'isDraft',
+    prop !== 'isDraft' &&
+    prop !== 'semanticTheme' &&
+    prop !== 'isCustomColor',
 })<{
-  variant: { main: string };
+  variant: { main: string; isCustom?: boolean };
   isMeeting?: boolean;
   overlapIndex?: number;
   isDraft?: boolean;
-}>(({ theme, variant, isMeeting, isDraft }) => {
+  semanticTheme?: SemanticTheme;
+  isCustomColor?: boolean;
+}>(({ theme, variant, isMeeting, isDraft, semanticTheme, isCustomColor }) => {
   const isDark = theme.palette.mode === 'dark';
+  const isGray = (theme as { appMode?: string }).appMode === 'graydark';
+  const colors = resolveEventColors(
+    theme,
+    semanticTheme,
+    variant.main,
+    isCustomColor,
+  );
 
-  // ── Draft card (solid surface, left accent, dashed outline, luminous glow) ──
+  // ── Draft card (dashed outline) ──
   if (isDraft) {
-    const borderColor = variant.main;
-    const isDefaultColor = variant.main === DEFAULT_COLOR.main;
-
-    const baseBg = isDefaultColor
-      ? surfaceColor(theme, '#1e293b', '#242425', '#ffffff')
-      : surfaceColor(theme, '#1e293b', '#242425', '#ffffff');
-
-    const textColor = isDark ? alpha('#ffffff', 0.95) : '#1e293b';
+    const textColor = isDark ? '#f1f5f9' : '#1e293b';
 
     return {
-      backgroundColor: baseBg,
-      backgroundImage: isDark
-        ? `linear-gradient(135deg, ${alpha(borderColor, 0.16)} 0%, ${alpha('#1e293b', 0.95)} 100%)`
-        : `linear-gradient(135deg, ${alpha(borderColor, 0.1)} 0%, #ffffff 100%)`,
+      backgroundColor: colors.bg,
       color: textColor,
       height: '100%',
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      padding: '2px 8px',
+      justifyContent: 'flex-start',
+      padding: '6px 10px',
       overflow: 'hidden',
       cursor: 'pointer',
       zIndex: 1,
-      borderRadius: '6px',
-      border: `1.5px dashed ${alpha(borderColor, isDark ? 0.6 : 0.45)}`,
-      borderLeft: `3.5px solid ${borderColor}`,
-      boxShadow: isDark
-        ? `0 2px 8px ${alpha(borderColor, 0.15)}`
-        : `0 2px 8px ${alpha(borderColor, 0.1)}`,
-      transition: 'all 0.2s ease',
-      animation: 'draftGlow 2.5s infinite ease-in-out',
-      '@keyframes draftGlow': {
-        '0%': {
-          boxShadow: isDark
-            ? `0 0 0 0 ${alpha(borderColor, 0.3)}`
-            : `0 0 0 0 ${alpha(borderColor, 0.2)}`,
-        },
-        '50%': {
-          boxShadow: isDark
-            ? `0 0 10px 1px ${alpha(borderColor, 0.28)}`
-            : `0 0 10px 1px ${alpha(borderColor, 0.18)}`,
-        },
-        '100%': {
-          boxShadow: isDark
-            ? `0 0 0 0 ${alpha(borderColor, 0.3)}`
-            : `0 0 0 0 ${alpha(borderColor, 0.2)}`,
-        },
-      },
+      borderRadius: '8px',
+      border: `1.5px dashed ${colors.border}`,
+      boxShadow: 'none',
+      transition: 'background-color 0.15s ease, border-color 0.15s ease',
+      boxSizing: 'border-box',
       '&:hover': {
-        zIndex: 50,
-        boxShadow: isDark
-          ? `0 4px 14px ${alpha(borderColor, 0.3)}`
-          : `0 4px 14px ${alpha(borderColor, 0.2)}`,
-        border: `1.5px dashed ${alpha(borderColor, 0.9)}`,
-        borderLeft: `3.5px solid ${borderColor}`,
+        zIndex: 20,
+        backgroundColor: colors.hover,
+        borderColor: colors.border,
       },
     };
   }
 
-  // ── Meeting card (dashed border, clean background) ──
+  // ── Meeting card (dashed border, solid muted surface) ──
   if (isMeeting) {
-    const MEETING_COLOR = '#60A5FA';
+    const meetingBorder = isDark ? (isGray ? '#333e4d' : '#273240') : '#cbd5e1';
+    const meetingBg = isDark ? (isGray ? '#1d2228' : '#12161d') : '#f8fafc';
+    const meetingHover = isDark ? (isGray ? '#232931' : '#191f27') : '#f1f5f9';
+
     return {
-      backgroundColor: surfaceColor(
-        theme,
-        alpha('#1e293b', 0.1),
-        alpha('#242425', 0.1),
-        '#ffffff',
-      ),
+      backgroundColor: meetingBg,
       color: isDark ? '#e2e8f0' : '#1e293b',
       height: '100%',
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      padding: '2px 8px',
+      justifyContent: 'flex-start',
+      padding: '6px 10px',
       position: 'relative',
-      borderRadius: '6px',
-      borderLeft: `3px solid ${MEETING_COLOR}`,
+      borderRadius: '8px',
+      border: `1.5px dashed ${meetingBorder}`,
       overflow: 'hidden',
       cursor: 'pointer',
       boxShadow: 'none',
       zIndex: 1,
-      transition: 'all 0.15s ease',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        border: `1.5px dashed ${alpha(MEETING_COLOR, 0.4)}`,
-        borderLeft: 'none',
-        borderRadius: 'inherit',
-        pointerEvents: 'none',
-      },
+      transition: 'background-color 0.15s ease, border-color 0.15s ease',
+      boxSizing: 'border-box',
       '&:hover': {
-        backgroundColor: surfaceColor(
-          theme,
-          alpha('#1e293b', 1),
-          '#242425',
-          '#f8fafc',
-        ),
-        boxShadow: 'none',
-        zIndex: 50,
+        backgroundColor: meetingHover,
+        borderColor: isDark ? (isGray ? '#47566a' : '#39485b') : '#94a3b8',
+        zIndex: 20,
       },
     };
   }
 
-  // ── Standard task card — Solid pastel backgrounds ──
-  // Use lighten/darken to create solid colors instead of transparent alpha, so grid lines don't show through.
-  const isDefaultColor = variant.main === DEFAULT_COLOR.main;
-
-  const textColor = isDark ? alpha('#ffffff', 0.95) : '#6f6f6fff';
-
-  // If no color assigned (DEFAULT_COLOR), use neutral background with black left border
-  // If color assigned, use colored background with colored left border
-  const finalBgColor = isDefaultColor
-    ? surfaceColor(theme, '#1e293b', '#242425', '#ffffff')
-    : surfaceColor(theme, '#1e293b', '#242425', '#ffffff');
-
-  const finalBgHover = isDefaultColor
-    ? surfaceColor(theme, '#2d3748', '#2A2A2C', '#f1f5f9')
-    : surfaceColor(theme, '#2d3748', '#2A2A2C', '#f1f5f9');
-
-  const borderColor = variant.main;
+  // ── Semantic & Custom Solid Card ──
+  const textColor = isDark ? '#f1f5f9' : '#0f172a';
 
   return {
-    backgroundColor: finalBgColor,
+    backgroundColor: colors.bg,
     color: textColor,
     position: 'relative',
     height: '100%',
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
-    padding: '2px 6px',
+    justifyContent: 'flex-start',
+    padding: '6px 10px',
     overflow: 'hidden',
     cursor: 'pointer',
     zIndex: 1,
-    boxShadow: 'none',
-    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-    borderRadius: '6px',
-    border: `1px solid ${theme.palette.divider}`,
-    borderLeft: `3px solid ${borderColor}`,
+    boxShadow: isDark
+      ? '0 1px 3px rgba(0, 0, 0, 0.2)'
+      : '0 1px 2px rgba(0, 0, 0, 0.03)',
+    transition: 'background-color 0.15s ease, border-color 0.15s ease',
+    borderRadius: '8px',
+    border: `1px solid ${colors.border}`,
+    boxSizing: 'border-box',
     '&:hover': {
-      backgroundColor: finalBgHover,
-      boxShadow: 'none',
-      zIndex: 200,
-      transform: 'none',
-      borderLeftColor: alpha(borderColor, 0.8),
+      backgroundColor: colors.hover,
+      borderColor: colors.border,
+      boxShadow: isDark
+        ? '0 2px 6px rgba(0, 0, 0, 0.3)'
+        : '0 2px 6px rgba(0, 0, 0, 0.06)',
+      zIndex: 20,
     },
   };
 });

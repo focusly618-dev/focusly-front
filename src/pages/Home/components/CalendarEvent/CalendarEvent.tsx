@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import {
   Box,
   Menu,
@@ -13,9 +14,7 @@ import {
   ContentCopy as DuplicateIcon,
   DeleteOutline as DeleteIcon,
   Schedule as ScheduleIcon,
-  AutoAwesome as AutoAwesomeIcon,
   Close as CloseIcon,
-  Google as GoogleIcon,
 } from '@mui/icons-material';
 
 import type { CalendarEventProps } from './CalendarEvent.types';
@@ -28,7 +27,10 @@ import {
   EventContainer,
   contextMenuSx,
   PRIORITY_COLORS,
+  getContrastTextColor,
 } from './CalendarEvent.styles';
+
+import { resolveSemanticTheme } from './calendarSemanticTheme';
 
 export const CalendarEvent = (props: CalendarEventProps) => {
   const {
@@ -37,14 +39,57 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     onDeleteDraft,
     isDeleting: propIsDeleting,
     onDeleteTask,
+    currentView,
+    isHighlighted,
   } = props;
+
+  const eventRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isHighlighted && eventRef.current) {
+      eventRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [isHighlighted]);
+
+  const isWeekView = currentView === 'week';
+  const isMonthView = currentView === 'month';
   const variant = getEventColor(event as { id?: string });
   const formatTime = (date: Date) => {
     return getMinutes(date) === 0
-      ? format(date, 'h a')
-      : format(date, 'h.mm a');
+      ? format(date, 'h:mm a')
+      : format(date, 'h:mm a');
   };
-  const timeRange = `${formatTime(event.start)} - ${formatTime(event.end)}`;
+
+  const formatMonthTime = (date: Date) => {
+    return getMinutes(date) === 0
+      ? format(date, 'ha').toLowerCase()
+      : format(date, 'h:mma').toLowerCase();
+  };
+
+  const {
+    theme: semanticTheme,
+    tagLabel,
+    tagPrefix,
+    secondaryTag,
+    linkTag,
+  } = resolveSemanticTheme(event);
+
+  const durationMinutes = Math.max(
+    1,
+    Math.round((event.end.getTime() - event.start.getTime()) / 60000),
+  );
+  const durationFormatted =
+    durationMinutes >= 60
+      ? `${(durationMinutes / 60).toFixed(durationMinutes % 60 === 0 ? 0 : 1)}h`
+      : `${durationMinutes}m`;
+
+  const timeHeader = `${formatTime(event.start)} – ${formatTime(event.end)}${
+    durationMinutes >= 60 ? ` (${durationFormatted})` : ''
+  }`;
+
+  const taskResource = event.resource as Task | undefined;
+  const rawNotes = taskResource?.notes_encrypted || '';
+  const cleanNotes = rawNotes.replace(/\[.*?\]/g, '').trim();
 
   const {
     handleContextMenu,
@@ -54,8 +99,6 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     onPriorityChange,
     handleOnStartFocus,
     isMeeting,
-    isShortEvent,
-    startTime,
     currentPriority,
     contextMenu,
     isReadOnly,
@@ -64,7 +107,6 @@ export const CalendarEvent = (props: CalendarEventProps) => {
 
   const isDeleting = Boolean(propIsDeleting || contextIsDeleting);
 
-  const isAiTask = event.type === 'task' && (event.resource as Task)?.use_ai;
   const isGoogleTask =
     event.type === 'event' ||
     (event.type === 'task' &&
@@ -72,248 +114,680 @@ export const CalendarEvent = (props: CalendarEventProps) => {
         (event.resource as Task)?.task_type === 'GoogleTask'));
   const isDraft = event.isDraft;
 
-  const renderClassic = () => (
-    <EventContainer
-      variant={variant}
-      isMeeting={isMeeting}
-      isDraft={isDraft}
-      onContextMenu={
-        isDraft || isDeleting
-          ? (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }
-          : handleContextMenu
-      }
-      sx={{
-        position: 'relative',
-        pr: isDraft || isDeleting ? '24px' : '6px',
-        opacity: isDeleting ? 0.6 : 1,
-        pointerEvents: isDeleting ? 'none' : 'auto',
-        transition: 'opacity 0.2s ease, filter 0.2s ease',
-        cursor: isDeleting ? 'wait' : 'pointer',
-      }}
-    >
-      {isDeleting ? (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 2,
-            right: 2,
-            width: 18,
-            height: 18,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            bgcolor: (theme) =>
+  const renderClassic = () => {
+    const isCustom = variant.isCustom;
+    const contrast = isCustom ? getContrastTextColor(variant.main) : null;
+    const titleColor = (theme: {
+      palette: { mode: string };
+      appMode?: string;
+    }) =>
+      contrast
+        ? contrast.primary
+        : theme.appMode === 'graydark'
+          ? '#f8fafc'
+          : theme.palette.mode === 'dark'
+            ? '#f8fafc'
+            : '#090d16';
+    const subtextColor = (theme: {
+      palette: { mode: string };
+      appMode?: string;
+    }) => {
+      if (contrast) return contrast.secondary;
+      if (theme.appMode === 'graydark') return '#cbd5e1';
+      return theme.palette.mode === 'dark' ? '#94a3b8' : '#64748b';
+    };
+
+    return (
+      <EventContainer
+        ref={eventRef}
+        data-highlighted={isHighlighted ? 'true' : undefined}
+        variant={variant}
+        isCustomColor={variant.isCustom}
+        semanticTheme={semanticTheme}
+        isMeeting={isMeeting}
+        isDraft={isDraft}
+        onContextMenu={
+          isDraft || isDeleting
+            ? (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            : handleContextMenu
+        }
+        sx={{
+          position: 'relative',
+          p: isMonthView
+            ? '2px 6px'
+            : isWeekView
+              ? '3px 6px'
+              : durationMinutes <= 45
+                ? '2px 8px'
+                : durationMinutes <= 60
+                  ? '3px 8px'
+                  : '5px 10px',
+          pr:
+            isDraft || isDeleting
+              ? '24px'
+              : isMonthView
+                ? '6px'
+                : isWeekView
+                  ? '6px'
+                  : durationMinutes <= 60
+                    ? '8px'
+                    : '10px',
+          borderRadius: isMonthView
+            ? '4px'
+            : durationMinutes <= 40
+              ? '8px'
+              : '10px',
+          borderWidth: isMonthView ? '1px' : undefined,
+          boxShadow: isMonthView ? 'none' : undefined,
+          minHeight: isMonthView ? '20px' : undefined,
+          justifyContent: isMonthView ? 'center' : 'flex-start',
+          opacity: isDeleting ? 0.6 : 1,
+          pointerEvents: isDeleting ? 'none' : 'auto',
+          transition:
+            'opacity 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
+          cursor: isDeleting ? 'wait' : 'pointer',
+          '&:hover': isMonthView
+            ? {
+                transform: 'none',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)',
+              }
+            : undefined,
+          ...(isHighlighted && {
+            zIndex: 9999,
+            borderColor: (theme) =>
               theme.palette.mode === 'dark'
-                ? 'rgba(0, 0, 0, 0.65)'
-                : 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 30,
-            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
-          }}
-        >
-          <CircularProgress
-            size={12}
-            thickness={5}
-            sx={{
-              color: (theme) =>
-                theme.palette.mode === 'dark' ? '#f87171' : '#ef4444',
-            }}
-          />
-        </Box>
-      ) : (
-        isDraft && onDeleteDraft && (
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDeleteDraft(event.id);
-            }}
+                ? '#94a3b8 !important'
+                : '#475569 !important',
+            borderWidth: '2px !important',
+            boxShadow: (theme) =>
+              theme.palette.mode === 'dark'
+                ? '0 0 0 1px rgba(255, 255, 255, 0.15), 0 4px 14px rgba(0, 0, 0, 0.45) !important'
+                : '0 0 0 1px rgba(0, 0, 0, 0.12), 0 4px 14px rgba(0, 0, 0, 0.08) !important',
+          }),
+        }}
+      >
+        {isDeleting ? (
+          <Box
             sx={{
               position: 'absolute',
               top: 2,
               right: 2,
-              padding: '2px',
-              color: 'text.secondary',
+              width: 18,
+              height: 18,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
               bgcolor: (theme) =>
                 theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.06)'
-                  : 'rgba(0, 0, 0, 0.04)',
-              zIndex: 10,
-              '&:hover': {
-                color: 'error.main',
-                bgcolor: 'rgba(239, 68, 68, 0.12)',
-              },
+                  ? 'rgba(0, 0, 0, 0.65)'
+                  : 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 30,
+              boxShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
             }}
           >
-            <CloseIcon sx={{ fontSize: 12 }} />
-          </IconButton>
-        )
-      )}
-
-      {isShortEvent ? (
-        /* ── Short event (< 40 min): time + title in one row ── */
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: '4px',
-            overflow: 'hidden',
-            width: '100%',
-            height: '100%',
-          }}
-        >
-          <Box
-            sx={{
-              fontSize: '10px',
-              fontWeight: 600,
-              opacity: isDraft ? 0.9 : 0.85,
-              color: isDraft ? 'text.secondary' : 'inherit',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}
-          >
-            {startTime}
-          </Box>
-          {isDraft ? (
-            <Typography
-              component="span"
+            <CircularProgress
+              size={12}
+              thickness={5}
               sx={{
-                fontSize: '8px',
-                fontWeight: 700,
                 color: (theme) =>
-                  theme.palette.mode === 'dark' ? '#c084fc' : '#7c3aed',
+                  theme.palette.mode === 'dark' ? '#f87171' : '#ef4444',
+              }}
+            />
+          </Box>
+        ) : (
+          isDraft &&
+          onDeleteDraft && (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteDraft(event.id);
+              }}
+              sx={{
+                position: 'absolute',
+                top: 2,
+                right: 2,
+                padding: '2px',
+                color: 'text.secondary',
                 bgcolor: (theme) =>
                   theme.palette.mode === 'dark'
-                    ? 'rgba(168, 85, 247, 0.18)'
-                    : 'rgba(124, 58, 237, 0.08)',
-                border: '1px solid',
-                borderColor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(168, 85, 247, 0.3)'
-                    : 'rgba(124, 58, 237, 0.2)',
-                px: 0.5,
-                py: 0.1,
-                borderRadius: '3px',
-                flexShrink: 0,
+                    ? 'rgba(255, 255, 255, 0.06)'
+                    : 'rgba(0, 0, 0, 0.04)',
+                zIndex: 10,
+                '&:hover': {
+                  color: 'error.main',
+                  bgcolor: 'rgba(239, 68, 68, 0.12)',
+                },
               }}
             >
-              ✨ IA
-            </Typography>
-          ) : (
-            <>
-              {isGoogleTask && (
-                <GoogleIcon
-                  sx={{ fontSize: 10, color: '#4285F4', flexShrink: 0 }}
-                />
-              )}
-              {isAiTask && (
-                <AutoAwesomeIcon
-                  sx={{ fontSize: 10, color: 'primary.main', flexShrink: 0 }}
-                />
-              )}
-            </>
-          )}
-          <Box
-            sx={{
-              fontSize: '11px',
-              fontWeight: 600,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              flexGrow: 1,
-              color: isDraft ? 'text.primary' : 'inherit',
-            }}
-          >
-            {event.title}
-          </Box>
-        </Box>
-      ) : (
-        /* ── Normal event (≥ 40 min): time above, title below ── */
-        <>
-          <Box
-            sx={{
-              fontSize: '10px',
-              fontWeight: 600,
-              mb: 0.5,
-              color: isDraft ? 'text.secondary' : 'inherit',
-              opacity: isDraft ? 0.9 : 0.85,
-            }}
-          >
-            {timeRange}
-          </Box>
+              <CloseIcon sx={{ fontSize: 12 }} />
+            </IconButton>
+          )
+        )}
+
+        {isMonthView ? (
+          /* ── Month View: Single row, start time + title (e.g. "9am Tarea de prueba") ── */
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
-              fontSize: '12px',
-              fontWeight: 600,
+              gap: '5px',
+              width: '100%',
+              height: '100%',
+              minWidth: 0,
               overflow: 'hidden',
+              whiteSpace: 'nowrap',
             }}
           >
-            {isDraft ? (
-              <Typography
-                component="span"
-                sx={{
-                  fontSize: '9px',
-                  fontWeight: 700,
-                  color: (theme) =>
-                    theme.palette.mode === 'dark' ? '#c084fc' : '#7c3aed',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(168, 85, 247, 0.18)'
-                      : 'rgba(124, 58, 237, 0.08)',
-                  border: '1px solid',
-                  borderColor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(168, 85, 247, 0.3)'
-                      : 'rgba(124, 58, 237, 0.2)',
-                  px: 0.5,
-                  py: 0.15,
-                  borderRadius: '4px',
-                  flexShrink: 0,
-                  lineHeight: 1.2,
-                }}
-              >
-                ✨ Sugerencia
-              </Typography>
-            ) : (
-              <>
-                {isGoogleTask && (
-                  <GoogleIcon
-                    sx={{ fontSize: 12, color: '#4285F4', flexShrink: 0 }}
-                  />
-                )}
-                {isAiTask && (
-                  <AutoAwesomeIcon
-                    sx={{ fontSize: 12, color: 'primary.main', flexShrink: 0 }}
-                  />
-                )}
-              </>
-            )}
-            <Box
+            <Typography
+              component="span"
               sx={{
-                fontSize: '12px',
+                fontSize: '11px',
+                fontWeight: 700,
+                color: (theme) =>
+                  contrast
+                    ? contrast.primary
+                    : (theme as { appMode?: string }).appMode === 'graydark'
+                      ? '#cbd5e1'
+                      : theme.palette.mode === 'dark'
+                        ? semanticTheme.tagColorDark
+                        : semanticTheme.tagColorLight,
+                flexShrink: 0,
+                lineHeight: 1.2,
+              }}
+            >
+              {formatMonthTime(event.start)}
+            </Typography>
+            <Typography
+              component="span"
+              noWrap
+              sx={{
+                fontSize: '11.5px',
                 fontWeight: 600,
+                color: titleColor,
+                lineHeight: 1.2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                flexGrow: 1,
-                color: isDraft ? 'text.primary' : 'inherit',
+                flex: 1,
+                minWidth: 0,
               }}
             >
               {event.title}
-            </Box>
+            </Typography>
           </Box>
-        </>
-      )}
-    </EventContainer>
-  );
+        ) : isWeekView ? (
+          /* ── Week View: Minimalist - Title on Top, Time on Bottom ── */
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: durationMinutes <= 30 ? 'center' : 'flex-start',
+              gap: '2px',
+              width: '100%',
+              height: '100%',
+              overflow: 'hidden',
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: '11px',
+                fontWeight: 700,
+                color: titleColor,
+                lineHeight: 1.25,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: durationMinutes >= 55 ? 2 : 1,
+                WebkitBoxOrient: 'vertical',
+              }}
+            >
+              {event.title}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: subtextColor,
+                whiteSpace: 'nowrap',
+                lineHeight: 1.2,
+              }}
+            >
+              {formatTime(event.start)} - {formatTime(event.end)}
+            </Typography>
+          </Box>
+        ) : durationMinutes < 55 ? (
+          durationMinutes <= 20 ? (
+            /* ── Very Short Task (≤ 20 min): Single Row ── */
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.75,
+                width: '100%',
+                height: '100%',
+                minWidth: 0,
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  color: subtextColor,
+                  flexShrink: 0,
+                  lineHeight: 1,
+                }}
+              >
+                {formatTime(event.start)}
+              </Typography>
+              <Typography
+                component="span"
+                noWrap
+                sx={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: titleColor,
+                  lineHeight: 1.2,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              >
+                {event.title}
+              </Typography>
+            </Box>
+          ) : (
+            /* ── Medium / Short Task (21 - 54 min): Title on Top, Time on Bottom ── */
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                gap: '2px',
+                height: '100%',
+                width: '100%',
+                minWidth: 0,
+                overflow: 'hidden',
+              }}
+            >
+              {/* Title on top */}
+              <Typography
+                sx={{
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  color: titleColor,
+                  lineHeight: 1.2,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  WebkitLineClamp: durationMinutes >= 35 ? 2 : 1,
+                  WebkitBoxOrient: 'vertical',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {event.title}
+              </Typography>
+
+              {/* Time on bottom */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 0.5,
+                  width: '100%',
+                  minWidth: 0,
+                  flexShrink: 0,
+                  mt: 'auto',
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontSize: '9.5px',
+                    fontWeight: 600,
+                    color: subtextColor,
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.1,
+                    letterSpacing: '0.01em',
+                  }}
+                >
+                  {formatTime(event.start)} – {formatTime(event.end)}
+                </Typography>
+
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    flexShrink: 0,
+                  }}
+                >
+                  {isGoogleTask && (
+                    <Box
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 13,
+                        height: 13,
+                        borderRadius: '3px',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.08)'
+                            : 'rgba(0, 0, 0, 0.05)',
+                        border: '1px solid',
+                        borderColor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.12)'
+                            : 'rgba(0, 0, 0, 0.08)',
+                        color: (theme) =>
+                          theme.palette.mode === 'dark' ? '#cbd5e1' : '#475569',
+                        fontSize: '8px',
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
+                      G
+                    </Box>
+                  )}
+                  {durationMinutes >= 45 && secondaryTag && (
+                    <Box
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        fontSize: '8.5px',
+                        fontWeight: 600,
+                        color: (theme) =>
+                          theme.palette.mode === 'dark' ? '#d4b28c' : '#7c5835',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(212, 178, 140, 0.12)'
+                            : '#fef3c7',
+                        px: 0.5,
+                        borderRadius: '3px',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {secondaryTag}
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          )
+        ) : (
+          /* ── Deep Work / Standard Long Event (≥ 50 min) ── */
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+              width: '100%',
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+          >
+            {/* Header row with category chip */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 0.5,
+                mb: 0.5,
+                width: '100%',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  minWidth: 0,
+                }}
+              >
+                {isGoogleTask && (
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 16,
+                      height: 16,
+                      borderRadius: '4px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.05)',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.12)'
+                          : 'rgba(0, 0, 0, 0.08)',
+                      color: (theme) =>
+                        theme.palette.mode === 'dark' ? '#cbd5e1' : '#475569',
+                      fontSize: '9.5px',
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    G
+                  </Box>
+                )}
+
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.3,
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    color: contrast
+                      ? contrast.chipText
+                      : (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? semanticTheme.textColorDark
+                            : semanticTheme.textColorLight,
+                    bgcolor: (theme) =>
+                      contrast
+                        ? contrast.chipBg
+                        : theme.palette.mode === 'dark'
+                          ? semanticTheme.tagBgDark
+                          : semanticTheme.tagBgLight,
+                    border: '1px solid',
+                    borderColor: (theme) =>
+                      contrast
+                        ? contrast.chipBorder
+                        : theme.palette.mode === 'dark'
+                          ? semanticTheme.tagBorderDark
+                          : semanticTheme.tagBorderLight,
+                    px: 0.75,
+                    py: 0.2,
+                    borderRadius: '6px',
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {tagPrefix && <span>{tagPrefix}</span>}
+                  <span>{tagLabel}</span>
+                </Box>
+
+                {secondaryTag && (
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      fontSize: '9.5px',
+                      fontWeight: 600,
+                      color: 'text.secondary',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.06)',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.12)'
+                          : 'rgba(0, 0, 0, 0.08)',
+                      px: 0.6,
+                      py: 0.15,
+                      borderRadius: '4px',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {secondaryTag}
+                  </Box>
+                )}
+              </Box>
+            </Box>
+
+            {/* Title */}
+            <Typography
+              sx={{
+                fontSize: '12px',
+                fontWeight: 700,
+                color: titleColor,
+                lineHeight: 1.3,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: durationMinutes >= 90 ? 4 : 3,
+                WebkitBoxOrient: 'vertical',
+                wordBreak: 'break-word',
+              }}
+            >
+              {event.title}
+            </Typography>
+
+            {/* Clean Description / Notes */}
+            {cleanNotes && durationMinutes >= 90 && (
+              <Typography
+                sx={{
+                  fontSize: '10.5px',
+                  fontWeight: 400,
+                  color: (theme) =>
+                    contrast
+                      ? contrast.secondary
+                      : (theme as { appMode?: string }).appMode === 'graydark'
+                        ? '#cbd5e1'
+                        : theme.palette.mode === 'dark'
+                          ? semanticTheme.textColorDark
+                          : '#475569',
+                  lineHeight: 1.35,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  mt: 0.3,
+                }}
+              >
+                {cleanNotes}
+              </Typography>
+            )}
+
+            {/* Time row (BELOW title and description) */}
+            <Typography
+              variant="caption"
+              sx={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: subtextColor,
+                whiteSpace: 'nowrap',
+                lineHeight: 1.2,
+                letterSpacing: '0.01em',
+                mt: 0.4,
+              }}
+            >
+              {timeHeader}
+            </Typography>
+
+            {/* Footer chips: Focused hours / Jira link */}
+            {durationMinutes >= 70 && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  mt: 'auto',
+                  pt: 0.5,
+                  flexWrap: 'wrap',
+                }}
+              >
+                {durationMinutes >= 60 && (
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      color: (theme) =>
+                        theme.palette.mode === 'dark' ? '#94a3b8' : '#475569',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(0, 0, 0, 0.04)',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.1)'
+                          : 'rgba(0, 0, 0, 0.08)',
+                      px: 0.75,
+                      py: 0.2,
+                      borderRadius: '6px',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {Math.round(durationMinutes / 60)} horas enfocadas
+                  </Box>
+                )}
+
+                {linkTag && (
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.25,
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      color: (theme) =>
+                        theme.palette.mode === 'dark' ? '#94a3b8' : '#475569',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(0, 0, 0, 0.04)',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.1)'
+                          : 'rgba(0, 0, 0, 0.08)',
+                      px: 0.75,
+                      py: 0.2,
+                      borderRadius: '6px',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    🔗 {linkTag}
+                  </Box>
+                )}
+              </Box>
+            )}
+          </Box>
+        )}
+      </EventContainer>
+    );
+  };
 
   return (
     <>

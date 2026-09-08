@@ -481,7 +481,7 @@ export const EditorAskAI: React.FC<EditorAskAIProps> = ({
               px: 2,
               py: 1,
               borderRadius: '999px',
-              bgcolor: glowBg,
+              bgcolor: theme.palette.primary.main,
               border: `1px solid ${glowBorder}`,
               boxShadow: glowShadow,
               cursor: 'pointer',

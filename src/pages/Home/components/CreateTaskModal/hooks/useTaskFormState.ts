@@ -48,7 +48,7 @@ export const useTaskFormState = ({
     const defaults = {
       title: '',
       description: '',
-      color: '#1e293b',
+      color: '#E0E7FF',
       priority: getPriorityFromLevel(2),
       status: 'Backlog' as Task['status'],
       category: 'General',
@@ -71,13 +71,14 @@ export const useTaskFormState = ({
     } = initialTask;
 
     // Use color field directly if available, otherwise fall back to parsing from notes_encrypted
-    let color = (initialTask as { color?: string }).color || '#1e293b';
-    if (!color) {
+    let color = (initialTask as { color?: string }).color;
+    if (!color && notes_encrypted) {
       const colorMatch = notes_encrypted.match(/\[COLOR:(.*?)\]/);
       if (colorMatch && colorMatch[1]) {
         color = colorMatch[1];
       }
     }
+    color = color && color !== '#1e293b' ? color : '#E0E7FF';
 
     const cleanDesc = notes_encrypted
       .replace(/\[START_DATE:(.*?)\]/g, '')

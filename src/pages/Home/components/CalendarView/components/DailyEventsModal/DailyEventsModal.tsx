@@ -139,11 +139,21 @@ export const DailyEventsModal: React.FC<DailyEventsModalProps> = ({
             sx={{
               cursor: 'pointer',
               borderRadius: '12px',
-              backgroundColor: 'action.hover',
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? (theme as { appMode?: string }).appMode === 'graydark'
+                    ? '#202022'
+                    : '#171719'
+                  : '#f8fafc',
               border: (theme) => `1px solid ${theme.palette.divider}`,
               transition: 'all 0.2s',
               '&:hover': {
-                backgroundColor: 'action.selected',
+                backgroundColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? (theme as { appMode?: string }).appMode === 'graydark'
+                      ? '#28282b'
+                      : '#222225'
+                    : '#f1f5f9',
                 transform: 'translateY(-1px)',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
                 borderColor: 'divider',

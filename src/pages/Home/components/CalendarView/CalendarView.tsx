@@ -1,10 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Calendar,
-  dateFnsLocalizer,
-  Views,
-} from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import {
@@ -14,8 +10,9 @@ import {
   getDay,
   startOfDay,
   addDays,
+  isToday,
 } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { enUS, es } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Components
@@ -41,10 +38,19 @@ import {
   Drawer,
   Backdrop,
   Button,
+  IconButton,
 } from '@mui/material';
+import {
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
 
 // Styles & Hooks
-import { CalendarContainer, DraftActionBar } from './CalendarView.styles';
+import {
+  CalendarContainer,
+  DraftActionBar,
+  CalendarTopBar,
+} from './CalendarView.styles';
 import { useCalendarView } from './hooks/useCalendarView.hook';
 import {
   contextMenuSx,
@@ -76,9 +82,10 @@ interface CalendarViewProps {
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isWeeklyPlannerOpen, setIsWeeklyPlannerOpen] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+  const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
   const {
     events,
     skeletonEvents,
@@ -113,6 +120,85 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     handleDeleteTask,
   } = useCalendarView();
 
+  const isCurrentDateToday = isToday(currentDate);
+
+  const formattedDateTitle = useMemo(() => {
+    try {
+      const isSpanish = !i18n.language || i18n.language.startsWith('es');
+      if (isSpanish) {
+        const dayOfWeek = format(currentDate, 'EEEE', { locale: es });
+        const dayOfMonth = format(currentDate, 'd');
+        const month = format(currentDate, 'MMMM', { locale: es });
+        const capDay = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
+        const capMonth = month.charAt(0).toUpperCase() + month.slice(1);
+        return `${capDay}, ${dayOfMonth} de ${capMonth}`;
+      }
+      return format(currentDate, 'EEEE, MMMM d', { locale: enUS });
+    } catch {
+      return format(currentDate, 'EEEE, d MMMM');
+    }
+  }, [currentDate, i18n.language]);
+
+  useEffect(() => {
+    const BADGE_ID = 'rbc-time-badge-live';
+
+    const updateTimeBadge = () => {
+      const indicator = document.querySelector('.rbc-current-time-indicator');
+      const gutter = document.querySelector('.rbc-time-gutter');
+      if (!indicator || !gutter) return;
+
+      // Get the indicator's vertical position relative to .rbc-time-content
+      const timeContent = indicator.closest('.rbc-time-content');
+      if (!timeContent) return;
+
+      const contentRect = timeContent.getBoundingClientRect();
+      const indicatorRect = indicator.getBoundingClientRect();
+      const topOffset =
+        indicatorRect.top - contentRect.top + timeContent.scrollTop;
+
+      // Create or reuse the badge element
+      let badge = document.getElementById(BADGE_ID);
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.id = BADGE_ID;
+        badge.className = 'rbc-time-badge';
+        // Place it inside the gutter's first timeslot-group parent for proper positioning
+        const gutterColumn = gutter as HTMLElement;
+        gutterColumn.style.position = 'relative';
+        gutterColumn.appendChild(badge);
+      }
+
+      badge.textContent = format(new Date(), 'h:mm a');
+      badge.style.top = `${topOffset}px`;
+    };
+
+    // Initial + delayed retry
+    updateTimeBadge();
+    const retryTimeout = setTimeout(updateTimeBadge, 500);
+    const interval = setInterval(updateTimeBadge, 20000);
+
+    // Re-sync when the library re-renders the indicator
+    const observer = new MutationObserver(() => {
+      requestAnimationFrame(updateTimeBadge);
+    });
+    const timeContent = document.querySelector('.rbc-time-content');
+    if (timeContent) {
+      observer.observe(timeContent, { childList: true, subtree: true });
+    }
+
+    // Re-sync on scroll (the indicator moves with scroll)
+    const handleScroll = () => requestAnimationFrame(updateTimeBadge);
+    timeContent?.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      clearTimeout(retryTimeout);
+      clearInterval(interval);
+      observer.disconnect();
+      timeContent?.removeEventListener('scroll', handleScroll);
+      document.getElementById(BADGE_ID)?.remove();
+    };
+  }, [currentView, currentDate]);
+
   const [isAILoading, setIsAILoading] = useState(false);
 
   const handleAIPlanningTrigger = async () => {
@@ -140,7 +226,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
 
       for (let d = 0; d < 3; d++) {
         const day = addDays(startDay, d);
-        if (workDays?.length && !workDays.includes(dayShortNames[day.getDay()])) {
+        if (
+          workDays?.length &&
+          !workDays.includes(dayShortNames[day.getDay()])
+        ) {
           continue;
         }
         for (let hour = startHour; hour < endHour; hour++) {
@@ -365,6 +454,106 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           flexDirection: 'column',
         }}
       >
+        <CalendarTopBar>
+          {/* Left: Date Title & Navigation Stepper */}
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            flexWrap="wrap"
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: '1rem', sm: '1.15rem' },
+                color: 'text.primary',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {formattedDateTitle}
+            </Typography>
+
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => handleOnNavigate(new Date())}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '12px',
+                  height: '30px',
+                  px: 1.25,
+                  minWidth: 0,
+                  borderColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.12)'
+                      : 'rgba(0, 0, 0, 0.12)',
+                  color: 'text.primary',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(99, 102, 241, 0.08)'
+                        : 'rgba(99, 102, 241, 0.04)',
+                  },
+                }}
+              >
+                {t('calendar.today', 'Hoy')}
+              </Button>
+
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : 'rgba(0, 0, 0, 0.04)',
+                  borderRadius: '8px',
+                  border: '1px solid',
+                  borderColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.1)'
+                      : 'rgba(0, 0, 0, 0.08)',
+                  p: '1px',
+                  height: '30px',
+                }}
+              >
+                <IconButton
+                  size="small"
+                  onClick={() => handleOnNavigate(addDays(currentDate, -1))}
+                  sx={{ p: 0.5, color: 'text.secondary' }}
+                >
+                  <ChevronLeftIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    px: 0.75,
+                    fontWeight: 600,
+                    fontSize: '12px',
+                    color: 'text.primary',
+                    userSelect: 'none',
+                  }}
+                >
+                  {isCurrentDateToday
+                    ? t('calendar.today', 'Hoy')
+                    : format(currentDate, 'd MMM')}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={() => handleOnNavigate(addDays(currentDate, 1))}
+                  sx={{ p: 0.5, color: 'text.secondary' }}
+                >
+                  <ChevronRightIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Box>
+            </Stack>
+          </Stack>
+        </CalendarTopBar>
         <Box
           sx={{
             flexGrow: 1,
@@ -401,8 +590,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             onSelectEvent={handleSelectEvent}
             onEventDrop={handleEventDrop}
             onEventResize={handleEventResize}
-            draggableAccessor={(event: ICalendarEvent) => event.type !== 'skeleton'}
-            resizableAccessor={(event: ICalendarEvent) => event.type !== 'skeleton'}
+            draggableAccessor={(event: ICalendarEvent) =>
+              event.type !== 'skeleton'
+            }
+            resizableAccessor={(event: ICalendarEvent) =>
+              event.type !== 'skeleton'
+            }
             scrollToTime={scrollToTime}
             dayPropGetter={dayPropGetter}
             slotPropGetter={slotPropGetter}
@@ -410,7 +603,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             selectable
             showAllEvents={false}
             doShowMoreDrillDown={false}
-            dayLayoutAlgorithm="overlap"
+            dayLayoutAlgorithm="no-overlap"
             showMultiDayTimes={true}
             components={{
               header: CalendarHeader,
@@ -427,25 +620,40 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                     currentView={currentView}
                     onDeleteDraft={handleDeleteDraft}
                     onDeleteTask={handleDeleteTask}
+                    isHighlighted={
+                      hoveredEventId !== null &&
+                      (props.event.id === hoveredEventId ||
+                        Boolean(
+                          props.event.resource &&
+                          'id' in props.event.resource &&
+                          props.event.resource.id === hoveredEventId,
+                        ) ||
+                        Boolean(
+                          props.event.resource &&
+                          'google_event_id' in props.event.resource &&
+                          props.event.resource.google_event_id ===
+                            hoveredEventId,
+                        ))
+                    }
                     isDeleting={
                       deletingTaskIds?.includes(props.event.id) ||
                       Boolean(
                         props.event.resource &&
-                          'id' in props.event.resource &&
-                          deletingTaskIds?.includes(
-                            (props.event.resource as { id: string }).id,
-                          ),
+                        'id' in props.event.resource &&
+                        deletingTaskIds?.includes(
+                          (props.event.resource as { id: string }).id,
+                        ),
                       ) ||
                       Boolean(
                         props.event.resource &&
-                          'google_event_id' in props.event.resource &&
-                          deletingTaskIds?.includes(
-                            (
-                              props.event.resource as {
-                                google_event_id: string;
-                              }
-                            ).google_event_id,
-                          ),
+                        'google_event_id' in props.event.resource &&
+                        deletingTaskIds?.includes(
+                          (
+                            props.event.resource as {
+                              google_event_id: string;
+                            }
+                          ).google_event_id,
+                        ),
                       )
                     }
                   />
@@ -545,6 +753,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           onEventSelect={handleSelectEvent}
           onAIPlannerClick={handleAIPlanningTrigger}
           onWeeklyPlannerClick={() => setIsWeeklyPlannerOpen(true)}
+          hoveredEventId={hoveredEventId}
+          onHoverEvent={setHoveredEventId}
         />
       </Box>
 
@@ -591,6 +801,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             setIsWeeklyPlannerOpen(true);
             setIsSidePanelOpen(false);
           }}
+          hoveredEventId={hoveredEventId}
+          onHoverEvent={setHoveredEventId}
         />
       </Drawer>
 

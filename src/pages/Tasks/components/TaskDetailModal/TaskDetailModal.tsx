@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, Box, TextField, Fade } from '@mui/material';
+import {
+  Dialog,
+  DialogContent,
+  Box,
+  TextField,
+  Fade,
+  Typography,
+  Tooltip,
+} from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 import React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -14,6 +22,7 @@ import {
 import { useTaskDetailModal } from './hooks/useTaskDetailModal.hooks';
 import { improveTaskAI } from '@/api/AI/apiAIPlanner';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { getColorName } from './TaskDetailModal.utils';
 
 // Sub-components
 import { TaskProperties } from './components/TaskProperties/TaskProperties';
@@ -288,26 +297,49 @@ export const TaskDetailModal = ({
                   InputProps={{
                     endAdornment: (
                       <Box
-                        sx={{ display: 'flex', alignItems: 'center', pr: 1 }}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          pr: 1,
+                          gap: 0.75,
+                        }}
                       >
-                        <Box
-                          onClick={(e) =>
-                            !isReadOnly && setColorAnchor(e.currentTarget)
-                          }
-                          sx={{
-                            width: 20,
-                            height: 20,
-                            borderRadius: '50%',
-                            bgcolor: color || '#1e293b',
-                            cursor: isReadOnly ? 'default' : 'pointer',
-                            border: '2px solid white',
-                            boxShadow: '0 0 0 1px rgba(0,0,0,0.1)',
-                            transition: 'transform 0.2s',
-                            '&:hover': {
-                              transform: isReadOnly ? 'none' : 'scale(1.1)',
-                            },
-                          }}
-                        />
+                        {getColorName(color) && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              color: 'text.secondary',
+                              userSelect: 'none',
+                            }}
+                          >
+                            {getColorName(color)}
+                          </Typography>
+                        )}
+                        <Tooltip
+                          title={`Color: ${getColorName(color) || 'Personalizado'}`}
+                          arrow
+                        >
+                          <Box
+                            onClick={(e) =>
+                              !isReadOnly && setColorAnchor(e.currentTarget)
+                            }
+                            sx={{
+                              width: 20,
+                              height: 20,
+                              borderRadius: '50%',
+                              bgcolor: color || '#1e293b',
+                              cursor: isReadOnly ? 'default' : 'pointer',
+                              border: '2px solid white',
+                              boxShadow: '0 0 0 1px rgba(0,0,0,0.1)',
+                              transition: 'transform 0.2s',
+                              '&:hover': {
+                                transform: isReadOnly ? 'none' : 'scale(1.15)',
+                              },
+                            }}
+                          />
+                        </Tooltip>
                       </Box>
                     ),
                   }}

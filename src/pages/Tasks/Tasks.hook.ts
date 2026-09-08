@@ -32,8 +32,8 @@ export const useTasks = () => {
 
   const ui = useTasksUI();
   const filterLogic = useTasksFilters(viewMode);
-
-  // The Today/Week/Month arrows navigate dateRangeFilter (startDate/endDate)
+  console.log(filterLogic.searchTerm);
+  // The Today/Week/Month arrows navigate dateRangeFilter (startDate/EndDate)
   // — merge it into the query's filters so the server returns only the
   // tasks for the active window, instead of fetching everything and
   // filtering client-side.
@@ -43,13 +43,15 @@ export const useTasks = () => {
       ...filterLogic.dateRangeFilter,
       // Send the search box to the server too, so it can find matches
       // outside whatever page/window has already been fetched.
-      ...(filterLogic.searchTerm ? { searchTerm: filterLogic.searchTerm } : {}),
+      ...(filterLogic.debouncedSearchTerm
+        ? { searchTerm: filterLogic.debouncedSearchTerm }
+        : {}),
     };
     return Object.keys(merged).length > 0 ? merged : undefined;
   }, [
     filterLogic.activeFilters,
     filterLogic.dateRangeFilter,
-    filterLogic.searchTerm,
+    filterLogic.debouncedSearchTerm,
   ]);
 
   const data = useTasksData({
