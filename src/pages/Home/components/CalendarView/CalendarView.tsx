@@ -119,6 +119,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     confirmingDraft,
     deletingTaskIds,
     handleDeleteTask,
+    expandedTaskId,
+    handleToggleExpandTask,
+    timeslotHeight,
   } = useCalendarView();
 
   const isCurrentDateToday = isToday(currentDate);
@@ -448,6 +451,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       )}
       <CalendarContainer
         isDayView={currentView === Views.DAY}
+        timeslotHeight={timeslotHeight}
         sx={{
           flexGrow: 1,
           height: '100%',
@@ -622,6 +626,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                     onDeleteDraft={handleDeleteDraft}
                     onDeleteTask={handleDeleteTask}
                     onToggleSubtask={handleToggleSubtask}
+                    isExpanded={Boolean(
+                      expandedTaskId &&
+                      (props.event.id === expandedTaskId ||
+                        (props.event.resource &&
+                          'id' in props.event.resource &&
+                          (props.event.resource as { id: string }).id ===
+                            expandedTaskId)),
+                    )}
+                    onToggleExpand={() => {
+                      const taskId =
+                        props.event.resource && 'id' in props.event.resource
+                          ? (props.event.resource as { id: string }).id
+                          : props.event.id;
+                      handleToggleExpandTask(taskId);
+                    }}
                     isHighlighted={
                       hoveredEventId !== null &&
                       (props.event.id === hoveredEventId ||

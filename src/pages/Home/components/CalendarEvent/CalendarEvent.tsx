@@ -45,9 +45,24 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     currentView,
     isHighlighted,
     onToggleSubtask,
+    isExpanded: propIsExpanded,
+    onToggleExpand,
   } = props;
 
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [localExpanded, setLocalExpanded] = useState(false);
+  const isExpanded =
+    propIsExpanded !== undefined ? propIsExpanded : localExpanded;
+
+  const handleToggleDropdown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onToggleExpand) {
+      onToggleExpand();
+    } else {
+      setLocalExpanded((prev) => !prev);
+    }
+  };
+
   const eventRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -55,6 +70,18 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       eventRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [isHighlighted]);
+
+  useEffect(() => {
+    if (isExpanded && eventRef.current) {
+      const timer = setTimeout(() => {
+        eventRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isExpanded]);
 
   const isWeekView = currentView === 'week';
   const isMonthView = currentView === 'month';
@@ -154,11 +181,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
         <Box
           component="button"
           type="button"
-          onClick={(e: React.MouseEvent) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsExpanded((prev) => !prev);
-          }}
+          onClick={handleToggleDropdown}
           sx={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -270,8 +293,11 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               flexDirection: 'column',
               gap: '3px',
               maxHeight: '142px', // Height for up to 5 subtasks
-              overflowY: subtasks.length > 5 ? 'auto' : 'visible',
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
               pr: subtasks.length > 5 ? 0.5 : 0,
+              flex: 1,
+              minHeight: 0,
               scrollbarWidth: 'thin',
               '&::-webkit-scrollbar': { width: '4px' },
               '&::-webkit-scrollbar-thumb': {
