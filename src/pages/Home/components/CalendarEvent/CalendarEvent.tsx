@@ -230,7 +230,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     };
 
     const renderSubtasksPanel = () => {
-      if (!hasSubtasks || !isExpanded) return null;
+      if (!hasSubtasks) return null;
 
       return (
         <Box
@@ -239,27 +239,60 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             e.stopPropagation();
           }}
           sx={{
-            mt: 0.75,
-            pt: 0.75,
-            borderTop: '1px solid',
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            zIndex: 200,
+            mt: '2px',
+            borderRadius: '0 0 10px 10px',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(28, 28, 35, 0.97)'
+                : 'rgba(255, 255, 255, 0.98)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid',
+            borderTop: 'none',
             borderColor: (theme) =>
               theme.palette.mode === 'dark'
                 ? 'rgba(255, 255, 255, 0.12)'
                 : 'rgba(0, 0, 0, 0.08)',
+            boxShadow: (theme) =>
+              theme.palette.mode === 'dark'
+                ? '0 12px 28px -4px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)'
+                : '0 12px 28px -4px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)',
+            pt: 0.75,
+            pb: 0.75,
+            px: 0.75,
             display: 'flex',
             flexDirection: 'column',
             gap: '3px',
-            width: '100%',
             cursor: 'default',
+            // Transition
+            overflow: 'hidden',
+            transformOrigin: 'top center',
+            animation: isExpanded
+              ? 'subtaskSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+              : 'none',
+            visibility: isExpanded ? 'visible' : 'hidden',
+            '@keyframes subtaskSlideIn': {
+              '0%': {
+                opacity: 0,
+                transform: 'scaleY(0.88) translateY(-6px)',
+              },
+              '100%': {
+                opacity: 1,
+                transform: 'scaleY(1) translateY(0)',
+              },
+            },
           }}
         >
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
               px: 0.25,
-              mb: 0.2,
+              mb: 0.25,
             }}
           >
             <Typography
@@ -280,12 +313,9 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               display: 'flex',
               flexDirection: 'column',
               gap: '3px',
-              maxHeight: '142px', // Height for up to 5 subtasks
-              overflowY: 'auto',
-              overscrollBehavior: 'contain',
+              maxHeight: '142px',
+              overflowY: subtasks.length > 5 ? 'auto' : 'visible',
               pr: subtasks.length > 5 ? 0.5 : 0,
-              flex: 1,
-              minHeight: 0,
               scrollbarWidth: 'thin',
               '&::-webkit-scrollbar': { width: '4px' },
               '&::-webkit-scrollbar-thumb': {
