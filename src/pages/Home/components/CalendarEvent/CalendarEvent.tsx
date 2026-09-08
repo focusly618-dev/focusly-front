@@ -230,172 +230,179 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     };
 
     const renderSubtasksPanel = () => {
-      if (!hasSubtasks || !isExpanded) return null;
+      if (!hasSubtasks) return null;
 
       return (
+        // Outer wrapper handles expand/collapse transition
         <Box
           onClick={(e: React.MouseEvent) => {
             e.preventDefault();
             e.stopPropagation();
           }}
           sx={{
-            mt: 0.75,
-            pt: 0.75,
-            borderTop: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.12)'
-                : 'rgba(0, 0, 0, 0.09)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '3px',
-            width: '100%',
-            cursor: 'default',
-            // Slide-in animation
-            transformOrigin: 'top center',
-            animation:
-              'subtaskSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-            '@keyframes subtaskSlideIn': {
-              '0%': { opacity: 0, transform: 'translateY(-6px) scaleY(0.9)' },
-              '100%': { opacity: 1, transform: 'translateY(0) scaleY(1)' },
-            },
+            overflow: 'hidden',
+            maxHeight: isExpanded ? '600px' : '0px',
+            opacity: isExpanded ? 1 : 0,
+            transition: isExpanded
+              ? 'max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease'
+              : 'max-height 0.22s ease-in, opacity 0.15s ease-in',
           }}
         >
+          {/* Inner content — always rendered, animated by outer wrapper */}
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              px: 0.25,
-              mb: 0.2,
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: '9px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-                color: subtextColor,
-              }}
-            >
-              Subtareas ({completedSubtasksCount}/{totalSubtasksCount})
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
+              mt: 0.75,
+              pt: 0.75,
+              borderTop: '1px solid',
+              borderColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.12)'
+                  : 'rgba(0, 0, 0, 0.09)',
               display: 'flex',
               flexDirection: 'column',
               gap: '3px',
-              maxHeight: '142px',
-              overflowY: subtasks.length > 5 ? 'auto' : 'visible',
-              pr: subtasks.length > 5 ? 0.5 : 0,
-              scrollbarWidth: 'thin',
-              '&::-webkit-scrollbar': { width: '4px' },
-              '&::-webkit-scrollbar-thumb': {
-                background: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.2)'
-                    : 'rgba(0, 0, 0, 0.15)',
-                borderRadius: '2px',
-              },
+              width: '100%',
+              cursor: 'default',
             }}
           >
-            {subtasks.map((subtask) => (
-              <Box
-                key={subtask.id}
-                onClick={(e: React.MouseEvent) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (onToggleSubtask && taskResource) {
-                    onToggleSubtask(taskResource.id, subtask.id);
-                  }
-                }}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                px: 0.25,
+                mb: 0.2,
+              }}
+            >
+              <Typography
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.6,
-                  p: '3.5px 6px',
-                  borderRadius: '5px',
-                  cursor: onToggleSubtask ? 'pointer' : 'default',
-                  bgcolor: (theme) =>
-                    subtask.completed
-                      ? theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.02)'
-                        : 'rgba(0, 0, 0, 0.02)'
-                      : theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.06)'
-                        : 'rgba(255, 255, 255, 0.65)',
-                  border: '1px solid',
-                  borderColor: (theme) =>
-                    subtask.completed
-                      ? 'transparent'
-                      : theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.08)'
-                        : 'rgba(0, 0, 0, 0.06)',
-                  transition: 'all 0.15s ease',
-                  '&:hover': onToggleSubtask
-                    ? {
-                        bgcolor: (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.12)'
-                            : 'rgba(255, 255, 255, 0.95)',
-                        borderColor: (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.18)'
-                            : 'rgba(0, 0, 0, 0.12)',
-                      }
-                    : undefined,
+                  fontSize: '9px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  color: subtextColor,
                 }}
               >
-                {subtask.completed ? (
-                  <CheckedIcon
-                    sx={{ fontSize: 13, color: '#10b981', flexShrink: 0 }}
-                  />
-                ) : (
-                  <UncheckedIcon
-                    sx={{ fontSize: 13, color: subtextColor, flexShrink: 0 }}
-                  />
-                )}
+                Subtareas ({completedSubtasksCount}/{totalSubtasksCount})
+              </Typography>
+            </Box>
 
-                <Typography
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '3px',
+                maxHeight: '142px',
+                overflowY: subtasks.length > 5 ? 'auto' : 'visible',
+                pr: subtasks.length > 5 ? 0.5 : 0,
+                scrollbarWidth: 'thin',
+                '&::-webkit-scrollbar': { width: '4px' },
+                '&::-webkit-scrollbar-thumb': {
+                  background: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 0.15)',
+                  borderRadius: '2px',
+                },
+              }}
+            >
+              {subtasks.map((subtask) => (
+                <Box
+                  key={subtask.id}
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (onToggleSubtask && taskResource) {
+                      onToggleSubtask(taskResource.id, subtask.id);
+                    }
+                  }}
                   sx={{
-                    fontSize: '10.5px',
-                    fontWeight: 500,
-                    color: subtask.completed ? subtextColor : titleColor,
-                    textDecoration: subtask.completed ? 'line-through' : 'none',
-                    lineHeight: 1.2,
-                    flex: 1,
-                    minWidth: 0,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.6,
+                    p: '3.5px 6px',
+                    borderRadius: '5px',
+                    cursor: onToggleSubtask ? 'pointer' : 'default',
+                    bgcolor: (theme) =>
+                      subtask.completed
+                        ? theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.02)'
+                          : 'rgba(0, 0, 0, 0.02)'
+                        : theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.06)'
+                          : 'rgba(255, 255, 255, 0.65)',
+                    border: '1px solid',
+                    borderColor: (theme) =>
+                      subtask.completed
+                        ? 'transparent'
+                        : theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.06)',
+                    transition: 'all 0.15s ease',
+                    '&:hover': onToggleSubtask
+                      ? {
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.12)'
+                              : 'rgba(255, 255, 255, 0.95)',
+                          borderColor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.18)'
+                              : 'rgba(0, 0, 0, 0.12)',
+                        }
+                      : undefined,
                   }}
                 >
-                  {subtask.title}
-                </Typography>
+                  {subtask.completed ? (
+                    <CheckedIcon
+                      sx={{ fontSize: 13, color: '#10b981', flexShrink: 0 }}
+                    />
+                  ) : (
+                    <UncheckedIcon
+                      sx={{ fontSize: 13, color: subtextColor, flexShrink: 0 }}
+                    />
+                  )}
 
-                {Boolean(subtask.estimate_timer) && (
                   <Typography
                     sx={{
-                      fontSize: '9px',
-                      fontWeight: 600,
-                      color: subtextColor,
-                      flexShrink: 0,
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.07)'
-                          : 'rgba(0, 0, 0, 0.05)',
-                      px: 0.5,
-                      py: 0.1,
-                      borderRadius: '3px',
+                      fontSize: '10.5px',
+                      fontWeight: 500,
+                      color: subtask.completed ? subtextColor : titleColor,
+                      textDecoration: subtask.completed
+                        ? 'line-through'
+                        : 'none',
+                      lineHeight: 1.2,
+                      flex: 1,
+                      minWidth: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    {subtask.estimate_timer}m
+                    {subtask.title}
                   </Typography>
-                )}
-              </Box>
-            ))}
+
+                  {Boolean(subtask.estimate_timer) && (
+                    <Typography
+                      sx={{
+                        fontSize: '9px',
+                        fontWeight: 600,
+                        color: subtextColor,
+                        flexShrink: 0,
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.07)'
+                            : 'rgba(0, 0, 0, 0.05)',
+                        px: 0.5,
+                        py: 0.1,
+                        borderRadius: '3px',
+                      }}
+                    >
+                      {subtask.estimate_timer}m
+                    </Typography>
+                  )}
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Box>
       );
