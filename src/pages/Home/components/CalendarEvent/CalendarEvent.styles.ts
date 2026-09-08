@@ -366,6 +366,15 @@ export const EventContainer = styled(Box, {
         : '0 2px 6px rgba(0, 0, 0, 0.06)',
       zIndex: 20,
     },
+    '&[data-expanded="true"]': {
+      height: 'auto !important',
+      minHeight: '100% !important',
+      overflow: 'visible !important',
+      zIndex: '100 !important',
+      boxShadow: isDark
+        ? '0 12px 32px -4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15) !important'
+        : '0 12px 32px -4px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.1) !important',
+    },
   };
 });
 

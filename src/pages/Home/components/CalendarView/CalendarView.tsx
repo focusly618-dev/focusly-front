@@ -113,6 +113,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     isCalendarInDraftMode,
     setIsCalendarInDraftMode,
     handleDeleteDraft,
+    handleToggleSubtask,
     confirmDraftEvents,
     clearDraftEvents,
     confirmingDraft,
@@ -620,6 +621,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                     currentView={currentView}
                     onDeleteDraft={handleDeleteDraft}
                     onDeleteTask={handleDeleteTask}
+                    onToggleSubtask={handleToggleSubtask}
                     isHighlighted={
                       hoveredEventId !== null &&
                       (props.event.id === hoveredEventId ||

@@ -28,6 +28,7 @@ export interface CalendarEventProps {
   isDeleting?: boolean;
   onDeleteTask?: (taskId: string) => Promise<void> | void;
   isHighlighted?: boolean;
+  onToggleSubtask?: (taskId: string, subtaskId: string) => Promise<void> | void;
 }
 
 export interface UseCalendarContextMenuReturn {

@@ -1050,6 +1050,50 @@ export const useCalendarView = () => {
     return {};
   };
 
+  const handleToggleSubtask = async (taskId: string, subtaskId: string) => {
+    const targetTask = tasks.find((t) => t.id === taskId);
+    if (!targetTask || !targetTask.subtasks) return;
+
+    const updatedSubtasks = targetTask.subtasks.map((st) => {
+      if (st.id === subtaskId) {
+        const nextCompleted = !st.completed;
+        return {
+          ...st,
+          completed: nextCompleted,
+          completed_at: nextCompleted ? new Date().toISOString() : null,
+        };
+      }
+      return st;
+    });
+
+    // Optimistic update in Redux
+    dispatch(updateTask({ ...targetTask, subtasks: updatedSubtasks }));
+
+    try {
+      await updateTaskMutation({
+        variables: {
+          updateTaskInput: {
+            id: taskId,
+            subtasks: updatedSubtasks.map((s) => ({
+              id: s.id,
+              title: s.title,
+              completed: s.completed,
+              completed_at: s.completed_at || null,
+              estimate_timer: s.estimate_timer || null,
+            })),
+          },
+        },
+      });
+    } catch (err) {
+      console.error('Error updating subtask from calendar:', err);
+      // Rollback on failure
+      dispatch(updateTask(targetTask));
+      sileo.error({
+        title: getFriendlyErrorMessage(err, 'Error updating subtask'),
+      });
+    }
+  };
+
   return {
     events,
     skeletonEvents,
@@ -1063,6 +1107,7 @@ export const useCalendarView = () => {
     handleEventDrop,
     handleEventResize,
     handleDeleteTask,
+    handleToggleSubtask,
     handleModalClose,
     handleShowMore,
     tasks,
