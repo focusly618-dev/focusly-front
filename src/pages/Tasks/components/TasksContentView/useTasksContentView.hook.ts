@@ -24,7 +24,7 @@ export const useTasksContentView = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [prevViewMode, setPrevViewMode] = useState(viewMode);
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
-  const [limit, setLimit] = useState(PAGE_SIZE);
+  const [limit, setLimit] = useState(24);
   const [page, setPage] = useState(1);
 
   // Sync state if view mode changes
