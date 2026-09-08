@@ -31,6 +31,7 @@ import {
   contextMenuSx,
   PRIORITY_COLORS,
   getContrastTextColor,
+  resolveEventColors,
 } from './CalendarEvent.styles';
 
 import { resolveSemanticTheme } from './calendarSemanticTheme';
@@ -240,27 +241,36 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           }}
           sx={{
             position: 'absolute',
-            top: '100%',
+            // Overlap 1px so no gap appears between the card bottom border and the panel top border
+            top: 'calc(100% - 1px)',
             left: 0,
             right: 0,
             zIndex: 200,
-            mt: '2px',
             borderRadius: '0 0 10px 10px',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(28, 28, 35, 0.97)'
-                : 'rgba(255, 255, 255, 0.98)',
-            backdropFilter: 'blur(12px)',
+            bgcolor: (theme) => {
+              const colors = resolveEventColors(
+                theme,
+                semanticTheme,
+                variant.main,
+                variant.isCustom,
+              );
+              return colors.bg;
+            },
             border: '1px solid',
-            borderTop: 'none',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.12)'
-                : 'rgba(0, 0, 0, 0.08)',
+            borderTop: '1px solid',
+            borderColor: (theme) => {
+              const colors = resolveEventColors(
+                theme,
+                semanticTheme,
+                variant.main,
+                variant.isCustom,
+              );
+              return colors.border;
+            },
             boxShadow: (theme) =>
               theme.palette.mode === 'dark'
-                ? '0 12px 28px -4px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)'
-                : '0 12px 28px -4px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)',
+                ? '0 12px 28px -4px rgba(0,0,0,0.7)'
+                : '0 12px 28px -4px rgba(0,0,0,0.18)',
             pt: 0.75,
             pb: 0.75,
             px: 0.75,
@@ -268,7 +278,6 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             flexDirection: 'column',
             gap: '3px',
             cursor: 'default',
-            // Transition
             overflow: 'hidden',
             transformOrigin: 'top center',
             animation: isExpanded
