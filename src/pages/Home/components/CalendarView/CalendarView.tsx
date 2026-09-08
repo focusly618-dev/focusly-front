@@ -25,6 +25,7 @@ import {
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
 import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
+import { AwaitedTasksModal } from './components/AwaitedTasksModal';
 import type { AITimeBlockItem } from '@/api/AI/apiAIPlanner';
 import { surfaceColor } from '@/context';
 import { LuminaOrb } from '@/components/ui';
@@ -81,10 +82,120 @@ interface CalendarViewProps {
   onStartFocus: (task: Task) => void;
 }
 
+interface CalendarEventsContextValue {
+  onStartFocus: (task: Task) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  currentView: any;
+  handleDeleteDraft: (id: string) => void;
+  handleDeleteTask: (id: string) => void;
+  handleToggleSubtask?: (taskId: string, subtaskId: string) => void;
+  expandedTaskId: string | null;
+  handleToggleExpandTask: (taskId: string) => void;
+  hoveredEventId: string | null;
+  deletingTaskIds?: string[];
+  handleSlotContextMenu: (
+    e: React.MouseEvent,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    slotInfo: any,
+  ) => void;
+}
+
+const CalendarEventsContext =
+  React.createContext<CalendarEventsContextValue | null>(null);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const StableCalendarEvent = (props: any) => {
+  const ctx = React.useContext(CalendarEventsContext);
+  if (!ctx) return null;
+
+  if (props.event.type === 'skeleton') {
+    return (
+      <CalendarEventSkeleton
+        colorIndex={Number(props.event.id.split('-')[1]) || 0}
+      />
+    );
+  }
+
+  const isExpanded = Boolean(
+    ctx.expandedTaskId &&
+    (props.event.id === ctx.expandedTaskId ||
+      (props.event.resource &&
+        'id' in props.event.resource &&
+        (props.event.resource as { id: string }).id === ctx.expandedTaskId)),
+  );
+
+  const isHighlighted =
+    ctx.hoveredEventId !== null &&
+    (props.event.id === ctx.hoveredEventId ||
+      Boolean(
+        props.event.resource &&
+        'id' in props.event.resource &&
+        (props.event.resource as { id: string }).id === ctx.hoveredEventId,
+      ) ||
+      Boolean(
+        props.event.resource &&
+        'google_event_id' in props.event.resource &&
+        (props.event.resource as { google_event_id: string })
+          .google_event_id === ctx.hoveredEventId,
+      ));
+
+  const isDeleting =
+    ctx.deletingTaskIds?.includes(props.event.id) ||
+    Boolean(
+      props.event.resource &&
+      'id' in props.event.resource &&
+      ctx.deletingTaskIds?.includes(
+        (props.event.resource as { id: string }).id,
+      ),
+    ) ||
+    Boolean(
+      props.event.resource &&
+      'google_event_id' in props.event.resource &&
+      ctx.deletingTaskIds?.includes(
+        (props.event.resource as { google_event_id: string }).google_event_id,
+      ),
+    );
+
+  const handleToggleExpand = () => {
+    const taskId =
+      props.event.resource && 'id' in props.event.resource
+        ? (props.event.resource as { id: string }).id
+        : props.event.id;
+    ctx.handleToggleExpandTask(taskId);
+  };
+
+  return (
+    <CalendarEvent
+      {...props}
+      onStartFocus={ctx.onStartFocus}
+      currentView={ctx.currentView}
+      onDeleteDraft={ctx.handleDeleteDraft}
+      onDeleteTask={ctx.handleDeleteTask}
+      onToggleSubtask={ctx.handleToggleSubtask}
+      isExpanded={isExpanded}
+      onToggleExpand={handleToggleExpand}
+      isHighlighted={isHighlighted}
+      isDeleting={isDeleting}
+    />
+  );
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const StableSlotWrapper = (props: any) => {
+  const ctx = React.useContext(CalendarEventsContext);
+  return (
+    <CalendarSlotWrapper
+      {...props}
+      onContextMenu={ctx?.handleSlotContextMenu}
+    />
+  );
+};
+
 export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
   const { t, i18n } = useTranslation();
   const [isWeeklyPlannerOpen, setIsWeeklyPlannerOpen] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+  const [isAwaitedTasksModalOpen, setIsAwaitedTasksModalOpen] = useState(false);
   const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
   const {
     events,
@@ -122,6 +233,43 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     expandedTaskId,
     handleToggleExpandTask,
   } = useCalendarView();
+
+  const calendarEventsContextValue = useMemo<CalendarEventsContextValue>(
+    () => ({
+      onStartFocus,
+      currentView,
+      handleDeleteDraft,
+      handleDeleteTask,
+      handleToggleSubtask,
+      expandedTaskId,
+      handleToggleExpandTask,
+      hoveredEventId,
+      deletingTaskIds,
+      handleSlotContextMenu,
+    }),
+    [
+      onStartFocus,
+      currentView,
+      handleDeleteDraft,
+      handleDeleteTask,
+      handleToggleSubtask,
+      expandedTaskId,
+      handleToggleExpandTask,
+      hoveredEventId,
+      deletingTaskIds,
+      handleSlotContextMenu,
+    ],
+  );
+
+  const calendarComponents = useMemo(
+    () => ({
+      header: CalendarHeader,
+      event: StableCalendarEvent,
+      timeSlotWrapper: StableSlotWrapper,
+      dateCellWrapper: StableSlotWrapper,
+    }),
+    [],
+  );
 
   const isCurrentDateToday = isToday(currentDate);
 
@@ -579,140 +727,61 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             },
           }}
         >
-          <DnDCalendar
-            localizer={localizer}
-            toolbar={false}
-            events={isCalendarLoading ? [...events, ...skeletonEvents] : events}
-            startAccessor="start"
-            endAccessor="end"
-            view={currentView}
-            onView={handleOnChangeView}
-            date={currentDate}
-            onNavigate={(newDate) => handleOnNavigate(newDate as Date)}
-            onSelectSlot={handleSelectSlot}
-            onSelectEvent={handleSelectEvent}
-            onEventDrop={handleEventDrop}
-            onEventResize={handleEventResize}
-            draggableAccessor={(event: ICalendarEvent) =>
-              event.type !== 'skeleton'
-            }
-            resizableAccessor={(event: ICalendarEvent) =>
-              event.type !== 'skeleton'
-            }
-            scrollToTime={scrollToTime}
-            dayPropGetter={dayPropGetter}
-            slotPropGetter={slotPropGetter}
-            resizable
-            selectable
-            showAllEvents={false}
-            doShowMoreDrillDown={false}
-            dayLayoutAlgorithm="no-overlap"
-            showMultiDayTimes={true}
-            components={{
-              header: CalendarHeader,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              event: (props: any) =>
-                props.event.type === 'skeleton' ? (
-                  <CalendarEventSkeleton
-                    colorIndex={Number(props.event.id.split('-')[1]) || 0}
-                  />
-                ) : (
-                  <CalendarEvent
-                    {...props}
-                    onStartFocus={onStartFocus}
-                    currentView={currentView}
-                    onDeleteDraft={handleDeleteDraft}
-                    onDeleteTask={handleDeleteTask}
-                    onToggleSubtask={handleToggleSubtask}
-                    isExpanded={Boolean(
-                      expandedTaskId &&
-                      (props.event.id === expandedTaskId ||
-                        (props.event.resource &&
-                          'id' in props.event.resource &&
-                          (props.event.resource as { id: string }).id ===
-                            expandedTaskId)),
-                    )}
-                    onToggleExpand={() => {
-                      const taskId =
-                        props.event.resource && 'id' in props.event.resource
-                          ? (props.event.resource as { id: string }).id
-                          : props.event.id;
-                      handleToggleExpandTask(taskId);
-                    }}
-                    isHighlighted={
-                      hoveredEventId !== null &&
-                      (props.event.id === hoveredEventId ||
-                        Boolean(
-                          props.event.resource &&
-                          'id' in props.event.resource &&
-                          props.event.resource.id === hoveredEventId,
-                        ) ||
-                        Boolean(
-                          props.event.resource &&
-                          'google_event_id' in props.event.resource &&
-                          props.event.resource.google_event_id ===
-                            hoveredEventId,
-                        ))
-                    }
-                    isDeleting={
-                      deletingTaskIds?.includes(props.event.id) ||
-                      Boolean(
-                        props.event.resource &&
-                        'id' in props.event.resource &&
-                        deletingTaskIds?.includes(
-                          (props.event.resource as { id: string }).id,
-                        ),
-                      ) ||
-                      Boolean(
-                        props.event.resource &&
-                        'google_event_id' in props.event.resource &&
-                        deletingTaskIds?.includes(
-                          (
-                            props.event.resource as {
-                              google_event_id: string;
-                            }
-                          ).google_event_id,
-                        ),
-                      )
-                    }
-                  />
-                ),
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              timeSlotWrapper: (props: any) => (
-                <CalendarSlotWrapper
-                  {...props}
-                  onContextMenu={handleSlotContextMenu}
-                />
-              ),
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              dateCellWrapper: (props: any) => (
-                <CalendarSlotWrapper
-                  {...props}
-                  onContextMenu={handleSlotContextMenu}
-                />
-              ),
-            }}
-            step={5}
-            timeslots={12}
-            onShowMore={handleShowMore}
-            popup={false}
-            messages={{
-              showMore: (count: number) => t('calendar.showMore', { count }),
-            }}
-            formats={{
-              timeGutterFormat: (
-                date: Date,
-                culture?: string,
-                localizer?: {
-                  format: (
-                    date: Date,
-                    format: string,
-                    culture?: string,
-                  ) => string;
-                },
-              ) => (localizer ? localizer.format(date, 'h a', culture) : ''),
-            }}
-          />
+          <CalendarEventsContext.Provider value={calendarEventsContextValue}>
+            <DnDCalendar
+              localizer={localizer}
+              toolbar={false}
+              events={
+                isCalendarLoading ? [...events, ...skeletonEvents] : events
+              }
+              startAccessor="start"
+              endAccessor="end"
+              view={currentView}
+              onView={handleOnChangeView}
+              date={currentDate}
+              onNavigate={(newDate) => handleOnNavigate(newDate as Date)}
+              onSelectSlot={handleSelectSlot}
+              onSelectEvent={handleSelectEvent}
+              onEventDrop={handleEventDrop}
+              onEventResize={handleEventResize}
+              draggableAccessor={(event: ICalendarEvent) =>
+                event.type !== 'skeleton'
+              }
+              resizableAccessor={(event: ICalendarEvent) =>
+                event.type !== 'skeleton'
+              }
+              scrollToTime={scrollToTime}
+              dayPropGetter={dayPropGetter}
+              slotPropGetter={slotPropGetter}
+              resizable
+              selectable
+              showAllEvents={false}
+              doShowMoreDrillDown={false}
+              dayLayoutAlgorithm="no-overlap"
+              showMultiDayTimes={true}
+              components={calendarComponents}
+              step={5}
+              timeslots={12}
+              onShowMore={handleShowMore}
+              popup={false}
+              messages={{
+                showMore: (count: number) => t('calendar.showMore', { count }),
+              }}
+              formats={{
+                timeGutterFormat: (
+                  date: Date,
+                  culture?: string,
+                  localizer?: {
+                    format: (
+                      date: Date,
+                      format: string,
+                      culture?: string,
+                    ) => string;
+                  },
+                ) => (localizer ? localizer.format(date, 'h a', culture) : ''),
+              }}
+            />
+          </CalendarEventsContext.Provider>
         </Box>
 
         <Menu
@@ -774,6 +843,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           onWeeklyPlannerClick={() => setIsWeeklyPlannerOpen(true)}
           hoveredEventId={hoveredEventId}
           onHoverEvent={setHoveredEventId}
+          onToggleSubtask={handleToggleSubtask}
+          onViewAllClick={() => setIsAwaitedTasksModalOpen(true)}
         />
       </Box>
 
@@ -822,6 +893,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           }}
           hoveredEventId={hoveredEventId}
           onHoverEvent={setHoveredEventId}
+          onToggleSubtask={handleToggleSubtask}
+          onViewAllClick={() => {
+            setIsAwaitedTasksModalOpen(true);
+            setIsSidePanelOpen(false);
+          }}
         />
       </Drawer>
 
@@ -830,6 +906,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         onClose={() => setIsWeeklyPlannerOpen(false)}
         tasks={tasks}
         currentDate={currentDate}
+      />
+
+      <AwaitedTasksModal
+        open={isAwaitedTasksModalOpen}
+        onClose={() => setIsAwaitedTasksModalOpen(false)}
+        currentDate={currentDate}
+        events={events}
+        onSelectEvent={handleSelectEvent}
+        onToggleSubtask={handleToggleSubtask}
       />
     </Box>
   );

@@ -15,12 +15,20 @@ export interface ActionPreviewData {
   contentPreview?: string;
   /** Human-readable date this will land on the calendar, e.g. "Sun, Sep 7" */
   dateLabel?: string;
+  /** Formatted time range, e.g. "09:00 AM - 10:30 AM" */
+  timeRangeLabel?: string;
   /** Human-readable duration, e.g. "2h 30m" */
   durationLabel?: string;
   /** Priority label, e.g. "High" */
   priorityLabel?: string;
   /** Hex color matching the priority, for the chip */
   priorityColor?: string;
+  /** Subtasks breakdown list */
+  subtasks?: Array<{
+    title: string;
+    estimateTimer?: number;
+    durationLabel?: string;
+  }>;
 }
 
 export interface UseSuggestedActionCardReturn {

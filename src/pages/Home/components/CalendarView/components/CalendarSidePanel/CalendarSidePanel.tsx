@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { View } from 'react-big-calendar';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
@@ -7,6 +7,9 @@ import {
   Add as AddIcon,
   ChevronRight,
   AutoAwesome as AutoAwesomeIcon,
+  KeyboardArrowDownRounded as ArrowDownIcon,
+  CheckCircleRounded as CheckedIcon,
+  RadioButtonUncheckedRounded as UncheckedIcon,
 } from '@mui/icons-material';
 import {
   startOfWeek,
@@ -150,6 +153,8 @@ interface CalendarSidePanelProps {
   onWeeklyPlannerClick?: () => void;
   hoveredEventId?: string | null;
   onHoverEvent?: (eventId: string | null) => void;
+  onToggleSubtask?: (taskId: string, subtaskId: string) => void;
+  onViewAllClick?: () => void;
 }
 
 export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
@@ -164,8 +169,22 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   onWeeklyPlannerClick,
   hoveredEventId,
   onHoverEvent,
+  onToggleSubtask,
+  onViewAllClick,
 }) => {
   const { t } = useTranslation();
+  const [expandedTaskIds, setExpandedTaskIds] = useState<
+    Record<string, boolean>
+  >({});
+
+  const handleToggleCardSubtasks = (e: React.MouseEvent, eventId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setExpandedTaskIds((prev) => ({
+      ...prev,
+      [eventId]: !prev[eventId],
+    }));
+  };
   const miniWeekDays = useMemo(() => {
     const startOfSelectedWeek = startOfWeek(currentDate, { weekStartsOn: 1 }); // 1 = Monday
     return Array.from({ length: 7 }, (_, i) => addDays(startOfSelectedWeek, i));
@@ -462,6 +481,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
             <Button
               variant="text"
               size="small"
+              onClick={onViewAllClick}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
@@ -526,8 +546,22 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       status?: string;
                       color?: string;
                       notes_encrypted?: string;
+                      subtasks?: Array<{
+                        id: string;
+                        title: string;
+                        completed: boolean;
+                        estimate_timer?: number;
+                      }>;
                     })
                   : null;
+                const subtasks = task?.subtasks || [];
+                const hasSubtasks = isTask && subtasks.length > 0;
+                const completedSubtasksCount = subtasks.filter(
+                  (s) => s.completed,
+                ).length;
+                const totalSubtasksCount = subtasks.length;
+                const isSubtasksExpanded = Boolean(expandedTaskIds[event.id]);
+
                 const category = task ? task.category || 'General' : 'Meeting';
                 const taskCustomColor =
                   task?.color && task.color !== '#1e293b'
@@ -560,8 +594,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                     onMouseLeave={() => onHoverEvent?.(null)}
                     sx={{
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      flexDirection: 'column',
                       p: 1,
                       borderRadius: 1,
                       bgcolor: isHovered
@@ -618,60 +651,258 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 1,
-                        minWidth: 0,
+                        justifyContent: 'space-between',
+                        width: '100%',
                       }}
                     >
                       <Box
                         sx={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: '50%',
-                          bgcolor: categoryColor,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          minWidth: 0,
+                          flex: 1,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            bgcolor: categoryColor,
+                            flexShrink: 0,
+                          }}
+                        />
+                        <Box sx={{ minWidth: 0, flex: 1, pr: 0.5 }}>
+                          <Typography
+                            variant="body2"
+                            noWrap
+                            sx={{
+                              fontWeight: 600,
+                              color: (theme) =>
+                                (theme as { appMode?: string }).appMode ===
+                                'graydark'
+                                  ? '#f8fafc'
+                                  : 'text.primary',
+                              fontSize: '12px',
+                              lineHeight: 1.2,
+                              mb: 0.2,
+                            }}
+                          >
+                            {event.title}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: (theme) =>
+                                (theme as { appMode?: string }).appMode ===
+                                'graydark'
+                                  ? '#cbd5e1'
+                                  : 'text.secondary',
+                              fontSize: '10.5px',
+                              lineHeight: 1.1,
+                            }}
+                          >
+                            {timeString}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
                           flexShrink: 0,
                         }}
-                      />
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography
-                          variant="body2"
-                          noWrap
+                      >
+                        {hasSubtasks && (
+                          <Box
+                            component="button"
+                            type="button"
+                            onClick={(e) =>
+                              handleToggleCardSubtasks(e, event.id)
+                            }
+                            sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.3,
+                              px: 0.6,
+                              py: 0.2,
+                              borderRadius: '4px',
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              border: '1px solid',
+                              borderColor: (theme) =>
+                                isSubtasksExpanded
+                                  ? theme.palette.mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.2)'
+                                    : 'rgba(0, 0, 0, 0.15)'
+                                  : 'divider',
+                              bgcolor: (theme) =>
+                                isSubtasksExpanded
+                                  ? theme.palette.mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.1)'
+                                    : 'rgba(0, 0, 0, 0.06)'
+                                  : 'transparent',
+                              color: 'text.secondary',
+                              outline: 'none',
+                              transition: 'all 0.15s ease',
+                              '&:hover': {
+                                bgcolor: (theme) =>
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.15)'
+                                    : 'rgba(0, 0, 0, 0.08)',
+                                color: 'text.primary',
+                              },
+                            }}
+                          >
+                            <span>
+                              {completedSubtasksCount}/{totalSubtasksCount}
+                            </span>
+                            <ArrowDownIcon
+                              sx={{
+                                fontSize: 13,
+                                transition: 'transform 0.2s ease',
+                                transform: isSubtasksExpanded
+                                  ? 'rotate(180deg)'
+                                  : 'rotate(0deg)',
+                              }}
+                            />
+                          </Box>
+                        )}
+                        <ChevronRight
                           sx={{
-                            fontWeight: 600,
-                            color: (theme) =>
-                              (theme as { appMode?: string }).appMode ===
-                              'graydark'
-                                ? '#f8fafc'
-                                : 'text.primary',
-                            fontSize: '12px',
-                            lineHeight: 1.2,
-                            mb: 0.2,
+                            fontSize: 16,
+                            color: 'text.disabled',
                           }}
-                        >
-                          {event.title}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: (theme) =>
-                              (theme as { appMode?: string }).appMode ===
-                              'graydark'
-                                ? '#cbd5e1'
-                                : 'text.secondary',
-                            fontSize: '10.5px',
-                            lineHeight: 1.1,
-                          }}
-                        >
-                          {timeString}
-                        </Typography>
+                        />
                       </Box>
                     </Box>
-                    <ChevronRight
-                      sx={{
-                        fontSize: 16,
-                        color: 'text.disabled',
-                        flexShrink: 0,
-                      }}
-                    />
+
+                    {/* Expandable Subtasks Accordion */}
+                    {hasSubtasks && (
+                      <Box
+                        onClick={(e: React.MouseEvent) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                        sx={{
+                          display: 'grid',
+                          gridTemplateRows: isSubtasksExpanded ? '1fr' : '0fr',
+                          opacity: isSubtasksExpanded ? 1 : 0,
+                          transition:
+                            'grid-template-rows 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease',
+                          width: '100%',
+                        }}
+                      >
+                        <Box sx={{ minHeight: 0, overflow: 'hidden' }}>
+                          <Box
+                            sx={{
+                              pt: 0.75,
+                              mt: 0.5,
+                              borderTop: '1px solid',
+                              borderColor: (theme) =>
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(255, 255, 255, 0.08)'
+                                  : 'rgba(0, 0, 0, 0.06)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '2px',
+                            }}
+                          >
+                            {subtasks.map((subtask) => (
+                              <Box
+                                key={subtask.id}
+                                onClick={(e: React.MouseEvent) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (task?.id && onToggleSubtask) {
+                                    onToggleSubtask(task.id, subtask.id);
+                                  }
+                                }}
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.6,
+                                  p: '2.5px 4px',
+                                  borderRadius: '4px',
+                                  cursor: onToggleSubtask
+                                    ? 'pointer'
+                                    : 'default',
+                                  transition: 'background-color 0.15s ease',
+                                  '&:hover': onToggleSubtask
+                                    ? {
+                                        bgcolor: (theme) =>
+                                          theme.palette.mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.06)'
+                                            : 'rgba(0, 0, 0, 0.04)',
+                                      }
+                                    : undefined,
+                                }}
+                              >
+                                {subtask.completed ? (
+                                  <CheckedIcon
+                                    sx={{
+                                      fontSize: 13,
+                                      color: '#10b981',
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                ) : (
+                                  <UncheckedIcon
+                                    sx={{
+                                      fontSize: 13,
+                                      color: 'text.disabled',
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                )}
+                                <Typography
+                                  variant="caption"
+                                  noWrap
+                                  sx={{
+                                    fontSize: '11px',
+                                    fontWeight: 500,
+                                    color: subtask.completed
+                                      ? 'text.disabled'
+                                      : 'text.primary',
+                                    textDecoration: subtask.completed
+                                      ? 'line-through'
+                                      : 'none',
+                                    flex: 1,
+                                    minWidth: 0,
+                                  }}
+                                >
+                                  {subtask.title}
+                                </Typography>
+                                {Boolean(subtask.estimate_timer) && (
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      fontSize: '9px',
+                                      fontWeight: 600,
+                                      color: 'text.secondary',
+                                      bgcolor: (theme) =>
+                                        theme.palette.mode === 'dark'
+                                          ? 'rgba(255, 255, 255, 0.08)'
+                                          : 'rgba(0, 0, 0, 0.05)',
+                                      px: 0.4,
+                                      py: 0.1,
+                                      borderRadius: '3px',
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    {subtask.estimate_timer}m
+                                  </Typography>
+                                )}
+                              </Box>
+                            ))}
+                          </Box>
+                        </Box>
+                      </Box>
+                    )}
                   </Box>
                 );
               })

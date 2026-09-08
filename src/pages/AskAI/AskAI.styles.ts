@@ -43,35 +43,72 @@ export const CenteredColumn = styled(Box)({
 
 /* ── Welcome / Hero ────────────────────────────────────────────────────────── */
 
-export const WelcomeSection = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  textAlign: 'center',
-  paddingTop: '60px',
-  paddingBottom: '36px',
-  gap: '12px',
+export const WelcomeSection = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  const isGray = theme.appMode === 'graydark';
+  return {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    paddingTop: '60px',
+    paddingBottom: '36px',
+    gap: '12px',
+    position: 'relative',
+    width: '100%',
+    '&::before': isDark
+      ? {
+          content: '""',
+          position: 'absolute',
+          top: '15px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '500px',
+          height: '280px',
+          background: isGray
+            ? 'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%)'
+            : 'radial-gradient(ellipse at center, rgba(96, 165, 250, 0.08) 0%, rgba(32, 32, 36, 0.04) 50%, transparent 75%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+          filter: 'blur(30px)',
+        }
+      : {},
+  };
 });
 
-export const MascotWrapper = styled(Box)(({ theme }) => ({
-  width: '88px',
-  height: '88px',
-  borderRadius: '50%',
-  background: surfaceColor(
-    theme,
-    'radial-gradient(circle at 35% 35%, #1e3a5f 0%, #0d1117 100%)',
-    'radial-gradient(circle at 35% 35%, #2A2A2C 0%, #19191A 100%)',
-    'radial-gradient(circle at 35% 35%, #dbeafe 0%, #eff6ff 100%)',
-  ),
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  boxShadow:
-    theme.palette.mode === 'dark'
-      ? '0 0 0 12px rgba(19, 127, 236, 0.07), 0 8px 32px rgba(0,0,0,0.4)'
+export const MascotWrapper = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  const isGray = theme.appMode === 'graydark';
+  return {
+    width: '88px',
+    height: '88px',
+    borderRadius: '50%',
+    position: 'relative',
+    zIndex: 1,
+    background: surfaceColor(
+      theme,
+      'radial-gradient(circle at 35% 35%, #242429 0%, #121214 100%)',
+      'radial-gradient(circle at 35% 35%, #2A2A2C 0%, #19191A 100%)',
+      'radial-gradient(circle at 35% 35%, #dbeafe 0%, #eff6ff 100%)',
+    ),
+    border: `1px solid ${
+      isDark
+        ? isGray
+          ? 'rgba(255, 255, 255, 0.08)'
+          : 'rgba(96, 165, 250, 0.22)'
+        : 'rgba(19, 127, 236, 0.15)'
+    }`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: isDark
+      ? isGray
+        ? '0 0 0 8px rgba(255, 255, 255, 0.02), 0 8px 32px rgba(0,0,0,0.5)'
+        : '0 0 0 8px rgba(96, 165, 250, 0.05), 0 8px 32px rgba(0,0,0,0.6), 0 0 28px rgba(96, 165, 250, 0.12)'
       : '0 0 0 12px rgba(19, 127, 236, 0.07), 0 8px 32px rgba(19, 127, 236, 0.15)',
-  marginBottom: '8px',
-}));
+    marginBottom: '8px',
+  };
+});
 
 /* ── Suggestion cards ──────────────────────────────────────────────────────── */
 
@@ -81,6 +118,8 @@ export const SuggestionGrid = styled(Box)({
   gap: '12px',
   width: '100%',
   marginTop: '8px',
+  position: 'relative',
+  zIndex: 1,
   '@media (max-width: 600px)': {
     gridTemplateColumns: '1fr',
   },
@@ -88,6 +127,7 @@ export const SuggestionGrid = styled(Box)({
 
 export const SuggestionCard = styled(Box)(({ theme }) => {
   const isDark = theme.palette.mode === 'dark';
+  const isGray = theme.appMode === 'graydark';
   return {
     display: 'flex',
     flexDirection: 'row',
@@ -95,20 +135,30 @@ export const SuggestionCard = styled(Box)(({ theme }) => {
     gap: '16px',
     padding: '16px 20px',
     borderRadius: '16px',
-    border: `1px solid ${theme.palette.divider}`,
+    border: `1px solid ${
+      isDark
+        ? isGray
+          ? 'rgba(255, 255, 255, 0.07)'
+          : 'rgba(255, 255, 255, 0.08)'
+        : theme.palette.divider
+    }`,
     backgroundColor: isDark
-      ? 'rgba(255, 255, 255, 0.02)'
+      ? surfaceColor(theme, '#18181B', '#242425', 'rgba(241, 245, 249, 0.5)')
       : 'rgba(241, 245, 249, 0.5)',
     cursor: 'pointer',
     transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
     userSelect: 'none',
-    boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.02)',
+    boxShadow: isDark
+      ? '0 2px 8px rgba(0,0,0,0.35)'
+      : '0 1px 3px rgba(0,0,0,0.02)',
     '&:hover': {
       transform: 'translateY(-2px)',
       borderColor: theme.palette.primary.main,
-      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#ffffff',
+      backgroundColor: isDark
+        ? surfaceColor(theme, '#202024', '#2C2C2E', '#ffffff')
+        : '#ffffff',
       boxShadow: isDark
-        ? '0 10px 30px rgba(0,0,0,0.2)'
+        ? '0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(96, 165, 250, 0.1)'
         : '0 10px 30px rgba(79, 70, 229, 0.06)',
     },
     '&:active': {
@@ -132,24 +182,27 @@ export const MessageRow = styled(Box)<{ isUser?: boolean }>(({ isUser }) => ({
   },
 }));
 
-export const AvatarWrapper = styled(Box)(({ theme }) => ({
-  width: '32px',
-  height: '32px',
-  borderRadius: '50%',
-  flexShrink: 0,
-  overflow: 'hidden',
-  background: surfaceColor(
-    theme,
-    'linear-gradient(135deg, #0f2d55 0%, #1a1f2e 100%)',
-    'linear-gradient(135deg, #2A2A2C 0%, #19191A 100%)',
-    'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)',
-  ),
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  border: `1.5px solid ${theme.palette.divider}`,
-  marginTop: '2px',
-}));
+export const AvatarWrapper = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    width: '32px',
+    height: '32px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    overflow: 'hidden',
+    background: surfaceColor(
+      theme,
+      'linear-gradient(135deg, #242429 0%, #121214 100%)',
+      'linear-gradient(135deg, #2A2A2C 0%, #19191A 100%)',
+      'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)',
+    ),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: `1.5px solid ${isDark ? 'rgba(96, 165, 250, 0.25)' : theme.palette.divider}`,
+    marginTop: '2px',
+  };
+});
 
 export const UserAvatar = styled(Box)(() => ({
   width: '32px',
@@ -264,26 +317,28 @@ export const InputWrapper = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
 }));
 
-export const InputBox = styled(Paper)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'flex-end',
-  gap: '8px',
-  padding: '8px 10px 8px 16px',
-  borderRadius: '12px',
-  width: '100%',
-  maxWidth: '780px',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255,255,255,0.02)'
+export const InputBox = styled(Paper)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    display: 'flex',
+    alignItems: 'flex-end',
+    gap: '8px',
+    padding: '8px 10px 8px 16px',
+    borderRadius: '12px',
+    width: '100%',
+    maxWidth: '780px',
+    backgroundColor: isDark
+      ? surfaceColor(theme, '#18181B', '#1F1F20', 'rgba(255,255,255,0.95)')
       : 'rgba(255,255,255,0.95)',
-  border: `1px solid ${theme.palette.divider}`,
-  boxShadow: 'none',
-  transition: 'border-color 0.2s, box-shadow 0.2s',
-  '&:focus-within': {
-    borderColor: theme.palette.primary.main,
-    boxShadow: `0 0 0 3px ${theme.palette.primary.main}25`,
-  },
-}));
+    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : theme.palette.divider}`,
+    boxShadow: isDark ? '0 4px 20px rgba(0, 0, 0, 0.25)' : 'none',
+    transition: 'border-color 0.2s, box-shadow 0.2s',
+    '&:focus-within': {
+      borderColor: theme.palette.primary.main,
+      boxShadow: `0 0 0 3px ${theme.palette.primary.main}25`,
+    },
+  };
+});
 
 export const StyledInput = styled(TextField)(({ theme }) => ({
   flex: 1,
@@ -332,7 +387,7 @@ export const HistorySidebar = styled(Box)(({ theme }) => ({
   height: '100%',
   backgroundColor: surfaceColor(
     theme,
-    'rgba(15, 23, 42, 0.6)',
+    'rgba(18, 18, 20, 0.85)',
     'rgba(36, 36, 37, 0.6)',
     'rgba(248, 250, 252, 0.8)',
   ),
@@ -366,7 +421,7 @@ export const ChatHeader = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
   backgroundColor: surfaceColor(
     theme,
-    'rgba(15, 23, 42, 0.4)',
+    'rgba(15, 15, 16, 0.85)',
     'rgba(36, 36, 37, 0.4)',
     'rgba(255, 255, 255, 0.4)',
   ),

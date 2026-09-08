@@ -139,6 +139,28 @@ export const CalendarEvent = (props: CalendarEventProps) => {
   const completedSubtasksCount = subtasks.filter((s) => s.completed).length;
   const totalSubtasksCount = subtasks.length;
 
+  // Keep the card expanded during the close animation so it doesn't
+  // instantly clip the wrapper's closing transition
+  const [isClosing, setIsClosing] = useState(false);
+  const [prevExpanded, setPrevExpanded] = useState(isExpanded);
+
+  // Synchronously detect closing transition in state adjustment during render (React recommended pattern)
+  if (prevExpanded !== isExpanded) {
+    setPrevExpanded(isExpanded);
+    if (prevExpanded && !isExpanded && hasSubtasks) {
+      setIsClosing(true);
+    }
+  }
+
+  useEffect(() => {
+    if (isClosing) {
+      const timer = setTimeout(() => setIsClosing(false), 260);
+      return () => clearTimeout(timer);
+    }
+  }, [isClosing]);
+
+  const keepExpanded = isExpanded || isClosing;
+
   const renderClassic = () => {
     const isCustom = variant.isCustom;
     const contrast = isCustom ? getContrastTextColor(variant.main) : null;
@@ -233,175 +255,185 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       if (!hasSubtasks) return null;
 
       return (
-        // Outer wrapper handles expand/collapse transition
+        // Outer wrapper: controls expand/collapse animation with CSS grid rows
         <Box
           onClick={(e: React.MouseEvent) => {
             e.preventDefault();
             e.stopPropagation();
           }}
           sx={{
-            overflow: 'hidden',
-            maxHeight: isExpanded ? '600px' : '0px',
+            display: 'grid',
+            gridTemplateRows: isExpanded ? '1fr' : '0fr',
             opacity: isExpanded ? 1 : 0,
-            transition: isExpanded
-              ? 'max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease'
-              : 'max-height 0.22s ease-in, opacity 0.15s ease-in',
+            transition:
+              'grid-template-rows 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease',
+            width: '100%',
           }}
         >
-          {/* Inner content — always rendered, animated by outer wrapper */}
+          {/* Direct child with minHeight 0 and overflow hidden allows grid row to animate between 0 and full content height */}
           <Box
             sx={{
-              mt: 0.75,
-              pt: 0.75,
-              borderTop: '1px solid',
-              borderColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.12)'
-                  : 'rgba(0, 0, 0, 0.09)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '3px',
-              width: '100%',
-              cursor: 'default',
+              minHeight: 0,
+              overflow: 'hidden',
             }}
           >
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                px: 0.25,
-                mb: 0.2,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: '9px',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
-                  color: subtextColor,
-                }}
-              >
-                Subtareas ({completedSubtasksCount}/{totalSubtasksCount})
-              </Typography>
-            </Box>
-
-            <Box
-              sx={{
+                pt: 0.75,
+                borderTop: '1px solid',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.12)'
+                    : 'rgba(0, 0, 0, 0.09)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '3px',
-                maxHeight: '142px',
-                overflowY: subtasks.length > 5 ? 'auto' : 'visible',
-                pr: subtasks.length > 5 ? 0.5 : 0,
-                scrollbarWidth: 'thin',
-                '&::-webkit-scrollbar': { width: '4px' },
-                '&::-webkit-scrollbar-thumb': {
-                  background: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 0.15)',
-                  borderRadius: '2px',
-                },
+                width: '100%',
+                cursor: 'default',
               }}
             >
-              {subtasks.map((subtask) => (
-                <Box
-                  key={subtask.id}
-                  onClick={(e: React.MouseEvent) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (onToggleSubtask && taskResource) {
-                      onToggleSubtask(taskResource.id, subtask.id);
-                    }
-                  }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  px: 0.25,
+                  mb: 0.2,
+                }}
+              >
+                <Typography
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.6,
-                    p: '3.5px 6px',
-                    borderRadius: '5px',
-                    cursor: onToggleSubtask ? 'pointer' : 'default',
-                    bgcolor: (theme) =>
-                      subtask.completed
-                        ? theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.02)'
-                          : 'rgba(0, 0, 0, 0.02)'
-                        : theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.06)'
-                          : 'rgba(255, 255, 255, 0.65)',
-                    border: '1px solid',
-                    borderColor: (theme) =>
-                      subtask.completed
-                        ? 'transparent'
-                        : theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.08)'
-                          : 'rgba(0, 0, 0, 0.06)',
-                    transition: 'all 0.15s ease',
-                    '&:hover': onToggleSubtask
-                      ? {
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.12)'
-                              : 'rgba(255, 255, 255, 0.95)',
-                          borderColor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.18)'
-                              : 'rgba(0, 0, 0, 0.12)',
-                        }
-                      : undefined,
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: subtextColor,
                   }}
                 >
-                  {subtask.completed ? (
-                    <CheckedIcon
-                      sx={{ fontSize: 13, color: '#10b981', flexShrink: 0 }}
-                    />
-                  ) : (
-                    <UncheckedIcon
-                      sx={{ fontSize: 13, color: subtextColor, flexShrink: 0 }}
-                    />
-                  )}
+                  Subtareas ({completedSubtasksCount}/{totalSubtasksCount})
+                </Typography>
+              </Box>
 
-                  <Typography
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                  maxHeight: '142px',
+                  overflowY: subtasks.length > 5 ? 'auto' : 'visible',
+                  pr: subtasks.length > 5 ? 0.5 : 0,
+                  scrollbarWidth: 'thin',
+                  '&::-webkit-scrollbar': { width: '4px' },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : 'rgba(0, 0, 0, 0.15)',
+                    borderRadius: '2px',
+                  },
+                }}
+              >
+                {subtasks.map((subtask) => (
+                  <Box
+                    key={subtask.id}
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (onToggleSubtask && taskResource) {
+                        onToggleSubtask(taskResource.id, subtask.id);
+                      }
+                    }}
                     sx={{
-                      fontSize: '10.5px',
-                      fontWeight: 500,
-                      color: subtask.completed ? subtextColor : titleColor,
-                      textDecoration: subtask.completed
-                        ? 'line-through'
-                        : 'none',
-                      lineHeight: 1.2,
-                      flex: 1,
-                      minWidth: 0,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.6,
+                      p: '3.5px 6px',
+                      borderRadius: '5px',
+                      cursor: onToggleSubtask ? 'pointer' : 'default',
+                      bgcolor: (theme) =>
+                        subtask.completed
+                          ? theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.02)'
+                            : 'rgba(0, 0, 0, 0.02)'
+                          : theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.06)'
+                            : 'rgba(255, 255, 255, 0.65)',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        subtask.completed
+                          ? 'transparent'
+                          : theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.08)'
+                            : 'rgba(0, 0, 0, 0.06)',
+                      transition: 'all 0.15s ease',
+                      '&:hover': onToggleSubtask
+                        ? {
+                            bgcolor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.12)'
+                                : 'rgba(255, 255, 255, 0.95)',
+                            borderColor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.18)'
+                                : 'rgba(0, 0, 0, 0.12)',
+                          }
+                        : undefined,
                     }}
                   >
-                    {subtask.title}
-                  </Typography>
+                    {subtask.completed ? (
+                      <CheckedIcon
+                        sx={{ fontSize: 13, color: '#10b981', flexShrink: 0 }}
+                      />
+                    ) : (
+                      <UncheckedIcon
+                        sx={{
+                          fontSize: 13,
+                          color: subtextColor,
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
 
-                  {Boolean(subtask.estimate_timer) && (
                     <Typography
                       sx={{
-                        fontSize: '9px',
-                        fontWeight: 600,
-                        color: subtextColor,
-                        flexShrink: 0,
-                        bgcolor: (theme) =>
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.07)'
-                            : 'rgba(0, 0, 0, 0.05)',
-                        px: 0.5,
-                        py: 0.1,
-                        borderRadius: '3px',
+                        fontSize: '10.5px',
+                        fontWeight: 500,
+                        color: subtask.completed ? subtextColor : titleColor,
+                        textDecoration: subtask.completed
+                          ? 'line-through'
+                          : 'none',
+                        lineHeight: 1.2,
+                        flex: 1,
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
                       }}
                     >
-                      {subtask.estimate_timer}m
+                      {subtask.title}
                     </Typography>
-                  )}
-                </Box>
-              ))}
+
+                    {Boolean(subtask.estimate_timer) && (
+                      <Typography
+                        sx={{
+                          fontSize: '9px',
+                          fontWeight: 600,
+                          color: subtextColor,
+                          flexShrink: 0,
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.07)'
+                              : 'rgba(0, 0, 0, 0.05)',
+                          px: 0.5,
+                          py: 0.1,
+                          borderRadius: '3px',
+                        }}
+                      >
+                        {subtask.estimate_timer}m
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Box>
             </Box>
           </Box>
         </Box>
@@ -412,7 +444,11 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       <EventContainer
         ref={eventRef}
         data-highlighted={isHighlighted ? 'true' : undefined}
-        data-expanded={hasSubtasks && isExpanded ? 'true' : undefined}
+        data-expanded={hasSubtasks && keepExpanded ? 'true' : undefined}
+        data-active-expanded={hasSubtasks && isExpanded ? 'true' : undefined}
+        data-closing={
+          hasSubtasks && !isExpanded && keepExpanded ? 'true' : undefined
+        }
         variant={variant}
         isCustomColor={variant.isCustom}
         semanticTheme={semanticTheme}
@@ -429,11 +465,11 @@ export const CalendarEvent = (props: CalendarEventProps) => {
         sx={{
           position: 'relative',
           ...(hasSubtasks &&
-            isExpanded && {
+            keepExpanded && {
               height: 'auto !important',
               minHeight: '100% !important',
               overflow: 'visible !important',
-              zIndex: 100,
+              zIndex: isExpanded ? 300 : 50,
             }),
           p: isMonthView
             ? '2px 6px'

@@ -9,10 +9,6 @@ import {
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { GET_TASKS, GET_TASKS_TITLES } from '@/pages/Tasks/Tasks.graphql';
-import {
-  GET_PROJECT_GROUPS,
-  GET_WORKSPACES,
-} from '@/pages/Workspace/Workspace.graphql';
 import type { ParsedLuminaAction } from '@/utils';
 import type { ActionPreviewData } from './suggestedActionCard.types';
 
@@ -112,13 +108,35 @@ export const getActionPreviewData = (
       Number(action.payload.estimate_timer) || 1800,
     );
     const deadline = parseDeadline(action.payload.deadline);
+    let timeRangeLabel: string | undefined;
+    if (deadline) {
+      const end = new Date(deadline.getTime() + estimateTimer * 60000);
+      timeRangeLabel = `${format(deadline, 'h:mm a')} - ${format(end, 'h:mm a')}`;
+    }
+
+    const rawSubtasks = action.payload.subtasks || [];
+    const subtasks = rawSubtasks.map((s) => {
+      const title = typeof s === 'string' ? s : s.title;
+      const timer =
+        typeof s === 'object' && s.estimate_timer
+          ? normalizeEstimateTimer(s.estimate_timer)
+          : undefined;
+      return {
+        title,
+        estimateTimer: timer,
+        durationLabel: timer ? formatDuration(timer) : undefined,
+      };
+    });
+
     return {
       title: action.payload.title || 'AI Task',
       description: action.payload.notes_encrypted || undefined,
       dateLabel: deadline ? formatDateLabel(deadline) : undefined,
+      timeRangeLabel,
       durationLabel: formatDuration(estimateTimer),
       priorityLabel: PRIORITY_LABELS[priorityLevel] || 'Medium',
       priorityColor: PRIORITY_COLORS[priorityLevel] || PRIORITY_COLORS[2],
+      subtasks: subtasks.length > 0 ? subtasks : undefined,
     };
   }
   if (action.type === 'UPDATE_TASK') {
@@ -136,10 +154,19 @@ export const getActionPreviewData = (
   if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE') {
     const raw =
       action.payload.content_encrypted || action.payload.content || '';
+    const projectName =
+      action.payload.project_name ||
+      action.payload.new_project_name ||
+      (action.payload.title
+        ? action.payload.title
+            .replace(/^(?:Reporte|Investigación|Proyecto|Documento):\s*/i, '')
+            .trim()
+        : undefined);
     return {
       title:
         action.payload.title ||
         (action.type === 'CREATE_NOTE' ? 'AI Note' : 'AI Workspace'),
+      description: projectName ? `📁 Proyecto: ${projectName}` : undefined,
       contentPreview: raw ? truncate(stripMarkdown(raw), 180) : undefined,
     };
   }
@@ -161,8 +188,7 @@ export const getActionIcon = (
   if (action.type === 'UPDATE_TASK') return <RescheduleIcon sx={sx} />;
   if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE')
     return <DescriptionIcon sx={sx} />;
-  if (action.type === 'INSERT_TO_WORKSPACE')
-    return <AssignmentIcon sx={sx} />;
+  if (action.type === 'INSERT_TO_WORKSPACE') return <AssignmentIcon sx={sx} />;
   return <FolderIcon sx={sx} />;
 };
 
@@ -193,6 +219,28 @@ export const executeSingleAction = async (
     );
     const deadline = parseDeadline(action.payload.deadline) ?? new Date();
 
+    const rawSubtasks = action.payload.subtasks || [];
+    const formattedSubtasks = rawSubtasks.map((s, idx) => {
+      const title = typeof s === 'string' ? s : s.title;
+      const timer =
+        typeof s === 'object' && s.estimate_timer
+          ? normalizeEstimateTimer(s.estimate_timer)
+          : undefined;
+      return {
+        id:
+          typeof s === 'object' && s.id
+            ? s.id
+            : `subtask-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 7)}`,
+        title,
+        completed:
+          typeof s === 'object' && typeof s.completed === 'boolean'
+            ? s.completed
+            : false,
+        completed_at: null,
+        estimate_timer: timer || null,
+      };
+    });
+
     const res = await ctx.createTask({
       variables: {
         createTaskInput: {
@@ -209,6 +257,7 @@ export const executeSingleAction = async (
           user_id: ctx.userId,
           status: 'Backlog',
           use_ai: true,
+          subtasks: formattedSubtasks,
           // The user picked this exact day on purpose (a day-by-day plan,
           // including deliberate weekend days) — never let the
           // auto-scheduler move it. skip_scheduling only protects THIS
@@ -264,59 +313,108 @@ export const executeSingleAction = async (
       if (deadline) updateTaskInput.deadline = deadline.toISOString();
     }
     if (action.payload.estimated_start_date) {
-      const start = parseDeadline(action.payload.estimated_start_date);
-      if (start) updateTaskInput.estimated_start_date = start.toISOString();
-    }
-    if (action.payload.estimated_end_date) {
-      const end = parseDeadline(action.payload.estimated_end_date);
-      if (end) updateTaskInput.estimated_end_date = end.toISOString();
+      const rawStart = action.payload.estimated_start_date;
+      const rawEnd = action.payload.estimated_end_date;
+      const rawDeadline = action.payload.deadline;
+
+      const startDate = parseDeadline(rawStart);
+      const deadlineDate = parseDeadline(rawDeadline || rawStart);
+      let endDate = parseDeadline(rawEnd);
+
+      if (startDate && !endDate && action.payload.estimate_timer) {
+        endDate = new Date(
+          startDate.getTime() +
+            normalizeEstimateTimer(action.payload.estimate_timer) * 60000,
+        );
+      }
+
+      if (startDate) {
+        updateTaskInput.estimated_start_date = format(
+          startDate,
+          "yyyy-MM-dd'T'HH:mm:ss",
+        );
+      }
+      if (endDate) {
+        updateTaskInput.estimated_end_date = format(
+          endDate,
+          "yyyy-MM-dd'T'HH:mm:ss",
+        );
+      }
+      if (deadlineDate) {
+        updateTaskInput.deadline = format(
+          deadlineDate,
+          "yyyy-MM-dd'T'HH:mm:ss",
+        );
+      }
     }
 
     const res = await ctx.updateTask({
-      variables: { updateTaskInput },
-      refetchQueries: [
-        { query: GET_TASKS, variables: { userId: ctx.userId } },
-        {
-          query: GET_TASKS_TITLES,
-          variables: { userId: ctx.userId, limit: 24, offset: 0 },
-        },
-      ],
+      variables: {
+        updateTaskInput,
+      },
+      refetchQueries: [{ query: GET_TASKS }, { query: GET_TASKS_TITLES }],
     });
     return { id: res.data?.updateTask?.id };
   }
 
-  if (action.type === 'CREATE_WORKSPACE') {
-    const res = await ctx.createWorkspace({
-      variables: {
-        createWorkspaceInput: {
-          title: action.payload.title || 'AI Workspace',
-          content: action.payload.content || '[]',
-          groupId: action.payload.groupId || null,
-          saveStatus: true,
-        },
-      },
-      refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
-    });
-    return { id: res.data?.createWorkspace?.id };
-  }
+  if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE') {
+    const isNote = action.type === 'CREATE_NOTE';
+    const title = action.payload.title || (isNote ? 'AI Note' : 'AI Workspace');
+    let rawContent =
+      action.payload.content ||
+      action.payload.content_encrypted ||
+      action.payload.markdown ||
+      '';
 
-  if (action.type === 'CREATE_NOTE') {
+    if (!rawContent || rawContent === '[]') {
+      rawContent = isNote
+        ? `# ${title}\n\nNota creada por Lumina.\n`
+        : `# ${title}\n\n## Resumen / Objetivos\nDocumento de trabajo generado por Lumina.\n\n## Secciones de Investigación\n- [ ] Recopilar fuentes y antecedentes\n- [ ] Desarrollo de conceptos clave\n- [ ] Conclusiones y referencias\n`;
+    }
+
+    let targetGroupId =
+      action.payload.project_group_id || action.payload.groupId || null;
+
+    if (!targetGroupId) {
+      const projectName =
+        action.payload.project_name ||
+        action.payload.new_project_name ||
+        title
+          .replace(/^(?:Reporte|Investigación|Proyecto|Documento):\s*/i, '')
+          .trim() ||
+        title;
+
+      try {
+        const projectRes = await ctx.createProjectGroup({
+          variables: {
+            input: {
+              name: projectName,
+              color: action.payload.color || '#6366f1',
+              emoji: action.payload.emoji || '📁',
+            },
+          },
+          refetchQueries: ['GetProjectGroups', 'GetProjectGroupsPaginated'],
+        });
+        targetGroupId = projectRes.data?.createProjectGroup?.id || null;
+      } catch (err) {
+        console.error('Error auto-creating project group for workspace:', err);
+      }
+    }
+
     const res = await ctx.createWorkspace({
       variables: {
         createWorkspaceInput: {
-          title: action.payload.title || 'AI Note',
-          content:
-            action.payload.content_encrypted ||
-            action.payload.content ||
-            '[]',
-          groupId:
-            action.payload.project_group_id ||
-            action.payload.groupId ||
-            null,
+          title,
+          content: rawContent,
+          groupId: targetGroupId,
           saveStatus: true,
         },
       },
-      refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
+      refetchQueries: [
+        'GetWorkspacesPaginated',
+        'GetProjectGroups',
+        'GetProjectGroupsPaginated',
+      ],
     });
     return { id: res.data?.createWorkspace?.id };
   }
@@ -325,12 +423,15 @@ export const executeSingleAction = async (
     const res = await ctx.createProjectGroup({
       variables: {
         input: {
-          name: action.payload.name || 'AI Project Group',
-          color: '#3b82f6',
-          emoji: '📁',
+          name:
+            action.payload.name ||
+            action.payload.project_name ||
+            'AI Project Group',
+          color: action.payload.color || '#6366f1',
+          emoji: action.payload.emoji || '📁',
         },
       },
-      refetchQueries: [{ query: GET_PROJECT_GROUPS }],
+      refetchQueries: ['GetProjectGroups', 'GetProjectGroupsPaginated'],
     });
     return { id: res.data?.createProjectGroup?.id };
   }

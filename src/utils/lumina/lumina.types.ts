@@ -16,6 +16,19 @@ export interface LuminaActionPayload {
   markdown?: string;
   content_encrypted?: string;
   project_group_id?: string;
+  project_name?: string;
+  new_project_name?: string;
+  emoji?: string;
+  color?: string;
+  subtasks?: Array<
+    | string
+    | {
+        id?: string;
+        title: string;
+        estimate_timer?: number;
+        completed?: boolean;
+      }
+  >;
 }
 
 export interface ParsedLuminaAction {

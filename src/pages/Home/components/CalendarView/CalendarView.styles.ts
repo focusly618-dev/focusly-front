@@ -230,11 +230,20 @@ export const CalendarContainer = styled(Box, {
       zIndex: '1000 !important' as unknown as number,
     },
     '& .rbc-event:has([data-expanded="true"])': {
-      zIndex: '150 !important' as unknown as number,
+      zIndex: '50 !important' as unknown as number,
       overflow: 'visible !important',
       height: 'auto !important',
     },
     '& .rbc-event:has([data-expanded="true"]) .rbc-event-content': {
+      overflow: 'visible !important',
+      height: 'auto !important',
+    },
+    '& .rbc-event:has([data-active-expanded="true"])': {
+      zIndex: '300 !important' as unknown as number,
+      overflow: 'visible !important',
+      height: 'auto !important',
+    },
+    '& .rbc-event:has([data-active-expanded="true"]) .rbc-event-content': {
       overflow: 'visible !important',
       height: 'auto !important',
     },
