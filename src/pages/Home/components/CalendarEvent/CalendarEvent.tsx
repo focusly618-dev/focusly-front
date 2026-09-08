@@ -53,6 +53,8 @@ export const CalendarEvent = (props: CalendarEventProps) => {
   const isExpanded =
     propIsExpanded !== undefined ? propIsExpanded : localExpanded;
 
+  const eventRef = useRef<HTMLDivElement | null>(null);
+
   const handleToggleDropdown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -63,25 +65,11 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     }
   };
 
-  const eventRef = useRef<HTMLDivElement | null>(null);
-
   useEffect(() => {
     if (isHighlighted && eventRef.current) {
       eventRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [isHighlighted]);
-
-  useEffect(() => {
-    if (isExpanded && eventRef.current) {
-      const timer = setTimeout(() => {
-        eventRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isExpanded]);
 
   const isWeekView = currentView === 'week';
   const isMonthView = currentView === 'month';

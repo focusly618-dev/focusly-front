@@ -367,10 +367,13 @@ export const EventContainer = styled(Box, {
       zIndex: 20,
     },
     '&[data-expanded="true"]': {
-      zIndex: 100,
+      height: 'auto !important',
+      minHeight: '100% !important',
+      overflow: 'visible !important',
+      zIndex: '150 !important',
       boxShadow: isDark
-        ? '0 12px 32px -4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15) !important'
-        : '0 12px 32px -4px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.1) !important',
+        ? '0 16px 36px -4px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.2) !important'
+        : '0 16px 36px -4px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.12) !important',
     },
   };
 });

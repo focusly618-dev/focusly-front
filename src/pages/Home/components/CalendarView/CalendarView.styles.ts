@@ -2,13 +2,8 @@ import { Box, styled } from '@mui/material';
 import { surfaceColor } from '@/context';
 
 export const CalendarContainer = styled(Box, {
-  shouldForwardProp: (prop) =>
-    prop !== 'isDayView' && prop !== 'timeslotHeight',
-})<{ isDayView?: boolean; timeslotHeight?: number }>(({
-  theme,
-  isDayView,
-  timeslotHeight = 84,
-}) => {
+  shouldForwardProp: (prop) => prop !== 'isDayView',
+})<{ isDayView?: boolean }>(({ theme, isDayView }) => {
   const isDark = theme.palette.mode === 'dark';
 
   // ── Use the SAME colors as the global MUI theme ──
@@ -116,12 +111,11 @@ export const CalendarContainer = styled(Box, {
     '& .rbc-timeslot-group': {
       backgroundColor: 'transparent !important',
       borderBottom: `1px solid ${dividerStrong} !important`,
-      minHeight: `${timeslotHeight}px`,
+      minHeight: '84px',
       display: 'flex',
       flexDirection: 'column',
-      transition: 'min-height 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       [theme.breakpoints.down('sm')]: {
-        minHeight: `${Math.max(64, Math.round(timeslotHeight * 0.75))}px`,
+        minHeight: '64px',
       },
     },
     '& .rbc-time-slot': {
@@ -236,7 +230,13 @@ export const CalendarContainer = styled(Box, {
       zIndex: '1000 !important' as unknown as number,
     },
     '& .rbc-event:has([data-expanded="true"])': {
-      zIndex: '100 !important' as unknown as number,
+      zIndex: '150 !important' as unknown as number,
+      overflow: 'visible !important',
+      height: 'auto !important',
+    },
+    '& .rbc-event:has([data-expanded="true"]) .rbc-event-content': {
+      overflow: 'visible !important',
+      height: 'auto !important',
     },
 
     // ── Current time indicator (Active Timeline Line & Badge) ──

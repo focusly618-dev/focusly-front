@@ -1105,50 +1105,6 @@ export const useCalendarView = () => {
     setExpandedTaskId(null);
   }, [currentDate, currentView]);
 
-  // Compute dynamic timeslot height so the expanded task duration block stretches
-  // physically to fit its subtasks without spilling over into subsequent time slots
-  const timeslotHeight = useMemo(() => {
-    if (!expandedTaskId) return 84;
-    const task =
-      tasks.find((t) => t.id === expandedTaskId) ||
-      (events.find(
-        (e) =>
-          e.id === expandedTaskId ||
-          (e.resource as Task)?.id === expandedTaskId,
-      )?.resource as Task | undefined);
-
-    if (!task) return 84;
-
-    let durationMinutes = task.estimate_timer || 60;
-    const event = events.find(
-      (e) =>
-        e.id === expandedTaskId || (e.resource as Task)?.id === expandedTaskId,
-    );
-    if (event?.start && event?.end) {
-      const start = new Date(event.start).getTime();
-      const end = new Date(event.end).getTime();
-      if (!isNaN(start) && !isNaN(end) && end > start) {
-        durationMinutes = Math.max(15, Math.round((end - start) / 60000));
-      }
-    } else if (task.estimated_start_date && task.estimated_end_date) {
-      const start = new Date(task.estimated_start_date).getTime();
-      const end = new Date(task.estimated_end_date).getTime();
-      if (!isNaN(start) && !isNaN(end) && end > start) {
-        durationMinutes = Math.max(15, Math.round((end - start) / 60000));
-      }
-    }
-
-    const durationHours = durationMinutes / 60;
-    const subtaskCount = Math.min(5, task.subtasks?.length || 1);
-    // Header (~40px) + subtasks (~28px * items up to 5) + padding & margins (~20px)
-    const neededPx = 42 + subtaskCount * 28 + 20;
-    // Since in React-Big-Calendar: eventHeightPx = durationHours * timeslotHeight
-    // We need timeslotHeight = neededPx / durationHours
-    const requiredHourHeight = Math.ceil(neededPx / durationHours);
-    // Clamp between 130px and 280px to maintain comfortable layout
-    return Math.min(280, Math.max(130, requiredHourHeight));
-  }, [expandedTaskId, tasks, events]);
-
   return {
     events,
     skeletonEvents,
@@ -1165,7 +1121,6 @@ export const useCalendarView = () => {
     handleToggleSubtask,
     expandedTaskId,
     handleToggleExpandTask,
-    timeslotHeight,
     handleModalClose,
     handleShowMore,
     tasks,

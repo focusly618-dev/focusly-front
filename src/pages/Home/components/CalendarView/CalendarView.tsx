@@ -121,7 +121,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     handleDeleteTask,
     expandedTaskId,
     handleToggleExpandTask,
-    timeslotHeight,
   } = useCalendarView();
 
   const isCurrentDateToday = isToday(currentDate);
@@ -451,7 +450,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       )}
       <CalendarContainer
         isDayView={currentView === Views.DAY}
-        timeslotHeight={timeslotHeight}
         sx={{
           flexGrow: 1,
           height: '100%',
