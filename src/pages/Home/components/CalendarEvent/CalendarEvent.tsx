@@ -31,7 +31,6 @@ import {
   contextMenuSx,
   PRIORITY_COLORS,
   getContrastTextColor,
-  resolveEventColors,
 } from './CalendarEvent.styles';
 
 import { resolveSemanticTheme } from './calendarSemanticTheme';
@@ -231,7 +230,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     };
 
     const renderSubtasksPanel = () => {
-      if (!hasSubtasks) return null;
+      if (!hasSubtasks || !isExpanded) return null;
 
       return (
         <Box
@@ -240,59 +239,25 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             e.stopPropagation();
           }}
           sx={{
-            position: 'absolute',
-            // Overlap 1px so no gap appears between the card bottom border and the panel top border
-            top: 'calc(100% - 1px)',
-            left: 0,
-            right: 0,
-            zIndex: 200,
-            borderRadius: '0 0 10px 10px',
-            bgcolor: (theme) => {
-              const colors = resolveEventColors(
-                theme,
-                semanticTheme,
-                variant.main,
-                variant.isCustom,
-              );
-              return colors.bg;
-            },
-            border: '1px solid',
-            borderTop: '1px solid',
-            borderColor: (theme) => {
-              const colors = resolveEventColors(
-                theme,
-                semanticTheme,
-                variant.main,
-                variant.isCustom,
-              );
-              return colors.border;
-            },
-            boxShadow: (theme) =>
-              theme.palette.mode === 'dark'
-                ? '0 12px 28px -4px rgba(0,0,0,0.7)'
-                : '0 12px 28px -4px rgba(0,0,0,0.18)',
+            mt: 0.75,
             pt: 0.75,
-            pb: 0.75,
-            px: 0.75,
+            borderTop: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.12)'
+                : 'rgba(0, 0, 0, 0.09)',
             display: 'flex',
             flexDirection: 'column',
             gap: '3px',
+            width: '100%',
             cursor: 'default',
-            overflow: 'hidden',
+            // Slide-in animation
             transformOrigin: 'top center',
-            animation: isExpanded
-              ? 'subtaskSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards'
-              : 'none',
-            visibility: isExpanded ? 'visible' : 'hidden',
+            animation:
+              'subtaskSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards',
             '@keyframes subtaskSlideIn': {
-              '0%': {
-                opacity: 0,
-                transform: 'scaleY(0.88) translateY(-6px)',
-              },
-              '100%': {
-                opacity: 1,
-                transform: 'scaleY(1) translateY(0)',
-              },
+              '0%': { opacity: 0, transform: 'translateY(-6px) scaleY(0.9)' },
+              '100%': { opacity: 1, transform: 'translateY(0) scaleY(1)' },
             },
           }}
         >
@@ -301,7 +266,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               display: 'flex',
               alignItems: 'center',
               px: 0.25,
-              mb: 0.25,
+              mb: 0.2,
             }}
           >
             <Typography
