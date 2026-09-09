@@ -184,6 +184,9 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       return theme.palette.mode === 'dark' ? '#94a3b8' : '#64748b';
     };
 
+    const isDarkBg = (theme: { palette: { mode: string } }) =>
+      contrast ? contrast.isDarkBg : theme.palette.mode === 'dark';
+
     const renderSubtasksDropdownTrigger = () => {
       if (!hasSubtasks || isMonthView) return null;
 
@@ -202,38 +205,48 @@ export const CalendarEvent = (props: CalendarEventProps) => {
             cursor: 'pointer',
             border: '1px solid',
             outline: 'none',
-            bgcolor: (theme) =>
-              isExpanded
-                ? theme.palette.mode === 'dark'
+            bgcolor: (theme) => {
+              const dark = isDarkBg(theme);
+              return isExpanded
+                ? dark
                   ? 'rgba(255, 255, 255, 0.16)'
                   : 'rgba(0, 0, 0, 0.1)'
-                : theme.palette.mode === 'dark'
+                : dark
                   ? 'rgba(255, 255, 255, 0.08)'
-                  : 'rgba(0, 0, 0, 0.05)',
-            borderColor: (theme) =>
-              isExpanded
-                ? theme.palette.mode === 'dark'
+                  : 'rgba(0, 0, 0, 0.05)';
+            },
+            borderColor: (theme) => {
+              const dark = isDarkBg(theme);
+              return isExpanded
+                ? dark
                   ? 'rgba(255, 255, 255, 0.3)'
                   : 'rgba(0, 0, 0, 0.2)'
-                : theme.palette.mode === 'dark'
+                : dark
                   ? 'rgba(255, 255, 255, 0.14)'
-                  : 'rgba(0, 0, 0, 0.08)',
-            color: (theme) =>
-              theme.palette.mode === 'dark' ? '#f1f5f9' : '#1e293b',
+                  : 'rgba(0, 0, 0, 0.08)';
+            },
+            color: (theme) => {
+              if (contrast) return contrast.primary;
+              return theme.palette.mode === 'dark' ? '#f1f5f9' : '#1e293b';
+            },
             fontSize: '9.5px',
             fontWeight: 700,
             lineHeight: 1,
             flexShrink: 0,
             transition: 'all 0.15s ease',
             '&:hover': {
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
+              bgcolor: (theme) => {
+                const dark = isDarkBg(theme);
+                return dark
                   ? 'rgba(255, 255, 255, 0.22)'
-                  : 'rgba(0, 0, 0, 0.14)',
-              borderColor: (theme) =>
-                theme.palette.mode === 'dark'
+                  : 'rgba(0, 0, 0, 0.14)';
+              },
+              borderColor: (theme) => {
+                const dark = isDarkBg(theme);
+                return dark
                   ? 'rgba(255, 255, 255, 0.4)'
-                  : 'rgba(0, 0, 0, 0.28)',
+                  : 'rgba(0, 0, 0, 0.28)';
+              },
             },
           }}
         >
@@ -281,10 +294,12 @@ export const CalendarEvent = (props: CalendarEventProps) => {
               sx={{
                 pt: 0.75,
                 borderTop: '1px solid',
-                borderColor: (theme) =>
-                  theme.palette.mode === 'dark'
+                borderColor: (theme) => {
+                  const dark = isDarkBg(theme);
+                  return dark
                     ? 'rgba(255, 255, 255, 0.12)'
-                    : 'rgba(0, 0, 0, 0.09)',
+                    : 'rgba(0, 0, 0, 0.09)';
+                },
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '3px',
@@ -324,10 +339,12 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                   scrollbarWidth: 'thin',
                   '&::-webkit-scrollbar': { width: '4px' },
                   '&::-webkit-scrollbar-thumb': {
-                    background: (theme) =>
-                      theme.palette.mode === 'dark'
+                    background: (theme) => {
+                      const dark = isDarkBg(theme);
+                      return dark
                         ? 'rgba(255, 255, 255, 0.2)'
-                        : 'rgba(0, 0, 0, 0.15)',
+                        : 'rgba(0, 0, 0, 0.15)';
+                    },
                     borderRadius: '2px',
                   },
                 }}
@@ -349,32 +366,40 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                       p: '3.5px 6px',
                       borderRadius: '5px',
                       cursor: onToggleSubtask ? 'pointer' : 'default',
-                      bgcolor: (theme) =>
-                        subtask.completed
-                          ? theme.palette.mode === 'dark'
+                      bgcolor: (theme) => {
+                        const dark = isDarkBg(theme);
+                        return subtask.completed
+                          ? dark
                             ? 'rgba(255, 255, 255, 0.02)'
                             : 'rgba(0, 0, 0, 0.02)'
-                          : theme.palette.mode === 'dark'
+                          : dark
                             ? 'rgba(255, 255, 255, 0.06)'
-                            : 'rgba(255, 255, 255, 0.65)',
+                            : 'rgba(255, 255, 255, 0.65)';
+                      },
                       border: '1px solid',
-                      borderColor: (theme) =>
-                        subtask.completed
+                      borderColor: (theme) => {
+                        const dark = isDarkBg(theme);
+                        return subtask.completed
                           ? 'transparent'
-                          : theme.palette.mode === 'dark'
+                          : dark
                             ? 'rgba(255, 255, 255, 0.08)'
-                            : 'rgba(0, 0, 0, 0.06)',
+                            : 'rgba(0, 0, 0, 0.06)';
+                      },
                       transition: 'all 0.15s ease',
                       '&:hover': onToggleSubtask
                         ? {
-                            bgcolor: (theme) =>
-                              theme.palette.mode === 'dark'
+                            bgcolor: (theme) => {
+                              const dark = isDarkBg(theme);
+                              return dark
                                 ? 'rgba(255, 255, 255, 0.12)'
-                                : 'rgba(255, 255, 255, 0.95)',
-                            borderColor: (theme) =>
-                              theme.palette.mode === 'dark'
+                                : 'rgba(255, 255, 255, 0.95)';
+                            },
+                            borderColor: (theme) => {
+                              const dark = isDarkBg(theme);
+                              return dark
                                 ? 'rgba(255, 255, 255, 0.18)'
-                                : 'rgba(0, 0, 0, 0.12)',
+                                : 'rgba(0, 0, 0, 0.12)';
+                            },
                           }
                         : undefined,
                     }}
@@ -419,10 +444,12 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                           fontWeight: 600,
                           color: subtextColor,
                           flexShrink: 0,
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
+                          bgcolor: (theme) => {
+                            const dark = isDarkBg(theme);
+                            return dark
                               ? 'rgba(255, 255, 255, 0.07)'
-                              : 'rgba(0, 0, 0, 0.05)',
+                              : 'rgba(0, 0, 0, 0.05)';
+                          },
                           px: 0.5,
                           py: 0.1,
                           borderRadius: '3px',

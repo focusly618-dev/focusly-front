@@ -16,10 +16,10 @@ import {
   DialogContentText,
   DialogActions,
   CircularProgress,
+  LinearProgress,
 } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
 import {
-  Send as SendIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
@@ -32,6 +32,12 @@ import {
   WarningAmberRounded as WarningIcon,
   ChatBubbleOutline as ChatIcon,
   AttachFile as AttachFileIcon,
+  ContentCopy as CopyIcon,
+  ThumbUpOutlined as ThumbUpOutlinedIcon,
+  Mic as MicIcon,
+  Search as SearchIcon,
+  ArrowForward as ArrowForwardIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
@@ -65,10 +71,14 @@ import {
   MascotWrapper,
   SuggestionGrid,
   SuggestionCard,
-  MessageRow,
   AvatarWrapper,
   UserAvatar,
   MessageBubble,
+  DateSeparator,
+  AIMessageWrapper,
+  AIMessageHeader,
+  AIMessageActions,
+  SuggestionsBar,
   TypingIndicator,
   LuminaWorkingIndicator,
   InputWrapper,
@@ -79,6 +89,7 @@ import {
   ChatAreaWrapper,
   ChatHeader,
   ModelBadgeButton,
+  StatusPill,
 } from './AskAI.styles';
 
 import {
@@ -113,7 +124,33 @@ interface Message {
   // tasks (e.g. one per week of a month-long plan), hence the array.
   actions?: ParsedLuminaAction[];
   attachedFiles?: AttachedFileMeta[];
+  createdAt?: string | Date;
 }
+
+const formatTodayDate = () => {
+  const now = new Date();
+  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long' };
+  const dateStr = now.toLocaleDateString('es-ES', options).toUpperCase();
+  return `HOY • ${dateStr}`;
+};
+
+const formatMessageTime = (date?: string | Date) => {
+  if (!date) {
+    const now = new Date();
+    return now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  }
+  const d = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+};
 
 const parseAttachedFilesFromContent = (
   rawContent: string,
@@ -207,6 +244,15 @@ const renderMarkdown = (text: string, isDark: boolean, theme: Theme) => {
     }
     return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">${text}</a>`;
   });
+
+  // 4b. Quoted task names or entities: "Task name" -> styled highlighted pill
+  const pillBg = isDark ? 'rgba(96, 165, 250, 0.16)' : '#eff6ff';
+  const pillBorder = isDark ? 'rgba(96, 165, 250, 0.35)' : '#dbeafe';
+  const pillColor = isDark ? '#93c5fd' : '#1e40af';
+  html = html.replace(
+    /&quot;([^&"\n]{3,80})&quot;|"([^"\n]{3,80})"/g,
+    `<span style="display: inline-block; background-color: ${pillBg}; border: 1px solid ${pillBorder}; color: ${pillColor}; font-weight: 700; padding: 1px 7px; border-radius: 6px; margin: 0 2px;">"$1$2"</span>`,
+  );
 
   // 5. Lists: lines starting with "- " or "* " -> <li>...</li>
   const lines = html.split('\n');
@@ -452,7 +498,59 @@ export const AskAI: React.FC = () => {
   >('main');
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(true);
+  const [historySearch, setHistorySearch] = useState('');
   const inputBoxRef = useRef<HTMLDivElement>(null);
+
+  const handleCopyMessage = (text: string) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    sileo.success({ title: 'Copiado al portapapeles' });
+  };
+
+  const handleFeedback = () => {
+    sileo.success({ title: '¡Gracias por tu feedback!' });
+  };
+
+  const filteredConversations = conversations.filter(
+    (c) =>
+      !historySearch.trim() ||
+      (c.title || '').toLowerCase().includes(historySearch.toLowerCase()),
+  );
+
+  const groupedConversations = React.useMemo(() => {
+    const today: AIConversation[] = [];
+    const yesterday: AIConversation[] = [];
+    const older: AIConversation[] = [];
+
+    const now = new Date();
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    ).getTime();
+    const yesterdayStart = todayStart - 86400000;
+
+    filteredConversations.forEach((c) => {
+      const time = c.updatedAt ? new Date(c.updatedAt).getTime() : 0;
+      if (time >= todayStart) {
+        today.push(c);
+      } else if (time >= yesterdayStart) {
+        yesterday.push(c);
+      } else {
+        older.push(c);
+      }
+    });
+
+    const groups: { label: string; items: AIConversation[] }[] = [];
+    if (today.length > 0) groups.push({ label: 'Hoy', items: today });
+    if (yesterday.length > 0) groups.push({ label: 'Ayer', items: yesterday });
+    if (older.length > 0) groups.push({ label: 'Anteriores', items: older });
+    if (groups.length === 0 && filteredConversations.length > 0) {
+      groups.push({ label: 'Conversaciones', items: filteredConversations });
+    }
+    return groups;
+  }, [filteredConversations]);
 
   const { data: workspacesData, loading: workspacesLoading } = useQuery(
     GET_WORKSPACES,
@@ -508,6 +606,7 @@ export const AskAI: React.FC = () => {
               : '',
             actions: m.actions ?? [],
             attachedFiles: parsedFiles,
+            createdAt: m.createdAt || new Date().toISOString(),
           };
         }),
       );
@@ -728,15 +827,6 @@ export const AskAI: React.FC = () => {
     }
   };
 
-  const getModelIcon = (model: string, isMenu: boolean = false) => {
-    const size = isMenu ? 16 : 14;
-    const mr = isMenu ? 1.5 : 0.5;
-    if (model.startsWith('claude')) {
-      return <ClaudeIcon sx={{ fontSize: size, color: '#cc6543', mr }} />;
-    }
-    return <GeminiIcon sx={{ fontSize: size, color: '#137fec', mr }} />;
-  };
-
   const biggestTask = tasks.reduce(
     (prev, curr) =>
       (curr.estimated_end_date &&
@@ -874,6 +964,7 @@ export const AskAI: React.FC = () => {
           size: f.size,
           type: f.type,
         })),
+        createdAt: new Date().toISOString(),
       };
 
       const baseHistory = customHistory || messages;
@@ -902,6 +993,7 @@ export const AskAI: React.FC = () => {
         sender: 'ai',
         text: '',
         html: '',
+        createdAt: new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev, aiMsg]);
@@ -1028,26 +1120,126 @@ export const AskAI: React.FC = () => {
       <ChatAreaWrapper>
         {/* ── Chat Header with Model Selector ── */}
         <ChatHeader>
-          <Box display="flex" alignItems="center" gap={1}>
-            <LuminaAnimatedFace size={20} primaryColor={primaryColor} />
-            <Typography
-              variant="subtitle2"
-              fontWeight={800}
-              color="text.primary"
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <Box
+              sx={{
+                width: 38,
+                height: 38,
+                borderRadius: '10px',
+                bgcolor: (t) =>
+                  t.palette.mode === 'dark'
+                    ? 'rgba(99, 102, 241, 0.15)'
+                    : '#ffffff',
+                border: '1.5px solid',
+                borderColor: (t) =>
+                  t.palette.mode === 'dark'
+                    ? 'rgba(99, 102, 241, 0.4)'
+                    : '#c7d2fe',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 6px rgba(99, 102, 241, 0.08)',
+                flexShrink: 0,
+              }}
             >
-              Lumina AI Chat
-            </Typography>
+              <LuminaAnimatedFace size={22} primaryColor={primaryColor} />
+            </Box>
+            <Box display="flex" flexDirection="column" gap={0.2}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={800}
+                  color="text.primary"
+                  sx={{ fontSize: '15px', lineHeight: 1.2 }}
+                >
+                  Lumina AI
+                </Typography>
+                <StatusPill>
+                  <span className="status-dot" />
+                  En línea
+                </StatusPill>
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: '11.5px',
+                  fontWeight: 500,
+                  lineHeight: 1.2,
+                }}
+              >
+                Tu copiloto inteligente para estructurar y ejecutar tareas
+              </Typography>
+            </Box>
           </Box>
 
           <Box display="flex" alignItems="center" gap={1}>
             <ModelBadgeButton
               size="small"
               onClick={(e) => setModelAnchor(e.currentTarget)}
-              startIcon={getModelIcon(selectedModel)}
-              endIcon={<ArrowDownIcon sx={{ fontSize: 12 }} />}
+              startIcon={
+                <Box
+                  sx={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    bgcolor: '#8b5cf6',
+                  }}
+                />
+              }
+              endIcon={<ArrowDownIcon sx={{ fontSize: 14 }} />}
             >
-              {getModelLabel(selectedModel)}
+              <Typography sx={{ fontSize: '12px', fontWeight: 600 }}>
+                {getModelLabel(selectedModel)}
+              </Typography>
+              <Box
+                component="span"
+                sx={{
+                  bgcolor: (t) =>
+                    t.palette.mode === 'dark'
+                      ? 'rgba(37, 99, 235, 0.25)'
+                      : '#eff6ff',
+                  color: '#2563eb',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  px: 0.6,
+                  py: 0.15,
+                  borderRadius: '4px',
+                  ml: 0.25,
+                }}
+              >
+                Rápido
+              </Box>
             </ModelBadgeButton>
+
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ mx: 0.75, height: '18px', alignSelf: 'center' }}
+            />
+
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setIsHistoryOpen((prev) => !prev)}
+              startIcon={<ChatIcon sx={{ fontSize: 15 }} />}
+              sx={{
+                borderRadius: '8px',
+                borderColor: 'divider',
+                textTransform: 'none',
+                color: 'text.primary',
+                fontSize: '12px',
+                fontWeight: 600,
+                px: 1.4,
+                py: 0.45,
+                '&:hover': {
+                  borderColor: '#2563eb',
+                  bgcolor: 'action.hover',
+                },
+              }}
+            >
+              Historial
+            </Button>
             <Menu
               anchorEl={modelAnchor}
               open={Boolean(modelAnchor)}
@@ -1230,7 +1422,11 @@ export const AskAI: React.FC = () => {
 
             {/* ── Message history ── */}
             {hasMessages && (
-              <Box display="flex" flexDirection="column" gap={1.5} py={3}>
+              <Box display="flex" flexDirection="column" gap={2} py={2}>
+                <DateSeparator>
+                  <span className="date-pill">{formatTodayDate()}</span>
+                </DateSeparator>
+
                 {messages.map((msg) => {
                   const isUser = msg.sender === 'user';
                   const {
@@ -1290,35 +1486,30 @@ export const AskAI: React.FC = () => {
                           )
                         : undefined;
 
-                  return (
-                    <MessageRow key={msg.id} isUser={isUser}>
-                      {/* AI avatar */}
-                      {!isUser && (
-                        <AvatarWrapper>
-                          <LuminaAnimatedFace
-                            size={22}
-                            primaryColor={primaryColor}
-                          />
-                        </AvatarWrapper>
-                      )}
+                  const timeStr = formatMessageTime(msg.createdAt);
 
+                  if (isUser) {
+                    return (
                       <Box
-                        display="flex"
-                        flexDirection="column"
+                        key={msg.id}
                         sx={{
-                          maxWidth: '75%',
-                          alignItems: isUser ? 'flex-end' : 'flex-start',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-end',
+                          gap: '3px',
+                          width: '100%',
                         }}
                       >
                         <Box
                           sx={{
                             display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                            flexDirection: isUser ? 'row-reverse' : 'row',
+                            alignItems: 'flex-end',
+                            justifyContent: 'flex-end',
+                            gap: 1.25,
+                            maxWidth: '85%',
                           }}
                         >
-                          <MessageBubble isUser={isUser}>
+                          <MessageBubble isUser>
                             {displayFiles && displayFiles.length > 0 && (
                               <Box
                                 sx={{
@@ -1333,7 +1524,10 @@ export const AskAI: React.FC = () => {
                                     key={idx}
                                     icon={
                                       <AttachFileIcon
-                                        sx={{ fontSize: '13px !important' }}
+                                        sx={{
+                                          fontSize: '13px !important',
+                                          color: '#ffffff !important',
+                                        }}
                                       />
                                     }
                                     label={file.name}
@@ -1342,123 +1536,185 @@ export const AskAI: React.FC = () => {
                                       fontSize: '11px',
                                       fontWeight: 600,
                                       borderRadius: '6px',
-                                      bgcolor: isUser
-                                        ? 'rgba(255, 255, 255, 0.15)'
-                                        : (t) =>
-                                            t.palette.mode === 'dark'
-                                              ? 'rgba(255, 255, 255, 0.08)'
-                                              : 'rgba(0, 0, 0, 0.05)',
-                                      color: 'inherit',
+                                      bgcolor: 'rgba(255, 255, 255, 0.2)',
+                                      color: '#ffffff',
                                     }}
                                   />
                                 ))}
                               </Box>
                             )}
-                            {cleanText &&
-                              (cleanHtml ? (
-                                <div
-                                  dangerouslySetInnerHTML={{
-                                    __html: cleanHtml,
-                                  }}
-                                  style={{ lineHeight: 1.65, fontSize: '14px' }}
-                                />
-                              ) : (
-                                <Typography
-                                  variant="body2"
-                                  sx={{ whiteSpace: 'pre-wrap' }}
-                                >
-                                  {cleanText}
-                                </Typography>
-                              ))}
-                            {hasPendingAction && (
-                              <LuminaWorkingIndicator
-                                sx={cleanText ? { mt: 1 } : undefined}
+                            {cleanText && (
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  whiteSpace: 'pre-wrap',
+                                  lineHeight: 1.55,
+                                }}
                               >
-                                <span className="shimmer-text">
-                                  Lumina está trabajando
-                                </span>
-                                <span className="pulse-dots">
-                                  <span className="pulse-dot" />
-                                  <span className="pulse-dot" />
-                                  <span className="pulse-dot" />
-                                </span>
-                              </LuminaWorkingIndicator>
+                                {cleanText}
+                              </Typography>
                             )}
                           </MessageBubble>
-                          <Tooltip title="Regenerate/Retry" placement="top">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleRetry(msg.id)}
-                              sx={{
-                                opacity: 0,
-                                transition: 'opacity 0.2s',
-                                color: 'text.secondary',
-                                '&:hover': {
-                                  color: 'primary.main',
-                                  bgcolor: 'action.hover',
-                                },
-                                p: 0.5,
-                              }}
-                              className="msg-action-btn"
-                            >
-                              <RefreshIcon sx={{ fontSize: 16 }} />
-                            </IconButton>
-                          </Tooltip>
+                          <UserAvatar>
+                            {user?.picture ? (
+                              <img
+                                src={user.picture}
+                                alt={user.name}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                  borderRadius: '50%',
+                                }}
+                              />
+                            ) : (
+                              userInitial
+                            )}
+                          </UserAvatar>
                         </Box>
-                        {!isUser && actions.length === 1 && (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontSize: '11px',
+                            color: 'text.secondary',
+                            mr: '44px',
+                            fontWeight: 500,
+                          }}
+                        >
+                          {timeStr}
+                        </Typography>
+                      </Box>
+                    );
+                  }
+
+                  // Lumina AI message
+                  return (
+                    <Box
+                      key={msg.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1.5,
+                        width: '100%',
+                      }}
+                    >
+                      <AvatarWrapper>
+                        <LuminaAnimatedFace
+                          size={22}
+                          primaryColor={primaryColor}
+                        />
+                      </AvatarWrapper>
+                      <AIMessageWrapper>
+                        <AIMessageHeader>
+                          <span className="ai-title">Lumina AI</span>
+                          <span className="ai-time">{timeStr}</span>
+                        </AIMessageHeader>
+                        <MessageBubble isUser={false}>
+                          {cleanText &&
+                            (cleanHtml ? (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: cleanHtml,
+                                }}
+                                style={{
+                                  lineHeight: 1.65,
+                                  fontSize: '14px',
+                                }}
+                              />
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                sx={{ whiteSpace: 'pre-wrap' }}
+                              >
+                                {cleanText}
+                              </Typography>
+                            ))}
+                          {hasPendingAction && (
+                            <LuminaWorkingIndicator
+                              sx={cleanText ? { mt: 1 } : undefined}
+                            >
+                              <span className="shimmer-text">
+                                Lumina está trabajando
+                              </span>
+                              <span className="pulse-dots">
+                                <span className="pulse-dot" />
+                                <span className="pulse-dot" />
+                                <span className="pulse-dot" />
+                              </span>
+                            </LuminaWorkingIndicator>
+                          )}
+                        </MessageBubble>
+                        {actions.length === 1 && (
                           <SuggestedActionCard action={actions[0]} />
                         )}
-                        {!isUser && actions.length > 1 && (
+                        {actions.length > 1 && (
                           <SuggestedActionsPlan actions={actions} />
                         )}
-                      </Box>
-
-                      {/* User avatar */}
-                      {isUser && (
-                        <UserAvatar>
-                          {user?.picture ? (
-                            <img
-                              src={user.picture}
-                              alt={user.name}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                borderRadius: '50%',
-                              }}
-                            />
-                          ) : (
-                            userInitial
-                          )}
-                        </UserAvatar>
-                      )}
-                    </MessageRow>
+                        <AIMessageActions>
+                          <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => handleCopyMessage(cleanText)}
+                          >
+                            <CopyIcon sx={{ fontSize: 13 }} />
+                            Copiar
+                          </button>
+                          <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => handleRetry(msg.id)}
+                          >
+                            <RefreshIcon sx={{ fontSize: 13 }} />
+                            Regenerar
+                          </button>
+                          <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => handleFeedback()}
+                          >
+                            <ThumbUpOutlinedIcon sx={{ fontSize: 13 }} />
+                          </button>
+                        </AIMessageActions>
+                      </AIMessageWrapper>
+                    </Box>
                   );
                 })}
 
                 {/* Typing indicator */}
                 {isTyping && (
-                  <MessageRow>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 1.5,
+                      width: '100%',
+                    }}
+                  >
                     <AvatarWrapper>
                       <LuminaOrb
-                        size={26}
+                        size={22}
                         state="thinking"
                         primaryColor={primaryColor}
                       />
                     </AvatarWrapper>
-                    <TypingIndicator>
-                      <LuminaWorkingIndicator>
-                        <span className="shimmer-text">
-                          {LUMINA_STATUS_MESSAGES[statusMessageIndex]}
-                        </span>
-                        <span className="pulse-dots">
-                          <span className="pulse-dot" />
-                          <span className="pulse-dot" />
-                          <span className="pulse-dot" />
-                        </span>
-                      </LuminaWorkingIndicator>
-                    </TypingIndicator>
-                  </MessageRow>
+                    <AIMessageWrapper>
+                      <AIMessageHeader>
+                        <span className="ai-title">Lumina AI</span>
+                      </AIMessageHeader>
+                      <TypingIndicator>
+                        <LuminaWorkingIndicator>
+                          <span className="shimmer-text">
+                            {LUMINA_STATUS_MESSAGES[statusMessageIndex]}
+                          </span>
+                          <span className="pulse-dots">
+                            <span className="pulse-dot" />
+                            <span className="pulse-dot" />
+                            <span className="pulse-dot" />
+                          </span>
+                        </LuminaWorkingIndicator>
+                      </TypingIndicator>
+                    </AIMessageWrapper>
+                  </Box>
                 )}
 
                 <div ref={endRef} />
@@ -1722,6 +1978,34 @@ export const AskAI: React.FC = () => {
             )}
           </Menu>
 
+          {/* Suggestions Bar */}
+          <SuggestionsBar>
+            <span className="sug-label">⚡ Sugerencias:</span>
+            <button
+              type="button"
+              className="sug-pill"
+              onClick={() => sendMessage('Revisar tono y claridad del texto')}
+            >
+              ✍️ Revisar tono
+            </button>
+            <button
+              type="button"
+              className="sug-pill"
+              onClick={() =>
+                sendMessage('Dividir en bloques de 25 min para hoy')
+              }
+            >
+              ⏱️ Dividir en bloques
+            </button>
+            <button
+              type="button"
+              className="sug-pill"
+              onClick={() => sendMessage('Resumir y extraer próximos pasos')}
+            >
+              📊 Resumir
+            </button>
+          </SuggestionsBar>
+
           <InputBox elevation={0} ref={inputBoxRef}>
             <input
               type="file"
@@ -1748,8 +2032,8 @@ export const AskAI: React.FC = () => {
                     setContextMenuLevel('main');
                   }}
                   sx={{
-                    color: selectedContext ? 'primary.main' : 'text.secondary',
-                    '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
+                    color: selectedContext ? '#2563eb' : 'text.secondary',
+                    '&:hover': { bgcolor: 'rgba(37, 99, 235, 0.08)' },
                   }}
                 >
                   <AtIcon sx={{ fontSize: 20 }} />
@@ -1764,17 +2048,15 @@ export const AskAI: React.FC = () => {
                     disabled={isProcessingFile}
                     sx={{
                       color:
-                        attachedFiles.length > 0
-                          ? 'primary.main'
-                          : 'text.secondary',
-                      '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' },
+                        attachedFiles.length > 0 ? '#2563eb' : 'text.secondary',
+                      '&:hover': { bgcolor: 'rgba(37, 99, 235, 0.08)' },
                     }}
                   >
                     {isProcessingFile ? (
                       <CircularProgress
                         size={18}
                         thickness={5}
-                        sx={{ color: 'primary.main' }}
+                        sx={{ color: '#2563eb' }}
                       />
                     ) : (
                       <AttachFileIcon sx={{ fontSize: 20 }} />
@@ -1809,42 +2091,12 @@ export const AskAI: React.FC = () => {
                       maxWidth: '140px',
                       bgcolor: (theme) =>
                         theme.palette.mode === 'dark'
-                          ? 'rgba(99, 102, 241, 0.15)'
-                          : 'rgba(99, 102, 241, 0.05)',
-                      borderColor: 'primary.main',
+                          ? 'rgba(37, 99, 235, 0.15)'
+                          : 'rgba(37, 99, 235, 0.05)',
+                      borderColor: '#2563eb',
                     }}
                   />
                 )}
-                {attachedFiles.map((f) => (
-                  <Chip
-                    key={f.id}
-                    icon={
-                      <AttachFileIcon sx={{ fontSize: '13px !important' }} />
-                    }
-                    label={f.name}
-                    onDelete={() =>
-                      setAttachedFiles((prev) =>
-                        prev.filter((item) => item.id !== f.id),
-                      )
-                    }
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      borderRadius: '6px',
-                      fontWeight: 600,
-                      fontSize: '11px',
-                      maxWidth: '160px',
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.06)'
-                          : 'rgba(0, 0, 0, 0.04)',
-                      borderColor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.15)'
-                          : 'rgba(0, 0, 0, 0.12)',
-                    }}
-                  />
-                ))}
               </Box>
             )}
 
@@ -1852,8 +2104,8 @@ export const AskAI: React.FC = () => {
               inputRef={inputRef}
               placeholder={
                 attachedFiles.length > 0
-                  ? 'Ask a question about the attached file(s)…'
-                  : 'Ask Lumina anything…'
+                  ? 'Pregunta sobre los archivos adjuntos...'
+                  : 'Pregúntale a Lumina lo que necesites o escribe / para comandos...'
               }
               value={inputValue}
               onChange={(e) => {
@@ -1866,178 +2118,333 @@ export const AskAI: React.FC = () => {
               }}
               onKeyDown={handleKeyDown}
               multiline
-              maxRows={5}
+              maxRows={3}
               variant="outlined"
               fullWidth
               autoComplete="off"
             />
-            <SendButton
-              active={!!inputValue.trim() || attachedFiles.length > 0}
-              onClick={() => sendMessage(inputValue)}
-              disabled={
-                (!inputValue.trim() && attachedFiles.length === 0) ||
-                isTyping ||
-                isProcessingFile
-              }
-              size="small"
-            >
-              <SendIcon sx={{ fontSize: 18 }} />
-            </SendButton>
+
+            {/* Mic and Send action buttons */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Tooltip title="Dictado por voz">
+                <IconButton
+                  size="small"
+                  sx={{
+                    color: 'text.secondary',
+                    p: 0.75,
+                    '&:hover': {
+                      color: '#2563eb',
+                      bgcolor: 'rgba(37, 99, 235, 0.08)',
+                    },
+                  }}
+                >
+                  <MicIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+              </Tooltip>
+
+              <SendButton
+                active={!!inputValue.trim() || attachedFiles.length > 0}
+                onClick={() => sendMessage(inputValue)}
+                disabled={
+                  (!inputValue.trim() && attachedFiles.length === 0) ||
+                  isTyping ||
+                  isProcessingFile
+                }
+                size="small"
+              >
+                <ArrowForwardIcon sx={{ fontSize: 18 }} />
+              </SendButton>
+            </Box>
           </InputBox>
+
+          <Typography
+            variant="caption"
+            sx={{
+              display: 'block',
+              textAlign: 'center',
+              fontSize: '11px',
+              color: 'text.secondary',
+              mt: 1,
+              opacity: 0.75,
+            }}
+          >
+            Lumina puede cometer errores. Verifica la información importante
+            sobre tareas y horarios.
+          </Typography>
         </InputWrapper>
       </ChatAreaWrapper>
 
       {/* ── Chat History Sidebar (right) ── */}
-      <HistorySidebar>
-        <Box sx={{ p: 2, display: 'flex', gap: 1 }}>
+      <HistorySidebar isOpen={isHistoryOpen}>
+        <Box
+          sx={{
+            p: 2,
+            pb: 1.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              color: 'text.secondary',
+            }}
+          >
+            Historial de conversaciones
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={() => setIsHistoryOpen(false)}
+            sx={{
+              color: 'text.secondary',
+              p: 0.5,
+              '&:hover': { color: 'text.primary', bgcolor: 'action.hover' },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+
+        <Box
+          sx={{
+            p: 2,
+            pb: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1.5,
+          }}
+        >
           <Button
             variant="contained"
             fullWidth
             onClick={handleNewChat}
             startIcon={<AddIcon />}
             sx={{
-              borderRadius: '12px',
+              borderRadius: '10px',
               textTransform: 'none',
-              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.15)',
+              boxShadow: 'none',
               fontWeight: 700,
               fontSize: '0.85rem',
-              py: 1.2,
-              bgcolor: 'primary.main',
+              py: 1.1,
+              bgcolor: '#2563eb',
+              color: '#ffffff',
               '&:hover': {
-                bgcolor: 'primary.dark',
-                boxShadow: '0 6px 16px rgba(79, 70, 229, 0.25)',
+                bgcolor: '#1d4ed8',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
               },
             }}
           >
-            New Chat
+            + Nuevo Chat
           </Button>
-        </Box>
-        <Box sx={{ flex: 1, overflowY: 'auto', px: 2, pb: 2 }}>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            fontWeight={800}
+
+          {/* Search box */}
+          <Box
             sx={{
-              px: 2,
-              mb: 2,
-              display: 'block',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              fontSize: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              px: 1.5,
+              py: 0.6,
+              borderRadius: '8px',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.05)'
+                  : 'rgba(0, 0, 0, 0.04)',
+              border: (theme) => `1px solid ${theme.palette.divider}`,
             }}
           >
-            Chat History
-          </Typography>
-          {conversations.map((c) => {
-            const isActive = c.id === activeConversationId;
-            return (
-              <Box
-                key={c.id}
-                onClick={() => handleSelectConversation(c.id)}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  px: 2,
-                  py: 1.5,
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  mb: 1.2,
-                  bgcolor: isActive
-                    ? (theme) =>
-                        surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff')
-                    : 'transparent',
-                  borderColor: isActive
-                    ? (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.05)'
-                          : 'rgba(0, 0, 0, 0.04)'
-                    : 'transparent',
-                  color: 'text.primary',
-                  boxShadow: isActive ? '0 4px 20px rgba(0,0,0,0.04)' : 'none',
-                  '&:hover': {
-                    bgcolor: (theme) =>
-                      surfaceColor(theme, '#1e293b', '#2A2A2C', '#ffffff'),
-                    borderColor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.05)'
-                        : 'rgba(0, 0, 0, 0.04)',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-                    '& .delete-btn': { opacity: 0.7 },
-                  },
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <Box sx={{ flex: 1, overflow: 'hidden', mr: 1 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: '13px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      color: 'text.primary',
-                    }}
-                  >
-                    {c.title || 'Untitled Chat'}
-                  </Typography>
-                  {c.updatedAt && (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{
-                        fontSize: '9.5px',
-                        fontWeight: 700,
-                        opacity: 0.6,
-                        display: 'block',
-                        mt: 0.5,
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      {formatUpdateTime(c.updatedAt).toUpperCase()}
-                    </Typography>
-                  )}
-                </Box>
-                <IconButton
-                  className="delete-btn"
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setConversationToDelete({
-                      id: c.id,
-                      title: c.title,
-                    });
-                  }}
+            <SearchIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 1 }} />
+            <input
+              type="text"
+              placeholder="Buscar en el historial..."
+              value={historySearch}
+              onChange={(e) => setHistorySearch(e.target.value)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
+                fontSize: '12px',
+                color: 'inherit',
+                width: '100%',
+              }}
+            />
+          </Box>
+        </Box>
+
+        <Box sx={{ flex: 1, overflowY: 'auto', px: 2, pb: 2 }}>
+          {filteredConversations.length === 0 ? (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ p: 2, display: 'block', textAlign: 'center' }}
+            >
+              No se encontraron chats
+            </Typography>
+          ) : (
+            groupedConversations.map((group) => (
+              <Box key={group.label} sx={{ mb: 2 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  fontWeight={800}
                   sx={{
-                    p: 0.25,
-                    opacity: 0,
-                    color: 'text.secondary',
-                    '&:hover': {
-                      color: theme.palette.error.main,
-                      opacity: '1 !important',
-                    },
-                    transition: 'opacity 0.15s, color 0.15s',
+                    px: 1,
+                    mb: 1,
+                    display: 'block',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    fontSize: '10px',
                   }}
                 >
-                  <DeleteIcon sx={{ fontSize: 14 }} />
-                </IconButton>
+                  {group.label}
+                </Typography>
+                {group.items.map((c) => {
+                  const isActive = c.id === activeConversationId;
+                  return (
+                    <Box
+                      key={c.id}
+                      onClick={() => handleSelectConversation(c.id)}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1.25,
+                        px: 1.5,
+                        py: 1.2,
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        mb: 0.8,
+                        bgcolor: isActive
+                          ? (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(37, 99, 235, 0.16)'
+                                : '#eff6ff'
+                          : 'transparent',
+                        border: isActive
+                          ? (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '1px solid rgba(59, 130, 246, 0.3)'
+                                : '1px solid #bfdbfe'
+                          : '1px solid transparent',
+                        color: 'text.primary',
+                        '&:hover': {
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.05)'
+                              : 'rgba(0, 0, 0, 0.03)',
+                          '& .delete-btn': { opacity: 0.7 },
+                        },
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <ChatIcon
+                        sx={{
+                          fontSize: 16,
+                          mt: '2px',
+                          color: isActive ? '#2563eb' : 'text.secondary',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: isActive ? 700 : 600,
+                              fontSize: '12.5px',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              color: isActive ? '#2563eb' : 'text.primary',
+                            }}
+                          >
+                            {c.title || 'Nuevo chat'}
+                          </Typography>
+                          {c.updatedAt && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: '10px',
+                                ml: 1,
+                                flexShrink: 0,
+                              }}
+                            >
+                              {formatUpdateTime(c.updatedAt)}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{
+                            fontSize: '11px',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            mt: 0.25,
+                            opacity: 0.8,
+                          }}
+                        >
+                          {c.id === activeConversationId && messages.length > 0
+                            ? messages[messages.length - 1].text.slice(0, 50)
+                            : 'Conversación de Lumina'}
+                        </Typography>
+                      </Box>
+                      <IconButton
+                        className="delete-btn"
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConversationToDelete({
+                            id: c.id,
+                            title: c.title,
+                          });
+                        }}
+                        sx={{
+                          p: 0.25,
+                          opacity: 0,
+                          color: 'text.secondary',
+                          '&:hover': {
+                            color: theme.palette.error.main,
+                            opacity: '1 !important',
+                          },
+                          transition: 'opacity 0.15s, color 0.15s',
+                        }}
+                      >
+                        <DeleteIcon sx={{ fontSize: 13 }} />
+                      </IconButton>
+                    </Box>
+                  );
+                })}
               </Box>
-            );
-          })}
+            ))
+          )}
         </Box>
+
         {FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && (
           <Box
             sx={{
               p: 2,
-              borderTop: `1px solid ${theme.palette.divider}`,
-              bgcolor:
+              borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+              bgcolor: (theme) =>
                 theme.palette.mode === 'dark'
                   ? 'rgba(255, 255, 255, 0.02)'
-                  : 'rgba(0, 0, 0, 0.02)',
+                  : 'rgba(0, 0, 0, 0.015)',
               display: 'flex',
               flexDirection: 'column',
-              gap: 1.5,
+              gap: 1.25,
             }}
           >
             <Box
@@ -2066,47 +2473,39 @@ export const AskAI: React.FC = () => {
                 {conversations.length} / 4
               </Typography>
             </Box>
-            <Box
+            <LinearProgress
+              variant="determinate"
+              value={Math.min((conversations.length / 4) * 100, 100)}
               sx={{
-                width: '100%',
-                bgcolor:
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.05)'
-                    : 'rgba(0, 0, 0, 0.05)',
-                borderRadius: '4px',
                 height: 6,
-                overflow: 'hidden',
+                borderRadius: 3,
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.08)'
+                    : 'rgba(0, 0, 0, 0.06)',
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 3,
+                  bgcolor: conversations.length >= 4 ? 'error.main' : '#2563eb',
+                },
               }}
-            >
-              <Box
-                sx={{
-                  width: `${Math.min((conversations.length / 4) * 100, 100)}%`,
-                  bgcolor:
-                    conversations.length >= 4 ? 'error.main' : 'primary.main',
-                  height: '100%',
-                  borderRadius: '4px',
-                  transition: 'width 0.3s ease',
-                }}
-              />
-            </Box>
+            />
             <Button
               variant="outlined"
-              color="primary"
               size="small"
               fullWidth
               onClick={() => setIsUpgradeModalOpen(true)}
               sx={{
                 mt: 0.5,
-                borderRadius: '20px',
+                borderRadius: '8px',
                 textTransform: 'none',
-                fontSize: '12px',
-                py: 0.8,
+                fontSize: '11.5px',
+                py: 0.7,
                 fontWeight: 700,
-                borderColor: 'primary.main',
-                color: 'primary.main',
+                borderColor: '#2563eb',
+                color: '#2563eb',
                 '&:hover': {
-                  borderColor: 'primary.dark',
-                  bgcolor: 'rgba(79, 70, 229, 0.04)',
+                  borderColor: '#1d4ed8',
+                  bgcolor: 'rgba(37, 99, 235, 0.04)',
                 },
               }}
             >
