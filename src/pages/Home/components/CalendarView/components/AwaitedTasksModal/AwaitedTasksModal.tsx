@@ -201,7 +201,7 @@ export const AwaitedTasksModal: React.FC<AwaitedTasksModalProps> = ({
               sx={{
                 height: 20,
                 fontSize: '11px',
-                fontWeight: 700,
+                fontWeight: 900,
                 bgcolor: isDark
                   ? 'rgba(255, 255, 255, 0.1)'
                   : 'rgba(0, 0, 0, 0.06)',

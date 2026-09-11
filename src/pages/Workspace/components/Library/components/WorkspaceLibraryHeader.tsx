@@ -12,6 +12,8 @@ import {
   Divider,
   useTheme,
   Tooltip,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -23,6 +25,8 @@ import {
   Palette as PaletteIcon,
   Check as CheckIcon,
   Add as AddIcon,
+  FolderOutlined as FolderIcon,
+  AssignmentOutlined as TaskIcon,
 } from '@mui/icons-material';
 import {
   LibraryHeader,
@@ -58,6 +62,8 @@ export interface WorkspaceLibraryHeaderProps {
   onNoteFilterChange: (type: 'all' | 'linked-task' | 'has-cover') => void;
   onCreate?: () => void;
   hasMultipleWorkspaces?: boolean;
+  projectTab?: 'projects' | 'tasks';
+  onProjectTabChange?: (tab: 'projects' | 'tasks') => void;
 }
 
 const PROJECT_COLORS = [
@@ -91,10 +97,28 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
   onNoteFilterChange,
   onCreate,
   hasMultipleWorkspaces,
+  projectTab = 'projects',
+  onProjectTabChange,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const [internalTab, setInternalTab] = useState<'projects' | 'tasks'>(
+    'projects',
+  );
+  const activeProjectTab = onProjectTabChange ? projectTab : internalTab;
+
+  const handleTabChange = (
+    _event: React.SyntheticEvent,
+    newValue: 'projects' | 'tasks',
+  ) => {
+    if (onProjectTabChange) {
+      onProjectTabChange(newValue);
+    } else {
+      setInternalTab(newValue);
+    }
+  };
+
   const [filterMenuAnchor, setFilterMenuAnchor] = useState<null | HTMLElement>(
     null,
   );
@@ -141,7 +165,11 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
         ) : (
           <Box display="flex" alignItems="center" gap={1}>
             <StyledTextField
-              placeholder="Search projects..."
+              placeholder={
+                activeProjectTab === 'projects'
+                  ? 'Search projects...'
+                  : 'Search tasks...'
+              }
               value={folderSearchTerm}
               onChange={(e) => onFolderSearchChange(e.target.value)}
               size="small"
@@ -166,7 +194,65 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                 ) : null,
               }}
             />
-
+            <Tabs
+              value={activeProjectTab}
+              onChange={handleTabChange}
+              sx={{
+                minHeight: 36,
+                height: 36,
+                bgcolor: isDark
+                  ? 'rgba(255, 255, 255, 0.05)'
+                  : 'rgba(0, 0, 0, 0.04)',
+                p: '3px',
+                borderRadius: '10px',
+                border: `1px solid ${
+                  isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'
+                }`,
+                '& .MuiTabs-indicator': {
+                  display: 'none',
+                },
+                '& .MuiTabs-flexContainer': {
+                  gap: '3px',
+                  height: '100%',
+                },
+                '& .MuiTab-root': {
+                  minHeight: 30,
+                  height: 30,
+                  padding: '4px 12px',
+                  borderRadius: '7px',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  color: 'text.secondary',
+                  transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+                  whiteSpace: 'nowrap',
+                  '&.Mui-selected': {
+                    color: isDark ? '#ffffff' : theme.palette.primary.main,
+                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ffffff',
+                    fontWeight: 600,
+                    boxShadow: isDark
+                      ? '0 1px 3px rgba(0,0,0,0.3)'
+                      : '0 1px 3px rgba(0,0,0,0.08)',
+                  },
+                  '&:hover': {
+                    color: 'text.primary',
+                  },
+                },
+              }}
+            >
+              <Tab
+                value="projects"
+                label="Ver proyectos"
+                icon={<FolderIcon sx={{ fontSize: 16 }} />}
+                iconPosition="start"
+              />
+              <Tab
+                value="tasks"
+                label="Ver tareas de los proyectos"
+                icon={<TaskIcon sx={{ fontSize: 16 }} />}
+                iconPosition="start"
+              />
+            </Tabs>
             <Tooltip title="Filter & Sort Projects">
               <IconButton
                 size="small"
@@ -356,7 +442,7 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
           </Box>
         )}
 
-        {onCreate && hasMultipleWorkspaces && (
+        {isInsideFolder && onCreate && hasMultipleWorkspaces && (
           <Button
             onClick={onCreate}
             variant="contained"

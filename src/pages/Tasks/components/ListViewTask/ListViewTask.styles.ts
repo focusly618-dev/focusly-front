@@ -440,8 +440,7 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
 
 export const TableHeader = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns:
-    '55px minmax(150px, 3fr) 100px 117px 123px 80px 125px 95px',
+  gridTemplateColumns: '55px minmax(150px, 3fr) 100px 117px 123px 80px 95px',
   padding: '6px 40px 6px 24px',
   backgroundColor: surfaceColor(
     theme,
@@ -467,7 +466,7 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   zIndex: 2,
   boxSizing: 'border-box',
-  minWidth: '950px',
+  minWidth: '825px',
 }));
 
 export const TableHeaderCell = styled(Box)(() => ({
@@ -483,7 +482,7 @@ export const TableBodyContainer = styled(Box)(({ theme }) => ({
   flex: 1,
   overflowY: 'auto',
   minHeight: 0,
-  minWidth: '950px',
+  minWidth: '825px',
   '&::-webkit-scrollbar': {
     width: '6px',
   },
@@ -529,7 +528,7 @@ export const TableStatusGroupRow = styled(Box, {
   cursor: 'pointer',
   userSelect: 'none',
   transition: 'background-color 0.15s ease',
-  minWidth: '950px',
+  minWidth: '825px',
   boxSizing: 'border-box',
   '&:hover': {
     backgroundColor: surfaceColor(
@@ -545,8 +544,7 @@ export const TaskRow = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'statusColor',
 })<{ statusColor?: string }>(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns:
-    '55px minmax(150px, 3fr) 100px 117px 123px 80px 125px 95px',
+  gridTemplateColumns: '55px minmax(150px, 3fr) 100px 117px 123px 80px 95px',
   alignItems: 'center',
   padding: '5px 40px 5px 24px',
   backgroundColor: 'transparent',
@@ -558,7 +556,7 @@ export const TaskRow = styled(Box, {
   transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   gap: '12px',
   boxSizing: 'border-box',
-  minWidth: '950px',
+  minWidth: '825px',
 
   '&:hover': {
     backgroundColor:

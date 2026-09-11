@@ -5,7 +5,6 @@ import {
   MenuItem,
   Tooltip,
   Checkbox,
-  Switch,
 } from '@mui/material';
 import { useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
@@ -341,48 +340,7 @@ export const ListViewTask = ({
           )}
         </Box>
 
-        {/* Cell 7: AI Switch */}
-        <Box
-          className="cell-ai"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            gap: '6px',
-          }}
-        >
-          <AutoAwesomeIcon
-            sx={{
-              fontSize: 14,
-              color: task.use_ai ? '#7c3aed' : 'text.secondary',
-              opacity: task.use_ai ? 1 : 0.35,
-              transition: 'all 0.3s ease',
-            }}
-          />
-          <Switch
-            size="small"
-            checked={task.use_ai || false}
-            disabled={isReadOnly}
-            onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-              if (isReadOnly) return;
-              if (updateTask) {
-                await updateTask(task.id, {
-                  ...task,
-                  use_ai: e.target.checked,
-                });
-              }
-            }}
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            sx={{
-              '& .MuiSwitch-switchBase.Mui-checked': { color: '#7c3aed' },
-              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                backgroundColor: '#7c3aed',
-              },
-            }}
-          />
-        </Box>
-
-        {/* Cell 8: Actions */}
+        {/* Cell 7: Actions */}
         <Box
           sx={{
             display: 'flex',

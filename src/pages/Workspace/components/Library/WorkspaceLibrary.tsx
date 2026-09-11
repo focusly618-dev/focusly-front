@@ -38,6 +38,7 @@ import {
   Folder as FolderFilledIcon,
   FolderOutlined as FolderOutlinedIcon,
   MoreHoriz as MoreHorizIcon,
+  AssignmentOutlined as TaskIcon,
 } from '@mui/icons-material';
 import { EmptyState } from '@/components/ui';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
@@ -95,8 +96,14 @@ export const WorkspaceLibrary = ({
     setGroupPage,
   } = actions;
 
-  const { workspaces, projectGroups, allProjectGroups, totalWorkspaces, loading, error } =
-    data;
+  const {
+    workspaces,
+    projectGroups,
+    allProjectGroups,
+    totalWorkspaces,
+    loading,
+    error,
+  } = data;
 
   const theme = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -110,6 +117,9 @@ export const WorkspaceLibrary = ({
     );
   });
 
+  const [projectTab, setProjectTab] = useState<'projects' | 'tasks'>(
+    'projects',
+  );
   const [isAllFoldersModalOpen, setIsAllFoldersModalOpen] = useState(false);
 
   const isTemplatesModalOpen = searchParams.get('modal') === 'templates';
@@ -446,262 +456,307 @@ export const WorkspaceLibrary = ({
           onCreate(undefined, undefined, selectedGroupId ?? undefined)
         }
         hasMultipleWorkspaces={totalWorkspaces > 1}
+        projectTab={projectTab}
+        onProjectTabChange={setProjectTab}
       />
 
       {!isInsideFolder ? (
-        /* Root Projects Cards Grid View */
-        <Box sx={{ mt: 3, pb: 4 }}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                sm: 'repeat(2, 1fr)',
-                md: 'repeat(3, 1fr)',
-              },
-              gap: 3,
-            }}
-          >
-            {/* Dashed Create Folder Card */}
+        projectTab === 'tasks' ? (
+          <Box sx={{ mt: 3, pb: 4 }}>
             <Box
-              onClick={() => setIsCreateFolderOpen(true)}
               sx={{
-                border: (theme) => `1.5px dashed ${theme.palette.divider}`,
+                p: 5,
                 borderRadius: '16px',
+                border: (theme) => `1px dashed ${theme.palette.divider}`,
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.02)'
+                    : 'rgba(0, 0, 0, 0.01)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer',
-                height: '190px',
-                transition: 'all 0.2s ease-in-out',
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.01)'
-                    : 'rgba(0, 0, 0, 0.01)',
-                '&:hover': {
-                  borderColor: 'primary.main',
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
-                  transform: 'translateY(-2px)',
-                },
+                minHeight: 340,
+                textAlign: 'center',
               }}
             >
-              <FolderIconCircle
-                color={theme.palette.primary.main}
+              <TaskIcon
                 sx={{
-                  width: '48px',
-                  height: '48px',
-                  mb: 1.5,
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(96, 165, 250, 0.12)'
-                      : 'rgba(59, 130, 246, 0.08)',
+                  fontSize: 48,
                   color: 'primary.main',
-                  boxShadow: 'none',
+                  mb: 2,
+                  opacity: 0.85,
                 }}
-              >
-                <AddIcon sx={{ fontSize: 24 }} />
-              </FolderIconCircle>
+              />
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+                Tareas de proyectos
+              </Typography>
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 700, color: 'text.secondary' }}
+                sx={{ color: 'text.secondary', maxWidth: 460 }}
               >
-                {t('workspaceLibrary.newFolder')}
+                Aquí se mostrarán las tareas de los proyectos. Selecciona
+                &quot;Ver proyectos&quot; para ver las carpetas de proyectos.
               </Typography>
             </Box>
-
-            {/* Folder Cards */}
-            {filteredGroups.map((group: ProjectGroupTypes, index) => {
-              const baseColor = group.color || '#7c3aed';
-              const noteCount = group.workspaces?.length ?? 0;
-              const statusLabel =
-                noteCount > 0
-                  ? index % 3 === 0
-                    ? 'RECENT'
-                    : 'ACTIVE'
-                  : 'DRAFT';
-
-              return (
-                <Box
-                  key={group.id}
-                  onClick={() => handleSelectFolder(group.id)}
+          </Box>
+        ) : (
+          /* Root Projects Cards Grid View */
+          <Box sx={{ mt: 3, pb: 4 }}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                },
+                gap: 3,
+              }}
+            >
+              {/* Dashed Create Folder Card */}
+              <Box
+                onClick={() => setIsCreateFolderOpen(true)}
+                sx={{
+                  border: (theme) => `1.5px dashed ${theme.palette.divider}`,
+                  borderRadius: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  height: '190px',
+                  transition: 'all 0.2s ease-in-out',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.01)'
+                      : 'rgba(0, 0, 0, 0.01)',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
+                    transform: 'translateY(-2px)',
+                  },
+                }}
+              >
+                <FolderIconCircle
+                  color={theme.palette.primary.main}
                   sx={{
-                    border: (theme) => `1px solid ${theme.palette.divider}`,
-                    borderRadius: '16px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    cursor: 'pointer',
-                    height: '190px',
-                    transition: 'all 0.2s ease-in-out',
-                    bgcolor: 'background.paper',
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      boxShadow: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? '0 8px 24px rgba(0,0,0,0.3)'
-                          : '0 8px 24px rgba(0, 0, 0, 0.04)',
-                      transform: 'translateY(-2px)',
-                    },
+                    width: '48px',
+                    height: '48px',
+                    mb: 1.5,
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(96, 165, 250, 0.12)'
+                        : 'rgba(59, 130, 246, 0.08)',
+                    color: 'primary.main',
+                    boxShadow: 'none',
                   }}
                 >
-                  {/* Top Accents */}
+                  <AddIcon sx={{ fontSize: 24 }} />
+                </FolderIconCircle>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: 'text.secondary' }}
+                >
+                  {t('workspaceLibrary.newFolder')}
+                </Typography>
+              </Box>
+
+              {/* Folder Cards */}
+              {filteredGroups.map((group: ProjectGroupTypes, index) => {
+                const baseColor = group.color || '#7c3aed';
+                const noteCount = group.workspaces?.length ?? 0;
+                const statusLabel =
+                  noteCount > 0
+                    ? index % 3 === 0
+                      ? 'RECENT'
+                      : 'ACTIVE'
+                    : 'DRAFT';
+
+                return (
                   <Box
+                    key={group.id}
+                    onClick={() => handleSelectFolder(group.id)}
                     sx={{
-                      p: 2,
-                      pb: 1,
+                      border: (theme) => `1px solid ${theme.palette.divider}`,
+                      borderRadius: '16px',
                       display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
+                      flexDirection: 'column',
+                      cursor: 'pointer',
+                      height: '190px',
+                      transition: 'all 0.2s ease-in-out',
+                      bgcolor: 'background.paper',
+                      '&:hover': {
+                        borderColor: 'primary.main',
+                        boxShadow: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? '0 8px 24px rgba(0,0,0,0.3)'
+                            : '0 8px 24px rgba(0, 0, 0, 0.04)',
+                        transform: 'translateY(-2px)',
+                      },
                     }}
                   >
-                    <FolderIconCircle
-                      color={baseColor}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setGroupToCustomize(group);
-                        setSelectedColor(baseColor);
-                        setSelectedStyle(
-                          group.emoji === 'outlined' ? 'outlined' : 'filled',
-                        );
-                        setIsCustomizeOpen(true);
-                      }}
+                    {/* Top Accents */}
+                    <Box
                       sx={{
-                        width: '40px',
-                        height: '40px',
-                        bgcolor: alpha(baseColor, 0.12),
-                        color: baseColor,
-                        boxShadow: 'none',
-                        transition: 'transform 0.2s',
-                        '&:hover': {
-                          transform: 'scale(1.1)',
-                        },
+                        p: 2,
+                        pb: 1,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
                       }}
                     >
-                      {group.emoji === 'outlined' ? (
-                        <FolderOutlinedIcon sx={{ fontSize: 20 }} />
-                      ) : (
-                        <FolderFilledIcon sx={{ fontSize: 20 }} />
-                      )}
-                    </FolderIconCircle>
+                      <FolderIconCircle
+                        color={baseColor}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setGroupToCustomize(group);
+                          setSelectedColor(baseColor);
+                          setSelectedStyle(
+                            group.emoji === 'outlined' ? 'outlined' : 'filled',
+                          );
+                          setIsCustomizeOpen(true);
+                        }}
+                        sx={{
+                          width: '40px',
+                          height: '40px',
+                          bgcolor: alpha(baseColor, 0.12),
+                          color: baseColor,
+                          boxShadow: 'none',
+                          transition: 'transform 0.2s',
+                          '&:hover': {
+                            transform: 'scale(1.1)',
+                          },
+                        }}
+                      >
+                        {group.emoji === 'outlined' ? (
+                          <FolderOutlinedIcon sx={{ fontSize: 20 }} />
+                        ) : (
+                          <FolderFilledIcon sx={{ fontSize: 20 }} />
+                        )}
+                      </FolderIconCircle>
 
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setGroupMenuAnchorEl(e.currentTarget);
-                        setGroupForMenu(group);
-                      }}
-                      sx={{ color: 'text.secondary' }}
-                    >
-                      <MoreHorizIcon sx={{ fontSize: 18 }} />
-                    </IconButton>
-                  </Box>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setGroupMenuAnchorEl(e.currentTarget);
+                          setGroupForMenu(group);
+                        }}
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        <MoreHorizIcon sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    </Box>
 
-                  {/* Body Text */}
-                  <Box sx={{ px: 2, flexGrow: 1 }}>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: 800,
-                        color: 'text.primary',
-                        mb: 0.5,
-                        lineHeight: 1.2,
-                      }}
-                    >
-                      {group.name}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: 'text.secondary',
-                        fontWeight: 500,
-                        display: 'block',
-                      }}
-                    >
-                      {t('workspaceLibrary.notesInside', { count: noteCount })}
-                    </Typography>
-                    {group.updatedAt && (
+                    {/* Body Text */}
+                    <Box sx={{ px: 2, flexGrow: 1 }}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 800,
+                          color: 'text.primary',
+                          mb: 0.5,
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {group.name}
+                      </Typography>
                       <Typography
                         variant="caption"
                         sx={{
                           color: 'text.secondary',
-                          opacity: 0.8,
-                          fontSize: '0.72rem',
+                          fontWeight: 500,
                           display: 'block',
-                          mt: 0.25,
                         }}
                       >
-                        {t('workspaceLibrary.lastUpdated')}
-                        {new Date(group.updatedAt).toLocaleDateString(
-                          undefined,
-                          { day: 'numeric', month: 'short', year: 'numeric' },
-                        )}
+                        {t('workspaceLibrary.notesInside', {
+                          count: noteCount,
+                        })}
                       </Typography>
-                    )}
-                  </Box>
+                      {group.updatedAt && (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'text.secondary',
+                            opacity: 0.8,
+                            fontSize: '0.72rem',
+                            display: 'block',
+                            mt: 0.25,
+                          }}
+                        >
+                          {t('workspaceLibrary.lastUpdated')}
+                          {new Date(group.updatedAt).toLocaleDateString(
+                            undefined,
+                            { day: 'numeric', month: 'short', year: 'numeric' },
+                          )}
+                        </Typography>
+                      )}
+                    </Box>
 
-                  {/* Status Bar bottom */}
-                  <Box
-                    sx={{
-                      px: 2,
-                      py: 1.25,
-                      borderTop: (theme) =>
-                        `1px solid ${theme.palette.divider}`,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      borderBottomLeftRadius: '16px',
-                      borderBottomRightRadius: '16px',
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.01)'
-                          : 'rgba(0,0,0,0.01)',
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
+                    {/* Status Bar bottom */}
+                    <Box
                       sx={{
-                        fontWeight: 800,
-                        fontSize: '0.65rem',
-                        letterSpacing: '0.05em',
-                        color:
-                          statusLabel === 'ACTIVE'
-                            ? 'success.main'
-                            : statusLabel === 'RECENT'
-                              ? 'primary.main'
-                              : 'text.secondary',
+                        px: 2,
+                        py: 1.25,
+                        borderTop: (theme) =>
+                          `1px solid ${theme.palette.divider}`,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderBottomLeftRadius: '16px',
+                        borderBottomRightRadius: '16px',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.01)'
+                            : 'rgba(0,0,0,0.01)',
                       }}
                     >
-                      {statusLabel === 'ACTIVE'
-                        ? t('common.active').toUpperCase()
-                        : statusLabel === 'RECENT'
-                          ? t('workspaceLibrary.status.recent').toUpperCase()
-                          : t('workspaceLibrary.status.draft').toUpperCase()}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: 'text.secondary', fontWeight: 700 }}
-                    >
-                      &rarr;
-                    </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '0.65rem',
+                          letterSpacing: '0.05em',
+                          color:
+                            statusLabel === 'ACTIVE'
+                              ? 'success.main'
+                              : statusLabel === 'RECENT'
+                                ? 'primary.main'
+                                : 'text.secondary',
+                        }}
+                      >
+                        {statusLabel === 'ACTIVE'
+                          ? t('common.active').toUpperCase()
+                          : statusLabel === 'RECENT'
+                            ? t('workspaceLibrary.status.recent').toUpperCase()
+                            : t('workspaceLibrary.status.draft').toUpperCase()}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: 'text.secondary', fontWeight: 700 }}
+                      >
+                        &rarr;
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              );
-            })}
-          </Box>
-
-          {!folderSearchTerm && totalGroupPages > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
-              <Pagination
-                count={totalGroupPages}
-                page={groupPage}
-                onChange={(_event, value) => setGroupPage(value)}
-                color="primary"
-                shape="rounded"
-              />
+                );
+              })}
             </Box>
-          )}
-        </Box>
+
+            {!folderSearchTerm && totalGroupPages > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+                <Pagination
+                  count={totalGroupPages}
+                  page={groupPage}
+                  onChange={(_event, value) => setGroupPage(value)}
+                  color="primary"
+                  shape="rounded"
+                />
+              </Box>
+            )}
+          </Box>
+        )
       ) : (
         /* Inside Folder: GridContainer showing note cards inside active folder */
         <>
@@ -731,7 +786,11 @@ export const WorkspaceLibrary = ({
                     description={t('workspaceLibrary.emptyFolder.desc')}
                     actionText={t('workspaceLibrary.emptyFolder.action')}
                     onAction={() =>
-                      onCreate(undefined, undefined, selectedGroupId ?? undefined)
+                      onCreate(
+                        undefined,
+                        undefined,
+                        selectedGroupId ?? undefined,
+                      )
                     }
                     sx={{ gridColumn: '1 / -1', py: 10 }}
                   />
