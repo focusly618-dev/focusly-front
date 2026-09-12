@@ -29,15 +29,10 @@ import {
   Divider,
 } from '@mui/material';
 
-import { SearchPalette } from '../SearchPalette/SearchPalette';
 import { ImportContentModal } from './components/ImportContentModal/ImportContentModal';
 import { convertMarkdownToDocx } from './documentExporters';
 import { sileo } from '@/utils';
-import {
-  HeaderLeft,
-  HeaderCenter,
-  HeaderRight,
-} from '@/pages/Workspace/Workspace.styles';
+import { HeaderLeft, HeaderRight } from '@/pages/Workspace/Workspace.styles';
 import { EditorHeader as StyledEditorHeader } from './EditorHeader.styles';
 import type { EditorHeaderProps } from './EditorHeader.types';
 import { useEditorHeader } from './useEditorHeader.hook';
@@ -45,22 +40,16 @@ import { useEditorHeader } from './useEditorHeader.hook';
 export const EditorHeader = (props: EditorHeaderProps) => {
   const {
     onBack,
-    showPalette,
-    setShowPalette,
-    loadMore,
-    searchTerm,
-    setSearchTerm,
-    filteredTasks,
     selectTask,
-    handleSelectTask,
-    setValue,
     saveState,
     sourceLanguage,
     targetLanguage,
-    hasMore,
     isCentered,
     onToggleCentered,
     onToggleSidebar,
+    isRightSidebarOpen,
+    currentFolder,
+    currentTitle,
     onStartFocus,
     markdownEditorRef,
   } = props;
@@ -86,7 +75,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${(selectTask?.title || 'note').replace(/[^\w-]+/g, '_')}.${extension}`;
+    link.download = `${(currentTitle || selectTask?.title || 'note').replace(/[^\w-]+/g, '_')}.${extension}`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -116,7 +105,14 @@ export const EditorHeader = (props: EditorHeaderProps) => {
   return (
     <StyledEditorHeader>
       {/* ─── DESKTOP LAYOUT ─── */}
-      <HeaderLeft sx={{ display: { xs: 'none', md: 'flex' } }}>
+      <HeaderLeft
+        sx={{
+          display: { xs: 'none', md: 'flex' },
+          alignItems: 'center',
+          gap: 1.25,
+          minWidth: 0,
+        }}
+      >
         <IconButton
           onClick={onBack}
           sx={{
@@ -124,7 +120,6 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             height: '34px',
             minWidth: '34px',
             p: 0,
-            mr: { xs: 0, md: 1 },
             borderRadius: '50%',
             border: '1px solid',
             borderColor: (theme) =>
@@ -146,30 +141,94 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         >
           <ArrowBackIcon sx={{ fontSize: 16 }} />
         </IconButton>
+
+        {/* Breadcrumb: Folder & Title */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            minWidth: 0,
+            overflow: 'hidden',
+          }}
+        >
+          {currentFolder?.name && (
+            <>
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  px: 1,
+                  py: 0.35,
+                  borderRadius: '8px',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : 'rgba(0, 0, 0, 0.04)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  maxWidth: '180px',
+                  flexShrink: 0,
+                }}
+              >
+                <ModernFolderFilledIcon
+                  sx={{
+                    fontSize: 15,
+                    color: currentFolder.color || 'primary.main',
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  variant="caption"
+                  noWrap
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: '12px',
+                    color: 'text.secondary',
+                  }}
+                >
+                  {currentFolder.name}
+                </Typography>
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.disabled',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  userSelect: 'none',
+                  flexShrink: 0,
+                }}
+              >
+                /
+              </Typography>
+            </>
+          )}
+          <Typography
+            variant="subtitle2"
+            noWrap
+            sx={{
+              fontWeight: 700,
+              fontSize: '13.5px',
+              color: 'text.primary',
+              letterSpacing: '-0.01em',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {currentTitle?.trim() || 'Untitled Note'}
+          </Typography>
+        </Box>
       </HeaderLeft>
 
       <HeaderCenter
-        id="joyride-editor-search"
         sx={{
           display: { xs: 'none', md: 'flex' },
-          position: 'relative',
-          zIndex: 50,
-          mx: { md: 1, lg: 2 },
+          flex: 1,
         }}
-      >
-        <SearchPalette
-          showPalette={showPalette}
-          setShowPalette={setShowPalette}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filteredTasks={filteredTasks}
-          selectTask={selectTask}
-          handleSelectTask={handleSelectTask}
-          setValue={setValue}
-          loadMore={loadMore}
-          hasMore={hasMore}
-        />
-      </HeaderCenter>
+      />
 
       <HeaderRight sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
         {/* Target Language Button */}
@@ -333,6 +392,58 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             ) : null}
           </Box>
         </Fade>
+
+        {/* Desktop Sidebar Toggle Button */}
+        {onToggleSidebar && (
+          <Tooltip
+            title={
+              isRightSidebarOpen
+                ? 'Cerrar panel acompañante'
+                : 'Abrir panel acompañante'
+            }
+          >
+            <IconButton
+              onClick={onToggleSidebar}
+              size="small"
+              sx={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px',
+                border: '1px solid',
+                borderColor: (theme) =>
+                  isRightSidebarOpen
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(19, 127, 236, 0.4)'
+                      : 'rgba(19, 127, 236, 0.3)'
+                    : theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.12)'
+                      : '#e2e8f0',
+                color: isRightSidebarOpen ? 'primary.main' : 'text.secondary',
+                bgcolor: (theme) =>
+                  isRightSidebarOpen
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(19, 127, 236, 0.15)'
+                      : 'rgba(19, 127, 236, 0.08)'
+                    : theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : '#ffffff',
+                '&:hover': {
+                  color: isRightSidebarOpen ? 'primary.main' : 'text.primary',
+                  bgcolor: (theme) =>
+                    isRightSidebarOpen
+                      ? theme.palette.mode === 'dark'
+                        ? 'rgba(19, 127, 236, 0.25)'
+                        : 'rgba(19, 127, 236, 0.14)'
+                      : theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.08)'
+                        : '#f8fafc',
+                },
+              }}
+            >
+              <ViewSidebarIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Tooltip>
+        )}
 
         {/* Editor Tools Menu (Detect Language / Dictation / Focus Mode) */}
         <Menu

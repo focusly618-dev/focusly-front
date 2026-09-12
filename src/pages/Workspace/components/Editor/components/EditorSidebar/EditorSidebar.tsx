@@ -1,120 +1,46 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAppSelector } from '@/redux/hooks';
 import {
   Box,
   Typography,
   IconButton,
-  Menu,
-  MenuItem,
-  Button,
   Tooltip,
+  useTheme,
+  Divider,
 } from '@mui/material';
 import {
   ChevronRight,
   ChevronLeft,
-  CheckCircle as CheckCircleIcon,
-  PauseCircle as PauseCircleIcon,
-  RadioButtonUnchecked as RadioButtonUncheckedIcon,
-  History as HistoryIcon,
-  Visibility as VisibilityIcon,
-  EventNote as PlannedIcon,
-  Description as DescriptionIcon,
-  LinkOff as LinkOffIcon,
-  Link as LinkIcon,
-  Launch as LaunchIcon,
-  AccessTime as AccessTimeIcon,
-  AssignmentOutlined as AssignmentIcon,
-  LightbulbOutlined as TipIcon,
-  Search as SearchIcon,
-  OpenInFull as OpenInFullIcon,
   Toc as TocIcon,
   Hub as HubIcon,
+  BarChart as BarChartIcon,
+  DescriptionOutlined as DocIcon,
+  MenuBookOutlined as ReadingTimeIcon,
+  TextFieldsOutlined as WordsIcon,
+  TitleOutlined as HeadingIcon,
+  NotesOutlined as ParagraphsIcon,
 } from '@mui/icons-material';
-import { formatDescriptionToHtml } from '@/utils/formatDescription';
-import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import { PriorityBadge, getPriorityConfig } from '@/components/ui';
+import { ModernFolderFilledIcon } from '@/components/ui';
 import {
   RightSidebar,
   SidebarHeaderTop,
   SidebarBody,
   DragHandle,
-  MetadataSection,
-  MarkDoneButton,
-  DescriptionContainer,
-  DescriptionHeader,
-  PropertyGrid,
-  PropertyCard,
-  PropertyLabel,
-  PropertyValue,
-  SectionSubtitle,
-  ResourceItem,
-  PulseIndicator,
-  EmptyStateContainer,
-  EmptyStateIconWrapper,
-  EmptyStateTipCard,
 } from './EditorSidebar.styles';
 import type { EditorSidebarProps } from './EditorSidebar.type';
-import { useEditorSidebar } from './EditorSidebar.hook';
 import { parseHeadings, NoteOutlineList, NoteGraphView } from './GraphSidebar';
 
 export const EditorSidebar = (props: EditorSidebarProps) => {
   const {
     isRightSidebarOpen,
     setIsRightSidebarOpen,
-    selectTask,
-    activeFocusTaskId,
-    onUnlinkTask,
-    setShowPalette,
     markdownContent,
     markdownEditorRef,
+    currentTitle,
+    currentFolder,
+    selectTask,
   } = props;
 
-  const { user } = useAppSelector((state) => state.auth);
-
-  const isReadOnly = useMemo(() => {
-    if (!selectTask) return false;
-    if (!user) return true;
-
-    const selectTaskAny = selectTask as {
-      task_type?: string;
-      google_event_id?: string;
-      organizer_email?: string;
-      user_id?: string;
-    };
-    // Check Google Calendar event ownership
-    if (
-      selectTaskAny.task_type === 'GoogleTask' ||
-      selectTaskAny.google_event_id
-    ) {
-      const organizerEmail = selectTaskAny.organizer_email;
-      if (organizerEmail) {
-        return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
-      }
-    }
-
-    // Check Focusly task ownership
-    if (selectTaskAny.user_id && selectTaskAny.user_id !== user.id) {
-      return true;
-    }
-
-    return false;
-  }, [selectTask, user]);
-
-  const {
-    priorityAnchor,
-    setPriorityAnchor,
-    statusAnchor,
-    setStatusAnchor,
-    getStatusColor,
-    handlePriorityClick,
-    handleStatusClick,
-    handlePrioritySelect,
-    handleStatusSelect,
-    handleMarkDone,
-    currentStatus,
-    currentPriorityLevel,
-    theme,
-  } = useEditorSidebar(props);
+  const theme = useTheme();
 
   const SIDEBAR_MIN = 300;
   const SIDEBAR_MAX = 380;
@@ -126,18 +52,17 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     const width = saved ? parseInt(saved, 10) : 340;
     return Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, width));
   });
-  // The note map benefits from a lot more room than task metadata ever
-  // needs — a separate width lets dragging the same handle "extend" just
-  // that tab, instead of permanently widening the sidebar for every view.
+
   const [graphPanelWidth, setGraphPanelWidth] = useState(() => {
     const saved = localStorage.getItem('workspace_sidebar_graph_width');
     const width = saved ? parseInt(saved, 10) : 700;
     return Math.max(GRAPH_MIN, Math.min(GRAPH_MAX, width));
   });
+
   const [isDragging, setIsDragging] = useState(false);
   const [activeInsightView, setActiveInsightView] = useState<
-    'outline' | 'graph' | null
-  >(null);
+    'outline' | 'graph' | 'stats'
+  >('outline');
 
   const isGraphView = activeInsightView === 'graph';
   const effectiveSidebarWidth = isGraphView ? graphPanelWidth : sidebarWidth;
@@ -147,9 +72,34 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     [markdownContent],
   );
 
+  const stats = useMemo(() => {
+    const raw = markdownContent ?? '';
+    const trimmed = raw.trim();
+    const words = trimmed ? trimmed.split(/\s+/).filter(Boolean).length : 0;
+    const chars = raw.length;
+    const charsNoSpaces = raw.replace(/\s+/g, '').length;
+    const readingTimeMinutes = Math.max(1, Math.ceil(words / 200));
+    const h1Count = headings.filter((h) => h.level === 1).length;
+    const h2Count = headings.filter((h) => h.level === 2).length;
+    const h3Count = headings.filter((h) => h.level >= 3).length;
+    const paragraphs = trimmed
+      ? trimmed.split(/\n\s*\n/).filter((p) => p.trim().length > 0).length
+      : 0;
+
+    return {
+      words,
+      chars,
+      charsNoSpaces,
+      readingTimeMinutes,
+      h1Count,
+      h2Count,
+      h3Count,
+      paragraphs,
+    };
+  }, [markdownContent, headings]);
+
   const handleJumpToHeading = (pos: number) => {
     markdownEditorRef?.current?.setCursor(pos);
-    setActiveInsightView(null);
   };
 
   const handlePointerDown = useCallback(
@@ -193,16 +143,18 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     );
   }, [graphPanelWidth]);
 
-  const isTaskInFocus = activeFocusTaskId === selectTask?.id;
   const headerLabel =
     activeInsightView === 'outline'
       ? 'OUTLINE'
       : activeInsightView === 'graph'
         ? 'MAPA DE NOTAS'
-        : 'TASK DETAILS';
+        : 'ESTADÍSTICAS';
+
+  const noteTitle = currentTitle?.trim() || selectTask?.title || 'Esta nota';
 
   return (
     <RightSidebar
+      id="joyride-editor-sidebar"
       isOpen={isRightSidebarOpen}
       widthVal={effectiveSidebarWidth}
       isDragging={isDragging}
@@ -221,73 +173,21 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           <Box display="flex" alignItems="center" gap={1}>
             <Typography
               variant="caption"
-              fontWeight={700}
+              fontWeight={750}
               color="text.secondary"
               letterSpacing={1.2}
             >
               {headerLabel}
             </Typography>
-            {!activeInsightView &&
-              isTaskInFocus &&
-              currentStatus !== 'Done' && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    bgcolor: `${theme.palette.primary.main}15`,
-                    color: theme.palette.primary.main,
-                    px: 1.5,
-                    py: 0.2,
-                    borderRadius: '99px',
-                    border: `1px solid ${theme.palette.primary.main}33`,
-                  }}
-                >
-                  <PulseIndicator />
-                  <Typography
-                    variant="caption"
-                    fontWeight={750}
-                    fontSize="9px"
-                    letterSpacing={0.5}
-                  >
-                    IN PROGRESS
-                  </Typography>
-                </Box>
-              )}
           </Box>
         )}
-        <Box display="flex" alignItems="center" gap={0.25}>
+        <Box display="flex" alignItems="center" gap={0.5}>
           {isRightSidebarOpen && (
             <>
-              <Tooltip title="Task details" placement="bottom">
-                <span>
-                  <IconButton
-                    id="joyride-editor-full-detail"
-                    size="small"
-                    disabled={!selectTask}
-                    onClick={() => setActiveInsightView(null)}
-                    sx={{
-                      color: !activeInsightView
-                        ? theme.palette.primary.main
-                        : 'text.secondary',
-                      bgcolor: !activeInsightView
-                        ? `${theme.palette.primary.main}15`
-                        : 'transparent',
-                      '&:hover': {
-                        bgcolor: !activeInsightView
-                          ? `${theme.palette.primary.main}22`
-                          : theme.palette.action.hover,
-                        color: !activeInsightView
-                          ? theme.palette.primary.main
-                          : theme.palette.text.primary,
-                      },
-                    }}
-                  >
-                    <OpenInFullIcon sx={{ fontSize: 15 }} />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Outline — jump to any heading" placement="bottom">
+              <Tooltip
+                title="Outline — Índice de encabezados"
+                placement="bottom"
+              >
                 <IconButton
                   size="small"
                   onClick={() => setActiveInsightView('outline')}
@@ -312,11 +212,12 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                     },
                   }}
                 >
-                  <TocIcon sx={{ fontSize: 17 }} />
+                  <TocIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
+
               <Tooltip
-                title="Mapa de notas — cómo se conectan los encabezados de esta nota con la tarea"
+                title="Mapa de notas — Visualización de conexiones"
                 placement="bottom"
               >
                 <IconButton
@@ -343,7 +244,36 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                     },
                   }}
                 >
-                  <HubIcon sx={{ fontSize: 15 }} />
+                  <HubIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Estadísticas del documento" placement="bottom">
+                <IconButton
+                  size="small"
+                  onClick={() => setActiveInsightView('stats')}
+                  sx={{
+                    color:
+                      activeInsightView === 'stats'
+                        ? theme.palette.primary.main
+                        : 'text.secondary',
+                    bgcolor:
+                      activeInsightView === 'stats'
+                        ? `${theme.palette.primary.main}15`
+                        : 'transparent',
+                    '&:hover': {
+                      bgcolor:
+                        activeInsightView === 'stats'
+                          ? `${theme.palette.primary.main}22`
+                          : theme.palette.action.hover,
+                      color:
+                        activeInsightView === 'stats'
+                          ? theme.palette.primary.main
+                          : theme.palette.text.primary,
+                    },
+                  }}
+                >
+                  <BarChartIcon sx={{ fontSize: 17 }} />
                 </IconButton>
               </Tooltip>
             </>
@@ -370,7 +300,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
 
       {isRightSidebarOpen && (
         <SidebarBody>
-          {activeInsightView ? (
+          {activeInsightView === 'outline' && (
             <Box
               sx={{
                 display: 'flex',
@@ -380,634 +310,465 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
               }}
             >
               <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 0.5 }}>
-                {activeInsightView === 'outline' ? (
-                  <NoteOutlineList
-                    headings={headings}
-                    onJump={handleJumpToHeading}
-                  />
-                ) : (
-                  <NoteGraphView
-                    rootLabel={selectTask?.title || 'This note'}
-                    headings={headings}
-                    onJump={handleJumpToHeading}
-                  />
-                )}
+                <NoteOutlineList
+                  headings={headings}
+                  onJump={handleJumpToHeading}
+                />
               </Box>
             </Box>
-          ) : (
-            <>
-              {selectTask ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flexGrow: 1,
-                    height: 'calc(100% - 50px)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <MetadataSection
-                    sx={{ flexGrow: 1, overflowY: 'auto', pr: 0.5 }}
+          )}
+
+          {activeInsightView === 'graph' && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                overflow: 'hidden',
+              }}
+            >
+              <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 0.5 }}>
+                <NoteGraphView
+                  rootLabel={noteTitle}
+                  headings={headings}
+                  onJump={handleJumpToHeading}
+                />
+              </Box>
+            </Box>
+          )}
+
+          {activeInsightView === 'stats' && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2.5,
+                height: '100%',
+                overflowY: 'auto',
+                pr: 0.5,
+              }}
+            >
+              {/* Document Info Card */}
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: '12px',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.03)'
+                      : 'rgba(0, 0, 0, 0.02)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.25,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <DocIcon
+                    sx={{
+                      fontSize: 18,
+                      color: 'primary.main',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '13px',
+                      color: 'text.primary',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
                   >
-                    <Box sx={{ mb: 3 }}>
-                      <Box
-                        display="flex"
-                        alignItems="flex-start"
-                        justifyContent="space-between"
-                      >
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 800,
-                            color: 'text.primary',
-                            lineHeight: 1.25,
-                            fontSize: '1.25rem',
-                            letterSpacing: '-0.02em',
-                            flex: 1,
-                          }}
-                        >
-                          {selectTask.title}
-                        </Typography>
-                        {onUnlinkTask && !isReadOnly && (
-                          <IconButton
-                            size="small"
-                            onClick={onUnlinkTask}
-                            sx={{
-                              color: 'text.secondary',
-                              ml: 1,
-                              '&:hover': {
-                                color: 'error.main',
-                                backgroundColor: `${theme.palette.error.main}12`,
-                              },
-                            }}
-                            title="Unlink task"
-                          >
-                            <LinkOffIcon sx={{ fontSize: 18 }} />
-                          </IconButton>
-                        )}
-                      </Box>
-                    </Box>
-
-                    <PropertyGrid id="joyride-editor-metadata">
-                      <PropertyCard>
-                        <PropertyLabel>STATUS</PropertyLabel>
-                        <PropertyValue
-                          onClick={isReadOnly ? undefined : handleStatusClick}
-                          sx={{
-                            cursor: isReadOnly ? 'default' : 'pointer',
-                            justifyContent: 'flex-start',
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 0.75,
-                              px: 1.25,
-                              py: 0.35,
-                              borderRadius: '12px',
-                              bgcolor:
-                                currentStatus === 'Done'
-                                  ? '#dcfce7'
-                                  : `${getStatusColor(currentStatus)}15`,
-                              color:
-                                currentStatus === 'Done'
-                                  ? '#166534'
-                                  : getStatusColor(currentStatus),
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                width: 6,
-                                height: 6,
-                                borderRadius: '50%',
-                                bgcolor:
-                                  currentStatus === 'Done'
-                                    ? '#166534'
-                                    : getStatusColor(currentStatus),
-                              }}
-                            />
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                fontWeight: 700,
-                                fontSize: '11px',
-                                lineHeight: 1,
-                              }}
-                            >
-                              {currentStatus}
-                            </Typography>
-                          </Box>
-                        </PropertyValue>
-                      </PropertyCard>
-
-                      <PropertyCard>
-                        <PropertyLabel>PRIORITY</PropertyLabel>
-                        <PropertyValue
-                          onClick={isReadOnly ? undefined : handlePriorityClick}
-                          sx={{
-                            cursor: isReadOnly ? 'default' : 'pointer',
-                          }}
-                        >
-                          <PriorityBadge
-                            priority={Number(currentPriorityLevel)}
-                            size={18}
-                          />
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontWeight: 700,
-                              fontSize: '11px',
-                              color: getPriorityConfig(
-                                Number(currentPriorityLevel),
-                              ).color,
-                            }}
-                          >
-                            {
-                              getPriorityConfig(Number(currentPriorityLevel))
-                                .label
-                            }
-                          </Typography>
-                        </PropertyValue>
-                      </PropertyCard>
-
-                      <PropertyCard>
-                        <PropertyLabel>ESTIMATE</PropertyLabel>
-                        <PropertyValue>
-                          <AccessTimeIcon
-                            sx={{
-                              fontSize: 14,
-                              color: theme.palette.text.secondary,
-                            }}
-                          />
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 600,
-                              fontSize: '13px',
-                              color: 'text.primary',
-                            }}
-                          >
-                            {selectTask?.estimate_timer
-                              ? formatDuration(selectTask.estimate_timer)
-                              : '2h'}
-                          </Typography>
-                        </PropertyValue>
-                      </PropertyCard>
-
-                      <PropertyCard>
-                        <PropertyLabel>REAL TIME</PropertyLabel>
-                        <PropertyValue>
-                          <AccessTimeIcon
-                            sx={{ fontSize: 14, color: '#3b82f6' }}
-                          />
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 600,
-                              fontSize: '13px',
-                              color: '#3b82f6',
-                            }}
-                          >
-                            {selectTask?.real_timer
-                              ? formatDuration(selectTask.real_timer)
-                              : '0h'}
-                          </Typography>
-                        </PropertyValue>
-                      </PropertyCard>
-
-                      {selectTask?.created_at && (
-                        <PropertyCard>
-                          <PropertyLabel>CREATED ON</PropertyLabel>
-                          <PropertyValue>
-                            <PlannedIcon
-                              sx={{
-                                fontSize: 14,
-                                color: theme.palette.text.secondary,
-                              }}
-                            />
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                fontWeight: 600,
-                                fontSize: '13px',
-                                color: 'text.primary',
-                              }}
-                            >
-                              {new Date(
-                                selectTask.created_at,
-                              ).toLocaleDateString(undefined, {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                              })}
-                            </Typography>
-                          </PropertyValue>
-                        </PropertyCard>
-                      )}
-                    </PropertyGrid>
-
-                    {selectTask.links && selectTask.links.length > 0 && (
-                      <>
-                        <SectionSubtitle>Links & Resources</SectionSubtitle>
-                        <Box
-                          display="flex"
-                          flexDirection="column"
-                          gap={1}
-                          mb={3}
-                        >
-                          {selectTask.links.map((link, index) => (
-                            <ResourceItem key={index}>
-                              <Box
-                                display="flex"
-                                alignItems="center"
-                                gap={1.2}
-                                sx={{ minWidth: 0, flex: 1 }}
-                              >
-                                <LinkIcon
-                                  sx={{
-                                    fontSize: 16,
-                                    color: theme.palette.primary.main,
-                                    flexShrink: 0,
-                                  }}
-                                />
-                                <Box sx={{ minWidth: 0, flex: 1 }}>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      fontWeight: 700,
-                                      color: theme.palette.text.primary,
-                                      lineHeight: 1.2,
-                                      fontSize: '12px',
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                    }}
-                                  >
-                                    {link.title}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: theme.palette.text.secondary,
-                                      display: 'block',
-                                      fontSize: '10px',
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                    }}
-                                  >
-                                    {link.url}
-                                  </Typography>
-                                </Box>
-                              </Box>
-                              <Button
-                                component="a"
-                                size="small"
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                startIcon={<LaunchIcon sx={{ fontSize: 10 }} />}
-                                sx={{
-                                  fontSize: '10px',
-                                  fontWeight: 700,
-                                  textTransform: 'none',
-                                  borderRadius: '6px',
-                                  padding: '4px 10px',
-                                  border: '1px solid',
-                                  borderColor: theme.palette.divider,
-                                  color: theme.palette.text.primary,
-                                  backgroundColor: 'transparent',
-                                  transition: 'all 0.2s ease',
-                                  '&:hover': {
-                                    backgroundColor: theme.palette.action.hover,
-                                    borderColor: theme.palette.text.secondary,
-                                  },
-                                  flexShrink: 0,
-                                  ml: 1,
-                                  ...(link.title
-                                    .toLowerCase()
-                                    .includes('meet') && {
-                                    bgcolor: `${theme.palette.primary.main}15`,
-                                    color: theme.palette.primary.main,
-                                    border: `1px solid ${theme.palette.primary.main}30`,
-                                    '&:hover': {
-                                      bgcolor: `${theme.palette.primary.main}25`,
-                                      borderColor: theme.palette.primary.main,
-                                    },
-                                  }),
-                                }}
-                              >
-                                {link.title.toLowerCase().includes('meet')
-                                  ? 'JOIN'
-                                  : 'OPEN'}
-                              </Button>
-                            </ResourceItem>
-                          ))}
-                        </Box>
-                      </>
-                    )}
-
-                    <Box sx={{ mt: 3 }}>
-                      <DescriptionHeader>
-                        <DescriptionIcon sx={{ fontSize: 14 }} />
-                        <Typography
-                          variant="caption"
-                          fontWeight={750}
-                          letterSpacing={1.2}
-                        >
-                          DESCRIPTION
-                        </Typography>
-                      </DescriptionHeader>
-                      <DescriptionContainer
-                        dangerouslySetInnerHTML={{
-                          __html:
-                            formatDescriptionToHtml(
-                              selectTask?.notes_encrypted,
-                            ) ||
-                            '<p style="color: grey; font-style: italic; font-size: 13px;">No description provided for this task.</p>',
-                        }}
-                      />
-                    </Box>
-                  </MetadataSection>
+                    {noteTitle}
+                  </Typography>
                 </Box>
-              ) : (
-                <EmptyStateContainer>
-                  <EmptyStateIconWrapper>
-                    <AssignmentIcon
+
+                {currentFolder?.name && (
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      px: 1,
+                      py: 0.4,
+                      borderRadius: '8px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(0, 0, 0, 0.04)',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      width: 'fit-content',
+                    }}
+                  >
+                    <ModernFolderFilledIcon
                       sx={{
-                        fontSize: 32,
-                        color: theme.palette.primary.main,
-                        filter: `drop-shadow(0 0 8px ${theme.palette.primary.main}50)`,
+                        fontSize: 14,
+                        color: currentFolder.color || 'primary.main',
                       }}
                     />
-                  </EmptyStateIconWrapper>
-
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      fontWeight: 800,
-                      color: 'text.primary',
-                      mb: 1,
-                      fontSize: '15px',
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    No Task Linked
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: 'text.secondary',
-                      fontSize: '12.5px',
-                      lineHeight: 1.5,
-                      maxWidth: '240px',
-                      mb: 3,
-                    }}
-                  >
-                    Link a task to track estimate vs actual time, update status,
-                    and manage its description or resources.
-                  </Typography>
-
-                  {setShowPalette && (
-                    <Button
-                      variant="contained"
-                      onClick={() => setShowPalette(true)}
-                      startIcon={<SearchIcon sx={{ fontSize: 16 }} />}
+                    <Typography
+                      variant="caption"
                       sx={{
-                        textTransform: 'none',
-                        bgcolor: theme.palette.primary.main,
-                        color: '#ffffff',
-                        px: 3,
-                        py: 1,
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        fontSize: '12px',
-                        boxShadow: `0 4px 12px ${theme.palette.primary.main}30`,
-                        transition: 'all 0.2s ease-in-out',
-                        '&:hover': {
-                          bgcolor: theme.palette.primary.dark,
-                          transform: 'translateY(-1.5px)',
-                          boxShadow: `0 6px 16px ${theme.palette.primary.main}45`,
-                        },
+                        fontWeight: 600,
+                        fontSize: '11px',
+                        color: 'text.secondary',
                       }}
                     >
-                      Link a Task
-                    </Button>
-                  )}
+                      {currentFolder.name}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
 
-                  <EmptyStateTipCard>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <TipIcon sx={{ fontSize: 14, color: 'warning.main' }} />
+              {/* 2x2 Metric Cards Grid */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: 1.5,
+                }}
+              >
+                {/* Words */}
+                <Box
+                  sx={{
+                    p: 1.75,
+                    borderRadius: '12px',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.03)'
+                        : 'rgba(0, 0, 0, 0.02)',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 0.5,
+                  }}
+                >
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
+                  >
+                    <WordsIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '10px',
+                        letterSpacing: '0.5px',
+                        color: 'text.secondary',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Palabras
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: '18px',
+                      lineHeight: 1.2,
+                      color: 'text.primary',
+                    }}
+                  >
+                    {stats.words.toLocaleString()}
+                  </Typography>
+                </Box>
+
+                {/* Characters */}
+                <Box
+                  sx={{
+                    p: 1.75,
+                    borderRadius: '12px',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.03)'
+                        : 'rgba(0, 0, 0, 0.02)',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 0.5,
+                  }}
+                >
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
+                  >
+                    <WordsIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '10px',
+                        letterSpacing: '0.5px',
+                        color: 'text.secondary',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Caracteres
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: '18px',
+                      lineHeight: 1.2,
+                      color: 'text.primary',
+                    }}
+                  >
+                    {stats.chars.toLocaleString()}
+                  </Typography>
+                </Box>
+
+                {/* Reading Time */}
+                <Box
+                  sx={{
+                    p: 1.75,
+                    borderRadius: '12px',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.03)'
+                        : 'rgba(0, 0, 0, 0.02)',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 0.5,
+                  }}
+                >
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
+                  >
+                    <ReadingTimeIcon
+                      sx={{ fontSize: 14, color: 'info.main' }}
+                    />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '10px',
+                        letterSpacing: '0.5px',
+                        color: 'text.secondary',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Lectura
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: '18px',
+                      lineHeight: 1.2,
+                      color: 'info.main',
+                    }}
+                  >
+                    {stats.readingTimeMinutes} min
+                  </Typography>
+                </Box>
+
+                {/* Headings */}
+                <Box
+                  sx={{
+                    p: 1.75,
+                    borderRadius: '12px',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.03)'
+                        : 'rgba(0, 0, 0, 0.02)',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 0.5,
+                  }}
+                >
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
+                  >
+                    <HeadingIcon sx={{ fontSize: 14, color: 'primary.main' }} />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '10px',
+                        letterSpacing: '0.5px',
+                        color: 'text.secondary',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Encabezados
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: '18px',
+                      lineHeight: 1.2,
+                      color: 'primary.main',
+                    }}
+                  >
+                    {headings.length}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Structural Breakdown */}
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: '12px',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.03)'
+                      : 'rgba(0, 0, 0, 0.02)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 750,
+                    fontSize: '11px',
+                    letterSpacing: '0.8px',
+                    color: 'text.secondary',
+                    textTransform: 'uppercase',
+                    display: 'block',
+                    mb: 1.5,
+                  }}
+                >
+                  Estructura del contenido
+                </Typography>
+
+                <Box
+                  sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ fontSize: '12.5px', color: 'text.secondary' }}
+                    >
+                      Títulos principales (H1)
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '12.5px',
+                        color: 'text.primary',
+                      }}
+                    >
+                      {stats.h1Count}
+                    </Typography>
+                  </Box>
+
+                  <Divider />
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ fontSize: '12.5px', color: 'text.secondary' }}
+                    >
+                      Secciones (H2)
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '12.5px',
+                        color: 'text.primary',
+                      }}
+                    >
+                      {stats.h2Count}
+                    </Typography>
+                  </Box>
+
+                  <Divider />
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ fontSize: '12.5px', color: 'text.secondary' }}
+                    >
+                      Subsecciones (H3+)
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '12.5px',
+                        color: 'text.primary',
+                      }}
+                    >
+                      {stats.h3Count}
+                    </Typography>
+                  </Box>
+
+                  <Divider />
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
+                    >
+                      <ParagraphsIcon
+                        sx={{ fontSize: 15, color: 'text.secondary' }}
+                      />
                       <Typography
-                        variant="caption"
-                        fontWeight={750}
-                        color="warning.main"
-                        letterSpacing={0.5}
+                        variant="body2"
+                        sx={{ fontSize: '12.5px', color: 'text.secondary' }}
                       >
-                        QUICK TIP
+                        Párrafos
                       </Typography>
                     </Box>
                     <Typography
-                      variant="caption"
-                      color="text.secondary"
+                      variant="body2"
                       sx={{
-                        textAlign: 'left',
-                        fontSize: '11px',
-                        lineHeight: 1.4,
+                        fontWeight: 700,
+                        fontSize: '12.5px',
+                        color: 'text.primary',
                       }}
                     >
-                      Use the search bar at the top of this editor to quickly
-                      search and link tasks from your workspaces.
+                      {stats.paragraphs}
                     </Typography>
-                  </EmptyStateTipCard>
-                </EmptyStateContainer>
-              )}
-
-              <Box sx={{ flexGrow: 1, minHeight: '20px' }} />
-
-              {selectTask && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 1.5,
-                    flexDirection: 'column',
-                    mt: 'auto',
-                    pt: 2,
-                  }}
-                >
-                  <MarkDoneButton
-                    disabled={!selectTask || isReadOnly}
-                    onClick={handleMarkDone}
-                    startIcon={
-                      currentStatus === 'Done' ? (
-                        <CheckCircleIcon
-                          sx={{ fontSize: 16, color: '#15803d !important' }}
-                        />
-                      ) : undefined
-                    }
-                    sx={{
-                      py: 1.4,
-                      fontSize: '11px',
-                      borderRadius: '12px',
-                      fontWeight: 800,
-                      letterSpacing: '0.5px',
-                      ...(currentStatus === 'Done'
-                        ? {
-                            bgcolor: '#dcfce7 !important',
-                            color: '#15803d !important',
-                            border:
-                              '1px solid rgba(21, 128, 61, 0.2) !important',
-                            '&:hover': {
-                              bgcolor: '#bbf7d0 !important',
-                            },
-                          }
-                        : {
-                            bgcolor: (theme) =>
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255,255,255,0.06)'
-                                : '#f1f5f9',
-                            color: 'text.primary',
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            '&:hover': {
-                              bgcolor: (theme) =>
-                                theme.palette.mode === 'dark'
-                                  ? 'rgba(255,255,255,0.1)'
-                                  : '#e2e8f0',
-                            },
-                          }),
-                    }}
-                  >
-                    {currentStatus === 'Done' ? 'COMPLETED' : 'Mark As Done'}
-                  </MarkDoneButton>
+                  </Box>
                 </Box>
-              )}
-            </>
+              </Box>
+            </Box>
           )}
         </SidebarBody>
       )}
-
-      <Menu
-        anchorEl={priorityAnchor}
-        open={Boolean(priorityAnchor)}
-        onClose={() => setPriorityAnchor(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '10px',
-            minWidth: '150px',
-            mt: 0.5,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-            border: '1px solid',
-            borderColor: 'divider',
-            backgroundImage: 'none',
-          },
-        }}
-      >
-        {[
-          { level: 4, id: 'Critical', label: 'Critical' },
-          { level: 3, id: 'High', label: 'High' },
-          { level: 2, id: 'Medium', label: 'Medium' },
-          { level: 1, id: 'Low', label: 'Low' },
-          { level: 0, id: 'None', label: 'No Priority' },
-        ].map((p) => (
-          <MenuItem
-            key={p.id}
-            onClick={() => handlePrioritySelect(p.level)}
-            sx={{
-              gap: 1.2,
-              py: 1,
-              px: 1.5,
-              borderRadius: '6px',
-              mx: 0.8,
-              my: 0.3,
-              fontSize: '12px',
-            }}
-          >
-            <PriorityBadge priority={p.id} size={24} />
-            <Typography variant="body2" fontWeight={600} fontSize="12px">
-              {p.label}
-            </Typography>
-          </MenuItem>
-        ))}
-      </Menu>
-
-      <Menu
-        anchorEl={statusAnchor}
-        open={Boolean(statusAnchor)}
-        onClose={() => setStatusAnchor(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '10px',
-            minWidth: '160px',
-            mt: 0.5,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-            border: '1px solid',
-            borderColor: 'divider',
-            backgroundImage: 'none',
-          },
-        }}
-      >
-        {[
-          'Todo',
-          'Planning',
-          'Scheduled',
-          'Pending',
-          'On Hold',
-          'Review',
-          'Done',
-          'Backlog',
-          'Archived',
-        ].map((s) => (
-          <MenuItem
-            key={s}
-            onClick={() => handleStatusSelect(s)}
-            sx={{
-              gap: 1.2,
-              py: 1,
-              px: 1.5,
-              borderRadius: '6px',
-              mx: 0.8,
-              my: 0.3,
-              fontSize: '12px',
-            }}
-          >
-            {s === 'Todo' && (
-              <RadioButtonUncheckedIcon
-                sx={{ fontSize: 16, color: 'text.secondary' }}
-              />
-            )}
-            {s === 'Planning' && (
-              <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />
-            )}
-            {s === 'Scheduled' && (
-              <PlannedIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />
-            )}
-            {s === 'Pending' && (
-              <PauseCircleIcon sx={{ fontSize: 16, color: 'warning.main' }} />
-            )}
-            {s === 'On Hold' && (
-              <PauseCircleIcon sx={{ fontSize: 16, color: 'error.main' }} />
-            )}
-            {s === 'Review' && (
-              <VisibilityIcon sx={{ fontSize: 16, color: '#06b6d4' }} />
-            )}
-            {s === 'Done' && (
-              <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
-            )}
-            {s === 'Backlog' && (
-              <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-            )}
-            {s === 'Archived' && (
-              <HistoryIcon sx={{ fontSize: 16, color: '#4b5563' }} />
-            )}
-            <Typography variant="body2" fontWeight={600} fontSize="12px">
-              {s}
-            </Typography>
-          </MenuItem>
-        ))}
-      </Menu>
     </RightSidebar>
   );
 };

@@ -68,6 +68,9 @@ export const WorkspaceEditor = ({
         <MainEditorArea>
           <EditorHeader
             onBack={onBack}
+            currentFolder={currentFolder}
+            currentTitle={currentTitle}
+            isRightSidebarOpen={isRightSidebarOpen}
             showPalette={showPalette}
             setShowPalette={setShowPalette}
             searchTerm={searchTerm}
@@ -108,6 +111,8 @@ export const WorkspaceEditor = ({
         <EditorSidebar
           isRightSidebarOpen={isRightSidebarOpen}
           setIsRightSidebarOpen={setIsRightSidebarOpen}
+          currentFolder={currentFolder}
+          currentTitle={currentTitle}
           selectTask={selectTask}
           handleUpdateTask={handleUpdateTask}
           onStartFocus={onStartFocus}
