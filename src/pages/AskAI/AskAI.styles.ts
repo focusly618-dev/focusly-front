@@ -37,8 +37,8 @@ export const ChatScrollArea = styled(Box)(({ theme }) => ({
 
 export const CenteredColumn = styled(Box)({
   width: '100%',
-  maxWidth: '780px',
-  padding: '0 24px',
+  maxWidth: '860px',
+  padding: '0 20px',
 });
 
 /* ── Welcome / Hero ────────────────────────────────────────────────────────── */
@@ -51,8 +51,8 @@ export const WelcomeSection = styled(Box)(({ theme }) => {
     flexDirection: 'column',
     alignItems: 'center',
     textAlign: 'center',
-    paddingTop: '60px',
-    paddingBottom: '36px',
+    paddingTop: '48px',
+    paddingBottom: '32px',
     gap: '12px',
     position: 'relative',
     width: '100%',
@@ -175,7 +175,7 @@ export const MessageRow = styled(Box)<{ isUser?: boolean }>(({ isUser }) => ({
   alignItems: 'flex-start',
   gap: '12px',
   width: '100%',
-  padding: '6px 0',
+  padding: '8px 0',
   justifyContent: isUser ? 'flex-end' : 'flex-start',
   '&:hover .msg-action-btn': {
     opacity: 0.85,
@@ -185,21 +185,19 @@ export const MessageRow = styled(Box)<{ isUser?: boolean }>(({ isUser }) => ({
 export const AvatarWrapper = styled(Box)(({ theme }) => {
   const isDark = theme.palette.mode === 'dark';
   return {
-    width: '32px',
-    height: '32px',
-    borderRadius: '50%',
+    width: '34px',
+    height: '34px',
+    borderRadius: '10px',
     flexShrink: 0,
     overflow: 'hidden',
-    background: surfaceColor(
-      theme,
-      'linear-gradient(135deg, #242429 0%, #121214 100%)',
-      'linear-gradient(135deg, #2A2A2C 0%, #19191A 100%)',
-      'linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)',
-    ),
+    backgroundColor: isDark ? '#1e2029' : '#ffffff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: `1.5px solid ${isDark ? 'rgba(96, 165, 250, 0.25)' : theme.palette.divider}`,
+    border: `1.5px solid ${isDark ? 'rgba(99, 102, 241, 0.4)' : '#c7d2fe'}`,
+    boxShadow: isDark
+      ? '0 2px 8px rgba(0,0,0,0.4)'
+      : '0 1px 4px rgba(99, 102, 241, 0.1)',
     marginTop: '2px',
   };
 });
@@ -212,62 +210,199 @@ export const UserAvatar = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '#fff',
-  fontSize: '13px',
+  backgroundColor: '#f97316', // Orange as in screenshot
+  color: '#ffffff',
+  fontSize: '12px',
   fontWeight: 700,
   marginTop: '2px',
+  boxShadow: '0 2px 6px rgba(249, 115, 22, 0.25)',
 }));
 
 export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
   ({ theme, isUser }) => ({
-    maxWidth: '78%',
-    padding: '10px 14px',
-    borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+    maxWidth: '100%',
+    padding: isUser ? '10px 16px' : '16px 20px',
+    borderRadius: isUser ? '18px 18px 4px 18px' : '16px',
     backgroundColor: isUser
-      ? theme.palette.primary.main
+      ? '#2563eb' // Modern vibrant blue
       : theme.palette.mode === 'dark'
-        ? 'rgba(255,255,255,0.02)'
-        : 'rgba(0,0,0,0.015)',
-    color: isUser ? '#fff' : theme.palette.text.primary,
-    fontSize: '13.5px',
-    lineHeight: '1.5',
-    border: `1px solid ${theme.palette.divider}`,
-    boxShadow: 'none',
-    '& p': { margin: 0 },
+        ? surfaceColor(theme, '#18181b', '#202022', '#ffffff')
+        : '#ffffff',
+    color: isUser ? '#ffffff' : theme.palette.text.primary,
+    fontSize: '14px',
+    lineHeight: '1.65',
+    border: isUser
+      ? 'none'
+      : `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0'}`,
+    boxShadow: isUser
+      ? '0 2px 8px rgba(37, 99, 235, 0.2)'
+      : theme.palette.mode === 'dark'
+        ? '0 2px 10px rgba(0,0,0,0.3)'
+        : '0 1px 3px rgba(0,0,0,0.03)',
+    '& p': { margin: '0 0 10px 0', '&:last-child': { margin: 0 } },
     '& strong': { fontWeight: 700 },
     '& code': {
       fontFamily: 'monospace',
-      fontSize: '12px',
-      backgroundColor:
-        theme.palette.mode === 'dark'
+      fontSize: '12.5px',
+      backgroundColor: isUser
+        ? 'rgba(255,255,255,0.2)'
+        : theme.palette.mode === 'dark'
           ? 'rgba(255,255,255,0.08)'
           : 'rgba(0,0,0,0.05)',
-      padding: '1px 5px',
-      borderRadius: '4px',
+      padding: '2px 6px',
+      borderRadius: '5px',
     },
   }),
 );
 
+/* ── Date separator pill ───────────────────────────────────────────────────── */
+
+export const DateSeparator = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  margin: '18px 0 14px 0',
+  '& .date-pill': {
+    padding: '4px 14px',
+    borderRadius: '20px',
+    border: `1px solid ${theme.palette.divider}`,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.03)'
+        : 'rgba(0, 0, 0, 0.02)',
+    fontSize: '11px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    color: theme.palette.text.secondary,
+    userSelect: 'none',
+  },
+}));
+
+/* ── Lumina AI Message Card and Header ─────────────────────────────────────── */
+
+export const AIMessageWrapper = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  maxWidth: '82%',
+  width: '100%',
+  alignItems: 'flex-start',
+});
+
+export const AIMessageHeader = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  marginBottom: '6px',
+  paddingLeft: '2px',
+  '& .ai-title': {
+    fontSize: '13px',
+    fontWeight: 700,
+    color: theme.palette.text.primary,
+  },
+  '& .ai-time': {
+    fontSize: '11px',
+    color: theme.palette.text.secondary,
+    fontWeight: 500,
+  },
+}));
+
+export const AIMessageActions = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  marginTop: '8px',
+  paddingLeft: '4px',
+  '& .action-btn': {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    background: 'none',
+    border: 'none',
+    outline: 'none',
+    cursor: 'pointer',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
+    padding: '2px 6px',
+    borderRadius: '6px',
+    transition: 'all 0.15s ease',
+    '&:hover': {
+      color: theme.palette.text.primary,
+      backgroundColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.06)'
+          : 'rgba(0, 0, 0, 0.04)',
+    },
+  },
+}));
+
+/* ── Suggestions Bar ───────────────────────────────────────────────────────── */
+
+export const SuggestionsBar = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  width: '100%',
+  maxWidth: '860px',
+  padding: '0 6px',
+  marginBottom: '10px',
+  overflowX: 'auto',
+  scrollbarWidth: 'none',
+  '&::-webkit-scrollbar': { display: 'none' },
+  '& .sug-label': {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '12px',
+    fontWeight: 700,
+    color: '#2563eb',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  },
+  '& .sug-pill': {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '5px 13px',
+    borderRadius: '20px',
+    border: `1px solid ${
+      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0'
+    }`,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? surfaceColor(theme, '#18181b', '#202022', '#ffffff')
+        : '#ffffff',
+    color: theme.palette.text.primary,
+    fontSize: '12px',
+    fontWeight: 500,
+    whiteSpace: 'nowrap',
+    cursor: 'pointer',
+    flexShrink: 0,
+    transition: 'all 0.18s ease',
+    '&:hover': {
+      borderColor: '#2563eb',
+      backgroundColor:
+        theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.1)' : '#eff6ff',
+      color: '#2563eb',
+      transform: 'translateY(-1px)',
+    },
+  },
+}));
+
 /* ── Typing indicator ──────────────────────────────────────────────────────── */
 
-// Bubble shell for the "Lumina is working" status while waiting for the
-// first token — the shimmer text + pulse dots inside come from
-// LuminaWorkingIndicator below.
 export const TypingIndicator = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '10px 14px',
-  borderRadius: '16px 16px 16px 4px',
+  padding: '12px 18px',
+  borderRadius: '16px',
   border: `1px solid ${theme.palette.divider}`,
   backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255,255,255,0.02)'
-      : 'rgba(0,0,0,0.015)',
+    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : '#ffffff',
   width: 'fit-content',
 }));
-
-/* ── "Lumina is working" inline indicator (shown while an [ACTION:...] tag
-   is still streaming in, instead of the raw tag text) ──────────────────── */
 
 export const LuminaWorkingIndicator = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
@@ -300,20 +435,20 @@ export const LuminaWorkingIndicator = styled(Box)(({ theme }) => ({
     width: '4px',
     height: '4px',
     borderRadius: '50%',
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: '#2563eb',
     animation: 'luminaPulseDot 1s ease-in-out infinite',
     '&:nth-of-type(2)': { animationDelay: '0.15s' },
     '&:nth-of-type(3)': { animationDelay: '0.3s' },
   },
 }));
 
-/* ── Input area ────────────────────────────────────────────────────────────── */
+/* ── Input area (Pill Design) ──────────────────────────────────────────────── */
 
 export const InputWrapper = styled(Box)(({ theme }) => ({
-  padding: '16px 24px 20px',
+  padding: '10px 20px 14px',
   display: 'flex',
-  justifyContent: 'center',
-  borderTop: `1px solid ${theme.palette.divider}`,
+  flexDirection: 'column',
+  alignItems: 'center',
   backgroundColor: theme.palette.background.default,
 }));
 
@@ -321,21 +456,23 @@ export const InputBox = styled(Paper)(({ theme }) => {
   const isDark = theme.palette.mode === 'dark';
   return {
     display: 'flex',
-    alignItems: 'flex-end',
-    gap: '8px',
-    padding: '8px 10px 8px 16px',
-    borderRadius: '12px',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '4px 6px 4px 14px',
+    borderRadius: '9999px', // Modern full pill container
     width: '100%',
-    maxWidth: '780px',
+    maxWidth: '860px',
     backgroundColor: isDark
-      ? surfaceColor(theme, '#18181B', '#1F1F20', 'rgba(255,255,255,0.95)')
-      : 'rgba(255,255,255,0.95)',
-    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : theme.palette.divider}`,
-    boxShadow: isDark ? '0 4px 20px rgba(0, 0, 0, 0.25)' : 'none',
+      ? surfaceColor(theme, '#18181B', '#1F1F20', '#ffffff')
+      : '#ffffff',
+    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0'}`,
+    boxShadow: isDark
+      ? '0 4px 20px rgba(0, 0, 0, 0.25)'
+      : '0 2px 10px rgba(0, 0, 0, 0.04)',
     transition: 'border-color 0.2s, box-shadow 0.2s',
     '&:focus-within': {
-      borderColor: theme.palette.primary.main,
-      boxShadow: `0 0 0 3px ${theme.palette.primary.main}25`,
+      borderColor: '#2563eb',
+      boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.15)',
     },
   };
 });
@@ -344,17 +481,17 @@ export const StyledInput = styled(TextField)(({ theme }) => ({
   flex: 1,
   '& .MuiInputBase-root': {
     padding: 0,
-    fontSize: '14px',
+    fontSize: '13.5px',
     color: theme.palette.text.primary,
     background: 'transparent',
     '&::before, &::after': { display: 'none' },
   },
   '& .MuiInputBase-input': {
-    padding: '6px 0',
-    lineHeight: 1.6,
+    padding: '8px 4px',
+    lineHeight: 1.5,
     '&::placeholder': {
       color: theme.palette.text.secondary,
-      opacity: 1,
+      opacity: 0.9,
     },
   },
   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
@@ -364,44 +501,48 @@ export const StyledInput = styled(TextField)(({ theme }) => ({
 
 export const SendButton = styled(IconButton)<{ active?: boolean }>(
   ({ theme, active }) => ({
-    width: '36px',
-    height: '36px',
-    borderRadius: '10px',
+    width: '34px',
+    height: '34px',
+    borderRadius: '50%',
     flexShrink: 0,
     backgroundColor: active
-      ? theme.palette.primary.main
+      ? '#2563eb'
       : theme.palette.action.disabledBackground,
-    color: active ? '#fff' : theme.palette.text.disabled,
+    color: active ? '#ffffff' : theme.palette.text.disabled,
     transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
     '&:hover': active
       ? {
-          backgroundColor: theme.palette.primary.dark,
-          transform: 'scale(1.08)',
+          backgroundColor: '#1d4ed8',
+          transform: 'scale(1.05)',
         }
       : {},
   }),
 );
 
-export const HistorySidebar = styled(Box)(({ theme }) => ({
-  width: '260px',
-  height: '100%',
-  backgroundColor: surfaceColor(
-    theme,
-    'rgba(18, 18, 20, 0.85)',
-    'rgba(36, 36, 37, 0.6)',
-    'rgba(248, 250, 252, 0.8)',
-  ),
-  borderLeft: `1px solid ${theme.palette.divider}`,
-  display: 'flex',
-  flexDirection: 'column',
-  flexShrink: 0,
-  transition: 'width 0.2s',
-  '@media (max-width: 768px)': {
-    width: '0px',
+/* ── History Sidebar (Slide-over / Collapsible) ────────────────────────────── */
+
+export const HistorySidebar = styled(Box)<{ isOpen?: boolean }>(
+  ({ theme, isOpen = true }) => ({
+    width: isOpen ? '300px' : '0px',
+    height: '100%',
+    backgroundColor: surfaceColor(theme, '#131518', '#1c1d20', '#ffffff'),
+    borderLeft: isOpen ? `1px solid ${theme.palette.divider}` : 'none',
+    display: 'flex',
+    flexDirection: 'column',
+    flexShrink: 0,
     overflow: 'hidden',
-    borderLeft: 'none',
-  },
-}));
+    transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+    zIndex: 20,
+    '@media (max-width: 768px)': {
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      bottom: 0,
+      width: isOpen ? '280px' : '0px',
+      boxShadow: isOpen ? '-4px 0 24px rgba(0,0,0,0.25)' : 'none',
+    },
+  }),
+);
 
 export const ChatAreaWrapper = styled(Box)({
   flex: 1,
@@ -413,7 +554,7 @@ export const ChatAreaWrapper = styled(Box)({
 });
 
 export const ChatHeader = styled(Box)(({ theme }) => ({
-  height: '52px',
+  height: '64px',
   padding: '0 24px',
   display: 'flex',
   alignItems: 'center',
@@ -423,31 +564,51 @@ export const ChatHeader = styled(Box)(({ theme }) => ({
     theme,
     'rgba(15, 15, 16, 0.85)',
     'rgba(36, 36, 37, 0.4)',
-    'rgba(255, 255, 255, 0.4)',
+    '#ffffff',
   ),
   backdropFilter: 'blur(10px)',
   zIndex: 10,
 }));
 
 export const ModelBadgeButton = styled(Button)(({ theme }) => ({
-  padding: '4px 10px',
-  borderRadius: '8px',
+  padding: '4px 12px',
+  borderRadius: '20px',
   textTransform: 'none',
-  fontSize: '11px',
-  fontWeight: 700,
+  fontSize: '12px',
+  fontWeight: 600,
   minWidth: 0,
-  gap: '4px',
+  gap: '6px',
   backgroundColor:
     theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, 0.05)'
-      : 'rgba(0, 0, 0, 0.05)',
+      : 'rgba(0, 0, 0, 0.02)',
   border: `1px solid ${theme.palette.divider}`,
   color: theme.palette.text.primary,
   '&:hover': {
     backgroundColor:
       theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.1)'
-        : 'rgba(0, 0, 0, 0.08)',
-    borderColor: theme.palette.primary.main,
+        ? 'rgba(255, 255, 255, 0.09)'
+        : 'rgba(0, 0, 0, 0.05)',
+    borderColor: '#2563eb',
+  },
+}));
+
+export const StatusPill = styled(Box)(() => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '4px',
+  padding: '2px 8px',
+  borderRadius: '12px',
+  backgroundColor: '#f0fdf4',
+  color: '#16a34a',
+  border: '1px solid #bbf7d0',
+  fontSize: '11px',
+  fontWeight: 600,
+  lineHeight: 1,
+  '& .status-dot': {
+    width: '6px',
+    height: '6px',
+    borderRadius: '50%',
+    backgroundColor: '#22c55e',
   },
 }));

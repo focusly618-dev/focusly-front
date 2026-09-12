@@ -11,7 +11,7 @@ import {
   PropertyValue,
 } from '../WorkspaceLibrary.styles';
 import { colorPaletteMap, iconMap } from '../constants/library.constants';
-import type { WorkspaceTypes } from '../../../types/workspace.types';
+import type { WorkspaceTypes } from '../../../workspace.types';
 import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import { UNTITLED_WORKSPACE_TITLE } from '@/utils';
 

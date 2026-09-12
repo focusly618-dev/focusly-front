@@ -47,6 +47,14 @@ export const GET_TASKS_TITLES = gql`
         completed_at
         estimate_timer
       }
+      workspace_id
+      project_id
+      project {
+        id
+        name
+        color
+        emoji
+      }
       workspace {
         id
         title
@@ -102,6 +110,14 @@ export const UPDATE_TASK = gql`
         estimate_timer
       }
       priority_level
+      workspace_id
+      project_id
+      project {
+        id
+        name
+        color
+        emoji
+      }
     }
   }
 `;
@@ -154,6 +170,14 @@ export const CREATE_TASK = gql`
         estimate_timer
       }
       priority_level
+      workspace_id
+      project_id
+      project {
+        id
+        name
+        color
+        emoji
+      }
     }
   }
 `;
@@ -243,6 +267,14 @@ export const GET_TASKS_PAGINATED = gql`
           completed
           completed_at
           estimate_timer
+        }
+        workspace_id
+        project_id
+        project {
+          id
+          name
+          color
+          emoji
         }
         workspace {
           id

@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import type { TaskSearchItems } from '@/pages/Workspace/types/workspace.types';
+import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 
 export interface SpeechRecognitionEvent {

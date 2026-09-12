@@ -393,8 +393,12 @@ export const FilterButton = styled(Box, {
 }));
 
 export const GridContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'layout',
-})<{ layout?: 'gallery' | 'list' | 'grid' }>(({ theme, layout }) => {
+  shouldForwardProp: (prop) => prop !== 'layout' && prop !== 'viewMode',
+})<{
+  layout?: 'gallery' | 'list' | 'grid';
+  viewMode?: 'gallery' | 'list' | 'grid';
+}>(({ theme, layout, viewMode }) => {
+  const activeLayout = layout || viewMode;
   const scrollbarStyles = {
     '&::-webkit-scrollbar': {
       width: '6px',
@@ -417,7 +421,7 @@ export const GridContainer = styled(Box, {
     },
   };
 
-  if (layout === 'list') {
+  if (activeLayout === 'list') {
     return {
       display: 'flex',
       flexDirection: 'column',

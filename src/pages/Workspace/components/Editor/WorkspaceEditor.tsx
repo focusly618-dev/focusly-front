@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { EditorContainer, MainEditorArea } from './WorkspaceEditor.styles';
 
-import type { WorkspaceEditorProps } from '../../types/workspace.types';
+import type { WorkspaceEditorProps } from '../../workspace.types';
 import { EditorHeader } from './components/EditorHeader/EditorHeader';
 import { EditorContent } from './components/EditorContent/EditorContent';
 import { EditorSidebar } from './components/EditorSidebar/EditorSidebar';

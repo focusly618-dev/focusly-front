@@ -4,7 +4,7 @@ import CalendarView from './components/CalendarView';
 import { Tasks } from '../Tasks/Tasks';
 import { TaskBar } from './components/Sidebar/types/Sidebar.types';
 import { Insights } from '../Insights/Insights';
-import Workspace from '../Workspace/Workspace';
+import Projects from '../Projects/Projects';
 import { FocusMode } from './components/FocusMode/FocusMode';
 import { TaskDetailModal } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal';
 import { useHome } from './hooks/useHome.hook';
@@ -76,7 +76,7 @@ export const Home = () => {
           )}
 
           {activeTab === TaskBar.Workspace && (
-            <Workspace
+            <Projects
               isEditorOpen={isWorkspaceEditorOpen}
               onEditorChange={setIsWorkspaceEditorOpen}
               onStartFocus={handleStartFocus}

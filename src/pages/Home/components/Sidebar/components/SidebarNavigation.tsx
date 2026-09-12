@@ -44,9 +44,15 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
     changeStatusTab,
     theme,
     isCollapsed,
+    closeToggleCollapse,
     taskCounts,
     isTasksExpanded,
     toggleTasksExpanded,
+    setIsTasksExpanded,
+    isProjectsExpanded,
+    toggleProjectsExpanded,
+    setIsProjectsExpanded,
+    projectGroups,
   } = sidebar;
 
   const currentTab = activeTab;
@@ -80,12 +86,18 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
     return unsub;
   }, []);
   const isProjectsActive =
-    currentTab === TaskBar.Workspace && !sidebar.searchParams.get('modal');
+    currentTab === TaskBar.Workspace &&
+    !sidebar.searchParams.get('modal') &&
+    !sidebar.searchParams.get('groupId');
   const isTemplatesActive =
     currentTab === TaskBar.Workspace &&
     sidebar.searchParams.get('modal') === 'templates';
 
   const handleProjectsTabClick = () => {
+    if (isCollapsed) {
+      closeToggleCollapse();
+      setIsProjectsExpanded(true);
+    }
     const newParams = new URLSearchParams();
     newParams.set('tab', TaskBar.Workspace);
     sidebar.setSearchParams(newParams);
@@ -166,6 +178,10 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           id="joyride-tasks"
           active={isTasksActive}
           onClick={() => {
+            if (isCollapsed) {
+              closeToggleCollapse();
+              setIsTasksExpanded(true);
+            }
             const newParams = new URLSearchParams();
             newParams.set('tab', TaskBar.Tasks);
             sidebar.setSearchParams(newParams);
@@ -446,13 +462,160 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             primary={t('nav.projects')}
             primaryTypographyProps={{
               fontSize: '12.5px',
-              fontWeight: 500,
+              fontWeight: isProjectsActive ? 600 : 500,
             }}
             sx={{
               display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
             }}
           />
+          {!isCollapsed && (
+            <Box
+              sx={{
+                display: { xs: 'none', lg: 'flex' },
+                alignItems: 'center',
+                gap: 0.5,
+                ml: 'auto',
+                maxHeight: '10px',
+              }}
+            >
+              {projectGroups.length > 0 && (
+                <NavCountBadge active={isProjectsActive}>
+                  {projectGroups.length}
+                </NavCountBadge>
+              )}
+              <Box
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleProjectsExpanded(e);
+                }}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: '2px',
+                  borderRadius: '4px',
+                  color: isProjectsActive ? '#ffffff' : 'text.secondary',
+                  opacity: 0.8,
+                  '&:hover': {
+                    opacity: 1,
+                    bgcolor: isProjectsActive
+                      ? 'rgba(255,255,255,0.2)'
+                      : 'action.hover',
+                  },
+                }}
+              >
+                <ExpandMoreIcon
+                  sx={{
+                    fontSize: 14,
+                    transform: isProjectsExpanded
+                      ? 'rotate(180deg)'
+                      : 'rotate(0deg)',
+                    transition: 'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
         </NavItem>
+
+        {/* Sub-items: Projects List */}
+        {!isCollapsed && (
+          <Collapse
+            in={isProjectsExpanded}
+            timeout={220}
+            unmountOnExit
+            sx={{
+              display: { xs: 'none', lg: 'block' },
+              width: '100%',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                mt: '1px',
+                mb: '2px',
+              }}
+            >
+              {projectGroups.map((group) => {
+                const isGroupActive =
+                  currentTab === TaskBar.Workspace &&
+                  sidebar.searchParams.get('groupId') === group.id;
+                const noteCount =
+                  group.workspaces?.length ??
+                  group.generalWorkspaces?.length ??
+                  0;
+
+                return (
+                  <SubNavItem
+                    key={group.id}
+                    active={isGroupActive}
+                    onClick={() => {
+                      const newParams = new URLSearchParams();
+                      newParams.set('tab', TaskBar.Workspace);
+                      newParams.set('groupId', group.id);
+                      sidebar.setSearchParams(newParams);
+                      changeStatusTab(TaskBar.Workspace, newParams);
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {group.emoji &&
+                      group.emoji !== 'outlined' &&
+                      group.emoji !== 'filled' ? (
+                        <Box
+                          component="span"
+                          sx={{
+                            fontSize: '13px',
+                            lineHeight: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {group.emoji}
+                        </Box>
+                      ) : (
+                        <Box
+                          sx={{
+                            width: 7,
+                            height: 7,
+                            borderRadius: '50%',
+                            bgcolor:
+                              group.color ||
+                              (theme.palette.mode === 'dark'
+                                ? '#818cf8'
+                                : '#6366f1'),
+                            flexShrink: 0,
+                          }}
+                        />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={group.name}
+                      primaryTypographyProps={{
+                        fontSize: '11.5px',
+                        fontWeight: isGroupActive ? 600 : 500,
+                        noWrap: true,
+                        textOverflow: 'ellipsis',
+                      }}
+                    />
+                    {noteCount > 0 && (
+                      <NavCountBadge active={isGroupActive}>
+                        {noteCount}
+                      </NavCountBadge>
+                    )}
+                  </SubNavItem>
+                );
+              })}
+            </Box>
+          </Collapse>
+        )}
         <NavItem
           id="joyride-templates"
           active={isTemplatesActive}

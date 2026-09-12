@@ -39,7 +39,7 @@ import type { UseSidebarReturn } from '../hooks/useSidebar';
 import type {
   ProjectGroupTypes,
   WorkspaceTypes,
-} from '@/pages/Workspace/types/workspace.types';
+} from '@/pages/Workspace/workspace.types';
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
