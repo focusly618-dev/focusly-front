@@ -1,6 +1,6 @@
 import React from 'react';
 import { Workspace } from '../Workspace/Workspace';
-import type { WorkspaceProps } from '../Workspace/types/workspace.types';
+import type { WorkspaceProps } from '../Workspace/workspace.types';
 
 export type ProjectsProps = WorkspaceProps;
 

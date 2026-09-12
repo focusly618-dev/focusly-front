@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useForm, useWatch } from 'react-hook-form';
 import debounce from 'lodash.debounce';
 import { CREATE_WORKSPACE, UPDATE_WORKSPACE } from '../Workspace.graphql';
-import type { WorkspaceFormData } from '../types/workspace.types';
+import type { WorkspaceFormData } from '../workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
 import { generateWorkspaceTitle } from '@/api/AI/apiAI';
 import { stripMarkdown } from '@/components/chat/suggestedActionCard/actionExecution.utils';

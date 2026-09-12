@@ -16,7 +16,7 @@ import { surfaceColor } from '@/context';
 import { UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import { CardAvatarCircle, BadgeChip } from '../WorkspaceLibrary.styles';
 import { iconMap } from '../constants/library.constants';
-import type { WorkspaceTypes } from '../../../types/workspace.types';
+import type { WorkspaceTypes } from '../../../workspace.types';
 
 interface WorkspaceListItemProps {
   workspace: WorkspaceTypes;

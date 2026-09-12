@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { WorkspaceTypes } from '../../Workspace/types/workspace.types';
+import type { WorkspaceTypes } from '../../Workspace/workspace.types';
 import { useProjectDocActions } from './useProjectDocActions.hook';
 
 export const useWorkspaceCardMenu = () => {

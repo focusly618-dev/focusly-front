@@ -1,4 +1,4 @@
-import type { WorkspaceTypes } from '../../../Workspace/types/workspace.types';
+import type { WorkspaceTypes } from '../../../Workspace/workspace.types';
 
 export interface ProjectDocCardMenuProps {
   anchorEl: HTMLElement | null;

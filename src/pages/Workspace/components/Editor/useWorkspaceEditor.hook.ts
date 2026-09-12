@@ -4,7 +4,7 @@ import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
 import type {
   TaskSearchItems,
   WorkspaceFormData,
-} from '../../../types/workspace.types';
+} from '../../../workspace.types';
 import type { MarkdownEditorRef } from '../codemirror/MarkdownEditor.types';
 
 export interface UseWorkspaceEditorProps {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer, Box } from '@mui/material';
 import { TaskDetailsFull } from './TaskDetailsFull';
-import type { TaskSearchItems } from '../../types/workspace.types';
+import type { TaskSearchItems } from '../../workspace.types';
 
 interface TaskDetailsFullModalProps {
   open: boolean;

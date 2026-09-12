@@ -9,10 +9,7 @@ import {
 } from '@mui/icons-material';
 import { EmptyState } from '@/components/ui';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
-import type {
-  WorkspaceTypes,
-  ProjectGroupTypes,
-} from '../../types/workspace.types';
+import type { WorkspaceTypes, ProjectGroupTypes } from '../../workspace.types';
 import {
   LibraryContainer,
   GridContainer,

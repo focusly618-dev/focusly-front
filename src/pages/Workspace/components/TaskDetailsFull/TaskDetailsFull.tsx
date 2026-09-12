@@ -12,7 +12,7 @@ import {
   getPriorityFromLevel,
   formatDuration,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import type { TaskSearchItems } from '../../types/workspace.types';
+import type { TaskSearchItems } from '../../workspace.types';
 
 import {
   SidebarTopNav,

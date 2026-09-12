@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client';
 import { UPDATE_WORKSPACE } from '../../Workspace/Workspace.graphql';
-import type { WorkspaceTypes } from '../../Workspace/types/workspace.types';
+import type { WorkspaceTypes } from '../../Workspace/workspace.types';
 import { sileo } from '@/utils';
 
 export const useProjectDocActions = () => {

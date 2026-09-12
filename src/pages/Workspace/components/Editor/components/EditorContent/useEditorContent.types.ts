@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import type { UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import type { WorkspaceFormData } from '@/pages/Workspace/types/workspace.types';
+import type { WorkspaceFormData } from '@/pages/Workspace/workspace.types';
 import type { HeaderColor } from '@/utils';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 import type { AITaskPreviewData } from '../AITaskPreviewModal/AITaskPreviewModal';

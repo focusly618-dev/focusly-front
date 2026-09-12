@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_WORKSPACES } from '../../Workspace/Workspace.graphql';
-import type { WorkspaceTypes } from '../../Workspace/types/workspace.types';
+import type { WorkspaceTypes } from '../../Workspace/workspace.types';
 
 const NOTE_LIMIT = 8;
 
@@ -49,7 +49,9 @@ export const useProjectNotes = (selectedGroupId: string | null = null) => {
     if (noteFilterType === 'linked-task') {
       list = list.filter((w) => Boolean(w.taskId || w.task));
     } else if (noteFilterType === 'has-cover') {
-      list = list.filter((w) => Boolean(w.coverImage));
+      list = list.filter((w) =>
+        Boolean(w.background_color || w.card_show_background),
+      );
     }
 
     list.sort((a, b) => {

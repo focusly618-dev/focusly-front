@@ -56,7 +56,7 @@ import {
   ViewStream as DefaultModeIcon,
 } from '@mui/icons-material';
 import type { UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import type { WorkspaceFormData } from '../../../../../../pages/Workspace/types/workspace.types';
+import type { WorkspaceFormData } from '../../../../workspace.types';
 import { AITaskPreviewModal } from '../AITaskPreviewModal/AITaskPreviewModal';
 import {
   EditorContent as StyledEditorContent,

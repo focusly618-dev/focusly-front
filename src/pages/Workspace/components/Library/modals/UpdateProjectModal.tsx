@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { EditNote as EditNoteIcon } from '@mui/icons-material';
 import { BaseModal } from '@/components/modals';
 import { Button, TextField } from '@/components/ui';
-import type { ProjectTypes } from '../../../types/workspace.types';
+import type { ProjectTypes } from '../../../workspace.types';
 
 interface UpdateProjectModalProps {
   open: boolean;

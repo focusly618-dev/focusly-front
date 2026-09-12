@@ -7,23 +7,19 @@ import {
   UPDATE_PROJECT_GROUP,
   DELETE_PROJECT_GROUP,
 } from '../../Workspace/Workspace.graphql';
-import type { ProjectGroupTypes } from '../../Workspace/types/workspace.types';
+import type { ProjectSortOption } from '../../Workspace/components/Library/components/WorkspaceLibraryHeader';
+import type { ProjectGroupTypes } from '../../Workspace/workspace.types';
 import { sileo } from '@/utils';
 
 const GROUP_LIMIT = 8;
 
-export type ProjectSortOption =
-  | 'updated-desc'
-  | 'updated-asc'
-  | 'name-asc'
-  | 'name-desc'
-  | 'notes-count';
+export type { ProjectSortOption };
 
 export const useProjectFolders = () => {
   const [groupPage, setGroupPage] = useState(1);
   const [folderSearchTerm, setFolderSearchTerm] = useState('');
   const [projectSortBy, setProjectSortBy] =
-    useState<ProjectSortOption>('updated-desc');
+    useState<ProjectSortOption>('recent');
   const [projectColorFilter, setProjectColorFilter] = useState<string>('all');
 
   // Queries
@@ -189,12 +185,7 @@ export const useProjectFolders = () => {
           const bCount = b.workspaces?.length ?? 0;
           return bCount - aCount;
         }
-        case 'updated-asc': {
-          const aDate = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-          const bDate = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-          return aDate - bDate;
-        }
-        case 'updated-desc':
+        case 'recent':
         default: {
           const aDate = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
           const bDate = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
@@ -231,7 +222,7 @@ export const useProjectFolders = () => {
     actions: {
       setGroupPage,
       setFolderSearchTerm,
-      setProjectSortBy,
+      setProjectSortBy: (sort: ProjectSortOption) => setProjectSortBy(sort),
       setProjectColorFilter,
       createFolder,
       updateFolder,

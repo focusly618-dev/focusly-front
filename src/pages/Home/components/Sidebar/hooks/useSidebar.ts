@@ -18,7 +18,7 @@ import { sileo, getFriendlyErrorMessage } from '@/utils';
 import type {
   WorkspaceTypes,
   ProjectGroupTypes,
-} from '@/pages/Workspace/types/workspace.types';
+} from '@/pages/Workspace/workspace.types';
 import { TaskBar, type SidebarProps } from '../types/Sidebar.types';
 import {
   GET_NOTIFICATIONS,

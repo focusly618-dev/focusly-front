@@ -20,7 +20,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui';
 import { StyledTextField } from '../WorkspaceLibrary.styles';
-import type { ProjectTypes } from '../../../types/workspace.types';
+import type { ProjectTypes } from '../../../workspace.types';
 
 interface AllProjectsModalProps {
   open: boolean;
