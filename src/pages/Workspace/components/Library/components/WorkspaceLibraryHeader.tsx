@@ -61,6 +61,7 @@ export interface WorkspaceLibraryHeaderProps {
   noteFilterType: 'all' | 'linked-task' | 'has-cover';
   onNoteFilterChange: (type: 'all' | 'linked-task' | 'has-cover') => void;
   onCreate?: () => void;
+  onCreateTask?: () => void;
   hasMultipleWorkspaces?: boolean;
   projectTab?: 'projects' | 'tasks';
   onProjectTabChange?: (tab: 'projects' | 'tasks') => void;
@@ -96,6 +97,7 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
   noteFilterType,
   onNoteFilterChange,
   onCreate,
+  onCreateTask,
   hasMultipleWorkspaces,
   projectTab = 'projects',
   onProjectTabChange,
@@ -289,6 +291,31 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                 <FilterListIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
+
+            {onCreateTask && (
+              <Button
+                id="header-create-task-btn"
+                onClick={onCreateTask}
+                variant="contained"
+                startIcon={<AddIcon sx={{ fontSize: 18 }} />}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  px: 2,
+                  height: '38px',
+                  boxShadow: 'none',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  bgcolor: '#2563eb',
+                  color: '#ffffff',
+                  '&:hover': { bgcolor: '#1d4ed8' },
+                }}
+              >
+                {t('projects.newTask', 'New Task')}
+              </Button>
+            )}
 
             {/* Filter & Sort Menu for Projects */}
             <Menu

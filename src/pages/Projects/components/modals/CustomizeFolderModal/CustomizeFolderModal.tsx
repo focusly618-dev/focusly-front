@@ -9,11 +9,11 @@ import {
   Button,
   Tooltip,
 } from '@mui/material';
-import {
-  Folder as FolderFilledIcon,
-  FolderOutlined as FolderOutlinedIcon,
-} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import {
+  ModernFolderFilledIcon,
+  ModernFolderOutlinedIcon,
+} from '@/components/ui';
 import { StyledTextField } from '../CreateFolderModal/CreateFolderModal';
 import type { ProjectGroupTypes } from '../../../Workspace/types/workspace.types';
 
@@ -140,7 +140,7 @@ export const CustomizeFolderModal: React.FC<CustomizeFolderModalProps> = ({
           <Button
             variant={folderStyle === 'filled' ? 'contained' : 'outlined'}
             onClick={() => setFolderStyle('filled')}
-            startIcon={<FolderFilledIcon />}
+            startIcon={<ModernFolderFilledIcon />}
             sx={{
               flex: 1,
               borderRadius: '8px',
@@ -153,7 +153,7 @@ export const CustomizeFolderModal: React.FC<CustomizeFolderModalProps> = ({
           <Button
             variant={folderStyle === 'outlined' ? 'contained' : 'outlined'}
             onClick={() => setFolderStyle('outlined')}
-            startIcon={<FolderOutlinedIcon />}
+            startIcon={<ModernFolderOutlinedIcon />}
             sx={{
               flex: 1,
               borderRadius: '8px',

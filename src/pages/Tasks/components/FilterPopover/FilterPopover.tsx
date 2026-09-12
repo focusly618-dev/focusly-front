@@ -6,7 +6,8 @@ import {
   Chip,
   Box,
 } from '@mui/material';
-import { Flag as FlagIcon, Search as SearchIcon } from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
+import { PriorityBadge } from '@/components/ui';
 
 import {
   StyledPopover,
@@ -121,45 +122,27 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
       {/* BY PRIORITY */}
       <Section>
         <SectionTitle>By Priority</SectionTitle>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('High', selectedPriorities, setSelectedPriorities)
-          }
-        >
-          <ItemLabel>
-            <FlagIcon sx={{ color: 'error.main', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              High Priority
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedPriorities.includes('High')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Medium', selectedPriorities, setSelectedPriorities)
-          }
-        >
-          <ItemLabel>
-            <FlagIcon sx={{ color: 'warning.main', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Medium Priority
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedPriorities.includes('Medium')} />
-        </ItemRow>
-        <ItemRow
-          onClick={() =>
-            toggleSelection('Low', selectedPriorities, setSelectedPriorities)
-          }
-        >
-          <ItemLabel>
-            <FlagIcon sx={{ color: 'primary.main', fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontSize: '13px' }}>
-              Low Priority
-            </Typography>
-          </ItemLabel>
-          <RadioCircle selected={selectedPriorities.includes('Low')} />
-        </ItemRow>
+        {[
+          { id: 'Critical', label: 'Critical Priority' },
+          { id: 'High', label: 'High Priority' },
+          { id: 'Medium', label: 'Medium Priority' },
+          { id: 'Low', label: 'Low Priority' },
+        ].map((p) => (
+          <ItemRow
+            key={p.id}
+            onClick={() =>
+              toggleSelection(p.id, selectedPriorities, setSelectedPriorities)
+            }
+          >
+            <ItemLabel>
+              <PriorityBadge priority={p.id} size={22} />
+              <Typography variant="body2" sx={{ fontSize: '13px' }}>
+                {p.label}
+              </Typography>
+            </ItemLabel>
+            <RadioCircle selected={selectedPriorities.includes(p.id)} />
+          </ItemRow>
+        ))}
       </Section>
       <Section>
         <SectionTitle>By Tags</SectionTitle>

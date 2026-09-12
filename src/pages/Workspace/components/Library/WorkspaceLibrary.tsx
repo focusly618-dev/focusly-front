@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography, Pagination, useTheme } from '@mui/material';
+import { PushPin as PushPinIcon } from '@mui/icons-material';
 import {
-  Folder as FolderFilledIcon,
-  FolderOutlined as FolderOutlinedIcon,
-  PushPin as PushPinIcon,
-} from '@mui/icons-material';
-import { EmptyState } from '@/components/ui';
+  EmptyState,
+  ModernFolderFilledIcon,
+  ModernFolderOutlinedIcon,
+  isCustomEmoji,
+} from '@/components/ui';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
 import type { WorkspaceTypes, ProjectGroupTypes } from '../../workspace.types';
 import {
@@ -31,7 +32,10 @@ import {
 } from '@/pages/Projects/hooks';
 import { ProjectFoldersGrid } from '@/pages/Projects/components/ProjectFolders';
 import { ProjectDocCardMenu } from '@/pages/Projects/components/ProjectDocCardMenu';
-import { ProjectTasksByStatus } from '@/pages/Projects/components/ProjectTasks';
+import {
+  ProjectTasksByStatus,
+  useProjectTasks,
+} from '@/pages/Projects/components/ProjectTasks';
 import { CreateProjectTaskModal } from '@/pages/Projects/components/CreateProjectTaskModal';
 
 interface WorkspaceLibraryProps {
@@ -58,6 +62,9 @@ export const WorkspaceLibrary = ({
   const folders = useProjectFolders();
   const notes = useProjectNotes(selectedGroupId);
   const cardMenu = useWorkspaceCardMenu();
+  const projectTasks = useProjectTasks({
+    projectId: selectedGroupId,
+  });
 
   // ── View Mode State ──
   const [viewMode, setViewMode] = useState<'gallery' | 'list' | 'grid'>(() => {
@@ -150,15 +157,19 @@ export const WorkspaceLibrary = ({
               &gt;
             </Typography>
             <Box display="flex" alignItems="center" gap={0.5}>
-              {activeGroup?.emoji === 'outlined' ? (
-                <FolderOutlinedIcon
+              {isCustomEmoji(activeGroup?.emoji) ? (
+                <Box component="span" sx={{ fontSize: '14px', lineHeight: 1 }}>
+                  {activeGroup?.emoji}
+                </Box>
+              ) : activeGroup?.emoji === 'outlined' ? (
+                <ModernFolderOutlinedIcon
                   sx={{
                     fontSize: 16,
-                    color: activeGroup.color || 'primary.main',
+                    color: activeGroup?.color || 'primary.main',
                   }}
                 />
               ) : (
-                <FolderFilledIcon
+                <ModernFolderFilledIcon
                   sx={{
                     fontSize: 16,
                     color: activeGroup?.color || 'primary.main',
@@ -211,6 +222,7 @@ export const WorkspaceLibrary = ({
         onCreate={() =>
           onCreate(undefined, undefined, selectedGroupId ?? undefined)
         }
+        onCreateTask={() => setIsCreateTaskModalOpen(true)}
         hasMultipleWorkspaces={notes.data.totalNotes > 1}
         projectTab={projectTab}
         onProjectTabChange={setProjectTab}
@@ -222,12 +234,32 @@ export const WorkspaceLibrary = ({
           /* ── Project Tasks By Status View ── */
           <Box sx={{ mt: 3, pb: 4 }}>
             <ProjectTasksByStatus
+              tasks={projectTasks.tasks}
               onTaskClick={() => setIsCreateTaskModalOpen(true)}
-              onAddTask={() => setIsCreateTaskModalOpen(true)}
-            />
-            <CreateProjectTaskModal
-              open={isCreateTaskModalOpen}
-              onClose={() => setIsCreateTaskModalOpen(false)}
+              onAddTask={(statusId, title) => {
+                if (title?.trim()) {
+                  const targetProjectId =
+                    selectedGroupId || folders.data.allGroups[0]?.id;
+                  projectTasks.createProjectTask({
+                    title: title.trim(),
+                    status: statusId,
+                    projectId: targetProjectId,
+                  });
+                } else {
+                  setIsCreateTaskModalOpen(true);
+                }
+              }}
+              onToggleComplete={projectTasks.toggleProjectTaskComplete}
+              onToggleSubtask={(taskId, subtaskId) => {
+                const targetTask = projectTasks.tasks.find(
+                  (t) => t.id === taskId,
+                );
+                projectTasks.toggleProjectSubtask(
+                  taskId,
+                  subtaskId,
+                  targetTask?.subtasks,
+                );
+              }}
             />
           </Box>
         ) : (
@@ -438,6 +470,38 @@ export const WorkspaceLibrary = ({
         projects={folders.data.allGroups}
         selectedGroupId={selectedGroupId}
         onSelectTemplate={handleSelectTemplate}
+      />
+
+      {/* ── Create Project Task Modal ── */}
+      <CreateProjectTaskModal
+        open={isCreateTaskModalOpen}
+        onClose={() => setIsCreateTaskModalOpen(false)}
+        projects={folders.data.allGroups.map((g) => ({
+          id: g.id,
+          name: g.name,
+          color: g.color,
+          emoji: g.emoji,
+        }))}
+        selectedProjectId={selectedGroupId}
+        projectName={activeGroup?.name || folders.data.allGroups[0]?.name}
+        projectEmoji={activeGroup?.emoji || folders.data.allGroups[0]?.emoji}
+        onCreate={async (taskData) => {
+          const targetProjectId =
+            (taskData.projectId as string) ||
+            selectedGroupId ||
+            folders.data.allGroups[0]?.id;
+          await projectTasks.createProjectTask({
+            title: String(taskData.title || 'New Task'),
+            status: String(taskData.status || 'in_progress'),
+            priority: String(taskData.priority || 'Medium'),
+            duration: taskData.estimatedDuration as string | undefined,
+            dueDate: taskData.dueDate as string | undefined,
+            description: taskData.description as string | undefined,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            subtasks: taskData.subtasks as any,
+            projectId: targetProjectId,
+          });
+        }}
       />
     </LibraryContainer>
   );

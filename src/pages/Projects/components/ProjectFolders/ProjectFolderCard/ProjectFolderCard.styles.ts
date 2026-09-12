@@ -23,17 +23,21 @@ export const CardContainer = styled(Box)(({ theme }) => ({
 export const FolderIconWrapper = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'baseColor',
 })<{ baseColor?: string }>(({ baseColor = '#7c3aed' }) => ({
-  width: '40px',
-  height: '40px',
-  borderRadius: '50%',
+  width: '42px',
+  height: '42px',
+  borderRadius: '12px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: alpha(baseColor, 0.12),
+  border: `1px solid ${alpha(baseColor, 0.22)}`,
+  boxShadow: `0 2px 8px ${alpha(baseColor, 0.12)}`,
   color: baseColor,
-  transition: 'transform 0.2s',
+  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    transform: 'scale(1.1)',
+    transform: 'scale(1.06)',
+    backgroundColor: alpha(baseColor, 0.18),
+    boxShadow: `0 4px 12px ${alpha(baseColor, 0.22)}`,
   },
 }));
 

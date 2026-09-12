@@ -12,7 +12,6 @@ import {
 import {
   ChevronRight,
   ChevronLeft,
-  Flag as FlagIcon,
   CheckCircle as CheckCircleIcon,
   PauseCircle as PauseCircleIcon,
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
@@ -32,12 +31,8 @@ import {
   Hub as HubIcon,
 } from '@mui/icons-material';
 import { formatDescriptionToHtml } from '@/utils/formatDescription';
-import {
-  getPriorityFromLevel,
-  getPriorityLevel,
-  formatDuration,
-} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import type { PriorityType } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import { PriorityBadge, getPriorityConfig } from '@/components/ui';
 import {
   RightSidebar,
   SidebarHeaderTop,
@@ -110,7 +105,6 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     setPriorityAnchor,
     statusAnchor,
     setStatusAnchor,
-    getPriorityColor,
     getStatusColor,
     handlePriorityClick,
     handleStatusClick,
@@ -515,33 +509,24 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                             cursor: isReadOnly ? 'default' : 'pointer',
                           }}
                         >
-                          <FlagIcon
-                            sx={{
-                              fontSize: 14,
-                              color: getPriorityColor(
-                                Number(currentPriorityLevel),
-                              ),
-                            }}
+                          <PriorityBadge
+                            priority={Number(currentPriorityLevel)}
+                            size={18}
                           />
                           <Typography
                             variant="caption"
                             sx={{
                               fontWeight: 700,
                               fontSize: '11px',
-                              letterSpacing: '0.5px',
-                              textTransform: 'uppercase',
-                              color: getPriorityColor(
+                              color: getPriorityConfig(
                                 Number(currentPriorityLevel),
-                              ),
+                              ).color,
                             }}
                           >
-                            {getPriorityFromLevel(
-                              Number(currentPriorityLevel),
-                            ) === 'No priority'
-                              ? 'NONE'
-                              : getPriorityFromLevel(
-                                  Number(currentPriorityLevel),
-                                )}
+                            {
+                              getPriorityConfig(Number(currentPriorityLevel))
+                                .label
+                            }
                           </Typography>
                         </PropertyValue>
                       </PropertyCard>
@@ -920,10 +905,16 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           },
         }}
       >
-        {(['High', 'Med', 'Low', 'No priority'] as PriorityType[]).map((p) => (
+        {[
+          { level: 4, id: 'Critical', label: 'Critical' },
+          { level: 3, id: 'High', label: 'High' },
+          { level: 2, id: 'Medium', label: 'Medium' },
+          { level: 1, id: 'Low', label: 'Low' },
+          { level: 0, id: 'None', label: 'No Priority' },
+        ].map((p) => (
           <MenuItem
-            key={p}
-            onClick={() => handlePrioritySelect(getPriorityLevel(p))}
+            key={p.id}
+            onClick={() => handlePrioritySelect(p.level)}
             sx={{
               gap: 1.2,
               py: 1,
@@ -934,14 +925,9 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
               fontSize: '12px',
             }}
           >
-            <FlagIcon
-              sx={{
-                fontSize: 16,
-                color: getPriorityColor(getPriorityLevel(p)),
-              }}
-            />
+            <PriorityBadge priority={p.id} size={24} />
             <Typography variant="body2" fontWeight={600} fontSize="12px">
-              {p === 'No priority' ? 'No Priority' : p}
+              {p.label}
             </Typography>
           </MenuItem>
         ))}

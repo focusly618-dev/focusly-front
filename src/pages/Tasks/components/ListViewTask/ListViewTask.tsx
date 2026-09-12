@@ -12,7 +12,6 @@ import {
   CalendarToday as CalendarTodayIcon,
   AutoAwesome as AutoAwesomeIcon,
   PlayArrow as PlayIcon,
-  Flag as FlagIcon,
   RadioButtonUnchecked as UncheckedIcon,
   CheckCircle as CheckedIcon,
   FormatListBulletedRounded as SubtasksIcon,
@@ -40,7 +39,7 @@ import type { Task } from '@/redux/tasks/task.types';
 import type { ListViewTaskProps } from './ListViewTask.types';
 import { useListViewTask } from './ListViewTask.hook';
 import { formatDuration } from '../TaskDetailModal/TaskDetailModal.utils';
-import { getPriorityIconColor } from '@/pages/Home/components/CreateTaskModal/components/TaskIcons';
+import { PriorityBadge, getPriorityConfig } from '@/components/ui';
 
 const formatTimeSinceCompletion = (dateString: string | undefined) => {
   if (!dateString) return '';
@@ -246,27 +245,8 @@ export const ListViewTask = ({
               opacity: isReadOnly ? 0.8 : 1,
             }}
           >
-            <FlagIcon
-              sx={{
-                fontSize: 11,
-                flexShrink: 0,
-                color:
-                  task.priority_level >= 3
-                    ? getPriorityIconColor('High')
-                    : task.priority_level === 2
-                      ? getPriorityIconColor('Med')
-                      : task.priority_level === 1
-                        ? getPriorityIconColor('Low')
-                        : getPriorityIconColor(null),
-              }}
-            />
-            {task.priority_level >= 3
-              ? 'High'
-              : task.priority_level === 2
-                ? 'Med'
-                : task.priority_level === 1
-                  ? 'Low'
-                  : 'None'}
+            <PriorityBadge priority={task.priority_level} size={15} />
+            <span>{getPriorityConfig(task.priority_level).label}</span>
           </PriorityChip>
         </Box>
 
@@ -379,25 +359,23 @@ export const ListViewTask = ({
         }}
       >
         {[
-          { level: 3, label: 'High', color: '#ef4444' },
-          { level: 2, label: 'Med', color: '#f59e0b' },
-          { level: 1, label: 'Low', color: '#22c55e' },
-          { level: 0, label: '', color: 'text.secondary' },
+          { level: 4, id: 'Critical', label: 'Critical' },
+          { level: 3, id: 'High', label: 'High' },
+          { level: 2, id: 'Medium', label: 'Medium' },
+          { level: 1, id: 'Low', label: 'Low' },
+          { level: 0, id: 'None', label: 'None' },
         ].map((p) => (
           <MenuItem
             key={p.level}
             onClick={() => handlePrioritySelect(p.level)}
-            sx={{ gap: 1.5, py: 1 }}
+            sx={{ gap: 1.2, py: 0.8, px: 1.5, borderRadius: '6px' }}
           >
-            <Box
-              sx={{
-                width: 12,
-                height: 12,
-                borderRadius: '2px',
-                bgcolor: p.color,
-              }}
-            />
-            <Typography variant="body2" fontWeight={600}>
+            <PriorityBadge priority={p.id} size={22} />
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              sx={{ color: getPriorityConfig(p.id).color }}
+            >
               {p.label}
             </Typography>
           </MenuItem>

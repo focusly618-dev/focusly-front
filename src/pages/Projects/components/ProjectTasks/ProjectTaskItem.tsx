@@ -13,10 +13,14 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { ProjectTaskSubtasks } from './ProjectTaskSubtasks';
+import {
+  PriorityBadge,
+  getPriorityConfig,
+  ModernFolderOutlinedIcon,
+  ModernFolderFilledIcon,
+  isCustomEmoji,
+} from '@/components/ui';
 import type {
   ProjectTaskItemData,
   ProjectTaskPriority,
@@ -43,60 +47,41 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
   const isDark = theme.palette.mode === 'dark';
   const hasSubtasks = Boolean(task.subtasks && task.subtasks.length > 0);
   const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(
-    initialExpanded ||
-      (hasSubtasks && task.subtasks!.some((s) => !s.completed)),
+    initialExpanded || false,
   );
 
   const completedSubtasksCount =
     task.subtasks?.filter((s) => s.completed).length || 0;
   const totalSubtasksCount = task.subtasks?.length || 0;
   const isDone = task.completed || task.status.toLowerCase() === 'completed';
+  const projectName = task.project?.name || task.projectName;
+  const projectColor = task.project?.color || task.projectColor || '#7c3aed';
+  const projectEmoji = task.project?.emoji || task.projectEmoji;
 
   // Priority Styles helper
   const renderPriorityBadge = (priority?: ProjectTaskPriority) => {
     if (!priority || priority === 'None') return null;
-
-    let color = '#3b82f6';
-    let label = 'Medium';
-    let icon: React.ReactNode = <ArrowUpwardIcon sx={{ fontSize: 11 }} />;
-
-    if (priority === 'Critical') {
-      color = '#ef4444';
-      label = '! Critical';
-      icon = null;
-    } else if (priority === 'High') {
-      color = '#f59e0b';
-      label = 'High';
-      icon = <ArrowUpwardIcon sx={{ fontSize: 11 }} />;
-    } else if (priority === 'Medium') {
-      color = '#3b82f6';
-      label = 'Medium';
-      icon = <ArrowUpwardIcon sx={{ fontSize: 11 }} />;
-    } else if (priority === 'Low') {
-      color = '#10b981';
-      label = 'Low';
-      icon = <ArrowDownwardIcon sx={{ fontSize: 11 }} />;
-    }
+    const config = getPriorityConfig(priority);
 
     return (
       <Box
         sx={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '3px',
+          gap: '4px',
           px: '7px',
           py: '2px',
           borderRadius: '4px',
           fontSize: '11px',
           fontWeight: 700,
-          bgcolor: alpha(color, 0.12),
-          color,
-          border: `1px solid ${alpha(color, 0.25)}`,
+          bgcolor: alpha(config.color, 0.12),
+          color: config.color,
+          border: `1px solid ${alpha(config.color, 0.25)}`,
           flexShrink: 0,
         }}
       >
-        {icon}
-        <span>{label}</span>
+        <PriorityBadge priority={priority} size={15} />
+        <span>{config.label}</span>
       </Box>
     );
   };
@@ -200,6 +185,57 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
           >
             {task.title}
           </Typography>
+
+          {/* Project Badge */}
+          {projectName && (
+            <Tooltip title={`Project: ${projectName}`}>
+              <Box
+                sx={{
+                  display: { xs: 'none', md: 'inline-flex' },
+                  alignItems: 'center',
+                  gap: '4px',
+                  px: '7px',
+                  py: '2px',
+                  borderRadius: '5px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: projectColor,
+                  bgcolor: alpha(projectColor, isDark ? 0.15 : 0.08),
+                  border: `1px solid ${alpha(projectColor, isDark ? 0.3 : 0.2)}`,
+                  flexShrink: 0,
+                  lineHeight: 1.4,
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    bgcolor: alpha(projectColor, isDark ? 0.24 : 0.15),
+                  },
+                }}
+              >
+                {isCustomEmoji(projectEmoji) ? (
+                  <span style={{ fontSize: '11px', lineHeight: 1 }}>
+                    {projectEmoji}
+                  </span>
+                ) : projectEmoji === 'filled' ? (
+                  <ModernFolderFilledIcon
+                    sx={{ fontSize: 13, color: projectColor }}
+                  />
+                ) : (
+                  <ModernFolderOutlinedIcon
+                    sx={{ fontSize: 13, color: projectColor }}
+                  />
+                )}
+                <span
+                  style={{
+                    maxWidth: '120px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {projectName}
+                </span>
+              </Box>
+            </Tooltip>
+          )}
 
           {/* Module / Tag Pill */}
           {task.tag && (

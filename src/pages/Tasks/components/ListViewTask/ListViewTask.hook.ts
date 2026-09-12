@@ -1,8 +1,11 @@
-import { useState } from "react";
-import type { ListViewTaskProps, UseListViewTask } from "./ListViewTask.types";
-import type { TaskResponse } from "@/api/Tasks/apiTaskTypes";
+import { useState } from 'react';
+import type { ListViewTaskProps, UseListViewTask } from './ListViewTask.types';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
-export const useListViewTask = ({task, updateTask}: Pick<ListViewTaskProps, 'task' | 'updateTask'>): UseListViewTask => {
+export const useListViewTask = ({
+  task,
+  updateTask,
+}: Pick<ListViewTaskProps, 'task' | 'updateTask'>): UseListViewTask => {
   const [statusAnchor, setStatusAnchor] = useState<null | HTMLElement>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
     null,
@@ -51,14 +54,15 @@ export const useListViewTask = ({task, updateTask}: Pick<ListViewTaskProps, 'tas
   };
 
   const getPriorityColor = (level: number) => {
-    if (level >= 3) return '#ef4444';
-    if (level === 2) return '#f59e0b';
-    return '#22c55e';
+    if (level >= 4) return '#ef4444';
+    if (level === 3) return '#f59e0b';
+    if (level === 2) return '#3b82f6';
+    if (level === 1) return '#10b981';
+    return '#6b7280';
   };
 
   const statusColor = getStatusColor(task.status);
   const priorityColor = getPriorityColor(task.priority_level);
-
 
   return {
     statusAnchor,
@@ -74,5 +78,5 @@ export const useListViewTask = ({task, updateTask}: Pick<ListViewTaskProps, 'tas
     getPriorityColor,
     statusColor,
     priorityColor,
-  }
-}
+  };
+};

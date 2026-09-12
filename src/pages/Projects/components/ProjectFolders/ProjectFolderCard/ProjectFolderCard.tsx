@@ -1,11 +1,12 @@
 import React from 'react';
 import { Box, Typography, IconButton, Menu, MenuItem } from '@mui/material';
-import {
-  Folder as FolderFilledIcon,
-  FolderOutlined as FolderOutlinedIcon,
-  MoreHoriz as MoreHorizIcon,
-} from '@mui/icons-material';
+import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import {
+  ModernFolderFilledIcon,
+  ModernFolderOutlinedIcon,
+  isCustomEmoji,
+} from '@/components/ui';
 import {
   CardContainer,
   FolderIconWrapper,
@@ -35,6 +36,7 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
   const noteCount = group.workspaces?.length ?? 0;
   const statusLabel =
     noteCount > 0 ? (index % 3 === 0 ? 'RECENT' : 'ACTIVE') : 'DRAFT';
+  const hasCustomEmoji = isCustomEmoji(group.emoji);
 
   return (
     <CardContainer onClick={() => onSelect(group.id)}>
@@ -55,10 +57,17 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
             onCustomize?.(group);
           }}
         >
-          {group.emoji === 'outlined' ? (
-            <FolderOutlinedIcon sx={{ fontSize: 20 }} />
+          {hasCustomEmoji ? (
+            <Box
+              component="span"
+              sx={{ fontSize: '1.25rem', lineHeight: 1, userSelect: 'none' }}
+            >
+              {group.emoji}
+            </Box>
+          ) : group.emoji === 'outlined' ? (
+            <ModernFolderOutlinedIcon sx={{ fontSize: 22 }} />
           ) : (
-            <FolderFilledIcon sx={{ fontSize: 20 }} />
+            <ModernFolderFilledIcon sx={{ fontSize: 22 }} />
           )}
         </FolderIconWrapper>
 

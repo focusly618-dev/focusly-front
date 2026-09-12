@@ -23,6 +23,9 @@ import {
   AskAIIcon,
   InsightsIcon,
   ProjectIcon,
+  ModernFolderFilledIcon,
+  ModernFolderOutlinedIcon,
+  isCustomEmoji,
 } from '@/components/ui';
 import {
   DescriptionOutlined as TemplateIcon,
@@ -565,9 +568,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                         justifyContent: 'center',
                       }}
                     >
-                      {group.emoji &&
-                      group.emoji !== 'outlined' &&
-                      group.emoji !== 'filled' ? (
+                      {isCustomEmoji(group.emoji) ? (
                         <Box
                           component="span"
                           sx={{
@@ -580,18 +581,26 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                         >
                           {group.emoji}
                         </Box>
-                      ) : (
-                        <Box
+                      ) : group.emoji === 'outlined' ? (
+                        <ModernFolderOutlinedIcon
                           sx={{
-                            width: 7,
-                            height: 7,
-                            borderRadius: '50%',
-                            bgcolor:
+                            fontSize: 14,
+                            color:
                               group.color ||
                               (theme.palette.mode === 'dark'
-                                ? '#818cf8'
-                                : '#6366f1'),
-                            flexShrink: 0,
+                                ? '#a78bfa'
+                                : '#7c3aed'),
+                          }}
+                        />
+                      ) : (
+                        <ModernFolderFilledIcon
+                          sx={{
+                            fontSize: 14,
+                            color:
+                              group.color ||
+                              (theme.palette.mode === 'dark'
+                                ? '#a78bfa'
+                                : '#7c3aed'),
                           }}
                         />
                       )}

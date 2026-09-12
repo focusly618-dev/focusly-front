@@ -29,6 +29,13 @@ export interface ProjectTaskAssignee {
   color?: string;
 }
 
+export interface ProjectInfo {
+  id: string;
+  name: string;
+  color?: string;
+  emoji?: string;
+}
+
 export interface ProjectTaskItemData {
   id: string;
   title: string;
@@ -41,6 +48,11 @@ export interface ProjectTaskItemData {
   assignee?: ProjectTaskAssignee;
   subtasks?: ProjectSubtaskItem[];
   completed?: boolean;
+  project?: ProjectInfo;
+  projectId?: string;
+  projectName?: string;
+  projectColor?: string;
+  projectEmoji?: string;
 }
 
 export interface ProjectStatusConfig {

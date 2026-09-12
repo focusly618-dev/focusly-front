@@ -136,7 +136,7 @@ export const InsightsIcon = (props: SvgIconProps) => (
 export const ProjectIcon = (props: SvgIconProps) => (
   <SvgIcon {...props} viewBox="0 0 24 24">
     <path
-      d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+      d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.75"
@@ -184,6 +184,35 @@ export const GeminiIcon = (props: SvgIconProps) => (
     <path
       d="M12 2c-.1 3.5-1.9 6.8-4.8 9-2.9 2.2-6.2 3-9.7 3.1 3.5.1 6.8 1.9 9 4.8 2.2 2.9 3 6.2 3.1 9.7.1-3.5 1.9-6.8 4.8-9 2.9-2.2 6.2-3 9.7-3.1-3.5-.1-6.8-1.9-9-4.8-2.2-2.9-3-6.2-3.1-9.7z"
       fill="currentColor"
+    />
+  </SvgIcon>
+);
+
+// Sleek, modern dual-tone folder filled icon (Linear / Apple macOS style)
+export const ModernFolderFilledIcon = (props: SvgIconProps) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <path
+      d="M4 5h4.5a2 2 0 0 1 1.6.8l1.07 1.6A2 2 0 0 0 12.77 8H20a2 2 0 0 1 2 2v3H2V7a2 2 0 0 1 2-2Z"
+      fill="currentColor"
+      opacity="0.55"
+    />
+    <path
+      d="M2 11.5a1.5 1.5 0 0 1 1.5-1.5h17a1.5 1.5 0 0 1 1.5 1.5V18a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6.5Z"
+      fill="currentColor"
+    />
+  </SvgIcon>
+);
+
+// Sleek, modern folder outlined icon (Feather / Lucide style)
+export const ModernFolderOutlinedIcon = (props: SvgIconProps) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <path
+      d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </SvgIcon>
 );

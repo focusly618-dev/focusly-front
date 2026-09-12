@@ -7,8 +7,7 @@ import { EditorContent } from './components/EditorContent/EditorContent';
 import { EditorSidebar } from './components/EditorSidebar/EditorSidebar';
 
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
-
-import { useWorkspaceEditor } from './hooks/useWorkspaceEditor.hook';
+import { useWorkspaceEditor } from './useWorkspaceEditor.hook';
 
 export const WorkspaceEditor = ({
   onBack,

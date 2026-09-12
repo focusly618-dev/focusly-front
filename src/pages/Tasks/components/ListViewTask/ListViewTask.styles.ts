@@ -194,51 +194,29 @@ export const CategoryChip = styled(Box)(({ theme }) => ({
 
 export const PriorityChip = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'priorityColor',
-})<{ priorityColor?: string }>(({ theme, priorityColor }) => {
+})<{ priorityColor?: string }>(({ priorityColor }) => {
   const defaultColor = priorityColor || '#6b7280';
-  let bg = alpha(defaultColor, 0.08);
-  let text = defaultColor;
-  let border = alpha(defaultColor, 0.12);
-
-  if (theme.palette.mode === 'light') {
-    if (defaultColor === '#ef4444') {
-      bg = '#fee2e2';
-      text = '#dc2626';
-      border = '#fecaca';
-    } else if (defaultColor === '#f59e0b') {
-      bg = '#ffedd5';
-      text = '#d97706';
-      border = '#fed7aa';
-    } else if (defaultColor === '#22c55e') {
-      bg = '#dcfce7';
-      text = '#15803d';
-      border = '#bbf7d0';
-    }
-  } else {
-    bg = alpha(defaultColor, 0.15);
-    text = alpha(defaultColor, 0.9);
-    border = alpha(defaultColor, 0.25);
-  }
+  const bg = alpha(defaultColor, 0.12);
+  const border = alpha(defaultColor, 0.25);
 
   return {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '6px',
-    padding: '4px 10px',
-    borderRadius: '20px',
+    gap: '3px',
+    padding: '2px 7px',
+    borderRadius: '4px',
     fontSize: '11px',
     fontWeight: 700,
     backgroundColor: bg,
-    color: text,
+    color: defaultColor,
     border: `1px solid ${border}`,
-    transition: 'all 0.2s ease',
+    transition: 'all 0.15s ease',
     width: 'fit-content',
     cursor: 'pointer',
+    flexShrink: 0,
     '&:hover': {
-      backgroundColor:
-        theme.palette.mode === 'dark'
-          ? alpha(defaultColor, 0.25)
-          : alpha(defaultColor, 0.15),
+      backgroundColor: alpha(defaultColor, 0.2),
+      borderColor: alpha(defaultColor, 0.4),
     },
   };
 });

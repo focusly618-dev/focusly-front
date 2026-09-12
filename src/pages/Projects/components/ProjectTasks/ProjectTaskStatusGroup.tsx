@@ -9,6 +9,7 @@ import {
   useTheme,
   Collapse,
   alpha,
+  Tooltip,
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -20,6 +21,7 @@ import type {
   ProjectStatusConfig,
   ProjectTaskItemData,
 } from './projectTasks.types';
+import CreateProjectTaskModal from '../CreateProjectTaskModal';
 
 export interface ProjectTaskStatusGroupProps {
   status: ProjectStatusConfig;
@@ -48,12 +50,13 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newTaskTitle.trim()) {
       e.preventDefault();
       onAddTask?.(status.id, newTaskTitle.trim());
       setNewTaskTitle('');
+      setIsAddingTask(false);
     } else if (e.key === 'Escape') {
       setIsAddingTask(false);
       setNewTaskTitle('');
@@ -170,6 +173,32 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
             </Box>
           )}
 
+          <Tooltip title={`Add task to ${status.label}`}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(true);
+                setIsAddingTask(true);
+              }}
+              sx={{
+                p: '3px',
+                color: isDark
+                  ? 'rgba(255, 255, 255, 0.5)'
+                  : 'rgba(0, 0, 0, 0.4)',
+                borderRadius: '6px',
+                '&:hover': {
+                  color: isDark ? '#ffffff' : '#000000',
+                  bgcolor: isDark
+                    ? 'rgba(255, 255, 255, 0.08)'
+                    : 'rgba(0, 0, 0, 0.04)',
+                },
+              }}
+            >
+              <AddIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Tooltip>
+
           <IconButton
             size="small"
             onClick={(e) => {
@@ -212,6 +241,7 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
             setIsExpanded(true);
             setIsAddingTask(true);
             setMenuAnchorEl(null);
+            setOpenModal(true);
           }}
           sx={{ fontSize: '12.5px', borderRadius: '6px', py: 0.75 }}
         >
@@ -319,6 +349,13 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
           </Box>
         </Box>
       </Collapse>
+      <CreateProjectTaskModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onCreate={(taskData) => {
+          onAddTask?.(status.id, String(taskData.title || ''));
+        }}
+      />
     </Box>
   );
 };

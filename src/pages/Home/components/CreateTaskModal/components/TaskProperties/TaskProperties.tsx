@@ -15,7 +15,6 @@ import {
   CalendarToday as PlannedIcon,
   AutoFixHigh as AutoFixHighIcon,
   Description as DescriptionIcon,
-  Flag as FlagIcon,
   Add as AddIcon,
   Timer as TimerIcon,
   History as HistoryIcon,
@@ -24,6 +23,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { format } from 'date-fns';
 import { surfaceColor } from '@/context';
+import { PriorityBadge, getPriorityConfig } from '@/components/ui';
 import {
   propertyListSx,
   propertyRowSx,
@@ -136,7 +136,7 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
         {/* Priority */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <FlagIcon sx={{ fontSize: 16, color: '#ef4444' }} />
+            <PriorityBadge priority={priority} size={18} />
             <Typography
               variant="caption"
               sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -146,8 +146,8 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
           </Box>
           <Box sx={propertyValueSx}>
             <Chip
-              icon={<FlagIcon sx={{ fontSize: 16 }} />}
-              label={priority || 'No priority'}
+              icon={<PriorityBadge priority={priority} size={16} />}
+              label={getPriorityConfig(priority).label}
               onClick={(e) => setPriorityAnchor(e.currentTarget)}
               sx={getSelectionChipSx('priority', priority || 'No priority')}
             />
@@ -592,132 +592,131 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                 </Typography>
               )}
             </Box>
-
-            {/* Real Duration */}
-            <Box display="flex" flexDirection="column" gap={0.5}>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.secondary',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                }}
-              >
-                Real Duration (Tracked)
-              </Typography>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  py: 1,
-                  px: 1.5,
-                  borderRadius: '10px',
-                  border: '1px solid',
-                  borderColor: realTimeInputError ? 'error.main' : 'divider',
-                  bgcolor: (theme) =>
-                    surfaceColor(
-                      theme,
-                      '#1A1F2B',
-                      '#1F1F20',
-                      'background.paper',
-                    ),
-                  minHeight: '43px',
-                }}
-              >
-                <HistoryIcon sx={{ fontSize: 16, color: '#16a34a' }} />
-                <TextField
-                  variant="standard"
-                  value={realTime}
-                  onChange={(e) => {
-                    if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
-                      triggerRealTimeError();
-                    }
-                    const sanitizedValue = sanitizeDurationValue(
-                      e.target.value,
-                    );
-                    e.target.value = sanitizedValue;
-                    handleTimerChange(
-                      sanitizedValue,
-                      setRealTime,
-                      setRealTimeSuggestions,
-                      setRealTimeAnchor,
-                      e.currentTarget.parentElement as HTMLDivElement,
-                    );
-                  }}
-                  onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
-                  placeholder="1h 30m"
-                  inputProps={{
-                    inputMode: 'text',
-                    pattern: '[0-9hHmM s]*',
-                    maxLength: 12,
-                  }}
-                  InputProps={{
-                    disableUnderline: true,
-                  }}
-                  sx={{
-                    flex: 1,
-                    '& .MuiInputBase-input': {
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: 'text.primary',
-                      padding: 0,
-                    },
-                  }}
-                />
-                <Popover
-                  open={Boolean(realTimeAnchor)}
-                  anchorEl={realTimeAnchor}
-                  onClose={() => setRealTimeAnchor(null)}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  disableAutoFocus
-                  disableEnforceFocus
-                  slotProps={{
-                    paper: {
-                      sx: {
-                        minWidth: 80,
-                        borderRadius: '12px',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                      },
-                    },
-                  }}
-                >
-                  <List dense sx={{ py: 0 }}>
-                    {realTimeSuggestions.map((s) => (
-                      <MenuItem
-                        key={s}
-                        onClick={() => {
-                          setRealTime(s);
-                          setRealTimeAnchor(null);
-                        }}
-                      >
-                        <ListItemText
-                          primary={s}
-                          primaryTypographyProps={{
-                            fontSize: '13px',
-                            fontWeight: 600,
-                          }}
-                        />
-                      </MenuItem>
-                    ))}
-                  </List>
-                </Popover>
-              </Box>
-              {realTimeInputError && (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'error.main',
-                    fontSize: '10px',
-                    ml: 0.5,
-                  }}
-                >
-                  {realTimeInputError}
-                </Typography>
-              )}
-            </Box>
           </Box>
+        </Box>
+
+        {/* Real Duration (Tracked) — Full Width */}
+        <Box
+          display="flex"
+          flexDirection="column"
+          gap={0.5}
+          sx={{ width: '100%' }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}
+          >
+            Real Duration (Tracked)
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              gap: 1,
+              py: 1,
+              px: 1.5,
+              borderRadius: '10px',
+              border: '1px solid',
+              borderColor: realTimeInputError ? 'error.main' : 'divider',
+              bgcolor: (theme) =>
+                surfaceColor(theme, '#1A1F2B', '#1F1F20', 'background.paper'),
+              minHeight: '43px',
+            }}
+          >
+            <HistoryIcon sx={{ fontSize: 16, color: '#16a34a' }} />
+            <TextField
+              variant="standard"
+              value={realTime}
+              onChange={(e) => {
+                if (/[^0-9hHmMsS\s]/g.test(e.target.value)) {
+                  triggerRealTimeError();
+                }
+                const sanitizedValue = sanitizeDurationValue(e.target.value);
+                e.target.value = sanitizedValue;
+                handleTimerChange(
+                  sanitizedValue,
+                  setRealTime,
+                  setRealTimeSuggestions,
+                  setRealTimeAnchor,
+                  e.currentTarget.parentElement as HTMLDivElement,
+                );
+              }}
+              onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
+              placeholder="1h 30m"
+              inputProps={{
+                inputMode: 'text',
+                pattern: '[0-9hHmM s]*',
+                maxLength: 12,
+              }}
+              InputProps={{
+                disableUnderline: true,
+              }}
+              sx={{
+                flex: 1,
+                '& .MuiInputBase-input': {
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'text.primary',
+                  padding: 0,
+                },
+              }}
+            />
+            <Popover
+              open={Boolean(realTimeAnchor)}
+              anchorEl={realTimeAnchor}
+              onClose={() => setRealTimeAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              disableAutoFocus
+              disableEnforceFocus
+              slotProps={{
+                paper: {
+                  sx: {
+                    minWidth: 80,
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                  },
+                },
+              }}
+            >
+              <List dense sx={{ py: 0 }}>
+                {realTimeSuggestions.map((s) => (
+                  <MenuItem
+                    key={s}
+                    onClick={() => {
+                      setRealTime(s);
+                      setRealTimeAnchor(null);
+                    }}
+                  >
+                    <ListItemText
+                      primary={s}
+                      primaryTypographyProps={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                      }}
+                    />
+                  </MenuItem>
+                ))}
+              </List>
+            </Popover>
+          </Box>
+          {realTimeInputError && (
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'error.main',
+                fontSize: '10px',
+                ml: 0.5,
+              }}
+            >
+              {realTimeInputError}
+            </Typography>
+          )}
         </Box>
 
         {/* Visual Timeline Badge */}

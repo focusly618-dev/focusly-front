@@ -11,11 +11,11 @@ import {
   styled,
   TextField,
 } from '@mui/material';
-import {
-  Folder as FolderFilledIcon,
-  FolderOutlined as FolderOutlinedIcon,
-} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import {
+  ModernFolderFilledIcon,
+  ModernFolderOutlinedIcon,
+} from '@/components/ui';
 
 export const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
@@ -155,7 +155,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
           <Button
             variant={folderStyle === 'filled' ? 'contained' : 'outlined'}
             onClick={() => setFolderStyle('filled')}
-            startIcon={<FolderFilledIcon />}
+            startIcon={<ModernFolderFilledIcon />}
             sx={{
               flex: 1,
               borderRadius: '8px',
@@ -168,7 +168,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
           <Button
             variant={folderStyle === 'outlined' ? 'contained' : 'outlined'}
             onClick={() => setFolderStyle('outlined')}
-            startIcon={<FolderOutlinedIcon />}
+            startIcon={<ModernFolderOutlinedIcon />}
             sx={{
               flex: 1,
               borderRadius: '8px',

@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { useTheme } from '@mui/material';
-import { getPriorityFromLevel } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { EditorSidebarProps } from './EditorSidebar.type';
 
 export const useEditorSidebar = (props: EditorSidebarProps) => {
@@ -22,10 +21,10 @@ export const useEditorSidebar = (props: EditorSidebarProps) => {
   }, [isRightSidebarOpen, setIsRightSidebarOpen]);
 
   const getPriorityColor = (level: number) => {
-    const priority = getPriorityFromLevel(level);
-    if (priority === 'High') return theme.palette.error.main;
-    if (priority === 'Med') return theme.palette.warning.main;
-    if (priority === 'Low') return theme.palette.success.main;
+    if (level >= 4) return '#ef4444';
+    if (level === 3) return '#f59e0b';
+    if (level === 2) return '#3b82f6';
+    if (level === 1) return '#10b981';
     return theme.palette.text.secondary;
   };
 

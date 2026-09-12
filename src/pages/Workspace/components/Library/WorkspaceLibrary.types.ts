@@ -1,4 +1,4 @@
-import type { WorkspaceTypes, ProjectTypes } from '../../../workspace.types';
+import type { WorkspaceTypes, ProjectTypes } from '../../workspace.types';
 
 export interface LibraryState {
   searchTerm: string;

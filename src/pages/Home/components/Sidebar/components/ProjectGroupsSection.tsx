@@ -23,13 +23,16 @@ import {
   ExpandLess,
   Add as AddIcon,
   MoreHoriz as MoreHorizIcon,
-  Folder as FolderIcon,
-  FolderOutlined as FolderOutlinedIcon,
   Search as SearchIcon,
   Close as CloseIcon,
   FolderOff as FolderOffIcon,
   Check as CheckIcon,
 } from '@mui/icons-material';
+import {
+  ModernFolderFilledIcon,
+  ModernFolderOutlinedIcon,
+  isCustomEmoji,
+} from '@/components/ui';
 import {
   ProjectsList,
   ProjectItemRow,
@@ -457,8 +460,15 @@ export const ProjectGroupsSection = ({
                   },
                 }}
               >
-                {group.emoji === 'outlined' ? (
-                  <FolderOutlinedIcon
+                {isCustomEmoji(group.emoji) ? (
+                  <Box
+                    component="span"
+                    sx={{ fontSize: '13px', lineHeight: 1 }}
+                  >
+                    {group.emoji}
+                  </Box>
+                ) : group.emoji === 'outlined' ? (
+                  <ModernFolderOutlinedIcon
                     sx={{
                       fontSize: 16,
                       color:
@@ -467,7 +477,7 @@ export const ProjectGroupsSection = ({
                     }}
                   />
                 ) : (
-                  <FolderIcon
+                  <ModernFolderFilledIcon
                     sx={{
                       fontSize: 16,
                       color:
@@ -618,7 +628,7 @@ export const ProjectGroupsSection = ({
                 textTransform: 'none',
               }}
             >
-              <FolderIcon sx={{ fontSize: 24 }} />
+              <ModernFolderFilledIcon sx={{ fontSize: 24 }} />
               <Typography variant="caption" fontWeight={600}>
                 Solid
               </Typography>
@@ -636,7 +646,7 @@ export const ProjectGroupsSection = ({
                 textTransform: 'none',
               }}
             >
-              <FolderOutlinedIcon sx={{ fontSize: 24 }} />
+              <ModernFolderOutlinedIcon sx={{ fontSize: 24 }} />
               <Typography variant="caption" fontWeight={600}>
                 Outlined
               </Typography>
