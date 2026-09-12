@@ -13,6 +13,7 @@ import {
   FileUpload as ImportIcon,
   FileDownload as ExportIcon,
   Description as DescriptionIcon,
+  ViewSidebarOutlined as ViewSidebarIcon,
 } from '@mui/icons-material';
 import {
   CircularProgress,
@@ -27,8 +28,10 @@ import {
   Button,
   Badge,
   Divider,
+  Tooltip,
 } from '@mui/material';
 
+import { ModernFolderFilledIcon } from '@/components/ui';
 import { ImportContentModal } from './components/ImportContentModal/ImportContentModal';
 import { convertMarkdownToDocx } from './documentExporters';
 import { sileo } from '@/utils';
@@ -222,13 +225,6 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           </Typography>
         </Box>
       </HeaderLeft>
-
-      <HeaderCenter
-        sx={{
-          display: { xs: 'none', md: 'flex' },
-          flex: 1,
-        }}
-      />
 
       <HeaderRight sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
         {/* Target Language Button */}

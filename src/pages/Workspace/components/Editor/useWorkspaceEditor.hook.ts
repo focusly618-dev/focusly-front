@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { UseFormWatch } from 'react-hook-form';
 import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
-import type {
-  TaskSearchItems,
-  WorkspaceFormData,
-} from '../../../workspace.types';
-import type { MarkdownEditorRef } from '../codemirror/MarkdownEditor.types';
+import type { TaskSearchItems, WorkspaceFormData } from '../../workspace.types';
+import type { MarkdownEditorRef } from './codemirror/MarkdownEditor.types';
 
 export interface UseWorkspaceEditorProps {
   watch: UseFormWatch<WorkspaceFormData>;
