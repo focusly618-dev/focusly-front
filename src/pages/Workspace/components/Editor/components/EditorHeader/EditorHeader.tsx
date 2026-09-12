@@ -223,87 +223,14 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         </Box>
       </HeaderLeft>
 
-      <HeaderRight sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-        {/* Target Language Button */}
-        <Button
-          onClick={(e) => setTargetAnchor(e.currentTarget)}
-          startIcon={<TranslateIcon sx={{ fontSize: 14 }} />}
-          sx={{
-            height: '34px',
-            px: 1.5,
-            borderRadius: '8px',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.12)'
-                : '#e2e8f0',
-            color: 'text.primary',
-            fontSize: '12px',
-            fontWeight: 600,
-            textTransform: 'none',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
-            '&:hover': {
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.08)'
-                  : '#f8fafc',
-            },
-          }}
-        >
-          {getLanguageLabel(targetLanguage)}
-        </Button>
-
-        {/* Editor Tools: Detect Language, Dictation, Focus Mode */}
-        <IconButton
-          ref={toolsButtonRef}
-          onClick={(e) => setToolsAnchor(e.currentTarget)}
-          size="small"
-          sx={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '8px',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.12)'
-                : '#e2e8f0',
-            color: 'text.primary',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
-            '&:hover': {
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.08)'
-                  : '#f8fafc',
-            },
-          }}
-        >
-          <Badge
-            variant="dot"
-            color="error"
-            invisible={!isListening}
-            sx={{
-              '& .MuiBadge-dot': {
-                animation: isListening
-                  ? 'pulse 1.5s infinite ease-in-out'
-                  : 'none',
-              },
-              '@keyframes pulse': {
-                '0%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.5)' },
-                '70%': { boxShadow: '0 0 0 4px rgba(239, 68, 68, 0)' },
-                '100%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)' },
-              },
-            }}
-          >
-            <MoreHorizIcon sx={{ fontSize: 18 }} />
-          </Badge>
-        </IconButton>
-
+      <HeaderRight
+        sx={{
+          display: { xs: 'none', md: 'flex' },
+          alignItems: 'center',
+          gap: 1,
+          ml: 'auto',
+        }}
+      >
         {/* Save Status Indicator */}
         <Fade
           in={saveState === 'saving' || saveState === 'saved'}
@@ -385,6 +312,86 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             ) : null}
           </Box>
         </Fade>
+
+        {/* Target Language Button */}
+        <Button
+          onClick={(e) => setTargetAnchor(e.currentTarget)}
+          startIcon={<TranslateIcon sx={{ fontSize: 14 }} />}
+          sx={{
+            height: '34px',
+            px: 1.5,
+            borderRadius: '8px',
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : '#e2e8f0',
+            color: 'text.primary',
+            fontSize: '12px',
+            fontWeight: 600,
+            textTransform: 'none',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : '#ffffff',
+            '&:hover': {
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : '#f8fafc',
+            },
+          }}
+        >
+          {getLanguageLabel(targetLanguage)}
+        </Button>
+
+        {/* Editor Tools: Detect Language, Dictation, Focus Mode (...) */}
+        <IconButton
+          ref={toolsButtonRef}
+          onClick={(e) => setToolsAnchor(e.currentTarget)}
+          size="small"
+          sx={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : '#e2e8f0',
+            color: 'text.primary',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : '#ffffff',
+            '&:hover': {
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : '#f8fafc',
+            },
+          }}
+        >
+          <Badge
+            variant="dot"
+            color="error"
+            invisible={!isListening}
+            sx={{
+              '& .MuiBadge-dot': {
+                animation: isListening
+                  ? 'pulse 1.5s infinite ease-in-out'
+                  : 'none',
+              },
+              '@keyframes pulse': {
+                '0%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.5)' },
+                '70%': { boxShadow: '0 0 0 4px rgba(239, 68, 68, 0)' },
+                '100%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)' },
+              },
+            }}
+          >
+            <MoreHorizIcon sx={{ fontSize: 18 }} />
+          </Badge>
+        </IconButton>
 
         {/* Editor Tools Menu (Detect Language / Dictation / Focus Mode) */}
         <Menu

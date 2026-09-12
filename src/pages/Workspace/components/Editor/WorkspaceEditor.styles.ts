@@ -61,7 +61,7 @@ export const EditorHeader = styled(Box, {
   borderBottom: `1px solid ${theme.palette.divider}`,
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-start',
+  justifyContent: 'space-between',
   padding: '0 24px',
   background: gradient || 'transparent',
   backgroundSize: 'cover',
