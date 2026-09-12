@@ -13,7 +13,6 @@ import {
   FileUpload as ImportIcon,
   FileDownload as ExportIcon,
   Description as DescriptionIcon,
-  ViewSidebarOutlined as ViewSidebarIcon,
 } from '@mui/icons-material';
 import {
   CircularProgress,
@@ -28,7 +27,6 @@ import {
   Button,
   Badge,
   Divider,
-  Tooltip,
 } from '@mui/material';
 
 import { ModernFolderFilledIcon } from '@/components/ui';
@@ -50,7 +48,6 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     isCentered,
     onToggleCentered,
     onToggleSidebar,
-    isRightSidebarOpen,
     currentFolder,
     currentTitle,
     onStartFocus,
@@ -388,58 +385,6 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             ) : null}
           </Box>
         </Fade>
-
-        {/* Desktop Sidebar Toggle Button */}
-        {onToggleSidebar && (
-          <Tooltip
-            title={
-              isRightSidebarOpen
-                ? 'Cerrar panel acompañante'
-                : 'Abrir panel acompañante'
-            }
-          >
-            <IconButton
-              onClick={onToggleSidebar}
-              size="small"
-              sx={{
-                width: '34px',
-                height: '34px',
-                borderRadius: '8px',
-                border: '1px solid',
-                borderColor: (theme) =>
-                  isRightSidebarOpen
-                    ? theme.palette.mode === 'dark'
-                      ? 'rgba(19, 127, 236, 0.4)'
-                      : 'rgba(19, 127, 236, 0.3)'
-                    : theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.12)'
-                      : '#e2e8f0',
-                color: isRightSidebarOpen ? 'primary.main' : 'text.secondary',
-                bgcolor: (theme) =>
-                  isRightSidebarOpen
-                    ? theme.palette.mode === 'dark'
-                      ? 'rgba(19, 127, 236, 0.15)'
-                      : 'rgba(19, 127, 236, 0.08)'
-                    : theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.03)'
-                      : '#ffffff',
-                '&:hover': {
-                  color: isRightSidebarOpen ? 'primary.main' : 'text.primary',
-                  bgcolor: (theme) =>
-                    isRightSidebarOpen
-                      ? theme.palette.mode === 'dark'
-                        ? 'rgba(19, 127, 236, 0.25)'
-                        : 'rgba(19, 127, 236, 0.14)'
-                      : theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.08)'
-                        : '#f8fafc',
-                },
-              }}
-            >
-              <ViewSidebarIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-          </Tooltip>
-        )}
 
         {/* Editor Tools Menu (Detect Language / Dictation / Focus Mode) */}
         <Menu
