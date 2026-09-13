@@ -6,13 +6,14 @@ import type {
   GraphSettings,
 } from '../NoteGraphView.types';
 import {
-  baseRadiusForLevel,
-  calculateTrimmedEdgeTarget,
+  calculateCurvedPath,
+  getNodeDimensions,
 } from '../utils/graphLayout.utils';
 
 interface GraphEdgeItemProps {
   edge: GraphEdge;
   nodeById: Map<string, GraphNode>;
+  selectedNodeId: string | null;
   neighborIds: Set<string> | null;
   settings: GraphSettings;
 }
@@ -20,43 +21,65 @@ interface GraphEdgeItemProps {
 export const GraphEdgeItem: React.FC<GraphEdgeItemProps> = ({
   edge,
   nodeById,
+  selectedNodeId,
   neighborIds,
   settings,
 }) => {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
   const from = nodeById.get(edge.from);
   const to = nodeById.get(edge.to);
 
   if (!from || !to) return null;
 
+  const isConnectedToSelected =
+    Boolean(selectedNodeId) &&
+    (edge.from === selectedNodeId || edge.to === selectedNodeId);
+
   const active =
     !neighborIds || (neighborIds.has(edge.from) && neighborIds.has(edge.to));
 
-  const targetRadius = baseRadiusForLevel(to.level);
-  const { trimmedX, trimmedY } = calculateTrimmedEdgeTarget(
-    from,
-    to,
-    targetRadius,
-    settings.nodeSize,
-  );
+  // Determine stroke color
+  let strokeColor = edge.color;
+
+  if (to.type === 'source' || from.type === 'source') {
+    strokeColor = isDark ? '#34d399' : '#059669';
+  } else if (to.type === 'concept' || from.type === 'concept') {
+    strokeColor = isDark ? '#60a5fa' : '#2563eb';
+  } else if (isConnectedToSelected) {
+    strokeColor = isDark ? '#c7d2fe' : '#312e81';
+  } else if (!strokeColor) {
+    strokeColor = isDark ? '#818cf8' : '#4f46e5';
+  }
+
+  const isDashed =
+    !isConnectedToSelected && to.type !== 'source' && to.type !== 'concept';
+  const strokeWidth =
+    (isConnectedToSelected ? 3.2 : 2.2) * settings.linkThickness;
+
+  const fromSize = getNodeDimensions(from, from.id === selectedNodeId);
+  const toSize = getNodeDimensions(to, to.id === selectedNodeId);
+  const pathData = calculateCurvedPath(from, to, fromSize, toSize);
 
   return (
-    <line
-      x1={from.x}
-      y1={from.y}
-      x2={settings.showArrows ? trimmedX : to.x}
-      y2={settings.showArrows ? trimmedY : to.y}
-      stroke={
-        active && neighborIds
-          ? theme.palette.primary.main
-          : theme.palette.divider
-      }
-      strokeWidth={
-        (active && neighborIds ? 1.75 : 1.25) * settings.linkThickness
-      }
-      opacity={active ? 1 : 0.25}
-      markerEnd={settings.showArrows ? 'url(#note-graph-arrow)' : undefined}
-      style={{ transition: 'opacity 0.15s, stroke 0.15s' }}
+    <path
+      d={pathData}
+      fill="none"
+      stroke={strokeColor}
+      strokeWidth={strokeWidth}
+      strokeDasharray={isDashed ? '7 4' : undefined}
+      strokeLinecap="round"
+      opacity={active ? 1 : 0.4}
+      style={{
+        filter: isConnectedToSelected
+          ? isDark
+            ? 'drop-shadow(0 0 5px rgba(199, 210, 254, 0.75))'
+            : 'drop-shadow(0 0 4px rgba(79, 70, 229, 0.5))'
+          : undefined,
+        transition:
+          'stroke 0.2s ease, opacity 0.2s ease, stroke-width 0.2s ease',
+      }}
     />
   );
 };

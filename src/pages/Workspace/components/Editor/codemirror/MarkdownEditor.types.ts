@@ -10,6 +10,7 @@ export interface MarkdownEditorRef {
   insertAtCursor: (text: string) => void;
   insertAtEnd: (text: string) => void;
   setCursor: (pos: number) => void;
+  jumpToSection: (target: { pos?: number; text?: string }) => boolean;
   getValue: () => string;
   focus: () => void;
   // Replaces the whole document with a combined old+new preview (deletions

@@ -38,6 +38,7 @@ export const useWorkspaceEditor = ({
   const currentTitle = watch('title');
   const currentContent = watch('content');
   const currentFolder = watch('project');
+  const currentEmoji = watch('emoji');
 
   const [showPalette, setShowPalette] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -113,6 +114,7 @@ export const useWorkspaceEditor = ({
     currentTitle,
     currentContent,
     currentFolder,
+    currentEmoji,
 
     showPalette,
     setShowPalette,

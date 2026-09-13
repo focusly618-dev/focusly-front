@@ -8,6 +8,7 @@ export interface EditorSidebarProps {
   markdownContent?: string;
   markdownEditorRef?: RefObject<MarkdownEditorRef | null>;
   currentTitle?: string;
+  currentEmoji?: string;
   currentFolder?: { name?: string; color?: string; emoji?: string } | null;
   // Optional legacy props
   selectTask?: TaskSearchItems | null;

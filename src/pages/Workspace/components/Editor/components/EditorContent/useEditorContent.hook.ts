@@ -66,12 +66,18 @@ export const useEditorContent = ({
   };
 
   const handleColorSelect = (color: HeaderColor) => {
-    setValue?.('background_color', color === 'none' ? undefined : color);
+    setValue?.('background_color', color === 'none' ? undefined : color, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setColorAnchor(null);
   };
 
   const handleIconSelect = (iconName: string) => {
-    setValue?.('emoji', iconName || undefined);
+    setValue?.('emoji', iconName || undefined, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setIconAnchor(null);
   };
 
