@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useQuery } from '@apollo/client';
 import {
   Dialog,
   Box,
@@ -11,6 +12,9 @@ import {
   Menu,
   MenuItem,
   CircularProgress,
+  InputBase,
+  Divider,
+  Tooltip,
   useTheme,
   alpha,
 } from '@mui/material';
@@ -21,7 +25,6 @@ import {
   CalendarTodayOutlined as CalendarIcon,
   TimerOutlined as TimerIcon,
   DescriptionOutlined as DocIcon,
-  OpenInNew as ExternalLinkIcon,
   AutoAwesome as SparklesIcon,
   Search as SearchIcon,
   FormatBold as BoldIcon,
@@ -36,8 +39,11 @@ import {
   LocalOfferOutlined as TagIcon,
   SyncAlt as StatusIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
+  Check as CheckIcon,
+  DeleteOutline as DeleteOutlineIcon,
 } from '@mui/icons-material';
-import { sileo } from '@/utils';
+import { sileo, UNTITLED_WORKSPACE_TITLE } from '@/utils';
+import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
   PRIORITY_OPTIONS,
   PriorityBadge,
@@ -72,6 +78,7 @@ const DURATION_OPTIONS = [
 export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
   open,
   onClose,
+  task,
   projects,
   selectedProjectId,
   projectName = 'Select Project',
@@ -79,11 +86,15 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
   sprintName,
   linkedSpecTitle,
   linkedSpecSection,
+  linkedWorkspaceId,
   defaultStatus,
   onCreate,
+  onUpdate,
+  onDelete,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const isEditing = Boolean(task);
 
   const [selectedProjectOverride, setSelectedProjectOverride] = useState<
     ProjectOption | undefined
@@ -106,6 +117,68 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
   const isCurrentOutlined = currentProjectEmoji === 'outlined';
   const hasProjects = Boolean(projects && projects.length > 0);
   const isMultipleProjects = Boolean(projects && projects.length > 1);
+
+  // ── Workspaces for Linked Spec & PRD Anchor ──
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
+    linkedWorkspaceId || null,
+  );
+  const [workspaceMenuAnchor, setWorkspaceMenuAnchor] =
+    useState<null | HTMLElement>(null);
+  const [workspaceSearch, setWorkspaceSearch] = useState('');
+
+  const { data: workspacesData, loading: loadingWorkspaces } = useQuery(
+    GET_WORKSPACES,
+    {
+      variables: {
+        projectId: selectedProject?.id || undefined,
+        limit: 50,
+        offset: 0,
+      },
+      skip: !open,
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+
+  const availableWorkspaces: Array<{
+    id: string;
+    title: string;
+    emoji?: string;
+    projectId?: string;
+    updatedAt?: string;
+  }> = useMemo(() => {
+    return workspacesData?.result?.workspaces || [];
+  }, [workspacesData]);
+
+  const filteredWorkspaces = useMemo(() => {
+    if (!workspaceSearch.trim()) return availableWorkspaces;
+    const lower = workspaceSearch.toLowerCase();
+    return availableWorkspaces.filter(
+      (w) =>
+        (w.title && w.title.toLowerCase().includes(lower)) ||
+        (w.emoji && w.emoji.includes(lower)),
+    );
+  }, [availableWorkspaces, workspaceSearch]);
+
+  const selectedWorkspace = useMemo(() => {
+    if (selectedWorkspaceId) {
+      return (
+        availableWorkspaces.find((w) => w.id === selectedWorkspaceId) || null
+      );
+    }
+    return null;
+  }, [availableWorkspaces, selectedWorkspaceId]);
+
+  const isWorkspaceLinked = Boolean(
+    selectedWorkspace || selectedWorkspaceId || linkedSpecTitle,
+  );
+  const displayWorkspaceTitle =
+    selectedWorkspace?.title?.trim() ||
+    linkedSpecTitle?.trim() ||
+    (selectedWorkspaceId ? UNTITLED_WORKSPACE_TITLE : '');
+  const displayWorkspaceSection = selectedWorkspace
+    ? currentProjectName
+    : linkedSpecSection || currentProjectName;
+  const displayWorkspaceEmoji = selectedWorkspace?.emoji || '📄';
 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [title, setTitle] = useState('');
@@ -141,6 +214,86 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [newSubtaskTime, setNewSubtaskTime] = useState('15m');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ── Sync Form with Passed Task (or Reset for New Task) ──
+  useEffect(() => {
+    if (open) {
+      if (task) {
+        setTitle(task.title || '');
+        setDescription(task.description || '');
+        setStatus(task.status || defaultStatus || 'in_progress');
+        setPriority(task.priority || 'Medium');
+
+        // Due date: YYYY-MM-DD for date input
+        if (task.rawDeadline) {
+          try {
+            setDueDate(new Date(task.rawDeadline).toISOString().slice(0, 10));
+          } catch {
+            setDueDate(task.rawDeadline.slice(0, 10));
+          }
+        } else if (task.dueDate && /^\d{4}-\d{2}-\d{2}/.test(task.dueDate)) {
+          setDueDate(task.dueDate.slice(0, 10));
+        } else {
+          setDueDate('');
+        }
+
+        setEstimatedDuration(task.duration || '30m');
+        setModules(
+          task.modules && task.modules.length > 0
+            ? task.modules
+            : task.tag
+              ? [task.tag]
+              : [],
+        );
+        setSubtasks(
+          (task.subtasks || []).map((s) => ({
+            id: s.id,
+            title: s.title,
+            time: s.duration || '15m',
+            completed: Boolean(s.completed),
+          })),
+        );
+        setSelectedWorkspaceId(task.workspaceId || linkedWorkspaceId || null);
+
+        const matchedProject = projects?.find(
+          (p) => p.id === task.projectId || p.id === task.project?.id,
+        );
+        if (matchedProject) {
+          setSelectedProjectOverride(matchedProject);
+        } else if (selectedProjectId && projects) {
+          setSelectedProjectOverride(
+            projects.find((p) => p.id === selectedProjectId),
+          );
+        } else {
+          setSelectedProjectOverride(undefined);
+        }
+      } else {
+        setTitle('');
+        setDescription('');
+        setStatus(defaultStatus || 'in_progress');
+        setPriority('Medium');
+        setDueDate('');
+        setEstimatedDuration('30m');
+        setModules([]);
+        setSubtasks([]);
+        setSelectedWorkspaceId(linkedWorkspaceId || null);
+        if (selectedProjectId && projects) {
+          setSelectedProjectOverride(
+            projects.find((p) => p.id === selectedProjectId),
+          );
+        } else {
+          setSelectedProjectOverride(undefined);
+        }
+      }
+    }
+  }, [
+    open,
+    task,
+    linkedWorkspaceId,
+    defaultStatus,
+    selectedProjectId,
+    projects,
+  ]);
 
   const currentStatusConfig =
     STATUS_OPTIONS.find(
@@ -203,30 +356,60 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      if (onCreate) {
-        await onCreate({
-          title: title.trim(),
-          status: currentStatusConfig.id,
-          priority: currentPriorityConfig.id,
-          modules,
-          dueDate: dueDate || undefined,
-          estimatedDuration,
-          description: description.trim(),
-          subtasks,
-          projectId: selectedProject?.id,
-        });
-      }
+      const payload = {
+        title: title.trim(),
+        status: currentStatusConfig.id,
+        priority: currentPriorityConfig.id,
+        modules,
+        dueDate: dueDate || undefined,
+        estimatedDuration,
+        description: description.trim(),
+        subtasks,
+        projectId: selectedProject?.id,
+        workspaceId: selectedWorkspaceId || undefined,
+      };
 
-      if (createMore) {
-        setTitle('');
-        setDescription('');
-        setSubtasks([]);
-        setModules([]);
-      } else {
+      if (isEditing && task) {
+        if (onUpdate) {
+          await onUpdate(task.id, payload);
+        } else if (onCreate) {
+          await onCreate({ ...payload, id: task.id });
+        }
+        sileo.success({
+          title: 'Task updated',
+          description: `"${title.trim()}" saved successfully.`,
+          duration: 2500,
+        });
         onClose();
+      } else {
+        if (onCreate) {
+          await onCreate(payload);
+        }
+
+        if (createMore) {
+          setTitle('');
+          setDescription('');
+          setSubtasks([]);
+          setModules([]);
+        } else {
+          onClose();
+        }
       }
     } catch (err) {
-      console.error('Failed to create task:', err);
+      console.error('Failed to save task:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteTask = async () => {
+    if (!task?.id || !onDelete) return;
+    setIsSubmitting(true);
+    try {
+      await onDelete(task.id);
+      onClose();
+    } catch (err) {
+      console.error('Failed to delete task:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -558,7 +741,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
           <Typography
             sx={{ fontSize: '13px', fontWeight: 500, color: secondaryText }}
           >
-            New Task
+            {isEditing ? 'Edit Task' : 'New Task'}
           </Typography>
           {sprintName && (
             <Chip
@@ -1155,65 +1338,379 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
             </Stack>
             <Button
               size="small"
+              onClick={(e) => {
+                setWorkspaceSearch('');
+                setWorkspaceMenuAnchor(e.currentTarget);
+              }}
               startIcon={<SearchIcon sx={{ fontSize: 13 }} />}
               sx={{
                 fontSize: '11px',
                 fontWeight: 600,
                 textTransform: 'none',
                 color: '#3b82f6',
-                p: '2px 6px',
+                p: '2px 8px',
                 minWidth: 0,
+                borderRadius: '6px',
+                bgcolor: alpha('#3b82f6', 0.08),
+                '&:hover': {
+                  bgcolor: alpha('#3b82f6', 0.16),
+                },
               }}
             >
-              Link Note
+              {isWorkspaceLinked ? 'Cambiar Workspace' : 'Vincular Workspace'}
             </Button>
           </Box>
 
-          {/* Linked Note Item Card */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              p: 1.5,
-              borderRadius: '8px',
-              bgcolor: isDark ? '#232328' : '#ffffff',
-              border: `1px solid ${alpha(cardBorder, 0.8)}`,
-              cursor: 'pointer',
-              transition: 'border-color 0.15s ease',
-              '&:hover': {
-                borderColor: '#3b82f6',
+          {/* Linked Workspace Item Card */}
+          {isWorkspaceLinked ? (
+            <Box
+              onClick={(e) => {
+                setWorkspaceSearch('');
+                setWorkspaceMenuAnchor(e.currentTarget);
+              }}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 1.5,
+                borderRadius: '8px',
+                bgcolor: isDark ? '#232328' : '#ffffff',
+                border: `1px solid ${alpha('#6366f1', 0.35)}`,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  borderColor: '#6366f1',
+                  boxShadow: isDark
+                    ? '0 4px 14px rgba(99, 102, 241, 0.2)'
+                    : '0 4px 14px rgba(99, 102, 241, 0.12)',
+                },
+              }}
+            >
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={1.5}
+                sx={{ minWidth: 0, flex: 1 }}
+              >
+                <Box
+                  sx={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: '8px',
+                    bgcolor: isDark ? alpha('#6366f1', 0.18) : '#e0e7ff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '17px',
+                    color: '#4f46e5',
+                    flexShrink: 0,
+                  }}
+                >
+                  {displayWorkspaceEmoji}
+                </Box>
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography
+                    noWrap
+                    sx={{
+                      fontSize: '13px',
+                      fontWeight: 650,
+                      color: headerText,
+                    }}
+                  >
+                    {displayWorkspaceTitle}
+                  </Typography>
+                  <Typography
+                    noWrap
+                    sx={{ fontSize: '11px', color: secondaryText }}
+                  >
+                    {displayWorkspaceSection} • Spec / PRD
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Chip
+                  label="Vinculado"
+                  size="small"
+                  sx={{
+                    height: '20px',
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    bgcolor: isDark ? alpha('#10b981', 0.15) : '#d1fae5',
+                    color: isDark ? '#34d399' : '#059669',
+                    border: '1px solid',
+                    borderColor: isDark ? alpha('#10b981', 0.3) : '#a7f3d0',
+                  }}
+                />
+                <Tooltip title="Desvincular workspace" arrow>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedWorkspaceId(null);
+                    }}
+                    sx={{
+                      p: 0.5,
+                      color: secondaryText,
+                      '&:hover': {
+                        color: '#ef4444',
+                        bgcolor: alpha('#ef4444', 0.1),
+                      },
+                    }}
+                  >
+                    <CloseIcon sx={{ fontSize: 14 }} />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Box>
+          ) : (
+            /* Unlinked Empty State Card */
+            <Box
+              onClick={(e) => {
+                setWorkspaceSearch('');
+                setWorkspaceMenuAnchor(e.currentTarget);
+              }}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 1.5,
+                borderRadius: '8px',
+                bgcolor: isDark ? alpha('#ffffff', 0.02) : '#f8fafc',
+                border: `1px dashed ${alpha(cardBorder, 1.2)}`,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  borderColor: '#3b82f6',
+                  bgcolor: isDark
+                    ? alpha('#3b82f6', 0.05)
+                    : alpha('#3b82f6', 0.03),
+                },
+              }}
+            >
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={1.5}
+                sx={{ minWidth: 0 }}
+              >
+                <Box
+                  sx={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: '8px',
+                    bgcolor: isDark ? alpha('#ffffff', 0.05) : '#e2e8f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: secondaryText,
+                    flexShrink: 0,
+                  }}
+                >
+                  <DocIcon sx={{ fontSize: 18 }} />
+                </Box>
+                <Box>
+                  <Typography
+                    sx={{
+                      fontSize: '12.5px',
+                      fontWeight: 600,
+                      color: headerText,
+                    }}
+                  >
+                    Ningún workspace vinculado
+                  </Typography>
+                  <Typography sx={{ fontSize: '11px', color: secondaryText }}>
+                    Haz clic para asociar esta tarea a una especificación o nota
+                  </Typography>
+                </Box>
+              </Stack>
+              <Button
+                size="small"
+                variant="outlined"
+                sx={{
+                  fontSize: '11px',
+                  textTransform: 'none',
+                  borderColor: alpha(cardBorder, 1.4),
+                  color: '#3b82f6',
+                  p: '2px 8px',
+                  borderRadius: '6px',
+                  minWidth: 0,
+                }}
+              >
+                + Seleccionar
+              </Button>
+            </Box>
+          )}
+
+          {/* ── Workspace Selection Dropdown Menu ── */}
+          <Menu
+            anchorEl={workspaceMenuAnchor}
+            open={Boolean(workspaceMenuAnchor)}
+            onClose={() => setWorkspaceMenuAnchor(null)}
+            PaperProps={{
+              sx: {
+                width: 340,
+                maxHeight: 380,
+                borderRadius: '14px',
+                p: 1,
+                bgcolor: isDark ? '#1e1e24' : '#ffffff',
+                border: `1px solid ${cardBorder}`,
+                boxShadow: isDark
+                  ? '0 16px 36px rgba(0,0,0,0.6)'
+                  : '0 16px 36px rgba(15,23,42,0.15)',
               },
             }}
           >
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Box
+            {/* Search Input */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 1.5,
+                py: 0.8,
+                mb: 1,
+                borderRadius: '8px',
+                bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#f1f5f9',
+                border: '1px solid',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+              }}
+            >
+              <SearchIcon sx={{ fontSize: 16, color: secondaryText }} />
+              <InputBase
+                value={workspaceSearch}
+                onChange={(e) => setWorkspaceSearch(e.target.value)}
+                placeholder="Buscar workspace o nota..."
+                fullWidth
+                autoFocus
                 sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '6px',
-                  bgcolor: isDark ? alpha('#6366f1', 0.15) : '#e0e7ff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#4f46e5',
+                  fontSize: '12.5px',
+                  color: headerText,
+                  '& input': { p: 0 },
                 }}
-              >
-                <DocIcon sx={{ fontSize: 18 }} />
+              />
+            </Box>
+
+            {loadingWorkspaces ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 2.5 }}>
+                <CircularProgress size={20} />
               </Box>
-              <Box>
-                <Typography
-                  sx={{ fontSize: '13px', fontWeight: 600, color: headerText }}
+            ) : filteredWorkspaces.length === 0 ? (
+              <Box sx={{ p: 2, textAlign: 'center' }}>
+                <Typography sx={{ fontSize: '12px', color: secondaryText }}>
+                  {workspaceSearch
+                    ? 'No se encontraron workspaces'
+                    : 'No hay workspaces en este proyecto'}
+                </Typography>
+              </Box>
+            ) : (
+              filteredWorkspaces.map((ws) => {
+                const isSelected = selectedWorkspaceId === ws.id;
+                return (
+                  <MenuItem
+                    key={ws.id}
+                    onClick={() => {
+                      setSelectedWorkspaceId(ws.id);
+                      setWorkspaceMenuAnchor(null);
+                      sileo.success({
+                        title: 'Workspace vinculado',
+                        description: ws.title || UNTITLED_WORKSPACE_TITLE,
+                        duration: 2500,
+                      });
+                    }}
+                    selected={isSelected}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      borderRadius: '8px',
+                      py: 1,
+                      px: 1.25,
+                      mb: 0.5,
+                      bgcolor: isSelected
+                        ? isDark
+                          ? 'rgba(99, 102, 241, 0.18)'
+                          : 'rgba(99, 102, 241, 0.08)'
+                        : 'transparent',
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1.2}
+                      sx={{ minWidth: 0, flex: 1 }}
+                    >
+                      <Box
+                        sx={{
+                          width: 26,
+                          height: 26,
+                          borderRadius: '6px',
+                          bgcolor: isDark
+                            ? 'rgba(255,255,255,0.06)'
+                            : '#e2e8f0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {ws.emoji || '📄'}
+                      </Box>
+                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                        <Typography
+                          noWrap
+                          sx={{
+                            fontSize: '12.5px',
+                            fontWeight: isSelected ? 700 : 500,
+                            color: isSelected ? '#6366f1' : headerText,
+                          }}
+                        >
+                          {ws.title || UNTITLED_WORKSPACE_TITLE}
+                        </Typography>
+                        {currentProjectName && (
+                          <Typography
+                            noWrap
+                            sx={{ fontSize: '10.5px', color: secondaryText }}
+                          >
+                            {currentProjectName}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Stack>
+                    {isSelected && (
+                      <CheckIcon sx={{ fontSize: 16, color: '#6366f1' }} />
+                    )}
+                  </MenuItem>
+                );
+              })
+            )}
+
+            {selectedWorkspaceId && (
+              <>
+                <Divider sx={{ my: 0.75 }} />
+                <MenuItem
+                  onClick={() => {
+                    setSelectedWorkspaceId(null);
+                    setWorkspaceMenuAnchor(null);
+                  }}
+                  sx={{
+                    borderRadius: '8px',
+                    py: 0.75,
+                    color: '#ef4444',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
                 >
-                  {linkedSpecTitle}
-                </Typography>
-                <Typography sx={{ fontSize: '11px', color: secondaryText }}>
-                  {linkedSpecSection}
-                </Typography>
-              </Box>
-            </Stack>
-            <ExternalLinkIcon sx={{ fontSize: 15, color: secondaryText }} />
-          </Box>
+                  <DeleteOutlineIcon sx={{ fontSize: 15 }} />
+                  Desvincular workspace
+                </MenuItem>
+              </>
+            )}
+          </Menu>
         </Box>
 
         {/* ── DESCRIPTION & CONTEXT ── */}
@@ -1510,29 +2007,57 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
 
         {/* Actions on the Right */}
         <Stack direction="row" alignItems="center" spacing={2.5}>
-          {/* Create More Checkbox */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={0.5}
-            onClick={() => setCreateMore(!createMore)}
-            sx={{ cursor: 'pointer', userSelect: 'none' }}
-          >
-            <Checkbox
-              size="small"
-              checked={createMore}
-              sx={{
-                p: 0.5,
-                color: secondaryText,
-                '&.Mui-checked': { color: '#2563eb' },
-              }}
-            />
-            <Typography
-              sx={{ fontSize: '12.5px', color: secondaryText, fontWeight: 500 }}
+          {/* Delete Button (Editing mode) */}
+          {isEditing && onDelete && (
+            <Tooltip title="Eliminar tarea">
+              <IconButton
+                size="small"
+                onClick={handleDeleteTask}
+                disabled={isSubmitting}
+                sx={{
+                  color: '#ef4444',
+                  p: 0.8,
+                  borderRadius: '8px',
+                  bgcolor: isDark ? 'rgba(239, 68, 68, 0.1)' : '#fee2e2',
+                  '&:hover': {
+                    bgcolor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#fecaca',
+                  },
+                }}
+              >
+                <DeleteOutlineIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {/* Create More Checkbox (Creation mode only) */}
+          {!isEditing && (
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={0.5}
+              onClick={() => setCreateMore(!createMore)}
+              sx={{ cursor: 'pointer', userSelect: 'none' }}
             >
-              Create more
-            </Typography>
-          </Stack>
+              <Checkbox
+                size="small"
+                checked={createMore}
+                sx={{
+                  p: 0.5,
+                  color: secondaryText,
+                  '&.Mui-checked': { color: '#2563eb' },
+                }}
+              />
+              <Typography
+                sx={{
+                  fontSize: '12.5px',
+                  color: secondaryText,
+                  fontWeight: 500,
+                }}
+              >
+                Create more
+              </Typography>
+            </Stack>
+          )}
 
           <Button
             size="small"
@@ -1586,7 +2111,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
               <CircularProgress size={16} sx={{ color: '#ffffff' }} />
             ) : (
               <>
-                <span>Create Task</span>
+                <span>{isEditing ? 'Save Changes' : 'Create Task'}</span>
                 <Box
                   sx={{
                     px: '5px',

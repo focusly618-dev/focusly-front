@@ -21,6 +21,7 @@ import type {
 export interface CreateProjectTaskInput {
   title: string;
   projectId?: string;
+  workspaceId?: string;
   status?: string;
   priority?: string;
   duration?: string | number;
@@ -44,6 +45,9 @@ export interface UpdateProjectTaskInput {
   priority?: string;
   duration?: string | number;
   dueDate?: string;
+  description?: string;
+  projectId?: string;
+  workspaceId?: string;
   completed?: boolean;
   subtasks?: Array<{
     id?: string;
@@ -177,6 +181,7 @@ export const useTaskMutations = () => {
         title: input.title.trim(),
         user_id: user.id,
         project_id: input.projectId || undefined,
+        workspace_id: input.workspaceId || undefined,
         status: mapStatusToBackend(input.status),
         priority_level: mapPriorityToBackend(input.priority),
         estimate_timer: estimateMinutes,
@@ -244,6 +249,15 @@ export const useTaskMutations = () => {
       }
       if (input.subtasks !== undefined) {
         updateTaskInput.subtasks = input.subtasks;
+      }
+      if (input.description !== undefined) {
+        updateTaskInput.notes_encrypted = input.description;
+      }
+      if (input.projectId !== undefined) {
+        updateTaskInput.project_id = input.projectId || undefined;
+      }
+      if (input.workspaceId !== undefined) {
+        updateTaskInput.workspace_id = input.workspaceId || undefined;
       }
 
       const res = await updateTaskMutation({

@@ -53,6 +53,11 @@ export interface ProjectTaskItemData {
   projectName?: string;
   projectColor?: string;
   projectEmoji?: string;
+  workspaceId?: string;
+  workspaceTitle?: string;
+  description?: string;
+  rawDeadline?: string;
+  modules?: string[];
 }
 
 export interface ProjectStatusConfig {

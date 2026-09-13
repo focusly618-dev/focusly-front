@@ -151,6 +151,14 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
         assignee,
         project,
         projectId: t.project_id || t.project?.id,
+        workspaceId: t.workspace_id || t.workspace?.id,
+        workspaceTitle: t.workspace?.title,
+        description: t.notes_encrypted || '',
+        rawDeadline: t.deadline,
+        modules: (t.tags || [])
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((tg: any) => (typeof tg === 'string' ? tg : tg?.name))
+          .filter(Boolean),
       };
     });
   }, [rawTasks, projectId]);

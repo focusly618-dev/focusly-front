@@ -35,6 +35,7 @@ import { ProjectDocCardMenu } from '@/pages/Projects/components/ProjectDocCardMe
 import {
   ProjectTasksByStatus,
   useProjectTasks,
+  type ProjectTaskItemData,
 } from '@/pages/Projects/components/ProjectTasks';
 import { CreateProjectTaskModal } from '@/pages/Projects/components/CreateProjectTaskModal';
 
@@ -81,6 +82,8 @@ export const WorkspaceLibrary = ({
   );
   const [isAllFoldersModalOpen, setIsAllFoldersModalOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
+  const [selectedProjectTask, setSelectedProjectTask] =
+    useState<ProjectTaskItemData | null>(null);
 
   // ── Templates Modal ──
   const isTemplatesModalOpen = searchParams.get('modal') === 'templates';
@@ -222,7 +225,10 @@ export const WorkspaceLibrary = ({
         onCreate={() =>
           onCreate(undefined, undefined, selectedGroupId ?? undefined)
         }
-        onCreateTask={() => setIsCreateTaskModalOpen(true)}
+        onCreateTask={() => {
+          setSelectedProjectTask(null);
+          setIsCreateTaskModalOpen(true);
+        }}
         hasMultipleWorkspaces={notes.data.totalNotes > 1}
         projectTab={projectTab}
         onProjectTabChange={setProjectTab}
@@ -235,7 +241,10 @@ export const WorkspaceLibrary = ({
           <Box sx={{ mt: 3, pb: 4 }}>
             <ProjectTasksByStatus
               tasks={projectTasks.tasks}
-              onTaskClick={() => setIsCreateTaskModalOpen(true)}
+              onTaskClick={(task) => {
+                setSelectedProjectTask(task);
+                setIsCreateTaskModalOpen(true);
+              }}
               onAddTask={(statusId, title) => {
                 if (title?.trim()) {
                   const targetProjectId =
@@ -246,6 +255,7 @@ export const WorkspaceLibrary = ({
                     projectId: targetProjectId,
                   });
                 } else {
+                  setSelectedProjectTask(null);
                   setIsCreateTaskModalOpen(true);
                 }
               }}
@@ -472,17 +482,21 @@ export const WorkspaceLibrary = ({
         onSelectTemplate={handleSelectTemplate}
       />
 
-      {/* ── Create Project Task Modal ── */}
+      {/* ── Create / Edit Project Task Modal ── */}
       <CreateProjectTaskModal
         open={isCreateTaskModalOpen}
-        onClose={() => setIsCreateTaskModalOpen(false)}
+        onClose={() => {
+          setIsCreateTaskModalOpen(false);
+          setSelectedProjectTask(null);
+        }}
+        task={selectedProjectTask}
         projects={folders.data.allGroups.map((g) => ({
           id: g.id,
           name: g.name,
           color: g.color,
           emoji: g.emoji,
         }))}
-        selectedProjectId={selectedGroupId}
+        selectedProjectId={selectedProjectTask?.projectId || selectedGroupId}
         projectName={activeGroup?.name || folders.data.allGroups[0]?.name}
         projectEmoji={activeGroup?.emoji || folders.data.allGroups[0]?.emoji}
         onCreate={async (taskData) => {
@@ -500,7 +514,26 @@ export const WorkspaceLibrary = ({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             subtasks: taskData.subtasks as any,
             projectId: targetProjectId,
+            workspaceId: taskData.workspaceId as string | undefined,
           });
+        }}
+        onUpdate={async (taskId, taskData) => {
+          await projectTasks.updateProjectTask({
+            id: taskId,
+            title: String(taskData.title || ''),
+            status: String(taskData.status || 'in_progress'),
+            priority: String(taskData.priority || 'Medium'),
+            duration: taskData.estimatedDuration as string | undefined,
+            dueDate: taskData.dueDate as string | undefined,
+            description: taskData.description as string | undefined,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            subtasks: taskData.subtasks as any,
+            projectId: taskData.projectId as string | undefined,
+            workspaceId: taskData.workspaceId as string | undefined,
+          });
+        }}
+        onDelete={async (taskId) => {
+          await projectTasks.deleteProjectTask(taskId);
         }}
       />
     </LibraryContainer>

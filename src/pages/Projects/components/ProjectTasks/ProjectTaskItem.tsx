@@ -237,6 +237,53 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
             </Tooltip>
           )}
 
+          {/* Linked Spec / Workspace Badge */}
+          {task.workspaceTitle && (
+            <Tooltip title={`Linked Spec: ${task.workspaceTitle}`}>
+              <Box
+                sx={{
+                  display: { xs: 'none', lg: 'inline-flex' },
+                  alignItems: 'center',
+                  gap: '4px',
+                  px: '7px',
+                  py: '2px',
+                  borderRadius: '5px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: isDark ? '#a5b4fc' : '#4f46e5',
+                  bgcolor: isDark
+                    ? 'rgba(99, 102, 241, 0.15)'
+                    : 'rgba(99, 102, 241, 0.08)',
+                  border: `1px solid ${
+                    isDark
+                      ? 'rgba(99, 102, 241, 0.3)'
+                      : 'rgba(99, 102, 241, 0.2)'
+                  }`,
+                  flexShrink: 0,
+                  lineHeight: 1.4,
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    bgcolor: isDark
+                      ? 'rgba(99, 102, 241, 0.24)'
+                      : 'rgba(99, 102, 241, 0.15)',
+                  },
+                }}
+              >
+                <span style={{ fontSize: '11px', lineHeight: 1 }}>📄</span>
+                <span
+                  style={{
+                    maxWidth: '120px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {task.workspaceTitle}
+                </span>
+              </Box>
+            </Tooltip>
+          )}
+
           {/* Module / Tag Pill */}
           {task.tag && (
             <Box
