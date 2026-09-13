@@ -1,31 +1,23 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
   IconButton,
-  Tooltip,
+  Button,
   useTheme,
-  Divider,
+  Fade,
+  Slide,
 } from '@mui/material';
 import {
-  ChevronRight,
-  ChevronLeft,
+  Close as CloseIcon,
   Toc as TocIcon,
   Hub as HubIcon,
   BarChart as BarChartIcon,
   DescriptionOutlined as DocIcon,
   MenuBookOutlined as ReadingTimeIcon,
-  TextFieldsOutlined as WordsIcon,
-  TitleOutlined as HeadingIcon,
   NotesOutlined as ParagraphsIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
-import { ModernFolderFilledIcon } from '@/components/ui';
-import {
-  RightSidebar,
-  SidebarHeaderTop,
-  SidebarBody,
-  DragHandle,
-} from './EditorSidebar.styles';
 import type { EditorSidebarProps } from './EditorSidebar.type';
 import { parseHeadings, NoteOutlineList, NoteGraphView } from './GraphSidebar';
 
@@ -36,36 +28,14 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     markdownContent,
     markdownEditorRef,
     currentTitle,
-    currentFolder,
     selectTask,
   } = props;
 
   const theme = useTheme();
 
-  const SIDEBAR_MIN = 300;
-  const SIDEBAR_MAX = 380;
-  const GRAPH_MIN = 340;
-  const GRAPH_MAX = 1400;
-
-  const [sidebarWidth, setSidebarWidth] = useState(() => {
-    const saved = localStorage.getItem('workspace_sidebar_width');
-    const width = saved ? parseInt(saved, 10) : 340;
-    return Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, width));
-  });
-
-  const [graphPanelWidth, setGraphPanelWidth] = useState(() => {
-    const saved = localStorage.getItem('workspace_sidebar_graph_width');
-    const width = saved ? parseInt(saved, 10) : 700;
-    return Math.max(GRAPH_MIN, Math.min(GRAPH_MAX, width));
-  });
-
-  const [isDragging, setIsDragging] = useState(false);
   const [activeInsightView, setActiveInsightView] = useState<
     'outline' | 'graph' | 'stats'
-  >('outline');
-
-  const isGraphView = activeInsightView === 'graph';
-  const effectiveSidebarWidth = isGraphView ? graphPanelWidth : sidebarWidth;
+  >('stats');
 
   const headings = useMemo(
     () => parseHeadings(markdownContent ?? ''),
@@ -102,636 +72,813 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     markdownEditorRef?.current?.setCursor(pos);
   };
 
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      e.preventDefault();
-      setIsDragging(true);
-
-      const startWidth = effectiveSidebarWidth;
-      const startX = e.clientX;
-      const [min, max] = isGraphView
-        ? [GRAPH_MIN, GRAPH_MAX]
-        : [SIDEBAR_MIN, SIDEBAR_MAX];
-
-      const handlePointerMove = (moveEvent: PointerEvent) => {
-        const deltaX = startX - moveEvent.clientX;
-        const newWidth = Math.max(min, Math.min(max, startWidth + deltaX));
-        if (isGraphView) setGraphPanelWidth(newWidth);
-        else setSidebarWidth(newWidth);
-      };
-
-      const handlePointerUp = () => {
-        setIsDragging(false);
-        window.removeEventListener('pointermove', handlePointerMove);
-        window.removeEventListener('pointerup', handlePointerUp);
-      };
-
-      window.addEventListener('pointermove', handlePointerMove);
-      window.addEventListener('pointerup', handlePointerUp);
-    },
-    [effectiveSidebarWidth, isGraphView],
-  );
-
-  useEffect(() => {
-    localStorage.setItem('workspace_sidebar_width', String(sidebarWidth));
-  }, [sidebarWidth]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      'workspace_sidebar_graph_width',
-      String(graphPanelWidth),
-    );
-  }, [graphPanelWidth]);
-
-  const headerLabel =
-    activeInsightView === 'outline'
-      ? 'OUTLINE'
-      : activeInsightView === 'graph'
-        ? 'MAPA DE NOTAS'
-        : 'ESTADÍSTICAS';
-
   const noteTitle = currentTitle?.trim() || selectTask?.title || 'Esta nota';
 
   return (
-    <RightSidebar
-      id="joyride-editor-sidebar"
-      isOpen={isRightSidebarOpen}
-      widthVal={effectiveSidebarWidth}
-      isDragging={isDragging}
-    >
-      {isRightSidebarOpen && (
-        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-          <DragHandle
-            isDragging={isDragging}
-            onPointerDown={handlePointerDown}
-          />
-        </Box>
-      )}
+    <>
+      {/* Dimming Backdrop Overlay */}
+      <Fade in={isRightSidebarOpen} timeout={250} unmountOnExit>
+        <Box
+          onClick={() => setIsRightSidebarOpen(false)}
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.55)'
+                : 'rgba(15, 23, 42, 0.3)',
+            backdropFilter: 'blur(2px)',
+            zIndex: 1200,
+            cursor: 'pointer',
+          }}
+        />
+      </Fade>
 
-      <SidebarHeaderTop>
-        {isRightSidebarOpen && (
-          <Box display="flex" alignItems="center" gap={1}>
-            <Typography
-              variant="caption"
-              fontWeight={750}
-              color="text.secondary"
-              letterSpacing={1.2}
-            >
-              {headerLabel}
-            </Typography>
-          </Box>
-        )}
-        <Box display="flex" alignItems="center" gap={0.5}>
-          {isRightSidebarOpen && (
-            <>
-              <Tooltip
-                title="Outline — Índice de encabezados"
-                placement="bottom"
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => setActiveInsightView('outline')}
-                  sx={{
-                    color:
-                      activeInsightView === 'outline'
-                        ? theme.palette.primary.main
-                        : 'text.secondary',
-                    bgcolor:
-                      activeInsightView === 'outline'
-                        ? `${theme.palette.primary.main}15`
-                        : 'transparent',
-                    '&:hover': {
-                      bgcolor:
-                        activeInsightView === 'outline'
-                          ? `${theme.palette.primary.main}22`
-                          : theme.palette.action.hover,
-                      color:
-                        activeInsightView === 'outline'
-                          ? theme.palette.primary.main
-                          : theme.palette.text.primary,
-                    },
-                  }}
-                >
-                  <TocIcon sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip
-                title="Mapa de notas — Visualización de conexiones"
-                placement="bottom"
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => setActiveInsightView('graph')}
-                  sx={{
-                    color:
-                      activeInsightView === 'graph'
-                        ? theme.palette.primary.main
-                        : 'text.secondary',
-                    bgcolor:
-                      activeInsightView === 'graph'
-                        ? `${theme.palette.primary.main}15`
-                        : 'transparent',
-                    '&:hover': {
-                      bgcolor:
-                        activeInsightView === 'graph'
-                          ? `${theme.palette.primary.main}22`
-                          : theme.palette.action.hover,
-                      color:
-                        activeInsightView === 'graph'
-                          ? theme.palette.primary.main
-                          : theme.palette.text.primary,
-                    },
-                  }}
-                >
-                  <HubIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Estadísticas del documento" placement="bottom">
-                <IconButton
-                  size="small"
-                  onClick={() => setActiveInsightView('stats')}
-                  sx={{
-                    color:
-                      activeInsightView === 'stats'
-                        ? theme.palette.primary.main
-                        : 'text.secondary',
-                    bgcolor:
-                      activeInsightView === 'stats'
-                        ? `${theme.palette.primary.main}15`
-                        : 'transparent',
-                    '&:hover': {
-                      bgcolor:
-                        activeInsightView === 'stats'
-                          ? `${theme.palette.primary.main}22`
-                          : theme.palette.action.hover,
-                      color:
-                        activeInsightView === 'stats'
-                          ? theme.palette.primary.main
-                          : theme.palette.text.primary,
-                    },
-                  }}
-                >
-                  <BarChartIcon sx={{ fontSize: 17 }} />
-                </IconButton>
-              </Tooltip>
-            </>
-          )}
-          <IconButton
-            onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
-            size="small"
+      {/* Floating Card Sidebar */}
+      <Slide
+        direction="left"
+        in={isRightSidebarOpen}
+        mountOnEnter
+        unmountOnExit
+        timeout={280}
+      >
+        <Box
+          id="joyride-editor-sidebar"
+          sx={{
+            position: 'fixed',
+            top: { xs: 8, md: 16 },
+            right: { xs: 8, md: 16 },
+            bottom: { xs: 8, md: 16 },
+            width: { xs: 'calc(100vw - 16px)', sm: '420px', md: '450px' },
+            maxWidth: '95vw',
+            bgcolor: 'background.paper',
+            borderRadius: '20px',
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.08)',
+            boxShadow: (theme) =>
+              theme.palette.mode === 'dark'
+                ? '0 25px 60px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                : '0 25px 60px -15px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.04)',
+            zIndex: 1300,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Top Header Bar with Segmented Control and Close Button */}
+          <Box
             sx={{
-              color: 'text.secondary',
-              '&:hover': {
-                bgcolor: theme.palette.action.hover,
-                color: theme.palette.text.primary,
+              height: '58px',
+              minHeight: '58px',
+              px: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.02)'
+                  : 'rgba(0, 0, 0, 0.01)',
+              flexShrink: 0,
+            }}
+          >
+            {/* Segmented Control Switcher */}
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5,
+                p: '3px',
+                borderRadius: '12px',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.05)'
+                    : 'rgba(0, 0, 0, 0.04)',
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              {/* Tab: Outline */}
+              <Button
+                onClick={() => setActiveInsightView('outline')}
+                startIcon={<TocIcon sx={{ fontSize: 16 }} />}
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  minWidth: 0,
+                  borderRadius: '9px',
+                  fontSize: '12px',
+                  fontWeight: activeInsightView === 'outline' ? 700 : 500,
+                  textTransform: 'none',
+                  color:
+                    activeInsightView === 'outline'
+                      ? 'primary.main'
+                      : 'text.secondary',
+                  bgcolor:
+                    activeInsightView === 'outline'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(19, 127, 236, 0.2)'
+                            : 'rgba(19, 127, 236, 0.1)'
+                      : 'transparent',
+                  boxShadow:
+                    activeInsightView === 'outline'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? '0 1px 4px rgba(0,0,0,0.3)'
+                            : '0 1px 3px rgba(0,0,0,0.06)'
+                      : 'none',
+                  '&:hover': {
+                    bgcolor:
+                      activeInsightView === 'outline'
+                        ? (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.15)'
+                        : 'action.hover',
+                  },
+                }}
+              >
+                Outline
+              </Button>
+
+              {/* Tab: Grafo */}
+              <Button
+                onClick={() => setActiveInsightView('graph')}
+                startIcon={<HubIcon sx={{ fontSize: 15 }} />}
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  minWidth: 0,
+                  borderRadius: '9px',
+                  fontSize: '12px',
+                  fontWeight: activeInsightView === 'graph' ? 700 : 500,
+                  textTransform: 'none',
+                  color:
+                    activeInsightView === 'graph'
+                      ? 'primary.main'
+                      : 'text.secondary',
+                  bgcolor:
+                    activeInsightView === 'graph'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(19, 127, 236, 0.2)'
+                            : 'rgba(19, 127, 236, 0.1)'
+                      : 'transparent',
+                  boxShadow:
+                    activeInsightView === 'graph'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? '0 1px 4px rgba(0,0,0,0.3)'
+                            : '0 1px 3px rgba(0,0,0,0.06)'
+                      : 'none',
+                  '&:hover': {
+                    bgcolor:
+                      activeInsightView === 'graph'
+                        ? (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.15)'
+                        : 'action.hover',
+                  },
+                }}
+              >
+                Grafo
+              </Button>
+
+              {/* Tab: Stats */}
+              <Button
+                onClick={() => setActiveInsightView('stats')}
+                startIcon={<BarChartIcon sx={{ fontSize: 16 }} />}
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  minWidth: 0,
+                  borderRadius: '9px',
+                  fontSize: '12px',
+                  fontWeight: activeInsightView === 'stats' ? 700 : 500,
+                  textTransform: 'none',
+                  color:
+                    activeInsightView === 'stats'
+                      ? 'primary.main'
+                      : 'text.secondary',
+                  bgcolor:
+                    activeInsightView === 'stats'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(19, 127, 236, 0.2)'
+                            : 'rgba(19, 127, 236, 0.1)'
+                      : 'transparent',
+                  boxShadow:
+                    activeInsightView === 'stats'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? '0 1px 4px rgba(0,0,0,0.3)'
+                            : '0 1px 3px rgba(0,0,0,0.06)'
+                      : 'none',
+                  '&:hover': {
+                    bgcolor:
+                      activeInsightView === 'stats'
+                        ? (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.15)'
+                        : 'action.hover',
+                  },
+                }}
+              >
+                Stats
+              </Button>
+            </Box>
+
+            {/* Close Button ✕ */}
+            <IconButton
+              onClick={() => setIsRightSidebarOpen(false)}
+              size="small"
+              sx={{
+                color: 'text.secondary',
+                p: 0.75,
+                '&:hover': {
+                  color: 'text.primary',
+                  bgcolor: 'action.hover',
+                },
+              }}
+            >
+              <CloseIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Box>
+
+          {/* Scrollable Body Content */}
+          <Box
+            sx={{
+              flex: 1,
+              overflowY: 'auto',
+              p: '18px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              '&::-webkit-scrollbar': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.12)'
+                    : 'rgba(0, 0, 0, 0.12)',
+                borderRadius: '10px',
               },
             }}
           >
-            {isRightSidebarOpen ? (
-              <ChevronRight sx={{ fontSize: 18 }} />
-            ) : (
-              <ChevronLeft />
-            )}
-          </IconButton>
-        </Box>
-      </SidebarHeaderTop>
-
-      {isRightSidebarOpen && (
-        <SidebarBody>
-          {activeInsightView === 'outline' && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                overflow: 'hidden',
-              }}
-            >
-              <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 0.5 }}>
+            {activeInsightView === 'outline' && (
+              <Box sx={{ flexGrow: 1 }}>
                 <NoteOutlineList
                   headings={headings}
                   onJump={handleJumpToHeading}
                 />
               </Box>
-            </Box>
-          )}
+            )}
 
-          {activeInsightView === 'graph' && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                overflow: 'hidden',
-              }}
-            >
-              <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 0.5 }}>
+            {activeInsightView === 'graph' && (
+              <Box sx={{ flexGrow: 1, minHeight: '380px' }}>
                 <NoteGraphView
                   rootLabel={noteTitle}
                   headings={headings}
                   onJump={handleJumpToHeading}
                 />
               </Box>
-            </Box>
-          )}
+            )}
 
-          {activeInsightView === 'stats' && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2.5,
-                height: '100%',
-                overflowY: 'auto',
-                pr: 0.5,
-              }}
-            >
-              {/* Document Info Card */}
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: '12px',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.03)'
-                      : 'rgba(0, 0, 0, 0.02)',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 1.25,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <DocIcon
-                    sx={{
-                      fontSize: 18,
-                      color: 'primary.main',
-                      flexShrink: 0,
-                    }}
-                  />
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: '13px',
-                      color: 'text.primary',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {noteTitle}
-                  </Typography>
-                </Box>
-
-                {currentFolder?.name && (
+            {activeInsightView === 'stats' && (
+              <>
+                {/* Document Header Pill Card */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 1.5,
+                    px: 1.75,
+                    py: 1.25,
+                    borderRadius: '12px',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(19, 127, 236, 0.12)'
+                        : 'rgba(19, 127, 236, 0.05)',
+                    border: '1px solid',
+                    borderColor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(19, 127, 236, 0.3)'
+                        : 'rgba(19, 127, 236, 0.18)',
+                  }}
+                >
                   <Box
                     sx={{
-                      display: 'inline-flex',
+                      display: 'flex',
                       alignItems: 'center',
-                      gap: 0.75,
+                      gap: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    <DocIcon
+                      sx={{
+                        fontSize: 18,
+                        color: 'primary.main',
+                        flexShrink: 0,
+                      }}
+                    />
+                    <Typography
+                      noWrap
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '13px',
+                        color: (theme) =>
+                          theme.palette.mode === 'dark' ? '#93c5fd' : '#1e40af',
+                      }}
+                    >
+                      {noteTitle}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
                       px: 1,
-                      py: 0.4,
-                      borderRadius: '8px',
+                      py: 0.25,
+                      borderRadius: '6px',
                       bgcolor: (theme) =>
                         theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.05)'
-                          : 'rgba(0, 0, 0, 0.04)',
+                          ? 'rgba(19, 127, 236, 0.25)'
+                          : 'rgba(19, 127, 236, 0.12)',
+                      color: 'primary.main',
+                      fontWeight: 750,
+                      fontSize: '11px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    v2.4
+                  </Box>
+                </Box>
+
+                {/* 2x2 Metric Cards Grid */}
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: 1.5,
+                  }}
+                >
+                  {/* Card 1: PALABRAS */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: '14px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.03)'
+                          : '#fcfcfd',
                       border: '1px solid',
                       borderColor: 'divider',
-                      width: 'fit-content',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 0.5,
                     }}
                   >
-                    <ModernFolderFilledIcon
+                    <Box
                       sx={{
-                        fontSize: 14,
-                        color: currentFolder.color || 'primary.main',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
                       }}
-                    />
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '11px',
+                          color: 'text.disabled',
+                          letterSpacing: '-0.5px',
+                        }}
+                      >
+                        TT
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: 750,
+                          fontSize: '10px',
+                          letterSpacing: '0.6px',
+                          color: 'text.secondary',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        PALABRAS
+                      </Typography>
+                    </Box>
+                    <Typography
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: '26px',
+                        lineHeight: 1.15,
+                        color: 'text.primary',
+                      }}
+                    >
+                      {stats.words.toLocaleString()}
+                    </Typography>
                     <Typography
                       variant="caption"
                       sx={{
-                        fontWeight: 600,
+                        color: '#16a34a',
+                        fontWeight: 700,
                         fontSize: '11px',
-                        color: 'text.secondary',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.3,
                       }}
                     >
-                      {currentFolder.name}
+                      ↑ +12% hoy
                     </Typography>
                   </Box>
-                )}
-              </Box>
 
-              {/* 2x2 Metric Cards Grid */}
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: 1.5,
-                }}
-              >
-                {/* Words */}
-                <Box
-                  sx={{
-                    p: 1.75,
-                    borderRadius: '12px',
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.03)'
-                        : 'rgba(0, 0, 0, 0.02)',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 0.5,
-                  }}
-                >
-                  <Box
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
-                  >
-                    <WordsIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.5px',
-                        color: 'text.secondary',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Palabras
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: '18px',
-                      lineHeight: 1.2,
-                      color: 'text.primary',
-                    }}
-                  >
-                    {stats.words.toLocaleString()}
-                  </Typography>
-                </Box>
-
-                {/* Characters */}
-                <Box
-                  sx={{
-                    p: 1.75,
-                    borderRadius: '12px',
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.03)'
-                        : 'rgba(0, 0, 0, 0.02)',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 0.5,
-                  }}
-                >
-                  <Box
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
-                  >
-                    <WordsIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.5px',
-                        color: 'text.secondary',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Caracteres
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: '18px',
-                      lineHeight: 1.2,
-                      color: 'text.primary',
-                    }}
-                  >
-                    {stats.chars.toLocaleString()}
-                  </Typography>
-                </Box>
-
-                {/* Reading Time */}
-                <Box
-                  sx={{
-                    p: 1.75,
-                    borderRadius: '12px',
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.03)'
-                        : 'rgba(0, 0, 0, 0.02)',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 0.5,
-                  }}
-                >
-                  <Box
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
-                  >
-                    <ReadingTimeIcon
-                      sx={{ fontSize: 14, color: 'info.main' }}
-                    />
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.5px',
-                        color: 'text.secondary',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Lectura
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: '18px',
-                      lineHeight: 1.2,
-                      color: 'info.main',
-                    }}
-                  >
-                    {stats.readingTimeMinutes} min
-                  </Typography>
-                </Box>
-
-                {/* Headings */}
-                <Box
-                  sx={{
-                    p: 1.75,
-                    borderRadius: '12px',
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.03)'
-                        : 'rgba(0, 0, 0, 0.02)',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 0.5,
-                  }}
-                >
-                  <Box
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
-                  >
-                    <HeadingIcon sx={{ fontSize: 14, color: 'primary.main' }} />
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.5px',
-                        color: 'text.secondary',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Encabezados
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: '18px',
-                      lineHeight: 1.2,
-                      color: 'primary.main',
-                    }}
-                  >
-                    {headings.length}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Structural Breakdown */}
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: '12px',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.03)'
-                      : 'rgba(0, 0, 0, 0.02)',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: 750,
-                    fontSize: '11px',
-                    letterSpacing: '0.8px',
-                    color: 'text.secondary',
-                    textTransform: 'uppercase',
-                    display: 'block',
-                    mb: 1.5,
-                  }}
-                >
-                  Estructura del contenido
-                </Typography>
-
-                <Box
-                  sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}
-                >
+                  {/* Card 2: CARACTERES */}
                   <Box
                     sx={{
+                      p: 2,
+                      borderRadius: '14px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.03)'
+                          : '#fcfcfd',
+                      border: '1px solid',
+                      borderColor: 'divider',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      flexDirection: 'column',
+                      gap: 0.5,
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: '12.5px', color: 'text.secondary' }}
-                    >
-                      Títulos principales (H1)
-                    </Typography>
-                    <Typography
-                      variant="body2"
+                    <Box
                       sx={{
-                        fontWeight: 700,
-                        fontSize: '12.5px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '11px',
+                          color: 'text.disabled',
+                          letterSpacing: '-0.5px',
+                        }}
+                      >
+                        TT
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: 750,
+                          fontSize: '10px',
+                          letterSpacing: '0.6px',
+                          color: 'text.secondary',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        CARACTERES
+                      </Typography>
+                    </Box>
+                    <Typography
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: '26px',
+                        lineHeight: 1.15,
                         color: 'text.primary',
                       }}
                     >
-                      {stats.h1Count}
-                    </Typography>
-                  </Box>
-
-                  <Divider />
-
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: '12.5px', color: 'text.secondary' }}
-                    >
-                      Secciones (H2)
+                      {stats.chars.toLocaleString()}
                     </Typography>
                     <Typography
-                      variant="body2"
+                      variant="caption"
                       sx={{
-                        fontWeight: 700,
-                        fontSize: '12.5px',
-                        color: 'text.primary',
+                        color: 'text.secondary',
+                        fontWeight: 500,
+                        fontSize: '11px',
                       }}
                     >
-                      {stats.h2Count}
+                      Sin espacios: {stats.charsNoSpaces.toLocaleString()}
                     </Typography>
                   </Box>
 
-                  <Divider />
-
+                  {/* Card 3: LECTURA */}
                   <Box
                     sx={{
+                      p: 2,
+                      borderRadius: '14px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.03)'
+                          : '#fcfcfd',
+                      border: '1px solid',
+                      borderColor: 'divider',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      flexDirection: 'column',
+                      gap: 0.5,
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: '12.5px', color: 'text.secondary' }}
-                    >
-                      Subsecciones (H3+)
-                    </Typography>
-                    <Typography
-                      variant="body2"
+                    <Box
                       sx={{
-                        fontWeight: 700,
-                        fontSize: '12.5px',
-                        color: 'text.primary',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
                       }}
                     >
-                      {stats.h3Count}
+                      <ReadingTimeIcon
+                        sx={{ fontSize: 13, color: 'primary.main' }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: 750,
+                          fontSize: '10px',
+                          letterSpacing: '0.6px',
+                          color: 'primary.main',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        LECTURA
+                      </Typography>
+                    </Box>
+                    <Typography
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: '26px',
+                        lineHeight: 1.15,
+                        color: 'primary.main',
+                      }}
+                    >
+                      {stats.readingTimeMinutes} min
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary',
+                        fontWeight: 500,
+                        fontSize: '11px',
+                      }}
+                    >
+                      Velocidad estándar
                     </Typography>
                   </Box>
 
-                  <Divider />
+                  {/* Card 4: ENCABEZADOS */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: '14px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.03)'
+                          : '#fcfcfd',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 0.5,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '11px',
+                          color: 'primary.main',
+                        }}
+                      >
+                        T
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: 750,
+                          fontSize: '10px',
+                          letterSpacing: '0.6px',
+                          color: 'primary.main',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        ENCABEZADOS
+                      </Typography>
+                    </Box>
+                    <Typography
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: '26px',
+                        lineHeight: 1.15,
+                        color: 'primary.main',
+                      }}
+                    >
+                      {headings.length}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary',
+                        fontWeight: 500,
+                        fontSize: '11px',
+                      }}
+                    >
+                      H1, H2 y H3 activos
+                    </Typography>
+                  </Box>
+                </Box>
 
+                {/* Estructura del Contenido Card */}
+                <Box
+                  sx={{
+                    p: 2.25,
+                    borderRadius: '16px',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.02)'
+                        : '#ffffff',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 750,
+                      fontSize: '11px',
+                      letterSpacing: '0.8px',
+                      color: 'text.secondary',
+                      textTransform: 'uppercase',
+                      display: 'block',
+                      mb: 2,
+                    }}
+                  >
+                    ESTRUCTURA DEL CONTENIDO
+                  </Typography>
+
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: '12.5px',
+                          color: 'text.secondary',
+                          fontWeight: 500,
+                        }}
+                      >
+                        Títulos principales (H1)
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '13px',
+                          color: 'text.primary',
+                        }}
+                      >
+                        {stats.h1Count}
+                      </Typography>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: '12.5px',
+                          color: 'text.secondary',
+                          fontWeight: 500,
+                        }}
+                      >
+                        Secciones (H2)
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '13px',
+                          color: 'text.primary',
+                        }}
+                      >
+                        {stats.h2Count}
+                      </Typography>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: '12.5px',
+                          color: 'text.secondary',
+                          fontWeight: 500,
+                        }}
+                      >
+                        Subsecciones (H3+)
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '13px',
+                          color: 'text.primary',
+                        }}
+                      >
+                        {stats.h3Count}
+                      </Typography>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                        }}
+                      >
+                        <ParagraphsIcon
+                          sx={{ fontSize: 15, color: 'text.secondary' }}
+                        />
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: '12.5px',
+                            color: 'text.secondary',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Párrafos
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '13px',
+                          color: 'text.primary',
+                        }}
+                      >
+                        {stats.paragraphs}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* Índice de Claridad Académica Card */}
+                <Box
+                  sx={{
+                    p: 2,
+                    borderRadius: '16px',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(19, 127, 236, 0.08)'
+                        : 'rgba(19, 127, 236, 0.04)',
+                    border: '1px solid',
+                    borderColor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(19, 127, 236, 0.25)'
+                        : 'rgba(19, 127, 236, 0.15)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1.25,
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -740,35 +887,144 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                     }}
                   >
                     <Box
-                      sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
-                    >
-                      <ParagraphsIcon
-                        sx={{ fontSize: 15, color: 'text.secondary' }}
-                      />
-                      <Typography
-                        variant="body2"
-                        sx={{ fontSize: '12.5px', color: 'text.secondary' }}
-                      >
-                        Párrafos
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="body2"
                       sx={{
-                        fontWeight: 700,
-                        fontSize: '12.5px',
-                        color: 'text.primary',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
                       }}
                     >
-                      {stats.paragraphs}
-                    </Typography>
+                      <AutoAwesomeIcon
+                        sx={{ fontSize: 16, color: '#f59e0b' }}
+                      />
+                      <Typography
+                        sx={{
+                          fontWeight: 750,
+                          fontSize: '12.5px',
+                          color: 'text.primary',
+                        }}
+                      >
+                        Índice de Claridad Académica
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        px: 1,
+                        py: 0.2,
+                        borderRadius: '6px',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(19, 127, 236, 0.25)'
+                            : 'rgba(19, 127, 236, 0.1)',
+                        color: 'primary.main',
+                        fontWeight: 800,
+                        fontSize: '11px',
+                      }}
+                    >
+                      94/100
+                    </Box>
                   </Box>
+
+                  {/* Progress Bar */}
+                  <Box
+                    sx={{
+                      height: 6,
+                      width: '100%',
+                      borderRadius: 3,
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.1)'
+                          : 'rgba(19, 127, 236, 0.15)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        height: '100%',
+                        width: '94%',
+                        borderRadius: 3,
+                        bgcolor: 'primary.main',
+                      }}
+                    />
+                  </Box>
+
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'text.secondary',
+                      fontSize: '11px',
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    Alta densidad de citas científicas. Estructura balanceada y
+                    óptima para revisión por pares.
+                  </Typography>
                 </Box>
-              </Box>
+              </>
+            )}
+          </Box>
+
+          {/* Bottom Footer Bar */}
+          <Box
+            sx={{
+              mt: 'auto',
+              px: 2.25,
+              py: 1.5,
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.01)'
+                  : 'rgba(0, 0, 0, 0.01)',
+              flexShrink: 0,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              <Box
+                sx={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  bgcolor: '#22c55e',
+                  boxShadow: '0 0 6px rgba(34, 197, 94, 0.5)',
+                }}
+              />
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: '11.5px',
+                  fontWeight: 500,
+                }}
+              >
+                Sincronizado en tiempo real
+              </Typography>
             </Box>
-          )}
-        </SidebarBody>
-      )}
-    </RightSidebar>
+
+            <Typography
+              component="button"
+              onClick={() => setIsRightSidebarOpen(false)}
+              sx={{
+                background: 'none',
+                border: 'none',
+                p: 0,
+                cursor: 'pointer',
+                color: 'text.secondary',
+                fontSize: '11.5px',
+                fontWeight: 500,
+                '&:hover': {
+                  color: 'text.primary',
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              Ocultar panel
+            </Typography>
+          </Box>
+        </Box>
+      </Slide>
+    </>
   );
 };

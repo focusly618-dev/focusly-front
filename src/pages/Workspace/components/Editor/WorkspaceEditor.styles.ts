@@ -22,7 +22,6 @@ export const MainEditorArea = styled(Box)(({ theme }) => ({
   minHeight: 0,
   display: 'flex',
   flexDirection: 'column',
-  borderRight: `1px solid ${theme.palette.divider}`,
   overflowY: 'auto',
   overflowX: 'hidden',
   overflowAnchor: 'none',

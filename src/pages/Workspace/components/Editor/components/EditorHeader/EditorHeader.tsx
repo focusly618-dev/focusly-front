@@ -13,6 +13,7 @@ import {
   FileUpload as ImportIcon,
   FileDownload as ExportIcon,
   Description as DescriptionIcon,
+  ViewSidebarOutlined as ViewSidebarIcon,
 } from '@mui/icons-material';
 import {
   CircularProgress,
@@ -27,9 +28,9 @@ import {
   Button,
   Badge,
   Divider,
+  Tooltip,
 } from '@mui/material';
 
-import { ModernFolderFilledIcon } from '@/components/ui';
 import { ImportContentModal } from './components/ImportContentModal/ImportContentModal';
 import { convertMarkdownToDocx } from './documentExporters';
 import { sileo } from '@/utils';
@@ -48,6 +49,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     isCentered,
     onToggleCentered,
     onToggleSidebar,
+    isRightSidebarOpen,
     currentFolder,
     currentTitle,
     onStartFocus,
@@ -81,7 +83,6 @@ export const EditorHeader = (props: EditorHeaderProps) => {
   };
 
   const handleExport = async (format: 'md' | 'docx') => {
-    setExportAnchor(null);
     const markdown = markdownEditorRef?.current?.getValue() ?? '';
 
     if (format === 'md') {
@@ -109,118 +110,69 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         sx={{
           display: { xs: 'none', md: 'flex' },
           alignItems: 'center',
-          gap: 1.25,
+          gap: 1.5,
           minWidth: 0,
         }}
       >
         <IconButton
           onClick={onBack}
           sx={{
-            width: '34px',
-            height: '34px',
-            minWidth: '34px',
+            width: '32px',
+            height: '32px',
+            minWidth: '32px',
             p: 0,
             borderRadius: '50%',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.12)'
-                : '#e2e8f0',
-            color: 'text.primary',
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
+            color: 'text.secondary',
             '&:hover': {
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.08)'
-                  : '#f8fafc',
+              color: 'text.primary',
+              bgcolor: 'action.hover',
             },
           }}
         >
-          <ArrowBackIcon sx={{ fontSize: 16 }} />
+          <ArrowBackIcon sx={{ fontSize: 18 }} />
         </IconButton>
 
-        {/* Breadcrumb: Folder & Title */}
-        <Box
+        <Typography
+          variant="subtitle1"
+          noWrap
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            minWidth: 0,
+            fontWeight: 700,
+            fontSize: '14px',
+            color: 'text.primary',
+            letterSpacing: '-0.01em',
+            maxWidth: { xs: '200px', sm: '320px', md: '460px' },
             overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
-          {currentFolder?.name && (
-            <>
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.75,
-                  px: 1,
-                  py: 0.35,
-                  borderRadius: '8px',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.05)'
-                      : 'rgba(0, 0, 0, 0.04)',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  maxWidth: '180px',
-                  flexShrink: 0,
-                }}
-              >
-                <ModernFolderFilledIcon
-                  sx={{
-                    fontSize: 15,
-                    color: currentFolder.color || 'primary.main',
-                    flexShrink: 0,
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  noWrap
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: '12px',
-                    color: 'text.secondary',
-                  }}
-                >
-                  {currentFolder.name}
-                </Typography>
-              </Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.disabled',
-                  fontWeight: 600,
-                  fontSize: '13px',
-                  userSelect: 'none',
-                  flexShrink: 0,
-                }}
-              >
-                /
-              </Typography>
-            </>
-          )}
-          <Typography
-            variant="subtitle2"
-            noWrap
+          {currentTitle?.trim() || 'Untitled Note'}
+        </Typography>
+
+        {currentFolder?.name && (
+          <Box
             sx={{
-              fontWeight: 700,
-              fontSize: '13.5px',
-              color: 'text.primary',
-              letterSpacing: '-0.01em',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              px: 1.2,
+              py: 0.35,
+              borderRadius: '6px',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.06)'
+                  : 'rgba(0, 0, 0, 0.05)',
+              border: '1px solid',
+              borderColor: 'divider',
+              color: 'text.secondary',
+              fontSize: '12px',
+              fontWeight: 600,
+              flexShrink: 0,
             }}
           >
-            {currentTitle?.trim() || 'Untitled Note'}
-          </Typography>
-        </Box>
+            {currentFolder.name}
+          </Box>
+        )}
       </HeaderLeft>
 
       <HeaderRight
@@ -392,6 +344,56 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             <MoreHorizIcon sx={{ fontSize: 18 }} />
           </Badge>
         </IconButton>
+
+        {/* Companion Sidebar Toggle Button */}
+        {onToggleSidebar && (
+          <Tooltip
+            title={
+              isRightSidebarOpen ? 'Cerrar panel' : 'Abrir panel acompañante'
+            }
+          >
+            <IconButton
+              onClick={onToggleSidebar}
+              size="small"
+              sx={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px',
+                border: '1px solid',
+                borderColor: (theme) =>
+                  isRightSidebarOpen
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(19, 127, 236, 0.4)'
+                      : 'rgba(19, 127, 236, 0.3)'
+                    : theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.12)'
+                      : '#e2e8f0',
+                color: isRightSidebarOpen ? 'primary.main' : 'text.secondary',
+                bgcolor: (theme) =>
+                  isRightSidebarOpen
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(19, 127, 236, 0.15)'
+                      : 'rgba(19, 127, 236, 0.08)'
+                    : theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : '#ffffff',
+                '&:hover': {
+                  color: isRightSidebarOpen ? 'primary.main' : 'text.primary',
+                  bgcolor: (theme) =>
+                    isRightSidebarOpen
+                      ? theme.palette.mode === 'dark'
+                        ? 'rgba(19, 127, 236, 0.25)'
+                        : 'rgba(19, 127, 236, 0.14)'
+                      : theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.08)'
+                        : '#f8fafc',
+                },
+              }}
+            >
+              <ViewSidebarIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Tooltip>
+        )}
 
         {/* Editor Tools Menu (Detect Language / Dictation / Focus Mode) */}
         <Menu
