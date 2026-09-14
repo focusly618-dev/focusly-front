@@ -8,3 +8,4 @@ export * from './icons';
 export * from './LuminaAnimatedFace';
 export * from './LuminaOrb';
 export * from './LanguageSelector';
+export * from './PriorityBadge';

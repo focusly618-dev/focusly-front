@@ -7,7 +7,7 @@ import {
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'motion/react';
 import { FolderTabsContainer, FolderTabItem } from '../WorkspaceLibrary.styles';
-import type { ProjectTypes } from '../../../types/workspace.types';
+import type { ProjectTypes } from '../../../workspace.types';
 
 interface FolderSectionListProps {
   selectedFolderId: string | null;

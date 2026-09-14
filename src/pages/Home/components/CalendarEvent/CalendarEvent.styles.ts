@@ -3,9 +3,9 @@ import type { Task } from '@/redux/tasks/task.types';
 
 // Priority-based soft pastel color palette — elegant, non-saturated pastels
 export const PRIORITY_COLORS: Record<number, { main: string }> = {
-  1: { main: '#D1FAE5' }, // Low → Verde salvia pastel
-  2: { main: '#DBEAFE' }, // Medium → Azul cielo pastel
-  3: { main: '#FEF3C7' }, // High → Ámbar suave pastel
+  1: { main: '#9a9a9aff' }, // Low → Verde salvia pastel
+  2: { main: '#d0def1ff' }, // Medium → Azul cielo pastel
+  3: { main: '#cfc6a1ff' }, // High → Ámbar suave pastel
   4: { main: '#FEE2E2' }, // Critical → Rosa suave pastel
 };
 

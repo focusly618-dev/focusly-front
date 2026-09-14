@@ -24,8 +24,9 @@ export const sanitizeDurationValue = (value: string) =>
   value.replace(/[^0-9hHmMsS\s]/g, '');
 
 export const getPriorityColor = (p: string) => {
-  if (p === 'High') return '#ef4444';
-  if (p === 'Med') return '#f59e0b';
-  if (p === 'Low') return '#22c55e';
+  if (p === 'Critical') return '#ef4444';
+  if (p === 'High') return '#f59e0b';
+  if (p === 'Med') return '#3b82f6';
+  if (p === 'Low') return '#10b981';
   return '#6b7280';
 };

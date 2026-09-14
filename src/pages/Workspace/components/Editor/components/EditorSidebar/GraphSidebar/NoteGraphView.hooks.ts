@@ -125,13 +125,25 @@ export const useGraphPanZoom = (
     setPan({ x: 0, y: 0 });
   }, []);
 
+  const zoomIn = useCallback(() => {
+    setZoom((z) => Math.min(ZOOM_MAX, +(z + 0.25).toFixed(2)));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setZoom((z) => Math.max(ZOOM_MIN, +(z - 0.25).toFixed(2)));
+  }, []);
+
   return {
     zoom,
+    setZoom,
     zoomOrigin,
     pan,
+    setPan,
     isPanning,
     handleCanvasPointerDown,
     resetPanZoom,
+    zoomIn,
+    zoomOut,
   };
 };
 

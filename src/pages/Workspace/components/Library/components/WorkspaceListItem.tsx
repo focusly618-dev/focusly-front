@@ -16,7 +16,7 @@ import { surfaceColor } from '@/context';
 import { UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import { CardAvatarCircle, BadgeChip } from '../WorkspaceLibrary.styles';
 import { iconMap } from '../constants/library.constants';
-import type { WorkspaceTypes } from '../../../types/workspace.types';
+import type { WorkspaceTypes } from '../../../workspace.types';
 
 interface WorkspaceListItemProps {
   workspace: WorkspaceTypes;
@@ -30,61 +30,6 @@ interface WorkspaceListItemProps {
   groupColor?: string;
 }
 
-const cleanMarkdown = (md: string): string => {
-  let text = md;
-  // 1. Remove table lines (any lines with vertical bars)
-  text = text
-    .split('\n')
-    .filter((line) => !line.includes('|'))
-    .join('\n');
-
-  // 2. Remove headers (# heading -> heading)
-  text = text.replace(/#+\s+/g, '');
-
-  // 3. Remove task list / bullet list markers
-  text = text.replace(/-\s*\[[ xX]\]\s+/g, ''); // checklists
-  text = text.replace(/[-*]\s+/g, ''); // bullets
-  text = text.replace(/^\d+\.\s+/gm, ''); // numbered lists
-
-  // 4. Remove bold/italic markup
-  text = text.replace(/[*_]{1,3}/g, '');
-
-  // 5. Remove quotes and HTML comments
-  text = text.replace(/^>\s+/gm, '');
-  text = text.replace(/<!--.*?-->/gs, '');
-
-  // 6. Replace multiple spaces/newlines with a single space
-  return text.replace(/\s+/g, ' ').trim() || 'No content yet';
-};
-
-const getSnippet = (contentStr?: string): string => {
-  if (!contentStr) return 'No content yet';
-  try {
-    const parsed = JSON.parse(contentStr);
-    if (Array.isArray(parsed)) {
-      for (const block of parsed) {
-        if (block.content) {
-          if (typeof block.content === 'string') {
-            return block.content;
-          }
-          if (Array.isArray(block.content)) {
-            const text = block.content
-              .map((c: { text?: string }) => c.text || '')
-              .join('');
-            if (text.trim()) return text;
-          }
-        }
-      }
-    }
-  } catch {
-    if (contentStr.startsWith('[') || contentStr.startsWith('{')) {
-      return 'No content yet';
-    }
-    return cleanMarkdown(contentStr);
-  }
-  return 'No content yet';
-};
-
 export const WorkspaceListItem = ({
   workspace,
   onSelect,
@@ -95,13 +40,10 @@ export const WorkspaceListItem = ({
 }: WorkspaceListItemProps) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-
-  const folderName = groupName || 'All Notes';
+  const folderName = groupName || null;
   const baseColor = groupColor || theme.palette.primary.main;
   const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
   const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
-
-  const snippet = getSnippet(workspace.content);
 
   return (
     <Box
@@ -175,28 +117,14 @@ export const WorkspaceListItem = ({
         </Typography>
       </Box>
 
-      {/* Snippet Preview */}
-      <Typography
-        variant="body2"
-        sx={{
-          fontSize: '0.8rem',
-          color: 'text.secondary',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          flex: '2 2 0%',
-          display: { xs: 'none', md: 'block' },
-        }}
-      >
-        {snippet}
-      </Typography>
-
       {/* Badge / Group */}
-      <Box sx={{ minWidth: 100, display: { xs: 'none', sm: 'block' } }}>
-        <BadgeChip color={visibleColor} bgColor={badgeBgColor}>
-          {folderName}
-        </BadgeChip>
-      </Box>
+      {folderName && (
+        <Box sx={{ minWidth: 100, display: { xs: 'none', sm: 'block' } }}>
+          <BadgeChip color={visibleColor} bgColor={badgeBgColor}>
+            {folderName}
+          </BadgeChip>
+        </Box>
+      )}
 
       {/* Task Link info */}
       <Box sx={{ minWidth: 140, display: { xs: 'none', lg: 'block' } }}>

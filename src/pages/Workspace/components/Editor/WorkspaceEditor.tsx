@@ -1,14 +1,13 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { EditorContainer, MainEditorArea } from './WorkspaceEditor.styles';
 
-import type { WorkspaceEditorProps } from '../../types/workspace.types';
+import type { WorkspaceEditorProps } from '../../workspace.types';
 import { EditorHeader } from './components/EditorHeader/EditorHeader';
 import { EditorContent } from './components/EditorContent/EditorContent';
 import { EditorSidebar } from './components/EditorSidebar/EditorSidebar';
 
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
-
-import { useWorkspaceEditor } from './hooks/useWorkspaceEditor.hook';
+import { useWorkspaceEditor } from './useWorkspaceEditor.hook';
 
 export const WorkspaceEditor = ({
   onBack,
@@ -43,6 +42,7 @@ export const WorkspaceEditor = ({
     currentTitle,
     currentContent,
     currentFolder,
+    currentEmoji,
 
     showPalette,
     setShowPalette,
@@ -63,12 +63,47 @@ export const WorkspaceEditor = ({
     tasksData,
   });
 
+  const [prevContent, setPrevContent] = useState(currentContent);
+  const [liveContent, setLiveContent] = useState<string>(currentContent || '');
+
+  if (currentContent !== prevContent) {
+    setPrevContent(currentContent);
+    setLiveContent(currentContent || '');
+  }
+
+  const [prevTitle, setPrevTitle] = useState(currentTitle);
+  const [liveTitle, setLiveTitle] = useState<string>(currentTitle || '');
+
+  if (currentTitle !== prevTitle) {
+    setPrevTitle(currentTitle);
+    setLiveTitle(currentTitle || '');
+  }
+
+  const handleContentChange = useCallback(
+    (markdown: string) => {
+      setLiveContent(markdown);
+      setValue('content', markdown, { shouldDirty: true });
+    },
+    [setValue],
+  );
+
+  const handleTitleChange = useCallback(
+    (title: string) => {
+      setLiveTitle(title);
+      setValue('title', title, { shouldDirty: true });
+    },
+    [setValue],
+  );
+
   return (
     <>
       <EditorContainer>
         <MainEditorArea>
           <EditorHeader
             onBack={onBack}
+            currentFolder={currentFolder}
+            currentTitle={liveTitle || currentTitle}
+            isRightSidebarOpen={isRightSidebarOpen}
             showPalette={showPalette}
             setShowPalette={setShowPalette}
             searchTerm={searchTerm}
@@ -93,11 +128,11 @@ export const WorkspaceEditor = ({
 
           <EditorContent
             currentFolder={currentFolder}
-            currentTitle={currentTitle}
-            setTitle={(title) => setValue('title', title)}
+            currentTitle={liveTitle || currentTitle}
+            setTitle={handleTitleChange}
             initialMarkdown={initialMarkdown}
             markdownEditorRef={markdownEditorRef}
-            onChange={(markdown) => setValue('content', markdown)}
+            onChange={handleContentChange}
             setValue={setValue}
             watch={watch}
             targetLanguage={targetLanguage}
@@ -109,13 +144,16 @@ export const WorkspaceEditor = ({
         <EditorSidebar
           isRightSidebarOpen={isRightSidebarOpen}
           setIsRightSidebarOpen={setIsRightSidebarOpen}
+          currentFolder={currentFolder}
+          currentTitle={liveTitle || currentTitle}
+          currentEmoji={currentEmoji}
           selectTask={selectTask}
           handleUpdateTask={handleUpdateTask}
           onStartFocus={onStartFocus}
           activeFocusTaskId={activeFocusTaskId}
           onUnlinkTask={onUnlinkTask}
           setShowPalette={setShowPalette}
-          markdownContent={currentContent}
+          markdownContent={liveContent || currentContent}
           markdownEditorRef={markdownEditorRef}
         />
       </EditorContainer>

@@ -19,11 +19,11 @@ import type { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import FlagIcon from '@mui/icons-material/Flag';
 import CategoryIcon from '@mui/icons-material/Category';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { format } from 'date-fns';
+import { PriorityBadge } from '@/components/ui';
 
 export interface AITaskPreviewData {
   title: string;
@@ -266,13 +266,8 @@ const AITaskPreviewContent: React.FC<AITaskPreviewContentProps> = ({
                 flexWrap: 'wrap',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <FlagIcon
-                  sx={{
-                    fontSize: 16,
-                    color: getPriorityColor(priority),
-                  }}
-                />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                <PriorityBadge priority={priority} size={18} />
                 <Chip
                   label={`${priority} Priority`}
                   size="small"

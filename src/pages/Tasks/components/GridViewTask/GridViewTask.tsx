@@ -1,7 +1,6 @@
-import { Box, Typography, LinearProgress } from '@mui/material';
+import { Box, Typography, LinearProgress, alpha } from '@mui/material';
 import {
   CalendarToday as CalendarTodayIcon,
-  Link as LinkIcon,
   AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 
@@ -11,13 +10,11 @@ import {
   GridCardFooter,
   ProgressBarContainer,
   ProgressLabel,
-  Tag,
   StatusDot,
   MetaBadge,
-  PriorityBar,
 } from './GridViewTask.styles';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import { PriorityBadge, getPriorityConfig } from '@/components/ui';
 
 interface GridViewTaskProps {
   task: TaskResponse;
@@ -28,23 +25,22 @@ interface GridViewTaskProps {
 // Professional color scheme matching ListViewTask
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
-    Done: '#22c55e',
-    Todo: '#3b82f6',
-    Planning: '#8b5cf6',
+    Todo: '#6b7280',
+    Planning: '#3b82f6',
+    Scheduled: '#8b5cf6',
     Pending: '#f59e0b',
     'On Hold': '#ef4444',
     Review: '#06b6d4',
-    Backlog: '#6b7280',
-    Scheduled: '#8b5cf6',
-    Archived: '#4b5563',
+    Done: '#10b981',
   };
   return colors[status] || '#6b7280';
 };
 
 const getPriorityColor = (level: number) => {
-  if (level >= 3) return '#ef4444';
-  if (level === 2) return '#f59e0b';
-  return '#22c55e';
+  if (level >= 4) return '#ef4444';
+  if (level === 3) return '#f59e0b';
+  if (level === 2) return '#3b82f6';
+  return '#10b981';
 };
 
 export const GridViewTask = ({
@@ -58,72 +54,88 @@ export const GridViewTask = ({
   const progress =
     task.status === 'Done'
       ? 100
-      : task.estimate_timer && task.real_timer
-        ? Math.min(100, Math.round((task.real_timer / task.estimate_timer) * 100))
-        : 0;
+      : task.subtasks && task.subtasks.length > 0
+        ? Math.round(
+            (task.subtasks.filter((s) => s.completed).length /
+              task.subtasks.length) *
+              100,
+          )
+        : task.status === 'Pending' || task.status === 'Planning'
+          ? 50
+          : 0;
 
   return (
     <GridTaskCard onClick={() => onTaskClick(task)}>
+      {/* Top row: Status and AI Suggestion */}
       <GridCardHeader>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <StatusDot color={statusColor} />
-          <Tag
-            tagColor={getTagColors(task.category || 'General').bgcolor}
-            textColor={getTagColors(task.category || 'General').color}
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: 'text.secondary',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
           >
-            {task.category || 'General'}
-          </Tag>
+            {task.status}
+          </Typography>
         </Box>
-        {task.links && task.links.length > 0 && (
-          <MetaBadge sx={{ color: '#3b82f6' }}>
-            <LinkIcon sx={{ fontSize: 14 }} />
-            <Typography
-              variant="caption"
-              sx={{ fontSize: '11px', fontWeight: 500 }}
-            >
-              {task.links.length}
-            </Typography>
-          </MetaBadge>
-        )}
-        {isAIScheduleEnabled && (
+
+        {isAIScheduleEnabled && task.ai_suggestion && (
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               gap: 0.5,
-              color: '#7c3aed',
-              background: 'rgba(124, 58, 237, 0.1)',
-              padding: '2px 6px',
-              borderRadius: '6px',
-              border: '1px solid rgba(124, 58, 237, 0.2)',
+              bgcolor: 'action.hover',
+              px: 1,
+              py: 0.25,
+              borderRadius: '12px',
             }}
           >
-            <AutoAwesomeIcon sx={{ fontSize: 12 }} />
-            <Typography sx={{ fontSize: '10px', fontWeight: 700 }}>
+            <AutoAwesomeIcon sx={{ fontSize: 11, color: '#8b5cf6' }} />
+            <Typography
+              variant="caption"
+              sx={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: '#8b5cf6',
+              }}
+            >
               AI
             </Typography>
           </Box>
         )}
       </GridCardHeader>
 
-      <Box sx={{ flex: 1 }}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontSize: '15px',
-            fontWeight: 600,
-            color: 'text.primary',
-            lineHeight: 1.4,
-            mb: 1,
-          }}
-        >
-          {task.title}
-        </Typography>
+      {/* Task title */}
+      <Typography
+        variant="subtitle2"
+        sx={{
+          fontWeight: 600,
+          fontSize: '14px',
+          color: 'text.primary',
+          lineHeight: 1.4,
+          mb: 1,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
+        {task.title}
+      </Typography>
+
+      {/* Task description preview */}
+      <Box sx={{ mb: 2, flex: 1 }}>
         <Typography
           variant="body2"
           sx={{
-            color: 'text.secondary',
             fontSize: '12px',
+            color: 'text.secondary',
             lineHeight: 1.5,
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -131,31 +143,34 @@ export const GridViewTask = ({
             overflow: 'hidden',
           }}
         >
-          {task.notes_encrypted?.replace(/\[COLOR:(.*?)\]/g, '').trim() ||
+          {task.description ||
+            task.notes_encrypted ||
             'No description provided.'}
         </Typography>
       </Box>
 
       {/* Metadata row */}
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
         {task.priority_level > 0 && (
-          <MetaBadge>
-            <PriorityBar color={priorityColor} />
-            <Typography
-              variant="caption"
-              sx={{
-                fontSize: '11px',
-                fontWeight: 500,
-                color: 'text.secondary',
-              }}
-            >
-              {task.priority_level >= 3
-                ? 'High'
-                : task.priority_level === 2
-                  ? 'Med'
-                  : 'Low'}
-            </Typography>
-          </MetaBadge>
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              px: '7px',
+              py: '2px',
+              borderRadius: '4px',
+              fontSize: '11px',
+              fontWeight: 700,
+              bgcolor: alpha(priorityColor, 0.12),
+              color: priorityColor,
+              border: `1px solid ${alpha(priorityColor, 0.25)}`,
+              flexShrink: 0,
+            }}
+          >
+            <PriorityBadge priority={task.priority_level} size={15} />
+            <span>{getPriorityConfig(task.priority_level).label}</span>
+          </Box>
         )}
         {task.deadline && (
           <MetaBadge>

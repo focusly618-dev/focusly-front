@@ -285,7 +285,6 @@ export const TasksContentView = ({
                   <TableHeaderCell className="col-actual">
                     Actual
                   </TableHeaderCell>
-                  <TableHeaderCell className="col-ai">AI</TableHeaderCell>
                   <TableHeaderCell sx={{ justifyContent: 'center' }}>
                     Actions
                   </TableHeaderCell>

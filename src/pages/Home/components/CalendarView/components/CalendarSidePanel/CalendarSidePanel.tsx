@@ -503,7 +503,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
             spacing={1}
             sx={{
               overflowY: 'auto',
-              maxHeight: '280px',
+              maxHeight: '480px',
               pr: 0.5,
             }}
           >

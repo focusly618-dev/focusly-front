@@ -6,7 +6,7 @@ import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import { CREATE_PROJECT_GROUP } from './Workspace.graphql';
 import { CreateProjectModal } from './components/Library/modals/CreateProjectModal';
 import { sileo } from '@/utils';
-import type { WorkspaceProps } from './types/workspace.types';
+import type { WorkspaceProps } from './workspace.types';
 
 const WorkspaceEditor = lazy(() =>
   import('./components/Editor/WorkspaceEditor').then((m) => ({

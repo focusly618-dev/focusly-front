@@ -5,8 +5,8 @@ import {
   UPDATE_WORKSPACE,
   GET_PROJECT_GROUPS,
   GET_PROJECT_GROUPS_PAGINATED,
-} from '../../../Workspace.graphql';
-import type { WorkspaceTypes } from '../../../types/workspace.types';
+} from '../../Workspace.graphql';
+import type { WorkspaceTypes } from '../../workspace.types';
 import { sileo } from '@/utils';
 
 const LIMIT = 8;

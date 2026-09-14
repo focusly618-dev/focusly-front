@@ -1,10 +1,11 @@
 import type { Task, Subtask } from '@/redux/tasks/task.types';
+import type { PriorityType } from '../TaskDetailModal.utils';
 
 export interface TaskData {
   id?: string;
   title: string;
   description: string;
-  priority: 'High' | 'Med' | 'Low' | 'No priority';
+  priority: PriorityType;
   category: string;
   deadline: Date | null;
   duration: string;

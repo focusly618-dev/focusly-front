@@ -13,6 +13,7 @@ import {
   FileUpload as ImportIcon,
   FileDownload as ExportIcon,
   Description as DescriptionIcon,
+  ViewSidebarOutlined as ViewSidebarIcon,
 } from '@mui/icons-material';
 import {
   CircularProgress,
@@ -27,17 +28,13 @@ import {
   Button,
   Badge,
   Divider,
+  Tooltip,
 } from '@mui/material';
 
-import { SearchPalette } from '../SearchPalette/SearchPalette';
 import { ImportContentModal } from './components/ImportContentModal/ImportContentModal';
 import { convertMarkdownToDocx } from './documentExporters';
 import { sileo } from '@/utils';
-import {
-  HeaderLeft,
-  HeaderCenter,
-  HeaderRight,
-} from '@/pages/Workspace/Workspace.styles';
+import { HeaderLeft, HeaderRight } from '@/pages/Workspace/Workspace.styles';
 import { EditorHeader as StyledEditorHeader } from './EditorHeader.styles';
 import type { EditorHeaderProps } from './EditorHeader.types';
 import { useEditorHeader } from './useEditorHeader.hook';
@@ -45,22 +42,16 @@ import { useEditorHeader } from './useEditorHeader.hook';
 export const EditorHeader = (props: EditorHeaderProps) => {
   const {
     onBack,
-    showPalette,
-    setShowPalette,
-    loadMore,
-    searchTerm,
-    setSearchTerm,
-    filteredTasks,
     selectTask,
-    handleSelectTask,
-    setValue,
     saveState,
     sourceLanguage,
     targetLanguage,
-    hasMore,
     isCentered,
     onToggleCentered,
     onToggleSidebar,
+    isRightSidebarOpen,
+    currentFolder,
+    currentTitle,
     onStartFocus,
     markdownEditorRef,
   } = props;
@@ -86,13 +77,12 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${(selectTask?.title || 'note').replace(/[^\w-]+/g, '_')}.${extension}`;
+    link.download = `${(currentTitle || selectTask?.title || 'note').replace(/[^\w-]+/g, '_')}.${extension}`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
   const handleExport = async (format: 'md' | 'docx') => {
-    setExportAnchor(null);
     const markdown = markdownEditorRef?.current?.getValue() ?? '';
 
     if (format === 'md') {
@@ -116,142 +106,83 @@ export const EditorHeader = (props: EditorHeaderProps) => {
   return (
     <StyledEditorHeader>
       {/* ─── DESKTOP LAYOUT ─── */}
-      <HeaderLeft sx={{ display: { xs: 'none', md: 'flex' } }}>
+      <HeaderLeft
+        sx={{
+          display: { xs: 'none', md: 'flex' },
+          alignItems: 'center',
+          gap: 1.5,
+          minWidth: 0,
+        }}
+      >
         <IconButton
           onClick={onBack}
           sx={{
-            width: '34px',
-            height: '34px',
-            minWidth: '34px',
+            width: '32px',
+            height: '32px',
+            minWidth: '32px',
             p: 0,
-            mr: { xs: 0, md: 1 },
             borderRadius: '50%',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.12)'
-                : '#e2e8f0',
-            color: 'text.primary',
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
+            color: 'text.secondary',
             '&:hover': {
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.08)'
-                  : '#f8fafc',
+              color: 'text.primary',
+              bgcolor: 'action.hover',
             },
           }}
         >
-          <ArrowBackIcon sx={{ fontSize: 16 }} />
+          <ArrowBackIcon sx={{ fontSize: 18 }} />
         </IconButton>
-      </HeaderLeft>
 
-      <HeaderCenter
-        id="joyride-editor-search"
-        sx={{
-          display: { xs: 'none', md: 'flex' },
-          position: 'relative',
-          zIndex: 50,
-          mx: { md: 1, lg: 2 },
-        }}
-      >
-        <SearchPalette
-          showPalette={showPalette}
-          setShowPalette={setShowPalette}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filteredTasks={filteredTasks}
-          selectTask={selectTask}
-          handleSelectTask={handleSelectTask}
-          setValue={setValue}
-          loadMore={loadMore}
-          hasMore={hasMore}
-        />
-      </HeaderCenter>
-
-      <HeaderRight sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-        {/* Target Language Button */}
-        <Button
-          onClick={(e) => setTargetAnchor(e.currentTarget)}
-          startIcon={<TranslateIcon sx={{ fontSize: 14 }} />}
+        <Typography
+          variant="subtitle1"
+          noWrap
           sx={{
-            height: '34px',
-            px: 1.5,
-            borderRadius: '8px',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.12)'
-                : '#e2e8f0',
+            fontWeight: 700,
+            fontSize: '14px',
             color: 'text.primary',
-            fontSize: '12px',
-            fontWeight: 600,
-            textTransform: 'none',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
-            '&:hover': {
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.08)'
-                  : '#f8fafc',
-            },
+            letterSpacing: '-0.01em',
+            maxWidth: { xs: '200px', sm: '320px', md: '460px' },
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
-          {getLanguageLabel(targetLanguage)}
-        </Button>
+          {currentTitle?.trim() || 'Untitled Note'}
+        </Typography>
 
-        {/* Editor Tools: Detect Language, Dictation, Focus Mode */}
-        <IconButton
-          ref={toolsButtonRef}
-          onClick={(e) => setToolsAnchor(e.currentTarget)}
-          size="small"
-          sx={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '8px',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.12)'
-                : '#e2e8f0',
-            color: 'text.primary',
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
-            '&:hover': {
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.08)'
-                  : '#f8fafc',
-            },
-          }}
-        >
-          <Badge
-            variant="dot"
-            color="error"
-            invisible={!isListening}
+        {currentFolder?.name && (
+          <Box
             sx={{
-              '& .MuiBadge-dot': {
-                animation: isListening
-                  ? 'pulse 1.5s infinite ease-in-out'
-                  : 'none',
-              },
-              '@keyframes pulse': {
-                '0%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.5)' },
-                '70%': { boxShadow: '0 0 0 4px rgba(239, 68, 68, 0)' },
-                '100%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)' },
-              },
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              px: 1.2,
+              py: 0.35,
+              borderRadius: '6px',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.06)'
+                  : 'rgba(0, 0, 0, 0.05)',
+              border: '1px solid',
+              borderColor: 'divider',
+              color: 'text.secondary',
+              fontSize: '12px',
+              fontWeight: 600,
+              flexShrink: 0,
             }}
           >
-            <MoreHorizIcon sx={{ fontSize: 18 }} />
-          </Badge>
-        </IconButton>
+            {currentFolder.name}
+          </Box>
+        )}
+      </HeaderLeft>
 
+      <HeaderRight
+        sx={{
+          display: { xs: 'none', md: 'flex' },
+          alignItems: 'center',
+          gap: 1,
+          ml: 'auto',
+        }}
+      >
         {/* Save Status Indicator */}
         <Fade
           in={saveState === 'saving' || saveState === 'saved'}
@@ -333,6 +264,136 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             ) : null}
           </Box>
         </Fade>
+
+        {/* Target Language Button */}
+        <Button
+          onClick={(e) => setTargetAnchor(e.currentTarget)}
+          startIcon={<TranslateIcon sx={{ fontSize: 14 }} />}
+          sx={{
+            height: '34px',
+            px: 1.5,
+            borderRadius: '8px',
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : '#e2e8f0',
+            color: 'text.primary',
+            fontSize: '12px',
+            fontWeight: 600,
+            textTransform: 'none',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : '#ffffff',
+            '&:hover': {
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : '#f8fafc',
+            },
+          }}
+        >
+          {getLanguageLabel(targetLanguage)}
+        </Button>
+
+        {/* Editor Tools: Detect Language, Dictation, Focus Mode (...) */}
+        <IconButton
+          ref={toolsButtonRef}
+          onClick={(e) => setToolsAnchor(e.currentTarget)}
+          size="small"
+          sx={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.12)'
+                : '#e2e8f0',
+            color: 'text.primary',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.03)'
+                : '#ffffff',
+            '&:hover': {
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : '#f8fafc',
+            },
+          }}
+        >
+          <Badge
+            variant="dot"
+            color="error"
+            invisible={!isListening}
+            sx={{
+              '& .MuiBadge-dot': {
+                animation: isListening
+                  ? 'pulse 1.5s infinite ease-in-out'
+                  : 'none',
+              },
+              '@keyframes pulse': {
+                '0%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.5)' },
+                '70%': { boxShadow: '0 0 0 4px rgba(239, 68, 68, 0)' },
+                '100%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)' },
+              },
+            }}
+          >
+            <MoreHorizIcon sx={{ fontSize: 18 }} />
+          </Badge>
+        </IconButton>
+
+        {/* Companion Sidebar Toggle Button */}
+        {onToggleSidebar && (
+          <Tooltip
+            title={
+              isRightSidebarOpen ? 'Cerrar panel' : 'Abrir panel acompañante'
+            }
+          >
+            <IconButton
+              onClick={onToggleSidebar}
+              size="small"
+              sx={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px',
+                border: '1px solid',
+                borderColor: (theme) =>
+                  isRightSidebarOpen
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(19, 127, 236, 0.4)'
+                      : 'rgba(19, 127, 236, 0.3)'
+                    : theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.12)'
+                      : '#e2e8f0',
+                color: isRightSidebarOpen ? 'primary.main' : 'text.secondary',
+                bgcolor: (theme) =>
+                  isRightSidebarOpen
+                    ? theme.palette.mode === 'dark'
+                      ? 'rgba(19, 127, 236, 0.15)'
+                      : 'rgba(19, 127, 236, 0.08)'
+                    : theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.03)'
+                      : '#ffffff',
+                '&:hover': {
+                  color: isRightSidebarOpen ? 'primary.main' : 'text.primary',
+                  bgcolor: (theme) =>
+                    isRightSidebarOpen
+                      ? theme.palette.mode === 'dark'
+                        ? 'rgba(19, 127, 236, 0.25)'
+                        : 'rgba(19, 127, 236, 0.14)'
+                      : theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.08)'
+                        : '#f8fafc',
+                },
+              }}
+            >
+              <ViewSidebarIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Tooltip>
+        )}
 
         {/* Editor Tools Menu (Detect Language / Dictation / Focus Mode) */}
         <Menu

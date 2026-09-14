@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import type { TaskSearchItems } from '@/pages/Workspace/types/workspace.types';
+import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 
 export interface SpeechRecognitionEvent {
@@ -34,25 +34,29 @@ export interface SpeechRecognitionWindow {
 
 export interface EditorHeaderProps {
   onBack: () => void;
-  showPalette: boolean;
-  setShowPalette: (b: boolean | ((prev: boolean) => boolean)) => void;
-  searchTerm: string;
-  setSearchTerm: (s: string) => void;
-  filteredTasks: TaskSearchItems[];
-  selectTask: TaskSearchItems | null;
-  handleSelectTask: (task: TaskSearchItems | null) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setValue: (field: any, value: any) => void;
   saveState?: 'idle' | 'saving' | 'saved';
   markdownEditorRef?: RefObject<MarkdownEditorRef | null>;
   sourceLanguage: string;
   setSourceLanguage: (lang: string) => void;
   targetLanguage: string;
   setTargetLanguage: (lang: string) => void;
-  loadMore: () => Promise<void>;
-  hasMore?: boolean;
   isCentered?: boolean;
   onToggleCentered?: () => void;
   onToggleSidebar?: () => void;
+  isRightSidebarOpen?: boolean;
+  currentFolder?: { name?: string; color?: string; emoji?: string } | null;
+  currentTitle?: string;
+  // Optional legacy props
+  showPalette?: boolean;
+  setShowPalette?: (b: boolean | ((prev: boolean) => boolean)) => void;
+  searchTerm?: string;
+  setSearchTerm?: (s: string) => void;
+  filteredTasks?: TaskSearchItems[];
+  selectTask?: TaskSearchItems | null;
+  handleSelectTask?: (task: TaskSearchItems | null) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setValue?: (field: any, value: any) => void;
+  loadMore?: () => Promise<void>;
+  hasMore?: boolean;
   onStartFocus?: (task?: TaskSearchItems | null) => void;
 }

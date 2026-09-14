@@ -1,1027 +1,1182 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAppSelector } from '@/redux/hooks';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
   IconButton,
-  Menu,
-  MenuItem,
   Button,
+  useTheme,
+  Fade,
+  Slide,
   Tooltip,
 } from '@mui/material';
 import {
-  ChevronRight,
-  ChevronLeft,
-  Flag as FlagIcon,
-  CheckCircle as CheckCircleIcon,
-  PauseCircle as PauseCircleIcon,
-  RadioButtonUnchecked as RadioButtonUncheckedIcon,
-  History as HistoryIcon,
-  Visibility as VisibilityIcon,
-  EventNote as PlannedIcon,
-  Description as DescriptionIcon,
-  LinkOff as LinkOffIcon,
-  Link as LinkIcon,
-  Launch as LaunchIcon,
-  AccessTime as AccessTimeIcon,
-  AssignmentOutlined as AssignmentIcon,
-  LightbulbOutlined as TipIcon,
-  Search as SearchIcon,
-  OpenInFull as OpenInFullIcon,
+  Close as CloseIcon,
   Toc as TocIcon,
   Hub as HubIcon,
+  BarChart as BarChartIcon,
+  DescriptionOutlined as DocIcon,
+  MenuBookOutlined as ReadingTimeIcon,
+  NotesOutlined as ParagraphsIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
-import { formatDescriptionToHtml } from '@/utils/formatDescription';
-import {
-  getPriorityFromLevel,
-  getPriorityLevel,
-  formatDuration,
-} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import type { PriorityType } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import {
-  RightSidebar,
-  SidebarHeaderTop,
-  SidebarBody,
-  DragHandle,
-  MetadataSection,
-  MarkDoneButton,
-  DescriptionContainer,
-  DescriptionHeader,
-  PropertyGrid,
-  PropertyCard,
-  PropertyLabel,
-  PropertyValue,
-  SectionSubtitle,
-  ResourceItem,
-  PulseIndicator,
-  EmptyStateContainer,
-  EmptyStateIconWrapper,
-  EmptyStateTipCard,
-} from './EditorSidebar.styles';
 import type { EditorSidebarProps } from './EditorSidebar.type';
-import { useEditorSidebar } from './EditorSidebar.hook';
 import { parseHeadings, NoteOutlineList, NoteGraphView } from './GraphSidebar';
 
 export const EditorSidebar = (props: EditorSidebarProps) => {
   const {
     isRightSidebarOpen,
     setIsRightSidebarOpen,
-    selectTask,
-    activeFocusTaskId,
-    onUnlinkTask,
-    setShowPalette,
     markdownContent,
     markdownEditorRef,
+    currentTitle,
+    currentEmoji,
+    currentFolder,
+    selectTask,
   } = props;
 
-  const { user } = useAppSelector((state) => state.auth);
+  const theme = useTheme();
 
-  const isReadOnly = useMemo(() => {
-    if (!selectTask) return false;
-    if (!user) return true;
+  const [activeInsightView, setActiveInsightView] = useState<
+    'outline' | 'graph' | 'stats'
+  >('stats');
 
-    const selectTaskAny = selectTask as {
-      task_type?: string;
-      google_event_id?: string;
-      organizer_email?: string;
-      user_id?: string;
-    };
-    // Check Google Calendar event ownership
-    if (
-      selectTaskAny.task_type === 'GoogleTask' ||
-      selectTaskAny.google_event_id
-    ) {
-      const organizerEmail = selectTaskAny.organizer_email;
-      if (organizerEmail) {
-        return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
+  const noteTitle = currentTitle?.trim() || selectTask?.title || 'Esta nota';
+  const activeIcon = currentEmoji || currentFolder?.emoji;
+
+  // Auto-updating document revision counter
+  const noteId =
+    selectTask?.id ||
+    (currentTitle
+      ? `title_${encodeURIComponent(currentTitle.trim())}`
+      : 'default_note');
+
+  const [prevNoteId, setPrevNoteId] = useState(noteId);
+  const [documentRevision, setDocumentRevision] = useState<number>(() => {
+    if (typeof window === 'undefined') return 1;
+    try {
+      const saved = localStorage.getItem(`focusly_doc_rev_${noteId}`);
+      return saved ? Math.max(1, parseInt(saved, 10)) : 1;
+    } catch {
+      return 1;
+    }
+  });
+
+  // Keep revision in sync when switching note
+  if (noteId !== prevNoteId) {
+    setPrevNoteId(noteId);
+    let rev = 1;
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(`focusly_doc_rev_${noteId}`);
+        if (saved) rev = Math.max(1, parseInt(saved, 10));
+      } catch {
+        // ignore
       }
     }
+    setDocumentRevision(rev);
+  }
 
-    // Check Focusly task ownership
-    if (selectTaskAny.user_id && selectTaskAny.user_id !== user.id) {
-      return true;
-    }
+  // Increment revision on markdownContent changes
+  const prevContentRef = useRef<string>(markdownContent ?? '');
+  useEffect(() => {
+    if (markdownContent === prevContentRef.current) return;
+    prevContentRef.current = markdownContent ?? '';
 
-    return false;
-  }, [selectTask, user]);
+    const timer = setTimeout(() => {
+      setDocumentRevision((prev) => {
+        const next = prev + 1;
+        try {
+          localStorage.setItem(`focusly_doc_rev_${noteId}`, next.toString());
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+    }, 700);
 
-  const {
-    priorityAnchor,
-    setPriorityAnchor,
-    statusAnchor,
-    setStatusAnchor,
-    getPriorityColor,
-    getStatusColor,
-    handlePriorityClick,
-    handleStatusClick,
-    handlePrioritySelect,
-    handleStatusSelect,
-    handleMarkDone,
-    currentStatus,
-    currentPriorityLevel,
-    theme,
-  } = useEditorSidebar(props);
-
-  const SIDEBAR_MIN = 300;
-  const SIDEBAR_MAX = 380;
-  const GRAPH_MIN = 340;
-  const GRAPH_MAX = 1400;
-
-  const [sidebarWidth, setSidebarWidth] = useState(() => {
-    const saved = localStorage.getItem('workspace_sidebar_width');
-    const width = saved ? parseInt(saved, 10) : 340;
-    return Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, width));
-  });
-  // The note map benefits from a lot more room than task metadata ever
-  // needs — a separate width lets dragging the same handle "extend" just
-  // that tab, instead of permanently widening the sidebar for every view.
-  const [graphPanelWidth, setGraphPanelWidth] = useState(() => {
-    const saved = localStorage.getItem('workspace_sidebar_graph_width');
-    const width = saved ? parseInt(saved, 10) : 700;
-    return Math.max(GRAPH_MIN, Math.min(GRAPH_MAX, width));
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const [activeInsightView, setActiveInsightView] = useState<
-    'outline' | 'graph' | null
-  >(null);
-
-  const isGraphView = activeInsightView === 'graph';
-  const effectiveSidebarWidth = isGraphView ? graphPanelWidth : sidebarWidth;
+    return () => clearTimeout(timer);
+  }, [markdownContent, noteId]);
 
   const headings = useMemo(
     () => parseHeadings(markdownContent ?? ''),
     [markdownContent],
   );
 
-  const handleJumpToHeading = (pos: number) => {
-    markdownEditorRef?.current?.setCursor(pos);
-    setActiveInsightView(null);
+  const stats = useMemo(() => {
+    const raw = markdownContent ?? '';
+    const trimmed = raw.trim();
+    const words = trimmed ? trimmed.split(/\s+/).filter(Boolean).length : 0;
+    const chars = raw.length;
+    const charsNoSpaces = raw.replace(/\s+/g, '').length;
+    const readingTimeMinutes = Math.max(1, Math.ceil(words / 200));
+    const h1Count = headings.filter((h) => h.level === 1).length;
+    const h2Count = headings.filter((h) => h.level === 2).length;
+    const h3Count = headings.filter((h) => h.level >= 3).length;
+    const paragraphs = trimmed
+      ? trimmed.split(/\n\s*\n/).filter((p) => p.trim().length > 0).length
+      : 0;
+
+    return {
+      words,
+      chars,
+      charsNoSpaces,
+      readingTimeMinutes,
+      h1Count,
+      h2Count,
+      h3Count,
+      paragraphs,
+    };
+  }, [markdownContent, headings]);
+
+  const handleJumpToHeading = (pos: number, label?: string) => {
+    markdownEditorRef?.current?.jumpToSection?.({ pos, text: label });
+    if (typeof window !== 'undefined' && window.innerWidth < 900) {
+      setIsRightSidebarOpen(false);
+    }
   };
 
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      e.preventDefault();
-      setIsDragging(true);
-
-      const startWidth = effectiveSidebarWidth;
-      const startX = e.clientX;
-      const [min, max] = isGraphView
-        ? [GRAPH_MIN, GRAPH_MAX]
-        : [SIDEBAR_MIN, SIDEBAR_MAX];
-
-      const handlePointerMove = (moveEvent: PointerEvent) => {
-        const deltaX = startX - moveEvent.clientX;
-        const newWidth = Math.max(min, Math.min(max, startWidth + deltaX));
-        if (isGraphView) setGraphPanelWidth(newWidth);
-        else setSidebarWidth(newWidth);
-      };
-
-      const handlePointerUp = () => {
-        setIsDragging(false);
-        window.removeEventListener('pointermove', handlePointerMove);
-        window.removeEventListener('pointerup', handlePointerUp);
-      };
-
-      window.addEventListener('pointermove', handlePointerMove);
-      window.addEventListener('pointerup', handlePointerUp);
-    },
-    [effectiveSidebarWidth, isGraphView],
-  );
-
-  useEffect(() => {
-    localStorage.setItem('workspace_sidebar_width', String(sidebarWidth));
-  }, [sidebarWidth]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      'workspace_sidebar_graph_width',
-      String(graphPanelWidth),
-    );
-  }, [graphPanelWidth]);
-
-  const isTaskInFocus = activeFocusTaskId === selectTask?.id;
-  const headerLabel =
-    activeInsightView === 'outline'
-      ? 'OUTLINE'
-      : activeInsightView === 'graph'
-        ? 'MAPA DE NOTAS'
-        : 'TASK DETAILS';
-
   return (
-    <RightSidebar
-      isOpen={isRightSidebarOpen}
-      widthVal={effectiveSidebarWidth}
-      isDragging={isDragging}
-    >
-      {isRightSidebarOpen && (
-        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-          <DragHandle
-            isDragging={isDragging}
-            onPointerDown={handlePointerDown}
-          />
-        </Box>
-      )}
+    <>
+      {/* Dimming Backdrop Overlay */}
+      <Fade in={isRightSidebarOpen} timeout={250} unmountOnExit>
+        <Box
+          onClick={() => setIsRightSidebarOpen(false)}
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.35)'
+                : 'rgba(15, 23, 42, 0.15)',
+            zIndex: 1200,
+            cursor: 'pointer',
+          }}
+        />
+      </Fade>
 
-      <SidebarHeaderTop>
-        {isRightSidebarOpen && (
-          <Box display="flex" alignItems="center" gap={1}>
-            <Typography
-              variant="caption"
-              fontWeight={700}
-              color="text.secondary"
-              letterSpacing={1.2}
-            >
-              {headerLabel}
-            </Typography>
-            {!activeInsightView &&
-              isTaskInFocus &&
-              currentStatus !== 'Done' && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    bgcolor: `${theme.palette.primary.main}15`,
-                    color: theme.palette.primary.main,
-                    px: 1.5,
-                    py: 0.2,
-                    borderRadius: '99px',
-                    border: `1px solid ${theme.palette.primary.main}33`,
-                  }}
-                >
-                  <PulseIndicator />
-                  <Typography
-                    variant="caption"
-                    fontWeight={750}
-                    fontSize="9px"
-                    letterSpacing={0.5}
-                  >
-                    IN PROGRESS
-                  </Typography>
-                </Box>
-              )}
-          </Box>
-        )}
-        <Box display="flex" alignItems="center" gap={0.25}>
-          {isRightSidebarOpen && (
-            <>
-              <Tooltip title="Task details" placement="bottom">
-                <span>
-                  <IconButton
-                    id="joyride-editor-full-detail"
-                    size="small"
-                    disabled={!selectTask}
-                    onClick={() => setActiveInsightView(null)}
-                    sx={{
-                      color: !activeInsightView
-                        ? theme.palette.primary.main
-                        : 'text.secondary',
-                      bgcolor: !activeInsightView
-                        ? `${theme.palette.primary.main}15`
-                        : 'transparent',
-                      '&:hover': {
-                        bgcolor: !activeInsightView
-                          ? `${theme.palette.primary.main}22`
-                          : theme.palette.action.hover,
-                        color: !activeInsightView
-                          ? theme.palette.primary.main
-                          : theme.palette.text.primary,
-                      },
-                    }}
-                  >
-                    <OpenInFullIcon sx={{ fontSize: 15 }} />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Outline — jump to any heading" placement="bottom">
-                <IconButton
-                  size="small"
-                  onClick={() => setActiveInsightView('outline')}
-                  sx={{
-                    color:
-                      activeInsightView === 'outline'
-                        ? theme.palette.primary.main
-                        : 'text.secondary',
-                    bgcolor:
-                      activeInsightView === 'outline'
-                        ? `${theme.palette.primary.main}15`
-                        : 'transparent',
-                    '&:hover': {
-                      bgcolor:
-                        activeInsightView === 'outline'
-                          ? `${theme.palette.primary.main}22`
-                          : theme.palette.action.hover,
-                      color:
-                        activeInsightView === 'outline'
-                          ? theme.palette.primary.main
-                          : theme.palette.text.primary,
-                    },
-                  }}
-                >
-                  <TocIcon sx={{ fontSize: 17 }} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                title="Mapa de notas — cómo se conectan los encabezados de esta nota con la tarea"
-                placement="bottom"
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => setActiveInsightView('graph')}
-                  sx={{
-                    color:
-                      activeInsightView === 'graph'
-                        ? theme.palette.primary.main
-                        : 'text.secondary',
-                    bgcolor:
-                      activeInsightView === 'graph'
-                        ? `${theme.palette.primary.main}15`
-                        : 'transparent',
-                    '&:hover': {
-                      bgcolor:
-                        activeInsightView === 'graph'
-                          ? `${theme.palette.primary.main}22`
-                          : theme.palette.action.hover,
-                      color:
-                        activeInsightView === 'graph'
-                          ? theme.palette.primary.main
-                          : theme.palette.text.primary,
-                    },
-                  }}
-                >
-                  <HubIcon sx={{ fontSize: 15 }} />
-                </IconButton>
-              </Tooltip>
-            </>
-          )}
-          <IconButton
-            onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
-            size="small"
+      {/* Floating Card Sidebar */}
+      <Slide
+        direction="left"
+        in={isRightSidebarOpen}
+        mountOnEnter
+        unmountOnExit
+        timeout={280}
+      >
+        <Box
+          id="joyride-editor-sidebar"
+          sx={{
+            position: 'fixed',
+            top: { xs: 8, md: 16 },
+            right: { xs: 8, md: 16 },
+            bottom: { xs: 8, md: 16 },
+            width:
+              activeInsightView === 'graph'
+                ? {
+                    xs: 'calc(100vw - 16px)',
+                    sm: '580px',
+                    md: '720px',
+                    lg: '820px',
+                  }
+                : { xs: 'calc(100vw - 16px)', sm: '420px', md: '450px' },
+            maxWidth: '96vw',
+            bgcolor: 'background.paper',
+            borderRadius: '20px',
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.08)',
+            boxShadow: (theme) =>
+              theme.palette.mode === 'dark'
+                ? '0 25px 60px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                : '0 25px 60px -15px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.04)',
+            zIndex: 1300,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            transition:
+              'width 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s ease',
+          }}
+        >
+          {/* Top Header Bar with Segmented Control and Close Button */}
+          <Box
             sx={{
-              color: 'text.secondary',
-              '&:hover': {
-                bgcolor: theme.palette.action.hover,
-                color: theme.palette.text.primary,
-              },
+              height: '58px',
+              minHeight: '58px',
+              px: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.02)'
+                  : 'rgba(0, 0, 0, 0.01)',
+              flexShrink: 0,
             }}
           >
-            {isRightSidebarOpen ? (
-              <ChevronRight sx={{ fontSize: 18 }} />
-            ) : (
-              <ChevronLeft />
-            )}
-          </IconButton>
-        </Box>
-      </SidebarHeaderTop>
-
-      {isRightSidebarOpen && (
-        <SidebarBody>
-          {activeInsightView ? (
+            {/* Segmented Control Switcher */}
             <Box
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                overflow: 'hidden',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5,
+                p: '3px',
+                borderRadius: '12px',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.05)'
+                    : 'rgba(0, 0, 0, 0.04)',
+                border: '1px solid',
+                borderColor: 'divider',
               }}
             >
-              <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 0.5 }}>
-                {activeInsightView === 'outline' ? (
+              {/* Tab: Outline */}
+              <Button
+                onClick={() => setActiveInsightView('outline')}
+                startIcon={<TocIcon sx={{ fontSize: 16 }} />}
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  minWidth: 0,
+                  borderRadius: '9px',
+                  fontSize: '12px',
+                  fontWeight: activeInsightView === 'outline' ? 700 : 500,
+                  textTransform: 'none',
+                  color:
+                    activeInsightView === 'outline'
+                      ? 'primary.main'
+                      : 'text.secondary',
+                  bgcolor:
+                    activeInsightView === 'outline'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(19, 127, 236, 0.2)'
+                            : 'rgba(19, 127, 236, 0.1)'
+                      : 'transparent',
+                  boxShadow:
+                    activeInsightView === 'outline'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? '0 1px 4px rgba(0,0,0,0.3)'
+                            : '0 1px 3px rgba(0,0,0,0.06)'
+                      : 'none',
+                  '&:hover': {
+                    bgcolor:
+                      activeInsightView === 'outline'
+                        ? (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.15)'
+                        : 'action.hover',
+                  },
+                }}
+              >
+                Outline
+              </Button>
+
+              {/* Tab: Grafo */}
+              <Button
+                onClick={() => setActiveInsightView('graph')}
+                startIcon={<HubIcon sx={{ fontSize: 15 }} />}
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  minWidth: 0,
+                  borderRadius: '9px',
+                  fontSize: '12px',
+                  fontWeight: activeInsightView === 'graph' ? 700 : 500,
+                  textTransform: 'none',
+                  color:
+                    activeInsightView === 'graph'
+                      ? 'primary.main'
+                      : 'text.secondary',
+                  bgcolor:
+                    activeInsightView === 'graph'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(19, 127, 236, 0.2)'
+                            : 'rgba(19, 127, 236, 0.1)'
+                      : 'transparent',
+                  boxShadow:
+                    activeInsightView === 'graph'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? '0 1px 4px rgba(0,0,0,0.3)'
+                            : '0 1px 3px rgba(0,0,0,0.06)'
+                      : 'none',
+                  '&:hover': {
+                    bgcolor:
+                      activeInsightView === 'graph'
+                        ? (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.15)'
+                        : 'action.hover',
+                  },
+                }}
+              >
+                Grafo
+              </Button>
+
+              {/* Tab: Stats */}
+              <Button
+                onClick={() => setActiveInsightView('stats')}
+                startIcon={<BarChartIcon sx={{ fontSize: 16 }} />}
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  minWidth: 0,
+                  borderRadius: '9px',
+                  fontSize: '12px',
+                  fontWeight: activeInsightView === 'stats' ? 700 : 500,
+                  textTransform: 'none',
+                  color:
+                    activeInsightView === 'stats'
+                      ? 'primary.main'
+                      : 'text.secondary',
+                  bgcolor:
+                    activeInsightView === 'stats'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(19, 127, 236, 0.2)'
+                            : 'rgba(19, 127, 236, 0.1)'
+                      : 'transparent',
+                  boxShadow:
+                    activeInsightView === 'stats'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? '0 1px 4px rgba(0,0,0,0.3)'
+                            : '0 1px 3px rgba(0,0,0,0.06)'
+                      : 'none',
+                  '&:hover': {
+                    bgcolor:
+                      activeInsightView === 'stats'
+                        ? (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.15)'
+                        : 'action.hover',
+                  },
+                }}
+              >
+                Stats
+              </Button>
+            </Box>
+
+            {/* Close Button ✕ */}
+            <IconButton
+              onClick={() => setIsRightSidebarOpen(false)}
+              size="small"
+              sx={{
+                color: 'text.secondary',
+                p: 0.75,
+                '&:hover': {
+                  color: 'text.primary',
+                  bgcolor: 'action.hover',
+                },
+              }}
+            >
+              <CloseIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Box>
+
+          {/* Main Content Area */}
+          {activeInsightView === 'graph' ? (
+            <Box
+              sx={{
+                flex: 1,
+                height: 'calc(100% - 58px)',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <NoteGraphView
+                rootLabel={noteTitle}
+                headings={headings}
+                markdownContent={markdownContent}
+                rootIcon={activeIcon}
+                onJump={handleJumpToHeading}
+              />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                flex: 1,
+                overflowY: 'auto',
+                p: '18px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                '&::-webkit-scrollbar': {
+                  width: '6px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.12)'
+                      : 'rgba(0, 0, 0, 0.12)',
+                  borderRadius: '10px',
+                },
+              }}
+            >
+              {activeInsightView === 'outline' && (
+                <Box sx={{ flexGrow: 1 }}>
                   <NoteOutlineList
                     headings={headings}
                     onJump={handleJumpToHeading}
                   />
-                ) : (
-                  <NoteGraphView
-                    rootLabel={selectTask?.title || 'This note'}
-                    headings={headings}
-                    onJump={handleJumpToHeading}
-                  />
-                )}
-              </Box>
-            </Box>
-          ) : (
-            <>
-              {selectTask ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flexGrow: 1,
-                    height: 'calc(100% - 50px)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <MetadataSection
-                    sx={{ flexGrow: 1, overflowY: 'auto', pr: 0.5 }}
+                </Box>
+              )}
+
+              {activeInsightView === 'stats' && (
+                <>
+                  {/* Document Header Pill Card */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 1.5,
+                      px: 1.75,
+                      py: 1.25,
+                      borderRadius: '12px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(19, 127, 236, 0.12)'
+                          : 'rgba(19, 127, 236, 0.05)',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(19, 127, 236, 0.3)'
+                          : 'rgba(19, 127, 236, 0.18)',
+                    }}
                   >
-                    <Box sx={{ mb: 3 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.25,
+                        minWidth: 0,
+                        flex: 1,
+                      }}
+                    >
+                      {/* Dynamic Document / Folder Icon */}
                       <Box
-                        display="flex"
-                        alignItems="flex-start"
-                        justifyContent="space-between"
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '8px',
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.12)',
+                          color: 'primary.main',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '18px',
+                          flexShrink: 0,
+                        }}
                       >
+                        {activeIcon ? (
+                          <span>{activeIcon}</span>
+                        ) : (
+                          <DocIcon
+                            sx={{ fontSize: 18, color: 'primary.main' }}
+                          />
+                        )}
+                      </Box>
+
+                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                        {currentFolder?.name && (
+                          <Typography
+                            noWrap
+                            sx={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: 'text.secondary',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.4px',
+                              lineHeight: 1.15,
+                              mb: 0.2,
+                            }}
+                          >
+                            {currentFolder.emoji
+                              ? `${currentFolder.emoji} `
+                              : '📁 '}
+                            {currentFolder.name}
+                          </Typography>
+                        )}
                         <Typography
-                          variant="h6"
+                          noWrap
                           sx={{
-                            fontWeight: 800,
-                            color: 'text.primary',
-                            lineHeight: 1.25,
-                            fontSize: '1.25rem',
-                            letterSpacing: '-0.02em',
-                            flex: 1,
+                            fontWeight: 750,
+                            fontSize: '13px',
+                            color: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#93c5fd'
+                                : '#1e40af',
+                            lineHeight: 1.2,
                           }}
                         >
-                          {selectTask.title}
+                          {noteTitle}
                         </Typography>
-                        {onUnlinkTask && !isReadOnly && (
-                          <IconButton
-                            size="small"
-                            onClick={onUnlinkTask}
-                            sx={{
-                              color: 'text.secondary',
-                              ml: 1,
-                              '&:hover': {
-                                color: 'error.main',
-                                backgroundColor: `${theme.palette.error.main}12`,
-                              },
-                            }}
-                            title="Unlink task"
-                          >
-                            <LinkOffIcon sx={{ fontSize: 18 }} />
-                          </IconButton>
-                        )}
                       </Box>
                     </Box>
 
-                    <PropertyGrid id="joyride-editor-metadata">
-                      <PropertyCard>
-                        <PropertyLabel>STATUS</PropertyLabel>
-                        <PropertyValue
-                          onClick={isReadOnly ? undefined : handleStatusClick}
-                          sx={{
-                            cursor: isReadOnly ? 'default' : 'pointer',
-                            justifyContent: 'flex-start',
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 0.75,
-                              px: 1.25,
-                              py: 0.35,
-                              borderRadius: '12px',
-                              bgcolor:
-                                currentStatus === 'Done'
-                                  ? '#dcfce7'
-                                  : `${getStatusColor(currentStatus)}15`,
-                              color:
-                                currentStatus === 'Done'
-                                  ? '#166534'
-                                  : getStatusColor(currentStatus),
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                width: 6,
-                                height: 6,
-                                borderRadius: '50%',
-                                bgcolor:
-                                  currentStatus === 'Done'
-                                    ? '#166534'
-                                    : getStatusColor(currentStatus),
-                              }}
-                            />
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                fontWeight: 700,
-                                fontSize: '11px',
-                                lineHeight: 1,
-                              }}
-                            >
-                              {currentStatus}
-                            </Typography>
-                          </Box>
-                        </PropertyValue>
-                      </PropertyCard>
-
-                      <PropertyCard>
-                        <PropertyLabel>PRIORITY</PropertyLabel>
-                        <PropertyValue
-                          onClick={isReadOnly ? undefined : handlePriorityClick}
-                          sx={{
-                            cursor: isReadOnly ? 'default' : 'pointer',
-                          }}
-                        >
-                          <FlagIcon
-                            sx={{
-                              fontSize: 14,
-                              color: getPriorityColor(
-                                Number(currentPriorityLevel),
-                              ),
-                            }}
-                          />
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontWeight: 700,
-                              fontSize: '11px',
-                              letterSpacing: '0.5px',
-                              textTransform: 'uppercase',
-                              color: getPriorityColor(
-                                Number(currentPriorityLevel),
-                              ),
-                            }}
-                          >
-                            {getPriorityFromLevel(
-                              Number(currentPriorityLevel),
-                            ) === 'No priority'
-                              ? 'NONE'
-                              : getPriorityFromLevel(
-                                  Number(currentPriorityLevel),
-                                )}
-                          </Typography>
-                        </PropertyValue>
-                      </PropertyCard>
-
-                      <PropertyCard>
-                        <PropertyLabel>ESTIMATE</PropertyLabel>
-                        <PropertyValue>
-                          <AccessTimeIcon
-                            sx={{
-                              fontSize: 14,
-                              color: theme.palette.text.secondary,
-                            }}
-                          />
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 600,
-                              fontSize: '13px',
-                              color: 'text.primary',
-                            }}
-                          >
-                            {selectTask?.estimate_timer
-                              ? formatDuration(selectTask.estimate_timer)
-                              : '2h'}
-                          </Typography>
-                        </PropertyValue>
-                      </PropertyCard>
-
-                      <PropertyCard>
-                        <PropertyLabel>REAL TIME</PropertyLabel>
-                        <PropertyValue>
-                          <AccessTimeIcon
-                            sx={{ fontSize: 14, color: '#3b82f6' }}
-                          />
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 600,
-                              fontSize: '13px',
-                              color: '#3b82f6',
-                            }}
-                          >
-                            {selectTask?.real_timer
-                              ? formatDuration(selectTask.real_timer)
-                              : '0h'}
-                          </Typography>
-                        </PropertyValue>
-                      </PropertyCard>
-
-                      {selectTask?.created_at && (
-                        <PropertyCard>
-                          <PropertyLabel>CREATED ON</PropertyLabel>
-                          <PropertyValue>
-                            <PlannedIcon
-                              sx={{
-                                fontSize: 14,
-                                color: theme.palette.text.secondary,
-                              }}
-                            />
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                fontWeight: 600,
-                                fontSize: '13px',
-                                color: 'text.primary',
-                              }}
-                            >
-                              {new Date(
-                                selectTask.created_at,
-                              ).toLocaleDateString(undefined, {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                              })}
-                            </Typography>
-                          </PropertyValue>
-                        </PropertyCard>
-                      )}
-                    </PropertyGrid>
-
-                    {selectTask.links && selectTask.links.length > 0 && (
-                      <>
-                        <SectionSubtitle>Links & Resources</SectionSubtitle>
+                    {/* Auto-updating Revision Pill with Live Status Indicator */}
+                    <Tooltip
+                      title="Versión del documento (actualizada automáticamente al editar)"
+                      arrow
+                    >
+                      <Box
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 0.6,
+                          px: 1.25,
+                          py: 0.4,
+                          borderRadius: '6px',
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.12)',
+                          color: 'primary.main',
+                          fontWeight: 800,
+                          fontSize: '11px',
+                          letterSpacing: '0.2px',
+                          flexShrink: 0,
+                          cursor: 'default',
+                        }}
+                      >
                         <Box
-                          display="flex"
-                          flexDirection="column"
-                          gap={1}
-                          mb={3}
-                        >
-                          {selectTask.links.map((link, index) => (
-                            <ResourceItem key={index}>
-                              <Box
-                                display="flex"
-                                alignItems="center"
-                                gap={1.2}
-                                sx={{ minWidth: 0, flex: 1 }}
-                              >
-                                <LinkIcon
-                                  sx={{
-                                    fontSize: 16,
-                                    color: theme.palette.primary.main,
-                                    flexShrink: 0,
-                                  }}
-                                />
-                                <Box sx={{ minWidth: 0, flex: 1 }}>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      fontWeight: 700,
-                                      color: theme.palette.text.primary,
-                                      lineHeight: 1.2,
-                                      fontSize: '12px',
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                    }}
-                                  >
-                                    {link.title}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: theme.palette.text.secondary,
-                                      display: 'block',
-                                      fontSize: '10px',
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                    }}
-                                  >
-                                    {link.url}
-                                  </Typography>
-                                </Box>
-                              </Box>
-                              <Button
-                                component="a"
-                                size="small"
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                startIcon={<LaunchIcon sx={{ fontSize: 10 }} />}
-                                sx={{
-                                  fontSize: '10px',
-                                  fontWeight: 700,
-                                  textTransform: 'none',
-                                  borderRadius: '6px',
-                                  padding: '4px 10px',
-                                  border: '1px solid',
-                                  borderColor: theme.palette.divider,
-                                  color: theme.palette.text.primary,
-                                  backgroundColor: 'transparent',
-                                  transition: 'all 0.2s ease',
-                                  '&:hover': {
-                                    backgroundColor: theme.palette.action.hover,
-                                    borderColor: theme.palette.text.secondary,
-                                  },
-                                  flexShrink: 0,
-                                  ml: 1,
-                                  ...(link.title
-                                    .toLowerCase()
-                                    .includes('meet') && {
-                                    bgcolor: `${theme.palette.primary.main}15`,
-                                    color: theme.palette.primary.main,
-                                    border: `1px solid ${theme.palette.primary.main}30`,
-                                    '&:hover': {
-                                      bgcolor: `${theme.palette.primary.main}25`,
-                                      borderColor: theme.palette.primary.main,
-                                    },
-                                  }),
-                                }}
-                              >
-                                {link.title.toLowerCase().includes('meet')
-                                  ? 'JOIN'
-                                  : 'OPEN'}
-                              </Button>
-                            </ResourceItem>
-                          ))}
-                        </Box>
-                      </>
-                    )}
+                          sx={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            bgcolor: '#10b981',
+                            boxShadow: '0 0 6px #10b981',
+                          }}
+                        />
+                        v1.{documentRevision}
+                      </Box>
+                    </Tooltip>
+                  </Box>
 
-                    <Box sx={{ mt: 3 }}>
-                      <DescriptionHeader>
-                        <DescriptionIcon sx={{ fontSize: 14 }} />
+                  {/* 2x2 Metric Cards Grid */}
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      gap: 1.5,
+                    }}
+                  >
+                    {/* Card 1: PALABRAS */}
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: '14px',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.03)'
+                            : '#fcfcfd',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 0.5,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: '11px',
+                            color: 'text.disabled',
+                            letterSpacing: '-0.5px',
+                          }}
+                        >
+                          TT
+                        </Typography>
                         <Typography
                           variant="caption"
-                          fontWeight={750}
-                          letterSpacing={1.2}
+                          sx={{
+                            fontWeight: 750,
+                            fontSize: '10px',
+                            letterSpacing: '0.6px',
+                            color: 'text.secondary',
+                            textTransform: 'uppercase',
+                          }}
                         >
-                          DESCRIPTION
+                          PALABRAS
                         </Typography>
-                      </DescriptionHeader>
-                      <DescriptionContainer
-                        dangerouslySetInnerHTML={{
-                          __html:
-                            formatDescriptionToHtml(
-                              selectTask?.notes_encrypted,
-                            ) ||
-                            '<p style="color: grey; font-style: italic; font-size: 13px;">No description provided for this task.</p>',
+                      </Box>
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '26px',
+                          lineHeight: 1.15,
+                          color: 'text.primary',
+                        }}
+                      >
+                        {stats.words.toLocaleString()}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: '#16a34a',
+                          fontWeight: 700,
+                          fontSize: '11px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.3,
+                        }}
+                      >
+                        ↑ +12% hoy
+                      </Typography>
+                    </Box>
+
+                    {/* Card 2: CARACTERES */}
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: '14px',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.03)'
+                            : '#fcfcfd',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 0.5,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: '11px',
+                            color: 'text.disabled',
+                            letterSpacing: '-0.5px',
+                          }}
+                        >
+                          TT
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 750,
+                            fontSize: '10px',
+                            letterSpacing: '0.6px',
+                            color: 'text.secondary',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          CARACTERES
+                        </Typography>
+                      </Box>
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '26px',
+                          lineHeight: 1.15,
+                          color: 'text.primary',
+                        }}
+                      >
+                        {stats.chars.toLocaleString()}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 500,
+                          fontSize: '11px',
+                        }}
+                      >
+                        Sin espacios: {stats.charsNoSpaces.toLocaleString()}
+                      </Typography>
+                    </Box>
+
+                    {/* Card 3: LECTURA */}
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: '14px',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.03)'
+                            : '#fcfcfd',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 0.5,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                        }}
+                      >
+                        <ReadingTimeIcon
+                          sx={{ fontSize: 13, color: 'primary.main' }}
+                        />
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 750,
+                            fontSize: '10px',
+                            letterSpacing: '0.6px',
+                            color: 'primary.main',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          LECTURA
+                        </Typography>
+                      </Box>
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '26px',
+                          lineHeight: 1.15,
+                          color: 'primary.main',
+                        }}
+                      >
+                        {stats.readingTimeMinutes} min
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 500,
+                          fontSize: '11px',
+                        }}
+                      >
+                        Velocidad estándar
+                      </Typography>
+                    </Box>
+
+                    {/* Card 4: ENCABEZADOS */}
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: '14px',
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.03)'
+                            : '#fcfcfd',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 0.5,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: '11px',
+                            color: 'primary.main',
+                          }}
+                        >
+                          T
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 750,
+                            fontSize: '10px',
+                            letterSpacing: '0.6px',
+                            color: 'primary.main',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          ENCABEZADOS
+                        </Typography>
+                      </Box>
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '26px',
+                          lineHeight: 1.15,
+                          color: 'primary.main',
+                        }}
+                      >
+                        {headings.length}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 500,
+                          fontSize: '11px',
+                        }}
+                      >
+                        H1, H2 y H3 activos
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Estructura del Contenido Card */}
+                  <Box
+                    sx={{
+                      p: 2.25,
+                      borderRadius: '16px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.02)'
+                          : '#ffffff',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 750,
+                        fontSize: '11px',
+                        letterSpacing: '0.8px',
+                        color: 'text.secondary',
+                        textTransform: 'uppercase',
+                        display: 'block',
+                        mb: 2,
+                      }}
+                    >
+                      ESTRUCTURA DEL CONTENIDO
+                    </Typography>
+
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1.5,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: '12.5px',
+                            color: 'text.secondary',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Títulos principales (H1)
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: '13px',
+                            color: 'text.primary',
+                          }}
+                        >
+                          {stats.h1Count}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: '12.5px',
+                            color: 'text.secondary',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Secciones (H2)
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: '13px',
+                            color: 'text.primary',
+                          }}
+                        >
+                          {stats.h2Count}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: '12.5px',
+                            color: 'text.secondary',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Subsecciones (H3+)
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: '13px',
+                            color: 'text.primary',
+                          }}
+                        >
+                          {stats.h3Count}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.75,
+                          }}
+                        >
+                          <ParagraphsIcon
+                            sx={{ fontSize: 15, color: 'text.secondary' }}
+                          />
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontSize: '12.5px',
+                              color: 'text.secondary',
+                              fontWeight: 500,
+                            }}
+                          >
+                            Párrafos
+                          </Typography>
+                        </Box>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: '13px',
+                            color: 'text.primary',
+                          }}
+                        >
+                          {stats.paragraphs}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  {/* Índice de Claridad Académica Card */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: '16px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(19, 127, 236, 0.08)'
+                          : 'rgba(19, 127, 236, 0.04)',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(19, 127, 236, 0.25)'
+                          : 'rgba(19, 127, 236, 0.15)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1.25,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                        }}
+                      >
+                        <AutoAwesomeIcon
+                          sx={{ fontSize: 16, color: '#f59e0b' }}
+                        />
+                        <Typography
+                          sx={{
+                            fontWeight: 750,
+                            fontSize: '12.5px',
+                            color: 'text.primary',
+                          }}
+                        >
+                          Índice de Claridad Académica
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          px: 1,
+                          py: 0.2,
+                          borderRadius: '6px',
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(19, 127, 236, 0.25)'
+                              : 'rgba(19, 127, 236, 0.1)',
+                          color: 'primary.main',
+                          fontWeight: 800,
+                          fontSize: '11px',
+                        }}
+                      >
+                        94/100
+                      </Box>
+                    </Box>
+
+                    {/* Progress Bar */}
+                    <Box
+                      sx={{
+                        height: 6,
+                        width: '100%',
+                        borderRadius: 3,
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.1)'
+                            : 'rgba(19, 127, 236, 0.15)',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          height: '100%',
+                          width: '94%',
+                          borderRadius: 3,
+                          bgcolor: 'primary.main',
                         }}
                       />
                     </Box>
-                  </MetadataSection>
-                </Box>
-              ) : (
-                <EmptyStateContainer>
-                  <EmptyStateIconWrapper>
-                    <AssignmentIcon
-                      sx={{
-                        fontSize: 32,
-                        color: theme.palette.primary.main,
-                        filter: `drop-shadow(0 0 8px ${theme.palette.primary.main}50)`,
-                      }}
-                    />
-                  </EmptyStateIconWrapper>
 
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      fontWeight: 800,
-                      color: 'text.primary',
-                      mb: 1,
-                      fontSize: '15px',
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    No Task Linked
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: 'text.secondary',
-                      fontSize: '12.5px',
-                      lineHeight: 1.5,
-                      maxWidth: '240px',
-                      mb: 3,
-                    }}
-                  >
-                    Link a task to track estimate vs actual time, update status,
-                    and manage its description or resources.
-                  </Typography>
-
-                  {setShowPalette && (
-                    <Button
-                      variant="contained"
-                      onClick={() => setShowPalette(true)}
-                      startIcon={<SearchIcon sx={{ fontSize: 16 }} />}
-                      sx={{
-                        textTransform: 'none',
-                        bgcolor: theme.palette.primary.main,
-                        color: '#ffffff',
-                        px: 3,
-                        py: 1,
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        fontSize: '12px',
-                        boxShadow: `0 4px 12px ${theme.palette.primary.main}30`,
-                        transition: 'all 0.2s ease-in-out',
-                        '&:hover': {
-                          bgcolor: theme.palette.primary.dark,
-                          transform: 'translateY(-1.5px)',
-                          boxShadow: `0 6px 16px ${theme.palette.primary.main}45`,
-                        },
-                      }}
-                    >
-                      Link a Task
-                    </Button>
-                  )}
-
-                  <EmptyStateTipCard>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <TipIcon sx={{ fontSize: 14, color: 'warning.main' }} />
-                      <Typography
-                        variant="caption"
-                        fontWeight={750}
-                        color="warning.main"
-                        letterSpacing={0.5}
-                      >
-                        QUICK TIP
-                      </Typography>
-                    </Box>
                     <Typography
                       variant="caption"
-                      color="text.secondary"
                       sx={{
-                        textAlign: 'left',
+                        color: 'text.secondary',
                         fontSize: '11px',
-                        lineHeight: 1.4,
+                        lineHeight: 1.45,
                       }}
                     >
-                      Use the search bar at the top of this editor to quickly
-                      search and link tasks from your workspaces.
+                      Alta densidad de citas científicas. Estructura balanceada
+                      y óptima para revisión por pares.
                     </Typography>
-                  </EmptyStateTipCard>
-                </EmptyStateContainer>
+                  </Box>
+                </>
               )}
+            </Box>
+          )}
 
-              <Box sx={{ flexGrow: 1, minHeight: '20px' }} />
-
-              {selectTask && (
+          {/* Bottom Footer Bar */}
+          {activeInsightView !== 'graph' && (
+            <Box
+              sx={{
+                mt: 'auto',
+                px: 2.25,
+                py: 1.5,
+                borderTop: '1px solid',
+                borderColor: 'divider',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.01)'
+                    : 'rgba(0, 0, 0, 0.01)',
+                flexShrink: 0,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                 <Box
                   sx={{
-                    display: 'flex',
-                    gap: 1.5,
-                    flexDirection: 'column',
-                    mt: 'auto',
-                    pt: 2,
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    bgcolor: '#22c55e',
+                    boxShadow: '0 0 6px rgba(34, 197, 94, 0.5)',
+                  }}
+                />
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    fontSize: '11.5px',
+                    fontWeight: 500,
                   }}
                 >
-                  <MarkDoneButton
-                    disabled={!selectTask || isReadOnly}
-                    onClick={handleMarkDone}
-                    startIcon={
-                      currentStatus === 'Done' ? (
-                        <CheckCircleIcon
-                          sx={{ fontSize: 16, color: '#15803d !important' }}
-                        />
-                      ) : undefined
-                    }
-                    sx={{
-                      py: 1.4,
-                      fontSize: '11px',
-                      borderRadius: '12px',
-                      fontWeight: 800,
-                      letterSpacing: '0.5px',
-                      ...(currentStatus === 'Done'
-                        ? {
-                            bgcolor: '#dcfce7 !important',
-                            color: '#15803d !important',
-                            border:
-                              '1px solid rgba(21, 128, 61, 0.2) !important',
-                            '&:hover': {
-                              bgcolor: '#bbf7d0 !important',
-                            },
-                          }
-                        : {
-                            bgcolor: (theme) =>
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255,255,255,0.06)'
-                                : '#f1f5f9',
-                            color: 'text.primary',
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            '&:hover': {
-                              bgcolor: (theme) =>
-                                theme.palette.mode === 'dark'
-                                  ? 'rgba(255,255,255,0.1)'
-                                  : '#e2e8f0',
-                            },
-                          }),
-                    }}
-                  >
-                    {currentStatus === 'Done' ? 'COMPLETED' : 'Mark As Done'}
-                  </MarkDoneButton>
-                </Box>
-              )}
-            </>
+                  Sincronizado en tiempo real
+                </Typography>
+              </Box>
+
+              <Typography
+                component="button"
+                onClick={() => setIsRightSidebarOpen(false)}
+                sx={{
+                  background: 'none',
+                  border: 'none',
+                  p: 0,
+                  cursor: 'pointer',
+                  color: 'text.secondary',
+                  fontSize: '11.5px',
+                  fontWeight: 500,
+                  '&:hover': {
+                    color: 'text.primary',
+                    textDecoration: 'underline',
+                  },
+                }}
+              >
+                Ocultar panel
+              </Typography>
+            </Box>
           )}
-        </SidebarBody>
-      )}
-
-      <Menu
-        anchorEl={priorityAnchor}
-        open={Boolean(priorityAnchor)}
-        onClose={() => setPriorityAnchor(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '10px',
-            minWidth: '150px',
-            mt: 0.5,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-            border: '1px solid',
-            borderColor: 'divider',
-            backgroundImage: 'none',
-          },
-        }}
-      >
-        {(['High', 'Med', 'Low', 'No priority'] as PriorityType[]).map((p) => (
-          <MenuItem
-            key={p}
-            onClick={() => handlePrioritySelect(getPriorityLevel(p))}
-            sx={{
-              gap: 1.2,
-              py: 1,
-              px: 1.5,
-              borderRadius: '6px',
-              mx: 0.8,
-              my: 0.3,
-              fontSize: '12px',
-            }}
-          >
-            <FlagIcon
-              sx={{
-                fontSize: 16,
-                color: getPriorityColor(getPriorityLevel(p)),
-              }}
-            />
-            <Typography variant="body2" fontWeight={600} fontSize="12px">
-              {p === 'No priority' ? 'No Priority' : p}
-            </Typography>
-          </MenuItem>
-        ))}
-      </Menu>
-
-      <Menu
-        anchorEl={statusAnchor}
-        open={Boolean(statusAnchor)}
-        onClose={() => setStatusAnchor(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '10px',
-            minWidth: '160px',
-            mt: 0.5,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-            border: '1px solid',
-            borderColor: 'divider',
-            backgroundImage: 'none',
-          },
-        }}
-      >
-        {[
-          'Todo',
-          'Planning',
-          'Scheduled',
-          'Pending',
-          'On Hold',
-          'Review',
-          'Done',
-          'Backlog',
-          'Archived',
-        ].map((s) => (
-          <MenuItem
-            key={s}
-            onClick={() => handleStatusSelect(s)}
-            sx={{
-              gap: 1.2,
-              py: 1,
-              px: 1.5,
-              borderRadius: '6px',
-              mx: 0.8,
-              my: 0.3,
-              fontSize: '12px',
-            }}
-          >
-            {s === 'Todo' && (
-              <RadioButtonUncheckedIcon
-                sx={{ fontSize: 16, color: 'text.secondary' }}
-              />
-            )}
-            {s === 'Planning' && (
-              <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />
-            )}
-            {s === 'Scheduled' && (
-              <PlannedIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />
-            )}
-            {s === 'Pending' && (
-              <PauseCircleIcon sx={{ fontSize: 16, color: 'warning.main' }} />
-            )}
-            {s === 'On Hold' && (
-              <PauseCircleIcon sx={{ fontSize: 16, color: 'error.main' }} />
-            )}
-            {s === 'Review' && (
-              <VisibilityIcon sx={{ fontSize: 16, color: '#06b6d4' }} />
-            )}
-            {s === 'Done' && (
-              <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
-            )}
-            {s === 'Backlog' && (
-              <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-            )}
-            {s === 'Archived' && (
-              <HistoryIcon sx={{ fontSize: 16, color: '#4b5563' }} />
-            )}
-            <Typography variant="body2" fontWeight={600} fontSize="12px">
-              {s}
-            </Typography>
-          </MenuItem>
-        ))}
-      </Menu>
-    </RightSidebar>
+        </Box>
+      </Slide>
+    </>
   );
 };

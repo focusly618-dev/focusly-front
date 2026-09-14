@@ -15,7 +15,6 @@ import {
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
-  Flag as FlagIcon,
   Groups as GroupsIcon,
   Category as CategoryIcon,
   RadioButtonUnchecked as TodoIcon,
@@ -41,6 +40,11 @@ import {
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { format, isSameDay } from 'date-fns';
 import { surfaceColor } from '@/context';
+import {
+  PriorityBadge,
+  PRIORITY_OPTIONS,
+  getPriorityConfig,
+} from '@/components/ui';
 import {
   propertyRowSx,
   propertyLabelSx,
@@ -77,14 +81,14 @@ import {
 import {
   triggerDurationError,
   sanitizeDurationValue,
-  getPriorityColor,
 } from './TaskProperties.utils';
+import type { PriorityType } from '../../TaskDetailModal.utils';
 
 interface TaskPropertiesProps {
   status: TaskStatus;
   setStatus: (s: TaskStatus) => void;
   priority: string;
-  setPriority: (p: 'High' | 'Med' | 'Low' | 'No priority') => void;
+  setPriority: (p: PriorityType) => void;
   category: string;
   setCategory: (c: string) => void;
   color: string;
@@ -230,7 +234,7 @@ export const TaskProperties = ({
         {/* Priority */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <FlagIcon sx={{ fontSize: 16, color: '#ef4444' }} />
+            <PriorityBadge priority={priority} size={18} />
             <Typography
               variant="caption"
               sx={{ fontSize: '14px', fontWeight: 500 }}
@@ -240,8 +244,8 @@ export const TaskProperties = ({
           </Box>
           <Box sx={propertyValueSx}>
             <Chip
-              icon={<FlagIcon sx={{ fontSize: 16 }} />}
-              label={priority || 'No priority'}
+              icon={<PriorityBadge priority={priority} size={16} />}
+              label={getPriorityConfig(priority).label}
               onClick={(e) => isOwner && setPriorityAnchor(e.currentTarget)}
               sx={{
                 ...getSelectionChipSx('priority', priority || 'No priority'),
@@ -784,268 +788,267 @@ export const TaskProperties = ({
                 </Typography>
               )}
             </Box>
+          </Box>
+        </Box>
 
-            {/* Real Duration */}
-            <Box display="flex" flexDirection="column" gap={0.5}>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.secondary',
-                  fontSize: '12px',
+        {/* Real Duration (Tracked) — Full Width */}
+        <Box
+          display="flex"
+          flexDirection="column"
+          gap={0.5}
+          sx={{ width: '100%' }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}
+          >
+            Real Duration (Tracked)
+          </Typography>
+          <Box
+            onClick={(e) => {
+              if (!isOwner) return;
+              setTimeLogAnchor((prev) => (prev ? null : e.currentTarget));
+            }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              gap: 1,
+              py: 1,
+              px: 1.5,
+              borderRadius: '10px',
+              border: '1px solid',
+              borderColor: 'divider',
+              bgcolor: (theme) =>
+                surfaceColor(theme, '#1A1F2B', '#1F1F20', 'background.paper'),
+              minHeight: '43px',
+              cursor: isOwner ? 'pointer' : 'default',
+              transition: 'all 0.2s',
+              '&:hover': {
+                borderColor: !isOwner ? 'divider' : 'primary.main',
+              },
+            }}
+          >
+            <HistoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+            <TextField
+              variant="standard"
+              value={realTime}
+              disabled={!isOwner}
+              placeholder="No time logged"
+              InputProps={{
+                disableUnderline: true,
+                readOnly: true,
+              }}
+              sx={{
+                flex: 1,
+                pointerEvents: 'none',
+                '& .MuiInputBase-input': {
+                  fontSize: '14px',
                   fontWeight: 600,
-                }}
-              >
-                Real Duration (Tracked)
-              </Typography>
+                  color: 'text.primary',
+                  padding: 0,
+                },
+              }}
+            />
+          </Box>
+          <Popover
+            open={Boolean(timeLogAnchor)}
+            anchorEl={timeLogAnchor}
+            onClose={() => setTimeLogAnchor(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            slotProps={{ paper: { sx: timeLogPopoverPaperSx } }}
+          >
+            <Box onClick={(e) => e.stopPropagation()}>
               <Box
-                onClick={(e) => {
-                  if (!isOwner) return;
-                  setTimeLogAnchor((prev) => (prev ? null : e.currentTarget));
-                }}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1,
-                  py: 1,
-                  px: 1.5,
-                  borderRadius: '10px',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  bgcolor: (theme) =>
-                    surfaceColor(
-                      theme,
-                      '#1A1F2B',
-                      '#1F1F20',
-                      'background.paper',
-                    ),
-                  minHeight: '43px',
-                  cursor: isOwner ? 'pointer' : 'default',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    borderColor: !isOwner ? 'divider' : 'primary.main',
-                  },
+                  justifyContent: 'space-between',
+                  mb: 0.5,
                 }}
               >
-                <HistoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-                <TextField
-                  variant="standard"
-                  value={realTime}
-                  disabled={!isOwner}
-                  placeholder="No time logged"
-                  InputProps={{
-                    disableUnderline: true,
-                    readOnly: true,
-                  }}
+                <Typography
+                  variant="caption"
                   sx={{
-                    flex: 1,
-                    pointerEvents: 'none',
-                    '& .MuiInputBase-input': {
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: 'text.primary',
-                      padding: 0,
-                    },
+                    fontWeight: 700,
+                    color: 'text.secondary',
+                    fontSize: '11px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
                   }}
-                />
+                >
+                  Log time
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={() => setTimeLogAnchor(null)}
+                  sx={{
+                    p: 0.25,
+                    color: 'text.secondary',
+                    '&:hover': { color: 'text.primary' },
+                  }}
+                >
+                  <CloseIcon sx={{ fontSize: 14 }} />
+                </IconButton>
               </Box>
-              <Popover
-                open={Boolean(timeLogAnchor)}
-                anchorEl={timeLogAnchor}
-                onClose={() => setTimeLogAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                slotProps={{ paper: { sx: timeLogPopoverPaperSx } }}
-              >
-                <Box onClick={(e) => e.stopPropagation()}>
+              <Box sx={{ display: 'flex', gap: 0.75, mt: 1 }}>
+                <Box sx={{ position: 'relative', flex: 1 }}>
                   <Box
+                    onClick={() => setNewLogDatePickerOpen(true)}
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 0.5,
+                      gap: 0.5,
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      py: 0.75,
+                      px: 1,
+                      borderRadius: '8px',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontWeight: 700,
-                        color: 'text.secondary',
-                        fontSize: '11px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      Log time
-                    </Typography>
-                    <IconButton
-                      size="small"
-                      onClick={() => setTimeLogAnchor(null)}
-                      sx={{
-                        p: 0.25,
-                        color: 'text.secondary',
-                        '&:hover': { color: 'text.primary' },
-                      }}
-                    >
-                      <CloseIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 0.75, mt: 1 }}>
-                    <Box sx={{ position: 'relative', flex: 1 }}>
-                      <Box
-                        onClick={() => setNewLogDatePickerOpen(true)}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          py: 0.75,
-                          px: 1,
-                          borderRadius: '8px',
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          cursor: 'pointer',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <PlannedIcon
-                          sx={{ fontSize: 14, color: 'text.disabled' }}
-                        />
-                        {newLogDate ? format(newLogDate, 'MMM d') : 'Date'}
-                      </Box>
-                      <DatePicker
-                        open={newLogDatePickerOpen}
-                        onClose={() => setNewLogDatePickerOpen(false)}
-                        value={newLogDate}
-                        onChange={(newValue) => {
-                          setNewLogDate(newValue);
-                          setNewLogDatePickerOpen(false);
-                        }}
-                        slotProps={{
-                          textField: {
-                            sx: {
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              width: '100%',
-                              height: '100%',
-                              opacity: 0,
-                              pointerEvents: 'none',
-                            },
-                          },
-                          popper: {
-                            sx: datePickerPopperSx,
-                            placement: 'bottom-start',
-                          },
-                          desktopPaper: {
-                            sx: datePickerPaperSx,
-                          },
-                        }}
-                      />
-                    </Box>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      value={newLogDuration}
-                      onChange={(e) =>
-                        setNewLogDuration(sanitizeDurationValue(e.target.value))
-                      }
-                      placeholder="2h"
-                      sx={{
-                        width: 64,
-                        '& .MuiInputBase-input': {
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          py: 0.85,
-                          px: 1,
-                        },
-                      }}
+                    <PlannedIcon
+                      sx={{ fontSize: 14, color: 'text.disabled' }}
                     />
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        const minutes = parseDuration(newLogDuration);
-                        if (minutes > 0 && newLogDate) {
-                          handleAddTimeLog(
-                            format(newLogDate, 'yyyy-MM-dd'),
-                            minutes,
-                          );
-                          setNewLogDuration('');
-                        }
-                      }}
-                      sx={{
-                        bgcolor: 'primary.main',
-                        color: '#fff',
-                        borderRadius: '8px',
-                        '&:hover': { bgcolor: 'primary.dark' },
-                      }}
-                    >
-                      <AddIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
+                    {newLogDate ? format(newLogDate, 'MMM d') : 'Date'}
                   </Box>
-
-                  {timeLogs.length > 0 ? (
-                    <List
-                      dense
-                      sx={{ py: 0, mt: 1, maxHeight: 200, overflowY: 'auto' }}
-                    >
-                      {timeLogs
-                        .map((entry, index) => ({ entry, index }))
-                        .sort((a, b) =>
-                          b.entry.date.localeCompare(a.entry.date),
-                        )
-                        .map(({ entry, index }) => (
-                          <MenuItem
-                            key={`${entry.date}-${index}`}
-                            disableRipple
-                            sx={{ px: 0.5, cursor: 'default' }}
-                          >
-                            <ListItemText
-                              primary={format(
-                                new Date(`${entry.date}T00:00:00`),
-                                'EEE, MMM d',
-                              )}
-                              secondary={formatDuration(entry.minutes)}
-                              primaryTypographyProps={{
-                                fontSize: '12px',
-                                fontWeight: 600,
-                              }}
-                              secondaryTypographyProps={{
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                color: 'text.primary',
-                              }}
-                            />
-                            {isOwner && (
-                              <IconButton
-                                size="small"
-                                onClick={() => handleRemoveTimeLog(index)}
-                                sx={{ p: 0.3 }}
-                              >
-                                <CloseIcon sx={{ fontSize: 14 }} />
-                              </IconButton>
-                            )}
-                          </MenuItem>
-                        ))}
-                    </List>
-                  ) : (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: 'block',
-                        mt: 1.5,
-                        mb: 0.5,
-                        color: 'text.disabled',
-                        fontStyle: 'italic',
-                      }}
-                    >
-                      No time logged yet.
-                    </Typography>
-                  )}
+                  <DatePicker
+                    open={newLogDatePickerOpen}
+                    onClose={() => setNewLogDatePickerOpen(false)}
+                    value={newLogDate}
+                    onChange={(newValue) => {
+                      setNewLogDate(newValue);
+                      setNewLogDatePickerOpen(false);
+                    }}
+                    slotProps={{
+                      textField: {
+                        sx: {
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          opacity: 0,
+                          pointerEvents: 'none',
+                        },
+                      },
+                      popper: {
+                        sx: datePickerPopperSx,
+                        placement: 'bottom-start',
+                      },
+                      desktopPaper: {
+                        sx: datePickerPaperSx,
+                      },
+                    }}
+                  />
                 </Box>
-              </Popover>
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  value={newLogDuration}
+                  onChange={(e) =>
+                    setNewLogDuration(sanitizeDurationValue(e.target.value))
+                  }
+                  placeholder="2h"
+                  sx={{
+                    width: 64,
+                    '& .MuiInputBase-input': {
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      py: 0.85,
+                      px: 1,
+                    },
+                  }}
+                />
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    const minutes = parseDuration(newLogDuration);
+                    if (minutes > 0 && newLogDate) {
+                      handleAddTimeLog(
+                        format(newLogDate, 'yyyy-MM-dd'),
+                        minutes,
+                      );
+                      setNewLogDuration('');
+                    }
+                  }}
+                  sx={{
+                    bgcolor: 'primary.main',
+                    color: '#fff',
+                    borderRadius: '8px',
+                    '&:hover': { bgcolor: 'primary.dark' },
+                  }}
+                >
+                  <AddIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Box>
+
+              {timeLogs.length > 0 ? (
+                <List
+                  dense
+                  sx={{ py: 0, mt: 1, maxHeight: 200, overflowY: 'auto' }}
+                >
+                  {timeLogs
+                    .map((entry, index) => ({ entry, index }))
+                    .sort((a, b) => b.entry.date.localeCompare(a.entry.date))
+                    .map(({ entry, index }) => (
+                      <MenuItem
+                        key={`${entry.date}-${index}`}
+                        disableRipple
+                        sx={{ px: 0.5, cursor: 'default' }}
+                      >
+                        <ListItemText
+                          primary={format(
+                            new Date(`${entry.date}T00:00:00`),
+                            'EEE, MMM d',
+                          )}
+                          secondary={formatDuration(entry.minutes)}
+                          primaryTypographyProps={{
+                            fontSize: '12px',
+                            fontWeight: 600,
+                          }}
+                          secondaryTypographyProps={{
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: 'text.primary',
+                          }}
+                        />
+                        {isOwner && (
+                          <IconButton
+                            size="small"
+                            onClick={() => handleRemoveTimeLog(index)}
+                            sx={{ p: 0.3 }}
+                          >
+                            <CloseIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        )}
+                      </MenuItem>
+                    ))}
+                </List>
+              ) : (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    mt: 1.5,
+                    mb: 0.5,
+                    color: 'text.disabled',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  No time logged yet.
+                </Typography>
+              )}
             </Box>
-          </Box>
+          </Popover>
         </Box>
 
         {/* Visual Timeline Badge */}
@@ -1204,20 +1207,20 @@ export const TaskProperties = ({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         PaperProps={{ sx: popoverPaperSx }}
       >
-        <Stack sx={{ p: 1, minWidth: '150px' }}>
-          {['High', 'Med', 'Low', 'No priority'].map((p) => (
+        <Stack sx={{ p: 1, minWidth: '160px' }}>
+          {PRIORITY_OPTIONS.map((pOpt) => (
             <MenuItem
-              key={p}
+              key={pOpt.id}
               onClick={() => {
-                setPriority(p as 'High' | 'Med' | 'Low' | 'No priority');
+                setPriority(pOpt.id as PriorityType);
                 setPriorityAnchor(null);
               }}
               sx={{ borderRadius: '8px', py: 1 }}
             >
               <Box display="flex" alignItems="center" gap={1.5}>
-                <FlagIcon sx={{ fontSize: 18, color: getPriorityColor(p) }} />
+                <PriorityBadge priority={pOpt.id} size={24} />
                 <Typography variant="body2" fontWeight={500}>
-                  {p}
+                  {pOpt.label}
                 </Typography>
               </Box>
             </MenuItem>

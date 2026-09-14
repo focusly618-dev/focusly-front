@@ -229,6 +229,63 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
         fontSize: '0.85em',
       },
+
+      // Target paragraph highlight from Graph Jump
+      '.cm-target-line-glow': {
+        position: 'relative',
+        borderRadius: '8px',
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          isDark ? 0.25 : 0.16,
+        ),
+        borderLeft: `5px solid ${theme.palette.primary.main} !important`,
+        boxShadow: isDark
+          ? `0 0 28px ${alpha(theme.palette.primary.main, 0.45)}, inset 0 0 16px ${alpha(theme.palette.primary.main, 0.2)}`
+          : `0 0 22px ${alpha(theme.palette.primary.main, 0.3)}, inset 0 0 10px ${alpha(theme.palette.primary.main, 0.15)}`,
+        animation:
+          'cmTargetPulse 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important',
+        transition: 'all 0.3s ease',
+      },
+      '.cm-target-text-glow': {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          isDark ? 0.35 : 0.25,
+        ),
+        borderRadius: '4px',
+        padding: '2px 6px',
+        fontWeight: 700,
+        boxShadow: `0 0 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+      },
+      '@keyframes cmTargetPulse': {
+        '0%': {
+          backgroundColor: alpha(
+            theme.palette.primary.main,
+            isDark ? 0.45 : 0.35,
+          ),
+          boxShadow: `0 0 35px ${alpha(theme.palette.primary.main, 0.75)}, inset 0 0 20px ${alpha(theme.palette.primary.main, 0.3)}`,
+          transform: 'scale(1.008)',
+        },
+        '30%': {
+          backgroundColor: alpha(
+            theme.palette.primary.main,
+            isDark ? 0.32 : 0.24,
+          ),
+          boxShadow: `0 0 26px ${alpha(theme.palette.primary.main, 0.5)}`,
+        },
+        '70%': {
+          backgroundColor: alpha(
+            theme.palette.primary.main,
+            isDark ? 0.16 : 0.1,
+          ),
+          boxShadow: `0 0 14px ${alpha(theme.palette.primary.main, 0.25)}`,
+        },
+        '100%': {
+          backgroundColor: 'transparent',
+          boxShadow: 'none',
+          borderLeft: '5px solid transparent',
+          transform: 'scale(1)',
+        },
+      },
     },
     { dark: isDark },
   );

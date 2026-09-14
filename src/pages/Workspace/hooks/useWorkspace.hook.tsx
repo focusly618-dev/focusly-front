@@ -13,7 +13,7 @@ import {
 import { useWorkspaceForm } from './useWorkspaceForm.hook';
 import { useWorkspaceTasks } from './useWorkspaceTasks.hook';
 import { useWorkspaceActions } from './useWorkspaceActions.hook';
-import type { WorkspaceTypes } from '../types/workspace.types';
+import type { WorkspaceTypes } from '../workspace.types';
 
 interface UseWorkspaceProps {
   isEditorOpen?: boolean;

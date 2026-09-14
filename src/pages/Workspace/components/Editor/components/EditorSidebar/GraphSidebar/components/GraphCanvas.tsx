@@ -11,7 +11,9 @@ import { GraphNodeItem } from './GraphNodeItem';
 
 interface GraphCanvasProps {
   svgRef: React.RefObject<SVGSVGElement | null>;
-  canvasSize: number;
+  canvasWidth: number;
+  canvasHeight: number;
+  canvasSize?: number;
   zoom: number;
   zoomOrigin: string;
   pan: PanState;
@@ -21,6 +23,7 @@ interface GraphCanvasProps {
   nodeById: Map<string, GraphNode>;
   neighborIds: Set<string> | null;
   hoveredId: string | null;
+  selectedNodeId: string | null;
   settings: GraphSettings;
   onCanvasPointerDown: (e: React.PointerEvent<SVGSVGElement>) => void;
   onNodePointerDown: (node: GraphNode) => (e: React.PointerEvent) => void;
@@ -30,7 +33,8 @@ interface GraphCanvasProps {
 
 export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   svgRef,
-  canvasSize,
+  canvasWidth,
+  canvasHeight,
   zoom,
   zoomOrigin,
   pan,
@@ -40,6 +44,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   nodeById,
   neighborIds,
   hoveredId,
+  selectedNodeId,
   settings,
   onCanvasPointerDown,
   onNodePointerDown,
@@ -47,64 +52,102 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   setHoveredId,
 }) => {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
 
   return (
     <svg
       ref={svgRef}
       width="100%"
-      viewBox={`0 0 ${canvasSize} ${canvasSize}`}
+      height="100%"
+      viewBox={`0 0 ${canvasWidth} ${canvasHeight}`}
+      preserveAspectRatio="xMidYMid meet"
       onPointerDown={onCanvasPointerDown}
       style={{
-        overflow: 'visible',
+        overflow: 'hidden',
         touchAction: 'none',
         userSelect: 'none',
         cursor: isPanning ? 'grabbing' : 'grab',
-        transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-        transformOrigin: zoomOrigin,
-        transition: isPanning ? 'none' : 'transform 0.05s linear',
+        width: '100%',
+        height: '100%',
+        display: 'block',
       }}
     >
       <defs>
-        <marker
-          id="note-graph-arrow"
-          markerWidth="8"
-          markerHeight="8"
-          refX="6"
-          refY="4"
-          orient="auto"
+        <pattern
+          id="note-graph-dots"
+          x="0"
+          y="0"
+          width="28"
+          height="28"
+          patternUnits="userSpaceOnUse"
         >
-          <path d="M0,0 L8,4 L0,8 Z" fill={theme.palette.text.secondary} />
-        </marker>
+          <circle
+            cx="2"
+            cy="2"
+            r="1.6"
+            fill={isDark ? 'rgba(255, 255, 255, 0.18)' : '#94a3b8'}
+          />
+        </pattern>
       </defs>
 
-      {edges.map((edge) => (
-        <GraphEdgeItem
-          key={`${edge.from}-${edge.to}`}
-          edge={edge}
-          nodeById={nodeById}
-          neighborIds={neighborIds}
-          settings={settings}
-        />
-      ))}
+      {/* Background with dotted grid */}
+      <rect
+        x={-canvasWidth * 2}
+        y={-canvasHeight * 2}
+        width={canvasWidth * 5}
+        height={canvasHeight * 5}
+        fill={isDark ? '#090d16' : '#f8fafc'}
+      />
+      <rect
+        x={-canvasWidth * 2}
+        y={-canvasHeight * 2}
+        width={canvasWidth * 5}
+        height={canvasHeight * 5}
+        fill="url(#note-graph-dots)"
+      />
 
-      {nodes.map((node) => {
-        const active = !neighborIds || neighborIds.has(node.id);
-        const isHovered = node.id === hoveredId;
-
-        return (
-          <GraphNodeItem
-            key={node.id}
-            node={node}
-            isHovered={isHovered}
-            active={active}
+      {/* Transformed content container for smooth pan and zoom */}
+      <g
+        style={{
+          transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
+          transformOrigin: zoomOrigin,
+          transition: isPanning ? 'none' : 'transform 0.05s linear',
+        }}
+      >
+        {/* Render edges */}
+        {edges.map((edge) => (
+          <GraphEdgeItem
+            key={`${edge.from}-${edge.to}`}
+            edge={edge}
+            nodeById={nodeById}
+            selectedNodeId={selectedNodeId}
+            neighborIds={neighborIds}
             settings={settings}
-            onPointerDown={onNodePointerDown(node)}
-            onClick={onNodeClick(node)}
-            onMouseEnter={() => setHoveredId(node.id)}
-            onMouseLeave={() => setHoveredId(null)}
           />
-        );
-      })}
+        ))}
+
+        {/* Render nodes */}
+        {nodes.map((node) => {
+          const active = !neighborIds || neighborIds.has(node.id);
+          const isHovered = node.id === hoveredId;
+          const isSelected = node.id === selectedNodeId;
+
+          return (
+            <GraphNodeItem
+              key={node.id}
+              node={node}
+              isHovered={isHovered}
+              isSelected={isSelected}
+              active={active}
+              settings={settings}
+              onPointerDown={onNodePointerDown(node)}
+              onClick={onNodeClick(node)}
+              onMouseEnter={() => setHoveredId(node.id)}
+              onMouseLeave={() => setHoveredId(null)}
+            />
+          );
+        })}
+      </g>
     </svg>
   );
 };

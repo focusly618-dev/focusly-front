@@ -57,6 +57,14 @@ export interface Task {
       color?: string;
     } | null;
   }[];
+  workspace_id?: string | null;
+  project_id?: string | null;
+  project?: {
+    id: string;
+    name: string;
+    color?: string | null;
+    emoji?: string | null;
+  } | null;
   links?: { title: string; url: string }[];
   time_logs?: { date: string; minutes: number }[];
   subtasks?: Subtask[];

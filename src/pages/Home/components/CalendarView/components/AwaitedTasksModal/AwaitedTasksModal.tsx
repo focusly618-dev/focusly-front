@@ -22,7 +22,7 @@ import {
   Schedule as ScheduleIcon,
   AssignmentTurnedIn as AssignmentIcon,
   KeyboardArrowDownRounded as ArrowDownIcon,
-  FlagRounded as FlagIcon,
+  ArrowUpwardRounded as ArrowUpIcon,
 } from '@mui/icons-material';
 import { format, isToday, startOfDay, endOfDay } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
@@ -201,7 +201,7 @@ export const AwaitedTasksModal: React.FC<AwaitedTasksModalProps> = ({
               sx={{
                 height: 20,
                 fontSize: '11px',
-                fontWeight: 700,
+                fontWeight: 900,
                 bgcolor: isDark
                   ? 'rgba(255, 255, 255, 0.1)'
                   : 'rgba(0, 0, 0, 0.06)',
@@ -382,7 +382,7 @@ export const AwaitedTasksModal: React.FC<AwaitedTasksModalProps> = ({
           <Box
             sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}
           >
-            <FlagIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+            <ArrowUpIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
             {[
               { level: 'all', label: 'Todas', color: 'transparent' },
               {

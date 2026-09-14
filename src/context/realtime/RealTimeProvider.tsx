@@ -32,7 +32,6 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log('[REALTIME] Connecting WebSocket to URL:', socketUrl);
 
     const newSocket = io(`${socketUrl}/realtime`, {
-      query: { userId },
       transports: ['websocket', 'polling'],
       withCredentials: true,
     });
@@ -52,7 +51,7 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('[REALTIME] Connection error:', error);
+      console.error('[REALTIME] Connection error:', error.message || error);
     });
 
     newSocket.on('schedule_updated', (data) => {

@@ -15,6 +15,7 @@ import { markdownExtension } from './markdownLanguage';
 import { livePreviewExtensions } from './livePreview';
 import { imagePasteExtension } from './imagePaste';
 import { diffReviewExtensions } from './diffReview';
+import { targetHighlightExtension } from './targetHighlight';
 
 export interface BuildMarkdownExtensionsOptions {
   editorThemeCompartment: Compartment;
@@ -40,5 +41,6 @@ export const buildMarkdownExtensions = ({
   ...livePreviewExtensions,
   imagePasteExtension,
   ...diffReviewExtensions,
+  ...targetHighlightExtension,
   ...(placeholder ? [placeholderExt(placeholder)] : []),
 ];

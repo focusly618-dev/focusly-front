@@ -194,51 +194,29 @@ export const CategoryChip = styled(Box)(({ theme }) => ({
 
 export const PriorityChip = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'priorityColor',
-})<{ priorityColor?: string }>(({ theme, priorityColor }) => {
+})<{ priorityColor?: string }>(({ priorityColor }) => {
   const defaultColor = priorityColor || '#6b7280';
-  let bg = alpha(defaultColor, 0.08);
-  let text = defaultColor;
-  let border = alpha(defaultColor, 0.12);
-
-  if (theme.palette.mode === 'light') {
-    if (defaultColor === '#ef4444') {
-      bg = '#fee2e2';
-      text = '#dc2626';
-      border = '#fecaca';
-    } else if (defaultColor === '#f59e0b') {
-      bg = '#ffedd5';
-      text = '#d97706';
-      border = '#fed7aa';
-    } else if (defaultColor === '#22c55e') {
-      bg = '#dcfce7';
-      text = '#15803d';
-      border = '#bbf7d0';
-    }
-  } else {
-    bg = alpha(defaultColor, 0.15);
-    text = alpha(defaultColor, 0.9);
-    border = alpha(defaultColor, 0.25);
-  }
+  const bg = alpha(defaultColor, 0.12);
+  const border = alpha(defaultColor, 0.25);
 
   return {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '6px',
-    padding: '4px 10px',
-    borderRadius: '20px',
+    gap: '3px',
+    padding: '2px 7px',
+    borderRadius: '4px',
     fontSize: '11px',
     fontWeight: 700,
     backgroundColor: bg,
-    color: text,
+    color: defaultColor,
     border: `1px solid ${border}`,
-    transition: 'all 0.2s ease',
+    transition: 'all 0.15s ease',
     width: 'fit-content',
     cursor: 'pointer',
+    flexShrink: 0,
     '&:hover': {
-      backgroundColor:
-        theme.palette.mode === 'dark'
-          ? alpha(defaultColor, 0.25)
-          : alpha(defaultColor, 0.15),
+      backgroundColor: alpha(defaultColor, 0.2),
+      borderColor: alpha(defaultColor, 0.4),
     },
   };
 });
@@ -440,8 +418,7 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
 
 export const TableHeader = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns:
-    '55px minmax(150px, 3fr) 100px 117px 123px 80px 125px 95px',
+  gridTemplateColumns: '55px minmax(150px, 3fr) 100px 117px 123px 80px 95px',
   padding: '6px 40px 6px 24px',
   backgroundColor: surfaceColor(
     theme,
@@ -467,7 +444,7 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   zIndex: 2,
   boxSizing: 'border-box',
-  minWidth: '950px',
+  minWidth: '825px',
 }));
 
 export const TableHeaderCell = styled(Box)(() => ({
@@ -483,7 +460,7 @@ export const TableBodyContainer = styled(Box)(({ theme }) => ({
   flex: 1,
   overflowY: 'auto',
   minHeight: 0,
-  minWidth: '950px',
+  minWidth: '825px',
   '&::-webkit-scrollbar': {
     width: '6px',
   },
@@ -529,7 +506,7 @@ export const TableStatusGroupRow = styled(Box, {
   cursor: 'pointer',
   userSelect: 'none',
   transition: 'background-color 0.15s ease',
-  minWidth: '950px',
+  minWidth: '825px',
   boxSizing: 'border-box',
   '&:hover': {
     backgroundColor: surfaceColor(
@@ -545,8 +522,7 @@ export const TaskRow = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'statusColor',
 })<{ statusColor?: string }>(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns:
-    '55px minmax(150px, 3fr) 100px 117px 123px 80px 125px 95px',
+  gridTemplateColumns: '55px minmax(150px, 3fr) 100px 117px 123px 80px 95px',
   alignItems: 'center',
   padding: '5px 40px 5px 24px',
   backgroundColor: 'transparent',
@@ -558,7 +534,7 @@ export const TaskRow = styled(Box, {
   transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   gap: '12px',
   boxSizing: 'border-box',
-  minWidth: '950px',
+  minWidth: '825px',
 
   '&:hover': {
     backgroundColor:

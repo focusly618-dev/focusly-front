@@ -18,6 +18,9 @@ export interface TaskFilterInput {
   endDate?: string;
   searchTerm?: string;
   tags?: string[];
+  project_id?: string;
+  projectId?: string;
+  workspace_id?: string;
 }
 
 export interface TaskSortInput {
@@ -30,6 +33,7 @@ export interface TaskResponse {
   user_id: string;
   is_owner?: boolean;
   title: string;
+  description?: string;
   notes_encrypted: string;
   estimate_timer: number;
   estimate_minutes: number;
@@ -87,6 +91,7 @@ export interface TaskResponse {
     } | null;
   };
   use_ai?: boolean;
+  ai_suggestion?: boolean | string;
 }
 
 export interface updateTask {
@@ -110,6 +115,8 @@ export interface updateTask {
   estimated_end_date?: string;
   subtasks?: Subtask[];
   use_ai?: boolean;
+  project_id?: string | null;
+  workspace_id?: string | null;
 }
 
 export interface CreateTaskRequest {
@@ -134,4 +141,6 @@ export interface CreateTaskRequest {
   estimated_start_date?: string;
   estimated_end_date?: string;
   use_ai?: boolean;
+  project_id?: string | null;
+  workspace_id?: string | null;
 }

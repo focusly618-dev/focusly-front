@@ -6,18 +6,17 @@ import {
   MenuItem,
   Tooltip,
 } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
-import { Flag as FlagIcon } from '@mui/icons-material';
+import type { Theme } from '@mui/material';
 import {
   getStatusIcon,
   getCategoryIcon,
   STATUS_LIST,
-  PRIORITY_LIST,
   CATEGORY_LIST,
 } from '../TaskIcons';
 import { PASTEL_COLORS, getColorName } from '../../CreateTaskModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 import { surfaceColor } from '@/context';
+import { PriorityBadge, PRIORITY_OPTIONS } from '@/components/ui';
 
 interface TaskPopoversProps {
   // Status
@@ -117,32 +116,20 @@ export const TaskPopovers = ({
       anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       PaperProps={{ sx: popoverPaperSx }}
     >
-      <Stack sx={{ p: 1, minWidth: '150px' }}>
-        {PRIORITY_LIST.map((p) => (
+      <Stack sx={{ p: 1, minWidth: '160px' }}>
+        {PRIORITY_OPTIONS.map((pOpt) => (
           <MenuItem
-            key={p}
+            key={pOpt.id}
             onClick={() => {
-              setPriority(p);
+              setPriority(pOpt.id);
               setPriorityAnchor(null);
             }}
             sx={{ borderRadius: '8px', py: 1 }}
           >
             <Box display="flex" alignItems="center" gap={1.5}>
-              <FlagIcon
-                sx={{
-                  fontSize: 18,
-                  color:
-                    p === 'High'
-                      ? 'error.main'
-                      : p === 'Med'
-                        ? 'warning.main'
-                        : p === 'Low'
-                          ? 'success.main'
-                          : 'text.secondary',
-                }}
-              />
+              <PriorityBadge priority={pOpt.id} size={24} />
               <Typography variant="body2" fontWeight={500}>
-                {p === 'No priority' ? '' : p}
+                {pOpt.label}
               </Typography>
             </Box>
           </MenuItem>

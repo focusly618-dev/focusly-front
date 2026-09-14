@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { UseFormWatch } from 'react-hook-form';
 import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
-import type {
-  TaskSearchItems,
-  WorkspaceFormData,
-} from '../../../types/workspace.types';
-import type { MarkdownEditorRef } from '../codemirror/MarkdownEditor.types';
+import type { TaskSearchItems, WorkspaceFormData } from '../../workspace.types';
+import type { MarkdownEditorRef } from './codemirror/MarkdownEditor.types';
 
 export interface UseWorkspaceEditorProps {
   watch: UseFormWatch<WorkspaceFormData>;
@@ -41,6 +38,7 @@ export const useWorkspaceEditor = ({
   const currentTitle = watch('title');
   const currentContent = watch('content');
   const currentFolder = watch('project');
+  const currentEmoji = watch('emoji');
 
   const [showPalette, setShowPalette] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -101,24 +99,14 @@ export const useWorkspaceEditor = ({
 
   const onboardingSteps = [
     {
-      target: '#joyride-editor-search',
-      content:
-        'Use this search bar to quickly find and link tasks to your document.',
-    },
-    {
       target: '#joyride-editor-area',
       content:
-        'Welcome to the smart editor! Write in plain Markdown — **bold**, # headings, - lists, and > quotes all render as you type.',
+        '¡Bienvenido al editor! Escribe en Markdown puro — encabezados, negritas, listas y bloques de código con formato en tiempo real.',
     },
     {
-      target: '#joyride-editor-metadata',
+      target: '#joyride-editor-sidebar',
       content:
-        'Here you can view and update the status, priority, and estimated time of the task linked to this document.',
-    },
-    {
-      target: '#joyride-editor-full-detail',
-      content:
-        'Need more details? Click here to open the full task view without leaving the editor.',
+        'Tu panel acompañante: consulta el índice de encabezados (Outline), el mapa visual de nodos y las estadísticas de tu documento.',
     },
   ];
 
@@ -126,6 +114,7 @@ export const useWorkspaceEditor = ({
     currentTitle,
     currentContent,
     currentFolder,
+    currentEmoji,
 
     showPalette,
     setShowPalette,

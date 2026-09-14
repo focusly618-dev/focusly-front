@@ -41,7 +41,7 @@ import {
   WarningAmberOutlined as RiskIcon,
   ForumOutlined as FeedbackIcon,
 } from '@mui/icons-material';
-import type { ProjectGroupTypes } from '../../../types/workspace.types';
+import type { ProjectGroupTypes } from '../../../workspace.types';
 
 export interface TemplateItem {
   id: string;

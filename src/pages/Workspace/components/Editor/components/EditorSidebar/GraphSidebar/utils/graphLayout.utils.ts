@@ -3,8 +3,8 @@ import type { GraphEdge, GraphNode } from '../NoteGraphView.types';
 
 export const SETTINGS_STORAGE_KEY = 'workspace_graph_settings';
 export const DRAG_THRESHOLD_PX = 4;
-export const ZOOM_MIN = 1;
-export const ZOOM_MAX = 4;
+export const ZOOM_MIN = 0.6;
+export const ZOOM_MAX = 3.5;
 
 export const truncate = (text: string, max: number): string =>
   text.length > max ? `${text.slice(0, max - 1)}…` : text;
@@ -12,28 +12,144 @@ export const truncate = (text: string, max: number): string =>
 export const baseRadiusFor = (titleCount: number): number =>
   Math.min(150 + Math.max(0, titleCount - 4) * 16, 260);
 
-// Visual size/prominence tapers off with heading depth, so H1s read as more
-// important than H2s, which read as more important than H3s, etc.
 export const baseRadiusForLevel = (level: number): number =>
   level === 0 ? 17 : Math.max(6, 12 - (level - 1) * 1.8);
 
-export const fontSizeForLevel = (level: number): number =>
-  level === 0 ? 14.5 : Math.max(10, 13 - (level - 1));
+export const getHeadingIcon = (text: string, level: number): string => {
+  // Check if starts with emoji
+  const emojiMatch = text.match(
+    /^([\p{Extended_Pictographic}\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}])/u,
+  );
+  if (emojiMatch) return emojiMatch[1];
 
-export const labelOffsetForLevel = (level: number): number =>
-  level === 0 ? 22 : Math.max(11, 18 - (level - 1) * 2);
+  const lower = text.toLowerCase();
+  if (
+    lower.includes('objetivo') ||
+    lower.includes('meta') ||
+    lower.includes('goal') ||
+    lower.includes('contexto')
+  )
+    return '🎯';
+  if (
+    lower.includes('estructura') ||
+    lower.includes('sección') ||
+    lower.includes('secciones') ||
+    lower.includes('outline')
+  )
+    return '📑';
+  if (
+    lower.includes('paso') ||
+    lower.includes('inmediato') ||
+    lower.includes('acción') ||
+    lower.includes('quickstart')
+  )
+    return '🚀';
+  if (
+    lower.includes('recurso') ||
+    lower.includes('fuente') ||
+    lower.includes('buscar') ||
+    lower.includes('referencia') ||
+    lower.includes('docs')
+  )
+    return '📚';
+  if (
+    lower.includes('criterio') ||
+    lower.includes('fin') ||
+    lower.includes('complet') ||
+    lower.includes('done') ||
+    lower.includes('check')
+  )
+    return '✅';
+  if (
+    lower.includes('pregunta') ||
+    lower.includes('investig') ||
+    lower.includes('faq') ||
+    lower.includes('duda')
+  )
+    return '💡';
+  if (
+    lower.includes('resumen') ||
+    lower.includes('intro') ||
+    lower.includes('portada')
+  )
+    return '📖';
+  if (lower.includes('nota') || lower.includes('idea')) return '📌';
 
-export const truncateLenForLevel = (level: number): number =>
-  level === 0 ? 22 : Math.max(12, 20 - (level - 1) * 2);
+  if (level === 1) return '📄';
+  if (level === 2) return '📁';
+  if (level === 3) return '🔹';
+  return '•';
+};
+
+export const getNodeDimensions = (
+  node: { type?: string; label: string },
+  isSelected = false,
+): { width: number; height: number } => {
+  if (node.type === 'document') {
+    return { width: 185, height: 54 };
+  }
+  if (node.type === 'source' || node.type === 'concept') {
+    const width = Math.max(95, Math.min(135, node.label.length * 9.5 + 24));
+    return { width, height: 30 };
+  }
+  if (isSelected) {
+    return { width: 195, height: 52 };
+  }
+  const width = Math.max(145, Math.min(205, node.label.length * 8.5 + 46));
+  return { width, height: 40 };
+};
+
+export const calculateCurvedPath = (
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  fromSize: { width: number; height: number } = { width: 180, height: 40 },
+  toSize: { width: number; height: number } = { width: 180, height: 40 },
+): string => {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+
+  let startX = from.x;
+  let startY = from.y;
+  let endX = to.x;
+  let endY = to.y;
+
+  // Determine if horizontal flow or vertical flow
+  if (Math.abs(dx) >= Math.abs(dy) * 0.6) {
+    // Horizontal connection
+    if (dx > 0) {
+      startX = from.x + fromSize.width / 2;
+      endX = to.x - toSize.width / 2;
+    } else {
+      startX = from.x - fromSize.width / 2;
+      endX = to.x + toSize.width / 2;
+    }
+    const rawDist = endX - startX;
+    const dist = Math.abs(rawDist) < 20 ? (dx >= 0 ? 30 : -30) : rawDist;
+    const cp1x = startX + dist * 0.45;
+    const cp2x = endX - dist * 0.45;
+    return `M ${startX} ${startY} C ${cp1x} ${startY}, ${cp2x} ${endY}, ${endX} ${endY}`;
+  } else {
+    // Vertical connection (e.g. downward to Criterios)
+    if (dy > 0) {
+      startY = from.y + fromSize.height / 2;
+      endY = to.y - toSize.height / 2;
+    } else {
+      startY = from.y - fromSize.height / 2;
+      endY = to.y + toSize.height / 2;
+    }
+    const rawDist = endY - startY;
+    const dist = Math.abs(rawDist) < 20 ? (dy >= 0 ? 30 : -30) : rawDist;
+    const cp1y = startY + dist * 0.45;
+    const cp2y = endY - dist * 0.45;
+    return `M ${startX} ${startY} C ${startX} ${cp1y}, ${endX} ${cp2y}, ${endX} ${endY}`;
+  }
+};
 
 interface HeadingTreeNode {
   heading: HeadingItem;
   children: HeadingTreeNode[];
 }
 
-// Nests headings the same way a markdown outline would: each heading's
-// parent is the nearest preceding heading with a shallower level (or the
-// note root if none — e.g. a document that opens straight into an H2).
 const buildHeadingTree = (headings: HeadingItem[]): HeadingTreeNode[] => {
   const roots: HeadingTreeNode[] = [];
   const stack: HeadingTreeNode[] = [];
@@ -69,8 +185,16 @@ const maxLevelOf = (node: HeadingTreeNode): number =>
 export const buildGraph = (
   rootLabel: string,
   headings: HeadingItem[],
-  spacing: number,
-): { nodes: GraphNode[]; edges: GraphEdge[]; canvasSize: number } => {
+  spacing = 1,
+  _markdownContent?: string,
+  rootIcon?: string,
+): {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  canvasWidth: number;
+  canvasHeight: number;
+  canvasSize: number;
+} => {
   const roots = buildHeadingTree(headings);
 
   if (roots.length === 0) {
@@ -88,6 +212,8 @@ export const buildGraph = (
         },
       ],
       edges: [],
+      canvasWidth: canvasSize,
+      canvasHeight: canvasSize,
       canvasSize,
     };
   }
@@ -101,8 +227,21 @@ export const buildGraph = (
   const center = canvasSize / 2;
 
   const nodes: GraphNode[] = [
-    { id: 'root', x: center, y: center, label: rootLabel, level: 0, pos: null },
+    {
+      id: 'root',
+      x: center,
+      y: center,
+      label: rootLabel || 'Esta nota',
+      type: 'document',
+      level: 0,
+      pos: null,
+      icon: rootIcon || '📄',
+      subtitle: 'Documento Principal',
+      status: 'Activo',
+      statusColor: 'indigo',
+    },
   ];
+
   const edges: GraphEdge[] = [];
 
   const place = (
@@ -116,16 +255,28 @@ export const buildGraph = (
     const x = center + radius * Math.cos(angle);
     const y = center + radius * Math.sin(angle);
     const id = `h-${node.heading.pos}`;
+    const cleanText = node.heading.text.trim();
+    const icon = getHeadingIcon(cleanText, node.heading.level);
 
     nodes.push({
       id,
       x,
       y,
-      label: node.heading.text,
+      label: cleanText,
+      type: 'section',
       level: node.heading.level,
       pos: node.heading.pos,
+      icon,
+      subtitle: 'Sección del Documento',
+      status: cleanText.includes('✅') ? 'Completado' : 'En progreso',
+      statusColor: cleanText.includes('✅') ? 'green' : 'amber',
+      category: 'section',
     });
-    edges.push({ from: parentId, to: id });
+
+    edges.push({
+      from: parentId,
+      to: id,
+    });
 
     if (node.children.length === 0) return;
 
@@ -152,14 +303,29 @@ export const buildGraph = (
     cursor += span;
   });
 
-  return { nodes, edges, canvasSize };
+  const outgoingCounts: Record<string, number> = {};
+  edges.forEach((edge) => {
+    outgoingCounts[edge.from] = (outgoingCounts[edge.from] || 0) + 1;
+  });
+
+  nodes.forEach((n) => {
+    n.outgoingCount = outgoingCounts[n.id] || 0;
+  });
+
+  return {
+    nodes,
+    edges,
+    canvasWidth: canvasSize,
+    canvasHeight: canvasSize,
+    canvasSize,
+  };
 };
 
 export const calculateNodeRadius = (
   level: number,
   isHovered: boolean,
   nodeSize: number,
-): number => baseRadiusForLevel(level) * nodeSize + (isHovered ? 2 : 0);
+): number => (level === 0 ? 20 : 12) * nodeSize + (isHovered ? 2 : 0);
 
 export const calculateTrimmedEdgeTarget = (
   from: { x: number; y: number },

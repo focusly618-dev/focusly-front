@@ -19,7 +19,7 @@ import {
   AddTaskButton,
   CollapsedSearchContainer,
 } from './SearchPalette.styles';
-import type { TaskSearchItems } from '../../../../types/workspace.types';
+import type { TaskSearchItems } from '../../../../workspace.types';
 
 interface SearchPaletteProps {
   showPalette: boolean;

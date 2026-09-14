@@ -11,7 +11,7 @@ import {
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { TaskBar } from '../components/Sidebar/types/Sidebar.types';
 import type { Task } from '@/redux/tasks/task.types';
-import type { TaskSearchItems } from '../../Workspace/types/workspace.types';
+import type { TaskSearchItems } from '../../Workspace/workspace.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import {
   mapGoogleEventToTask,

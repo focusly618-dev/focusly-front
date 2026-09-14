@@ -18,7 +18,7 @@ import { sileo, getFriendlyErrorMessage } from '@/utils';
 import type {
   WorkspaceTypes,
   ProjectGroupTypes,
-} from '@/pages/Workspace/types/workspace.types';
+} from '@/pages/Workspace/workspace.types';
 import { TaskBar, type SidebarProps } from '../types/Sidebar.types';
 import {
   GET_NOTIFICATIONS,
@@ -55,6 +55,11 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     });
   };
 
+  const closeToggleCollapse = () => {
+    setIsCollapsed(false);
+    localStorage.removeItem('sidebar-collapsed');
+  };
+
   // Tasks counts & expansion (Akiflow style)
   const tasks = useAppSelector((state) => state.task.tasks || []);
 
@@ -64,9 +69,35 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
 
   const toggleTasksExpanded = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    if (isCollapsed) {
+      closeToggleCollapse();
+      setIsTasksExpanded(true);
+      localStorage.setItem('sidebar-tasks-expanded', 'true');
+      return;
+    }
     setIsTasksExpanded((prev) => {
       const next = !prev;
       localStorage.setItem('sidebar-tasks-expanded', String(next));
+      return next;
+    });
+  };
+
+  // Projects expansion (Akiflow / Linear style)
+  const [isProjectsExpanded, setIsProjectsExpanded] = useState(() => {
+    return localStorage.getItem('sidebar-projects-expanded') !== 'false';
+  });
+
+  const toggleProjectsExpanded = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (isCollapsed) {
+      closeToggleCollapse();
+      setIsProjectsExpanded(true);
+      localStorage.setItem('sidebar-projects-expanded', 'true');
+      return;
+    }
+    setIsProjectsExpanded((prev) => {
+      const next = !prev;
+      localStorage.setItem('sidebar-projects-expanded', String(next));
       return next;
     });
   };
@@ -559,6 +590,11 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     taskCounts,
     isTasksExpanded,
     toggleTasksExpanded,
+    setIsTasksExpanded,
+    isProjectsExpanded,
+    toggleProjectsExpanded,
+    setIsProjectsExpanded,
+    closeToggleCollapse,
   };
 };
 

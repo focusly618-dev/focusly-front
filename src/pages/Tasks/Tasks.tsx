@@ -100,7 +100,11 @@ export const Tasks = ({
         showAIOrganize: false,
       };
     }
-    if (urlFilter === 'upcoming' || dateRange === 'this_week' || dateRange === 'this_month') {
+    if (
+      urlFilter === 'upcoming' ||
+      dateRange === 'this_week' ||
+      dateRange === 'this_month'
+    ) {
       return {
         headerTitle: 'Upcoming',
         headerEyebrow: 'Próximas Tareas',
@@ -247,15 +251,21 @@ export const Tasks = ({
                 <Button
                   variant="contained"
                   onClick={() => setIsCreateTaskModalOpen(true)}
-                  startIcon={<AddIcon />}
+                  startIcon={<AddIcon sx={{ color: '#2563eb' }} />}
                   sx={{
                     borderRadius: '10px',
                     textTransform: 'none',
                     fontWeight: 700,
                     boxShadow: 'none',
                     height: 36,
-                    bgcolor: '#2563eb',
-                    '&:hover': { bgcolor: '#1d4ed8', boxShadow: 'none' },
+                    border: '1px solid #2563eb',
+                    bgcolor: 'background.default',
+                    color: '#2563eb',
+                    '&:hover': {
+                      bgcolor: 'rgba(37, 99, 235, 0.08)',
+                      borderColor: '#2563eb',
+                      boxShadow: 'none',
+                    },
                     fontSize: '0.8rem',
                     px: 2,
                   }}
