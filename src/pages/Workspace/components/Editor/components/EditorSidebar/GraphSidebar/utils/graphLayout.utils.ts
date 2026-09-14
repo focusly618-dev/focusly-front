@@ -9,6 +9,12 @@ export const ZOOM_MAX = 3.5;
 export const truncate = (text: string, max: number): string =>
   text.length > max ? `${text.slice(0, max - 1)}…` : text;
 
+export const baseRadiusFor = (titleCount: number): number =>
+  Math.min(150 + Math.max(0, titleCount - 4) * 16, 260);
+
+export const baseRadiusForLevel = (level: number): number =>
+  level === 0 ? 17 : Math.max(6, 12 - (level - 1) * 1.8);
+
 export const getHeadingIcon = (text: string, level: number): string => {
   // Check if starts with emoji
   const emojiMatch = text.match(
@@ -76,7 +82,7 @@ export const getHeadingIcon = (text: string, level: number): string => {
 };
 
 export const getNodeDimensions = (
-  node: { type: string; label: string },
+  node: { type?: string; label: string },
   isSelected = false,
 ): { width: number; height: number } => {
   if (node.type === 'document') {
@@ -165,11 +171,21 @@ const buildHeadingTree = (headings: HeadingItem[]): HeadingTreeNode[] => {
   return roots;
 };
 
+const countLeaves = (node: HeadingTreeNode): number =>
+  node.children.length === 0
+    ? 1
+    : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+
+const maxLevelOf = (node: HeadingTreeNode): number =>
+  node.children.reduce(
+    (max, child) => Math.max(max, maxLevelOf(child)),
+    node.heading.level,
+  );
+
 export const buildGraph = (
   rootLabel: string,
   headings: HeadingItem[],
   spacing = 1,
-  markdownContent = '',
   rootIcon?: string,
 ): {
   nodes: GraphNode[];
@@ -178,21 +194,46 @@ export const buildGraph = (
   canvasHeight: number;
   canvasSize: number;
 } => {
-  const effectiveHeadings = headings;
+  const roots = buildHeadingTree(headings);
 
-  const canvasWidth = 1440;
-  const canvasHeight = 920;
-  const center = { x: 700, y: 460 };
+  if (roots.length === 0) {
+    const canvasSize = 400;
+    const center = canvasSize / 2;
+    return {
+      nodes: [
+        {
+          id: 'root',
+          x: center,
+          y: center,
+          label: rootLabel,
+          level: 0,
+          pos: null,
+        },
+      ],
+      edges: [],
+      canvasWidth: canvasSize,
+      canvasHeight: canvasSize,
+      canvasSize,
+    };
+  }
+
+  const totalLeaves = roots.reduce((sum, r) => sum + countLeaves(r), 0);
+  const maxLevel = Math.max(...roots.map(maxLevelOf));
+  const baseRadius = baseRadiusFor(totalLeaves) * spacing;
+  const ringStep = 90 * spacing;
+  const maxRadius = baseRadius + (maxLevel - 1) * ringStep;
+  const canvasSize = Math.max(400, maxRadius * 2 + 160);
+  const center = canvasSize / 2;
 
   const nodes: GraphNode[] = [
     {
       id: 'root',
-      x: center.x,
-      y: center.y,
+      x: center,
+      y: center,
       label: rootLabel || 'Esta nota',
       type: 'document',
       level: 0,
-      pos: 0,
+      pos: null,
       icon: rootIcon || '📄',
       subtitle: 'Documento Principal',
       status: 'Activo',
@@ -202,97 +243,30 @@ export const buildGraph = (
 
   const edges: GraphEdge[] = [];
 
-  // Parse links or sub-items from markdown content under headings
-  const parseSectionLinks = (headingPos: number, nextPos: number) => {
-    if (!markdownContent) return [];
-    const sectionText = markdownContent.slice(headingPos, nextPos);
-    const links: { label: string; url: string; pos: number }[] = [];
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    let match: RegExpExecArray | null;
-    while ((match = linkRegex.exec(sectionText)) !== null) {
-      links.push({
-        label: match[1].trim(),
-        url: match[2].trim(),
-        pos: headingPos + match.index,
-      });
-    }
-    return links;
-  };
-
-  // Pre-configured coordinate offsets for zero-crossing planar layout
-  const presetPositions: Record<string, { x: number; y: number }> = {
-    '🎯 Objetivo & Contexto': { x: 340, y: 260 },
-    '📑 Estructura & Secciones': { x: 340, y: 560 },
-    '1. Portada': { x: 80, y: 480 },
-    '2. Preguntas Inv.': { x: 80, y: 640 },
-    '🚀 Primer Paso Inmediato': { x: 1060, y: 260 },
-    '📚 Recursos Clave': { x: 1060, y: 560 },
-    '✅ Criterios de Finalización': { x: 700, y: 780 },
-  };
-
-  const roots = buildHeadingTree(effectiveHeadings);
-
-  const placeDynamicNode = (
+  const place = (
     node: HeadingTreeNode,
     parentId: string,
-    index: number,
-    total: number,
+    angleStart: number,
+    angleEnd: number,
   ) => {
-    const heading = node.heading;
-    const cleanText = heading.text.trim();
-    const id = `h-${heading.pos}-${cleanText.replace(/\s+/g, '_')}`;
-    const icon = getHeadingIcon(cleanText, heading.level);
-
-    let posXY = presetPositions[cleanText];
-    if (!posXY) {
-      if (parentId === 'root') {
-        // Symmetrical dual-sided layout: split into left and right wings
-        const isRight = index % 2 === 0;
-        const wingIndex = Math.floor(index / 2);
-        const totalWing = Math.max(1, Math.ceil(total / 2));
-        const verticalSpan = 480 * spacing;
-        const startY = center.y - verticalSpan / 2;
-        const stepY = totalWing > 1 ? verticalSpan / (totalWing - 1) : 0;
-        const y = startY + wingIndex * stepY;
-        const x = isRight ? center.x + 360 * spacing : center.x - 360 * spacing;
-        posXY = { x, y };
-      } else {
-        // Sub-heading: place outward on same wing as parent
-        const parentNode = nodes.find((n) => n.id === parentId);
-        const parentX = parentNode?.x ?? center.x;
-        const parentY = parentNode?.y ?? center.y;
-        const isRight = parentX >= center.x;
-        const subX = isRight ? parentX + 270 : parentX - 270;
-
-        const childSpacing = 85;
-        const childStartY = parentY - ((total - 1) * childSpacing) / 2;
-        const subY = childStartY + index * childSpacing;
-        posXY = { x: subX, y: subY };
-      }
-    }
-
-    // Check for child links in markdown
-    const nextHeading = effectiveHeadings.find((h) => h.pos > heading.pos);
-    const links = parseSectionLinks(
-      heading.pos,
-      nextHeading ? nextHeading.pos : markdownContent.length,
-    );
-
-    const totalSubItems = links.length + node.children.length;
+    const angle = (angleStart + angleEnd) / 2;
+    const radius = baseRadius + (node.heading.level - 1) * ringStep;
+    const x = center + radius * Math.cos(angle);
+    const y = center + radius * Math.sin(angle);
+    const id = `h-${node.heading.pos}`;
+    const cleanText = node.heading.text.trim();
+    const icon = getHeadingIcon(cleanText, node.heading.level);
 
     nodes.push({
       id,
-      x: posXY.x,
-      y: posXY.y,
+      x,
+      y,
       label: cleanText,
       type: 'section',
-      level: heading.level,
-      pos: heading.pos,
+      level: node.heading.level,
+      pos: node.heading.pos,
       icon,
-      subtitle:
-        totalSubItems > 0
-          ? `${totalSubItems} ${totalSubItems === 1 ? 'conexión' : 'conexiones'}`
-          : 'Sección del Documento',
+      subtitle: 'Sección del Documento',
       status: cleanText.includes('✅') ? 'Completado' : 'En progreso',
       statusColor: cleanText.includes('✅') ? 'green' : 'amber',
       category: 'section',
@@ -301,55 +275,33 @@ export const buildGraph = (
     edges.push({
       from: parentId,
       to: id,
-      dashed: true,
     });
 
-    if (links.length > 0) {
-      const isParentRight = posXY.x >= center.x;
-      const sX = isParentRight ? posXY.x + 270 : posXY.x - 270;
-      const childCount = links.length;
-      const startLinkY = posXY.y - ((childCount - 1) * 50) / 2;
+    if (node.children.length === 0) return;
 
-      links.forEach((link, lIndex) => {
-        const sourceId = `src-${id}-${lIndex}`;
-        const sY = startLinkY + lIndex * 50;
+    const childLeafCounts = node.children.map(countLeaves);
+    const totalChildLeaves = childLeafCounts.reduce((a, b) => a + b, 0);
+    const span = angleEnd - angleStart;
+    let cursor = angleStart;
 
-        nodes.push({
-          id: sourceId,
-          x: sX,
-          y: sY,
-          label: link.label,
-          type: 'source',
-          level: heading.level + 1,
-          pos: link.pos,
-          url: link.url,
-          icon: '🌐',
-          subtitle: 'Fuente Externa / Enlace',
-          status: 'Referencia',
-          statusColor: 'green',
-          tagColor: '#10b981',
-          category: 'source',
-        });
-
-        edges.push({
-          from: id,
-          to: sourceId,
-          color: '#10b981',
-        });
-      });
-    }
-
-    // Place heading children (sub-headings)
-    node.children.forEach((child, cIndex) => {
-      placeDynamicNode(child, id, cIndex, node.children.length);
+    node.children.forEach((child, i) => {
+      const childSpan = (childLeafCounts[i] / totalChildLeaves) * span;
+      place(child, id, cursor, cursor + childSpan);
+      cursor += childSpan;
     });
   };
 
-  roots.forEach((rootNode, i) => {
-    placeDynamicNode(rootNode, 'root', i, roots.length);
+  const rootLeafCounts = roots.map(countLeaves);
+  const totalRootLeaves = rootLeafCounts.reduce((a, b) => a + b, 0);
+  const fullSpan = 2 * Math.PI;
+  let cursor = -Math.PI / 2;
+
+  roots.forEach((root, i) => {
+    const span = (rootLeafCounts[i] / totalRootLeaves) * fullSpan;
+    place(root, 'root', cursor, cursor + span);
+    cursor += span;
   });
 
-  // Calculate outgoing count for each node
   const outgoingCounts: Record<string, number> = {};
   edges.forEach((edge) => {
     outgoingCounts[edge.from] = (outgoingCounts[edge.from] || 0) + 1;
@@ -362,9 +314,9 @@ export const buildGraph = (
   return {
     nodes,
     edges,
-    canvasWidth,
-    canvasHeight,
-    canvasSize: Math.max(canvasWidth, canvasHeight),
+    canvasWidth: canvasSize,
+    canvasHeight: canvasSize,
+    canvasSize,
   };
 };
 
