@@ -33,6 +33,7 @@ export interface TaskResponse {
   user_id: string;
   is_owner?: boolean;
   title: string;
+  description?: string;
   notes_encrypted: string;
   estimate_timer: number;
   estimate_minutes: number;
@@ -90,6 +91,7 @@ export interface TaskResponse {
     } | null;
   };
   use_ai?: boolean;
+  ai_suggestion?: boolean | string;
 }
 
 export interface updateTask {

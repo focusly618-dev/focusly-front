@@ -8,7 +8,7 @@ import {
   Button,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import type { ProjectGroupTypes } from '../../../Workspace/types/workspace.types';
+import type { ProjectGroupTypes } from '@/pages/Workspace/workspace.types';
 
 export interface DeleteFolderModalProps {
   open: boolean;

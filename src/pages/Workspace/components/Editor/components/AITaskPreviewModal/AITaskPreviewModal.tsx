@@ -21,6 +21,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CategoryIcon from '@mui/icons-material/Category';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { format } from 'date-fns';
 import { PriorityBadge } from '@/components/ui';
 

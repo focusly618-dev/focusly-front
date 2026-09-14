@@ -15,7 +15,7 @@ import {
   ModernFolderOutlinedIcon,
 } from '@/components/ui';
 import { StyledTextField } from '../CreateFolderModal/CreateFolderModal';
-import type { ProjectGroupTypes } from '../../../Workspace/types/workspace.types';
+import type { ProjectGroupTypes } from '@/pages/Workspace/workspace.types';
 
 const FOLDER_COLORS = [
   { name: 'Red', value: '#ef4444' },

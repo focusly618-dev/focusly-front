@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ProjectGroupTypes } from '../../../Workspace/types/workspace.types';
+import type { ProjectGroupTypes } from '@/pages/Workspace/workspace.types';
 
 export interface UseProjectFolderCardParams {
   group: ProjectGroupTypes;

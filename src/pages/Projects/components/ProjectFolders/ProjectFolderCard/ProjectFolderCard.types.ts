@@ -1,4 +1,4 @@
-import type { ProjectGroupTypes } from '../../../Workspace/types/workspace.types';
+import type { ProjectGroupTypes } from '@/pages/Workspace/workspace.types';
 
 export interface ProjectFolderCardProps {
   group: ProjectGroupTypes;
