@@ -12,12 +12,13 @@ export interface EditorSidebarProps {
   currentFolder?: { name?: string; color?: string; emoji?: string } | null;
   // Optional legacy props
   selectTask?: TaskSearchItems | null;
+  linkedTasks?: TaskSearchItems[];
   handleUpdateTask?: (
     taskId: string,
     updates: Partial<TaskSearchItems>,
   ) => Promise<void>;
   onStartFocus?: (task: TaskSearchItems) => void;
   activeFocusTaskId?: string | null;
-  onUnlinkTask?: () => void;
+  onUnlinkTask?: (task?: TaskSearchItems) => void;
   setShowPalette?: (b: boolean | ((prev: boolean) => boolean)) => void;
 }

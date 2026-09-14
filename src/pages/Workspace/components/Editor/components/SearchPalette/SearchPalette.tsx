@@ -33,6 +33,8 @@ interface SearchPaletteProps {
   setValue: (field: any, value: any) => void;
   loadMore: () => Promise<void>;
   hasMore?: boolean;
+  linkedTaskIds?: string[];
+  onToggleTask?: (task: TaskSearchItems, isLinked: boolean) => void;
 }
 
 export const SearchPalette = ({
@@ -46,20 +48,26 @@ export const SearchPalette = ({
   setValue,
   loadMore,
   hasMore,
+  linkedTaskIds,
+  onToggleTask,
 }: SearchPaletteProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const selectedTaskIds = useMemo(() => {
+    if (linkedTaskIds) return new Set(linkedTaskIds);
+    return new Set(selectTask ? [selectTask.id] : []);
+  }, [linkedTaskIds, selectTask]);
+
   const displayedTasks = useMemo(() => {
-    if (!selectTask) return filteredTasks;
-    const selectedTaskIndex = filteredTasks.findIndex(
-      (t) => t.id === selectTask.id,
+    const selected = filteredTasks.filter((task) =>
+      selectedTaskIds.has(task.id),
     );
-    if (selectedTaskIndex === -1) return filteredTasks;
-    const selected = filteredTasks[selectedTaskIndex];
-    const others = filteredTasks.filter((t) => t.id !== selectTask.id);
-    return [selected, ...others];
-  }, [filteredTasks, selectTask]);
+    const others = filteredTasks.filter(
+      (task) => !selectedTaskIds.has(task.id),
+    );
+    return [...selected, ...others];
+  }, [filteredTasks, selectedTaskIds]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -143,7 +151,7 @@ export const SearchPalette = ({
                   letterSpacing: '0.04em',
                 }}
               >
-                AVAILABLE PROJECTS & TASKS
+                TAREAS DISPONIBLES
               </ResultTitle>
               <Typography
                 variant="caption"
@@ -160,8 +168,8 @@ export const SearchPalette = ({
                   fontWeight: 600,
                 }}
               >
-                {filteredTasks.length}{' '}
-                {filteredTasks.length === 1 ? 'match' : 'matches'}
+                {selectedTaskIds.size} vinculada
+                {selectedTaskIds.size === 1 ? '' : 's'}
               </Typography>
             </ResultHeader>
 
@@ -172,12 +180,12 @@ export const SearchPalette = ({
                   color="text.secondary"
                   sx={{ fontSize: '13px' }}
                 >
-                  No matching tasks found
+                  No se encontraron tareas
                 </Typography>
               </Box>
             ) : (
               displayedTasks.map((task: TaskSearchItems) => {
-                const isSelected = selectTask?.id === task.id;
+                const isSelected = selectedTaskIds.has(task.id);
                 const statusColor =
                   task.status === 'Todo'
                     ? 'info.main'
@@ -205,6 +213,11 @@ export const SearchPalette = ({
                     key={task.id}
                     active={isSelected}
                     onClick={() => {
+                      if (onToggleTask) {
+                        onToggleTask(task, isSelected);
+                        return;
+                      }
+
                       if (isSelected) {
                         handleSelectTask(null);
                         setValue('taskId', null);
@@ -315,7 +328,7 @@ export const SearchPalette = ({
                 >
                   Enter
                 </Box>{' '}
-                to link selection
+                para vincular o quitar tareas
               </Typography>
             </Box>
             <AddTaskButton
@@ -327,7 +340,7 @@ export const SearchPalette = ({
                 setShowPalette(false);
               }}
             >
-              + Create New Task
+              + Crear tarea
             </AddTaskButton>
           </PaletteFooter>
         </CommandPaletteContainer>

@@ -4,6 +4,24 @@ export interface HeadingItem {
   pos: number;
 }
 
+export const getHeadingPath = (
+  headings: HeadingItem[],
+  targetPos: number,
+): HeadingItem[] => {
+  const path: HeadingItem[] = [];
+
+  for (const heading of headings) {
+    while (path.length > 0 && path[path.length - 1].level >= heading.level) {
+      path.pop();
+    }
+    path.push(heading);
+
+    if (heading.pos === targetPos) return [...path];
+  }
+
+  return [];
+};
+
 // Plain-text line scan, not the CM6/Lezer syntax tree — this only needs to
 // extract heading text + level + offset for a side panel, not decide what to
 // hide/reveal while editing, so there's no reason to depend on the editor's

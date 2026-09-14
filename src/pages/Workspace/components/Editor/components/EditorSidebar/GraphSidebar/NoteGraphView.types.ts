@@ -1,7 +1,7 @@
 import type { HeadingItem } from './markdownHeadings';
 
 export type GraphNodeType = 'document' | 'section' | 'source' | 'concept';
-export type GraphFilterCategory = 'all' | 'sections' | 'sources' | 'concepts';
+export type GraphFilterCategory = 'all' | 'h1' | 'h2' | 'h3';
 
 export interface NoteGraphViewProps {
   rootLabel: string;
