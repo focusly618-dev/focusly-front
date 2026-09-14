@@ -14,7 +14,7 @@ import {
   CreateFolderModal,
   CustomizeFolderModal,
   DeleteFolderModal,
-} from '../../modals';
+} from '../../../modals';
 import type { ProjectFoldersGridProps } from './ProjectFoldersGrid.types';
 
 export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({

@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useQuery } from '@apollo/client';
+import React from 'react';
 import {
   Dialog,
   Box,
@@ -15,7 +14,6 @@ import {
   InputBase,
   Divider,
   Tooltip,
-  useTheme,
   alpha,
 } from '@mui/material';
 import {
@@ -42,394 +40,117 @@ import {
   Check as CheckIcon,
   DeleteOutline as DeleteOutlineIcon,
 } from '@mui/icons-material';
-import { sileo, UNTITLED_WORKSPACE_TITLE } from '@/utils';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
-  PRIORITY_OPTIONS,
   PriorityBadge,
   ModernFolderFilledIcon,
   ModernFolderOutlinedIcon,
   isCustomEmoji,
+  PRIORITY_OPTIONS,
 } from '@/components/ui';
-import type {
-  CreateProjectTaskModalProps,
-  ProjectOption,
-} from './CreateProjectTaskModal.types';
+import { sileo, UNTITLED_WORKSPACE_TITLE } from '@/utils';
+import type { CreateProjectTaskModalProps } from './CreateProjectTaskModal.types';
+import {
+  useCreateProjectTaskModal,
+  STATUS_OPTIONS,
+  DURATION_OPTIONS,
+} from './useCreateProjectTaskModal.hook';
 
-const STATUS_OPTIONS = [
-  { id: 'backlog', label: 'Backlog', color: '#64748b' },
-  { id: 'todo', label: 'To Do', color: '#94a3b8' },
-  { id: 'in_progress', label: 'In Progress', color: '#3b82f6' },
-  { id: 'review', label: 'Review', color: '#8b5cf6' },
-  { id: 'done', label: 'Done', color: '#10b981' },
-];
+export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
+  props,
+) => {
+  const {
+    // Theme
+    isDark,
+    themeTokens,
 
-const DURATION_OPTIONS = [
-  '15m',
-  '30m',
-  '45m',
-  '1h',
-  '1h 30m',
-  '2h',
-  '3h',
-  '4h',
-];
+    // Editing
+    isEditing,
 
-export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
-  open,
-  onClose,
-  task,
-  projects,
-  selectedProjectId,
-  projectName = 'Select Project',
-  projectEmoji = '📁',
-  sprintName,
-  linkedSpecTitle,
-  linkedSpecSection,
-  linkedWorkspaceId,
-  defaultStatus,
-  onCreate,
-  onUpdate,
-  onDelete,
-}) => {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-  const isEditing = Boolean(task);
+    // Project
+    selectedProject,
+    setSelectedProjectOverride,
+    projectMenuAnchor,
+    setProjectMenuAnchor,
+    currentProjectName,
+    currentProjectColor,
+    currentProjectEmoji,
+    isCurrentEmojiCustom,
+    isCurrentOutlined,
+    hasProjects,
+    isMultipleProjects,
 
-  const [selectedProjectOverride, setSelectedProjectOverride] = useState<
-    ProjectOption | undefined
-  >(undefined);
-  const [projectMenuAnchor, setProjectMenuAnchor] =
-    useState<null | HTMLElement>(null);
+    // Workspace
+    selectedWorkspaceId,
+    setSelectedWorkspaceId,
+    workspaceMenuAnchor,
+    setWorkspaceMenuAnchor,
+    workspaceSearch,
+    setWorkspaceSearch,
+    loadingWorkspaces,
+    filteredWorkspaces,
+    isWorkspaceLinked,
+    displayWorkspaceTitle,
+    displayWorkspaceSection,
+    displayWorkspaceEmoji,
 
-  const selectedProject =
-    selectedProjectOverride ||
-    (selectedProjectId && projects
-      ? projects.find((p) => p.id === selectedProjectId)
-      : projects?.[0]);
+    // Form
+    isFullScreen,
+    setIsFullScreen,
+    title,
+    setTitle,
+    setStatus,
+    statusMenuAnchor,
+    setStatusMenuAnchor,
+    setPriority,
+    priorityMenuAnchor,
+    setPriorityMenuAnchor,
+    modules,
+    newTagInput,
+    setNewTagInput,
+    isAddingTag,
+    setIsAddingTag,
+    dueDate,
+    setDueDate,
+    estimatedDuration,
+    setEstimatedDuration,
+    durationMenuAnchor,
+    setDurationMenuAnchor,
+    createMore,
+    setCreateMore,
+    description,
+    setDescription,
+    subtasks,
+    newSubtaskTitle,
+    setNewSubtaskTitle,
+    newSubtaskTime,
+    setNewSubtaskTime,
+    isSubmitting,
 
-  const currentProjectName = selectedProject?.name || projectName;
-  const currentProjectColor = selectedProject?.color || '#3b82f6';
-  const currentProjectEmoji =
-    selectedProject?.emoji ||
-    (projectEmoji !== '📁' ? projectEmoji : undefined);
-  const isCurrentEmojiCustom = isCustomEmoji(currentProjectEmoji);
-  const isCurrentOutlined = currentProjectEmoji === 'outlined';
-  const hasProjects = Boolean(projects && projects.length > 0);
-  const isMultipleProjects = Boolean(projects && projects.length > 1);
+    // Derived
+    currentStatusConfig,
+    currentPriorityConfig,
+    completedCount,
 
-  // ── Workspaces for Linked Spec & PRD Anchor ──
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
-    linkedWorkspaceId || null,
-  );
-  const [workspaceMenuAnchor, setWorkspaceMenuAnchor] =
-    useState<null | HTMLElement>(null);
-  const [workspaceSearch, setWorkspaceSearch] = useState('');
+    // Handlers
+    toggleSubtask,
+    handleAddSubtask,
+    handleRemoveSubtask,
+    handleAddTag,
+    handleRemoveTag,
+    handleCreateTask,
+    handleDeleteTask,
+    handleKeyDown,
+    handleRedirectWorkspace,
+  } = useCreateProjectTaskModal(props);
 
-  const { data: workspacesData, loading: loadingWorkspaces } = useQuery(
-    GET_WORKSPACES,
-    {
-      variables: {
-        projectId: selectedProject?.id || undefined,
-        limit: 50,
-        offset: 0,
-      },
-      skip: !open,
-      fetchPolicy: 'cache-and-network',
-    },
-  );
-
-  const availableWorkspaces: Array<{
-    id: string;
-    title: string;
-    emoji?: string;
-    projectId?: string;
-    updatedAt?: string;
-  }> = useMemo(() => {
-    return workspacesData?.result?.workspaces || [];
-  }, [workspacesData]);
-
-  const filteredWorkspaces = useMemo(() => {
-    if (!workspaceSearch.trim()) return availableWorkspaces;
-    const lower = workspaceSearch.toLowerCase();
-    return availableWorkspaces.filter(
-      (w) =>
-        (w.title && w.title.toLowerCase().includes(lower)) ||
-        (w.emoji && w.emoji.includes(lower)),
-    );
-  }, [availableWorkspaces, workspaceSearch]);
-
-  const selectedWorkspace = useMemo(() => {
-    if (selectedWorkspaceId) {
-      return (
-        availableWorkspaces.find((w) => w.id === selectedWorkspaceId) || null
-      );
-    }
-    return null;
-  }, [availableWorkspaces, selectedWorkspaceId]);
-
-  const isWorkspaceLinked = Boolean(
-    selectedWorkspace || selectedWorkspaceId || linkedSpecTitle,
-  );
-  const displayWorkspaceTitle =
-    selectedWorkspace?.title?.trim() ||
-    linkedSpecTitle?.trim() ||
-    (selectedWorkspaceId ? UNTITLED_WORKSPACE_TITLE : '');
-  const displayWorkspaceSection = selectedWorkspace
-    ? currentProjectName
-    : linkedSpecSection || currentProjectName;
-  const displayWorkspaceEmoji = selectedWorkspace?.emoji || '📄';
-
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [status, setStatus] = useState<string>(defaultStatus || 'in_progress');
-  const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(
-    null,
-  );
-
-  const [priority, setPriority] = useState<string>('Medium');
-  const [priorityMenuAnchor, setPriorityMenuAnchor] =
-    useState<null | HTMLElement>(null);
-
-  const [modules, setModules] = useState<string[]>([]);
-  const [newTagInput, setNewTagInput] = useState('');
-  const [isAddingTag, setIsAddingTag] = useState(false);
-
-  const [dueDate, setDueDate] = useState('');
-  const [estimatedDuration, setEstimatedDuration] = useState('30m');
-  const [durationMenuAnchor, setDurationMenuAnchor] =
-    useState<null | HTMLElement>(null);
-
-  const [createMore, setCreateMore] = useState(false);
-  const [description, setDescription] = useState('');
-
-  const [subtasks, setSubtasks] = useState<
-    Array<{
-      id: string;
-      title: string;
-      time?: string;
-      completed?: boolean;
-    }>
-  >([]);
-  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
-  const [newSubtaskTime, setNewSubtaskTime] = useState('15m');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // ── Sync Form with Passed Task (or Reset for New Task) ──
-  useEffect(() => {
-    if (open) {
-      if (task) {
-        setTitle(task.title || '');
-        setDescription(task.description || '');
-        setStatus(task.status || defaultStatus || 'in_progress');
-        setPriority(task.priority || 'Medium');
-
-        // Due date: YYYY-MM-DD for date input
-        if (task.rawDeadline) {
-          try {
-            setDueDate(new Date(task.rawDeadline).toISOString().slice(0, 10));
-          } catch {
-            setDueDate(task.rawDeadline.slice(0, 10));
-          }
-        } else if (task.dueDate && /^\d{4}-\d{2}-\d{2}/.test(task.dueDate)) {
-          setDueDate(task.dueDate.slice(0, 10));
-        } else {
-          setDueDate('');
-        }
-
-        setEstimatedDuration(task.duration || '30m');
-        setModules(
-          task.modules && task.modules.length > 0
-            ? task.modules
-            : task.tag
-              ? [task.tag]
-              : [],
-        );
-        setSubtasks(
-          (task.subtasks || []).map((s) => ({
-            id: s.id,
-            title: s.title,
-            time: s.duration || '15m',
-            completed: Boolean(s.completed),
-          })),
-        );
-        setSelectedWorkspaceId(task.workspaceId || linkedWorkspaceId || null);
-
-        const matchedProject = projects?.find(
-          (p) => p.id === task.projectId || p.id === task.project?.id,
-        );
-        if (matchedProject) {
-          setSelectedProjectOverride(matchedProject);
-        } else if (selectedProjectId && projects) {
-          setSelectedProjectOverride(
-            projects.find((p) => p.id === selectedProjectId),
-          );
-        } else {
-          setSelectedProjectOverride(undefined);
-        }
-      } else {
-        setTitle('');
-        setDescription('');
-        setStatus(defaultStatus || 'in_progress');
-        setPriority('Medium');
-        setDueDate('');
-        setEstimatedDuration('30m');
-        setModules([]);
-        setSubtasks([]);
-        setSelectedWorkspaceId(linkedWorkspaceId || null);
-        if (selectedProjectId && projects) {
-          setSelectedProjectOverride(
-            projects.find((p) => p.id === selectedProjectId),
-          );
-        } else {
-          setSelectedProjectOverride(undefined);
-        }
-      }
-    }
-  }, [
-    open,
-    task,
-    linkedWorkspaceId,
-    defaultStatus,
-    selectedProjectId,
-    projects,
-  ]);
-
-  const currentStatusConfig =
-    STATUS_OPTIONS.find(
-      (s) => s.id === status || s.label.toLowerCase() === status.toLowerCase(),
-    ) || STATUS_OPTIONS[2];
-
-  const currentPriorityConfig =
-    PRIORITY_OPTIONS.find(
-      (p) =>
-        p.id.toLowerCase() === priority.toLowerCase() ||
-        p.label.toLowerCase() === priority.toLowerCase(),
-    ) || PRIORITY_OPTIONS[1];
-
-  const toggleSubtask = (id: string) => {
-    setSubtasks((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, completed: !s.completed } : s)),
-    );
-  };
-
-  const handleAddSubtask = () => {
-    if (!newSubtaskTitle.trim()) return;
-    setSubtasks((prev) => [
-      ...prev,
-      {
-        id: `st-${Date.now()}`,
-        title: newSubtaskTitle.trim(),
-        time: newSubtaskTime || '15m',
-        completed: false,
-      },
-    ]);
-    setNewSubtaskTitle('');
-  };
-
-  const handleRemoveSubtask = (id: string) => {
-    setSubtasks((prev) => prev.filter((s) => s.id !== id));
-  };
-
-  const handleAddTag = () => {
-    const trimmed = newTagInput.trim();
-    if (trimmed && !modules.includes(trimmed)) {
-      setModules((prev) => [...prev, trimmed]);
-    }
-    setNewTagInput('');
-    setIsAddingTag(false);
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setModules((prev) => prev.filter((t) => t !== tagToRemove));
-  };
-
-  const handleCreateTask = async () => {
-    if (!title.trim()) {
-      sileo.warning({
-        title: 'Title required',
-        description: 'Please enter a title for the task.',
-        duration: 3000,
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const payload = {
-        title: title.trim(),
-        status: currentStatusConfig.id,
-        priority: currentPriorityConfig.id,
-        modules,
-        dueDate: dueDate || undefined,
-        estimatedDuration,
-        description: description.trim(),
-        subtasks,
-        projectId: selectedProject?.id,
-        workspaceId: selectedWorkspaceId || undefined,
-      };
-
-      if (isEditing && task) {
-        if (onUpdate) {
-          await onUpdate(task.id, payload);
-        } else if (onCreate) {
-          await onCreate({ ...payload, id: task.id });
-        }
-        sileo.success({
-          title: 'Task updated',
-          description: `"${title.trim()}" saved successfully.`,
-          duration: 2500,
-        });
-        onClose();
-      } else {
-        if (onCreate) {
-          await onCreate(payload);
-        }
-
-        if (createMore) {
-          setTitle('');
-          setDescription('');
-          setSubtasks([]);
-          setModules([]);
-        } else {
-          onClose();
-        }
-      }
-    } catch (err) {
-      console.error('Failed to save task:', err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDeleteTask = async () => {
-    if (!task?.id || !onDelete) return;
-    setIsSubmitting(true);
-    try {
-      await onDelete(task.id);
-      onClose();
-    } catch (err) {
-      console.error('Failed to delete task:', err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      e.preventDefault();
-      handleCreateTask();
-    }
-  };
-
-  const completedCount = subtasks.filter((s) => s.completed).length;
+  const { open, onClose, sprintName, projects, onDelete } = props;
 
   // Visual Theme Tokens
-  const surfaceBg = isDark ? '#141417' : '#ffffff';
-  const cardBg = isDark ? '#1a1a1f' : '#f8fafc';
-  const cardBorder = isDark ? '#27272a' : '#e2e8f0';
-  const secondaryText = isDark ? '#a1a1aa' : '#64748b';
-  const headerText = isDark ? '#f4f4f5' : '#0f172a';
+  const surfaceBg = themeTokens.surfaceBg;
+  const cardBg = themeTokens.cardBg;
+  const cardBorder = themeTokens.cardBorder;
+  const secondaryText = themeTokens.secondaryText;
+  const headerText = themeTokens.headerText;
 
   return (
     <Dialog
@@ -1364,10 +1085,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
           {/* Linked Workspace Item Card */}
           {isWorkspaceLinked ? (
             <Box
-              onClick={(e) => {
-                setWorkspaceSearch('');
-                setWorkspaceMenuAnchor(e.currentTarget);
-              }}
+              onClick={() => handleRedirectWorkspace()}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -1428,21 +1146,89 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
                 </Box>
               </Stack>
 
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Chip
-                  label="Vinculado"
-                  size="small"
+              <Stack direction="row" alignItems="center" spacing={0.75}>
+                {/* Open workspace button */}
+                <Tooltip title="Open workspace" arrow placement="top">
+                  <Box
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRedirectWorkspace();
+                    }}
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      px: 1,
+                      py: 0.4,
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      bgcolor: isDark
+                        ? alpha('#6366f1', 0.12)
+                        : alpha('#6366f1', 0.08),
+                      border: `1px solid ${isDark ? alpha('#6366f1', 0.25) : alpha('#6366f1', 0.18)}`,
+                      color: isDark ? '#818cf8' : '#4f46e5',
+                      transition: 'all 0.15s ease',
+                      '&:hover': {
+                        bgcolor: isDark
+                          ? alpha('#6366f1', 0.22)
+                          : alpha('#6366f1', 0.14),
+                        borderColor: isDark
+                          ? alpha('#6366f1', 0.45)
+                          : alpha('#6366f1', 0.35),
+                      },
+                    }}
+                  >
+                    <DocIcon sx={{ fontSize: 11 }} />
+                    <Typography
+                      sx={{
+                        fontSize: '10.5px',
+                        fontWeight: 700,
+                        lineHeight: 1,
+                      }}
+                    >
+                      Open
+                    </Typography>
+                  </Box>
+                </Tooltip>
+
+                {/* Linked badge */}
+                <Box
                   sx={{
-                    height: '20px',
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    bgcolor: isDark ? alpha('#10b981', 0.15) : '#d1fae5',
-                    color: isDark ? '#34d399' : '#059669',
-                    border: '1px solid',
-                    borderColor: isDark ? alpha('#10b981', 0.3) : '#a7f3d0',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.4,
+                    px: 0.75,
+                    py: 0.35,
+                    borderRadius: '6px',
+                    bgcolor: isDark
+                      ? alpha('#10b981', 0.1)
+                      : alpha('#10b981', 0.08),
+                    border: `1px solid ${isDark ? alpha('#10b981', 0.22) : alpha('#10b981', 0.2)}`,
                   }}
-                />
-                <Tooltip title="Desvincular workspace" arrow>
+                >
+                  <Box
+                    sx={{
+                      width: 5,
+                      height: 5,
+                      borderRadius: '50%',
+                      bgcolor: isDark ? '#34d399' : '#10b981',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: isDark ? '#34d399' : '#059669',
+                      lineHeight: 1,
+                    }}
+                  >
+                    Linked
+                  </Typography>
+                </Box>
+
+                {/* Unlink button */}
+                <Tooltip title="Unlink workspace" arrow>
                   <IconButton
                     size="small"
                     onClick={(e) => {
@@ -1450,15 +1236,15 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
                       setSelectedWorkspaceId(null);
                     }}
                     sx={{
-                      p: 0.5,
+                      p: 0.45,
                       color: secondaryText,
                       '&:hover': {
                         color: '#ef4444',
-                        bgcolor: alpha('#ef4444', 0.1),
+                        bgcolor: alpha('#ef4444', 0.08),
                       },
                     }}
                   >
-                    <CloseIcon sx={{ fontSize: 14 }} />
+                    <CloseIcon sx={{ fontSize: 13 }} />
                   </IconButton>
                 </Tooltip>
               </Stack>
@@ -1477,7 +1263,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
                 p: 1.5,
                 borderRadius: '8px',
                 bgcolor: isDark ? alpha('#ffffff', 0.02) : '#f8fafc',
-                border: `1px dashed ${alpha(cardBorder, 1.2)}`,
+                border: `1px dashed ${cardBorder}`,
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 '&:hover': {
@@ -1530,7 +1316,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
                 sx={{
                   fontSize: '11px',
                   textTransform: 'none',
-                  borderColor: alpha(cardBorder, 1.4),
+                  borderColor: cardBorder,
                   color: '#3b82f6',
                   p: '2px 8px',
                   borderRadius: '6px',
@@ -1686,30 +1472,29 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = ({
               })
             )}
 
-            {selectedWorkspaceId && (
-              <>
-                <Divider sx={{ my: 0.75 }} />
-                <MenuItem
-                  onClick={() => {
-                    setSelectedWorkspaceId(null);
-                    setWorkspaceMenuAnchor(null);
-                  }}
-                  sx={{
-                    borderRadius: '8px',
-                    py: 0.75,
-                    color: '#ef4444',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                  }}
-                >
-                  <DeleteOutlineIcon sx={{ fontSize: 15 }} />
-                  Desvincular workspace
-                </MenuItem>
-              </>
-            )}
+            {selectedWorkspaceId && [
+              <Divider key="divider" sx={{ my: 0.75 }} />,
+              <MenuItem
+                key="desvincular"
+                onClick={() => {
+                  setSelectedWorkspaceId(null);
+                  setWorkspaceMenuAnchor(null);
+                }}
+                sx={{
+                  borderRadius: '8px',
+                  py: 0.75,
+                  color: '#ef4444',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <DeleteOutlineIcon sx={{ fontSize: 15 }} />
+                Desvincular workspace
+              </MenuItem>,
+            ]}
           </Menu>
         </Box>
 
