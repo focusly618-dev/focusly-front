@@ -6,6 +6,7 @@ import {
   MenuItem,
   Tooltip,
 } from '@mui/material';
+import type { Theme } from '@mui/material';
 import {
   getStatusIcon,
   getCategoryIcon,

@@ -25,6 +25,7 @@ import {
   MoreHoriz as MoreHorizIcon,
   Search as SearchIcon,
   Close as CloseIcon,
+  Folder as FolderIcon,
   FolderOff as FolderOffIcon,
   Check as CheckIcon,
 } from '@mui/icons-material';
