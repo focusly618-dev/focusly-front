@@ -186,6 +186,7 @@ export const buildGraph = (
   rootLabel: string,
   headings: HeadingItem[],
   spacing = 1,
+  _markdownContent?: string,
   rootIcon?: string,
 ): {
   nodes: GraphNode[];
