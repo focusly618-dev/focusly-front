@@ -116,13 +116,13 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
   const filteredNodes = useMemo(() => {
     return allNodes.filter((node) => {
       if (activeFilter === 'h1') {
-        return node.type === 'document' || node.level === 1;
+        return node.type === 'document' || node.level === 0 || node.level === 1;
       }
       if (activeFilter === 'h2') {
-        return node.type === 'document' || node.level === 2;
+        return node.type === 'document' || node.level === 0 || node.level === 2;
       }
       if (activeFilter === 'h3') {
-        return node.type === 'document' || node.level >= 3;
+        return node.type === 'document' || node.level === 0 || node.level >= 3;
       }
       return true;
     });
@@ -132,7 +132,9 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
   const visibleNodes = useMemo(() => {
     if (!searchQuery.trim()) return filteredNodes;
     const q = searchQuery.toLowerCase();
-    return filteredNodes.filter((node) => node.label.toLowerCase().includes(q));
+    return filteredNodes.filter((node) =>
+      (node.label || '').toLowerCase().includes(q),
+    );
   }, [filteredNodes, searchQuery]);
 
   const nodeById = useMemo(
@@ -216,11 +218,15 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
   // Hierarchical location path for selected node
   const nodeBreadcrumbs = useMemo(() => {
     if (!selectedNode) return [];
-    if (selectedNode.type === 'document' || selectedNode.pos == null) {
-      return [{ text: rootLabel, level: 0, pos: 0 }];
+    if (
+      selectedNode.type === 'document' ||
+      selectedNode.level === 0 ||
+      selectedNode.pos == null
+    ) {
+      return [{ text: rootLabel || 'Documento', level: 0, pos: 0 }];
     }
     const path = getHeadingPath(headings, selectedNode.pos);
-    return [{ text: rootLabel, level: 0, pos: 0 }, ...path];
+    return [{ text: rootLabel || 'Documento', level: 0, pos: 0 }, ...path];
   }, [selectedNode, rootLabel, headings]);
 
   return (

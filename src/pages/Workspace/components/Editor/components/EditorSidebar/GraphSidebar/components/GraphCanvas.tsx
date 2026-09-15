@@ -36,7 +36,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   canvasWidth,
   canvasHeight,
   zoom,
-  zoomOrigin,
   pan,
   isPanning,
   nodes,
@@ -108,9 +107,8 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
       {/* Transformed content container for smooth pan and zoom */}
       <g
+        transform={`translate(${canvasWidth / 2 + pan.x}, ${canvasHeight / 2 + pan.y}) scale(${zoom}) translate(${-canvasWidth / 2}, ${-canvasHeight / 2})`}
         style={{
-          transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-          transformOrigin: zoomOrigin,
           transition: isPanning ? 'none' : 'transform 0.05s linear',
         }}
       >

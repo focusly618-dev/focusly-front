@@ -4,6 +4,8 @@ import {
   Button,
   Fade,
   IconButton,
+  Menu,
+  MenuItem,
   Slide,
   Tooltip,
   Typography,
@@ -14,16 +16,26 @@ import {
   CalendarTodayOutlined as CalendarIcon,
   Close as CloseIcon,
   DescriptionOutlined as DocumentIcon,
-  FlagOutlined as FlagIcon,
   HubOutlined as HubIcon,
   LinkOffOutlined as UnlinkIcon,
   NotesOutlined as ParagraphsIcon,
-  PlayArrowRounded as PlayIcon,
+  FlashOn as FlashOnIcon,
   TocOutlined as TocIcon,
   TimerOutlined as TimerIcon,
   Add as AddIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
 } from '@mui/icons-material';
-import { getPriorityConfig } from '@/components/ui/PriorityBadge/priority.constants';
+import {
+  PriorityBadge,
+  PRIORITY_OPTIONS,
+  getPriorityConfig,
+} from '@/components/ui';
+import { STATUS_LIST } from '@/pages/Home/components/CreateTaskModal/components/TaskIcons';
+import {
+  getPriorityLevel,
+  type PriorityType,
+} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 import type { EditorSidebarProps } from './EditorSidebar.type';
 import { parseHeadings, NoteGraphView, NoteOutlineList } from './GraphSidebar';
 
@@ -76,15 +88,6 @@ const formatDeadline = (deadline?: string) => {
   }).format(date);
 };
 
-const formatEstimate = (minutes?: number) => {
-  if (!minutes) return 'Sin estimación';
-  if (minutes < 60) return `${minutes} min`;
-
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  return remainingMinutes ? `${hours} h ${remainingMinutes} min` : `${hours} h`;
-};
-
 export const EditorSidebar = (props: EditorSidebarProps) => {
   const {
     isRightSidebarOpen,
@@ -96,6 +99,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     currentFolder,
     selectTask,
     linkedTasks,
+    handleUpdateTask,
     onStartFocus,
     activeFocusTaskId,
     onUnlinkTask,
@@ -105,6 +109,60 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
   const theme = useTheme();
   const [activeInsightView, setActiveInsightView] =
     useState<InsightView>('stats');
+
+  const [statusMenu, setStatusMenu] = useState<{
+    anchorEl: HTMLElement;
+    task: TaskSearchItems;
+  } | null>(null);
+
+  const [priorityMenu, setPriorityMenu] = useState<{
+    anchorEl: HTMLElement;
+    task: TaskSearchItems;
+  } | null>(null);
+
+  const [taskOverrides, setTaskOverrides] = useState<
+    Record<string, Partial<TaskSearchItems>>
+  >({});
+
+  const handleUpdateTaskStatus = async (
+    task: TaskSearchItems,
+    newStatus: string,
+  ) => {
+    setStatusMenu(null);
+    setTaskOverrides((prev) => ({
+      ...prev,
+      [task.id]: {
+        ...prev[task.id],
+        status: newStatus as TaskSearchItems['status'],
+      },
+    }));
+    try {
+      await handleUpdateTask?.(task.id, {
+        status: newStatus as TaskSearchItems['status'],
+      });
+    } catch (error) {
+      console.error('Failed to update task status in sidebar', error);
+    }
+  };
+
+  const handleUpdateTaskPriority = async (
+    task: TaskSearchItems,
+    newLevel: number,
+  ) => {
+    setPriorityMenu(null);
+    setTaskOverrides((prev) => ({
+      ...prev,
+      [task.id]: {
+        ...prev[task.id],
+        priority_level: newLevel,
+      },
+    }));
+    try {
+      await handleUpdateTask?.(task.id, { priority_level: newLevel });
+    } catch (error) {
+      console.error('Failed to update task priority in sidebar', error);
+    }
+  };
 
   const noteTitle =
     currentTitle?.trim() || selectTask?.title || 'Nota sin título';
@@ -158,10 +216,18 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
   ];
 
   const tasksToList = useMemo(() => {
-    if (linkedTasks && linkedTasks.length > 0) return linkedTasks;
-    if (selectTask) return [selectTask];
-    return [];
-  }, [linkedTasks, selectTask]);
+    const rawList =
+      linkedTasks && linkedTasks.length > 0
+        ? linkedTasks
+        : selectTask
+          ? [selectTask]
+          : [];
+
+    return rawList.map((t) => {
+      const override = taskOverrides[t.id];
+      return override ? { ...t, ...override } : t;
+    });
+  }, [linkedTasks, selectTask, taskOverrides]);
 
   return (
     <>
@@ -203,7 +269,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
             bgcolor: 'background.paper',
             border: '1px solid',
             borderColor: 'divider',
-            borderRadius: { xs: 2, md: 3 },
+            borderRadius: { xs: 1, md: 1 },
             boxShadow: (currentTheme) =>
               currentTheme.palette.mode === 'dark'
                 ? '0 16px 44px rgba(0, 0, 0, 0.42)'
@@ -279,7 +345,17 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           </Box>
 
           {activeInsightView === 'graph' ? (
-            <Box sx={{ flex: 1, minHeight: 0, display: 'flex' }}>
+            <Box
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                minWidth: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                overflow: 'hidden',
+              }}
+            >
               <NoteGraphView
                 rootLabel={noteTitle}
                 headings={headings}
@@ -427,7 +503,18 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                         sx={{
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: 1,
+                          gap: 0.75,
+                          maxHeight: 190,
+                          overflowY: 'auto',
+                          pr: 0.5,
+                          '&::-webkit-scrollbar': { width: 4 },
+                          '&::-webkit-scrollbar-thumb': {
+                            borderRadius: 4,
+                            bgcolor: (t) =>
+                              t.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.16)'
+                                : 'rgba(15, 23, 42, 0.16)',
+                          },
                         }}
                       >
                         {tasksToList.map((task) => {
@@ -439,6 +526,9 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                           );
                           const statusColor = getStatusColor(task.status);
                           const statusLabel = getStatusLabel(task.status);
+                          const durationLabel = task.estimate_timer
+                            ? `${task.estimate_timer}m`
+                            : '25m';
 
                           return (
                             <Box
@@ -448,74 +538,53 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                                 borderColor: isFocusActive
                                   ? 'primary.main'
                                   : 'divider',
-                                borderRadius: 2,
-                                overflow: 'hidden',
+                                borderRadius: '8px',
+                                p: '7px 10px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 0.65,
                                 bgcolor: (t) =>
                                   isFocusActive
                                     ? t.palette.mode === 'dark'
-                                      ? 'rgba(37, 99, 235, 0.08)'
-                                      : 'rgba(37, 99, 235, 0.04)'
-                                    : 'transparent',
-                                transition: 'border-color 0.15s ease',
+                                      ? 'rgba(37, 99, 235, 0.1)'
+                                      : 'rgba(37, 99, 235, 0.05)'
+                                    : t.palette.mode === 'dark'
+                                      ? 'rgba(255, 255, 255, 0.02)'
+                                      : 'rgba(0, 0, 0, 0.01)',
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  borderColor: isFocusActive
+                                    ? 'primary.main'
+                                    : 'divider',
+                                  bgcolor: (t) =>
+                                    isFocusActive
+                                      ? t.palette.mode === 'dark'
+                                        ? 'rgba(37, 99, 235, 0.15)'
+                                        : 'rgba(37, 99, 235, 0.08)'
+                                      : 'action.hover',
+                                },
                               }}
                             >
-                              <Box sx={{ p: 1.25 }}>
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    gap: 1,
-                                    mb: 0.5,
-                                  }}
-                                >
-                                  <Box
-                                    sx={{
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: 0.75,
-                                    }}
-                                  >
-                                    <Box
-                                      sx={{
-                                        width: 7,
-                                        height: 7,
-                                        borderRadius: '50%',
-                                        bgcolor: statusColor,
-                                        flexShrink: 0,
-                                      }}
-                                    />
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        color: 'text.secondary',
-                                        fontWeight: 600,
-                                        fontSize: '11px',
-                                      }}
-                                    >
-                                      {statusLabel}
-                                    </Typography>
-                                  </Box>
-                                  <Box
-                                    sx={{
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: 0.5,
-                                      color: priority.color,
-                                      fontSize: '11px',
-                                      fontWeight: 700,
-                                    }}
-                                  >
-                                    <FlagIcon sx={{ fontSize: 13 }} />
-                                    {priority.label}
-                                  </Box>
-                                </Box>
-
+                              {/* Row 1: Title + Action buttons (Focus + Unlink) */}
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  gap: 0.75,
+                                  minWidth: 0,
+                                }}
+                              >
                                 <Typography
+                                  noWrap
+                                  title={task.title}
                                   sx={{
-                                    fontSize: '13px',
+                                    fontSize: '12px',
                                     fontWeight: 700,
-                                    lineHeight: 1.35,
+                                    color: 'text.primary',
+                                    lineHeight: 1.25,
+                                    flex: 1,
+                                    minWidth: 0,
                                   }}
                                 >
                                   {task.title}
@@ -524,96 +593,275 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                                 <Box
                                   sx={{
                                     display: 'flex',
-                                    flexWrap: 'wrap',
-                                    gap: 1.5,
-                                    mt: 0.75,
-                                    color: 'text.secondary',
+                                    alignItems: 'center',
+                                    gap: 0.35,
+                                    flexShrink: 0,
                                   }}
                                 >
+                                  <Tooltip
+                                    title={
+                                      isFocusActive
+                                        ? 'Focus activo'
+                                        : `Iniciar Focus Mode (${durationLabel})`
+                                    }
+                                  >
+                                    <span>
+                                      <Button
+                                        size="small"
+                                        variant={
+                                          isFocusActive
+                                            ? 'contained'
+                                            : 'outlined'
+                                        }
+                                        startIcon={
+                                          <FlashOnIcon
+                                            sx={{
+                                              fontSize: 13,
+                                              color: isFocusActive
+                                                ? '#ffffff'
+                                                : '#f59e0b',
+                                            }}
+                                          />
+                                        }
+                                        disabled={
+                                          !onStartFocus ||
+                                          isFocusActive ||
+                                          task.status === 'Done'
+                                        }
+                                        onClick={() => onStartFocus?.(task)}
+                                        sx={{
+                                          textTransform: 'none',
+                                          fontSize: '10.5px',
+                                          fontWeight: 700,
+                                          py: 0.2,
+                                          px: 0.75,
+                                          height: 24,
+                                          minWidth: 0,
+                                          whiteSpace: 'nowrap',
+                                          borderColor: isFocusActive
+                                            ? 'primary.main'
+                                            : 'rgba(245, 158, 11, 0.4)',
+                                          color: isFocusActive
+                                            ? '#ffffff'
+                                            : 'text.primary',
+                                          boxShadow: 'none',
+                                          '&:hover': {
+                                            borderColor: '#f59e0b',
+                                            bgcolor: isFocusActive
+                                              ? 'primary.dark'
+                                              : 'rgba(245, 158, 11, 0.08)',
+                                          },
+                                        }}
+                                      >
+                                        {isFocusActive
+                                          ? 'Focus'
+                                          : `Focus (${durationLabel})`}
+                                      </Button>
+                                    </span>
+                                  </Tooltip>
+
+                                  {onUnlinkTask && (
+                                    <Tooltip title="Desvincular tarea">
+                                      <IconButton
+                                        aria-label="Desvincular tarea"
+                                        size="small"
+                                        onClick={() => onUnlinkTask(task)}
+                                        sx={{
+                                          color: 'text.secondary',
+                                          p: 0.3,
+                                          width: 24,
+                                          height: 24,
+                                          '&:hover': {
+                                            color: 'error.main',
+                                            bgcolor: 'error.lighter',
+                                          },
+                                        }}
+                                      >
+                                        <UnlinkIcon sx={{ fontSize: 14 }} />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                                </Box>
+                              </Box>
+
+                              {/* Row 2: Status Dropdown + Priority Dropdown + Timer + Deadline */}
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.6,
+                                  flexWrap: 'wrap',
+                                  color: 'text.secondary',
+                                }}
+                              >
+                                {/* Status Dropdown Pill */}
+                                <Tooltip title="Cambiar estado">
                                   <Box
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setStatusMenu({
+                                        anchorEl: e.currentTarget,
+                                        task,
+                                      });
+                                    }}
                                     sx={{
                                       display: 'inline-flex',
                                       alignItems: 'center',
-                                      gap: 0.5,
+                                      gap: 0.45,
+                                      px: 0.6,
+                                      py: 0.2,
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      bgcolor: (t) =>
+                                        t.palette.mode === 'dark'
+                                          ? 'rgba(255, 255, 255, 0.05)'
+                                          : 'rgba(0, 0, 0, 0.04)',
+                                      border: '1px solid',
+                                      borderColor: (t) =>
+                                        t.palette.mode === 'dark'
+                                          ? 'rgba(255, 255, 255, 0.08)'
+                                          : 'rgba(0, 0, 0, 0.06)',
+                                      '&:hover': {
+                                        bgcolor: (t) =>
+                                          t.palette.mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.12)'
+                                            : 'rgba(0, 0, 0, 0.08)',
+                                        borderColor: 'divider',
+                                      },
+                                      transition: 'all 0.15s',
                                     }}
                                   >
-                                    <CalendarIcon sx={{ fontSize: 13 }} />
+                                    <Box
+                                      sx={{
+                                        width: 6,
+                                        height: 6,
+                                        borderRadius: '50%',
+                                        bgcolor: statusColor,
+                                        flexShrink: 0,
+                                      }}
+                                    />
+                                    <Typography
+                                      sx={{
+                                        fontSize: '10px',
+                                        fontWeight: 600,
+                                        color: 'text.primary',
+                                        lineHeight: 1,
+                                      }}
+                                    >
+                                      {statusLabel}
+                                    </Typography>
+                                    <KeyboardArrowDownIcon
+                                      sx={{
+                                        fontSize: 11,
+                                        color: 'text.secondary',
+                                        ml: -0.2,
+                                      }}
+                                    />
+                                  </Box>
+                                </Tooltip>
+
+                                {/* Priority Dropdown Pill */}
+                                <Tooltip title="Cambiar prioridad">
+                                  <Box
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPriorityMenu({
+                                        anchorEl: e.currentTarget,
+                                        task,
+                                      });
+                                    }}
+                                    sx={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 0.35,
+                                      px: 0.6,
+                                      py: 0.2,
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      bgcolor: (t) =>
+                                        t.palette.mode === 'dark'
+                                          ? 'rgba(255, 255, 255, 0.05)'
+                                          : 'rgba(0, 0, 0, 0.04)',
+                                      border: '1px solid',
+                                      borderColor: (t) =>
+                                        t.palette.mode === 'dark'
+                                          ? 'rgba(255, 255, 255, 0.08)'
+                                          : 'rgba(0, 0, 0, 0.06)',
+                                      '&:hover': {
+                                        bgcolor: (t) =>
+                                          t.palette.mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.12)'
+                                            : 'rgba(0, 0, 0, 0.08)',
+                                        borderColor: 'divider',
+                                      },
+                                      transition: 'all 0.15s',
+                                    }}
+                                  >
+                                    <PriorityBadge
+                                      priority={task.priority_level}
+                                      size={13}
+                                    />
+                                    <Typography
+                                      sx={{
+                                        fontSize: '10px',
+                                        fontWeight: 700,
+                                        color: priority.color,
+                                        lineHeight: 1,
+                                      }}
+                                    >
+                                      {priority.label}
+                                    </Typography>
+                                    <KeyboardArrowDownIcon
+                                      sx={{
+                                        fontSize: 11,
+                                        color: 'text.secondary',
+                                        ml: -0.2,
+                                      }}
+                                    />
+                                  </Box>
+                                </Tooltip>
+
+                                {/* Duration */}
+                                <Box
+                                  sx={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 0.3,
+                                    ml: 'auto',
+                                  }}
+                                >
+                                  <TimerIcon sx={{ fontSize: 11 }} />
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ fontSize: '10px' }}
+                                  >
+                                    {durationLabel}
+                                    {task.real_timer && task.real_timer > 0
+                                      ? ` (${Math.round(task.real_timer)}m)`
+                                      : ''}
+                                  </Typography>
+                                </Box>
+
+                                {/* Deadline */}
+                                {task.deadline && (
+                                  <Box
+                                    sx={{
+                                      display: {
+                                        xs: 'none',
+                                        sm: 'inline-flex',
+                                      },
+                                      alignItems: 'center',
+                                      gap: 0.3,
+                                    }}
+                                  >
+                                    <CalendarIcon sx={{ fontSize: 11 }} />
                                     <Typography
                                       variant="caption"
-                                      sx={{ fontSize: '11px' }}
+                                      sx={{ fontSize: '10px' }}
                                     >
                                       {formatDeadline(task.deadline)}
                                     </Typography>
                                   </Box>
-                                  <Box
-                                    sx={{
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: 0.5,
-                                    }}
-                                  >
-                                    <TimerIcon sx={{ fontSize: 13 }} />
-                                    <Typography
-                                      variant="caption"
-                                      sx={{ fontSize: '11px' }}
-                                    >
-                                      {formatEstimate(task.estimate_timer)}
-                                    </Typography>
-                                  </Box>
-                                </Box>
-                              </Box>
-
-                              <Box
-                                sx={{
-                                  px: 1,
-                                  py: 0.5,
-                                  borderTop: '1px solid',
-                                  borderColor: 'divider',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'space-between',
-                                  bgcolor: (t) =>
-                                    t.palette.mode === 'dark'
-                                      ? 'rgba(255, 255, 255, 0.02)'
-                                      : 'rgba(0, 0, 0, 0.01)',
-                                }}
-                              >
-                                <Button
-                                  size="small"
-                                  variant={
-                                    isFocusActive ? 'contained' : 'outlined'
-                                  }
-                                  startIcon={<PlayIcon sx={{ fontSize: 15 }} />}
-                                  disabled={
-                                    !onStartFocus ||
-                                    isFocusActive ||
-                                    task.status === 'Done'
-                                  }
-                                  onClick={() => onStartFocus?.(task)}
-                                  sx={{
-                                    textTransform: 'none',
-                                    fontSize: '11px',
-                                    py: 0.2,
-                                    px: 1,
-                                    boxShadow: 'none',
-                                  }}
-                                >
-                                  {isFocusActive
-                                    ? 'Focus activo'
-                                    : 'Iniciar focus'}
-                                </Button>
-
-                                {onUnlinkTask && (
-                                  <Tooltip title="Desvincular tarea">
-                                    <IconButton
-                                      aria-label="Desvincular tarea"
-                                      size="small"
-                                      onClick={() => onUnlinkTask(task)}
-                                      sx={{ color: 'text.secondary', p: 0.5 }}
-                                    >
-                                      <UnlinkIcon sx={{ fontSize: 16 }} />
-                                    </IconButton>
-                                  </Tooltip>
                                 )}
                               </Box>
                             </Box>
@@ -774,6 +1022,121 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           )}
         </Box>
       </Slide>
+
+      {/* Status Menu */}
+      <Menu
+        anchorEl={statusMenu?.anchorEl}
+        open={Boolean(statusMenu)}
+        onClose={() => setStatusMenu(null)}
+        PaperProps={{
+          sx: {
+            bgcolor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+            minWidth: 150,
+            borderRadius: '8px',
+            p: 0.5,
+          },
+        }}
+      >
+        {STATUS_LIST.map((statusName) => {
+          const isSelected = statusMenu?.task.status === statusName;
+          const sColor = getStatusColor(statusName);
+
+          return (
+            <MenuItem
+              key={statusName}
+              selected={isSelected}
+              onClick={() => {
+                if (statusMenu) {
+                  void handleUpdateTaskStatus(statusMenu.task, statusName);
+                }
+              }}
+              sx={{
+                gap: 1.25,
+                py: 0.6,
+                px: 1.25,
+                borderRadius: '6px',
+                my: 0.2,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  bgcolor: sColor,
+                  flexShrink: 0,
+                }}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: '12px',
+                  fontWeight: isSelected ? 700 : 500,
+                  color: isSelected ? 'text.primary' : 'text.secondary',
+                }}
+              >
+                {getStatusLabel(statusName)}
+              </Typography>
+            </MenuItem>
+          );
+        })}
+      </Menu>
+
+      {/* Priority Menu */}
+      <Menu
+        anchorEl={priorityMenu?.anchorEl}
+        open={Boolean(priorityMenu)}
+        onClose={() => setPriorityMenu(null)}
+        PaperProps={{
+          sx: {
+            bgcolor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+            minWidth: 150,
+            borderRadius: '8px',
+            p: 0.5,
+          },
+        }}
+      >
+        {PRIORITY_OPTIONS.map((pOpt) => {
+          const level = getPriorityLevel(pOpt.id as PriorityType);
+          const isSelected =
+            getPriorityConfig(priorityMenu?.task.priority_level).id === pOpt.id;
+
+          return (
+            <MenuItem
+              key={pOpt.id}
+              selected={isSelected}
+              onClick={() => {
+                if (priorityMenu) {
+                  void handleUpdateTaskPriority(priorityMenu.task, level);
+                }
+              }}
+              sx={{
+                gap: 1.25,
+                py: 0.6,
+                px: 1.25,
+                borderRadius: '6px',
+                my: 0.2,
+              }}
+            >
+              <PriorityBadge priority={pOpt.id} size={18} />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: '12px',
+                  fontWeight: isSelected ? 700 : 500,
+                  color: isSelected ? 'text.primary' : 'text.secondary',
+                }}
+              >
+                {pOpt.label}
+              </Typography>
+            </MenuItem>
+          );
+        })}
+      </Menu>
     </>
   );
 };

@@ -82,20 +82,22 @@ export const getHeadingIcon = (text: string, level: number): string => {
 };
 
 export const getNodeDimensions = (
-  node: { type?: string; label: string },
+  node: { type?: string; label?: string; level?: number },
   isSelected = false,
 ): { width: number; height: number } => {
-  if (node.type === 'document') {
+  if (!node) return { width: 185, height: 54 };
+  const label = node.label || '';
+  if (node.level === 0 || node.type === 'document') {
     return { width: 185, height: 54 };
   }
   if (node.type === 'source' || node.type === 'concept') {
-    const width = Math.max(95, Math.min(135, node.label.length * 9.5 + 24));
+    const width = Math.max(95, Math.min(135, label.length * 9.5 + 24));
     return { width, height: 30 };
   }
   if (isSelected) {
     return { width: 195, height: 52 };
   }
-  const width = Math.max(145, Math.min(205, node.label.length * 8.5 + 46));
+  const width = Math.max(145, Math.min(205, label.length * 8.5 + 46));
   return { width, height: 40 };
 };
 

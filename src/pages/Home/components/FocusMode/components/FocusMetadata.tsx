@@ -6,7 +6,6 @@ import {
   PauseCircle as PauseCircleIcon,
   History as HistoryIcon,
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
-  FlashOn as FlashOnIcon,
   EventNote as PlannedIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
@@ -16,8 +15,14 @@ import {
   TaskMetadataContainer,
 } from '../FocusMode.styles';
 import {
-  getPriorityFromLevel,
+  PriorityBadge,
+  PRIORITY_OPTIONS,
+  getPriorityConfig,
+} from '@/components/ui';
+import {
   formatDuration,
+  getPriorityLevel,
+  type PriorityType,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 
@@ -186,11 +191,11 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 0.5,
+            gap: 0.75,
             cursor: 'pointer',
             '&:hover': {
               color: theme.palette.text.primary,
-              bgcolor: 'rgba(255,255,255,0.05)',
+              bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
             },
             px: 1,
             py: 0.5,
@@ -198,15 +203,15 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             transition: 'all 0.2s',
           }}
         >
-          {getPriorityFromLevel(Number(activeItem?.priority_level)) !==
-            'No priority' && (
-            <FlashOnIcon sx={{ fontSize: 16, color: '#f59e0b' }} />
-          )}
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {getPriorityFromLevel(Number(activeItem?.priority_level)) ===
-            'No priority'
-              ? ''
-              : getPriorityFromLevel(Number(activeItem?.priority_level))}
+          <PriorityBadge priority={activeItem?.priority_level} size={18} />
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 500,
+              color: getPriorityConfig(activeItem?.priority_level).color,
+            }}
+          >
+            {getPriorityConfig(activeItem?.priority_level).label}
           </Typography>
         </Box>
 
@@ -313,29 +318,39 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             border: `1px solid ${theme.palette.divider}`,
             boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
             minWidth: 160,
+            borderRadius: '8px',
+            p: 0.5,
           },
         }}
       >
-        {[
-          { level: 1, label: 'Low', color: theme.palette.success.main },
-          { level: 2, label: 'Med', color: theme.palette.warning.main },
-          { level: 3, label: 'High', color: theme.palette.error.main },
-          { level: 0, label: '', color: theme.palette.text.secondary },
-        ].map((p) => (
-          <MenuItem
-            key={p.level}
-            onClick={() => {
-              handleUpdatePriority(p.level);
-              setPriorityAnchor(null);
-            }}
-            sx={{ gap: 1.5, py: 1 }}
-          >
-            {p.label !== '' && (
-              <FlashOnIcon sx={{ fontSize: 18, color: p.color }} />
-            )}
-            <Typography variant="body2">{p.label}</Typography>
-          </MenuItem>
-        ))}
+        {PRIORITY_OPTIONS.map((pOpt) => {
+          const level = getPriorityLevel(pOpt.id as PriorityType);
+          const isSelected =
+            getPriorityConfig(activeItem?.priority_level).id === pOpt.id;
+
+          return (
+            <MenuItem
+              key={pOpt.id}
+              selected={isSelected}
+              onClick={() => {
+                handleUpdatePriority(level);
+                setPriorityAnchor(null);
+              }}
+              sx={{
+                gap: 1.5,
+                py: 0.75,
+                px: 1.25,
+                borderRadius: '6px',
+                my: 0.25,
+              }}
+            >
+              <PriorityBadge priority={pOpt.id} size={20} />
+              <Typography variant="body2" fontWeight={isSelected ? 600 : 500}>
+                {pOpt.label}
+              </Typography>
+            </MenuItem>
+          );
+        })}
       </Menu>
     </TaskTitleContainer>
   );
