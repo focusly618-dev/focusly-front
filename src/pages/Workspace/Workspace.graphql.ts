@@ -141,10 +141,13 @@ export const GET_PROJECT_GROUPS_PAGINATED = gql`
         name
         color
         emoji
+        userId
+        createdAt
+        updatedAt
+        workspaceCount
         workspaces {
           id
         }
-        updatedAt
       }
     }
   }

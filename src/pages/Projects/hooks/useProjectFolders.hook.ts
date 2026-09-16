@@ -146,7 +146,7 @@ export const useProjectFolders = () => {
   const totalGroups = projectGroupsData?.result?.totalCount ?? rawGroups.length;
   const totalGroupPages = Math.max(1, Math.ceil(totalGroups / GROUP_LIMIT));
 
-  // Client-side filtering & sorting
+  // Client-side filtering
   const filteredGroups = useMemo(() => {
     let list = [...rawGroups];
 
@@ -162,7 +162,7 @@ export const useProjectFolders = () => {
     }
 
     return list;
-  }, [rawGroups, folderSearchTerm, projectColorFilter, projectSortBy]);
+  }, [rawGroups, folderSearchTerm, projectColorFilter]);
 
   return {
     state: {
@@ -182,7 +182,10 @@ export const useProjectFolders = () => {
     },
     actions: {
       setGroupPage,
-      setFolderSearchTerm,
+      setFolderSearchTerm: (term: string) => {
+        setFolderSearchTerm(term);
+        setGroupPage(1);
+      },
       setProjectSortBy: (sort: ProjectSortOption) => setProjectSortBy(sort),
       setProjectColorFilter,
       createFolder,
