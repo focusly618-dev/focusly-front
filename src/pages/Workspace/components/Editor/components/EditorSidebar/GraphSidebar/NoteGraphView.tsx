@@ -20,7 +20,9 @@ import {
   ArrowBack as ArrowBackIcon,
   KeyboardArrowDown as CollapseIcon,
   KeyboardArrowUp as ExpandIcon,
-  AutoAwesome as AutoAwesomeIcon,
+  Refresh as RefreshIcon,
+  ChevronRight as ChevronRightIcon,
+  InfoOutlined as InfoIcon,
   Check as CheckIcon,
 } from '@mui/icons-material';
 import type {
@@ -28,6 +30,7 @@ import type {
   GraphNode,
   NoteGraphViewProps,
 } from './NoteGraphView.types';
+import { getHeadingPath } from './markdownHeadings';
 import { buildGraph } from './utils/graphLayout.utils';
 import {
   useGraphNodeDrag,
@@ -109,17 +112,17 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
     [baseNodes, overrides],
   );
 
-  // Filter nodes based on category pill
+  // Filter nodes based on heading level
   const filteredNodes = useMemo(() => {
     return allNodes.filter((node) => {
-      if (activeFilter === 'sections') {
-        return node.type === 'document' || node.type === 'section';
+      if (activeFilter === 'h1') {
+        return node.type === 'document' || node.level === 0 || node.level === 1;
       }
-      if (activeFilter === 'sources') {
-        return node.type === 'source' || node.type === 'document';
+      if (activeFilter === 'h2') {
+        return node.type === 'document' || node.level === 0 || node.level === 2;
       }
-      if (activeFilter === 'concepts') {
-        return node.type === 'concept' || node.type === 'document';
+      if (activeFilter === 'h3') {
+        return node.type === 'document' || node.level === 0 || node.level >= 3;
       }
       return true;
     });
@@ -129,7 +132,9 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
   const visibleNodes = useMemo(() => {
     if (!searchQuery.trim()) return filteredNodes;
     const q = searchQuery.toLowerCase();
-    return filteredNodes.filter((node) => node.label.toLowerCase().includes(q));
+    return filteredNodes.filter((node) =>
+      (node.label || '').toLowerCase().includes(q),
+    );
   }, [filteredNodes, searchQuery]);
 
   const nodeById = useMemo(
@@ -195,29 +200,34 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
 
   // Node type label for inspector
   const getNodeTypeLabel = (node: GraphNode | null) => {
-    if (!node) return 'Sección';
-    if (node.type === 'document') return 'Documento Raíz';
-    if (node.label.toLowerCase().includes('recurso'))
-      return 'Recurso / Base de datos';
-    if (node.type === 'source') return 'Fuente Externa / Base de datos';
-    if (node.type === 'concept') return 'Concepto Clave';
-    return 'Sección del Documento';
+    if (!node || node.type === 'document' || node.level === 0)
+      return 'Documento Raíz';
+    if (node.level === 1) return 'Título Principal (H1)';
+    if (node.level === 2) return 'Sección (H2)';
+    return `Subsección (H${node.level})`;
   };
 
   // Outgoing connections description
   const getOutgoingLabel = (node: GraphNode | null) => {
     if (!node) return '0 conexiones';
     const outgoing = baseEdges.filter((e) => e.from === node.id);
-    const sources = outgoing.filter((e) => {
-      const target = nodeById.get(e.to);
-      return target?.type === 'source';
-    }).length;
-
-    if (sources > 0) {
-      return `${outgoing.length} conexiones (${sources} fuentes)`;
-    }
-    return `${outgoing.length} conexiones activas`;
+    if (outgoing.length === 0) return 'Sección terminal';
+    return `${outgoing.length} ${outgoing.length === 1 ? 'conexión' : 'conexiones'}`;
   };
+
+  // Hierarchical location path for selected node
+  const nodeBreadcrumbs = useMemo(() => {
+    if (!selectedNode) return [];
+    if (
+      selectedNode.type === 'document' ||
+      selectedNode.level === 0 ||
+      selectedNode.pos == null
+    ) {
+      return [{ text: rootLabel || 'Documento', level: 0, pos: 0 }];
+    }
+    const path = getHeadingPath(headings, selectedNode.pos);
+    return [{ text: rootLabel || 'Documento', level: 0, pos: 0 }, ...path];
+  }, [selectedNode, rootLabel, headings]);
 
   return (
     <Box
@@ -306,19 +316,17 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
             <IconButton
               size="small"
               onClick={handleOrganizeLayout}
-              title="Organizar y estructurar grafo"
+              title="Reorganizar distribución"
               sx={{
                 p: 0.5,
-                color: isOrganizing ? '#4f46e5' : 'text.secondary',
+                color: isOrganizing ? 'primary.main' : 'text.secondary',
                 transition: 'color 0.2s ease',
               }}
             >
-              <AutoAwesomeIcon
+              <RefreshIcon
                 sx={{
                   fontSize: 15,
-                  transform: isOrganizing
-                    ? 'rotate(180deg) scale(1.15)'
-                    : 'none',
+                  transform: isOrganizing ? 'rotate(180deg)' : 'none',
                   transition: 'transform 0.4s ease',
                 }}
               />
@@ -336,7 +344,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
             </IconButton>
           </Box>
 
-          {/* Right Category Filter Pills */}
+          {/* Right Level Filter Pills */}
           <Box
             sx={{
               display: 'inline-flex',
@@ -345,149 +353,43 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
               overflowX: 'auto',
             }}
           >
-            <Button
-              onClick={() => setActiveFilter('all')}
-              size="small"
-              sx={{
-                px: 1.5,
-                py: 0.4,
-                borderRadius: '9999px',
-                fontSize: '11.5px',
-                fontWeight: activeFilter === 'all' ? 700 : 600,
-                textTransform: 'none',
-                minWidth: 0,
-                bgcolor:
-                  activeFilter === 'all'
-                    ? '#4f46e5'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.06)'
-                      : '#f1f5f9',
-                color:
-                  activeFilter === 'all'
-                    ? '#ffffff'
-                    : isDark
-                      ? '#94a3b8'
-                      : '#475569',
-                '&:hover': {
-                  bgcolor:
-                    activeFilter === 'all'
-                      ? '#4338ca'
+            {[
+              { value: 'all', label: `Todos (${allNodes.length})` },
+              { value: 'h1', label: 'Títulos (H1)' },
+              { value: 'h2', label: 'Secciones (H2)' },
+              { value: 'h3', label: 'Subsecciones (H3+)' },
+            ].map((tab) => {
+              const isActive = activeFilter === tab.value;
+              return (
+                <Button
+                  key={tab.value}
+                  onClick={() =>
+                    setActiveFilter(tab.value as GraphFilterCategory)
+                  }
+                  size="small"
+                  sx={{
+                    px: 1.25,
+                    py: 0.35,
+                    borderRadius: '9999px',
+                    fontSize: '11px',
+                    fontWeight: isActive ? 700 : 600,
+                    textTransform: 'none',
+                    minWidth: 0,
+                    bgcolor: isActive
+                      ? 'primary.main'
                       : isDark
-                        ? 'rgba(255, 255, 255, 0.1)'
-                        : '#e2e8f0',
-                },
-              }}
-            >
-              Todos ({allNodes.length})
-            </Button>
-
-            <Button
-              onClick={() => setActiveFilter('sections')}
-              size="small"
-              sx={{
-                px: 1.5,
-                py: 0.4,
-                borderRadius: '9999px',
-                fontSize: '11.5px',
-                fontWeight: activeFilter === 'sections' ? 700 : 600,
-                textTransform: 'none',
-                minWidth: 0,
-                bgcolor:
-                  activeFilter === 'sections'
-                    ? '#4f46e5'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.06)'
-                      : '#f1f5f9',
-                color:
-                  activeFilter === 'sections'
-                    ? '#ffffff'
-                    : isDark
-                      ? '#94a3b8'
-                      : '#475569',
-                '&:hover': {
-                  bgcolor:
-                    activeFilter === 'sections'
-                      ? '#4338ca'
-                      : isDark
-                        ? 'rgba(255, 255, 255, 0.1)'
-                        : '#e2e8f0',
-                },
-              }}
-            >
-              Secciones
-            </Button>
-
-            <Button
-              onClick={() => setActiveFilter('sources')}
-              size="small"
-              sx={{
-                px: 1.5,
-                py: 0.4,
-                borderRadius: '9999px',
-                fontSize: '11.5px',
-                fontWeight: activeFilter === 'sources' ? 700 : 600,
-                textTransform: 'none',
-                minWidth: 0,
-                bgcolor:
-                  activeFilter === 'sources'
-                    ? '#4f46e5'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.06)'
-                      : '#f1f5f9',
-                color:
-                  activeFilter === 'sources'
-                    ? '#ffffff'
-                    : isDark
-                      ? '#94a3b8'
-                      : '#475569',
-                '&:hover': {
-                  bgcolor:
-                    activeFilter === 'sources'
-                      ? '#4338ca'
-                      : isDark
-                        ? 'rgba(255, 255, 255, 0.1)'
-                        : '#e2e8f0',
-                },
-              }}
-            >
-              Fuentes
-            </Button>
-
-            <Button
-              onClick={() => setActiveFilter('concepts')}
-              size="small"
-              sx={{
-                px: 1.5,
-                py: 0.4,
-                borderRadius: '9999px',
-                fontSize: '11.5px',
-                fontWeight: activeFilter === 'concepts' ? 700 : 600,
-                textTransform: 'none',
-                minWidth: 0,
-                bgcolor:
-                  activeFilter === 'concepts'
-                    ? '#4f46e5'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.06)'
-                      : '#f1f5f9',
-                color:
-                  activeFilter === 'concepts'
-                    ? '#ffffff'
-                    : isDark
-                      ? '#94a3b8'
-                      : '#475569',
-                '&:hover': {
-                  bgcolor:
-                    activeFilter === 'concepts'
-                      ? '#4338ca'
-                      : isDark
-                        ? 'rgba(255, 255, 255, 0.1)'
-                        : '#e2e8f0',
-                },
-              }}
-            >
-              Conceptos
-            </Button>
+                        ? 'rgba(255, 255, 255, 0.06)'
+                        : '#f1f5f9',
+                    color: isActive ? '#ffffff' : 'text.secondary',
+                    '&:hover': {
+                      bgcolor: isActive ? 'primary.dark' : 'action.hover',
+                    },
+                  }}
+                >
+                  {tab.label}
+                </Button>
+              );
+            })}
           </Box>
         </Box>
 
@@ -538,17 +440,17 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
           height: '100%',
         }}
       >
-        {/* Floating "Organizar" button in Canvas */}
+        {/* Floating "Reorganizar" button in Canvas */}
         <Button
           id="btn-organize-graph"
-          variant="contained"
+          variant="outlined"
           size="small"
           onClick={handleOrganizeLayout}
           startIcon={
-            <AutoAwesomeIcon
+            <RefreshIcon
               sx={{
-                fontSize: 16,
-                transform: isOrganizing ? 'rotate(180deg) scale(1.15)' : 'none',
+                fontSize: 15,
+                transform: isOrganizing ? 'rotate(180deg)' : 'none',
                 transition: 'transform 0.4s ease',
               }}
             />
@@ -558,37 +460,27 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
             top: 14,
             left: 14,
             zIndex: 15,
-            borderRadius: '12px',
-            px: 1.8,
-            py: 0.65,
-            bgcolor: isDark ? 'rgba(79, 70, 229, 0.92)' : '#4f46e5',
-            color: '#ffffff',
-            fontWeight: 700,
-            fontSize: '12px',
-            letterSpacing: '0.2px',
+            borderRadius: '10px',
+            px: 1.5,
+            py: 0.4,
+            bgcolor: isDark
+              ? 'rgba(15, 23, 42, 0.88)'
+              : 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(8px)',
+            borderColor: 'divider',
+            color: 'text.primary',
+            fontWeight: 600,
+            fontSize: '11.5px',
             textTransform: 'none',
-            boxShadow: isDark
-              ? '0 4px 16px rgba(79, 70, 229, 0.5), 0 2px 6px rgba(0,0,0,0.35)'
-              : '0 4px 14px rgba(79, 70, 229, 0.3), 0 2px 4px rgba(79, 70, 229, 0.15)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid',
-            borderColor: isDark
-              ? 'rgba(165, 180, 252, 0.35)'
-              : 'rgba(255, 255, 255, 0.35)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
             '&:hover': {
-              bgcolor: isDark ? '#4338ca' : '#4338ca',
-              transform: 'translateY(-1px)',
-              boxShadow: isDark
-                ? '0 6px 20px rgba(79, 70, 229, 0.65)'
-                : '0 6px 18px rgba(79, 70, 229, 0.4)',
-            },
-            '&:active': {
-              transform: 'translateY(0px)',
+              bgcolor: isDark ? 'rgba(15, 23, 42, 0.98)' : '#ffffff',
+              borderColor: 'primary.main',
             },
             transition: 'all 0.15s ease',
           }}
         >
-          Organizar
+          Reorganizar
         </Button>
 
         <GraphCanvas
@@ -644,7 +536,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
               maxWidth: '85%',
             }}
           >
-            <AutoAwesomeIcon sx={{ fontSize: 16, color: '#6366f1' }} />
+            <InfoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
             <Typography
               sx={{
                 fontSize: '12px',
@@ -843,7 +735,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
               backdropFilter: 'blur(10px)',
             }}
           >
-            {/* Card Header: Avatar Icon, Title, Subtitle, Status Chip & Minimize Button */}
+            {/* Card Header: Avatar Icon, Title, Breadcrumbs, Level Badge & Minimize Button */}
             <Box
               sx={{
                 display: 'flex',
@@ -858,6 +750,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                   alignItems: 'center',
                   gap: 1.25,
                   minWidth: 0,
+                  flex: 1,
                 }}
               >
                 {/* Squircle Avatar */}
@@ -874,11 +767,11 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                     flexShrink: 0,
                   }}
                 >
-                  {selectedNode?.icon || '📚'}
+                  {selectedNode?.icon || '📑'}
                 </Box>
 
-                {/* Title & Subtitle */}
-                <Box sx={{ minWidth: 0 }}>
+                {/* Title & Hierarchical Breadcrumbs */}
+                <Box sx={{ minWidth: 0, flex: 1 }}>
                   <Typography
                     noWrap
                     sx={{
@@ -888,19 +781,56 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                       lineHeight: 1.2,
                     }}
                   >
-                    {selectedNode?.label || 'Recursos Clave & Dónde Buscar'}
+                    {selectedNode?.label || rootLabel}
                   </Typography>
-                  <Typography
-                    noWrap
+                  <Box
                     sx={{
-                      fontWeight: 500,
-                      fontSize: '11px',
-                      color: 'text.secondary',
-                      mt: 0.15,
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'nowrap',
+                      gap: 0.5,
+                      mt: 0.25,
+                      overflow: 'hidden',
                     }}
                   >
-                    {selectedNode?.subtitle || 'Sección del Documento'}
-                  </Typography>
+                    {nodeBreadcrumbs.map((crumb, idx) => (
+                      <Box
+                        key={`${crumb.pos}-${idx}`}
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          flexShrink:
+                            idx === nodeBreadcrumbs.length - 1 ? 0 : 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        {idx > 0 && (
+                          <ChevronRightIcon
+                            sx={{
+                              fontSize: 12,
+                              color: 'text.disabled',
+                              flexShrink: 0,
+                            }}
+                          />
+                        )}
+                        <Typography
+                          noWrap
+                          sx={{
+                            fontSize: '11px',
+                            fontWeight:
+                              idx === nodeBreadcrumbs.length - 1 ? 700 : 500,
+                            color:
+                              idx === nodeBreadcrumbs.length - 1
+                                ? 'primary.main'
+                                : 'text.secondary',
+                          }}
+                        >
+                          {crumb.text}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
                 </Box>
               </Box>
 
@@ -912,35 +842,21 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                   flexShrink: 0,
                 }}
               >
-                {/* Status Chip */}
+                {/* Level Chip */}
                 <Box
                   sx={{
                     px: 1,
                     py: 0.25,
                     borderRadius: '9999px',
-                    bgcolor:
-                      selectedNode?.statusColor === 'green'
-                        ? isDark
-                          ? 'rgba(16, 185, 129, 0.2)'
-                          : '#ecfdf5'
-                        : selectedNode?.statusColor === 'blue'
-                          ? isDark
-                            ? 'rgba(59, 130, 246, 0.2)'
-                            : '#eff6ff'
-                          : isDark
-                            ? 'rgba(245, 158, 11, 0.2)'
-                            : '#fef3c7',
-                    color:
-                      selectedNode?.statusColor === 'green'
-                        ? '#10b981'
-                        : selectedNode?.statusColor === 'blue'
-                          ? '#3b82f6'
-                          : '#b45309',
+                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
+                    color: 'text.secondary',
                     fontSize: '10.5px',
-                    fontWeight: 750,
+                    fontWeight: 700,
+                    border: '1px solid',
+                    borderColor: 'divider',
                   }}
                 >
-                  {selectedNode?.status || 'En progreso'}
+                  {getNodeTypeLabel(selectedNode)}
                 </Box>
 
                 <IconButton
@@ -983,7 +899,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                     color: 'text.secondary',
                   }}
                 >
-                  Tipo de nodo:
+                  Jerarquía:
                 </Typography>
                 <Typography
                   noWrap
@@ -993,7 +909,9 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                     color: 'text.primary',
                   }}
                 >
-                  {getNodeTypeLabel(selectedNode)}
+                  {selectedNode?.type === 'document'
+                    ? 'Raíz'
+                    : `Nivel ${selectedNode?.level ?? 1}`}
                 </Typography>
               </Box>
 
@@ -1018,14 +936,14 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                     color: 'text.secondary',
                   }}
                 >
-                  Enlaces salientes:
+                  Conexiones:
                 </Typography>
                 <Typography
                   noWrap
                   sx={{
                     fontSize: '11.5px',
                     fontWeight: 750,
-                    color: '#4f46e5',
+                    color: 'primary.main',
                   }}
                 >
                   {getOutgoingLabel(selectedNode)}
@@ -1033,7 +951,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
               </Box>
             </Box>
 
-            {/* Action Button: Saltar al párrafo en el documento ← */}
+            {/* Action Button: Ir a la sección en el editor */}
             <Button
               fullWidth
               onClick={handleJumpToSelected}
@@ -1045,28 +963,23 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                 )
               }
               sx={{
-                height: '40px',
+                height: '38px',
                 borderRadius: '10px',
-                bgcolor: jumpFeedback ? '#10b981' : '#4f46e5',
+                bgcolor: jumpFeedback ? '#10b981' : 'primary.main',
                 color: '#ffffff',
                 fontWeight: 700,
-                fontSize: '12.5px',
+                fontSize: '12px',
                 textTransform: 'none',
-                boxShadow: jumpFeedback
-                  ? '0 4px 14px rgba(16, 185, 129, 0.45)'
-                  : '0 3px 10px rgba(79, 70, 229, 0.25)',
+                boxShadow: 'none',
                 '&:hover': {
-                  bgcolor: jumpFeedback ? '#059669' : '#4338ca',
-                  boxShadow: jumpFeedback
-                    ? '0 6px 18px rgba(16, 185, 129, 0.55)'
-                    : '0 5px 14px rgba(79, 70, 229, 0.35)',
+                  bgcolor: jumpFeedback ? '#059669' : 'primary.dark',
                 },
                 transition: 'all 0.2s ease',
               }}
             >
               {jumpFeedback
-                ? '¡Párrafo localizado y resaltado en documento!'
-                : 'Saltar al párrafo en el documento'}
+                ? '¡Sección localizada en el editor!'
+                : 'Ir a sección en el editor'}
             </Button>
           </Box>
         )}

@@ -8,7 +8,6 @@ import {
   CREATE_TASK,
   DELETE_TASK,
   GET_TASKS,
-  GET_TASKS_TITLES,
   UPDATE_TASK,
 } from '@/pages/Tasks/Tasks.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
@@ -112,12 +111,7 @@ export const useTaskOperations = () => {
     if (!user?.id) throw new Error('User not authenticated');
 
     const defaultRefetchQueries: InternalRefetchQueriesInclude = [
-      'GetTasksByUserPaginated',
       { query: GET_TASKS, variables: { userId: user.id } },
-      {
-        query: GET_TASKS_TITLES,
-        variables: { userId: user.id, limit: 24, offset: 0 },
-      },
     ];
 
     const refetchQueries = extraRefetchQueries || defaultRefetchQueries;
@@ -125,7 +119,6 @@ export const useTaskOperations = () => {
     const { data } = await createTaskMutation({
       variables: { createTaskInput },
       refetchQueries,
-      awaitRefetchQueries: true,
     });
 
     if (data?.createTask) {
@@ -142,16 +135,9 @@ export const useTaskOperations = () => {
   ) => {
     if (!user?.id) throw new Error('User not authenticated');
 
-    const defaultRefetchQueries: InternalRefetchQueriesInclude = [
-      'GetTasksByUserPaginated',
-      { query: GET_TASKS, variables: { userId: user.id } },
-    ];
-
-    const refetchQueries = extraRefetchQueries || defaultRefetchQueries;
-
     const { data } = await updateTaskMutation({
       variables: { updateTaskInput },
-      refetchQueries,
+      refetchQueries: extraRefetchQueries || [],
     });
 
     if (data?.updateTask) {

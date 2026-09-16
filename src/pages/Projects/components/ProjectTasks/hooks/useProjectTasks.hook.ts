@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { useAppSelector } from '@/redux/hooks';
-import { GET_TASKS_PAGINATED } from '@/pages/Tasks/Tasks.graphql';
+import { GET_PROJECT_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import {
   useTaskMutations,
@@ -56,9 +56,10 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
   const { user } = useAppSelector((state) => state.auth);
   const mutations = useTaskMutations();
 
-  const { data, loading, error, refetch } = useQuery(GET_TASKS_PAGINATED, {
+  const { data, loading, error, refetch } = useQuery(GET_PROJECT_TASKS, {
     variables: {
       userId: user?.id || '',
+      filters: projectId ? { project_id: projectId } : undefined,
       limit,
       offset: 0,
     },

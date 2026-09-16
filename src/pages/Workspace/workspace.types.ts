@@ -109,6 +109,7 @@ export interface TaskSearchItems {
   google_event_id?: string;
   task_type?: 'PlatformTask' | 'GoogleTask';
   source?: 'google' | 'platform';
+  workspace_id?: string | null;
   workspaces?: {
     id: string;
     title: string;

@@ -1,10 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTheme, alpha } from '@mui/material';
 import { sileo, UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import { PRIORITY_OPTIONS, isCustomEmoji } from '@/components/ui';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
+import {
+  GET_WORKSPACES,
+  CREATE_WORKSPACE,
+} from '@/pages/Workspace/Workspace.graphql';
 import type {
   CreateProjectTaskModalProps,
   ProjectOption,
@@ -92,19 +95,91 @@ export function useCreateProjectTaskModal({
   const [workspaceMenuAnchor, setWorkspaceMenuAnchor] =
     useState<null | HTMLElement>(null);
   const [workspaceSearch, setWorkspaceSearch] = useState('');
+  const [isCreateWorkspaceDialogOpen, setIsCreateWorkspaceDialogOpen] =
+    useState(false);
+  const [newWorkspaceTitle, setNewWorkspaceTitle] = useState('');
+  const [createdWorkspaces, setCreatedWorkspaces] = useState<
+    Array<{ id: string; title: string; emoji?: string; projectId?: string }>
+  >([]);
 
-  const { data: workspacesData, loading: loadingWorkspaces } = useQuery(
-    GET_WORKSPACES,
-    {
-      variables: {
-        projectId: selectedProject?.id || undefined,
-        limit: 50,
-        offset: 0,
-      },
-      skip: !open,
-      fetchPolicy: 'cache-and-network',
+  const {
+    data: workspacesData,
+    loading: loadingWorkspaces,
+    refetch: refetchWorkspaces,
+  } = useQuery(GET_WORKSPACES, {
+    variables: {
+      projectId: selectedProject?.id || undefined,
+      limit: 50,
+      offset: 0,
     },
-  );
+    skip: !open,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const [createWorkspaceMutation, { loading: isCreatingWorkspace }] =
+    useMutation(CREATE_WORKSPACE, {
+      refetchQueries: [
+        'GetWorkspacesPaginated',
+        'GetWorkspaces',
+        'GetProjectGroups',
+      ],
+      update(cache) {
+        cache.evict({ fieldName: 'workspacesPaginated' });
+        cache.evict({ fieldName: 'workspaces' });
+        cache.gc();
+      },
+    });
+
+  const handleCreateWorkspace = async (customTitle?: string) => {
+    const titleToUse = (
+      customTitle !== undefined ? customTitle : newWorkspaceTitle
+    ).trim();
+    if (!titleToUse) {
+      sileo.warning({
+        title: 'Título requerido',
+        description: 'Por favor escribe un título para el workspace.',
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      const res = await createWorkspaceMutation({
+        variables: {
+          createWorkspaceInput: {
+            title: titleToUse,
+            content: '[]',
+            groupId: selectedProject?.id || undefined,
+            taskId: task?.id || undefined,
+            saveStatus: true,
+          },
+        },
+      });
+
+      const newWs = res.data?.createWorkspace;
+      if (newWs?.id) {
+        setCreatedWorkspaces((prev) => [newWs, ...prev]);
+        setSelectedWorkspaceId(newWs.id);
+        setIsCreateWorkspaceDialogOpen(false);
+        setNewWorkspaceTitle('');
+        setWorkspaceMenuAnchor(null);
+        await refetchWorkspaces();
+        sileo.success({
+          title: 'Workspace creado y vinculado',
+          description: `"${newWs.title || titleToUse}"`,
+          duration: 2500,
+        });
+        return newWs;
+      }
+    } catch (err) {
+      console.error('Error al crear workspace:', err);
+      sileo.error({
+        title: 'Error',
+        description: 'No se pudo crear el workspace. Intenta de nuevo.',
+        duration: 3000,
+      });
+    }
+  };
 
   const availableWorkspaces: Array<{
     id: string;
@@ -113,8 +188,15 @@ export function useCreateProjectTaskModal({
     projectId?: string;
     updatedAt?: string;
   }> = useMemo(() => {
-    return workspacesData?.result?.workspaces || [];
-  }, [workspacesData]);
+    const fromQuery = workspacesData?.result?.workspaces || [];
+    const combined = [...createdWorkspaces, ...fromQuery];
+    const seen = new Set<string>();
+    return combined.filter((w) => {
+      if (seen.has(w.id)) return false;
+      seen.add(w.id);
+      return true;
+    });
+  }, [workspacesData, createdWorkspaces]);
 
   const filteredWorkspaces = useMemo(() => {
     if (!workspaceSearch.trim()) return availableWorkspaces;
@@ -440,6 +522,12 @@ export function useCreateProjectTaskModal({
     displayWorkspaceTitle,
     displayWorkspaceSection,
     displayWorkspaceEmoji,
+    isCreateWorkspaceDialogOpen,
+    setIsCreateWorkspaceDialogOpen,
+    newWorkspaceTitle,
+    setNewWorkspaceTitle,
+    isCreatingWorkspace,
+    handleCreateWorkspace,
 
     // Form fields
     isFullScreen,

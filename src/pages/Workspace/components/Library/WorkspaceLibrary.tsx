@@ -38,6 +38,7 @@ import {
   type ProjectTaskItemData,
 } from '@/pages/Projects/components/ProjectTasks';
 import { CreateProjectTaskModal } from '@/pages/Projects/components/CreateProjectTaskModal';
+import type { Subtask } from '@/redux/tasks/task.types';
 
 interface WorkspaceLibraryProps {
   onCreate: (
@@ -511,13 +512,18 @@ export const WorkspaceLibrary = ({
             duration: taskData.estimatedDuration as string | undefined,
             dueDate: taskData.dueDate as string | undefined,
             description: taskData.description as string | undefined,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            subtasks: taskData.subtasks as any,
+            subtasks: (taskData.subtasks as Subtask[]).map((subtask) => ({
+              id: subtask.id,
+              title: subtask.title,
+              completed: subtask.completed,
+              estimated_timer: subtask.estimate_timer,
+            })),
             projectId: targetProjectId,
             workspaceId: taskData.workspaceId as string | undefined,
           });
         }}
         onUpdate={async (taskId, taskData) => {
+          console.log(taskData);
           await projectTasks.updateProjectTask({
             id: taskId,
             title: String(taskData.title || ''),
@@ -526,8 +532,12 @@ export const WorkspaceLibrary = ({
             duration: taskData.estimatedDuration as string | undefined,
             dueDate: taskData.dueDate as string | undefined,
             description: taskData.description as string | undefined,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            subtasks: taskData.subtasks as any,
+            subtasks: (taskData.subtasks as Subtask[]).map((subtask) => ({
+              id: subtask.id,
+              title: subtask.title,
+              completed: subtask.completed,
+              estimated_timer: subtask.estimate_timer,
+            })),
             projectId: taskData.projectId as string | undefined,
             workspaceId: taskData.workspaceId as string | undefined,
           });
