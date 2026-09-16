@@ -9,56 +9,14 @@ export const GET_TASKS_TITLES = gql`
       estimate_timer
       real_timer
       priority_level
-      user_id
-      is_owner
       category
-      color
-      notes_encrypted
-      use_ai
-      tags {
-        name
-      }
       deadline
       created_at
-      updated_at
-      links {
-        title
-        url
-      }
-      google_event_id
-      task_type
-      source
-      estimated_start_date
-      estimated_end_date
-      collaborators {
-        name
-        email
-        avatar
-        responseStatus
-      }
-      time_logs {
-        date
-        minutes
-      }
-      subtasks {
-        id
-        title
-        completed
-        completed_at
-        estimate_timer
-      }
       workspace_id
       project_id
-      project {
-        id
-        name
-        color
-        emoji
-      }
-      workspace {
-        id
-        title
-      }
+      task_type
+      source
+      google_event_id
     }
   }
 `;
@@ -112,12 +70,6 @@ export const UPDATE_TASK = gql`
       priority_level
       workspace_id
       project_id
-      project {
-        id
-        name
-        color
-        emoji
-      }
     }
   }
 `;
@@ -225,13 +177,13 @@ export const GET_TASKS_PAGINATED = gql`
     ) {
       tasks {
         id
+        user_id
         title
         notes_encrypted
         status
         estimate_timer
         real_timer
         priority_level
-        user_id
         is_owner
         category
         color
@@ -242,25 +194,11 @@ export const GET_TASKS_PAGINATED = gql`
         deadline
         created_at
         updated_at
-        links {
-          title
-          url
-        }
-        google_event_id
         task_type
         source
+        google_event_id
         estimated_start_date
         estimated_end_date
-        collaborators {
-          name
-          email
-          avatar
-          responseStatus
-        }
-        time_logs {
-          date
-          minutes
-        }
         subtasks {
           id
           title
@@ -270,12 +208,96 @@ export const GET_TASKS_PAGINATED = gql`
         }
         workspace_id
         project_id
+      }
+      totalCount
+    }
+  }
+`;
+
+export const GET_TASKS = GET_TASKS_PAGINATED;
+
+export const GET_TASKS_CALENDAR = gql`
+  query GetTasksCalendar(
+    $userId: String!
+    $filters: TaskFilterInput
+    $sort: TaskSortInput
+    $offset: Int
+    $limit: Int
+  ) {
+    result: getTasksByUserPaginated(
+      userId: $userId
+      filters: $filters
+      sort: $sort
+      offset: $offset
+      limit: $limit
+    ) {
+      tasks {
+        id
+        user_id
+        title
+        status
+        notes_encrypted
+        estimated_start_date
+        estimated_end_date
+        deadline
+        color
+        priority_level
+        category
+        google_event_id
+        task_type
+        source
+        estimate_timer
+        real_timer
+        is_owner
+      }
+      totalCount
+    }
+  }
+`;
+
+export const GET_PROJECT_TASKS = gql`
+  query GetProjectTasks(
+    $userId: String!
+    $filters: TaskFilterInput
+    $limit: Int
+    $offset: Int
+  ) {
+    result: getTasksByUserPaginated(
+      userId: $userId
+      filters: $filters
+      limit: $limit
+      offset: $offset
+    ) {
+      tasks {
+        id
+        title
+        status
+        priority_level
+        deadline
+        estimate_timer
+        real_timer
+        category
+        color
+        created_at
+        subtasks {
+          id
+          title
+          completed
+          estimate_timer
+        }
+        collaborators {
+          name
+          email
+          avatar
+        }
+        project_id
         project {
           id
           name
           color
           emoji
         }
+        workspace_id
         workspace {
           id
           title
@@ -286,4 +308,67 @@ export const GET_TASKS_PAGINATED = gql`
   }
 `;
 
-export const GET_TASKS = GET_TASKS_PAGINATED;
+export const GET_TASK_DETAIL = gql`
+  query GetTaskDetail($id: String!) {
+    task: getTask(id: $id) {
+      id
+      user_id
+      title
+      notes_encrypted
+      status
+      estimate_timer
+      real_timer
+      priority_level
+      deadline
+      category
+      color
+      created_at
+      updated_at
+      completed_at
+      duration
+      use_ai
+      is_owner
+      tags {
+        name
+      }
+      links {
+        title
+        url
+      }
+      collaborators {
+        name
+        email
+        avatar
+        responseStatus
+      }
+      time_logs {
+        date
+        minutes
+      }
+      subtasks {
+        id
+        title
+        completed
+        completed_at
+        estimate_timer
+      }
+      workspace_id
+      project_id
+      project {
+        id
+        name
+        color
+        emoji
+      }
+      workspace {
+        id
+        title
+      }
+      google_event_id
+      task_type
+      source
+      estimated_start_date
+      estimated_end_date
+    }
+  }
+`;

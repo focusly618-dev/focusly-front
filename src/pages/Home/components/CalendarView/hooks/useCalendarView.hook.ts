@@ -13,6 +13,7 @@ import {
 import {
   DELETE_TASK,
   GET_TASKS,
+  GET_TASKS_CALENDAR,
   UPDATE_TASK,
 } from '@/pages/Tasks/Tasks.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
@@ -147,7 +148,7 @@ export const useCalendarView = () => {
     data: tasksData,
     loading: isTasksQueryLoading,
     refetch: refetchTasks,
-  } = useQuery(GET_TASKS, {
+  } = useQuery(GET_TASKS_CALENDAR, {
     skip: !user?.id,
     variables: {
       userId: user?.id,
