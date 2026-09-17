@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import {
-  GET_PROJECT_GROUPS,
   GET_PROJECT_GROUPS_PAGINATED,
   CREATE_PROJECT_GROUP,
   UPDATE_PROJECT_GROUP,
@@ -22,7 +21,6 @@ export const useProjectFolders = () => {
     useState<ProjectSortOption>('recent');
   const [projectColorFilter, setProjectColorFilter] = useState<string>('all');
 
-  // Queries
   const {
     data: projectGroupsData,
     loading: loadingGroups,
@@ -31,17 +29,10 @@ export const useProjectFolders = () => {
     variables: {
       limit: GROUP_LIMIT,
       offset: (groupPage - 1) * GROUP_LIMIT,
+      search: folderSearchTerm.trim() || undefined,
     },
     fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
-  });
-
-  const {
-    data: allProjectGroupsData,
-    loading: loadingAllGroups,
-    refetch: refetchAllGroups,
-  } = useQuery(GET_PROJECT_GROUPS, {
-    fetchPolicy: 'cache-and-network',
   });
 
   // Mutations
@@ -152,16 +143,12 @@ export const useProjectFolders = () => {
     () => projectGroupsData?.result?.projectGroups || [],
     [projectGroupsData],
   );
-  const allGroups: ProjectGroupTypes[] = useMemo(
-    () => allProjectGroupsData?.projectGroups || [],
-    [allProjectGroupsData],
-  );
   const totalGroups = projectGroupsData?.result?.totalCount ?? rawGroups.length;
   const totalGroupPages = Math.max(1, Math.ceil(totalGroups / GROUP_LIMIT));
 
-  // Client-side filtering & sorting
+  // Client-side filtering
   const filteredGroups = useMemo(() => {
-    let list = [...(folderSearchTerm ? allGroups : rawGroups)];
+    let list = [...rawGroups];
 
     if (folderSearchTerm.trim()) {
       const q = folderSearchTerm.toLowerCase();
@@ -174,34 +161,8 @@ export const useProjectFolders = () => {
       );
     }
 
-    list.sort((a, b) => {
-      switch (projectSortBy) {
-        case 'name-asc':
-          return a.name.localeCompare(b.name);
-        case 'name-desc':
-          return b.name.localeCompare(a.name);
-        case 'notes-count': {
-          const aCount = a.workspaces?.length ?? 0;
-          const bCount = b.workspaces?.length ?? 0;
-          return bCount - aCount;
-        }
-        case 'recent':
-        default: {
-          const aDate = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-          const bDate = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-          return bDate - aDate;
-        }
-      }
-    });
-
     return list;
-  }, [
-    rawGroups,
-    allGroups,
-    folderSearchTerm,
-    projectColorFilter,
-    projectSortBy,
-  ]);
+  }, [rawGroups, folderSearchTerm, projectColorFilter]);
 
   return {
     state: {
@@ -210,25 +171,27 @@ export const useProjectFolders = () => {
       folderSearchTerm,
       projectSortBy,
       projectColorFilter,
-      loading: loadingGroups || loadingAllGroups,
+      loading: loadingGroups,
       isMutating: creatingGroup || updatingGroup || deletingGroup,
     },
     data: {
       groups: filteredGroups,
-      allGroups,
+      allGroups: filteredGroups,
       rawGroups,
       totalGroups,
     },
     actions: {
       setGroupPage,
-      setFolderSearchTerm,
+      setFolderSearchTerm: (term: string) => {
+        setFolderSearchTerm(term);
+        setGroupPage(1);
+      },
       setProjectSortBy: (sort: ProjectSortOption) => setProjectSortBy(sort),
       setProjectColorFilter,
       createFolder,
       updateFolder,
       deleteFolder,
       refetchPaginatedGroups,
-      refetchAllGroups,
     },
   };
 };

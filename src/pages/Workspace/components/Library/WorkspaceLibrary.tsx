@@ -491,7 +491,7 @@ export const WorkspaceLibrary = ({
           setSelectedProjectTask(null);
         }}
         task={selectedProjectTask}
-        projects={folders.data.allGroups.map((g) => ({
+        projects={folders.data.allGroups.map((g: ProjectGroupTypes) => ({
           id: g.id,
           name: g.name,
           color: g.color,

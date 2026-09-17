@@ -128,8 +128,12 @@ export const GET_PROJECT_GROUPS = gql`
 // unpaginated (e.g. for a folder tree), so that query stays as-is. Only the
 // Workspace Library's root folder grid wants pages of groups.
 export const GET_PROJECT_GROUPS_PAGINATED = gql`
-  query GetProjectGroupsPaginated($limit: Int, $offset: Int) {
-    result: projectGroupsPaginated(limit: $limit, offset: $offset) {
+  query GetProjectGroupsPaginated($limit: Int, $offset: Int, $search: String) {
+    result: projectGroupsPaginated(
+      limit: $limit
+      offset: $offset
+      search: $search
+    ) {
       totalCount
       hasMore
       projectGroups {
@@ -137,10 +141,13 @@ export const GET_PROJECT_GROUPS_PAGINATED = gql`
         name
         color
         emoji
+        userId
+        createdAt
+        updatedAt
+        workspaceCount
         workspaces {
           id
         }
-        updatedAt
       }
     }
   }
