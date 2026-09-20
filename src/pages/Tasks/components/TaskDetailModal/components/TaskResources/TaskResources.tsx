@@ -10,6 +10,7 @@ import {
   TextField,
   CircularProgress,
   Chip,
+  Skeleton,
 } from '@mui/material';
 import {
   Link as LinkIcon,
@@ -66,6 +67,7 @@ interface TaskResourcesProps {
   handleAddCollaborator?: (name: string, email: string) => void;
   handleRemoveCollaborator?: (index: number) => void;
   isReadOnly?: boolean;
+  isLoadingDetail?: boolean;
 }
 
 export const TaskResources = ({
@@ -87,6 +89,7 @@ export const TaskResources = ({
   handleAddCollaborator,
   handleRemoveCollaborator,
   isReadOnly,
+  isLoadingDetail,
 }: TaskResourcesProps) => {
   const [emailInput, setEmailInput] = useState('');
   const [nameInput, setNameInput] = useState('');
@@ -145,8 +148,12 @@ export const TaskResources = ({
         sx={resourcesHeaderSx(isLinksExpanded)}
         onClick={() => setIsLinksExpanded(!isLinksExpanded)}
       >
-
-        {links.length === 0 ? (
+        {isLoadingDetail && links.length === 0 ? (
+          <Box display="flex" alignItems="center" gap={1}>
+            <Skeleton variant="circular" width={16} height={16} />
+            <Skeleton variant="text" width={130} height={18} />
+          </Box>
+        ) : links.length === 0 ? (
           showEmptyLinks()
         ) : (
           <Box display="flex" alignItems="center" gap={1}>
@@ -200,7 +207,9 @@ export const TaskResources = ({
                       e.stopPropagation();
                       handleGenerateMeet();
                     }}
-                    disabled={isGeneratingMeet || hasMeetLink}
+                    disabled={
+                      isGeneratingMeet || hasMeetLink || isLoadingDetail
+                    }
                     startIcon={
                       isGeneratingMeet ? (
                         <CircularProgress size={14} color="inherit" />
@@ -222,7 +231,6 @@ export const TaskResources = ({
                     </AnimatePresence>
                   </Button>
 
-
                   {hasMeetLink && (
                     <Button
                       size="small"
@@ -231,6 +239,7 @@ export const TaskResources = ({
                         e.stopPropagation();
                         setIsAddingCollaborator((prev) => !prev);
                       }}
+                      disabled={isReadOnly || isLoadingDetail}
                       sx={addResourceButtonSx}
                     >
                       Add Collaborators
@@ -245,6 +254,7 @@ export const TaskResources = ({
                       e.stopPropagation();
                       setIsAddingLink(true);
                     }}
+                    disabled={isReadOnly || isLoadingDetail}
                     sx={addResourceButtonSx}
                   >
                     Add Resource
@@ -304,6 +314,7 @@ export const TaskResources = ({
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  disabled={isReadOnly || isLoadingDetail}
                   variant="outlined"
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -317,7 +328,7 @@ export const TaskResources = ({
                   variant="contained"
                   disableElevation
                   onClick={submitCollaborator}
-                  disabled={!emailInput.includes('@')}
+                  disabled={!emailInput.includes('@') || isLoadingDetail}
                   startIcon={
                     <PersonAddIcon sx={{ fontSize: 16, color: 'white' }} />
                   }
@@ -346,7 +357,9 @@ export const TaskResources = ({
                     }
                     label={c.name ? `${c.name} (${c.email})` : c.email}
                     onDelete={
-                      !isReadOnly && handleRemoveCollaborator
+                      !isReadOnly &&
+                      !isLoadingDetail &&
+                      handleRemoveCollaborator
                         ? () => handleRemoveCollaborator(idx)
                         : undefined
                     }
@@ -380,6 +393,16 @@ export const TaskResources = ({
             exit={{ opacity: 0, height: 0 }}
             sx={{ overflow: 'hidden' }}
           >
+            {isLoadingDetail && links.length === 0 && (
+              <Box sx={{ mb: 2 }}>
+                <Skeleton
+                  variant="rounded"
+                  width="100%"
+                  height={38}
+                  sx={{ borderRadius: '8px' }}
+                />
+              </Box>
+            )}
             {links.length > 0 && (
               <Box sx={{ mb: 2 }}>
                 <Stack gap={1}>
@@ -476,6 +499,7 @@ export const TaskResources = ({
                               <IconButton
                                 size="small"
                                 onClick={() => handleRemoveLink(idx)}
+                                disabled={isLoadingDetail}
                                 sx={resourceRemoveButtonSx}
                               >
                                 <CloseIcon sx={{ fontSize: 16 }} />
@@ -505,6 +529,7 @@ export const TaskResources = ({
                       placeholder="Link Title (e.g., Google Meet, Design Doc)"
                       value={newLinkTitle}
                       onChange={(e) => setNewLinkTitle(e.target.value)}
+                      disabled={isLoadingDetail}
                       fullWidth
                       variant="standard"
                       InputProps={{
@@ -517,6 +542,7 @@ export const TaskResources = ({
                       placeholder="URL (https://...)"
                       value={newLinkUrl}
                       onChange={(e) => setNewLinkUrl(e.target.value)}
+                      disabled={isLoadingDetail}
                       fullWidth
                       variant="standard"
                       InputProps={{
@@ -544,7 +570,9 @@ export const TaskResources = ({
                         size="small"
                         variant="contained"
                         disableElevation
-                        disabled={!newLinkTitle || !newLinkUrl}
+                        disabled={
+                          !newLinkTitle || !newLinkUrl || isLoadingDetail
+                        }
                         onClick={() => {
                           handleAddLink(newLinkTitle, newLinkUrl);
                           setNewLinkTitle('');

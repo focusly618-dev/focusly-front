@@ -2,12 +2,7 @@ import { useMutation } from '@apollo/client';
 import { useAppDispatch } from '@/redux/hooks';
 import { upsertTask } from '@/redux/tasks/task.slice';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
-import {
-  UPDATE_TASK,
-  GET_TASKS,
-  GET_TASKS_TITLES,
-} from '@/pages/Tasks/Tasks.graphql';
+import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 import { handleMutationError } from '@/utils';
 
@@ -17,7 +12,6 @@ interface UseFocusModeActionsProps {
 }
 
 export const useFocusModeActions = ({
-  userId,
   onSessionComplete,
 }: UseFocusModeActionsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
@@ -40,14 +34,6 @@ export const useFocusModeActions = ({
             duration: null,
           },
         },
-        refetchQueries: [
-          { query: GET_TASKS, variables: { userId } },
-          {
-            query: GET_TASKS_TITLES,
-            variables: { userId, limit: 24, offset: 0 },
-          },
-          { query: GET_WORKSPACES, variables: { search: '' } },
-        ],
       });
 
       if (data?.updateTask) {
@@ -71,13 +57,6 @@ export const useFocusModeActions = ({
             status: newStatus,
           },
         },
-        refetchQueries: [
-          { query: GET_TASKS, variables: { userId } },
-          {
-            query: GET_TASKS_TITLES,
-            variables: { userId, limit: 24, offset: 0 },
-          },
-        ],
       });
 
       if (data?.updateTask) {
@@ -100,13 +79,6 @@ export const useFocusModeActions = ({
             priority_level: newPriority,
           },
         },
-        refetchQueries: [
-          { query: GET_TASKS, variables: { userId } },
-          {
-            query: GET_TASKS_TITLES,
-            variables: { userId, limit: 24, offset: 0 },
-          },
-        ],
       });
 
       if (data?.updateTask) {

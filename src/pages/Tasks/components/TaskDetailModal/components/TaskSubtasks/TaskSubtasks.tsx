@@ -7,6 +7,7 @@ import {
   InputBase,
   Tooltip,
   Collapse,
+  Skeleton,
 } from '@mui/material';
 import {
   CheckCircleRounded as CheckedIcon,
@@ -37,6 +38,7 @@ interface TaskSubtasksProps {
   onUpdateSubtask?: (id: string, title: string) => void;
   onImproveWithAI?: () => void;
   isReadOnly?: boolean;
+  isLoading?: boolean;
 }
 
 export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
@@ -47,6 +49,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
   onUpdateSubtask,
   onImproveWithAI,
   isReadOnly = false,
+  isLoading = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [newTitle, setNewTitle] = useState('');
@@ -75,9 +78,9 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
   };
 
   const handleStartEdit = (subtask: Subtask) => {
-    if (isReadOnly) return;
+    if (isReadOnly || (isLoading && !subtask.title)) return;
     setEditingId(subtask.id);
-    setEditingTitle(subtask.title);
+    setEditingTitle(subtask.title || '');
   };
 
   const handleSaveEdit = (id: string) => {
@@ -145,6 +148,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                 size="small"
                 variant="outlined"
                 onClick={onImproveWithAI}
+                disabled={isLoading}
                 sx={aiButtonSx}
                 startIcon={
                   <SparklesIcon sx={{ fontSize: '13px !important' }} />
@@ -193,7 +197,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                 >
                   <IconButton
                     size="small"
-                    disabled={isReadOnly}
+                    disabled={isReadOnly || (isLoading && !subtask.title)}
                     onClick={() => onToggleSubtask(subtask.id)}
                     sx={{
                       p: 0.4,
@@ -233,10 +237,19 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                         borderColor: 'primary.main',
                       }}
                     />
+                  ) : isLoading && !subtask.title ? (
+                    <Skeleton
+                      variant="text"
+                      width="65%"
+                      height={20}
+                      sx={{ borderRadius: '4px' }}
+                    />
                   ) : (
                     <Typography
                       variant="body2"
-                      onDoubleClick={() => handleStartEdit(subtask)}
+                      onDoubleClick={() =>
+                        !isLoading && handleStartEdit(subtask)
+                      }
                       sx={{
                         fontSize: '13px',
                         color: subtask.completed
@@ -246,7 +259,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                           ? 'line-through'
                           : 'none',
                         opacity: subtask.completed ? 0.65 : 1,
-                        cursor: isReadOnly ? 'default' : 'pointer',
+                        cursor: isReadOnly || isLoading ? 'default' : 'pointer',
                         transition: 'opacity 0.2s ease',
                         wordBreak: 'break-word',
                         userSelect: 'none',
@@ -272,6 +285,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                     <Tooltip title="Delete subtask">
                       <IconButton
                         size="small"
+                        disabled={isLoading}
                         onClick={() => onRemoveSubtask(subtask.id)}
                         sx={{
                           p: 0.3,
@@ -295,16 +309,19 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                 sx={{
                   fontSize: 16,
                   color: 'text.secondary',
-                  opacity: 0.7,
+                  opacity: isLoading ? 0.35 : 0.7,
                 }}
               />
               <InputBase
                 inputRef={inputRef}
                 fullWidth
-                placeholder="Add a step... (Press Enter)"
+                placeholder={
+                  isLoading ? 'Loading...' : 'Add a step... (Press Enter)'
+                }
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
+                disabled={isReadOnly || isLoading}
                 sx={{
                   fontSize: '13px',
                   color: 'text.primary',
@@ -315,6 +332,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                   size="small"
                   variant="contained"
                   onClick={handleAdd}
+                  disabled={isLoading}
                   sx={{
                     textTransform: 'none',
                     fontSize: '11px',

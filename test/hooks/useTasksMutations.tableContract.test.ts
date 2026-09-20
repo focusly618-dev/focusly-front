@@ -68,14 +68,13 @@ describe('useTasksMutations — table row contract', () => {
     });
 
     expect(updateTaskMutation).toHaveBeenCalledTimes(1);
-    const input =
-      updateTaskMutation.mock.calls[0][0].variables.updateTaskInput;
+    const input = updateTaskMutation.mock.calls[0][0].variables.updateTaskInput;
 
     expect(input.use_ai).toBe(true);
     expect(input.estimate_timer).toBe(45);
   });
 
-  it('refetchQueries for GET_TASKS must include the same paginated variables the table uses', async () => {
+  it('does not trigger redundant refetchQueries on updateTask as Apollo normalizes the cache in place', async () => {
     const { result } = renderHook(() =>
       useTasksMutations({ userId: 'u-1', tasks: [], onSuccess: vi.fn() }),
     );
@@ -84,17 +83,7 @@ describe('useTasksMutations — table row contract', () => {
       await result.current.updateTask('task-1', tableRowTask);
     });
 
-    const { refetchQueries } = updateTaskMutation.mock.calls[0][0];
-    const getTasksRefetch = refetchQueries.find(
-      (q: { query?: { loc?: { source?: { body?: string } } }; variables?: object }) =>
-        q.query?.loc?.source?.body?.includes('getTasksByUserPaginated'),
-    );
-
-    expect(getTasksRefetch).toBeDefined();
-    expect(getTasksRefetch.variables).toMatchObject({
-      userId: 'u-1',
-      offset: expect.any(Number),
-      limit: expect.any(Number),
-    });
+    const callArgs = updateTaskMutation.mock.calls[0][0];
+    expect(callArgs.refetchQueries).toBeUndefined();
   });
 });

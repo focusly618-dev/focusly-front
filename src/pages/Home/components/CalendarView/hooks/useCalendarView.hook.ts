@@ -12,7 +12,6 @@ import {
 } from '@/api/Tasks/taskMapper';
 import {
   DELETE_TASK,
-  GET_TASKS,
   GET_TASKS_CALENDAR,
   UPDATE_TASK,
 } from '@/pages/Tasks/Tasks.graphql';
@@ -630,7 +629,7 @@ export const useCalendarView = () => {
           variables: { id: taskId },
           refetchQueries: [
             {
-              query: GET_TASKS,
+              query: GET_TASKS_CALENDAR,
               variables: {
                 userId: user?.id,
                 filters: { startDate: dateRange.start, endDate: dateRange.end },
@@ -860,16 +859,6 @@ export const useCalendarView = () => {
             estimated_end_date: endDate.toISOString(),
           },
         },
-        // We still refetch to ensure server sync, but optimistic update removes the "jump"
-        refetchQueries: [
-          {
-            query: GET_TASKS,
-            variables: {
-              userId: user?.id,
-              filters: { startDate: dateRange.start, endDate: dateRange.end },
-            },
-          },
-        ],
       });
 
       sileo.success({
@@ -985,15 +974,6 @@ export const useCalendarView = () => {
             estimated_end_date: endDate.toISOString(),
           },
         },
-        refetchQueries: [
-          {
-            query: GET_TASKS,
-            variables: {
-              userId: user?.id,
-              filters: { startDate: dateRange.start, endDate: dateRange.end },
-            },
-          },
-        ],
       });
     } catch (err) {
       console.error('Error resizing event:', err);

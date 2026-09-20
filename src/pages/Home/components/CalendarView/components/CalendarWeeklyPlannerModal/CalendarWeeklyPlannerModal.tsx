@@ -15,7 +15,7 @@ import {
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { useAppSelector } from '@/redux/hooks';
 import { useMutation } from '@apollo/client';
-import { UPDATE_TASK, GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
+import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { planWeeklyAI, type AIWeeklyPlanDayItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
@@ -131,9 +131,6 @@ export const CalendarWeeklyPlannerModal: React.FC<
                 estimated_end_date: endDate.toISOString(),
               },
             },
-            refetchQueries: [
-              { query: GET_TASKS, variables: { userId: user.id } },
-            ],
           });
         }
       }

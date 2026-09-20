@@ -352,7 +352,6 @@ export const executeSingleAction = async (
       variables: {
         updateTaskInput,
       },
-      refetchQueries: [{ query: GET_TASKS }, { query: GET_TASKS_TITLES }],
     });
     return { id: res.data?.updateTask?.id };
   }

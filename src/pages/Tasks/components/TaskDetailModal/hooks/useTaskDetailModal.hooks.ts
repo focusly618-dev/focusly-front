@@ -1,6 +1,7 @@
 import { useCallback, useState, useMemo, useRef } from 'react';
+import { useQuery } from '@apollo/client';
 import type { UseTaskDetailModalProps } from '../types/TaskDetailModal.types';
-import type { Subtask } from '@/redux/tasks/task.types';
+import type { Subtask, Task } from '@/redux/tasks/task.types';
 import { useTaskFormState } from './useTaskFormState';
 import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
@@ -8,6 +9,8 @@ import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions, formatDuration } from '../TaskDetailModal.utils';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
+import { GET_TASK_DETAIL } from '../../../Tasks.graphql';
+import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
 export const useTaskDetailModal = ({
   onSave,
@@ -20,21 +23,58 @@ export const useTaskDetailModal = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAppSelector((state) => state.auth);
 
+  const taskId = initialTask?.id;
+  const isGoogleTask =
+    initialTask?.task_type === 'GoogleTask' ||
+    Boolean(initialTask?.google_event_id);
+
+  const { data: detailData, loading: isLoadingDetail } = useQuery(
+    GET_TASK_DETAIL,
+    {
+      variables: { id: taskId as string },
+      skip: !taskId || isGoogleTask,
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+
+  const hasServerDetail = Boolean(detailData?.task);
+
+  const serverTask = useMemo(() => {
+    if (detailData?.task) {
+      return mapResponseToTask(detailData.task);
+    }
+    return null;
+  }, [detailData]);
+
+  const effectiveTask: Task | null = useMemo(() => {
+    if (serverTask) {
+      return {
+        ...initialTask,
+        ...serverTask,
+        google_event_id:
+          initialTask?.google_event_id || serverTask.google_event_id,
+        task_type: initialTask?.task_type || serverTask.task_type,
+      };
+    }
+    return initialTask ?? null;
+  }, [serverTask, initialTask]);
+
   const isReadOnly = useMemo(() => {
-    if (!initialTask) return false;
+    const currentTask = effectiveTask || initialTask;
+    if (!currentTask) return false;
     if (!user) return true;
 
-    if (initialTask.is_owner !== undefined) {
-      return !initialTask.is_owner;
+    if (currentTask.is_owner !== undefined) {
+      return !currentTask.is_owner;
     }
 
     // Check Focusly task ownership
-    if (initialTask.user_id && initialTask.user_id !== user.id) {
+    if (currentTask.user_id && currentTask.user_id !== user.id) {
       return true;
     }
 
     return false;
-  }, [initialTask, user]);
+  }, [effectiveTask, initialTask, user]);
 
   const {
     title,
@@ -61,7 +101,11 @@ export const useTaskDetailModal = ({
     validateForm,
     initialState,
     timeSlotDisplay,
-  } = useTaskFormState({ initialStart, initialEnd, initialTask });
+  } = useTaskFormState({
+    initialStart,
+    initialEnd,
+    initialTask: effectiveTask,
+  });
   const [shouldGenerateMeet, setShouldGenerateMeet] = useState(false);
 
   const resetFormRef = useRef<() => void>(() => {});
@@ -70,9 +114,11 @@ export const useTaskDetailModal = ({
     onSave,
     onClose,
     onDelete,
-    initialTask,
+    initialTask: effectiveTask,
     resetForm: () => resetFormRef.current(),
   });
+
+  const effectiveTaskId = effectiveTask?.id || initialTask?.id;
 
   const {
     tags,
@@ -110,9 +156,10 @@ export const useTaskDetailModal = ({
     handleReorderSubtasks,
     initialCollections,
   } = useTaskCollections({
-    initialTask,
+    initialTask: effectiveTask,
+    hasServerDetail,
     onSubtasksChange: (updatedSubtasks: Subtask[]) => {
-      if (initialTask?.id) {
+      if (effectiveTaskId) {
         mutations.handleUpdate(
           {
             title,
@@ -135,7 +182,7 @@ export const useTaskDetailModal = ({
       }
     },
     onAddLink: (updatedLinks: { title: string; url: string }[]) => {
-      if (initialTask?.id) {
+      if (effectiveTaskId) {
         mutations.handleUpdate(
           {
             title,
@@ -155,7 +202,7 @@ export const useTaskDetailModal = ({
       }
     },
     onRemoveLink: (updatedLinks: { title: string; url: string }[]) => {
-      if (initialTask?.id) {
+      if (effectiveTaskId) {
         mutations.handleUpdate(
           {
             title,
@@ -178,7 +225,7 @@ export const useTaskDetailModal = ({
       const minutesSum = updatedTimeLogs.reduce((s, e) => s + e.minutes, 0);
       const nextRealTime = formatDuration(minutesSum);
       setRealTime(nextRealTime);
-      if (initialTask?.id) {
+      if (effectiveTaskId) {
         mutations.handleUpdate(
           {
             title,
@@ -201,7 +248,7 @@ export const useTaskDetailModal = ({
       const minutesSum = updatedTimeLogs.reduce((s, e) => s + e.minutes, 0);
       const nextRealTime = formatDuration(minutesSum);
       setRealTime(nextRealTime);
-      if (initialTask?.id) {
+      if (effectiveTaskId) {
         mutations.handleUpdate(
           {
             title,
@@ -477,6 +524,8 @@ export const useTaskDetailModal = ({
   ]);
 
   return {
+    effectiveTask,
+    isLoadingDetail,
     isReadOnly,
     isDirty,
     title,

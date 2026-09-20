@@ -59,7 +59,7 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
   const { data, loading, error, refetch } = useQuery(GET_PROJECT_TASKS, {
     variables: {
       userId: user?.id || '',
-      filters: projectId ? { project_id: projectId } : undefined,
+      filters: projectId ? { project_id: projectId } : { has_project: true },
       limit,
       offset: 0,
     },

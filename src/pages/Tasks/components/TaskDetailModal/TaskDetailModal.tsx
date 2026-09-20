@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,9 +6,10 @@ import {
   Fade,
   Typography,
   Tooltip,
+  LinearProgress,
 } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
-import React from 'react';
+import React, { useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import type { TaskDetailModalProps } from './types/TaskDetailModal.types';
@@ -58,6 +58,8 @@ export const TaskDetailModal = ({
 }: TaskDetailModalProps) => {
   const effectiveDelete = propHandleDelete || onDelete;
   const {
+    effectiveTask,
+    isLoadingDetail,
     isReadOnly,
     isDirty,
     title,
@@ -176,29 +178,34 @@ export const TaskDetailModal = ({
             MEDIUM: 'Med',
             LOW: 'Low',
           };
-          setPriority(map[res.suggestedPriority.toUpperCase()] || 'Med');
+          const mapped = map[res.suggestedPriority];
+          if (mapped) {
+            setPriority(mapped);
+          }
         }
       }
 
       sileo.success({
         title: 'Tarea Optimizada',
-        description: 'Lumina ha mejorado los campos de tu tarea con éxito.',
+        description: 'Lumina ha sugerido mejoras inteligentes para tu tarea.',
         duration: 3000,
       });
     } catch (e) {
-      console.error('Error improving task:', e);
+      console.error('Error improving task with AI:', e);
       sileo.error({
-        title: 'Error de IA',
+        title: 'Error de Optimización',
         description: getFriendlyErrorMessage(
           e,
-          'No se pudieron sugerir mejoras para la tarea.',
+          'No se pudo optimizar la tarea con IA.',
         ),
-        duration: 3000,
+        duration: 4000,
       });
     }
   };
 
-  const isPureGoogleTask = initialTask?.source === 'google';
+  const isPureGoogleTask =
+    (initialTask as { task_type?: string })?.task_type === 'GoogleTask';
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Dialog
@@ -225,6 +232,7 @@ export const TaskDetailModal = ({
         <DialogContent
           sx={{
             ...dialogContentSx,
+            position: 'relative',
             overflow: 'hidden !important',
             p: 0,
             display: 'flex',
@@ -259,6 +267,18 @@ export const TaskDetailModal = ({
               },
           }}
         >
+          {isLoadingDetail && (
+            <LinearProgress
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '3px',
+                zIndex: 10,
+              }}
+            />
+          )}
           <PerfectScrollbar
             style={{
               maxHeight: 'calc(90vh - 100px)',
@@ -272,7 +292,7 @@ export const TaskDetailModal = ({
               setIsFullScreen={setIsFullScreen}
               title={title}
               onClose={onClose}
-              initialTask={initialTask}
+              initialTask={effectiveTask || initialTask}
               handleDelete={handleDelete}
               isReadOnly={isReadOnly}
             />
@@ -377,8 +397,9 @@ export const TaskDetailModal = ({
                 timeLogs={timeLogs}
                 handleAddTimeLog={handleAddTimeLog}
                 handleRemoveTimeLog={handleRemoveTimeLog}
-                createdAt={initialTask?.created_at}
-                deadline={initialTask?.deadline}
+                createdAt={effectiveTask?.created_at || initialTask?.created_at}
+                deadline={effectiveTask?.deadline || initialTask?.deadline}
+                isLoadingDetail={isLoadingDetail}
               />
 
               <TaskSubtasks
@@ -389,6 +410,7 @@ export const TaskDetailModal = ({
                 onUpdateSubtask={handleUpdateSubtask}
                 onImproveWithAI={() => handleImproveTask('subtasks')}
                 isReadOnly={isReadOnly}
+                isLoading={isLoadingDetail}
               />
 
               <TaskResources
@@ -410,13 +432,20 @@ export const TaskDetailModal = ({
                 handleAddCollaborator={handleAddCollaborator}
                 handleRemoveCollaborator={handleRemoveCollaborator}
                 isReadOnly={isReadOnly}
+                isLoadingDetail={isLoadingDetail}
               />
 
               <TaskWorkspaces
-                workspaces={initialTask?.workspaces}
+                workspaces={
+                  effectiveTask?.workspaces || initialTask?.workspaces
+                }
                 onNavigate={createURLWorkSpace}
                 onRemove={handleRemoveWorkspace}
                 isReadOnly={isReadOnly}
+                isLoading={isLoadingDetail}
+                hasWorkspaceId={Boolean(
+                  effectiveTask?.workspace_id || initialTask?.workspace_id,
+                )}
               />
 
               <TaskDescription
@@ -429,7 +458,7 @@ export const TaskDetailModal = ({
         </DialogContent>
 
         <TaskActions
-          initialTask={initialTask}
+          initialTask={effectiveTask || initialTask}
           isDirty={isDirty}
           handleDelete={handleDelete}
           onClose={onClose}

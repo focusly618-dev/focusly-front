@@ -21,6 +21,8 @@ export interface TaskFilterInput {
   project_id?: string;
   projectId?: string;
   workspace_id?: string;
+  has_project?: boolean;
+  hasProject?: boolean;
 }
 
 export interface TaskSortInput {
@@ -54,7 +56,7 @@ export interface TaskResponse {
     | 'Scheduled'
     | 'Archived';
   completed_at?: string;
-  created_at: string;
+  created_at?: string;
   updated_at: string;
   deleted_at?: string;
   tags: { name: string }[];

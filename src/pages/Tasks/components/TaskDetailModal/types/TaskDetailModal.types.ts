@@ -76,6 +76,7 @@ export interface TaskInput {
 
 export interface UseTaskCollectionsProps {
   initialTask?: Task | null;
+  hasServerDetail?: boolean;
   onAddLink?: (links: { title: string; url: string }[]) => void;
   onRemoveLink?: (links: { title: string; url: string }[]) => void;
   onAddTimeLog?: (timeLogs: { date: string; minutes: number }[]) => void;

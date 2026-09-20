@@ -262,8 +262,6 @@ export const useTaskMutations = () => {
 
       const res = await updateTaskMutation({
         variables: { updateTaskInput },
-        refetchQueries: getRefetchQueries(),
-        awaitRefetchQueries: true,
       });
 
       if (res.data?.updateTask) {

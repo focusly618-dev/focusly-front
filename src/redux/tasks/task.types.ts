@@ -11,7 +11,7 @@ export type TaskStatus =
 
 export interface Subtask {
   id: string;
-  title: string;
+  title?: string;
   completed: boolean;
   completed_at?: string | null;
   estimate_timer?: number | null;

@@ -76,7 +76,9 @@ export const useHome = () => {
     const googleEvent = reduxEvents.find((e) => e.id === taskIdParam);
     if (googleEvent) return mapGoogleEventToTask(googleEvent);
 
-    return null;
+    // Fallback: when taskId is in URL but not in Redux cache yet (e.g. direct link or fresh reload),
+    // provide minimal task reference so TaskDetailModal can fetch it via GET_TASK_DETAIL
+    return { id: taskIdParam } as Task;
   }, [tasks, reduxEvents, taskIdParam, tempTask]);
 
   const isTaskDetailsOpen = !!taskIdParam && !!taskDetailsTask;

@@ -11,12 +11,8 @@ export const GET_TASKS_TITLES = gql`
       priority_level
       category
       deadline
-      created_at
       workspace_id
-      project_id
-      task_type
       source
-      google_event_id
     }
   }
 `;
@@ -186,25 +182,18 @@ export const GET_TASKS_PAGINATED = gql`
         priority_level
         is_owner
         category
-        color
         use_ai
         tags {
           name
         }
         deadline
-        created_at
         updated_at
         task_type
-        source
         google_event_id
         estimated_start_date
-        estimated_end_date
         subtasks {
           id
-          title
           completed
-          completed_at
-          estimate_timer
         }
         workspace_id
         project_id

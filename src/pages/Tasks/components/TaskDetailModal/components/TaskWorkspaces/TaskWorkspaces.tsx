@@ -1,5 +1,12 @@
 import React from 'react';
-import { Box, Typography, Button, alpha, useTheme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  alpha,
+  useTheme,
+  Skeleton,
+} from '@mui/material';
 import {
   Description as WorkspaceIcon,
   ChevronRight as ChevronRightIcon,
@@ -20,6 +27,8 @@ interface TaskWorkspacesProps {
   onNavigate: (id: string) => void;
   onRemove?: (id: string) => void;
   isReadOnly?: boolean;
+  isLoading?: boolean;
+  hasWorkspaceId?: boolean;
 }
 
 export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({
@@ -27,8 +36,27 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({
   onNavigate,
   onRemove,
   isReadOnly,
+  isLoading,
+  hasWorkspaceId,
 }) => {
   const theme = useTheme();
+
+  if (isLoading && (!workspaces || workspaces.length === 0) && hasWorkspaceId) {
+    return (
+      <Box sx={{ px: 4, mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+          <Skeleton variant="circular" width={16} height={16} />
+          <Skeleton variant="text" width={120} height={16} />
+        </Box>
+        <Skeleton
+          variant="rounded"
+          width="100%"
+          height={56}
+          sx={{ borderRadius: '12px' }}
+        />
+      </Box>
+    );
+  }
 
   if (!workspaces || workspaces.length === 0) return null;
 

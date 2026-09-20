@@ -127,14 +127,6 @@ export const useWorkspaceTasks = ({
         },
         refetchQueries: [
           {
-            query: GET_TASKS_TITLES,
-            variables: {
-              userId,
-              limit: LIMIT,
-              offset: 0,
-            },
-          },
-          {
             query: GET_WORKSPACES,
             variables: { search: '' },
           },

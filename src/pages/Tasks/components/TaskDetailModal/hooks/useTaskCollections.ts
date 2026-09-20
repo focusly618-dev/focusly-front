@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import type { Subtask } from '@/redux/tasks/task.types';
 import {
   deduplicateLinks,
@@ -8,6 +9,7 @@ import type { UseTaskCollectionsProps } from '../types/TaskDetailModal.types';
 
 export const useTaskCollections = ({
   initialTask,
+  hasServerDetail,
   onAddLink,
   onRemoveLink,
   onAddTimeLog,
@@ -80,6 +82,38 @@ export const useTaskCollections = ({
   const [subtasks, setSubtasks] = useState<Subtask[]>(
     initialCollections.subtasks,
   );
+
+  // Track which task ID has already had its full server detail applied.
+  // Using hasServerDetail guarantees synchronization runs exactly once when
+  // GET_TASK_DETAIL transitions from unresolved to resolved, preventing infinite
+  // re-render loops while eliminating brittle manual string hashes of individual fields.
+  const syncedTaskIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!initialTask?.id) return;
+
+    // If hasServerDetail is provided and false, wait until server detail resolves
+    if (hasServerDetail === false) {
+      if (syncedTaskIdRef.current !== initialTask.id) {
+        syncedTaskIdRef.current = null;
+      }
+      return;
+    }
+
+    // Once server detail resolves for this task (or for standalone callers without hasServerDetail),
+    // sync the full collections from effectiveTask exactly once.
+    if (syncedTaskIdRef.current === initialTask.id) {
+      return;
+    }
+    syncedTaskIdRef.current = initialTask.id;
+
+    const fresh = getInitialCollectionState();
+    setTags(fresh.tags);
+    setLinks(fresh.links);
+    setCollaborators(fresh.collaborators);
+    setTimeLogs(fresh.timeLogs);
+    setSubtasks(fresh.subtasks);
+  }, [getInitialCollectionState, initialTask?.id, hasServerDetail]);
   const [newTag, setNewTag] = useState('');
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newLinkTitle, setNewLinkTitle] = useState('');

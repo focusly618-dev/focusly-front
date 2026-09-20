@@ -123,6 +123,7 @@ interface TaskPropertiesProps {
   isOwner?: boolean;
   createdAt?: string;
   deadline?: string;
+  isLoadingDetail?: boolean;
 }
 
 export const TaskProperties = ({
@@ -156,6 +157,7 @@ export const TaskProperties = ({
   isOwner,
   createdAt,
   deadline,
+  isLoadingDetail,
 }: TaskPropertiesProps) => {
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(
@@ -318,7 +320,7 @@ export const TaskProperties = ({
                     <Chip
                       label={tag}
                       onDelete={
-                        !isOwner
+                        !isOwner || isLoadingDetail
                           ? undefined
                           : () => setTags(tags.filter((t) => t !== tag))
                       }
@@ -355,11 +357,15 @@ export const TaskProperties = ({
                     <TextField
                       autoFocus
                       value={newTag}
+                      disabled={isLoadingDetail}
                       onChange={(e) => setNewTag(e.target.value)}
-                      onBlur={() => handleAddTag()}
+                      onBlur={() => !isLoadingDetail && handleAddTag()}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleAddTag();
-                        else if (e.key === 'Escape') setIsAddingTag(false);
+                        if (e.key === 'Enter') {
+                          if (!isLoadingDetail) handleAddTag();
+                        } else if (e.key === 'Escape') {
+                          setIsAddingTag(false);
+                        }
                       }}
                       size="small"
                       sx={addTagInputSx}
@@ -377,7 +383,10 @@ export const TaskProperties = ({
                     <Chip
                       icon={<AddIcon sx={{ fontSize: 14 }} />}
                       label="Add Tag"
-                      onClick={() => setIsAddingTag(true)}
+                      onClick={
+                        isLoadingDetail ? undefined : () => setIsAddingTag(true)
+                      }
+                      disabled={isLoadingDetail}
                       sx={{
                         height: 28,
                         fontSize: 12,
@@ -385,7 +394,13 @@ export const TaskProperties = ({
                         color: 'text.secondary',
                         border: '1px dashed',
                         borderColor: 'divider',
-                        '&:hover': { bgcolor: 'action.hover' },
+                        opacity: isLoadingDetail ? 0.5 : 1,
+                        cursor: isLoadingDetail ? 'default' : 'pointer',
+                        '&:hover': {
+                          bgcolor: isLoadingDetail
+                            ? 'transparent'
+                            : 'action.hover',
+                        },
                       }}
                     />
                   </Box>
@@ -953,6 +968,7 @@ export const TaskProperties = ({
                 <TextField
                   variant="outlined"
                   size="small"
+                  disabled={isLoadingDetail}
                   value={newLogDuration}
                   onChange={(e) =>
                     setNewLogDuration(sanitizeDurationValue(e.target.value))
@@ -970,6 +986,7 @@ export const TaskProperties = ({
                 />
                 <IconButton
                   size="small"
+                  disabled={isLoadingDetail}
                   onClick={() => {
                     const minutes = parseDuration(newLogDuration);
                     if (minutes > 0 && newLogDate) {
@@ -1025,6 +1042,7 @@ export const TaskProperties = ({
                           <IconButton
                             size="small"
                             onClick={() => handleRemoveTimeLog(index)}
+                            disabled={isLoadingDetail}
                             sx={{ p: 0.3 }}
                           >
                             <CloseIcon sx={{ fontSize: 14 }} />

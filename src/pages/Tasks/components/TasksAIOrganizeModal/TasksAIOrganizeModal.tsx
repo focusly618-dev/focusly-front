@@ -22,7 +22,7 @@ import {
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 import { useMutation } from '@apollo/client';
-import { UPDATE_TASK, GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
+import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { LuminaOrb } from '@/components/ui';
 import { organizeTasksAI, type AIPlanItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
@@ -107,9 +107,6 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
               estimated_end_date: targetTask.estimated_end_date,
             },
           },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user.id } },
-          ],
         });
       }
 

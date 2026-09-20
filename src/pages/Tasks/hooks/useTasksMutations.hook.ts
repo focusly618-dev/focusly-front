@@ -1,9 +1,5 @@
 import { useMutation } from '@apollo/client';
-import {
-  UPDATE_TASK,
-  GET_TASKS,
-  DELETE_TASKS,
-} from '@/pages/Tasks/Tasks.graphql';
+import { UPDATE_TASK, DELETE_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import type {
   TaskResponse,
   TaskFilterInput,
@@ -29,10 +25,6 @@ interface UseTasksMutationsProps {
 
 export const useTasksMutations = ({
   userId,
-  filters,
-  sort,
-  offset = 0,
-  limit = 24,
   onSuccess,
 }: UseTasksMutationsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
@@ -109,18 +101,6 @@ export const useTasksMutations = ({
               ) || [],
           },
         },
-        refetchQueries: [
-          {
-            query: GET_TASKS,
-            variables: {
-              userId,
-              filters: filters || null,
-              sort: sort || null,
-              offset,
-              limit,
-            },
-          },
-        ],
       });
 
       if (data?.updateTask) {

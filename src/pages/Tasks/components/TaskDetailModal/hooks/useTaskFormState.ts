@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import type { Task } from '@/redux/tasks/task.types';
 import {
   getPriorityFromLevel,
@@ -116,6 +117,20 @@ export const useTaskFormState = ({
   const [errors, setErrors] = useState<{ title?: string; duration?: string }>(
     {},
   );
+
+  const lastSyncedTaskFormRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!initialTask?.id) return;
+    const sig = `${initialTask.id}-${initialTask.color}-${initialTask.notes_encrypted?.length}`;
+    if (lastSyncedTaskFormRef.current === sig) return;
+    lastSyncedTaskFormRef.current = sig;
+
+    const fresh = getInitialState();
+    setColor((prev) => (prev && prev !== '#E0E7FF' ? prev : fresh.color));
+    setDescription((prev) => (prev ? prev : fresh.description));
+    setRealTime((prev) => (prev && prev !== '00:00' ? prev : fresh.realTime));
+  }, [getInitialState, initialTask]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
