@@ -16,6 +16,7 @@ import type {
 export interface UseProjectTasksOptions {
   projectId?: string | null;
   limit?: number;
+  searchTerm?: string;
 }
 
 const formatDueDate = (
@@ -52,14 +53,17 @@ const formatDueDate = (
 };
 
 export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
-  const { projectId, limit = 100 } = options;
+  const { projectId, limit = 100, searchTerm } = options;
   const { user } = useAppSelector((state) => state.auth);
   const mutations = useTaskMutations();
 
   const { data, loading, error, refetch } = useQuery(GET_PROJECT_TASKS, {
     variables: {
       userId: user?.id || '',
-      filters: projectId ? { project_id: projectId } : { has_project: true },
+      filters: {
+        ...(projectId ? { project_id: projectId } : { has_project: true }),
+        searchTerm: searchTerm?.trim() || undefined,
+      },
       limit,
       offset: 0,
     },
@@ -75,21 +79,38 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
 
   const tasks: ProjectTaskItemData[] = useMemo(() => {
     // Filtrar estrictamente solo las tareas que pertenecen a proyectos (excluir tareas globales sin proyecto)
-    const projectOnlyTasks = rawTasks.filter((t) =>
+    let projectOnlyTasks = rawTasks.filter((t) =>
       Boolean(t.project_id || t.project?.id || t.projectId),
     );
 
     // Si se especifica un proyecto, filtrar únicamente por ese proyecto
-    const filtered = projectId
-      ? projectOnlyTasks.filter(
-          (t) =>
-            t.project_id === projectId ||
-            t.project?.id === projectId ||
-            t.projectId === projectId,
-        )
-      : projectOnlyTasks;
+    if (projectId) {
+      projectOnlyTasks = projectOnlyTasks.filter(
+        (t) =>
+          t.project_id === projectId ||
+          t.project?.id === projectId ||
+          t.projectId === projectId,
+      );
+    }
 
-    return filtered.map((t) => {
+    if (searchTerm?.trim()) {
+      const q = searchTerm.trim().toLowerCase();
+      projectOnlyTasks = projectOnlyTasks.filter((t) => {
+        const titleMatch = t.title?.toLowerCase().includes(q);
+        const notesMatch = t.notes_encrypted?.toLowerCase().includes(q);
+        const tagMatch = t.tags?.some((tg: string | { name?: string }) =>
+          (typeof tg === 'string' ? tg : tg?.name)?.toLowerCase().includes(q),
+        );
+        const projectNameMatch = (t.project?.name || t.projectName)
+          ?.toLowerCase()
+          .includes(q);
+        return Boolean(
+          titleMatch || notesMatch || tagMatch || projectNameMatch,
+        );
+      });
+    }
+
+    return projectOnlyTasks.map((t) => {
       const { dueDate, dueDateHighlight } = formatDueDate(t.deadline);
       const isCompleted =
         t.status?.toLowerCase() === 'done' ||
@@ -162,7 +183,7 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
           .filter(Boolean),
       };
     });
-  }, [rawTasks, projectId]);
+  }, [rawTasks, projectId, searchTerm]);
 
   return {
     tasks,

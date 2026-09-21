@@ -34,6 +34,9 @@ import {
   StyledTextField,
 } from '../WorkspaceLibrary.styles';
 import { LibrarySearchHeader } from './LibrarySearchHeader';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setProjectTab } from '@/redux/tasks/task.slice';
+import type { ProjectTab } from '@/redux/tasks/task.types';
 
 export type ProjectSortOption =
   | 'recent'
@@ -63,8 +66,8 @@ export interface WorkspaceLibraryHeaderProps {
   onCreate?: () => void;
   onCreateTask?: () => void;
   hasMultipleWorkspaces?: boolean;
-  projectTab?: 'projects' | 'tasks';
-  onProjectTabChange?: (tab: 'projects' | 'tasks') => void;
+  projectTab?: ProjectTab;
+  onProjectTabChange?: (tab: ProjectTab) => void;
 }
 
 const PROJECT_COLORS = [
@@ -99,25 +102,28 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
   onCreate,
   onCreateTask,
   hasMultipleWorkspaces,
-  projectTab = 'projects',
+  projectTab,
   onProjectTabChange,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  const [internalTab, setInternalTab] = useState<'projects' | 'tasks'>(
-    'projects',
+  const dispatch = useAppDispatch();
+  const reduxProjectTab = useAppSelector(
+    (state) => state.task.projectTab || 'projects',
   );
-  const activeProjectTab = onProjectTabChange ? projectTab : internalTab;
+  const activeProjectTab =
+    onProjectTabChange && projectTab !== undefined
+      ? projectTab
+      : reduxProjectTab;
 
   const handleTabChange = (
     _event: React.SyntheticEvent,
-    newValue: 'projects' | 'tasks',
+    newValue: ProjectTab,
   ) => {
+    dispatch(setProjectTab(newValue));
     if (onProjectTabChange) {
       onProjectTabChange(newValue);
-    } else {
-      setInternalTab(newValue);
     }
   };
 

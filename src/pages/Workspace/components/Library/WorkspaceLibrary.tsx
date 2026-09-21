@@ -38,7 +38,9 @@ import {
   type ProjectTaskItemData,
 } from '@/pages/Projects/components/ProjectTasks';
 import { CreateProjectTaskModal } from '@/pages/Projects/components/CreateProjectTaskModal';
-import type { Subtask } from '@/redux/tasks/task.types';
+import type { Subtask, ProjectTab } from '@/redux/tasks/task.types';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setProjectTab } from '@/redux/tasks/task.slice';
 
 interface WorkspaceLibraryProps {
   onCreate: (
@@ -66,6 +68,7 @@ export const WorkspaceLibrary = ({
   const cardMenu = useWorkspaceCardMenu();
   const projectTasks = useProjectTasks({
     projectId: selectedGroupId,
+    searchTerm: folders.state.debouncedSearchTerm,
   });
 
   // ── View Mode State ──
@@ -78,8 +81,9 @@ export const WorkspaceLibrary = ({
     );
   });
 
-  const [projectTab, setProjectTab] = useState<'projects' | 'tasks'>(
-    'projects',
+  const dispatch = useAppDispatch();
+  const projectTab = useAppSelector(
+    (state) => state.task.projectTab || 'projects',
   );
   const [isAllFoldersModalOpen, setIsAllFoldersModalOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
@@ -232,7 +236,7 @@ export const WorkspaceLibrary = ({
         }}
         hasMultipleWorkspaces={notes.data.totalNotes > 1}
         projectTab={projectTab}
-        onProjectTabChange={setProjectTab}
+        onProjectTabChange={(tab: ProjectTab) => dispatch(setProjectTab(tab))}
       />
 
       {/* ── Content View ── */}

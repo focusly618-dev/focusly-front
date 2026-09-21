@@ -1,10 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Task, TaskState } from './task.types';
+import type { ProjectTab, Task, TaskState } from './task.types';
 
 const initialState: TaskState = {
   tasks: [],
   loading: false,
   error: null,
+  projectTab: 'projects',
 };
 
 const taskSlice = createSlice({
@@ -58,6 +59,9 @@ const taskSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setProjectTab: (state, action: PayloadAction<ProjectTab>) => {
+      state.projectTab = action.payload;
+    },
   },
 });
 
@@ -72,6 +76,7 @@ export const {
   setLoading,
   setError,
   resetTask,
+  setProjectTab,
 } = taskSlice.actions;
 
 export default taskSlice.reducer;

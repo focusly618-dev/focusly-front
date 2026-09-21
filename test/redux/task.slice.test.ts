@@ -10,6 +10,7 @@ import reducer, {
   setLoading,
   setError,
   resetTask,
+  setProjectTab,
 } from '@/redux/tasks/task.slice';
 import type { Task, TaskState } from '@/redux/tasks/task.types';
 
@@ -195,5 +196,18 @@ describe('task.slice reducer — adversarial / can-it-break-the-app cases', () =
       'Updated mid-list',
     );
     expect(state.tasks.find((t) => t.id === 't-4999')).toBeUndefined();
+  });
+
+  it('setProjectTab updates the active project tab correctly', () => {
+    const state = reducer(emptyState, setProjectTab('tasks'));
+    expect(state.projectTab).toBe('tasks');
+
+    const nextState = reducer(state, setProjectTab('projects'));
+    expect(nextState.projectTab).toBe('projects');
+  });
+
+  it('initial state has projectTab set to "projects"', () => {
+    const state = reducer(undefined, { type: '@@INIT' });
+    expect(state.projectTab).toBe('projects');
   });
 });

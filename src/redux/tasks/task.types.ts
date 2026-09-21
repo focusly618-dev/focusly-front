@@ -82,8 +82,11 @@ export interface Task {
   is_owner?: boolean;
 }
 
+export type ProjectTab = 'projects' | 'tasks';
+
 export interface TaskState {
   tasks: Task[];
   loading: boolean;
   error: string | null;
+  projectTab?: ProjectTab;
 }
