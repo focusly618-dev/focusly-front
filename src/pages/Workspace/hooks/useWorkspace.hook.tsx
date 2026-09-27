@@ -129,8 +129,17 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
 
   const [getWorkspaceById] = useLazyQuery(GET_WORKSPACE_BY_ID);
 
+  const workspaces: WorkspaceTypes[] = useMemo(() => {
+    const list = workspacesData?.result?.workspaces || [];
+    return [...list].sort((a, b) => {
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [workspacesData]);
+
   const hasWorkspaces =
-    (workspacesData?.result?.workspaces?.length ?? 0) > 0 ||
+    workspaces.length > 0 ||
     (projectGroupsData?.projectGroups?.length ?? 0) > 0;
 
   // 6. Effects
@@ -312,6 +321,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     onConfirm,
 
     // Workspace loading / queries
+    workspaces,
     workspacesData,
     workspacesLoading,
     hasWorkspaces,

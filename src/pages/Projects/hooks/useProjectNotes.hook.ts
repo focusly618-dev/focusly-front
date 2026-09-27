@@ -35,10 +35,14 @@ export const useProjectNotes = (selectedGroupId: string | null = null) => {
     nextFetchPolicy: 'cache-first',
   });
 
-  const rawWorkspaces: WorkspaceTypes[] = useMemo(
-    () => data?.result?.workspaces || [],
-    [data],
-  );
+  const rawWorkspaces: WorkspaceTypes[] = useMemo(() => {
+    const list = data?.result?.workspaces || [];
+    return [...list].sort((a, b) => {
+      const aDate = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const bDate = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return bDate - aDate;
+    });
+  }, [data]);
   const totalWorkspaces = data?.result?.totalCount ?? rawWorkspaces.length;
   const totalPages = Math.max(1, Math.ceil(totalWorkspaces / NOTE_LIMIT));
 

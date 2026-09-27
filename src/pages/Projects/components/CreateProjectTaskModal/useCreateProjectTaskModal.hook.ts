@@ -191,10 +191,15 @@ export function useCreateProjectTaskModal({
     const fromQuery = workspacesData?.result?.workspaces || [];
     const combined = [...createdWorkspaces, ...fromQuery];
     const seen = new Set<string>();
-    return combined.filter((w) => {
+    const deduplicated = combined.filter((w) => {
       if (seen.has(w.id)) return false;
       seen.add(w.id);
       return true;
+    });
+    return deduplicated.sort((a, b) => {
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return dateB - dateA;
     });
   }, [workspacesData, createdWorkspaces]);
 

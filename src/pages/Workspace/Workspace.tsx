@@ -68,6 +68,7 @@ export const Workspace = ({
     runOnboarding,
     handleFinishOnboarding,
     onboardingSteps,
+    workspaces,
     workspacesData,
     workspacesLoading,
     hasWorkspaces,
@@ -138,7 +139,7 @@ export const Workspace = ({
                 onStartFocus={onStartFocus}
                 isRightSidebarOpen={isSidebarOpen}
                 setIsRightSidebarOpen={onSidebarChange}
-                workspaces={workspacesData?.result?.workspaces}
+                workspaces={workspaces}
                 activeFocusTaskId={activeFocusTaskId}
                 onUnlinkTask={handleUnlinkTask}
                 saveState={saveState}

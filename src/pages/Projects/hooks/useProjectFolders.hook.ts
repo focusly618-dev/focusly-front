@@ -177,10 +177,14 @@ export const useProjectFolders = () => {
     }
   };
 
-  const rawGroups: ProjectGroupTypes[] = useMemo(
-    () => projectGroupsData?.result?.projectGroups || [],
-    [projectGroupsData],
-  );
+  const rawGroups: ProjectGroupTypes[] = useMemo(() => {
+    const groups = projectGroupsData?.result?.projectGroups || [];
+    return [...groups].sort((a, b) => {
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [projectGroupsData]);
   const totalGroups = projectGroupsData?.result?.totalCount ?? rawGroups.length;
 
   const rawTasks = useMemo(
@@ -192,7 +196,7 @@ export const useProjectFolders = () => {
   const currentTotal = activeProjectTab === 'tasks' ? totalTasks : totalGroups;
   const totalGroupPages = Math.max(1, Math.ceil(currentTotal / GROUP_LIMIT));
 
-  // Client-side filtering
+  // Client-side filtering & sorting
   const filteredGroups = useMemo(() => {
     let list = [...rawGroups];
 
@@ -207,8 +211,28 @@ export const useProjectFolders = () => {
       );
     }
 
+    list.sort((a, b) => {
+      switch (projectSortBy) {
+        case 'name-asc':
+          return (a.name || '').localeCompare(b.name || '');
+        case 'name-desc':
+          return (b.name || '').localeCompare(a.name || '');
+        case 'notes-count': {
+          const aCount = a.workspaceCount ?? a.workspaces?.length ?? 0;
+          const bCount = b.workspaceCount ?? b.workspaces?.length ?? 0;
+          return bCount - aCount;
+        }
+        case 'recent':
+        default: {
+          const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+          const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+          return dateB - dateA;
+        }
+      }
+    });
+
     return list;
-  }, [rawGroups, debouncedSearchTerm, projectColorFilter]);
+  }, [rawGroups, debouncedSearchTerm, projectColorFilter, projectSortBy]);
 
   interface SearchableTask {
     title?: string;
