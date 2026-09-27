@@ -81,6 +81,30 @@ class AIStreamService {
     });
   }
 
+  private currentReader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+
+  stopStream() {
+    if (this.currentReader) {
+      try {
+        this.currentReader.cancel();
+      } catch (err) {
+        console.error('[AIStreamService] Error cancelling reader:', err);
+      }
+      this.currentReader = null;
+    }
+    if (this.state.isGenerating) {
+      this.state.isGenerating = false;
+      this.state.status = 'completed';
+      this.notify({
+        type: 'done',
+        accumulatedText: this.state.accumulatedText,
+        conversationId: this.state.conversationId || '',
+        aiMsgId: this.state.aiMsgId || '',
+        activeMessages: this.state.activeMessages,
+      });
+    }
+  }
+
   async startStream(
     conversationId: string,
     aiMsgId: string,
@@ -100,6 +124,7 @@ class AIStreamService {
     try {
       const stream = await streamPromise;
       const reader = stream.getReader();
+      this.currentReader = reader;
       const decoder = new TextDecoder();
 
       while (true) {
@@ -131,6 +156,7 @@ class AIStreamService {
 
       this.state.isGenerating = false;
       this.state.status = 'completed';
+      this.currentReader = null;
       this.notify({
         type: 'done',
         accumulatedText: this.state.accumulatedText,
@@ -141,6 +167,7 @@ class AIStreamService {
 
       return this.state.accumulatedText;
     } catch (err: unknown) {
+      this.currentReader = null;
       this.state.isGenerating = false;
       this.state.status = 'error';
       const errorMessage =

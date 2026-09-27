@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  Card,
-  CardContent,
   Box,
   Typography,
   Button,
@@ -19,18 +17,38 @@ import {
   Add as AddIcon,
   Schedule as ScheduleIcon,
   Flag as FlagIcon,
+  Folder as FolderIcon,
+  Description as DescriptionIcon,
+  Assignment as AssignmentIcon,
+  EventRepeat as RescheduleIcon,
+  OpenInFull as OpenInFullIcon,
 } from '@mui/icons-material';
-import { cardSx } from '../suggestedActionCard/suggestedActionCard.styles';
+import {
+  Plan,
+  PlanHeader,
+  PlanTitle,
+  PlanDescription,
+  PlanContent,
+  PlanFooter,
+  PlanTrigger,
+} from '@/components/ai-elements/plan';
+import {
+  Task,
+  TaskTrigger,
+  TaskContent,
+  TaskStatus,
+  type TaskStatusType,
+} from '@/components/ai-elements/task';
 import {
   getActionPreviewData,
   getActionTitle,
 } from '../suggestedActionCard/actionExecution.utils';
 import { useSuggestedActionsPlan } from './useSuggestedActionsPlan.hook';
-import type { SuggestedActionsPlanProps } from './SuggestedActionsPlan.types';
+import type {
+  SuggestedActionsPlanProps,
+  PlanItemStatus,
+} from './SuggestedActionsPlan.types';
 import {
-  summaryCardContentSx,
-  summaryTextRowSx,
-  previewButtonSx,
   dialogPaperSx,
   dialogHeaderSx,
   dialogListSx,
@@ -44,6 +62,35 @@ import {
   dialogFooterSx,
   createAllButtonSx,
 } from './SuggestedActionsPlan.styles';
+
+const mapStatusToTaskStatus = (status: PlanItemStatus): TaskStatusType => {
+  switch (status) {
+    case 'done':
+      return 'completed';
+    case 'creating':
+      return 'in_progress';
+    case 'error':
+      return 'error';
+    default:
+      return 'pending';
+  }
+};
+
+const getActionTypeIcon = (type: string) => {
+  switch (type) {
+    case 'CREATE_TASK':
+      return <AssignmentIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
+    case 'UPDATE_TASK':
+      return <RescheduleIcon sx={{ fontSize: 16, color: 'info.main' }} />;
+    case 'CREATE_PROJECT_GROUP':
+    case 'CREATE_WORKSPACE':
+      return <FolderIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
+    case 'CREATE_NOTE':
+      return <DescriptionIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
+    default:
+      return <AssignmentIcon sx={{ fontSize: 16, color: 'primary.main' }} />;
+  }
+};
 
 export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
   actions,
@@ -60,14 +107,10 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
   } = useSuggestedActionsPlan(actions);
 
   const previews = actions.map((action) => getActionPreviewData(action));
-  // A batch made entirely of moves ("compress my week", "add a break
-  // between these") reads very differently from a batch of brand-new
-  // items — labeling it "Create 5 tasks" would repeat the exact
-  // create-vs-edit confusion this action type exists to fix.
+
   const isRescheduleOnly =
     actions.length > 0 && actions.every((a) => a.type === 'UPDATE_TASK');
 
-  // Compute a contextual label for the count badge
   const hasTasks = actions.some(
     (a) => a.type === 'CREATE_TASK' || a.type === 'UPDATE_TASK',
   );
@@ -87,56 +130,220 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
           ? 'elemento'
           : 'elementos';
 
+  const completedCount = itemStatuses.filter((s) => s === 'done').length;
+
   return (
     <>
-      <Card sx={cardSx(theme)}>
-        <CardContent sx={summaryCardContentSx}>
-          <Box sx={summaryTextRowSx}>
-            <EventNoteIcon
-              sx={{ fontSize: 20, color: theme.palette.primary.main }}
-            />
-            <Box minWidth={0}>
-              <Typography
-                variant="subtitle2"
-                fontWeight={800}
-                color="text.primary"
-              >
+      {/* AI Elements Inline Plan Container */}
+      <Plan
+        defaultOpen={true}
+        isStreaming={isCreating}
+        className="my-3.5 border border-indigo-500/20 bg-white/80 dark:bg-zinc-900/90 shadow-lg dark:shadow-2xl"
+      >
+        <PlanHeader className="py-3 px-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center justify-center size-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shrink-0">
+              <EventNoteIcon sx={{ fontSize: 18 }} />
+            </div>
+            <div className="min-w-0">
+              <PlanTitle className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 truncate">
                 {isRescheduleOnly ? 'Cambios sugeridos' : 'Plan sugerido'} ·{' '}
                 {actions.length} {planItemLabel}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
+              </PlanTitle>
+              <PlanDescription className="text-xs text-zinc-500 dark:text-zinc-400">
                 {isCompleted
                   ? isRescheduleOnly
-                    ? 'Ya movidas en tu calendario'
-                    : 'Ya agregado a tu calendario'
-                  : isRescheduleOnly
-                    ? 'Revisa los nuevos horarios antes de aplicarlos'
-                    : 'Revisa las fechas antes de agregarlas'}
-              </Typography>
-            </Box>
-          </Box>
+                    ? 'Horarios actualizados en tu calendario'
+                    : 'Elementos agregados a tu espacio'
+                  : isCreating
+                    ? `Aplicando acciones (${completedCount}/${actions.length})...`
+                    : `${actions.length} acciones listas para confirmar`}
+              </PlanDescription>
+            </div>
+          </div>
 
-          {isCompleted ? (
-            <Chip
-              size="small"
-              icon={<CheckCircleIcon sx={{ fontSize: 14 }} />}
-              label="Creadas"
-              color="success"
-              variant="outlined"
-            />
-          ) : (
+          <div className="flex items-center gap-1.5 shrink-0">
+            {isCompleted ? (
+              <Chip
+                size="small"
+                icon={<CheckCircleIcon sx={{ fontSize: 14 }} />}
+                label="Completado"
+                color="success"
+                variant="outlined"
+                sx={{ height: 26, fontSize: '11px', fontWeight: 600 }}
+              />
+            ) : (
+              <Button
+                variant="contained"
+                size="small"
+                disabled={isCreating}
+                onClick={handleCreateAll}
+                startIcon={
+                  isCreating ? (
+                    <CircularProgress size={12} color="inherit" />
+                  ) : (
+                    <AddIcon sx={{ fontSize: 14 }} />
+                  )
+                }
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  py: 0.5,
+                  px: 1.5,
+                  borderRadius: '8px',
+                  boxShadow: 'none',
+                }}
+              >
+                {isCreating ? 'Creando...' : 'Ejecutar todo'}
+              </Button>
+            )}
+
+            <TooltipIconButton
+              title="Vista detallada"
+              onClick={() => setOpen(true)}
+            >
+              <OpenInFullIcon sx={{ fontSize: 15 }} />
+            </TooltipIconButton>
+
+            <PlanTrigger />
+          </div>
+        </PlanHeader>
+
+        <PlanContent className="p-3 space-y-2">
+          {actions.map((action, idx) => {
+            const preview = previews[idx];
+            const status = itemStatuses[idx];
+            const taskStatus = mapStatusToTaskStatus(status);
+
+            return (
+              <Task
+                key={idx}
+                defaultOpen={false}
+                className="border border-black/[0.06] dark:border-white/[0.06] bg-black/[0.015] dark:bg-white/[0.02]"
+              >
+                <TaskTrigger>
+                  <div className="flex items-center justify-between gap-2.5 w-full py-0.5">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <TaskStatus status={taskStatus} />
+                      <div className="shrink-0">
+                        {getActionTypeIcon(action.type)}
+                      </div>
+                      <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">
+                        {preview.title || getActionTitle(action)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {preview.dateLabel && (
+                        <span className="text-[10.5px] px-2 py-0.5 rounded-full font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/40">
+                          {preview.dateLabel}
+                        </span>
+                      )}
+                      {preview.durationLabel && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-md font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/60">
+                          {preview.durationLabel}
+                        </span>
+                      )}
+                      {preview.priorityLabel && (
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold text-white"
+                          style={{
+                            backgroundColor: preview.priorityColor || '#6366f1',
+                          }}
+                        >
+                          {preview.priorityLabel}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </TaskTrigger>
+
+                <TaskContent>
+                  {(preview.description || preview.contentPreview) && (
+                    <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                      {preview.description || preview.contentPreview}
+                    </p>
+                  )}
+
+                  {preview.subtasks && preview.subtasks.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-black/5 dark:border-white/5 space-y-1">
+                      <span className="text-[10.5px] font-bold text-zinc-500 uppercase tracking-wider block">
+                        Subtareas ({preview.subtasks.length}):
+                      </span>
+                      {preview.subtasks.map((st, sIdx) => (
+                        <div
+                          key={sIdx}
+                          className="flex items-center justify-between text-xs py-0.5 text-zinc-700 dark:text-zinc-300"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="size-1.5 rounded-full bg-indigo-500" />
+                            <span>{st.title}</span>
+                          </div>
+                          {st.durationLabel && (
+                            <span className="text-[10px] text-zinc-400">
+                              {st.durationLabel}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TaskContent>
+              </Task>
+            );
+          })}
+
+          {errorMessage && (
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs">
+              <ErrorOutlineIcon sx={{ fontSize: 16 }} />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+        </PlanContent>
+
+        <PlanFooter className="flex items-center justify-between py-2 px-4 bg-zinc-50/60 dark:bg-zinc-900/40">
+          <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+            {isCompleted
+              ? 'Todas las acciones se han ejecutado correctamente'
+              : `${actions.length - completedCount} pendientes de ejecutar`}
+          </span>
+
+          <div className="flex items-center gap-2">
             <Button
-              variant="outlined"
+              variant="text"
               size="small"
               onClick={() => setOpen(true)}
-              sx={previewButtonSx}
+              sx={{
+                textTransform: 'none',
+                fontSize: '11px',
+                color: 'text.secondary',
+              }}
             >
-              Preview
+              Ver en modal
             </Button>
-          )}
-        </CardContent>
-      </Card>
+            {!isCompleted && (
+              <Button
+                variant="contained"
+                size="small"
+                disabled={isCreating}
+                onClick={handleCreateAll}
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  borderRadius: '6px',
+                  boxShadow: 'none',
+                }}
+              >
+                {isCreating ? 'Creando...' : 'Crear todas'}
+              </Button>
+            )}
+          </div>
+        </PlanFooter>
+      </Plan>
 
+      {/* Fallback Detailed Modal Dialog */}
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -322,3 +529,18 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
     </>
   );
 };
+
+const TooltipIconButton: React.FC<{
+  title: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}> = ({ title, onClick, children }) => (
+  <button
+    type="button"
+    title={title}
+    onClick={onClick}
+    className="inline-flex items-center justify-center size-8 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+  >
+    {children}
+  </button>
+);

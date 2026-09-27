@@ -15,6 +15,7 @@ export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
   size = 32,
   primaryColor = '#1d4ed8',
   secondaryColor = '#f472b6',
+  isSpeaking = false,
 }) => {
   const baseId = React.useId();
   const cleanId = baseId.replace(/:/g, '');
@@ -43,6 +44,14 @@ export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
             0%, 100% { transform: translate(0px, 0px) rotate(22deg); }
             50% { transform: translate(-0.8px, 1px) rotate(26deg); }
           }
+          @keyframes mouthTalk-${cleanId} {
+            0%, 100% { transform: scale(0.8, 0.4); opacity: 0.85; }
+            50% { transform: scale(1.15, 1.25); opacity: 1; }
+          }
+          @keyframes speechWave-${cleanId} {
+            0% { transform: scale(0.85); opacity: 0.85; }
+            100% { transform: scale(1.3); opacity: 0; }
+          }
           .lumina-character-group-${cleanId} {
             transform-origin: 32px 34px;
             animation: faceFloat-${cleanId} 3.2s ease-in-out infinite;
@@ -57,7 +66,7 @@ export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
           }
           .lumina-pencil-${cleanId} {
             transform-origin: 47px 47px;
-            animation: pencilWiggle-${cleanId} 1.6s ease-in-out infinite;
+            animation: pencilWiggle-${cleanId} ${isSpeaking ? '0.8s' : '1.6s'} ease-in-out infinite;
           }
         `}</style>
 
@@ -128,6 +137,63 @@ export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
         {/* Blushing cheeks */}
         <circle cx="19" cy="35" r="2.5" fill={secondaryColor} opacity="0.4" />
         <circle cx="45" cy="35" r="2.5" fill={secondaryColor} opacity="0.4" />
+
+        {/* Talking Mouth / Gentle Smile */}
+        {isSpeaking ? (
+          <g
+            style={{
+              transformOrigin: '32px 35.5px',
+              animation: `mouthTalk-${cleanId} 0.26s ease-in-out infinite`,
+            }}
+          >
+            <ellipse cx="32" cy="35.5" rx="3.2" ry="3.6" fill="#e11d48" />
+            <path d="M29.8 36 Q32 38.5 34.2 36" fill="#fda4af" />
+            <path
+              d="M30 34.2 Q32 33.2 34 34.2"
+              stroke="#ffffff"
+              strokeWidth="0.8"
+              strokeLinecap="round"
+            />
+          </g>
+        ) : (
+          <path
+            d="M30 35 Q32 37 34 35"
+            stroke="#1e293b"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            fill="none"
+          />
+        )}
+
+        {/* Animated speech soundwaves when speaking */}
+        {isSpeaking && (
+          <g>
+            <path
+              d="M48 24 C50.5 27.5 50.5 32.5 48 36"
+              stroke="#6366f1"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.85"
+              style={{
+                transformOrigin: '48px 30px',
+                animation: `speechWave-${cleanId} 0.9s ease-out infinite`,
+              }}
+            />
+            <path
+              d="M52 21 C55.5 26 55.5 34 52 39"
+              stroke="#6366f1"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.5"
+              style={{
+                transformOrigin: '52px 30px',
+                animation: `speechWave-${cleanId} 0.9s ease-out infinite 0.2s`,
+              }}
+            />
+          </g>
+        )}
 
         {/* Deep Blue Vertical Oval Eyes */}
         <g className={`lumina-eye-left-${cleanId}`}>

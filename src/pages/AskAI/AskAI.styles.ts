@@ -182,23 +182,46 @@ export const MessageRow = styled(Box)<{ isUser?: boolean }>(({ isUser }) => ({
   },
 }));
 
-export const AvatarWrapper = styled(Box)(({ theme }) => {
+export const AvatarWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isSpeaking',
+})<{ isSpeaking?: boolean }>(({ theme, isSpeaking }) => {
   const isDark = theme.palette.mode === 'dark';
   return {
     width: '34px',
     height: '34px',
     borderRadius: '10px',
     flexShrink: 0,
-    overflow: 'hidden',
+    overflow: 'visible',
+    position: 'relative',
     backgroundColor: isDark ? '#1e2029' : '#ffffff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: `1.5px solid ${isDark ? 'rgba(99, 102, 241, 0.4)' : '#c7d2fe'}`,
-    boxShadow: isDark
-      ? '0 2px 8px rgba(0,0,0,0.4)'
-      : '0 1px 4px rgba(99, 102, 241, 0.1)',
+    border: `1.5px solid ${
+      isSpeaking ? '#6366f1' : isDark ? 'rgba(99, 102, 241, 0.4)' : '#c7d2fe'
+    }`,
+    boxShadow: isSpeaking
+      ? '0 0 16px rgba(99, 102, 241, 0.6), 0 0 0 3px rgba(99, 102, 241, 0.2)'
+      : isDark
+        ? '0 2px 8px rgba(0,0,0,0.4)'
+        : '0 1px 4px rgba(99, 102, 241, 0.1)',
+    transition: 'all 0.3s ease-in-out',
     marginTop: '2px',
+    ...(isSpeaking && {
+      animation: 'luminaAuraPulse 1.8s ease-in-out infinite',
+      '@keyframes luminaAuraPulse': {
+        '0%, 100%': {
+          boxShadow:
+            '0 0 12px rgba(99, 102, 241, 0.45), 0 0 0 2px rgba(99, 102, 241, 0.2)',
+          transform: 'scale(1)',
+        },
+        '50%': {
+          boxShadow:
+            '0 0 22px rgba(99, 102, 241, 0.75), 0 0 0 5px rgba(99, 102, 241, 0.3)',
+          transform: 'scale(1.05)',
+        },
+      },
+    }),
   };
 });
 

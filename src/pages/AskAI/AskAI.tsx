@@ -34,9 +34,7 @@ import {
   AttachFile as AttachFileIcon,
   ContentCopy as CopyIcon,
   ThumbUpOutlined as ThumbUpOutlinedIcon,
-  Mic as MicIcon,
   Search as SearchIcon,
-  ArrowForward as ArrowForwardIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -50,6 +48,7 @@ import {
   LuminaOrb,
   ClaudeIcon,
   GeminiIcon,
+  LuminaSpeakingWave,
 } from '@/components/ui';
 import { useQuery } from '@apollo/client';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
@@ -62,9 +61,32 @@ import {
 } from '@/api/AI/apiAI';
 import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
 import { SuggestedActionsPlan } from '@/components/chat/suggestedActionsPlan/SuggestedActionsPlan';
+import {
+  PromptInput,
+  PromptInputHeader,
+  PromptInputBody,
+  PromptInputTextarea,
+  PromptInputFooter,
+  PromptInputTools,
+  PromptInputButton,
+  PromptInputSubmit,
+  type ChatStatus,
+  ChainOfThought,
+  ChainOfThoughtHeader,
+  ChainOfThoughtContent,
+  ChainOfThoughtStep,
+  Suggestions,
+  Suggestion,
+  Shimmer,
+} from '@/components/ai-elements';
 import { UpgradeModal } from '@/components/modals';
 import { aiStreamService } from '@/services/aiStreamService';
-import { parseLuminaActions, sileo, type ParsedLuminaAction } from '@/utils';
+import {
+  parseLuminaActions,
+  sileo,
+  type ParsedLuminaAction,
+  extractUserIntent,
+} from '@/utils';
 import { surfaceColor } from '@/context';
 import {
   AskAIContainer,
@@ -81,17 +103,10 @@ import {
   AIMessageWrapper,
   AIMessageHeader,
   AIMessageActions,
-  SuggestionsBar,
-  TypingIndicator,
-  LuminaWorkingIndicator,
   InputWrapper,
-  InputBox,
-  StyledInput,
-  SendButton,
   HistorySidebar,
   ChatAreaWrapper,
   ChatHeader,
-  ModelBadgeButton,
   StatusPill,
 } from './AskAI.styles';
 
@@ -448,18 +463,7 @@ const formatUpdateTime = (dateStr: string) => {
   }
 };
 
-// Rotates while waiting for the first token of a reply — reflects, roughly,
-// the context-building steps the backend actually does before the LLM call
-// (see build_context() in focusly-workflows) so the wait doesn't look idle.
 const LAST_CONVERSATION_STORAGE_KEY = 'focusly_ai_last_conversation_id';
-
-const LUMINA_STATUS_MESSAGES = [
-  'Lumina se está conectando',
-  'Leyendo tus tareas',
-  'Revisando tus workspaces y folders',
-  'Consultando tu calendario',
-  'Analizando el contexto',
-];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -511,10 +515,10 @@ export const AskAI: React.FC = () => {
     return [];
   });
   const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState<boolean>(() =>
-    aiStreamService.isGenerating(),
+  const [status, setStatus] = useState<ChatStatus>(() =>
+    aiStreamService.isGenerating() ? 'streaming' : 'ready',
   );
-  const [statusMessageIndex, setStatusMessageIndex] = useState(0);
+  const isTyping = status === 'submitted' || status === 'streaming';
   const [conversations, setConversations] = useState<AIConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
@@ -669,11 +673,16 @@ export const AskAI: React.FC = () => {
     }
   }, [activeConversationId]);
 
+  const handleStopStream = useCallback(() => {
+    aiStreamService.stopStream();
+    setStatus('ready');
+  }, []);
+
   // Subscribe to background AI stream service
   useEffect(() => {
     const unsubscribe = aiStreamService.subscribe((event) => {
       if (event.type === 'chunk') {
-        setIsTyping(false);
+        setStatus('streaming');
         setMessages((prev) => {
           const exists = prev.some((m) => m.id === event.aiMsgId);
           if (!exists) {
@@ -706,7 +715,7 @@ export const AskAI: React.FC = () => {
           );
         });
       } else if (event.type === 'done') {
-        setIsTyping(false);
+        setStatus('ready');
         getAIConversations()
           .then((updatedConvs) => {
             setConversations(updatedConvs);
@@ -716,7 +725,7 @@ export const AskAI: React.FC = () => {
           })
           .catch(console.error);
       } else if (event.type === 'error') {
-        setIsTyping(false);
+        setStatus('error');
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === event.aiMsgId
@@ -825,19 +834,6 @@ export const AskAI: React.FC = () => {
       endRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
-
-  // Rotate the "what Lumina is doing" status text while waiting for the
-  // first token of a reply (index is reset to 0 where sendMessage sets
-  // isTyping, right before the request goes out).
-  useEffect(() => {
-    if (!isTyping) return;
-    const intervalId = setInterval(() => {
-      setStatusMessageIndex(
-        (prev) => (prev + 1) % LUMINA_STATUS_MESSAGES.length,
-      );
-    }, 1400);
-    return () => clearInterval(intervalId);
-  }, [isTyping]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -1021,8 +1017,7 @@ export const AskAI: React.FC = () => {
       }
       setInputValue('');
       setAttachedFiles([]);
-      setIsTyping(true);
-      setStatusMessageIndex(0);
+      setStatus('submitted');
 
       const aiMsgId = `ai-${Date.now()}`;
       const aiMsg: Message = {
@@ -1092,7 +1087,7 @@ export const AskAI: React.FC = () => {
               : msg,
           ),
         );
-        setIsTyping(false);
+        setStatus('error');
       }
     },
     [
@@ -1134,15 +1129,6 @@ export const AskAI: React.FC = () => {
     sendMessage(retryText, truncatedHistory);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (inputValue.trim() || attachedFiles.length > 0) {
-        sendMessage(inputValue);
-      }
-    }
-  };
-
   const handleSuggestionClick = (prompt: string) => {
     sendMessage(prompt);
     inputRef.current?.focus();
@@ -1179,7 +1165,11 @@ export const AskAI: React.FC = () => {
                 flexShrink: 0,
               }}
             >
-              <LuminaAnimatedFace size={22} primaryColor={primaryColor} />
+              <LuminaAnimatedFace
+                size={22}
+                primaryColor={primaryColor}
+                isSpeaking={status === 'streaming' || status === 'submitted'}
+              />
             </Box>
             <Box display="flex" flexDirection="column" gap={0.2}>
               <Box display="flex" alignItems="center" gap={1}>
@@ -1191,10 +1181,19 @@ export const AskAI: React.FC = () => {
                 >
                   Lumina AI
                 </Typography>
-                <StatusPill>
-                  <span className="status-dot" />
-                  En línea
-                </StatusPill>
+                {status === 'streaming' || status === 'submitted' ? (
+                  <LuminaSpeakingWave
+                    isSpeaking={true}
+                    label={
+                      status === 'streaming' ? 'Hablando...' : 'Pensando...'
+                    }
+                  />
+                ) : (
+                  <StatusPill>
+                    <span className="status-dot" />
+                    En línea
+                  </StatusPill>
+                )}
               </Box>
               <Typography
                 variant="caption"
@@ -1211,50 +1210,6 @@ export const AskAI: React.FC = () => {
           </Box>
 
           <Box display="flex" alignItems="center" gap={1}>
-            <ModelBadgeButton
-              size="small"
-              onClick={(e) => setModelAnchor(e.currentTarget)}
-              startIcon={
-                <Box
-                  sx={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: '50%',
-                    bgcolor: '#8b5cf6',
-                  }}
-                />
-              }
-              endIcon={<ArrowDownIcon sx={{ fontSize: 14 }} />}
-            >
-              <Typography sx={{ fontSize: '12px', fontWeight: 600 }}>
-                {getModelLabel(selectedModel)}
-              </Typography>
-              <Box
-                component="span"
-                sx={{
-                  bgcolor: (t) =>
-                    t.palette.mode === 'dark'
-                      ? 'rgba(37, 99, 235, 0.25)'
-                      : '#eff6ff',
-                  color: '#2563eb',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  px: 0.6,
-                  py: 0.15,
-                  borderRadius: '4px',
-                  ml: 0.25,
-                }}
-              >
-                Rápido
-              </Box>
-            </ModelBadgeButton>
-
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={{ mx: 0.75, height: '18px', alignSelf: 'center' }}
-            />
-
             <Button
               variant="outlined"
               size="small"
@@ -1464,7 +1419,7 @@ export const AskAI: React.FC = () => {
                   <span className="date-pill">{formatTodayDate()}</span>
                 </DateSeparator>
 
-                {messages.map((msg) => {
+                {messages.map((msg, index) => {
                   const isUser = msg.sender === 'user';
                   const {
                     cleanText: parsedCleanText,
@@ -1504,9 +1459,42 @@ export const AskAI: React.FC = () => {
                   const hasPendingAction =
                     msg.actions === undefined && livePendingAction;
 
-                  if (!isUser && !cleanText.trim() && !hasPendingAction) {
+                  const thinkMatch = !isUser
+                    ? cleanText.match(/<think>([\s\S]*?)<\/think>/i)
+                    : null;
+                  const reasoningText = thinkMatch
+                    ? thinkMatch[1].trim()
+                    : null;
+                  const displayCleanText = reasoningText
+                    ? cleanText.replace(/<think>[\s\S]*?<\/think>/i, '').trim()
+                    : cleanText;
+
+                  const isStreamingOrSubmitted =
+                    (status === 'submitted' || status === 'streaming') &&
+                    (msg.id === aiStreamService.getState().aiMsgId ||
+                      (!isUser && index === messages.length - 1));
+
+                  if (
+                    !isUser &&
+                    !displayCleanText &&
+                    !hasPendingAction &&
+                    !reasoningText &&
+                    !isStreamingOrSubmitted
+                  ) {
                     return null;
                   }
+
+                  const prevUserMsg = !isUser
+                    ? messages
+                        .slice(0, index)
+                        .reverse()
+                        .find((m) => m.sender === 'user')
+                    : undefined;
+                  const userPromptText = prevUserMsg?.text || '';
+                  const userIntent = !isUser
+                    ? extractUserIntent(userPromptText)
+                    : '';
+
                   if (
                     isUser &&
                     !cleanText.trim() &&
@@ -1518,7 +1506,7 @@ export const AskAI: React.FC = () => {
                   const cleanHtml =
                     msg.html && !isUser
                       ? renderMarkdown(
-                          cleanText,
+                          displayCleanText,
                           theme.palette.mode === 'dark',
                           theme,
                         )
@@ -1642,20 +1630,116 @@ export const AskAI: React.FC = () => {
                         width: '100%',
                       }}
                     >
-                      <AvatarWrapper>
+                      <AvatarWrapper isSpeaking={isStreamingOrSubmitted}>
                         <LuminaAnimatedFace
                           size={22}
                           primaryColor={primaryColor}
+                          isSpeaking={isStreamingOrSubmitted}
                         />
                       </AvatarWrapper>
                       <AIMessageWrapper>
                         <AIMessageHeader>
                           <span className="ai-title">Lumina AI</span>
+                          {isStreamingOrSubmitted && (
+                            <LuminaSpeakingWave
+                              isSpeaking={true}
+                              label={
+                                status === 'streaming' ? 'Hablando' : 'Pensando'
+                              }
+                            />
+                          )}
                           <span className="ai-time">{timeStr}</span>
                         </AIMessageHeader>
-                        <MessageBubble isUser={false}>
-                          {cleanText &&
-                            (cleanHtml ? (
+                        {/* Notion-style Chain of Thought dropdown */}
+                        {userIntent && (
+                          <ChainOfThought
+                            defaultOpen={isStreamingOrSubmitted}
+                            isStreaming={isStreamingOrSubmitted}
+                            className="my-1.5 w-full"
+                          >
+                            <ChainOfThoughtHeader>
+                              <span className="flex items-center gap-1.5 truncate">
+                                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                                  {isStreamingOrSubmitted
+                                    ? 'El usuario está queriendo'
+                                    : 'El usuario requirió'}
+                                  :
+                                </span>
+                                <span className="font-normal text-zinc-600 dark:text-zinc-400 italic truncate">
+                                  {userIntent}
+                                </span>
+                              </span>
+                            </ChainOfThoughtHeader>
+                            <ChainOfThoughtContent>
+                              <ChainOfThoughtStep
+                                status="complete"
+                                label="Comprendiendo objetivo del usuario"
+                                description={`"${userIntent}"`}
+                              />
+                              <ChainOfThoughtStep
+                                status={
+                                  isStreamingOrSubmitted && !displayCleanText
+                                    ? 'active'
+                                    : 'complete'
+                                }
+                                label="Consultando contexto de Focusly"
+                                description="Workspaces, proyectos, tareas y calendario"
+                              />
+                              <ChainOfThoughtStep
+                                status={
+                                  isStreamingOrSubmitted
+                                    ? displayCleanText
+                                      ? 'active'
+                                      : 'pending'
+                                    : 'complete'
+                                }
+                                label="Estructurando respuesta y acciones"
+                                description={
+                                  actions.length > 0
+                                    ? `${actions.length} acción(es) detectada(s)`
+                                    : undefined
+                                }
+                              />
+                              {reasoningText && (
+                                <div className="mt-2.5 p-3 rounded-lg bg-zinc-100/80 dark:bg-zinc-800/60 border border-black/5 dark:border-white/5 font-mono text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed max-h-56 overflow-y-auto">
+                                  <div className="font-sans font-semibold text-[11px] text-indigo-500 uppercase tracking-wider mb-1.5">
+                                    Pensamiento de Lumina
+                                  </div>
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: renderMarkdown(
+                                        reasoningText,
+                                        theme.palette.mode === 'dark',
+                                        theme,
+                                      ),
+                                    }}
+                                  />
+                                </div>
+                              )}
+                            </ChainOfThoughtContent>
+                          </ChainOfThought>
+                        )}
+
+                        {/* Loading interaction while AI is working */}
+                        {!displayCleanText && isStreamingOrSubmitted && (
+                          <div className="flex items-center gap-2.5 py-2.5 px-3.5 my-1.5 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-500/15 w-fit animate-in fade-in duration-300">
+                            <LuminaOrb
+                              size={18}
+                              state="thinking"
+                              primaryColor={primaryColor}
+                            />
+                            <Shimmer
+                              duration={1.5}
+                              className="text-xs font-medium text-indigo-600 dark:text-indigo-400"
+                            >
+                              Lumina está trabajando en tu solicitud...
+                            </Shimmer>
+                          </div>
+                        )}
+
+                        {displayCleanText && (
+                          <MessageBubble isUser={false}>
+                            {cleanHtml ? (
                               <div
                                 dangerouslySetInnerHTML={{
                                   __html: cleanHtml,
@@ -1670,24 +1754,19 @@ export const AskAI: React.FC = () => {
                                 variant="body2"
                                 sx={{ whiteSpace: 'pre-wrap' }}
                               >
-                                {cleanText}
+                                {displayCleanText}
                               </Typography>
-                            ))}
-                          {hasPendingAction && (
-                            <LuminaWorkingIndicator
-                              sx={cleanText ? { mt: 1 } : undefined}
-                            >
-                              <span className="shimmer-text">
-                                Lumina está trabajando
-                              </span>
-                              <span className="pulse-dots">
-                                <span className="pulse-dot" />
-                                <span className="pulse-dot" />
-                                <span className="pulse-dot" />
-                              </span>
-                            </LuminaWorkingIndicator>
-                          )}
-                        </MessageBubble>
+                            )}
+                            {hasPendingAction && (
+                              <div className="mt-2 text-xs text-indigo-500 font-medium">
+                                <Shimmer duration={1.5}>
+                                  Lumina está preparando los cambios...
+                                </Shimmer>
+                              </div>
+                            )}
+                          </MessageBubble>
+                        )}
+
                         {actions.length === 1 && (
                           <SuggestedActionCard action={actions[0]} />
                         )}
@@ -1698,7 +1777,7 @@ export const AskAI: React.FC = () => {
                           <button
                             type="button"
                             className="action-btn"
-                            onClick={() => handleCopyMessage(cleanText)}
+                            onClick={() => handleCopyMessage(displayCleanText)}
                           >
                             <CopyIcon sx={{ fontSize: 13 }} />
                             Copiar
@@ -1723,43 +1802,6 @@ export const AskAI: React.FC = () => {
                     </Box>
                   );
                 })}
-
-                {/* Typing indicator */}
-                {isTyping && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 1.5,
-                      width: '100%',
-                    }}
-                  >
-                    <AvatarWrapper>
-                      <LuminaOrb
-                        size={22}
-                        state="thinking"
-                        primaryColor={primaryColor}
-                      />
-                    </AvatarWrapper>
-                    <AIMessageWrapper>
-                      <AIMessageHeader>
-                        <span className="ai-title">Lumina AI</span>
-                      </AIMessageHeader>
-                      <TypingIndicator>
-                        <LuminaWorkingIndicator>
-                          <span className="shimmer-text">
-                            {LUMINA_STATUS_MESSAGES[statusMessageIndex]}
-                          </span>
-                          <span className="pulse-dots">
-                            <span className="pulse-dot" />
-                            <span className="pulse-dot" />
-                            <span className="pulse-dot" />
-                          </span>
-                        </LuminaWorkingIndicator>
-                      </TypingIndicator>
-                    </AIMessageWrapper>
-                  </Box>
-                )}
 
                 <div ref={endRef} />
               </Box>
@@ -2141,35 +2183,32 @@ export const AskAI: React.FC = () => {
             )}
           </Menu>
 
-          {/* Suggestions Bar */}
-          <SuggestionsBar>
-            <span className="sug-label">⚡ Sugerencias:</span>
-            <button
-              type="button"
-              className="sug-pill"
+          {/* AI Elements Suggestions */}
+          <Suggestions className="mb-2.5 max-w-2xl w-full justify-center">
+            <Suggestion
               onClick={() => sendMessage('Revisar tono y claridad del texto')}
-            >
-              ✍️ Revisar tono
-            </button>
-            <button
-              type="button"
-              className="sug-pill"
+              label="✍️ Revisar tono"
+              description="Mejora la redacción"
+            />
+            <Suggestion
               onClick={() =>
                 sendMessage('Dividir en bloques de 25 min para hoy')
               }
-            >
-              ⏱️ Dividir en bloques
-            </button>
-            <button
-              type="button"
-              className="sug-pill"
+              label="⏱️ Dividir en bloques"
+              description="Organiza tus tareas con Pomodoro"
+            />
+            <Suggestion
               onClick={() => sendMessage('Resumir y extraer próximos pasos')}
-            >
-              📊 Resumir
-            </button>
-          </SuggestionsBar>
+              label="📊 Resumir"
+              description="Extrae puntos clave y acciones"
+            />
+          </Suggestions>
 
-          <InputBox elevation={0} ref={inputBoxRef}>
+          {/* AI Elements PromptInput */}
+          <div
+            className="w-full max-w-3xl"
+            ref={inputBoxRef as unknown as React.Ref<HTMLDivElement>}
+          >
             <input
               type="file"
               ref={fileInputRef}
@@ -2179,146 +2218,139 @@ export const AskAI: React.FC = () => {
               style={{ display: 'none' }}
             />
 
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                alignSelf: 'center',
-              }}
+            <PromptInput
+              status={status}
+              onStop={handleStopStream}
+              onSubmit={() => sendMessage(inputValue)}
+              className="border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900/90 shadow-lg"
             >
-              <Tooltip title="Reference context (@)">
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    setContextAnchor(inputBoxRef.current);
-                    setContextMenuLevel('main');
-                  }}
-                  sx={{
-                    color: selectedContext ? '#2563eb' : 'text.secondary',
-                    '&:hover': { bgcolor: 'rgba(37, 99, 235, 0.08)' },
-                  }}
-                >
-                  <AtIcon sx={{ fontSize: 20 }} />
-                </IconButton>
-              </Tooltip>
+              {(selectedContext || attachedFiles.length > 0) && (
+                <PromptInputHeader>
+                  {selectedContext && (
+                    <Chip
+                      label={`@${selectedContext.title}`}
+                      onDelete={() => setSelectedContext(null)}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        borderRadius: '6px',
+                        fontWeight: 700,
+                        fontSize: '11px',
+                        height: 24,
+                        bgcolor:
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(37, 99, 235, 0.15)'
+                            : 'rgba(37, 99, 235, 0.05)',
+                        borderColor: '#2563eb',
+                      }}
+                    />
+                  )}
+                  {attachedFiles.map((file, idx) => (
+                    <Chip
+                      key={file.id || idx}
+                      icon={
+                        <AttachFileIcon sx={{ fontSize: '13px !important' }} />
+                      }
+                      label={file.name}
+                      onDelete={() =>
+                        setAttachedFiles((prev) =>
+                          prev.filter((_, i) => i !== idx),
+                        )
+                      }
+                      size="small"
+                      sx={{
+                        borderRadius: '6px',
+                        fontWeight: 500,
+                        fontSize: '11px',
+                        height: 24,
+                      }}
+                    />
+                  ))}
+                </PromptInputHeader>
+              )}
 
-              <Tooltip title="Attach files (PDF, DOCX, TXT, MD, CSV, Code)">
-                <span>
-                  <IconButton
-                    size="small"
+              <PromptInputBody>
+                <PromptInputTextarea
+                  value={inputValue}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setInputValue(val);
+                    if (val.endsWith('@')) {
+                      setContextAnchor(inputBoxRef.current);
+                      setContextMenuLevel('main');
+                    }
+                  }}
+                  placeholder={
+                    attachedFiles.length > 0
+                      ? 'Pregunta sobre los archivos adjuntos...'
+                      : 'Pregúntale a Lumina lo que necesites o escribe @ para contexto...'
+                  }
+                />
+              </PromptInputBody>
+
+              <PromptInputFooter>
+                <PromptInputTools>
+                  <PromptInputButton
+                    onClick={() => {
+                      setContextAnchor(inputBoxRef.current);
+                      setContextMenuLevel('main');
+                    }}
+                    className={
+                      selectedContext
+                        ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40'
+                        : ''
+                    }
+                    title="Referenciar contexto (@)"
+                  >
+                    <AtIcon sx={{ fontSize: 16 }} />
+                    <span className="hidden sm:inline">
+                      {selectedContext
+                        ? `@${selectedContext.title}`
+                        : 'Contexto'}
+                    </span>
+                  </PromptInputButton>
+
+                  <PromptInputButton
                     onClick={handleOpenFile}
                     disabled={isProcessingFile}
-                    sx={{
-                      color:
-                        attachedFiles.length > 0 ? '#2563eb' : 'text.secondary',
-                      '&:hover': { bgcolor: 'rgba(37, 99, 235, 0.08)' },
-                    }}
+                    title="Adjuntar archivo (PDF, DOCX, TXT, MD, etc.)"
                   >
                     {isProcessingFile ? (
-                      <CircularProgress
-                        size={18}
-                        thickness={5}
-                        sx={{ color: '#2563eb' }}
-                      />
+                      <CircularProgress size={14} sx={{ color: 'inherit' }} />
                     ) : (
-                      <AttachFileIcon sx={{ fontSize: 20 }} />
+                      <AttachFileIcon sx={{ fontSize: 16 }} />
                     )}
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
+                    <span className="hidden sm:inline">Adjuntar</span>
+                  </PromptInputButton>
 
-            {/* Context & Attached Files Chips */}
-            {(selectedContext || attachedFiles.length > 0) && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: 0.8,
-                  mr: 1,
-                  maxWidth: { xs: '200px', sm: '320px', md: '450px' },
-                }}
-              >
-                {selectedContext && (
-                  <Chip
-                    label={`@${selectedContext.title}`}
-                    onDelete={() => setSelectedContext(null)}
-                    color="primary"
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      borderRadius: '6px',
-                      fontWeight: 700,
-                      maxWidth: '140px',
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(37, 99, 235, 0.15)'
-                          : 'rgba(37, 99, 235, 0.05)',
-                      borderColor: '#2563eb',
-                    }}
-                  />
-                )}
-              </Box>
-            )}
+                  <PromptInputButton
+                    onClick={(e) => setModelAnchor(e.currentTarget)}
+                    title="Seleccionar modelo"
+                  >
+                    {selectedModel.startsWith('claude') ? (
+                      <ClaudeIcon sx={{ fontSize: 14 }} />
+                    ) : (
+                      <GeminiIcon sx={{ fontSize: 14 }} />
+                    )}
+                    <span className="hidden sm:inline">
+                      {getModelLabel(selectedModel)}
+                    </span>
+                    <ArrowDownIcon sx={{ fontSize: 14 }} />
+                  </PromptInputButton>
+                </PromptInputTools>
 
-            <StyledInput
-              inputRef={inputRef}
-              placeholder={
-                attachedFiles.length > 0
-                  ? 'Pregunta sobre los archivos adjuntos...'
-                  : 'Pregúntale a Lumina lo que necesites o escribe / para comandos...'
-              }
-              value={inputValue}
-              onChange={(e) => {
-                const val = e.target.value;
-                setInputValue(val);
-                if (val.endsWith('@')) {
-                  setContextAnchor(inputBoxRef.current);
-                  setContextMenuLevel('main');
-                }
-              }}
-              onKeyDown={handleKeyDown}
-              multiline
-              maxRows={3}
-              variant="outlined"
-              fullWidth
-              autoComplete="off"
-            />
-
-            {/* Mic and Send action buttons */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Tooltip title="Dictado por voz">
-                <IconButton
-                  size="small"
-                  sx={{
-                    color: 'text.secondary',
-                    p: 0.75,
-                    '&:hover': {
-                      color: '#2563eb',
-                      bgcolor: 'rgba(37, 99, 235, 0.08)',
-                    },
-                  }}
-                >
-                  <MicIcon sx={{ fontSize: 20 }} />
-                </IconButton>
-              </Tooltip>
-
-              <SendButton
-                active={!!inputValue.trim() || attachedFiles.length > 0}
-                onClick={() => sendMessage(inputValue)}
-                disabled={
-                  (!inputValue.trim() && attachedFiles.length === 0) ||
-                  isTyping ||
-                  isProcessingFile
-                }
-                size="small"
-              >
-                <ArrowForwardIcon sx={{ fontSize: 18 }} />
-              </SendButton>
-            </Box>
-          </InputBox>
+                <PromptInputSubmit
+                  status={status}
+                  onStop={handleStopStream}
+                  disabled={
+                    (!inputValue.trim() && attachedFiles.length === 0) ||
+                    isProcessingFile
+                  }
+                />
+              </PromptInputFooter>
+            </PromptInput>
+          </div>
 
           <Typography
             variant="caption"

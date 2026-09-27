@@ -9,3 +9,4 @@ export * from './LuminaAnimatedFace';
 export * from './LuminaOrb';
 export * from './LanguageSelector';
 export * from './PriorityBadge';
+export * from './LuminaSpeakingWave';
