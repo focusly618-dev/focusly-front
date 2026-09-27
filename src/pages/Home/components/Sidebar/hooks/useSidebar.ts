@@ -384,9 +384,15 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     setEditingGroupName('');
   };
 
-  // Derive project groups list
-  const projectGroups: ProjectGroupTypes[] =
-    projectGroupsData?.projectGroups || [];
+  // Derive project groups list sorted by most recently updated
+  const projectGroups: ProjectGroupTypes[] = useMemo(() => {
+    const groups = projectGroupsData?.projectGroups || [];
+    return [...groups].sort((a, b) => {
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [projectGroupsData?.projectGroups]);
 
   const handleDeleteWorkspace = (id: string) => {
     sileo.warning({
