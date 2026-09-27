@@ -16,12 +16,15 @@ import { handleQuoteMark } from './blockquote';
 import { handleTaskMarker, handleTaskCheckboxMousedown } from './taskList';
 import { handleFencedCode } from './codeBlocks';
 import { handleHorizontalRule } from './horizontalRule';
-import { handleImage } from './image';
+import { handleImage, imageAtomicRangesExtension, imageKeymap } from './image';
 import { handleCalloutMarker, handleCalloutToggleClick } from './callout';
 import { handleInlineMath } from './math';
+import { handleListMark } from './list';
 import { setCalloutFold, calloutFoldField } from './foldState';
 import { blockDecorationsField } from './blockDecorations';
 import type { Handler, Push } from './utils';
+
+export { imageKeymap };
 
 // Dispatch table for the viewport-scoped walk: inline marks/hides and line
 // decorations only — never `block: true` (see blockDecorations.ts for the
@@ -39,6 +42,7 @@ const HANDLERS: Record<string, Handler> = {
   Link: handleLink,
   QuoteMark: handleQuoteMark,
   TaskMarker: handleTaskMarker,
+  ListMark: handleListMark,
   FencedCode: handleFencedCode,
   HorizontalRule: handleHorizontalRule,
   Image: handleImage,
@@ -120,4 +124,5 @@ export const livePreviewExtensions: Extension[] = [
   livePreviewPlugin,
   calloutFoldField,
   blockDecorationsField,
+  imageAtomicRangesExtension,
 ];

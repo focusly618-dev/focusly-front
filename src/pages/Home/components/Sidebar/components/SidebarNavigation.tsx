@@ -28,7 +28,6 @@ import {
   isCustomEmoji,
 } from '@/components/ui';
 import {
-  DescriptionOutlined as TemplateIcon,
   InboxOutlined as InboxIcon,
   TodayOutlined as TodayIcon,
   CalendarMonthOutlined as UpcomingIcon,
@@ -92,9 +91,6 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
     currentTab === TaskBar.Workspace &&
     !sidebar.searchParams.get('modal') &&
     !sidebar.searchParams.get('groupId');
-  const isTemplatesActive =
-    currentTab === TaskBar.Workspace &&
-    sidebar.searchParams.get('modal') === 'templates';
 
   const handleProjectsTabClick = () => {
     if (isCollapsed) {
@@ -103,14 +99,6 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
     }
     const newParams = new URLSearchParams();
     newParams.set('tab', TaskBar.Workspace);
-    sidebar.setSearchParams(newParams);
-    changeStatusTab(TaskBar.Workspace, newParams);
-  };
-
-  const handleTemplatesTabClick = () => {
-    const newParams = new URLSearchParams();
-    newParams.set('tab', TaskBar.Workspace);
-    newParams.set('modal', 'templates');
     sidebar.setSearchParams(newParams);
     changeStatusTab(TaskBar.Workspace, newParams);
   };
@@ -625,25 +613,6 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
             </Box>
           </Collapse>
         )}
-        <NavItem
-          id="joyride-templates"
-          active={isTemplatesActive}
-          onClick={handleTemplatesTabClick}
-        >
-          <ListItemIcon>
-            <TemplateIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('nav.templates')}
-            primaryTypographyProps={{
-              fontSize: '12.5px',
-              fontWeight: 500,
-            }}
-            sx={{
-              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
-            }}
-          />
-        </NavItem>
       </ListItem>
 
       {/* Profile Tab - Mobile Only */}

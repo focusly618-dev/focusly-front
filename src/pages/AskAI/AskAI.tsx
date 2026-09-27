@@ -41,7 +41,10 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { setEvents } from '@/redux/calendar/calendar.slice';
+import { fetchGoogleEvents } from '@/api/GoogleCalendar/googleCalendarApi';
+import type { UserSettings } from '@/api/User/apiUser.types';
 import {
   LuminaAnimatedFace,
   LuminaOrb,
@@ -417,7 +420,7 @@ const renderMarkdown = (text: string, isDark: boolean, theme: Theme) => {
 };
 
 export interface AIContextSelector {
-  type: 'tasks' | 'workspaces' | 'task' | 'workspace';
+  type: 'tasks' | 'workspaces' | 'task' | 'workspace' | 'calendar' | 'event';
   id?: string;
   title: string;
 }
@@ -465,7 +468,41 @@ export const AskAI: React.FC = () => {
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
   const { tasks } = useAppSelector((state) => state.task);
+  const { reduxEvents } = useAppSelector((state) => state.calendar);
+  const dispatch = useAppDispatch();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isCalendarConnected = Boolean(
+    (user?.settings as UserSettings | undefined)?.calendarConnected,
+  );
+
+  useEffect(() => {
+    if (
+      user?.authProvider === 'google' &&
+      user?.id &&
+      isCalendarConnected &&
+      reduxEvents.length === 0
+    ) {
+      const now = new Date();
+      const start = new Date(now.getTime() - 7 * 86400000).toISOString();
+      const end = new Date(now.getTime() + 45 * 86400000).toISOString();
+      fetchGoogleEvents(start, end)
+        .then((events) => {
+          if (events && events.length > 0) {
+            dispatch(setEvents(events));
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to fetch calendar events in AskAI:', err);
+        });
+    }
+  }, [
+    user?.authProvider,
+    user?.id,
+    isCalendarConnected,
+    reduxEvents.length,
+    dispatch,
+  ]);
 
   const [messages, setMessages] = useState<Message[]>(() => {
     if (aiStreamService.isGenerating()) {
@@ -494,7 +531,7 @@ export const AskAI: React.FC = () => {
     useState<AIContextSelector | null>(null);
   const [contextAnchor, setContextAnchor] = useState<null | HTMLElement>(null);
   const [contextMenuLevel, setContextMenuLevel] = useState<
-    'main' | 'tasks' | 'workspaces'
+    'main' | 'tasks' | 'workspaces' | 'calendar'
   >('main');
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [isProcessingFile, setIsProcessingFile] = useState(false);
@@ -1820,6 +1857,12 @@ export const AskAI: React.FC = () => {
                   📋 Tasks / Tareas
                 </MenuItem>
                 <MenuItem
+                  onClick={() => setContextMenuLevel('calendar')}
+                  sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
+                >
+                  📅 Calendario / Google Calendar
+                </MenuItem>
+                <MenuItem
                   onClick={() => setContextMenuLevel('workspaces')}
                   sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
                 >
@@ -1868,19 +1911,132 @@ export const AskAI: React.FC = () => {
                   📋 Todas las Tareas (@Tasks)
                 </MenuItem>
                 <Divider sx={{ my: 0.5 }} />
-                {tasks.length === 0 ? (
+                {tasks.length === 0 && reduxEvents.length === 0 ? (
                   <MenuItem disabled sx={{ fontSize: '11px' }}>
-                    No hay tareas activas
+                    No hay tareas ni eventos activos
                   </MenuItem>
                 ) : (
-                  tasks.slice(0, 8).map((t) => (
+                  <>
+                    {tasks.slice(0, 8).map((t) => (
+                      <MenuItem
+                        key={t.id}
+                        onClick={() =>
+                          selectContext({
+                            type: 'task',
+                            id: t.id,
+                            title: t.title,
+                          })
+                        }
+                        sx={{
+                          fontSize: '11px',
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          py: 0.5,
+                        }}
+                      >
+                        📋 {t.title}
+                      </MenuItem>
+                    ))}
+                    {reduxEvents.length > 0 && (
+                      <>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            px: 2,
+                            py: 0.5,
+                            display: 'block',
+                            fontWeight: 700,
+                            color: 'text.secondary',
+                            fontSize: '10px',
+                          }}
+                        >
+                          EVENTOS DE CALENDARIO
+                        </Typography>
+                        {reduxEvents.slice(0, 5).map((ev) => (
+                          <MenuItem
+                            key={ev.id}
+                            onClick={() =>
+                              selectContext({
+                                type: 'event',
+                                id: ev.id,
+                                title: ev.title,
+                              })
+                            }
+                            sx={{
+                              fontSize: '11px',
+                              textOverflow: 'ellipsis',
+                              overflow: 'hidden',
+                              whiteSpace: 'nowrap',
+                              py: 0.5,
+                            }}
+                          >
+                            📅 {ev.title}
+                          </MenuItem>
+                        ))}
+                      </>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+
+            {contextMenuLevel === 'calendar' && (
+              <>
+                <MenuItem
+                  onClick={() => setContextMenuLevel('main')}
+                  sx={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: 'primary.main',
+                    py: 0.75,
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  ⬅️ Volver al menú principal
+                </MenuItem>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    display: 'block',
+                    fontWeight: 800,
+                    color: 'text.secondary',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.03)'
+                        : 'rgba(0,0,0,0.02)',
+                  }}
+                >
+                  SELECCIONAR EVENTO DE CALENDARIO
+                </Typography>
+                <MenuItem
+                  onClick={() =>
+                    selectContext({
+                      type: 'calendar',
+                      title: 'Todo el Calendario',
+                    })
+                  }
+                  sx={{ fontSize: '11px', fontWeight: 600, py: 0.75 }}
+                >
+                  📅 Todo el Calendario (@Calendar)
+                </MenuItem>
+                <Divider sx={{ my: 0.5 }} />
+                {reduxEvents.length === 0 ? (
+                  <MenuItem disabled sx={{ fontSize: '11px' }}>
+                    No hay eventos de calendario
+                  </MenuItem>
+                ) : (
+                  reduxEvents.slice(0, 10).map((ev) => (
                     <MenuItem
-                      key={t.id}
+                      key={ev.id}
                       onClick={() =>
                         selectContext({
-                          type: 'task',
-                          id: t.id,
-                          title: t.title,
+                          type: 'event',
+                          id: ev.id,
+                          title: ev.title,
                         })
                       }
                       sx={{
@@ -1891,7 +2047,7 @@ export const AskAI: React.FC = () => {
                         py: 0.5,
                       }}
                     >
-                      📋 {t.title}
+                      📅 {ev.title}
                     </MenuItem>
                   ))
                 )}

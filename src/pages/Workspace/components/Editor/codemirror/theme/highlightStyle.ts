@@ -9,8 +9,8 @@ export const buildHighlightStyle = (theme: Theme): HighlightStyle => {
   const isDark = theme.palette.mode === 'dark';
 
   return HighlightStyle.define([
-    { tag: tags.keyword, color: isDark ? '#c792ea' : '#8b5cf6' },
-    { tag: tags.controlKeyword, color: isDark ? '#c792ea' : '#8b5cf6' },
+    { tag: tags.keyword, color: isDark ? '#c084fc' : '#8b5cf6' },
+    { tag: tags.controlKeyword, color: isDark ? '#c084fc' : '#8b5cf6' },
     {
       tag: [tags.name, tags.deleted, tags.character],
       color: theme.palette.text.primary,
@@ -64,7 +64,7 @@ export const buildHighlightStyle = (theme: Theme): HighlightStyle => {
     },
     {
       tag: [tags.processingInstruction, tags.string, tags.inserted],
-      color: isDark ? '#c3e88d' : '#16a34a',
+      color: isDark ? '#86efac' : '#16a34a',
     },
     { tag: tags.invalid, color: theme.palette.error.main },
   ]);

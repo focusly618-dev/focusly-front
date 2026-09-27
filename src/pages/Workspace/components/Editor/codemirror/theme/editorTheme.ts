@@ -83,6 +83,7 @@ export const buildEditorTheme = (theme: Theme): Extension => {
       '.cm-content': {
         padding: '4px 0 200px 0',
         caretColor: theme.palette.primary.main,
+        color: isDark ? '#d4d4d8' : theme.palette.text.primary,
       },
       '.cm-line': {
         padding: '0 2px',
@@ -98,18 +99,46 @@ export const buildEditorTheme = (theme: Theme): Extension => {
       },
 
       // Live Preview formatting
-      '.cm-live-strong': { fontWeight: 700 },
+      '.cm-live-strong': {
+        fontWeight: 700,
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+      },
       '.cm-live-em': { fontStyle: 'italic' },
-      '.cm-live-h1': { fontSize: '1.7em', fontWeight: 800, lineHeight: '1.4' },
-      '.cm-live-h2': { fontSize: '1.4em', fontWeight: 750, lineHeight: '1.4' },
-      '.cm-live-h3': { fontSize: '1.22em', fontWeight: 700, lineHeight: '1.4' },
-      '.cm-live-h4': { fontSize: '1.1em', fontWeight: 700, lineHeight: '1.4' },
-      '.cm-live-h5': { fontSize: '1.02em', fontWeight: 700, lineHeight: '1.4' },
+      '.cm-live-h1': {
+        fontSize: '1.7em',
+        fontWeight: 800,
+        lineHeight: '1.4',
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+      },
+      '.cm-live-h2': {
+        fontSize: '1.4em',
+        fontWeight: 750,
+        lineHeight: '1.4',
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+      },
+      '.cm-live-h3': {
+        fontSize: '1.22em',
+        fontWeight: 700,
+        lineHeight: '1.4',
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+      },
+      '.cm-live-h4': {
+        fontSize: '1.1em',
+        fontWeight: 700,
+        lineHeight: '1.4',
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+      },
+      '.cm-live-h5': {
+        fontSize: '1.02em',
+        fontWeight: 700,
+        lineHeight: '1.4',
+        color: isDark ? '#ffffff' : theme.palette.text.primary,
+      },
       '.cm-live-h6': {
         fontSize: '0.95em',
         fontWeight: 700,
         lineHeight: '1.4',
-        color: theme.palette.text.secondary,
+        color: isDark ? '#a1a1aa' : theme.palette.text.secondary,
       },
       '.cm-live-link': {
         color: theme.palette.primary.main,
@@ -119,12 +148,14 @@ export const buildEditorTheme = (theme: Theme): Extension => {
       },
       '.cm-live-inlinecode': {
         fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
-        fontSize: '0.9em',
+        fontSize: '0.88em',
         backgroundColor: isDark
           ? 'rgba(255, 255, 255, 0.08)'
           : 'rgba(0, 0, 0, 0.05)',
-        borderRadius: '4px',
-        padding: '1px 5px',
+        color: isDark ? '#e4e4e7' : '#3f3f46',
+        borderRadius: '5px',
+        padding: '2px 6px',
+        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'}`,
       },
       '.cm-live-quote-line': {
         borderLeft: `3px solid ${theme.palette.divider}`,
@@ -137,32 +168,128 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         accentColor: theme.palette.primary.main,
         verticalAlign: 'middle',
       },
+      '.cm-live-bullet': {
+        color: isDark
+          ? theme.palette.primary.light
+          : theme.palette.primary.main,
+        display: 'inline-block',
+        width: '1.2em',
+        textAlign: 'center',
+        fontWeight: 700,
+        userSelect: 'none',
+      },
+      '.cm-live-image-container': {
+        display: 'inline-block',
+        position: 'relative',
+        margin: '10px 0',
+        maxWidth: '100%',
+        borderRadius: '12px',
+        verticalAlign: 'middle',
+        transition: 'all 0.2s ease',
+      },
+      '.cm-live-image-container.cm-selected': {
+        outline: `2px solid ${theme.palette.primary.main}`,
+        outlineOffset: '3px',
+      },
       '.cm-live-image': {
         display: 'block',
         maxWidth: '100%',
+        maxHeight: '520px',
         borderRadius: '10px',
-        margin: '8px 0',
         border: `1px solid ${theme.palette.divider}`,
+        boxShadow: isDark
+          ? '0 4px 16px rgba(0, 0, 0, 0.45)'
+          : '0 4px 12px rgba(0, 0, 0, 0.08)',
+        cursor: 'pointer',
+        transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+      },
+      '.cm-live-image-container:hover .cm-live-image': {
+        boxShadow: isDark
+          ? '0 6px 22px rgba(0, 0, 0, 0.6)'
+          : '0 6px 18px rgba(0, 0, 0, 0.12)',
+      },
+      '.cm-live-image-delete-btn': {
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+        opacity: 0,
+        pointerEvents: 'none',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '32px',
+        height: '32px',
+        borderRadius: '8px',
+        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)'}`,
+        backgroundColor: isDark
+          ? 'rgba(24, 24, 27, 0.88)'
+          : 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'blur(8px)',
+        color: theme.palette.error.main,
+        cursor: 'pointer',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+        transform: 'scale(0.9)',
+        transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+        zIndex: 10,
+      },
+      '.cm-live-image-container:hover .cm-live-image-delete-btn': {
+        opacity: 1,
+        pointerEvents: 'auto',
+        transform: 'scale(1)',
+      },
+      '.cm-live-image-delete-btn:hover': {
+        backgroundColor: theme.palette.error.main,
+        color: '#ffffff',
+        transform: 'scale(1.08)',
+        boxShadow: `0 4px 14px ${alpha(theme.palette.error.main, 0.45)}`,
+      },
+      '.cm-live-image-delete-btn:active': {
+        transform: 'scale(0.94)',
       },
 
-      // Fenced code blocks
-      '.cm-code-fence-line': {
-        color: theme.palette.text.disabled,
-        fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
-        fontSize: '0.85em',
-      },
+      // Fenced code blocks — seamless unified container
       '.cm-code-block-line': {
-        backgroundColor: isDark ? '#0f172a' : '#f4f4f5',
+        backgroundColor: isDark ? '#111827' : '#f8fafc',
         fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
         fontSize: '0.88em',
+        padding: '2px 14px',
+        borderLeft: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
+        borderRight: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
       },
-      '.cm-code-block-line-first': {
+      '.cm-code-block-header': {
+        borderTop: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
         borderTopLeftRadius: '10px',
         borderTopRightRadius: '10px',
+        paddingTop: '6px',
+        paddingBottom: '3px',
+        marginTop: '8px',
+        borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'}`,
       },
-      '.cm-code-block-line-last': {
+      '.cm-code-block-footer': {
+        borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
         borderBottomLeftRadius: '10px',
         borderBottomRightRadius: '10px',
+        paddingBottom: '6px',
+        marginBottom: '8px',
+        minHeight: '10px',
+      },
+      '.cm-code-fence-active': {
+        color: theme.palette.text.disabled,
+      },
+      '.cm-code-lang-badge': {
+        display: 'inline-block',
+        fontSize: '0.72em',
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        color: isDark ? '#94a3b8' : '#64748b',
+        backgroundColor: isDark
+          ? 'rgba(255, 255, 255, 0.08)'
+          : 'rgba(0, 0, 0, 0.05)',
+        padding: '2px 7px',
+        borderRadius: '4px',
+        letterSpacing: '0.06em',
+        fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+        userSelect: 'none',
       },
 
       '.cm-hr-line': {

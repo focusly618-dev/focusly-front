@@ -30,7 +30,8 @@ export const WorkspaceEditor = ({
   const [sourceLanguage, setSourceLanguage] = useState('auto');
   const [targetLanguage, setTargetLanguage] = useState('en');
   const [isCentered, setIsCentered] = useState<boolean>(() => {
-    return localStorage.getItem('editor_centered_mode') === 'true';
+    const saved = localStorage.getItem('editor_centered_mode');
+    return saved !== null ? saved === 'true' : true;
   });
 
   const toggleCentered = () => {

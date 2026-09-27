@@ -162,7 +162,14 @@ export const fetchChatStreamResponse = async (
   abortSignal?: AbortSignal,
   model?: string,
   conversationId?: string,
-  contextType?: 'tasks' | 'workspaces' | 'task' | 'workspace' | null,
+  contextType?:
+    | 'tasks'
+    | 'workspaces'
+    | 'task'
+    | 'workspace'
+    | 'calendar'
+    | 'event'
+    | null,
   contextId?: string | null,
 ): Promise<ReadableStream<Uint8Array>> => {
   const endpoint = getAIEndpoint();

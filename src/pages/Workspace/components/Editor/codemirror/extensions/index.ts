@@ -12,7 +12,7 @@ import {
 } from '@codemirror/commands';
 import { syntaxHighlighting, type HighlightStyle } from '@codemirror/language';
 import { markdownExtension } from './markdownLanguage';
-import { livePreviewExtensions } from './livePreview';
+import { livePreviewExtensions, imageKeymap } from './livePreview';
 import { imagePasteExtension } from './imagePaste';
 import { diffReviewExtensions } from './diffReview';
 import { targetHighlightExtension } from './targetHighlight';
@@ -33,7 +33,12 @@ export const buildMarkdownExtensions = ({
   placeholder,
 }: BuildMarkdownExtensionsOptions): Extension[] => [
   history(),
-  keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
+  keymap.of([
+    ...imageKeymap,
+    ...defaultKeymap,
+    ...historyKeymap,
+    indentWithTab,
+  ]),
   EditorView.lineWrapping,
   markdownExtension,
   editorThemeCompartment.of(initialEditorTheme),
