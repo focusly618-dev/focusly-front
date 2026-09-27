@@ -95,7 +95,7 @@ export const getActionTitle = (action: ParsedLuminaAction): string => {
   if (action.type === 'UPDATE_TASK') return 'Reschedule Task';
   if (action.type === 'CREATE_WORKSPACE') return 'Create Workspace';
   if (action.type === 'CREATE_NOTE') return 'Create Note';
-  if (action.type === 'INSERT_TO_WORKSPACE') return 'Insert into Workspace';
+  if (action.type === 'INSERT_TO_WORKSPACE') return 'Insertar en Workspace';
   return 'Create Project Group';
 };
 
@@ -437,6 +437,18 @@ export const executeSingleAction = async (
 
   if (action.type === 'INSERT_TO_WORKSPACE') {
     const text = action.payload.markdown || '';
+    // Check if a workspace editor is currently mounted and listening for this event.
+    // The editor registers/unregisters itself via a global flag so we can give
+    // the user meaningful feedback instead of silently losing content.
+    const editorIsOpen =
+      typeof window !== 'undefined' &&
+      (window as unknown as Record<string, unknown>).__luminaEditorMounted ===
+        true;
+    if (!editorIsOpen) {
+      throw new Error(
+        'Abre un Workspace en la pestaña de Proyectos para poder insertar contenido.',
+      );
+    }
     window.dispatchEvent(
       new CustomEvent('lumina-insert-content', { detail: { text } }),
     );

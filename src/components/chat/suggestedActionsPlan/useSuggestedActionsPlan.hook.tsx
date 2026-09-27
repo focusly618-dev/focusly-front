@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useMutation } from '@apollo/client';
 import { useAppSelector } from '@/redux/hooks';
 import { CREATE_TASK, UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
@@ -13,7 +13,17 @@ import type { PlanItemStatus } from './SuggestedActionsPlan.types';
 export const useSuggestedActionsPlan = (actions: ParsedLuminaAction[]) => {
   const { user } = useAppSelector((state) => state.auth);
 
-  const planKey = `focusly_plan_completed_${JSON.stringify(actions)}`;
+  // Compact fingerprint: type + title/name for each action, not the full payload.
+  // JSON.stringify(actions) can be hundreds of KB when notes/content are included.
+  const planKey = useMemo(() => {
+    const fingerprint = actions
+      .map(
+        (a) =>
+          `${a.type}:${a.payload.title ?? a.payload.name ?? ''}:${a.payload.deadline ?? ''}`,
+      )
+      .join('|');
+    return `focusly_plan_completed_${fingerprint}`;
+  }, [actions]);
   const initiallyCompleted = localStorage.getItem(planKey) === 'true';
 
   const [open, setOpen] = useState(false);
@@ -40,18 +50,47 @@ export const useSuggestedActionsPlan = (actions: ParsedLuminaAction[]) => {
     const statuses = [...itemStatuses];
     let hasError = false;
 
+    // Thread context: tracks IDs produced by previous steps so later steps can use them.
+    // Specifically, if CREATE_PROJECT_GROUP runs before CREATE_WORKSPACE, we pass the
+    // created group ID into the workspace action so it doesn't create another duplicate group.
+    let lastCreatedGroupId: string | undefined;
+
     for (let i = 0; i < actions.length; i++) {
       if (statuses[i] === 'done') continue;
       statuses[i] = 'creating';
       setItemStatuses([...statuses]);
       try {
-        await executeSingleAction(actions[i], {
+        // Inject the group ID from a preceding CREATE_PROJECT_GROUP into any
+        // CREATE_WORKSPACE or CREATE_NOTE that lacks a project_group_id already.
+        let resolvedAction = actions[i];
+        if (
+          lastCreatedGroupId &&
+          (actions[i].type === 'CREATE_WORKSPACE' ||
+            actions[i].type === 'CREATE_NOTE') &&
+          !actions[i].payload.project_group_id
+        ) {
+          resolvedAction = {
+            ...actions[i],
+            payload: {
+              ...actions[i].payload,
+              project_group_id: lastCreatedGroupId,
+            },
+          };
+        }
+
+        const result = await executeSingleAction(resolvedAction, {
           userId: user.id,
           createTask,
           updateTask,
           createWorkspace,
           createProjectGroup,
         });
+
+        // Track the created group ID to thread into subsequent workspace/note actions.
+        if (actions[i].type === 'CREATE_PROJECT_GROUP' && result.id) {
+          lastCreatedGroupId = result.id;
+        }
+
         statuses[i] = 'done';
       } catch (err) {
         console.error('Error creating plan item:', err);

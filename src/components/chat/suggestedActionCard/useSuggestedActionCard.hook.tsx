@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useMutation } from '@apollo/client';
 import { useTheme } from '@mui/material';
 import { useAppSelector } from '@/redux/hooks';
@@ -22,9 +22,40 @@ export const useSuggestedActionCard = (
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
 
-  // Generate unique keys based on action payload properties
-  const actionKey = `focusly_action_completed_${action.type}_${JSON.stringify(action.payload)}`;
-  const actionIdKey = `focusly_action_created_id_${action.type}_${JSON.stringify(action.payload)}`;
+  // Generate a stable, compact key for this action to track completion in localStorage.
+  // We use a fingerprint of a few discriminating fields rather than JSON.stringify(payload)
+  // because payload.content / payload.notes_encrypted can be thousands of characters long,
+  // which would make the key itself megabytes-large and degrade localStorage performance.
+  const actionKey = useMemo(() => {
+    const {
+      title,
+      name,
+      deadline,
+      estimate_timer,
+      project_group_id,
+      project_name,
+      id,
+    } = action.payload;
+    const discriminators = [
+      action.type,
+      title,
+      name,
+      deadline,
+      estimate_timer,
+      project_group_id,
+      project_name,
+      id,
+    ]
+      .map((v) => (v == null ? '' : String(v)))
+      .join('|');
+    return `focusly_action_completed_${discriminators}`;
+  }, [action.type, action.payload]);
+
+  const actionIdKey = useMemo(
+    () =>
+      `focusly_action_created_id_${actionKey.slice('focusly_action_completed_'.length)}`,
+    [actionKey],
+  );
 
   const [isCompleted, setIsCompleted] = useState(() => {
     return localStorage.getItem(actionKey) === 'true';
@@ -35,14 +66,14 @@ export const useSuggestedActionCard = (
   const [errorMessage, setErrorMessage] = useState('');
 
   const [createTask, { loading: taskLoading }] = useMutation(CREATE_TASK);
-  const [updateTask, { loading: updateTaskLoading }] =
-    useMutation(UPDATE_TASK);
+  const [updateTask, { loading: updateTaskLoading }] = useMutation(UPDATE_TASK);
   const [createWorkspace, { loading: wsLoading }] =
     useMutation(CREATE_WORKSPACE);
   const [createProjectGroup, { loading: groupLoading }] =
     useMutation(CREATE_PROJECT_GROUP);
 
-  const isLoading = taskLoading || updateTaskLoading || wsLoading || groupLoading;
+  const isLoading =
+    taskLoading || updateTaskLoading || wsLoading || groupLoading;
 
   const handleExecute = async () => {
     if (!user) {

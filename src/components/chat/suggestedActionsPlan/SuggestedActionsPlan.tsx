@@ -67,6 +67,26 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
   const isRescheduleOnly =
     actions.length > 0 && actions.every((a) => a.type === 'UPDATE_TASK');
 
+  // Compute a contextual label for the count badge
+  const hasTasks = actions.some(
+    (a) => a.type === 'CREATE_TASK' || a.type === 'UPDATE_TASK',
+  );
+  const hasDocuments = actions.some(
+    (a) => a.type === 'CREATE_WORKSPACE' || a.type === 'CREATE_NOTE',
+  );
+  const planItemLabel =
+    hasTasks && !hasDocuments
+      ? actions.length === 1
+        ? 'tarea'
+        : 'tareas'
+      : !hasTasks && hasDocuments
+        ? actions.length === 1
+          ? 'documento'
+          : 'documentos'
+        : actions.length === 1
+          ? 'elemento'
+          : 'elementos';
+
   return (
     <>
       <Card sx={cardSx(theme)}>
@@ -82,7 +102,7 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                 color="text.primary"
               >
                 {isRescheduleOnly ? 'Cambios sugeridos' : 'Plan sugerido'} ·{' '}
-                {actions.length} tareas
+                {actions.length} {planItemLabel}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {isCompleted
@@ -125,7 +145,7 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
         <Box sx={dialogHeaderSx}>
           <Typography variant="subtitle1" fontWeight={800} color="text.primary">
             {isRescheduleOnly ? 'Cambios sugeridos' : 'Plan sugerido'} ·{' '}
-            {actions.length} tareas
+            {actions.length} {planItemLabel}
           </Typography>
           <IconButton size="small" onClick={() => setOpen(false)}>
             <CloseIcon sx={{ fontSize: 18 }} />
@@ -294,8 +314,8 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                   ? 'Moviendo...'
                   : 'Creando...'
                 : isRescheduleOnly
-                  ? `Mover las ${actions.length} tareas`
-                  : `Crear las ${actions.length} tareas`}
+                  ? `Mover las ${actions.length} ${planItemLabel}`
+                  : `Crear las ${actions.length} ${planItemLabel}`}
           </Button>
         </Box>
       </Dialog>

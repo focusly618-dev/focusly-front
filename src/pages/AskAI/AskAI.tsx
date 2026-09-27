@@ -1483,15 +1483,22 @@ export const AskAI: React.FC = () => {
                       ? msg.attachedFiles
                       : fallbackFiles;
 
+                  // Historical messages already carry the backend-parsed actions;
+                  // only run the client-side parser (expensive regex + brace scan)
+                  // for messages that are still streaming (msg.actions === undefined).
+                  const needsClientParse = msg.actions === undefined && !isUser;
                   const {
                     cleanText,
                     actions: liveActions,
                     hasPendingAction: livePendingAction,
-                  } = parseLuminaActions(parsedCleanText);
-                  // Historical messages already carry the backend-parsed
-                  // actions; only fall back to the client-side regex (and
-                  // its "still streaming a tag" flag) for the message
-                  // currently being streamed in.
+                  } = needsClientParse
+                    ? parseLuminaActions(parsedCleanText)
+                    : {
+                        cleanText: parsedCleanText,
+                        actions: [],
+                        hasPendingAction: false,
+                      };
+
                   const actions =
                     msg.actions !== undefined ? msg.actions : liveActions;
                   const hasPendingAction =

@@ -91,8 +91,13 @@ export const useWorkspaceEditor = ({
       markdownEditorRef.current?.insertAtEnd(textToInsert);
     };
 
+    // Register a global flag so the AI action executor can detect whether a
+    // workspace editor is currently open before attempting INSERT_TO_WORKSPACE.
+    (window as unknown as Record<string, unknown>).__luminaEditorMounted = true;
     window.addEventListener('lumina-insert-content', handleInsert);
     return () => {
+      (window as unknown as Record<string, unknown>).__luminaEditorMounted =
+        false;
       window.removeEventListener('lumina-insert-content', handleInsert);
     };
   }, []);
