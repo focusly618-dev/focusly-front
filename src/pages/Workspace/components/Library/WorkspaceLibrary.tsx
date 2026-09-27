@@ -518,9 +518,16 @@ export const WorkspaceLibrary = ({
             description: taskData.description as string | undefined,
             subtasks: (taskData.subtasks as Subtask[]).map((subtask) => ({
               id: subtask.id,
-              title: subtask.title,
+              title: subtask.title || '',
               completed: subtask.completed,
-              estimated_timer: subtask.estimate_timer,
+              time:
+                typeof subtask.estimate_timer === 'number'
+                  ? String(subtask.estimate_timer)
+                  : undefined,
+              duration:
+                typeof subtask.estimate_timer === 'number'
+                  ? String(subtask.estimate_timer)
+                  : undefined,
             })),
             projectId: targetProjectId,
             workspaceId: taskData.workspaceId as string | undefined,
@@ -538,9 +545,12 @@ export const WorkspaceLibrary = ({
             description: taskData.description as string | undefined,
             subtasks: (taskData.subtasks as Subtask[]).map((subtask) => ({
               id: subtask.id,
-              title: subtask.title,
+              title: subtask.title || '',
               completed: subtask.completed,
-              estimated_timer: subtask.estimate_timer,
+              estimate_timer:
+                typeof subtask.estimate_timer === 'number'
+                  ? subtask.estimate_timer
+                  : undefined,
             })),
             projectId: taskData.projectId as string | undefined,
             workspaceId: taskData.workspaceId as string | undefined,

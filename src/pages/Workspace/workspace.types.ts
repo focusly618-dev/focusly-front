@@ -14,6 +14,7 @@ export interface ProjectGroupTypes {
   folders?: ProjectTypes[];
   generalWorkspaces?: WorkspaceTypes[];
   workspaces?: { id: string }[];
+  workspaceCount?: number;
   folderCount?: number;
   createdAt: string;
   updatedAt: string;

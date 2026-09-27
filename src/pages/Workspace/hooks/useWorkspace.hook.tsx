@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router-dom';
 import type { Step } from 'react-joyride';

@@ -124,7 +124,7 @@ export const AwaitedTasksModal: React.FC<AwaitedTasksModalProps> = ({
         const query = searchQuery.toLowerCase().trim();
         const matchesTitle = event.title?.toLowerCase().includes(query);
         const matchesSubtask = task?.subtasks?.some((s) =>
-          s.title.toLowerCase().includes(query),
+          s.title?.toLowerCase().includes(query),
         );
         if (!matchesTitle && !matchesSubtask) return false;
       }
