@@ -445,16 +445,16 @@ export const WorkspaceLibrary = ({
                           mb: 0.5,
                         }}
                       >
-                        {t('workspaceLibrary.newWorkspace', 'Nuevo Workspace')}
+                        {t(
+                          'workspaceLibrary.emptyFolder.action',
+                          'Crear espacio de trabajo',
+                        )}
                       </Typography>
                       <Typography
                         variant="caption"
                         sx={{ color: 'text.secondary', fontSize: '12px' }}
                       >
-                        {t(
-                          'workspaceLibrary.emptyFolder.action',
-                          'Crear una nota o documento',
-                        )}
+                        Crear una nota o documento
                       </Typography>
                     </DashedCard>
                   )}

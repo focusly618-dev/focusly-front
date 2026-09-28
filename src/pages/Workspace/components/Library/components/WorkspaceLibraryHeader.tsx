@@ -101,7 +101,6 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
   onNoteSortChange,
   noteFilterType,
   onNoteFilterChange,
-  onCreate,
   onCreateTask,
   onCreateProject,
   projectTab,
@@ -320,12 +319,11 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                 </IconButton>
               </Tooltip>
 
-              {activeProjectTab === 'projects' ? (
-                <>
-                  {onCreate && (
+              {activeProjectTab === 'projects'
+                ? onCreateProject && (
                     <Button
-                      id="header-create-workspace-btn"
-                      onClick={onCreate}
+                      id="header-create-project-btn"
+                      onClick={onCreateProject}
                       variant="contained"
                       startIcon={<AddIcon sx={{ fontSize: 18 }} />}
                       sx={{
@@ -343,41 +341,10 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                         '&:hover': { bgcolor: '#007357' },
                       }}
                     >
-                      {t('workspaceLibrary.newWorkspace', 'Nuevo Workspace')}
-                    </Button>
-                  )}
-                  {onCreateProject && (
-                    <Button
-                      id="header-create-project-btn"
-                      onClick={onCreateProject}
-                      variant="outlined"
-                      startIcon={<AddIcon sx={{ fontSize: 18 }} />}
-                      sx={{
-                        borderRadius: '8px',
-                        textTransform: 'none',
-                        fontWeight: 700,
-                        fontSize: '13px',
-                        px: 2,
-                        height: '38px',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0,
-                        borderColor: '#008767',
-                        color: '#008767',
-                        '&:hover': {
-                          borderColor: '#007357',
-                          bgcolor: isDark
-                            ? 'rgba(0, 135, 103, 0.15)'
-                            : '#ecfdf5',
-                        },
-                      }}
-                    >
                       {t('createProjectModal.create', 'Nuevo Proyecto')}
                     </Button>
-                  )}
-                </>
-              ) : (
-                <>
-                  {onCreateTask && (
+                  )
+                : onCreateTask && (
                     <Button
                       id="header-create-task-btn"
                       onClick={onCreateTask}
@@ -401,36 +368,6 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                       {t('tasks.createTask', 'Nueva Tarea')}
                     </Button>
                   )}
-                  {onCreate && (
-                    <Button
-                      id="header-create-workspace-secondary-btn"
-                      onClick={onCreate}
-                      variant="outlined"
-                      startIcon={<AddIcon sx={{ fontSize: 18 }} />}
-                      sx={{
-                        borderRadius: '8px',
-                        textTransform: 'none',
-                        fontWeight: 700,
-                        fontSize: '13px',
-                        px: 2,
-                        height: '38px',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0,
-                        borderColor: '#008767',
-                        color: '#008767',
-                        '&:hover': {
-                          borderColor: '#007357',
-                          bgcolor: isDark
-                            ? 'rgba(0, 135, 103, 0.15)'
-                            : '#ecfdf5',
-                        },
-                      }}
-                    >
-                      {t('workspaceLibrary.newWorkspace', 'Nuevo Workspace')}
-                    </Button>
-                  )}
-                </>
-              )}
 
               {/* Filter & Sort Menu for Projects */}
               <Menu
@@ -584,31 +521,6 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                 </Box>
               </Menu>
             </Box>
-          )}
-
-          {isInsideFolder && onCreate && (
-            <Button
-              id="folder-create-workspace-btn"
-              onClick={onCreate}
-              variant="contained"
-              startIcon={<AddIcon sx={{ fontSize: 18 }} />}
-              sx={{
-                borderRadius: '8px',
-                textTransform: 'none',
-                fontWeight: 700,
-                fontSize: '13px',
-                px: 2,
-                height: '38px',
-                boxShadow: 'none',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-                bgcolor: '#008767',
-                color: '#ffffff',
-                '&:hover': { bgcolor: '#007357' },
-              }}
-            >
-              {t('workspaceLibrary.newWorkspace', 'Nuevo Workspace')}
-            </Button>
           )}
         </Box>
       </LibraryHeader>
