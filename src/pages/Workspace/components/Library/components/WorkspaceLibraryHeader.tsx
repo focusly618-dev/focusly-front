@@ -586,59 +586,29 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
             </Box>
           )}
 
-          {isInsideFolder && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {onCreate && (
-                <Button
-                  id="folder-create-workspace-btn"
-                  onClick={onCreate}
-                  variant="contained"
-                  startIcon={<AddIcon sx={{ fontSize: 18 }} />}
-                  sx={{
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    fontSize: '13px',
-                    px: 2,
-                    height: '38px',
-                    boxShadow: 'none',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0,
-                    bgcolor: '#008767',
-                    color: '#ffffff',
-                    '&:hover': { bgcolor: '#007357' },
-                  }}
-                >
-                  {t('workspaceLibrary.newWorkspace', 'Nuevo Workspace')}
-                </Button>
-              )}
-              {onCreateTask && (
-                <Button
-                  id="folder-create-task-btn"
-                  onClick={onCreateTask}
-                  variant="outlined"
-                  startIcon={<AddIcon sx={{ fontSize: 18 }} />}
-                  sx={{
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    fontSize: '13px',
-                    px: 2,
-                    height: '38px',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0,
-                    borderColor: '#008767',
-                    color: '#008767',
-                    '&:hover': {
-                      borderColor: '#007357',
-                      bgcolor: isDark ? 'rgba(0, 135, 103, 0.15)' : '#ecfdf5',
-                    },
-                  }}
-                >
-                  {t('tasks.createTask', 'Nueva Tarea')}
-                </Button>
-              )}
-            </Box>
+          {isInsideFolder && onCreate && (
+            <Button
+              id="folder-create-workspace-btn"
+              onClick={onCreate}
+              variant="contained"
+              startIcon={<AddIcon sx={{ fontSize: 18 }} />}
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '13px',
+                px: 2,
+                height: '38px',
+                boxShadow: 'none',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                bgcolor: '#008767',
+                color: '#ffffff',
+                '&:hover': { bgcolor: '#007357' },
+              }}
+            >
+              {t('workspaceLibrary.newWorkspace', 'Nuevo Workspace')}
+            </Button>
           )}
         </Box>
       </LibraryHeader>
