@@ -18,19 +18,19 @@ import {
 } from '../Sidebar.styles';
 import { TaskBar } from '../types/Sidebar.types';
 import {
-  DailyPlanIcon,
-  TasksIcon,
-  AskAIIcon,
-  InsightsIcon,
-  ProjectIcon,
   ModernFolderFilledIcon,
   ModernFolderOutlinedIcon,
   isCustomEmoji,
 } from '@/components/ui';
 import {
-  InboxOutlined as InboxIcon,
-  TodayOutlined as TodayIcon,
-  CalendarMonthOutlined as UpcomingIcon,
+  CalendarTodayOutlined as DailyPlanIcon,
+  CheckBoxOutlined as TasksIcon,
+  MailOutline as InboxIcon,
+  StarOutline as TodayIcon,
+  KeyboardDoubleArrowRightRounded as UpcomingIcon,
+  ElectricBoltOutlined as AskAIIcon,
+  BarChartRounded as InsightsIcon,
+  GridViewOutlined as ProjectIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import type { UseSidebarReturn } from '../hooks/useSidebar';

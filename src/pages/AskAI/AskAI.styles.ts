@@ -1,11 +1,4 @@
-import {
-  Box,
-  Paper,
-  TextField,
-  styled,
-  IconButton,
-  Button,
-} from '@mui/material';
+import { Box, Paper, TextField, styled, IconButton } from '@mui/material';
 import { surfaceColor } from '@/context';
 
 /* ── Layout containers ─────────────────────────────────────────────────────── */
@@ -198,13 +191,13 @@ export const AvatarWrapper = styled(Box, {
     alignItems: 'center',
     justifyContent: 'center',
     border: `1.5px solid ${
-      isSpeaking ? '#6366f1' : isDark ? 'rgba(99, 102, 241, 0.4)' : '#c7d2fe'
+      isSpeaking ? '#008767' : isDark ? 'rgba(0, 135, 103, 0.4)' : '#a7f3d0'
     }`,
     boxShadow: isSpeaking
-      ? '0 0 16px rgba(99, 102, 241, 0.6), 0 0 0 3px rgba(99, 102, 241, 0.2)'
+      ? '0 0 16px rgba(0, 135, 103, 0.6), 0 0 0 3px rgba(0, 135, 103, 0.2)'
       : isDark
         ? '0 2px 8px rgba(0,0,0,0.4)'
-        : '0 1px 4px rgba(99, 102, 241, 0.1)',
+        : '0 1px 4px rgba(0, 135, 103, 0.1)',
     transition: 'all 0.3s ease-in-out',
     marginTop: '2px',
     ...(isSpeaking && {
@@ -212,12 +205,12 @@ export const AvatarWrapper = styled(Box, {
       '@keyframes luminaAuraPulse': {
         '0%, 100%': {
           boxShadow:
-            '0 0 12px rgba(99, 102, 241, 0.45), 0 0 0 2px rgba(99, 102, 241, 0.2)',
+            '0 0 12px rgba(0, 135, 103, 0.45), 0 0 0 2px rgba(0, 135, 103, 0.2)',
           transform: 'scale(1)',
         },
         '50%': {
           boxShadow:
-            '0 0 22px rgba(99, 102, 241, 0.75), 0 0 0 5px rgba(99, 102, 241, 0.3)',
+            '0 0 22px rgba(0, 135, 103, 0.75), 0 0 0 5px rgba(0, 135, 103, 0.3)',
           transform: 'scale(1.05)',
         },
       },
@@ -247,7 +240,7 @@ export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
     padding: isUser ? '10px 16px' : '16px 20px',
     borderRadius: isUser ? '18px 18px 4px 18px' : '16px',
     backgroundColor: isUser
-      ? '#2563eb' // Modern vibrant blue
+      ? '#008767'
       : theme.palette.mode === 'dark'
         ? surfaceColor(theme, '#18181b', '#202022', '#ffffff')
         : '#ffffff',
@@ -258,7 +251,7 @@ export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
       ? 'none'
       : `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0'}`,
     boxShadow: isUser
-      ? '0 2px 8px rgba(37, 99, 235, 0.2)'
+      ? '0 2px 8px rgba(0, 135, 103, 0.2)'
       : theme.palette.mode === 'dark'
         ? '0 2px 10px rgba(0,0,0,0.3)'
         : '0 1px 3px rgba(0,0,0,0.03)',
@@ -380,7 +373,7 @@ export const SuggestionsBar = styled(Box)(({ theme }) => ({
     gap: '4px',
     fontSize: '12px',
     fontWeight: 700,
-    color: '#2563eb',
+    color: '#008767',
     whiteSpace: 'nowrap',
     flexShrink: 0,
   },
@@ -405,10 +398,10 @@ export const SuggestionsBar = styled(Box)(({ theme }) => ({
     flexShrink: 0,
     transition: 'all 0.18s ease',
     '&:hover': {
-      borderColor: '#2563eb',
+      borderColor: '#008767',
       backgroundColor:
-        theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.1)' : '#eff6ff',
-      color: '#2563eb',
+        theme.palette.mode === 'dark' ? 'rgba(0, 135, 103, 0.12)' : '#ecfdf5',
+      color: '#008767',
       transform: 'translateY(-1px)',
     },
   },
@@ -458,7 +451,7 @@ export const LuminaWorkingIndicator = styled(Box)(({ theme }) => ({
     width: '4px',
     height: '4px',
     borderRadius: '50%',
-    backgroundColor: '#2563eb',
+    backgroundColor: '#008767',
     animation: 'luminaPulseDot 1s ease-in-out infinite',
     '&:nth-of-type(2)': { animationDelay: '0.15s' },
     '&:nth-of-type(3)': { animationDelay: '0.3s' },
@@ -494,8 +487,8 @@ export const InputBox = styled(Paper)(({ theme }) => {
       : '0 2px 10px rgba(0, 0, 0, 0.04)',
     transition: 'border-color 0.2s, box-shadow 0.2s',
     '&:focus-within': {
-      borderColor: '#2563eb',
-      boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.15)',
+      borderColor: '#008767',
+      boxShadow: '0 0 0 3px rgba(0, 135, 103, 0.15)',
     },
   };
 });
@@ -529,13 +522,13 @@ export const SendButton = styled(IconButton)<{ active?: boolean }>(
     borderRadius: '50%',
     flexShrink: 0,
     backgroundColor: active
-      ? '#2563eb'
+      ? '#008767'
       : theme.palette.action.disabledBackground,
     color: active ? '#ffffff' : theme.palette.text.disabled,
     transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
     '&:hover': active
       ? {
-          backgroundColor: '#1d4ed8',
+          backgroundColor: '#007357',
           transform: 'scale(1.05)',
         }
       : {},
@@ -591,29 +584,6 @@ export const ChatHeader = styled(Box)(({ theme }) => ({
   ),
   backdropFilter: 'blur(10px)',
   zIndex: 10,
-}));
-
-export const ModelBadgeButton = styled(Button)(({ theme }) => ({
-  padding: '4px 12px',
-  borderRadius: '20px',
-  textTransform: 'none',
-  fontSize: '12px',
-  fontWeight: 600,
-  minWidth: 0,
-  gap: '6px',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.05)'
-      : 'rgba(0, 0, 0, 0.02)',
-  border: `1px solid ${theme.palette.divider}`,
-  color: theme.palette.text.primary,
-  '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.09)'
-        : 'rgba(0, 0, 0, 0.05)',
-    borderColor: '#2563eb',
-  },
 }));
 
 export const StatusPill = styled(Box)(() => ({

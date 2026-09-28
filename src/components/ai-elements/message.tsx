@@ -41,7 +41,7 @@ export const MessageContent: React.FC<MessageContentProps> = ({
   <div
     className={cn(
       'flex w-fit min-w-0 max-w-[90%] md:max-w-[85%] flex-col gap-2 overflow-hidden text-sm leading-relaxed transition-all',
-      'group-[.is-user]:rounded-2xl group-[.is-user]:rounded-tr-sm group-[.is-user]:bg-gradient-to-r group-[.is-user]:from-indigo-600 group-[.is-user]:to-indigo-500 group-[.is-user]:px-4 group-[.is-user]:py-2.5 group-[.is-user]:text-white group-[.is-user]:shadow-md',
+      'group-[.is-user]:rounded-2xl group-[.is-user]:rounded-tr-sm group-[.is-user]:bg-gradient-to-r group-[.is-user]:from-[#008767] group-[.is-user]:to-[#059669] group-[.is-user]:px-4 group-[.is-user]:py-2.5 group-[.is-user]:text-white group-[.is-user]:shadow-md',
       'group-[.is-assistant]:rounded-2xl group-[.is-assistant]:rounded-tl-sm group-[.is-assistant]:bg-black/[0.03] dark:group-[.is-assistant]:bg-white/[0.04] group-[.is-assistant]:border group-[.is-assistant]:border-black/5 dark:group-[.is-assistant]:border-white/5 group-[.is-assistant]:px-4.5 group-[.is-assistant]:py-3.5 group-[.is-assistant]:text-zinc-900 dark:group-[.is-assistant]:text-zinc-100',
       className,
     )}

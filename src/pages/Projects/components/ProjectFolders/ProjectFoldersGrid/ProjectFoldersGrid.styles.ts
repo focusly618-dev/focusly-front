@@ -1,4 +1,4 @@
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 
 export const GridWrapper = styled(Box)(() => ({
@@ -9,7 +9,7 @@ export const GridWrapper = styled(Box)(() => ({
 export const FoldersGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: '1fr',
-  gap: '24px',
+  gap: '20px',
   [theme.breakpoints.up('sm')]: {
     gridTemplateColumns: 'repeat(2, 1fr)',
   },
@@ -19,37 +19,38 @@ export const FoldersGrid = styled(Box)(({ theme }) => ({
 }));
 
 export const DashedCard = styled(Box)(({ theme }) => ({
-  border: `1.5px dashed ${theme.palette.divider}`,
+  border:
+    theme.palette.mode === 'dark'
+      ? '1.5px dashed rgba(255, 255, 255, 0.15)'
+      : '1.5px dashed #D1D5DB',
   borderRadius: '16px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
-  height: '190px',
-  transition: 'all 0.2s ease-in-out',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.01)'
-      : 'rgba(0, 0, 0, 0.01)',
+  minHeight: '235px',
+  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1C1C1E' : '#FFFFFF',
   '&:hover': {
-    borderColor: theme.palette.primary.main,
-    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+    borderColor: '#008767',
     transform: 'translateY(-2px)',
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? '0 8px 20px rgba(0,0,0,0.3)'
+        : '0 8px 20px rgba(0, 0, 0, 0.04)',
   },
 }));
 
 export const AddCircleIconWrapper = styled(Box)(({ theme }) => ({
-  width: '48px',
-  height: '48px',
+  width: '44px',
+  height: '44px',
   borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  marginBottom: '12px',
+  marginBottom: '10px',
   backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(96, 165, 250, 0.12)'
-      : 'rgba(59, 130, 246, 0.08)',
-  color: theme.palette.primary.main,
+    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#F3F4F6',
+  color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#1F2937',
 }));

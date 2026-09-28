@@ -180,13 +180,13 @@ export const CategoryChip = styled(Box)(({ theme }) => ({
   fontWeight: 600,
   backgroundColor:
     theme.palette.mode === 'dark'
-      ? 'rgba(99, 102, 241, 0.08)'
-      : 'rgba(59, 130, 246, 0.05)',
-  color: theme.palette.mode === 'dark' ? '#818cf8' : '#2563eb',
+      ? 'rgba(16, 185, 129, 0.1)'
+      : 'rgba(0, 135, 103, 0.06)',
+  color: theme.palette.mode === 'dark' ? '#34d399' : '#008767',
   border: `1px solid ${
     theme.palette.mode === 'dark'
-      ? 'rgba(99, 102, 241, 0.15)'
-      : 'rgba(59, 130, 246, 0.12)'
+      ? 'rgba(16, 185, 129, 0.2)'
+      : 'rgba(0, 135, 103, 0.15)'
   }`,
   flexShrink: 0,
   width: 'fit-content',
@@ -240,18 +240,18 @@ export const DateChip = styled(Box)(({ theme }) => ({
   fontSize: '11px',
   fontWeight: 700,
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.15)' : '#eff6ff',
-  color: theme.palette.mode === 'dark' ? '#60a5fa' : '#2563eb',
+    theme.palette.mode === 'dark' ? 'rgba(0, 135, 103, 0.15)' : '#ecfdf5',
+  color: theme.palette.mode === 'dark' ? '#34d399' : '#008767',
   border:
     theme.palette.mode === 'dark'
-      ? '1px solid rgba(37, 99, 235, 0.25)'
-      : '1px solid #dbeafe',
+      ? '1px solid rgba(0, 135, 103, 0.25)'
+      : '1px solid #a7f3d0',
   transition: 'all 0.2s ease',
   width: 'fit-content',
   cursor: 'pointer',
   '&:hover': {
     backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(37, 99, 235, 0.25)' : '#dbeafe',
+      theme.palette.mode === 'dark' ? 'rgba(0, 135, 103, 0.25)' : '#d1fae5',
   },
 }));
 

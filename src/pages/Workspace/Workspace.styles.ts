@@ -401,7 +401,7 @@ export const AddTaskButton = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: theme.palette.info.main,
+  color: theme.palette.primary.main,
   fontSize: '11px',
   fontWeight: 700,
   cursor: 'pointer',

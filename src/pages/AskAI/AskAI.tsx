@@ -16,7 +16,6 @@ import {
   DialogContentText,
   DialogActions,
   CircularProgress,
-  LinearProgress,
 } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
 import {
@@ -75,8 +74,6 @@ import {
   ChainOfThoughtHeader,
   ChainOfThoughtContent,
   ChainOfThoughtStep,
-  Suggestions,
-  Suggestion,
   Shimmer,
 } from '@/components/ai-elements';
 import { UpgradeModal } from '@/components/modals';
@@ -258,15 +255,15 @@ const renderMarkdown = (text: string, isDark: boolean, theme: Theme) => {
   html = html.replace(/\[(.*?)\]\((.*?)\)/g, (_, text, url) => {
     const isInternal = /^\/(?!\/)/.test(url);
     if (isInternal) {
-      return `<a href="${url}" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">${text}</a>`;
+      return `<a href="${url}" style="color: #008767; text-decoration: underline; font-weight: 600;">${text}</a>`;
     }
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">${text}</a>`;
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #008767; text-decoration: underline; font-weight: 600;">${text}</a>`;
   });
 
   // 4b. Quoted task names or entities: "Task name" -> styled highlighted pill
-  const pillBg = isDark ? 'rgba(96, 165, 250, 0.16)' : '#eff6ff';
-  const pillBorder = isDark ? 'rgba(96, 165, 250, 0.35)' : '#dbeafe';
-  const pillColor = isDark ? '#93c5fd' : '#1e40af';
+  const pillBg = isDark ? 'rgba(0, 135, 103, 0.16)' : '#ecfdf5';
+  const pillBorder = isDark ? 'rgba(0, 135, 103, 0.35)' : '#a7f3d0';
+  const pillColor = isDark ? '#6ee7b7' : '#065f46';
   html = html.replace(
     /&quot;([^&"\n]{3,80})&quot;|"([^"\n]{3,80})"/g,
     `<span style="display: inline-block; background-color: ${pillBg}; border: 1px solid ${pillBorder}; color: ${pillColor}; font-weight: 700; padding: 1px 7px; border-radius: 6px; margin: 0 2px;">"$1$2"</span>`,
@@ -396,7 +393,7 @@ const renderMarkdown = (text: string, isDark: boolean, theme: Theme) => {
         const quoteBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
         const quoteColor = isDark ? '#cbd5e1' : '#475569';
         processedLines.push(
-          `<blockquote style="margin: 10px 0; padding: 8px 14px; background: ${quoteBg}; border-left: 4px solid #3b82f6; border-radius: 0 6px 6px 0; color: ${quoteColor}; font-style: italic; font-size: 13.5px; line-height: 1.6;">${quoteText}</blockquote>`,
+          `<blockquote style="margin: 10px 0; padding: 8px 14px; background: ${quoteBg}; border-left: 4px solid #008767; border-radius: 0 6px 6px 0; color: ${quoteColor}; font-style: italic; font-size: 13.5px; line-height: 1.6;">${quoteText}</blockquote>`,
         );
       } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
         if (!inList) {
@@ -884,19 +881,37 @@ export const AskAI: React.FC = () => {
     setIsProcessingFile(true);
     const newFiles: AttachedFile[] = [];
 
+    // Límite de tamaño: 3MB para PDFs y documentos
+    const MAX_PDF_SIZE_MB = 3;
+    const MAX_PDF_SIZE_BYTES = MAX_PDF_SIZE_MB * 1024 * 1024;
+    const MAX_DOC_SIZE_MB = 3;
+    const MAX_DOC_SIZE_BYTES = MAX_DOC_SIZE_MB * 1024 * 1024;
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (file.size > 20 * 1024 * 1024) {
+      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+
+      if (extension === 'pdf' && file.size > MAX_PDF_SIZE_BYTES) {
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
         sileo.error({
-          title: 'File too large',
-          description: `${file.name} exceeds 20MB limit`,
+          title: 'Archivo demasiado pesado',
+          description: `El límite de tamaño en PDF es de 3MB. "${file.name}" (${fileSizeMB}MB) supera el límite.`,
           fill: 'var(--sileo-error-bg)',
-          duration: 3500,
+          duration: 4000,
         });
         continue;
       }
 
-      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+      if (file.size > MAX_DOC_SIZE_BYTES) {
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        sileo.error({
+          title: 'Archivo demasiado pesado',
+          description: `El límite de tamaño para documentos es de 3MB. "${file.name}" (${fileSizeMB}MB) supera el límite.`,
+          fill: 'var(--sileo-error-bg)',
+          duration: 4000,
+        });
+        continue;
+      }
 
       try {
         let content = '';
@@ -918,8 +933,8 @@ export const AskAI: React.FC = () => {
       } catch (err) {
         console.error('Failed to read file:', file.name, err);
         sileo.error({
-          title: 'Failed to read file',
-          description: `Could not parse ${file.name}`,
+          title: 'Error al leer el archivo',
+          description: `No se pudo procesar ${file.name}`,
           fill: 'var(--sileo-error-bg)',
           duration: 3500,
         });
@@ -931,8 +946,8 @@ export const AskAI: React.FC = () => {
       sileo.success({
         title:
           newFiles.length === 1
-            ? 'File attached'
-            : `${newFiles.length} files attached`,
+            ? 'Archivo adjuntado'
+            : `${newFiles.length} archivos adjuntados`,
         description: newFiles.map((f) => f.name).join(', '),
         duration: 3000,
       });
@@ -1141,7 +1156,7 @@ export const AskAI: React.FC = () => {
     <AskAIContainer>
       {/* ── Main Chat Area ── */}
       <ChatAreaWrapper>
-        {/* ── Chat Header with Model Selector ── */}
+        {/* ── Chat Header ── */}
         <ChatHeader>
           <Box display="flex" alignItems="center" gap={1.5}>
             <Box
@@ -1151,17 +1166,17 @@ export const AskAI: React.FC = () => {
                 borderRadius: '10px',
                 bgcolor: (t) =>
                   t.palette.mode === 'dark'
-                    ? 'rgba(99, 102, 241, 0.15)'
+                    ? 'rgba(0, 135, 103, 0.15)'
                     : '#ffffff',
                 border: '1.5px solid',
                 borderColor: (t) =>
                   t.palette.mode === 'dark'
-                    ? 'rgba(99, 102, 241, 0.4)'
-                    : '#c7d2fe',
+                    ? 'rgba(0, 135, 103, 0.4)'
+                    : '#a7f3d0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 6px rgba(99, 102, 241, 0.08)',
+                boxShadow: '0 2px 6px rgba(0, 135, 103, 0.08)',
                 flexShrink: 0,
               }}
             >
@@ -1225,98 +1240,13 @@ export const AskAI: React.FC = () => {
                 px: 1.4,
                 py: 0.45,
                 '&:hover': {
-                  borderColor: '#2563eb',
+                  borderColor: '#008767',
                   bgcolor: 'action.hover',
                 },
               }}
             >
               Historial
             </Button>
-            <Menu
-              anchorEl={modelAnchor}
-              open={Boolean(modelAnchor)}
-              onClose={() => setModelAnchor(null)}
-              PaperProps={{
-                sx: {
-                  borderRadius: '10px',
-                  minWidth: '150px',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  mt: 0.5,
-                },
-              }}
-            >
-              {/* Claude models */}
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('claude-3-5-sonnet');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'claude-3-5-sonnet'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
-                Claude 3.5 Sonnet (Recommended)
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('claude-3-5-haiku');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'claude-3-5-haiku'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
-                Claude 3.5 Haiku (Fast)
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('claude-3-opus');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'claude-3-opus'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
-                Claude 3 Opus (Advanced)
-              </MenuItem>
-              <Divider sx={{ my: 0.5 }} />
-              {/* Gemini models */}
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('gemini-2.5-flash-lite');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'gemini-2.5-flash-lite'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
-                Gemini 2.5 Flash Lite
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('gemini-2.5-flash');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'gemini-2.5-flash'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
-                Gemini 2.5 Flash
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('gemini-1.5-flash');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'gemini-1.5-flash'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
-                Gemini 1.5 Flash
-              </MenuItem>
-            </Menu>
           </Box>
         </ChatHeader>
 
@@ -1372,8 +1302,8 @@ export const AskAI: React.FC = () => {
                             borderRadius: '10px',
                             bgcolor: (theme) =>
                               theme.palette.mode === 'dark'
-                                ? 'rgba(59, 130, 246, 0.15)'
-                                : 'rgba(59, 130, 246, 0.08)',
+                                ? 'rgba(0, 135, 103, 0.15)'
+                                : 'rgba(0, 135, 103, 0.08)',
                             flexShrink: 0,
                           }}
                         >
@@ -1438,9 +1368,6 @@ export const AskAI: React.FC = () => {
                       ? msg.attachedFiles
                       : fallbackFiles;
 
-                  // Historical messages already carry the backend-parsed actions;
-                  // only run the client-side parser (expensive regex + brace scan)
-                  // for messages that are still streaming (msg.actions === undefined).
                   const needsClientParse = msg.actions === undefined && !isUser;
                   const {
                     cleanText,
@@ -1702,7 +1629,7 @@ export const AskAI: React.FC = () => {
                               />
                               {reasoningText && (
                                 <div className="mt-2.5 p-3 rounded-lg bg-zinc-100/80 dark:bg-zinc-800/60 border border-black/5 dark:border-white/5 font-mono text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed max-h-56 overflow-y-auto">
-                                  <div className="font-sans font-semibold text-[11px] text-indigo-500 uppercase tracking-wider mb-1.5">
+                                  <div className="font-sans font-semibold text-[11px] text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1.5">
                                     Pensamiento de Lumina
                                   </div>
                                   <div
@@ -1722,7 +1649,7 @@ export const AskAI: React.FC = () => {
 
                         {/* Loading interaction while AI is working */}
                         {!displayCleanText && isStreamingOrSubmitted && (
-                          <div className="flex items-center gap-2.5 py-2.5 px-3.5 my-1.5 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-500/15 w-fit animate-in fade-in duration-300">
+                          <div className="flex items-center gap-2.5 py-2.5 px-3.5 my-1.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-500/15 w-fit animate-in fade-in duration-300">
                             <LuminaOrb
                               size={18}
                               state="thinking"
@@ -1730,7 +1657,7 @@ export const AskAI: React.FC = () => {
                             />
                             <Shimmer
                               duration={1.5}
-                              className="text-xs font-medium text-indigo-600 dark:text-indigo-400"
+                              className="text-xs font-medium text-emerald-700 dark:text-emerald-400"
                             >
                               Lumina está trabajando en tu solicitud...
                             </Shimmer>
@@ -1758,7 +1685,7 @@ export const AskAI: React.FC = () => {
                               </Typography>
                             )}
                             {hasPendingAction && (
-                              <div className="mt-2 text-xs text-indigo-500 font-medium">
+                              <div className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                                 <Shimmer duration={1.5}>
                                   Lumina está preparando los cambios...
                                 </Shimmer>
@@ -2183,27 +2110,6 @@ export const AskAI: React.FC = () => {
             )}
           </Menu>
 
-          {/* AI Elements Suggestions */}
-          <Suggestions className="mb-2.5 max-w-2xl w-full justify-center">
-            <Suggestion
-              onClick={() => sendMessage('Revisar tono y claridad del texto')}
-              label="✍️ Revisar tono"
-              description="Mejora la redacción"
-            />
-            <Suggestion
-              onClick={() =>
-                sendMessage('Dividir en bloques de 25 min para hoy')
-              }
-              label="⏱️ Dividir en bloques"
-              description="Organiza tus tareas con Pomodoro"
-            />
-            <Suggestion
-              onClick={() => sendMessage('Resumir y extraer próximos pasos')}
-              label="📊 Resumir"
-              description="Extrae puntos clave y acciones"
-            />
-          </Suggestions>
-
           {/* AI Elements PromptInput */}
           <div
             className="w-full max-w-3xl"
@@ -2240,9 +2146,9 @@ export const AskAI: React.FC = () => {
                         height: 24,
                         bgcolor:
                           theme.palette.mode === 'dark'
-                            ? 'rgba(37, 99, 235, 0.15)'
-                            : 'rgba(37, 99, 235, 0.05)',
-                        borderColor: '#2563eb',
+                            ? 'rgba(0, 135, 103, 0.15)'
+                            : 'rgba(0, 135, 103, 0.08)',
+                        borderColor: '#008767',
                       }}
                     />
                   )}
@@ -2298,7 +2204,7 @@ export const AskAI: React.FC = () => {
                     }}
                     className={
                       selectedContext
-                        ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40'
+                        ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
                         : ''
                     }
                     title="Referenciar contexto (@)"
@@ -2314,7 +2220,7 @@ export const AskAI: React.FC = () => {
                   <PromptInputButton
                     onClick={handleOpenFile}
                     disabled={isProcessingFile}
-                    title="Adjuntar archivo (PDF, DOCX, TXT, MD, etc.)"
+                    title="Adjuntar archivo (PDF, DOCX, TXT, MD, etc. - Máx. 3MB)"
                   >
                     {isProcessingFile ? (
                       <CircularProgress size={14} sx={{ color: 'inherit' }} />
@@ -2350,6 +2256,93 @@ export const AskAI: React.FC = () => {
                 />
               </PromptInputFooter>
             </PromptInput>
+
+            {/* Model Selector Menu (anchored to PromptInput model button) */}
+            <Menu
+              anchorEl={modelAnchor}
+              open={Boolean(modelAnchor)}
+              onClose={() => setModelAnchor(null)}
+              PaperProps={{
+                sx: {
+                  borderRadius: '10px',
+                  minWidth: '150px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  mt: 0.5,
+                },
+              }}
+            >
+              {/* Claude models */}
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-5-sonnet');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-5-sonnet'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
+                Claude 3.5 Sonnet (Recommended)
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-5-haiku');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-5-haiku'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
+                Claude 3.5 Haiku (Fast)
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('claude-3-opus');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'claude-3-opus'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
+                Claude 3 Opus (Advanced)
+              </MenuItem>
+              <Divider sx={{ my: 0.5 }} />
+              {/* Gemini models */}
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-2.5-flash-lite');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-2.5-flash-lite'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
+                Gemini 2.5 Flash Lite
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-2.5-flash');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-2.5-flash'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
+                Gemini 2.5 Flash
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setSelectedModel('gemini-1.5-flash');
+                  setModelAnchor(null);
+                }}
+                selected={selectedModel === 'gemini-1.5-flash'}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
+                Gemini 1.5 Flash
+              </MenuItem>
+            </Menu>
           </div>
 
           <Typography
@@ -2378,7 +2371,6 @@ export const AskAI: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
           }}
         >
           <Typography
@@ -2415,29 +2407,6 @@ export const AskAI: React.FC = () => {
             gap: 1.5,
           }}
         >
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={handleNewChat}
-            startIcon={<AddIcon />}
-            sx={{
-              borderRadius: '10px',
-              textTransform: 'none',
-              boxShadow: 'none',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              py: 1.1,
-              bgcolor: '#2563eb',
-              color: '#ffffff',
-              '&:hover': {
-                bgcolor: '#1d4ed8',
-                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
-              },
-            }}
-          >
-            + Nuevo Chat
-          </Button>
-
           {/* Search box */}
           <Box
             sx={{
@@ -2516,14 +2485,14 @@ export const AskAI: React.FC = () => {
                         bgcolor: isActive
                           ? (theme) =>
                               theme.palette.mode === 'dark'
-                                ? 'rgba(37, 99, 235, 0.16)'
-                                : '#eff6ff'
+                                ? 'rgba(0, 135, 103, 0.16)'
+                                : '#ecfdf5'
                           : 'transparent',
                         border: isActive
                           ? (theme) =>
                               theme.palette.mode === 'dark'
-                                ? '1px solid rgba(59, 130, 246, 0.3)'
-                                : '1px solid #bfdbfe'
+                                ? '1px solid rgba(0, 135, 103, 0.35)'
+                                : '1px solid #a7f3d0'
                           : '1px solid transparent',
                         color: 'text.primary',
                         '&:hover': {
@@ -2540,7 +2509,7 @@ export const AskAI: React.FC = () => {
                         sx={{
                           fontSize: 16,
                           mt: '2px',
-                          color: isActive ? '#2563eb' : 'text.secondary',
+                          color: isActive ? '#008767' : 'text.secondary',
                           flexShrink: 0,
                         }}
                       />
@@ -2560,7 +2529,7 @@ export const AskAI: React.FC = () => {
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
-                              color: isActive ? '#2563eb' : 'text.primary',
+                              color: isActive ? '#008767' : 'text.primary',
                             }}
                           >
                             {c.title || 'Nuevo chat'}
@@ -2649,63 +2618,29 @@ export const AskAI: React.FC = () => {
                 alignItems: 'center',
               }}
             >
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                fontWeight={600}
-                sx={{ fontSize: '11px' }}
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleNewChat}
+                startIcon={<AddIcon />}
+                sx={{
+                  borderRadius: '10px',
+                  textTransform: 'none',
+                  boxShadow: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  py: 1.1,
+                  border: '1px dashed #008767',
+                  color: '#ffffff',
+                  '&:hover': {
+                    bgcolor: '#007357',
+                    boxShadow: '0 4px 12px rgba(0, 135, 103, 0.25)',
+                  },
+                }}
               >
-                Chats creados:
-              </Typography>
-              <Typography
-                variant="caption"
-                color={
-                  conversations.length >= 4 ? 'error.main' : 'text.primary'
-                }
-                fontWeight={700}
-                sx={{ fontSize: '11px' }}
-              >
-                {conversations.length} / 4
-              </Typography>
+                Nuevo Chat
+              </Button>
             </Box>
-            <LinearProgress
-              variant="determinate"
-              value={Math.min((conversations.length / 4) * 100, 100)}
-              sx={{
-                height: 6,
-                borderRadius: 3,
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.08)'
-                    : 'rgba(0, 0, 0, 0.06)',
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: 3,
-                  bgcolor: conversations.length >= 4 ? 'error.main' : '#2563eb',
-                },
-              }}
-            />
-            <Button
-              variant="outlined"
-              size="small"
-              fullWidth
-              onClick={() => setIsUpgradeModalOpen(true)}
-              sx={{
-                mt: 0.5,
-                borderRadius: '8px',
-                textTransform: 'none',
-                fontSize: '11.5px',
-                py: 0.7,
-                fontWeight: 700,
-                borderColor: '#2563eb',
-                color: '#2563eb',
-                '&:hover': {
-                  borderColor: '#1d4ed8',
-                  bgcolor: 'rgba(37, 99, 235, 0.04)',
-                },
-              }}
-            >
-              Desbloquear chats ilimitados
-            </Button>
           </Box>
         )}
       </HistorySidebar>

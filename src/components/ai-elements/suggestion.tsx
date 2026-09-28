@@ -37,13 +37,15 @@ export const Suggestion: React.FC<SuggestionProps> = ({
   <button
     type="button"
     className={cn(
-      'flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-white/60 dark:bg-zinc-900/60 border border-black/5 dark:border-white/5 hover:border-indigo-500/30 dark:hover:border-indigo-500/30 hover:bg-white dark:hover:bg-zinc-800 shadow-sm transition-all cursor-pointer text-left',
+      'flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-white/60 dark:bg-zinc-900/60 border border-black/5 dark:border-white/5 hover:border-[#008767]/40 dark:hover:border-[#008767]/40 hover:bg-white dark:hover:bg-zinc-800 shadow-sm transition-all cursor-pointer text-left',
       className,
     )}
     data-slot="suggestion"
     {...props}
   >
-    {icon && <div className="text-indigo-500 shrink-0">{icon}</div>}
+    {icon && (
+      <div className="text-[#008767] dark:text-[#10B981] shrink-0">{icon}</div>
+    )}
     <div className="flex flex-col min-w-0">
       {label && (
         <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">

@@ -80,7 +80,7 @@ export const ChainOfThought: React.FC<ChainOfThoughtProps> = ({
         open={isOpen}
         onOpenChange={setIsOpen}
         className={cn(
-          'not-prose w-full rounded-xl border border-indigo-500/20 bg-indigo-50/40 dark:bg-zinc-900/60 p-2.5 backdrop-blur-sm transition-all',
+          'not-prose w-full rounded-xl border border-emerald-500/20 bg-emerald-50/40 dark:bg-zinc-900/60 p-2.5 backdrop-blur-sm transition-all',
           className,
         )}
         {...props}
@@ -108,16 +108,16 @@ export const ChainOfThoughtHeader: React.FC<ChainOfThoughtHeaderProps> = ({
   return (
     <CollapsibleTrigger
       className={cn(
-        'flex w-full items-center gap-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer select-none text-left',
+        'flex w-full items-center gap-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-[#008767] dark:hover:text-[#10B981] transition-colors cursor-pointer select-none text-left',
         className,
       )}
       {...props}
     >
       {icon ??
         (isStreaming ? (
-          <CircleDashedIcon className="size-3.5 text-indigo-500 animate-spin shrink-0" />
+          <CircleDashedIcon className="size-3.5 text-[#008767] animate-spin shrink-0" />
         ) : (
-          <BrainIcon className="size-3.5 text-indigo-500 shrink-0" />
+          <BrainIcon className="size-3.5 text-[#008767] shrink-0" />
         ))}
       <span className="flex-1 truncate">
         {children ?? 'Proceso de análisis'}
@@ -142,7 +142,7 @@ export type ChainOfThoughtStepProps = ComponentProps<'div'> & {
 };
 
 const stepStatusStyles: Record<ChainOfThoughtStepStatus, string> = {
-  active: 'text-indigo-600 dark:text-indigo-400 font-medium',
+  active: 'text-[#008767] dark:text-[#10B981] font-medium',
   complete: 'text-zinc-500 dark:text-zinc-400',
   pending: 'text-zinc-400/60 dark:text-zinc-600',
 };
@@ -169,7 +169,7 @@ export const ChainOfThoughtStep: React.FC<ChainOfThoughtStepProps> = ({
         <CheckCircle2Icon className="size-3.5 text-emerald-500" />
       )}
       {status === 'active' && (
-        <CircleDashedIcon className="size-3.5 text-indigo-500 animate-spin" />
+        <CircleDashedIcon className="size-3.5 text-[#008767] animate-spin" />
       )}
       {status === 'pending' && (
         <CircleIcon className="size-2 text-zinc-300 dark:text-zinc-700" />
@@ -201,7 +201,7 @@ export const ChainOfThoughtContent: React.FC<ChainOfThoughtContentProps> = ({
 }) => (
   <CollapsibleContent
     className={cn(
-      'mt-2.5 pt-2 border-t border-indigo-500/10 space-y-1.5',
+      'mt-2.5 pt-2 border-t border-emerald-500/10 space-y-1.5',
       'data-[state=closed]:animate-out data-[state=open]:animate-in',
       className,
     )}
@@ -228,7 +228,7 @@ export const ChainOfThoughtSearchResult: React.FC<ComponentProps<'span'>> = ({
 }) => (
   <span
     className={cn(
-      'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/15',
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/15',
       className,
     )}
     {...props}

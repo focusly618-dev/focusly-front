@@ -15,8 +15,7 @@ import {
   DeleteOutline as DeleteNotifIcon,
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
+  ViewSidebarOutlined as ViewSidebarIcon,
 } from '@mui/icons-material';
 import { Logo } from '../Sidebar.styles';
 import { FocuslyLogo } from '@/components/ui';
@@ -126,11 +125,7 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
               },
             }}
           >
-            {isCollapsed ? (
-              <ChevronRightIcon sx={{ fontSize: 17 }} />
-            ) : (
-              <ChevronLeftIcon sx={{ fontSize: 17 }} />
-            )}
+            <ViewSidebarIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Box>
       </Logo>

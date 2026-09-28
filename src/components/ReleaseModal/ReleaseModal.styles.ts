@@ -53,7 +53,7 @@ export const IconWrapper = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: '24px',
-  color: theme.palette.mode === 'dark' ? '#60a5fa' : '#3b82f6',
+  color: theme.palette.mode === 'dark' ? '#10B981' : '#008767',
 }));
 
 export const Title = styled(Typography)({
@@ -67,7 +67,7 @@ export const Title = styled(Typography)({
 export const DividerLine = styled(Box)({
   width: '32px',
   height: '3px',
-  backgroundColor: '#3b82f6',
+  backgroundColor: '#008767',
   borderRadius: '2px',
   marginBottom: '20px',
 });
@@ -105,7 +105,7 @@ export const FeatureText = styled(Typography)(({ theme }) => ({
 }));
 
 export const AcceptButton = styled(Button)({
-  backgroundColor: '#3b82f6',
+  backgroundColor: '#008767',
   color: '#ffffff',
   borderRadius: '12px',
   padding: '12px',
@@ -117,7 +117,9 @@ export const AcceptButton = styled(Button)({
   justifyContent: 'center',
   alignItems: 'center',
   gap: '8px',
+  boxShadow: 'none',
   '&:hover': {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#007357',
+    boxShadow: 'none',
   },
 });

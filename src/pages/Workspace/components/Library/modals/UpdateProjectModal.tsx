@@ -22,10 +22,11 @@ export const UpdateProjectModal = ({
   const { t } = useTranslation();
   const [name, setName] = useState(project?.name || '');
   const [selectedColor, setSelectedColor] = useState(
-    project?.color || '#3b82f6',
+    project?.color || '#008767',
   );
 
   const colors = [
+    { nameKey: 'colorNames.emerald', value: '#008767' },
     { nameKey: 'colorNames.black', value: '#18181b' },
     { nameKey: 'colorNames.slate', value: '#475569' },
     { nameKey: 'colorNames.zinc', value: '#a1a1aa' },

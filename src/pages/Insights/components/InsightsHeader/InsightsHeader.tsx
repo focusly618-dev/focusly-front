@@ -71,7 +71,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             <span>{t('insightsHeader.export')}</span>
           </Button>
 
-          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-xl text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer">
+          <Button className="bg-[#008767] hover:bg-[#007357] text-white shadow-sm rounded-xl text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer">
             <Add className="text-base" />
             <span>{t('insightsHeader.createReport')}</span>
           </Button>

@@ -71,10 +71,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     '&.Mui-focused': {
       boxShadow:
         theme.palette.mode === 'dark'
-          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : '0 0 0 3px rgba(59, 130, 246, 0.08)',
+          ? '0 0 0 3px rgba(16, 185, 129, 0.15)'
+          : '0 0 0 3px rgba(0, 135, 103, 0.1)',
       '& fieldset': {
-        borderColor: theme.palette.mode === 'dark' ? '#6366f1' : '#2563eb',
+        borderColor: theme.palette.mode === 'dark' ? '#10b981' : '#008767',
         borderWidth: '1px',
       },
     },

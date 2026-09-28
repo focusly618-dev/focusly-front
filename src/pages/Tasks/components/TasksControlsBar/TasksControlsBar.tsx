@@ -262,7 +262,7 @@ export const TasksControlsBar = ({
                 sx={{
                   p: 0.25,
                   color: (theme) =>
-                    theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
+                    theme.palette.mode === 'dark' ? '#34d399' : '#008767',
                 }}
               >
                 <ChevronLeftIcon sx={{ fontSize: 18 }} />
@@ -270,7 +270,9 @@ export const TasksControlsBar = ({
 
               <Select
                 value={dateRange}
-                onChange={(e) => setDateRange(e.target.value as DateRangeFilter)}
+                onChange={(e) =>
+                  setDateRange(e.target.value as DateRangeFilter)
+                }
                 renderValue={() => periodLabel}
                 size="small"
                 variant="standard"
@@ -279,7 +281,7 @@ export const TasksControlsBar = ({
                   fontSize: '12px',
                   fontWeight: 700,
                   color: (theme) =>
-                    theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
+                    theme.palette.mode === 'dark' ? '#34d399' : '#008767',
                   '& .MuiSelect-select': {
                     py: 0,
                     pr: '20px !important',
@@ -299,7 +301,7 @@ export const TasksControlsBar = ({
                 sx={{
                   p: 0.25,
                   color: (theme) =>
-                    theme.palette.mode === 'dark' ? '#a5b4fc' : '#2563eb',
+                    theme.palette.mode === 'dark' ? '#34d399' : '#008767',
                 }}
               >
                 <ChevronRightIcon sx={{ fontSize: 18 }} />

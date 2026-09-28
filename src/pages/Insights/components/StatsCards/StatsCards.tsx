@@ -26,9 +26,9 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
           ? '📈 +12% vs período anterior'
           : totalFocusHours.change,
       icon: (
-        <AccessTime className="text-indigo-600 dark:text-indigo-400 text-xl" />
+        <AccessTime className="text-[#008767] dark:text-[#10B981] text-xl" />
       ),
-      iconBg: 'bg-indigo-50 dark:bg-indigo-950/60',
+      iconBg: 'bg-emerald-50 dark:bg-emerald-950/60',
       changeColor: 'text-emerald-600 dark:text-emerald-400',
     },
     {

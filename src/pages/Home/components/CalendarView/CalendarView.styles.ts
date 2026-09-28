@@ -250,7 +250,7 @@ export const CalendarContainer = styled(Box, {
 
     // ── Current time indicator (Active Timeline Line & Badge) ──
     '& .rbc-current-time-indicator': {
-      backgroundColor: '#2563eb', // Prominent blue line
+      backgroundColor: '#008767', // Focusly emerald brand line
       height: '2px',
       zIndex: 20,
       pointerEvents: 'none',
@@ -262,8 +262,8 @@ export const CalendarContainer = styled(Box, {
         width: '10px',
         height: '10px',
         borderRadius: '50%',
-        backgroundColor: '#2563eb',
-        boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.3)',
+        backgroundColor: '#008767',
+        boxShadow: '0 0 0 3px rgba(0, 135, 103, 0.3)',
         zIndex: 22,
       },
     },
@@ -271,13 +271,13 @@ export const CalendarContainer = styled(Box, {
     '& .rbc-time-badge': {
       position: 'absolute',
       right: '-17px',
-      backgroundColor: '#2563eb',
+      backgroundColor: '#008767',
       color: '#ffffff',
       fontSize: '10px',
       fontWeight: 700,
       padding: '2px 7px',
       borderRadius: '6px',
-      boxShadow: '0 2px 8px rgba(37, 99, 235, 0.35)',
+      boxShadow: '0 2px 8px rgba(0, 135, 103, 0.35)',
       whiteSpace: 'nowrap',
       fontFamily: '"Inter", sans-serif',
       zIndex: 23,

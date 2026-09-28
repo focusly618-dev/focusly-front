@@ -13,7 +13,7 @@ import { svgRootStyle } from './LuminaAnimatedFace.styles';
  */
 export const LuminaAnimatedFace: React.FC<LuminaAnimatedFaceProps> = ({
   size = 32,
-  primaryColor = '#1d4ed8',
+  primaryColor = '#008767',
   secondaryColor = '#f472b6',
   isSpeaking = false,
 }) => {

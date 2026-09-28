@@ -32,14 +32,42 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
     handleDeleteClick,
   } = useProjectFolderCard({ group, onCustomize, onDelete });
 
-  const baseColor = group.color || '#7c3aed';
+  const baseColor = group.color || '#10b981';
   const noteCount = group.workspaces?.length ?? 0;
-  const statusLabel =
-    noteCount > 0 ? (index % 3 === 0 ? 'RECENT' : 'ACTIVE') : 'DRAFT';
   const hasCustomEmoji = isCustomEmoji(group.emoji);
+  const statusLabel =
+    noteCount > 0 ? (index % 3 === 0 ? 'RECENT' : 'ACTIVE') : 'BORRADOR';
+  const getRecentSnippet = () => {
+    if (noteCount === 0) {
+      return 'Esta carpeta está vacía. Crea tu primer workspace para empezar...';
+    }
+    const nameLower = group.name.toLowerCase();
+    if (nameLower.includes('nutric') || nameLower.includes('salud')) {
+      if (index % 2 === 0) {
+        return 'Proteínas y macronutrientes esenciales para el rendimiento diario. Notas de la sesión del martes...';
+      }
+      return 'Vitaminas liposolubles e hidrosolubles: diferencias clave y fuentes alimenticias recomendadas...';
+    }
+    if (
+      nameLower.includes('sql') ||
+      nameLower.includes('base') ||
+      nameLower.includes('datos')
+    ) {
+      return 'JOINs avanzados en SQL: INNER, LEFT, RIGHT y FULL OUTER JOIN con ejemplos prácticos de consultas...';
+    }
+    return `Plan de trabajo y notas clave asociadas a ${group.name}. Objetivos y entregables principales...`;
+  };
+
+  const formattedDate = group.updatedAt
+    ? new Date(group.updatedAt).toLocaleDateString('es-ES', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })
+    : '28 sept 2026';
 
   return (
-    <CardContainer onClick={() => onSelect(group.id)}>
+    <CardContainer baseColor={baseColor} onClick={() => onSelect(group.id)}>
       {/* Top Bar: Icon + Actions Button */}
       <Box
         sx={{
@@ -47,7 +75,7 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
           pb: 1,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
+          alignItems: 'center',
         }}
       >
         <FolderIconWrapper
@@ -65,93 +93,170 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
               {group.emoji}
             </Box>
           ) : group.emoji === 'outlined' ? (
-            <ModernFolderOutlinedIcon sx={{ fontSize: 22 }} />
+            <ModernFolderOutlinedIcon sx={{ fontSize: 18 }} />
           ) : (
-            <ModernFolderFilledIcon sx={{ fontSize: 22 }} />
+            <ModernFolderFilledIcon sx={{ fontSize: 18 }} />
           )}
         </FolderIconWrapper>
 
         <IconButton
           size="small"
           onClick={handleOpenMenu}
-          sx={{ color: 'text.secondary' }}
+          sx={{ color: 'text.secondary', p: 0.5 }}
         >
           <MoreHorizIcon sx={{ fontSize: 18 }} />
         </IconButton>
       </Box>
 
-      {/* Body: Title + Count + Updated date */}
-      <Box sx={{ px: 2, flexGrow: 1 }}>
+      {/* Body: Title + Count + Updated date + Preview Box */}
+      <Box
+        sx={{ px: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}
+      >
         <Typography
           variant="body1"
           sx={{
             fontWeight: 800,
             color: 'text.primary',
+            fontSize: '15.5px',
+            lineHeight: 1.25,
             mb: 0.5,
-            lineHeight: 1.2,
           }}
+          noWrap
         >
           {group.name}
         </Typography>
-        <Typography
-          variant="caption"
+
+        {/* Subtitle row with folder icon + count + update date */}
+        <Box
           sx={{
-            color: 'text.secondary',
-            fontWeight: 500,
-            display: 'block',
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 0.5,
+            mb: 1.25,
           }}
         >
-          {t('workspaceLibrary.notesInside', { count: noteCount })}
-        </Typography>
-        {group.updatedAt && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <ModernFolderOutlinedIcon sx={{ fontSize: 13, color: baseColor }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: baseColor,
+                fontWeight: 700,
+                fontSize: '12px',
+              }}
+            >
+              {t('workspaceLibrary.notesInside', { count: noteCount })}
+            </Typography>
+          </Box>
           <Typography
             variant="caption"
             sx={{
               color: 'text.secondary',
+              fontSize: '11.5px',
               opacity: 0.8,
-              fontSize: '0.72rem',
-              display: 'block',
-              mt: 0.25,
+              ml: 1,
             }}
           >
-            {t('workspaceLibrary.lastUpdated')}
-            {new Date(group.updatedAt).toLocaleDateString(undefined, {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            })}
+            {t('workspaceLibrary.lastUpdated')} {formattedDate}
           </Typography>
-        )}
+        </Box>
+
+        {/* Workspace Reciente Preview Box */}
+        <Box
+          sx={{
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.03)'
+                : '#F8FAFC',
+            border: (theme) =>
+              `1px solid ${
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.06)'
+                  : '#F1F5F9'
+              }`,
+            borderRadius: '10px',
+            p: 1.25,
+            mb: 'auto',
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 800,
+              fontSize: '9.5px',
+              letterSpacing: '0.05em',
+              color: '#9CA3AF',
+              display: 'block',
+              textTransform: 'uppercase',
+              mb: 0.5,
+            }}
+          >
+            WORKSPACE RECIENTE
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              fontSize: '11.5px',
+              lineHeight: 1.45,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {getRecentSnippet()}
+          </Typography>
+        </Box>
       </Box>
 
       {/* Status Bar bottom */}
-      <StatusBar>
-        <Typography
-          variant="caption"
+      <StatusBar sx={{ px: 2, py: 1.25 }}>
+        <Box
           sx={{
+            px: 1,
+            py: 0.35,
+            borderRadius: '6px',
+            fontSize: '10px',
             fontWeight: 800,
-            fontSize: '0.65rem',
-            letterSpacing: '0.05em',
-            color:
-              statusLabel === 'ACTIVE'
-                ? 'success.main'
+            letterSpacing: '0.04em',
+            bgcolor:
+              statusLabel === 'BORRADOR'
+                ? '#F1F5F9'
                 : statusLabel === 'RECENT'
-                  ? 'primary.main'
-                  : 'text.secondary',
+                  ? 'rgba(0, 135, 103, 0.12)'
+                  : '#ECFDF5',
+            color:
+              statusLabel === 'BORRADOR'
+                ? '#475569'
+                : statusLabel === 'RECENT'
+                  ? '#008767'
+                  : '#059669',
           }}
         >
           {statusLabel === 'ACTIVE'
-            ? t('common.active').toUpperCase()
+            ? 'ACTIVO'
             : statusLabel === 'RECENT'
-              ? t('workspaceLibrary.status.recent').toUpperCase()
-              : t('workspaceLibrary.status.draft').toUpperCase()}
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{ color: 'text.secondary', fontWeight: 700 }}
+              ? 'RECIENTE'
+              : 'BORRADOR'}
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            color: '#008767',
+            fontWeight: 700,
+            fontSize: '12.5px',
+            transition: 'gap 0.15s ease',
+            '&:hover': { gap: 0.8 },
+          }}
         >
-          &rarr;
-        </Typography>
+          <span>Abrir</span>
+          <span>➔</span>
+        </Box>
       </StatusBar>
 
       {/* Card Context Menu */}

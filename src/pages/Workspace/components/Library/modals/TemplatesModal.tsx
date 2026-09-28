@@ -841,7 +841,7 @@ Write a single sentence summarizing the essence of this concept.
     description:
       "David J. Anderson's Kanban method with WIP limits grounded in Little's Law: less work-in-progress means faster delivery.",
     estimatedTime: '15 min setup',
-    icon: <KanbanIcon sx={{ color: '#2563eb' }} />,
+    icon: <KanbanIcon sx={{ color: '#008767' }} />,
     tips: [
       'Set WIP limits low at first — you can raise them later, but starting too high defeats the purpose.',
       'When a column hits its limit, swarm to unblock it before pulling in new work.',
@@ -1573,12 +1573,10 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                   px: 3,
                   py: 1,
                   boxShadow: 'none',
-                  bgcolor: isDark ? '#ffffff' : '#1c1c1a',
-                  color: isDark ? '#0b0f14' : '#ffffff',
+                  bgcolor: '#008767',
+                  color: '#ffffff',
                   '&:hover': {
-                    bgcolor: isDark
-                      ? 'rgba(255,255,255,0.9)'
-                      : 'rgba(28,28,26,0.9)',
+                    bgcolor: '#007357',
                   },
                 }}
               >

@@ -125,10 +125,10 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
     '&.Mui-focused': {
       boxShadow:
         theme.palette.mode === 'dark'
-          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : '0 0 0 3px rgba(59, 130, 246, 0.08)',
+          ? '0 0 0 3px rgba(16, 185, 129, 0.15)'
+          : '0 0 0 3px rgba(0, 135, 103, 0.1)',
       '& fieldset': {
-        borderColor: theme.palette.mode === 'dark' ? '#6366f1' : '#2563eb',
+        borderColor: theme.palette.mode === 'dark' ? '#10b981' : '#008767',
         borderWidth: '1px',
       },
     },
@@ -140,20 +140,20 @@ export const FilterButton = styled(Button, {
 })<{ active?: boolean }>(({ theme, active }) => ({
   backgroundColor: active
     ? theme.palette.mode === 'dark'
-      ? 'rgba(99, 102, 241, 0.15)'
-      : 'rgba(59, 130, 246, 0.08)'
+      ? 'rgba(16, 185, 129, 0.15)'
+      : 'rgba(0, 135, 103, 0.08)'
     : theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, 0.03)'
       : '#ffffff',
   color: active
     ? theme.palette.mode === 'dark'
-      ? '#818cf8'
-      : '#2563eb'
+      ? '#34d399'
+      : '#008767'
     : theme.palette.text.primary,
   border: active
     ? theme.palette.mode === 'dark'
-      ? '1px solid rgba(99, 102, 241, 0.3)'
-      : '1px solid rgba(59, 130, 246, 0.2)'
+      ? '1px solid rgba(16, 185, 129, 0.3)'
+      : '1px solid rgba(0, 135, 103, 0.25)'
     : theme.palette.mode === 'dark'
       ? '1px solid rgba(255, 255, 255, 0.05)'
       : '1px solid rgba(0, 0, 0, 0.05)',
@@ -166,21 +166,21 @@ export const FilterButton = styled(Button, {
   textTransform: 'none',
   boxShadow:
     active && theme.palette.mode !== 'dark'
-      ? '0 1px 2px rgba(59, 130, 246, 0.05)'
+      ? '0 1px 2px rgba(0, 135, 103, 0.08)'
       : 'none',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
     backgroundColor: active
       ? theme.palette.mode === 'dark'
-        ? 'rgba(99, 102, 241, 0.2)'
-        : 'rgba(59, 130, 246, 0.12)'
+        ? 'rgba(16, 185, 129, 0.22)'
+        : 'rgba(0, 135, 103, 0.12)'
       : theme.palette.mode === 'dark'
         ? 'rgba(255, 255, 255, 0.08)'
         : 'rgba(0, 0, 0, 0.025)',
     borderColor: active
       ? theme.palette.mode === 'dark'
-        ? '#818cf8'
-        : '#2563eb'
+        ? '#34d399'
+        : '#008767'
       : theme.palette.mode === 'dark'
         ? 'rgba(255, 255, 255, 0.15)'
         : 'rgba(0, 0, 0, 0.1)',
@@ -196,20 +196,20 @@ export const SortButton = styled(Button, {
 })<{ active?: boolean }>(({ theme, active }) => ({
   backgroundColor: active
     ? theme.palette.mode === 'dark'
-      ? 'rgba(99, 102, 241, 0.15)'
-      : 'rgba(59, 130, 246, 0.08)'
+      ? 'rgba(16, 185, 129, 0.15)'
+      : 'rgba(0, 135, 103, 0.08)'
     : theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, 0.03)'
       : '#ffffff',
   color: active
     ? theme.palette.mode === 'dark'
-      ? '#818cf8'
-      : '#2563eb'
+      ? '#34d399'
+      : '#008767'
     : theme.palette.text.primary,
   border: active
     ? theme.palette.mode === 'dark'
-      ? '1px solid rgba(99, 102, 241, 0.3)'
-      : '1px solid rgba(59, 130, 246, 0.2)'
+      ? '1px solid rgba(16, 185, 129, 0.3)'
+      : '1px solid rgba(0, 135, 103, 0.25)'
     : theme.palette.mode === 'dark'
       ? '1px solid rgba(255, 255, 255, 0.05)'
       : '1px solid rgba(0, 0, 0, 0.05)',
@@ -222,21 +222,21 @@ export const SortButton = styled(Button, {
   textTransform: 'none',
   boxShadow:
     active && theme.palette.mode !== 'dark'
-      ? '0 1px 2px rgba(59, 130, 246, 0.05)'
+      ? '0 1px 2px rgba(0, 135, 103, 0.08)'
       : 'none',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
     backgroundColor: active
       ? theme.palette.mode === 'dark'
-        ? 'rgba(99, 102, 241, 0.2)'
-        : 'rgba(59, 130, 246, 0.12)'
+        ? 'rgba(16, 185, 129, 0.22)'
+        : 'rgba(0, 135, 103, 0.12)'
       : theme.palette.mode === 'dark'
         ? 'rgba(255, 255, 255, 0.08)'
         : 'rgba(0, 0, 0, 0.025)',
     borderColor: active
       ? theme.palette.mode === 'dark'
-        ? '#818cf8'
-        : '#2563eb'
+        ? '#34d399'
+        : '#008767'
       : theme.palette.mode === 'dark'
         ? 'rgba(255, 255, 255, 0.15)'
         : 'rgba(0, 0, 0, 0.1)',
@@ -407,13 +407,13 @@ export const ViewToggleButton = styled(Box, {
   cursor: 'pointer',
   backgroundColor: active
     ? theme.palette.mode === 'dark'
-      ? 'rgba(99, 102, 241, 0.18)'
-      : theme.palette.action.selected
+      ? 'rgba(16, 185, 129, 0.15)'
+      : '#EAECEF'
     : 'transparent',
   color: active
     ? theme.palette.mode === 'dark'
-      ? '#818cf8'
-      : theme.palette.text.primary
+      ? '#34d399'
+      : '#111827'
     : theme.palette.text.secondary,
   display: 'flex',
   alignItems: 'center',
@@ -422,8 +422,8 @@ export const ViewToggleButton = styled(Box, {
   '&:hover': {
     backgroundColor: active
       ? theme.palette.mode === 'dark'
-        ? 'rgba(99, 102, 241, 0.25)'
-        : theme.palette.action.selected
+        ? 'rgba(16, 185, 129, 0.25)'
+        : '#EAECEF'
       : theme.palette.mode === 'dark'
         ? 'rgba(255, 255, 255, 0.05)'
         : theme.palette.action.hover,

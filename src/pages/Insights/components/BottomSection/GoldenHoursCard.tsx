@@ -321,7 +321,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
             color: 'primary.main',
             '&:hover': {
               borderColor: 'primary.dark',
-              bgcolor: 'rgba(59, 130, 246, 0.08)',
+              bgcolor: 'rgba(0, 135, 103, 0.08)',
             },
           }}
         >
@@ -443,7 +443,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
                         p: 0.5,
                         '&:hover': {
                           color: 'primary.main',
-                          bgcolor: 'rgba(59, 130, 246, 0.08)',
+                          bgcolor: 'rgba(0, 135, 103, 0.08)',
                         },
                       }}
                     >
@@ -799,14 +799,14 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
                                 : 'rgba(16, 185, 129, 0.03)'
                           : (t: { palette: { mode: string } }) =>
                               t.palette.mode === 'dark'
-                                ? 'rgba(59, 130, 246, 0.08)'
-                                : 'rgba(59, 130, 246, 0.03)';
+                                ? 'rgba(0, 135, 103, 0.08)'
+                                : 'rgba(0, 135, 103, 0.03)';
 
                       const borderColor = isWarning
                         ? 'rgba(239, 140, 0, 0.2)'
                         : isSuccess
                           ? 'rgba(16, 185, 129, 0.2)'
-                          : 'rgba(59, 130, 246, 0.2)';
+                          : 'rgba(0, 135, 103, 0.2)';
 
                       const isApplied =
                         rec.action &&

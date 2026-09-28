@@ -14,9 +14,10 @@ export const LibraryContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-  overflow: 'hidden',
-  backgroundColor: surfaceColor(theme, '#121318', '#19191A', '#fafbfd'),
-  padding: theme.spacing(3),
+  overflowY: 'auto',
+  overflowX: 'hidden',
+  backgroundColor: surfaceColor(theme, '#121318', '#19191A', '#F3F4F6'),
+  padding: theme.spacing(3.5),
   [theme.breakpoints.down('md')]: {
     padding: theme.spacing(2),
   },
@@ -72,10 +73,10 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
     '&.Mui-focused': {
       boxShadow:
         theme.palette.mode === 'dark'
-          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : '0 0 0 3px rgba(59, 130, 246, 0.08)',
+          ? '0 0 0 3px rgba(16, 185, 129, 0.15)'
+          : '0 0 0 3px rgba(0, 135, 103, 0.1)',
       '& fieldset': {
-        borderColor: theme.palette.mode === 'dark' ? '#6366f1' : '#2563eb',
+        borderColor: theme.palette.mode === 'dark' ? '#10b981' : '#008767',
         borderWidth: '1px',
       },
     },

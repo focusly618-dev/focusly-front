@@ -22,9 +22,9 @@ export const DEFAULT_TRENDS: TrendData[] = [
 }));
 
 export const DEFAULT_DISTRIBUTION: DistributionEntry[] = [
-  { name: 'Deep Work', value: 0, color: '#3b82f6' },
-  { name: 'Meetings', value: 0, color: '#6366f1' },
-  { name: 'Admin/Misc', value: 0, color: '#8b5cf6' },
+  { name: 'Deep Work', value: 0, color: '#008767' },
+  { name: 'Meetings', value: 0, color: '#059669' },
+  { name: 'Admin/Misc', value: 0, color: '#10b981' },
   { name: 'Rest/Breaks', value: 0, color: '#1e293b' },
 ];
 

@@ -138,11 +138,11 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
       <Plan
         defaultOpen={true}
         isStreaming={isCreating}
-        className="my-3.5 border border-indigo-500/20 bg-white/80 dark:bg-zinc-900/90 shadow-lg dark:shadow-2xl"
+        className="my-3.5 border border-emerald-500/20 bg-white/80 dark:bg-zinc-900/90 shadow-lg dark:shadow-2xl"
       >
         <PlanHeader className="py-3 px-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex items-center justify-center size-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shrink-0">
+            <div className="flex items-center justify-center size-8 rounded-xl bg-[#008767]/10 text-[#008767] dark:text-[#10B981] shrink-0">
               <EventNoteIcon sx={{ fontSize: 18 }} />
             </div>
             <div className="min-w-0">
@@ -193,6 +193,9 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                   px: 1.5,
                   borderRadius: '8px',
                   boxShadow: 'none',
+                  bgcolor: '#008767',
+                  color: '#ffffff',
+                  '&:hover': { bgcolor: '#007357', boxShadow: 'none' },
                 }}
               >
                 {isCreating ? 'Creando...' : 'Ejecutar todo'}
@@ -236,7 +239,7 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
 
                     <div className="flex items-center gap-1.5 shrink-0">
                       {preview.dateLabel && (
-                        <span className="text-[10.5px] px-2 py-0.5 rounded-full font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/40">
+                        <span className="text-[10.5px] px-2 py-0.5 rounded-full font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/40">
                           {preview.dateLabel}
                         </span>
                       )}
@@ -249,7 +252,7 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                         <span
                           className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold text-white"
                           style={{
-                            backgroundColor: preview.priorityColor || '#6366f1',
+                            backgroundColor: preview.priorityColor || '#008767',
                           }}
                         >
                           {preview.priorityLabel}
@@ -277,7 +280,7 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                           className="flex items-center justify-between text-xs py-0.5 text-zinc-700 dark:text-zinc-300"
                         >
                           <div className="flex items-center gap-2">
-                            <span className="size-1.5 rounded-full bg-indigo-500" />
+                            <span className="size-1.5 rounded-full bg-[#008767]" />
                             <span>{st.title}</span>
                           </div>
                           {st.durationLabel && (

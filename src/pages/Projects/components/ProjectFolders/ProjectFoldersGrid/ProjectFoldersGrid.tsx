@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Typography, Pagination } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
 import {
   GridWrapper,
   FoldersGrid,
@@ -28,7 +27,6 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
   onDeleteFolder,
   folderSearchTerm = '',
 }) => {
-  const { t } = useTranslation();
   const { state, actions } = useProjectFoldersGrid();
 
   return (
@@ -37,13 +35,24 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
         {/* Dashed Create Folder Card */}
         <DashedCard onClick={actions.openCreate}>
           <AddCircleIconWrapper>
-            <AddIcon sx={{ fontSize: 24 }} />
+            <AddIcon sx={{ fontSize: 22 }} />
           </AddCircleIconWrapper>
           <Typography
-            variant="body2"
-            sx={{ fontWeight: 700, color: 'text.secondary' }}
+            variant="body1"
+            sx={{
+              fontWeight: 700,
+              fontSize: '15px',
+              color: 'text.primary',
+              mb: 0.5,
+            }}
           >
-            {t('workspaceLibrary.newFolder')}
+            Nuevo Proyecto
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ color: 'text.secondary', fontSize: '12px' }}
+          >
+            Crear una carpeta limpia
           </Typography>
         </DashedCard>
 
@@ -60,18 +69,52 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
         ))}
       </FoldersGrid>
 
-      {/* Pagination */}
-      {!folderSearchTerm && totalGroupPages > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
-          <Pagination
-            count={totalGroupPages}
-            page={groupPage}
-            onChange={(_event, value) => onPageChange?.(value)}
-            color="primary"
-            shape="rounded"
-          />
-        </Box>
-      )}
+      {/* Pagination Footer */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          pt: 4,
+          pb: 2,
+          flexWrap: 'wrap',
+          gap: 2,
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{ color: 'text.secondary', fontSize: '13px' }}
+        >
+          {folderSearchTerm
+            ? `Mostrando ${groups.length} resultados para "${folderSearchTerm}"`
+            : `Mostrando ${groups.length} de ${groups.length} proyectos`}
+        </Typography>
+
+        <Pagination
+          count={Math.max(totalGroupPages, 1)}
+          page={groupPage}
+          onChange={(_event, value) => onPageChange?.(value)}
+          shape="rounded"
+          sx={{
+            '& .MuiPaginationItem-root': {
+              borderRadius: '6px',
+              fontSize: '13px',
+              minWidth: '32px',
+              height: '32px',
+              fontWeight: 500,
+              color: 'text.secondary',
+              '&.Mui-selected': {
+                bgcolor: '#008767 !important',
+                color: '#ffffff',
+                fontWeight: 700,
+              },
+              '&:hover': {
+                bgcolor: 'action.hover',
+              },
+            },
+          }}
+        />
+      </Box>
 
       {/* Modals */}
       <CreateFolderModal

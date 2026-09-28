@@ -479,10 +479,10 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   height: 22,
                   fontSize: '11px',
                   fontWeight: 600,
-                  bgcolor: isDark ? alpha('#3b82f6', 0.15) : '#eff6ff',
-                  color: '#3b82f6',
+                  bgcolor: isDark ? alpha('#008767', 0.15) : '#ecfdf5',
+                  color: '#008767',
                   borderRadius: '6px',
-                  border: `1px solid ${alpha('#3b82f6', 0.3)}`,
+                  border: `1px solid ${alpha('#008767', 0.3)}`,
                 }}
               />
             )}
@@ -814,8 +814,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       height: 22,
                       fontSize: '11px',
                       fontWeight: 600,
-                      bgcolor: isDark ? alpha('#6366f1', 0.18) : '#eff6ff',
-                      color: isDark ? '#a5b4fc' : '#2563eb',
+                      bgcolor: isDark ? alpha('#008767', 0.18) : '#ecfdf5',
+                      color: isDark ? '#10B981' : '#008767',
                       borderRadius: '5px',
                       '& .MuiChip-deleteIcon': {
                         fontSize: 13,
@@ -848,7 +848,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         fontSize: '11px',
                         padding: '0 8px',
                         borderRadius: '4px',
-                        border: `1px solid ${isDark ? '#4f46e5' : '#6366f1'}`,
+                        border: `1px solid ${isDark ? '#007357' : '#008767'}`,
                         background: isDark ? '#18181b' : '#ffffff',
                         color: headerText,
                         outline: 'none',
@@ -900,7 +900,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               }}
             >
               <Stack direction="row" alignItems="center" spacing={1}>
-                <ClockIcon sx={{ fontSize: 14, color: '#3b82f6' }} />
+                <ClockIcon sx={{ fontSize: 14, color: '#008767' }} />
                 <Typography
                   sx={{
                     fontSize: '11px',
@@ -981,10 +981,10 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   p: 1.2,
                   borderRadius: '8px',
                   bgcolor: isDark ? '#232328' : '#ffffff',
-                  border: `1px solid ${durationMenuAnchor ? '#3b82f6' : alpha(cardBorder, 0.8)}`,
+                  border: `1px solid ${durationMenuAnchor ? '#008767' : alpha(cardBorder, 0.8)}`,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
-                  '&:hover': { borderColor: '#3b82f6' },
+                  '&:hover': { borderColor: '#008767' },
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={1.5}>
@@ -1065,7 +1065,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               }}
             >
               <Stack direction="row" alignItems="center" spacing={1}>
-                <DocIcon sx={{ fontSize: 15, color: '#6366f1' }} />
+                <DocIcon sx={{ fontSize: 15, color: '#008767' }} />
                 <Typography
                   sx={{
                     fontSize: '11px',
@@ -1090,13 +1090,13 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     fontSize: '11px',
                     fontWeight: 600,
                     textTransform: 'none',
-                    color: '#6366f1',
+                    color: '#008767',
                     p: '2px 8px',
                     minWidth: 0,
                     borderRadius: '6px',
-                    bgcolor: alpha('#6366f1', 0.08),
+                    bgcolor: alpha('#008767', 0.08),
                     '&:hover': {
-                      bgcolor: alpha('#6366f1', 0.16),
+                      bgcolor: alpha('#008767', 0.16),
                     },
                   }}
                 >
@@ -1113,13 +1113,13 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     fontSize: '11px',
                     fontWeight: 600,
                     textTransform: 'none',
-                    color: '#3b82f6',
+                    color: '#008767',
                     p: '2px 8px',
                     minWidth: 0,
                     borderRadius: '6px',
-                    bgcolor: alpha('#3b82f6', 0.08),
+                    bgcolor: alpha('#008767', 0.08),
                     '&:hover': {
-                      bgcolor: alpha('#3b82f6', 0.16),
+                      bgcolor: alpha('#008767', 0.16),
                     },
                   }}
                 >
@@ -1141,14 +1141,14 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   p: 1.5,
                   borderRadius: '8px',
                   bgcolor: isDark ? '#232328' : '#ffffff',
-                  border: `1px solid ${alpha('#6366f1', 0.35)}`,
+                  border: `1px solid ${alpha('#008767', 0.35)}`,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                   '&:hover': {
-                    borderColor: '#6366f1',
+                    borderColor: '#008767',
                     boxShadow: isDark
-                      ? '0 4px 14px rgba(99, 102, 241, 0.2)'
-                      : '0 4px 14px rgba(99, 102, 241, 0.12)',
+                      ? '0 4px 14px rgba(0, 135, 103, 0.2)'
+                      : '0 4px 14px rgba(0, 135, 103, 0.12)',
                   },
                 }}
               >
@@ -1163,12 +1163,12 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       width: 34,
                       height: 34,
                       borderRadius: '8px',
-                      bgcolor: isDark ? alpha('#6366f1', 0.18) : '#e0e7ff',
+                      bgcolor: isDark ? alpha('#008767', 0.18) : '#ecfdf5',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '17px',
-                      color: '#4f46e5',
+                      color: '#008767',
                       flexShrink: 0,
                     }}
                   >
@@ -1211,18 +1211,18 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         borderRadius: '6px',
                         cursor: 'pointer',
                         bgcolor: isDark
-                          ? alpha('#6366f1', 0.12)
-                          : alpha('#6366f1', 0.08),
-                        border: `1px solid ${isDark ? alpha('#6366f1', 0.25) : alpha('#6366f1', 0.18)}`,
-                        color: isDark ? '#818cf8' : '#4f46e5',
+                          ? alpha('#008767', 0.14)
+                          : alpha('#008767', 0.08),
+                        border: `1px solid ${isDark ? alpha('#008767', 0.28) : alpha('#008767', 0.2)}`,
+                        color: isDark ? '#10B981' : '#008767',
                         transition: 'all 0.15s ease',
                         '&:hover': {
                           bgcolor: isDark
-                            ? alpha('#6366f1', 0.22)
-                            : alpha('#6366f1', 0.14),
+                            ? alpha('#008767', 0.24)
+                            : alpha('#008767', 0.15),
                           borderColor: isDark
-                            ? alpha('#6366f1', 0.45)
-                            : alpha('#6366f1', 0.35),
+                            ? alpha('#008767', 0.5)
+                            : alpha('#008767', 0.4),
                         },
                       }}
                     >
@@ -1315,10 +1315,10 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                   '&:hover': {
-                    borderColor: '#3b82f6',
+                    borderColor: '#008767',
                     bgcolor: isDark
-                      ? alpha('#3b82f6', 0.05)
-                      : alpha('#3b82f6', 0.03),
+                      ? alpha('#008767', 0.08)
+                      : alpha('#008767', 0.04),
                   },
                 }}
               >
@@ -1377,14 +1377,14 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       fontSize: '11px',
                       fontWeight: 600,
                       textTransform: 'none',
-                      borderColor: alpha('#6366f1', 0.35),
-                      color: '#6366f1',
+                      borderColor: alpha('#008767', 0.35),
+                      color: '#008767',
                       p: '2px 8px',
                       borderRadius: '6px',
                       minWidth: 0,
                       '&:hover': {
-                        borderColor: '#6366f1',
-                        bgcolor: alpha('#6366f1', 0.08),
+                        borderColor: '#008767',
+                        bgcolor: alpha('#008767', 0.08),
                       },
                     }}
                   >
@@ -1401,7 +1401,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       fontSize: '11px',
                       textTransform: 'none',
                       borderColor: cardBorder,
-                      color: '#3b82f6',
+                      color: '#008767',
                       p: '2px 8px',
                       borderRadius: '6px',
                       minWidth: 0,
@@ -1480,14 +1480,14 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     justifyContent: 'flex-start',
                     p: '6px 10px',
                     borderRadius: '8px',
-                    color: '#6366f1',
+                    color: '#008767',
                     bgcolor: isDark
-                      ? alpha('#6366f1', 0.12)
-                      : alpha('#6366f1', 0.06),
+                      ? alpha('#008767', 0.12)
+                      : alpha('#008767', 0.06),
                     '&:hover': {
                       bgcolor: isDark
-                        ? alpha('#6366f1', 0.2)
-                        : alpha('#6366f1', 0.12),
+                        ? alpha('#008767', 0.2)
+                        : alpha('#008767', 0.12),
                     },
                   }}
                 >
@@ -1512,13 +1512,13 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       px: 1.25,
                       mb: 0.5,
                       bgcolor: isDark
-                        ? alpha('#6366f1', 0.12)
-                        : alpha('#6366f1', 0.08),
-                      border: `1px dashed ${alpha('#6366f1', 0.35)}`,
+                        ? alpha('#008767', 0.12)
+                        : alpha('#008767', 0.08),
+                      border: `1px dashed ${alpha('#008767', 0.35)}`,
                       '&:hover': {
                         bgcolor: isDark
-                          ? alpha('#6366f1', 0.2)
-                          : alpha('#6366f1', 0.14),
+                          ? alpha('#008767', 0.2)
+                          : alpha('#008767', 0.14),
                       },
                     }}
                   >
@@ -1533,11 +1533,11 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                           width: 26,
                           height: 26,
                           borderRadius: '6px',
-                          bgcolor: alpha('#6366f1', 0.15),
+                          bgcolor: alpha('#008767', 0.15),
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#6366f1',
+                          color: '#008767',
                           flexShrink: 0,
                         }}
                       >
@@ -1549,7 +1549,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                           sx={{
                             fontSize: '12.5px',
                             fontWeight: 650,
-                            color: '#6366f1',
+                            color: '#008767',
                           }}
                         >
                           Crear &quot;{workspaceSearch.trim()}&quot;
@@ -1592,11 +1592,11 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       fontWeight: 600,
                       textTransform: 'none',
                       borderRadius: '8px',
-                      borderColor: alpha('#6366f1', 0.4),
-                      color: '#6366f1',
+                      borderColor: alpha('#008767', 0.4),
+                      color: '#008767',
                       '&:hover': {
-                        borderColor: '#6366f1',
-                        bgcolor: alpha('#6366f1', 0.08),
+                        borderColor: '#008767',
+                        bgcolor: alpha('#008767', 0.08),
                       },
                     }}
                   >
@@ -1631,8 +1631,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         mb: 0.5,
                         bgcolor: isSelected
                           ? isDark
-                            ? 'rgba(99, 102, 241, 0.18)'
-                            : 'rgba(99, 102, 241, 0.08)'
+                            ? 'rgba(0, 135, 103, 0.18)'
+                            : 'rgba(0, 135, 103, 0.08)'
                           : 'transparent',
                       }}
                     >
@@ -1665,7 +1665,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                             sx={{
                               fontSize: '12.5px',
                               fontWeight: isSelected ? 700 : 500,
-                              color: isSelected ? '#6366f1' : headerText,
+                              color: isSelected ? '#008767' : headerText,
                             }}
                           >
                             {ws.title || UNTITLED_WORKSPACE_TITLE}
@@ -1681,7 +1681,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         </Box>
                       </Stack>
                       {isSelected && (
-                        <CheckIcon sx={{ fontSize: 16, color: '#6366f1' }} />
+                        <CheckIcon sx={{ fontSize: 16, color: '#008767' }} />
                       )}
                     </MenuItem>
                   );
@@ -1836,12 +1836,12 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       onClick={() => toggleSubtask(task.id)}
                       sx={{
                         p: 0,
-                        color: task.completed ? '#2563eb' : secondaryText,
+                        color: task.completed ? '#008767' : secondaryText,
                       }}
                     >
                       {task.completed ? (
                         <CheckCircleIcon
-                          sx={{ fontSize: 18, color: '#2563eb' }}
+                          sx={{ fontSize: 18, color: '#008767' }}
                         />
                       ) : (
                         <UncheckedIcon sx={{ fontSize: 18 }} />
@@ -2048,7 +2048,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   sx={{
                     p: 0.5,
                     color: secondaryText,
-                    '&.Mui-checked': { color: '#2563eb' },
+                    '&.Mui-checked': { color: '#008767' },
                   }}
                 />
                 <Typography
@@ -2085,7 +2085,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               disabled={isSubmitting || !title.trim()}
               onClick={handleCreateTask}
               sx={{
-                bgcolor: '#2563eb',
+                bgcolor: '#008767',
                 color: '#ffffff',
                 borderRadius: '8px',
                 textTransform: 'none',
@@ -2093,13 +2093,13 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 fontWeight: 600,
                 px: 2.2,
                 py: 0.8,
-                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                boxShadow: '0 4px 12px rgba(0, 135, 103, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
                 '&:hover': {
-                  bgcolor: '#1d4ed8',
-                  boxShadow: '0 6px 16px rgba(37, 99, 235, 0.35)',
+                  bgcolor: '#007357',
+                  boxShadow: '0 6px 16px rgba(0, 135, 103, 0.35)',
                 },
                 '&.Mui-disabled': {
                   bgcolor: isDark
@@ -2174,8 +2174,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 width: 32,
                 height: 32,
                 borderRadius: '8px',
-                bgcolor: alpha('#6366f1', 0.12),
-                color: '#6366f1',
+                bgcolor: alpha('#008767', 0.12),
+                color: '#008767',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -2280,8 +2280,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               border: `1px solid ${cardBorder}`,
               transition: 'all 0.15s ease',
               '&:focus-within': {
-                borderColor: '#6366f1',
-                boxShadow: `0 0 0 3px ${alpha('#6366f1', 0.15)}`,
+                borderColor: '#008767',
+                boxShadow: `0 0 0 3px ${alpha('#008767', 0.15)}`,
               },
             }}
           />
@@ -2315,8 +2315,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               fontWeight: 600,
               px: 2,
               borderRadius: '8px',
-              bgcolor: '#6366f1',
-              '&:hover': { bgcolor: '#4f46e5' },
+              bgcolor: '#008767',
+              '&:hover': { bgcolor: '#007357' },
             }}
           >
             {isCreatingWorkspace ? (

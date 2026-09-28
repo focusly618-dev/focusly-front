@@ -296,18 +296,18 @@ export const AllProjectsModal = ({
                       borderRadius: '12px',
                       bgcolor:
                         selectedId === project.id
-                          ? 'rgba(0, 245, 255, 0.1)'
+                          ? 'rgba(0, 135, 103, 0.1)'
                           : 'transparent',
-                      border: `1px solid ${selectedId === project.id ? '#00f5ff' : 'transparent'}`,
+                      border: `1px solid ${selectedId === project.id ? '#008767' : 'transparent'}`,
                     }}
                   >
                     <Typography
                       variant="caption"
-                      fontWeight={800}
+                      fontWeight={700}
                       sx={{
                         color:
                           selectedId === project.id
-                            ? '#00f5ff'
+                            ? '#008767'
                             : 'text.secondary',
                         fontSize: '10px',
                         textTransform: 'uppercase',
@@ -337,14 +337,9 @@ export const AllProjectsModal = ({
               startIcon={<DeleteIcon />}
               onClick={handleDeleteClick}
               sx={{
-                fontWeight: 800,
-                borderRadius: '12px',
+                fontWeight: 700,
+                borderRadius: '8px',
                 px: 2.5,
-                boxShadow: '0 0 15px rgba(244, 67, 54, 0.3)',
-                '&:hover': {
-                  bgcolor: 'error.dark',
-                  boxShadow: '0 0 25px rgba(244, 67, 54, 0.5)',
-                },
               }}
             >
               {t('allProjectsModal.deleteSelected', {
@@ -367,15 +362,14 @@ export const AllProjectsModal = ({
               variant="contained"
               onClick={onClose}
               sx={{
-                bgcolor: '#00f5ff',
-                color: '#000',
-                fontWeight: 800,
-                borderRadius: '12px',
+                bgcolor: '#008767',
+                color: '#fff',
+                fontWeight: 700,
+                borderRadius: '8px',
                 px: 3,
-                boxShadow: '0 0 20px rgba(0, 245, 255, 0.4)',
+                boxShadow: 'none',
                 '&:hover': {
-                  bgcolor: '#00e1eb',
-                  boxShadow: '0 0 30px rgba(0, 245, 255, 0.6)',
+                  bgcolor: '#007357',
                 },
               }}
             >

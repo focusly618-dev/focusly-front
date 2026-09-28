@@ -23,15 +23,15 @@ export const darkInputSx = {
     },
     '&.Mui-focused fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#6366f1' : '#4f46e5',
+        theme.palette.mode === 'dark' ? '#10b981' : '#008767',
     },
     '&.Mui-focused': {
       backgroundColor: (theme: Theme) =>
         surfaceColor(theme, '#121318', '#1F1F20', '#f8fafc'),
       boxShadow: (theme: Theme) =>
         theme.palette.mode === 'dark'
-          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : '0 0 0 3px rgba(79, 70, 229, 0.08)',
+          ? '0 0 0 3px rgba(16, 185, 129, 0.15)'
+          : '0 0 0 3px rgba(0, 135, 103, 0.1)',
     },
     '& input': {
       padding: '10px 14px',
@@ -79,13 +79,13 @@ export const darkInputSxTimers = {
     },
     '&.Mui-focused fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#6366f1' : '#4f46e5',
+        theme.palette.mode === 'dark' ? '#10b981' : '#008767',
     },
     '&.Mui-focused': {
       boxShadow: (theme: Theme) =>
         theme.palette.mode === 'dark'
-          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : '0 0 0 3px rgba(79, 70, 229, 0.08)',
+          ? '0 0 0 3px rgba(16, 185, 129, 0.15)'
+          : '0 0 0 3px rgba(0, 135, 103, 0.1)',
     },
     '& input': {
       padding: '5px 5px',
@@ -348,17 +348,17 @@ export const cancelButtonSx = {
 };
 
 export const saveButtonSx = {
-  bgcolor: '#2563eb',
+  bgcolor: '#008767',
   color: '#fff',
   textTransform: 'none' as const,
-  borderRadius: '10px',
+  borderRadius: '8px',
   fontWeight: 700,
   px: 3,
   height: '36px',
   boxShadow: 'none',
   transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    bgcolor: '#1d4ed8',
+    bgcolor: '#007357',
     boxShadow: 'none',
   },
   '&.Mui-disabled': {
@@ -386,13 +386,13 @@ export const descriptionInputSx = {
     },
     '&.Mui-focused fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+        theme.palette.mode === 'dark' ? '#10b981' : 'primary.main',
     },
     '&.Mui-focused': {
       boxShadow: (theme: Theme) =>
         theme.palette.mode === 'dark'
-          ? '0 0 0 3px rgba(99, 102, 241, 0.15)'
-          : 'none',
+          ? '0 0 0 3px rgba(16, 185, 129, 0.15)'
+          : '0 0 0 3px rgba(0, 135, 103, 0.1)',
     },
   },
   '& .MuiInputBase-root': {
@@ -477,7 +477,7 @@ export const timeSlotBoxSx = {
         ? 'rgba(255, 255, 255, 0.04)'
         : 'action.hover',
     borderColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+      theme.palette.mode === 'dark' ? '#10b981' : 'primary.main',
   },
 };
 
@@ -632,7 +632,7 @@ export const categorySelectSx = {
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#6366f1' : 'primary.main',
+      theme.palette.mode === 'dark' ? '#10b981' : 'primary.main',
   },
 };
 

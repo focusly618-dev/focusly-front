@@ -21,11 +21,11 @@ export const subtaskCountBadgeSx = (allCompleted: boolean) => ({
     ? 'rgba(16, 185, 129, 0.15)'
     : (theme: Theme) =>
         theme.palette.mode === 'dark'
-          ? 'rgba(99, 102, 241, 0.18)'
-          : 'rgba(59, 130, 246, 0.12)',
+          ? 'rgba(0, 135, 103, 0.18)'
+          : 'rgba(0, 135, 103, 0.1)',
   color: allCompleted
     ? '#10b981'
-    : (theme: Theme) => (theme.palette.mode === 'dark' ? '#818cf8' : '#2563eb'),
+    : (theme: Theme) => (theme.palette.mode === 'dark' ? '#10b981' : '#008767'),
   fontSize: '11px',
   fontWeight: 700,
   display: 'inline-flex',
@@ -34,7 +34,7 @@ export const subtaskCountBadgeSx = (allCompleted: boolean) => ({
   border: '1px solid',
   borderColor: allCompleted
     ? 'rgba(16, 185, 129, 0.3)'
-    : 'rgba(99, 102, 241, 0.25)',
+    : 'rgba(0, 135, 103, 0.25)',
   transition: 'all 0.2s ease',
 });
 
@@ -110,8 +110,8 @@ export const subtaskInputFormSx = {
     borderColor: 'primary.main',
     bgcolor: (theme: Theme) =>
       theme.palette.mode === 'dark'
-        ? 'rgba(99, 102, 241, 0.05)'
-        : 'rgba(59, 130, 246, 0.04)',
+        ? 'rgba(0, 135, 103, 0.08)'
+        : 'rgba(0, 135, 103, 0.04)',
   },
 };
 

@@ -53,7 +53,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
       <form
         onSubmit={handleSubmit}
         className={cn(
-          'relative flex flex-col w-full rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900/90 backdrop-blur-md shadow-lg transition-all focus-within:border-indigo-500/50 dark:focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/10 p-2.5',
+          'relative flex flex-col w-full rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900/90 backdrop-blur-md shadow-lg transition-all focus-within:border-[#008767]/50 dark:focus-within:border-[#008767]/50 focus-within:ring-2 focus-within:ring-[#008767]/15 p-2.5',
           className,
         )}
         data-slot="prompt-input"
@@ -272,7 +272,7 @@ export const PromptInputSubmit: React.FC<PromptInputSubmitProps> = ({
         type="button"
         disabled
         className={cn(
-          'inline-flex items-center justify-center size-8 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 shrink-0 cursor-wait',
+          'inline-flex items-center justify-center size-8 rounded-full bg-[#008767]/20 text-[#008767] dark:text-[#10B981] shrink-0 cursor-wait',
           className,
         )}
         title="Generando..."
@@ -288,7 +288,7 @@ export const PromptInputSubmit: React.FC<PromptInputSubmitProps> = ({
       type="submit"
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center size-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shadow-sm shrink-0',
+        'inline-flex items-center justify-center size-8 rounded-full bg-[#008767] hover:bg-[#007357] text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shadow-sm shrink-0',
         className,
       )}
       title="Enviar mensaje"

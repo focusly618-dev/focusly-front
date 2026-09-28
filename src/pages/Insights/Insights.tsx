@@ -81,7 +81,7 @@ export const Insights = () => {
           position: 'fixed',
           bottom: 32,
           right: 32,
-          boxShadow: '0 4px 14px rgba(79, 70, 229, 0.35)',
+          boxShadow: '0 4px 14px rgba(0, 135, 103, 0.35)',
           bgcolor: 'primary.main',
           color: '#ffffff',
           '&:hover': {

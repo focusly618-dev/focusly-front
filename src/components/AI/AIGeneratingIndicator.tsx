@@ -17,10 +17,10 @@ const floatIn = keyframes`
 
 const pulseGlow = keyframes`
   0%, 100% {
-    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.25), 0 0 0 1px rgba(139, 92, 246, 0.35);
+    box-shadow: 0 8px 24px rgba(0, 135, 103, 0.25), 0 0 0 1px rgba(0, 135, 103, 0.35);
   }
   50% {
-    box-shadow: 0 12px 32px rgba(139, 92, 246, 0.45), 0 0 0 2px rgba(168, 85, 247, 0.6);
+    box-shadow: 0 12px 32px rgba(0, 135, 103, 0.4), 0 0 0 2px rgba(5, 150, 105, 0.5);
   }
 `;
 
@@ -77,8 +77,8 @@ export const AIGeneratingIndicator: React.FC<AIGeneratingIndicatorProps> = ({
         border: '1px solid',
         borderColor: (theme) =>
           theme.palette.mode === 'dark'
-            ? 'rgba(139, 92, 246, 0.4)'
-            : 'rgba(139, 92, 246, 0.3)',
+            ? 'rgba(0, 135, 103, 0.4)'
+            : 'rgba(0, 135, 103, 0.3)',
         color: (theme) => theme.palette.text.primary,
         cursor: 'pointer',
         animation: `${floatIn} 0.3s cubic-bezier(0.16, 1, 0.3, 1), ${pulseGlow} 2.5s infinite ease-in-out`,
@@ -92,7 +92,7 @@ export const AIGeneratingIndicator: React.FC<AIGeneratingIndicatorProps> = ({
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <LuminaAnimatedFace size={20} primaryColor="#8b5cf6" />
+        <LuminaAnimatedFace size={20} primaryColor="#008767" />
       </Box>
 
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -101,7 +101,7 @@ export const AIGeneratingIndicator: React.FC<AIGeneratingIndicatorProps> = ({
             fontSize: '12px',
             fontWeight: 600,
             lineHeight: 1.2,
-            background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)',
+            background: 'linear-gradient(135deg, #059669 0%, #008767 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}

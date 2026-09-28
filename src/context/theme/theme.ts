@@ -28,14 +28,20 @@ export const getDesignTokens = (mode: ThemeMode) => {
     palette: {
       mode: mode === 'light' ? 'light' : 'dark',
       primary: {
-        main: isDark ? '#60A5FA' : '#3B82F6', // Accent
-        light: isDark ? '#93C5FD' : '#60A5FA',
-        dark: isDark ? '#2563EB' : '#1D4ED8',
+        main: isDark ? '#10B981' : '#008767', // Focusly Emerald Brand
+        light: isDark ? '#34D399' : '#059669',
+        dark: isDark ? '#059669' : '#007357',
+        contrastText: '#ffffff',
+      },
+      secondary: {
+        main: isDark ? '#34D399' : '#059669',
+        light: isDark ? '#6EE7B7' : '#10B981',
+        dark: isDark ? '#059669' : '#007357',
         contrastText: '#ffffff',
       },
       success: {
-        main: '#16A34A',
-        light: 'rgba(22, 163, 74, 0.12)',
+        main: '#10B981',
+        light: 'rgba(16, 185, 129, 0.12)',
       },
       error: {
         main: '#EF4444',
@@ -110,16 +116,42 @@ export const getDesignTokens = (mode: ThemeMode) => {
           },
           containedPrimary: {
             boxShadow: 'none',
-            background: isDark ? '#60A5FA' : '#3B82F6',
-            color: isDark ? surfaceDefault : '#ffffff',
+            background: isDark ? '#10B981' : '#008767',
+            color: '#ffffff',
             border: 'none',
             '&:hover': {
               boxShadow: isDark
-                ? '0 4px 20px rgba(96, 165, 250, 0.25)'
-                : '0 4px 20px rgba(59, 130, 246, 0.25)',
+                ? '0 4px 20px rgba(16, 185, 129, 0.25)'
+                : '0 4px 20px rgba(0, 135, 103, 0.25)',
               transform: 'translateY(-1px)',
-              backgroundColor: isDark ? '#93C5FD' : '#2563EB',
+              backgroundColor: isDark ? '#34D399' : '#007357',
             },
+          },
+        },
+      },
+      MuiCheckbox: {
+        styleOverrides: {
+          root: {
+            color: isDark ? 'rgba(255, 255, 255, 0.3)' : '#D1D5DB',
+            '&.Mui-checked': {
+              color: isDark ? '#10B981' : '#008767',
+            },
+          },
+        },
+      },
+      MuiRadio: {
+        styleOverrides: {
+          root: {
+            '&.Mui-checked': {
+              color: isDark ? '#10B981' : '#008767',
+            },
+          },
+        },
+      },
+      MuiTabs: {
+        styleOverrides: {
+          indicator: {
+            backgroundColor: isDark ? '#10B981' : '#008767',
           },
         },
       },
@@ -163,17 +195,17 @@ export const getDesignTokens = (mode: ThemeMode) => {
               borderColor: isDark ? surfaceDivider : '#E5E5E5',
             },
             '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: isDark ? '#60A5FA' : '#3B82F6',
+              borderColor: isDark ? '#10B981' : '#008767',
             },
             '&.Mui-focused': {
               backgroundColor: isDark ? surfaceDefault : undefined,
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? '#60A5FA' : '#3B82F6',
-                borderWidth: '1px',
+                borderColor: isDark ? '#10B981' : '#008767',
+                borderWidth: '1.5px',
               },
               boxShadow: isDark
-                ? '0 0 0 3px rgba(96, 165, 250, 0.15)'
-                : '0 0 0 3px rgba(59, 130, 246, 0.15)',
+                ? '0 0 0 3px rgba(16, 185, 129, 0.15)'
+                : '0 0 0 3px rgba(0, 135, 103, 0.12)',
             },
           },
         },
@@ -203,12 +235,14 @@ export const getDesignTokens = (mode: ThemeMode) => {
               backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : undefined,
             },
             '&.Mui-selected': {
-              backgroundColor: isDark ? 'rgba(96, 165, 250, 0.15)' : undefined,
-              color: isDark ? '#60A5FA' : undefined,
+              backgroundColor: isDark
+                ? 'rgba(16, 185, 129, 0.15)'
+                : 'rgba(0, 135, 103, 0.08)',
+              color: isDark ? '#34D399' : '#008767',
               '&:hover': {
                 backgroundColor: isDark
-                  ? 'rgba(96, 165, 250, 0.25)'
-                  : undefined,
+                  ? 'rgba(16, 185, 129, 0.25)'
+                  : 'rgba(0, 135, 103, 0.14)',
               },
             },
           },

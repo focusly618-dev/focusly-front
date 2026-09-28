@@ -84,7 +84,29 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
   const addFiles = (files: FileList | File[]) => {
     const incoming = Array.from(files);
     if (incoming.length === 0) return;
-    setStagedFiles((prev) => [...prev, ...incoming]);
+
+    const MAX_FILE_SIZE = 3 * 1024 * 1024;
+    const valid: File[] = [];
+
+    for (const f of incoming) {
+      if (f.size > MAX_FILE_SIZE) {
+        const isPdf = f.name.toLowerCase().endsWith('.pdf');
+        const sizeMB = (f.size / (1024 * 1024)).toFixed(1);
+        sileo.error({
+          title: 'Archivo demasiado pesado',
+          description: isPdf
+            ? `El límite de tamaño en PDF es de 3MB. "${f.name}" (${sizeMB}MB) supera el límite.`
+            : `El límite de tamaño para documentos es de 3MB. "${f.name}" (${sizeMB}MB) supera el límite.`,
+          fill: 'var(--sileo-error-bg)',
+          duration: 4000,
+        });
+      } else {
+        valid.push(f);
+      }
+    }
+
+    if (valid.length === 0) return;
+    setStagedFiles((prev) => [...prev, ...valid]);
   };
 
   const handleRemoveFile = (index: number) => {
@@ -188,7 +210,11 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
 
   const modalActions = (
     <>
-      <Button onClick={handleClose} variant="text" sx={{ color: 'text.secondary' }}>
+      <Button
+        onClick={handleClose}
+        variant="text"
+        sx={{ color: 'text.secondary' }}
+      >
         Cancel
       </Button>
       <Button

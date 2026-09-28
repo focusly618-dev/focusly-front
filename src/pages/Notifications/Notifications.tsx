@@ -350,14 +350,14 @@ export const Notifications = () => {
                           ? 'rgba(239, 68, 68, 0.1)'
                           : notification.type === 'success'
                             ? 'rgba(34, 197, 94, 0.1)'
-                            : 'rgba(99, 102, 241, 0.1)',
+                            : 'rgba(0, 135, 103, 0.1)',
                       color: notification.read
                         ? 'text.disabled'
                         : notification.type === 'warning'
                           ? '#EF4444'
                           : notification.type === 'success'
                             ? '#22C55E'
-                            : '#6366F1',
+                            : '#008767',
                       flexShrink: 0,
                     }}
                   >

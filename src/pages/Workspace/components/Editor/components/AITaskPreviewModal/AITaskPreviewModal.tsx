@@ -376,12 +376,11 @@ const AITaskPreviewContent: React.FC<AITaskPreviewContentProps> = ({
             textTransform: 'none',
             fontWeight: 700,
             px: 3,
-            py: 1,
-            background: 'linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%)',
-            boxShadow: '0 4px 14px rgba(124, 58, 237, 0.35)',
+            bgcolor: '#008767',
+            boxShadow: '0 4px 14px rgba(0, 135, 103, 0.25)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #6d28d9 0%, #2563eb 100%)',
-              boxShadow: '0 6px 20px rgba(124, 58, 237, 0.45)',
+              bgcolor: '#007357',
+              boxShadow: '0 6px 20px rgba(0, 135, 103, 0.35)',
             },
           }}
         >

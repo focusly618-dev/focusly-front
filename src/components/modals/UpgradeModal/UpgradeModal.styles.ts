@@ -26,8 +26,8 @@ export const planCardSx = (
   bgcolor: (theme: Theme) =>
     variant === 'featured'
       ? theme.palette.mode === 'dark'
-        ? 'rgba(99, 102, 241, 0.04)'
-        : 'rgba(99, 102, 241, 0.01)'
+        ? 'rgba(0, 135, 103, 0.05)'
+        : 'rgba(0, 135, 103, 0.03)'
       : theme.palette.mode === 'dark'
         ? 'rgba(255,255,255,0.01)'
         : 'rgba(0,0,0,0.005)',
@@ -35,7 +35,7 @@ export const planCardSx = (
   flexDirection: 'column',
   justifyContent: 'space-between',
   ...(variant === 'featured'
-    ? { boxShadow: '0 4px 16px rgba(99, 102, 241, 0.08)' }
+    ? { boxShadow: '0 4px 16px rgba(0, 135, 103, 0.12)' }
     : {}),
 });
 
@@ -150,7 +150,7 @@ export const ctaButtonSx = (
         fontSize: '11px',
         '&:hover': {
           borderColor: 'primary.dark',
-          bgcolor: 'rgba(99, 102, 241, 0.04)',
+          bgcolor: 'rgba(0, 135, 103, 0.06)',
         },
       };
     case 'free':

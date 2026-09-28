@@ -16,7 +16,7 @@ export const TasksHeader = ({ title, eyebrow, children }: TasksHeaderProps) => {
         <Typography
           variant="caption"
           sx={{
-            color: '#4f46e5', // Primary indigo color matching screenshot
+            color: '#008767', // Primary emerald brand color
             fontWeight: 700,
             fontSize: '11px',
             letterSpacing: '0.08em',

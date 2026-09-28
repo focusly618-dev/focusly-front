@@ -17,7 +17,7 @@ export const LuminaSpeakingWave: React.FC<LuminaSpeakingWaveProps> = ({
     <div
       className={cn(
         'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full select-none transition-all',
-        'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/25',
+        'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25',
         className,
       )}
     >
@@ -42,31 +42,31 @@ export const LuminaSpeakingWave: React.FC<LuminaSpeakingWaveProps> = ({
         )}
       >
         <span
-          className={`sound-bar-${cleanId} w-[2px] h-2.5 bg-gradient-to-t from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400 rounded-full`}
+          className={`sound-bar-${cleanId} w-[2px] h-2.5 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
           style={{
             animation: `soundWaveBar-${cleanId} 0.8s ease-in-out infinite`,
           }}
         />
         <span
-          className={`sound-bar-${cleanId} w-[2px] h-3.5 bg-gradient-to-t from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400 rounded-full`}
+          className={`sound-bar-${cleanId} w-[2px] h-3.5 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
           style={{
             animation: `soundWaveBar-${cleanId} 1.1s ease-in-out infinite 0.15s`,
           }}
         />
         <span
-          className={`sound-bar-${cleanId} w-[2px] h-4 bg-gradient-to-t from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400 rounded-full`}
+          className={`sound-bar-${cleanId} w-[2px] h-4 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
           style={{
             animation: `soundWaveBar-${cleanId} 0.9s ease-in-out infinite 0.3s`,
           }}
         />
         <span
-          className={`sound-bar-${cleanId} w-[2px] h-3 bg-gradient-to-t from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400 rounded-full`}
+          className={`sound-bar-${cleanId} w-[2px] h-3 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
           style={{
             animation: `soundWaveBar-${cleanId} 1.25s ease-in-out infinite 0.1s`,
           }}
         />
         <span
-          className={`sound-bar-${cleanId} w-[2px] h-2 bg-gradient-to-t from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400 rounded-full`}
+          className={`sound-bar-${cleanId} w-[2px] h-2 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
           style={{
             animation: `soundWaveBar-${cleanId} 0.75s ease-in-out infinite 0.25s`,
           }}

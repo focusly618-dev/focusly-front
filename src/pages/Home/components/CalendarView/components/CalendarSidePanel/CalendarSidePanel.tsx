@@ -49,20 +49,20 @@ const PanelContainer = styled(Box)(({ theme }) => ({
 
 const AddTaskButton = styled(Button)({
   width: '100%',
-  backgroundColor: '#3b82f6',
+  backgroundColor: '#008767',
   color: '#ffffff',
   textTransform: 'none',
   fontWeight: 600,
   fontSize: '12.5px',
   padding: '7px 12px',
   borderRadius: 8,
-  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)',
+  boxShadow: '0 2px 8px rgba(0, 135, 103, 0.25)',
   transition: 'all 0.2s ease-in-out',
   gap: 6,
   '&:hover': {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#007357',
     transform: 'translateY(-1px)',
-    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.35)',
+    boxShadow: '0 4px 12px rgba(0, 135, 103, 0.35)',
   },
 });
 
@@ -108,12 +108,12 @@ const ToggleButton = styled(Button)(({ theme }) => ({
     color: theme.palette.text.primary,
   },
   '&.active': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#3b82f6' : '#ffffff',
+    backgroundColor: theme.palette.mode === 'dark' ? '#10b981' : '#ffffff',
     color:
       theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.primary.main,
     boxShadow:
       theme.palette.mode === 'dark'
-        ? '0 2px 8px rgba(59, 130, 246, 0.4)'
+        ? '0 2px 8px rgba(16, 185, 129, 0.4)'
         : '0 1px 3px rgba(0, 0, 0, 0.06)',
   },
 }));

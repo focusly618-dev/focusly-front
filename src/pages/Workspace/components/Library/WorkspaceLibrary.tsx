@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography, Pagination, useTheme } from '@mui/material';
-import { PushPin as PushPinIcon } from '@mui/icons-material';
+import { PushPin as PushPinIcon, Add as AddIcon } from '@mui/icons-material';
 import {
   EmptyState,
   ModernFolderFilledIcon,
@@ -31,6 +31,10 @@ import {
   useWorkspaceCardMenu,
 } from '@/pages/Projects/hooks';
 import { ProjectFoldersGrid } from '@/pages/Projects/components/ProjectFolders';
+import {
+  DashedCard,
+  AddCircleIconWrapper,
+} from '@/pages/Projects/components/ProjectFolders/ProjectFoldersGrid/ProjectFoldersGrid.styles';
 import { ProjectDocCardMenu } from '@/pages/Projects/components/ProjectDocCardMenu';
 import {
   ProjectTasksByStatus,
@@ -38,6 +42,7 @@ import {
   type ProjectTaskItemData,
 } from '@/pages/Projects/components/ProjectTasks';
 import { CreateProjectTaskModal } from '@/pages/Projects/components/CreateProjectTaskModal';
+import { CreateFolderModal } from '@/pages/Projects/modals';
 import type { Subtask, ProjectTab } from '@/redux/tasks/task.types';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setProjectTab } from '@/redux/tasks/task.slice';
@@ -86,6 +91,7 @@ export const WorkspaceLibrary = ({
     (state) => state.task.projectTab || 'projects',
   );
   const [isAllFoldersModalOpen, setIsAllFoldersModalOpen] = useState(false);
+  const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
   const [selectedProjectTask, setSelectedProjectTask] =
     useState<ProjectTaskItemData | null>(null);
@@ -142,6 +148,23 @@ export const WorkspaceLibrary = ({
         mb={2}
         sx={{ userSelect: 'none' }}
       >
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            fontSize: '13px',
+            fontWeight: 500,
+          }}
+        >
+          {t('nav.workspace', 'Espacios')}
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.disabled"
+          sx={{ fontSize: '13px' }}
+        >
+          &gt;
+        </Typography>
         {isInsideFolder ? (
           <>
             <Typography
@@ -151,11 +174,11 @@ export const WorkspaceLibrary = ({
                 cursor: 'pointer',
                 fontSize: '13px',
                 fontWeight: 500,
-                '&:hover': { color: 'primary.main' },
+                '&:hover': { color: '#008767' },
               }}
               onClick={() => handleSelectFolder('')}
             >
-              {t('nav.projects')}
+              {t('nav.projects', 'Proyectos')}
             </Typography>
             <Typography
               variant="body2"
@@ -173,14 +196,14 @@ export const WorkspaceLibrary = ({
                 <ModernFolderOutlinedIcon
                   sx={{
                     fontSize: 16,
-                    color: activeGroup?.color || 'primary.main',
+                    color: activeGroup?.color || '#008767',
                   }}
                 />
               ) : (
                 <ModernFolderFilledIcon
                   sx={{
                     fontSize: 16,
-                    color: activeGroup?.color || 'primary.main',
+                    color: activeGroup?.color || '#008767',
                   }}
                 />
               )}
@@ -200,9 +223,9 @@ export const WorkspaceLibrary = ({
         ) : (
           <Typography
             variant="body2"
-            sx={{ fontWeight: 700, color: 'primary.main', fontSize: '13px' }}
+            sx={{ fontWeight: 700, color: '#008767', fontSize: '13px' }}
           >
-            {t('nav.projects')}
+            {t('nav.projects', 'Proyectos')}
           </Typography>
         )}
       </Box>
@@ -230,11 +253,11 @@ export const WorkspaceLibrary = ({
         onCreate={() =>
           onCreate(undefined, undefined, selectedGroupId ?? undefined)
         }
+        onCreateProject={() => setIsCreateFolderModalOpen(true)}
         onCreateTask={() => {
           setSelectedProjectTask(null);
           setIsCreateTaskModalOpen(true);
         }}
-        hasMultipleWorkspaces={notes.data.totalNotes > 1}
         projectTab={projectTab}
         onProjectTabChange={(tab: ProjectTab) => dispatch(setProjectTab(tab))}
       />
@@ -323,78 +346,119 @@ export const WorkspaceLibrary = ({
                 )}
 
               {/* Skeletons while loading */}
-              {notes.state.loading && !notes.data.notes.length
-                ? [1, 2, 3, 4, 5].map((i) => {
-                    if (viewMode === 'list') {
-                      return (
-                        <Box
-                          key={i}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 2,
-                            p: 2,
-                            borderRadius: '12px',
-                            border: `1px solid ${theme.palette.divider}`,
-                            mb: 1,
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: 12,
-                              height: 12,
-                              borderRadius: '50%',
-                              bgcolor: 'action.disabledBackground',
-                            }}
-                          />
-                          <Box
-                            sx={{
-                              height: 16,
-                              bgcolor: 'action.hover',
-                              borderRadius: 1,
-                              flex: 1,
-                            }}
-                          />
-                        </Box>
-                      );
-                    }
+              {notes.state.loading && !notes.data.notes.length ? (
+                [1, 2, 3, 4, 5].map((i) => {
+                  if (viewMode === 'list') {
                     return (
-                      <WorkspaceCard key={i} compact={viewMode === 'grid'}>
+                      <Box
+                        key={i}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 2,
+                          p: 2,
+                          borderRadius: '12px',
+                          border: `1px solid ${theme.palette.divider}`,
+                          mb: 1,
+                        }}
+                      >
                         <Box
                           sx={{
-                            width: '80%',
-                            height: 24,
-                            bgcolor: 'action.hover',
-                            mb: 1.5,
-                            borderRadius: 1,
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            bgcolor: 'action.disabledBackground',
                           }}
                         />
-                        {viewMode !== 'grid' && (
-                          <>
-                            <Box
-                              sx={{
-                                width: '100%',
-                                height: 16,
-                                bgcolor: 'action.hover',
-                                mb: 0.5,
-                                borderRadius: 1,
-                              }}
-                            />
-                            <Box
-                              sx={{
-                                width: '90%',
-                                height: 16,
-                                bgcolor: 'action.hover',
-                                mb: 0.5,
-                                borderRadius: 1,
-                              }}
-                            />
-                          </>
-                        )}
-                      </WorkspaceCard>
+                        <Box
+                          sx={{
+                            height: 16,
+                            bgcolor: 'action.hover',
+                            borderRadius: 1,
+                            flex: 1,
+                          }}
+                        />
+                      </Box>
                     );
-                  })
-                : notes.data.notes.map((workspace: WorkspaceTypes) => {
+                  }
+                  return (
+                    <WorkspaceCard key={i} compact={viewMode === 'grid'}>
+                      <Box
+                        sx={{
+                          width: '80%',
+                          height: 24,
+                          bgcolor: 'action.hover',
+                          mb: 1.5,
+                          borderRadius: 1,
+                        }}
+                      />
+                      {viewMode !== 'grid' && (
+                        <>
+                          <Box
+                            sx={{
+                              width: '100%',
+                              height: 16,
+                              bgcolor: 'action.hover',
+                              mb: 0.5,
+                              borderRadius: 1,
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              width: '90%',
+                              height: 16,
+                              bgcolor: 'action.hover',
+                              mb: 0.5,
+                              borderRadius: 1,
+                            }}
+                          />
+                        </>
+                      )}
+                    </WorkspaceCard>
+                  );
+                })
+              ) : (
+                <>
+                  {!notes.state.searchTerm && viewMode !== 'list' && (
+                    <DashedCard
+                      id="card-create-workspace"
+                      onClick={() =>
+                        onCreate(
+                          undefined,
+                          undefined,
+                          selectedGroupId ?? undefined,
+                        )
+                      }
+                      sx={{
+                        minHeight: viewMode === 'grid' ? '200px' : '235px',
+                      }}
+                    >
+                      <AddCircleIconWrapper>
+                        <AddIcon sx={{ fontSize: 22 }} />
+                      </AddCircleIconWrapper>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '15px',
+                          color: 'text.primary',
+                          mb: 0.5,
+                        }}
+                      >
+                        {t('workspaceLibrary.newWorkspace', 'Nuevo Workspace')}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: 'text.secondary', fontSize: '12px' }}
+                      >
+                        {t(
+                          'workspaceLibrary.emptyFolder.action',
+                          'Crear una nota o documento',
+                        )}
+                      </Typography>
+                    </DashedCard>
+                  )}
+                  {notes.data.notes.map((workspace: WorkspaceTypes) => {
                     const group = folders.data.allGroups.find(
                       (g: ProjectGroupTypes) => g.id === workspace.groupId,
                     );
@@ -426,6 +490,8 @@ export const WorkspaceLibrary = ({
                       />
                     );
                   })}
+                </>
+              )}
             </GridContainer>
           )}
 
@@ -476,6 +542,13 @@ export const WorkspaceLibrary = ({
           handleSelectFolder(groupId);
           setIsAllFoldersModalOpen(false);
         }}
+      />
+
+      {/* ── Create Folder Modal (from Header button) ── */}
+      <CreateFolderModal
+        open={isCreateFolderModalOpen}
+        onClose={() => setIsCreateFolderModalOpen(false)}
+        onCreateFolder={folders.actions.createFolder}
       />
 
       {/* ── Templates Modal ── */}

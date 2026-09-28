@@ -239,8 +239,9 @@ export const Tasks = ({
                       fontWeight: 700,
                       boxShadow: 'none',
                       height: 36,
-                      bgcolor: '#6366f1',
-                      '&:hover': { bgcolor: '#4f46e5', boxShadow: 'none' },
+                      bgcolor: '#008767',
+                      color: '#ffffff',
+                      '&:hover': { bgcolor: '#007357', boxShadow: 'none' },
                       fontSize: '0.8rem',
                       px: 2,
                     }}
@@ -249,24 +250,25 @@ export const Tasks = ({
                   </Button>
                 )}
                 <Button
+                  id="tasks-add-new-task-btn"
                   variant="contained"
                   onClick={() => setIsCreateTaskModalOpen(true)}
-                  startIcon={<AddIcon sx={{ color: '#2563eb' }} />}
+                  startIcon={
+                    <AddIcon sx={{ color: '#ffffff', fontSize: 18 }} />
+                  }
                   sx={{
-                    borderRadius: '10px',
+                    borderRadius: '8px',
                     textTransform: 'none',
                     fontWeight: 700,
                     boxShadow: 'none',
                     height: 36,
-                    border: '1px solid #2563eb',
-                    bgcolor: 'background.default',
-                    color: '#2563eb',
+                    bgcolor: '#008767',
+                    color: '#ffffff',
                     '&:hover': {
-                      bgcolor: 'rgba(37, 99, 235, 0.08)',
-                      borderColor: '#2563eb',
+                      bgcolor: '#007357',
                       boxShadow: 'none',
                     },
-                    fontSize: '0.8rem',
+                    fontSize: '13px',
                     px: 2,
                   }}
                 >

@@ -18,9 +18,10 @@ export const CreateProjectModal = ({
 }: CreateProjectModalProps) => {
   const { t } = useTranslation();
   const [name, setName] = useState('');
-  const [selectedColor, setSelectedColor] = useState('#3b82f6'); // Default blue
+  const [selectedColor, setSelectedColor] = useState('#008767'); // Default Focusly emerald
 
   const colors = [
+    { nameKey: 'colorNames.emerald', value: '#008767' },
     { nameKey: 'colorNames.black', value: '#18181b' },
     { nameKey: 'colorNames.slate', value: '#475569' },
     { nameKey: 'colorNames.zinc', value: '#a1a1aa' },

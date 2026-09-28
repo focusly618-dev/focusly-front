@@ -30,7 +30,7 @@ export const TaskStatus: React.FC<TaskStatusProps> = ({
         'inline-flex items-center justify-center size-5 shrink-0 rounded-full transition-colors',
         status === 'completed' && 'text-emerald-500 bg-emerald-500/10',
         status === 'in_progress' &&
-          'text-indigo-500 bg-indigo-500/10 animate-spin',
+          'text-[#008767] bg-[#008767]/10 animate-spin',
         status === 'pending' && 'text-zinc-400 bg-zinc-500/10',
         status === 'error' && 'text-rose-500 bg-rose-500/10',
         className,

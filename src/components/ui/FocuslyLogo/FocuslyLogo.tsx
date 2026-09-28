@@ -37,8 +37,8 @@ export const FocuslyLogo = ({ size = 24, sx }: FocuslyLogoProps) => {
             y2="22"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="#3B82F6" />
-            <stop offset="1" stopColor="#2563EB" />
+            <stop stopColor="#059669" />
+            <stop offset="1" stopColor="#008767" />
           </linearGradient>
         </defs>
       </svg>

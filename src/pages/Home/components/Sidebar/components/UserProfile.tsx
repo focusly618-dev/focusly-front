@@ -4,7 +4,6 @@ import {
   DarkMode as DarkModeIcon,
 } from '@mui/icons-material';
 import { LanguageSelector } from '@/components/ui';
-import { surfaceColor } from '@/context';
 import { TaskBar } from '../types/Sidebar.types';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 
@@ -30,39 +29,18 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
         justifyContent: 'center',
         gap: 1,
         cursor: 'pointer',
-        border: { xs: 'none', lg: '1px solid' },
-        borderColor:
-          theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.08)'
-            : 'rgba(0, 0, 0, 0.06)',
-        backgroundColor: {
-          xs: 'transparent',
-          lg: surfaceColor(
-            theme,
-            'rgba(30, 41, 59, 0.3)',
-            'rgba(40, 40, 42, 0.3)',
-            'rgba(255, 255, 255, 0.7)',
-          ),
-        },
-        backdropFilter: { xs: 'none', lg: 'blur(10px)' },
+        border: 'none',
+        backgroundColor: 'transparent',
         boxShadow: 'none',
         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         flexShrink: 0,
         '&:hover': {
-          backgroundColor: {
-            xs: 'action.hover',
-            lg: surfaceColor(
-              theme,
-              'rgba(30, 41, 59, 0.5)',
-              'rgba(40, 40, 42, 0.5)',
-              'rgba(255, 255, 255, 0.9)',
-            ),
-          },
-          borderColor: theme.palette.primary.main,
-          transform: 'translateY(-1px)',
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.06)'
+              : 'rgba(0, 0, 0, 0.04)',
           '& .profile-avatar': {
             transform: 'scale(1.05)',
-            borderColor: theme.palette.primary.main,
           },
         },
       }}

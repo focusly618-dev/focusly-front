@@ -130,7 +130,7 @@ export const ProductivityTrendsChart: React.FC<
           style={{ color: theme.palette.text.secondary }}
         >
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#008767] dark:bg-[#10B981]" />
             <span>Tiempo Real</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -152,8 +152,8 @@ export const ProductivityTrendsChart: React.FC<
             >
               <defs>
                 <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#008767" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#008767" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -177,7 +177,7 @@ export const ProductivityTrendsChart: React.FC<
               <Area
                 type="monotone"
                 dataKey="actual"
-                stroke="#6366f1"
+                stroke="#008767"
                 strokeWidth={3.5}
                 fillOpacity={1}
                 fill="url(#colorActual)"

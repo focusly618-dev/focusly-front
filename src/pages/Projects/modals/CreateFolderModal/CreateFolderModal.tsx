@@ -78,7 +78,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const [folderName, setFolderName] = useState('');
-  const [folderColor, setFolderColor] = useState('#3b82f6');
+  const [folderColor, setFolderColor] = useState('#008767');
   const [folderStyle, setFolderStyle] = useState<'filled' | 'outlined'>(
     'filled',
   );
@@ -90,7 +90,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
     try {
       await onCreateFolder(folderName.trim(), folderColor, folderStyle);
       setFolderName('');
-      setFolderColor('#3b82f6');
+      setFolderColor('#008767');
       setFolderStyle('filled');
       onClose();
     } finally {
