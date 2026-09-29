@@ -15,9 +15,7 @@ import {
   CheckBox as CheckBoxIcon,
   Delete as DeleteIcon,
   Close as CloseIcon,
-  RadioButtonUnchecked as UncheckedIcon,
-  CheckCircle as CheckedIcon,
-  RemoveCircle as IndeterminateIcon,
+  Check as CheckIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
@@ -210,28 +208,79 @@ export const TasksContentView = ({
             ) : (
               <>
                 <TableHeader>
-                  <TableHeaderCell sx={{ justifyContent: 'center' }}>
+                  <TableHeaderCell
+                    sx={{
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSelectAll();
+                    }}
+                  >
                     <Checkbox
                       checked={isAllSelected}
                       indeterminate={isSomeSelected}
-                      onChange={handleToggleSelectAll}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleToggleSelectAll();
+                      }}
+                      onClick={(e) => e.stopPropagation()}
                       size="small"
                       icon={
-                        <UncheckedIcon
+                        <Box
                           sx={{
-                            fontSize: 18,
-                            color: 'text.secondary',
-                            opacity: 0.6,
+                            width: 17,
+                            height: 17,
+                            borderRadius: '4px',
+                            border: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '1.5px solid #3a3d48'
+                                : '1.5px solid #d1d5db',
+                            bgcolor: 'transparent',
+                            transition: 'all 0.15s ease',
+                            '&:hover': {
+                              borderColor: '#008767',
+                            },
                           }}
                         />
                       }
                       checkedIcon={
-                        <CheckedIcon sx={{ fontSize: 18, color: '#008767' }} />
+                        <Box
+                          sx={{
+                            width: 17,
+                            height: 17,
+                            borderRadius: '4px',
+                            bgcolor: '#008767',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <CheckIcon sx={{ fontSize: 13, color: '#ffffff' }} />
+                        </Box>
                       }
                       indeterminateIcon={
-                        <IndeterminateIcon
-                          sx={{ fontSize: 18, color: '#008767' }}
-                        />
+                        <Box
+                          sx={{
+                            width: 17,
+                            height: 17,
+                            borderRadius: '4px',
+                            bgcolor: '#008767',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 9,
+                              height: 2,
+                              bgcolor: '#ffffff',
+                              borderRadius: '1px',
+                            }}
+                          />
+                        </Box>
                       }
                       sx={{
                         padding: 0,
@@ -428,7 +477,9 @@ export const TasksContentView = ({
               sx={{ fontWeight: 700, color: 'text.primary' }}
             >
               {selectedTaskIds.size}{' '}
-              {selectedTaskIds.size === 1 ? 'task' : 'tasks'} selected
+              {selectedTaskIds.size === 1
+                ? 'tarea seleccionada'
+                : 'tareas seleccionadas'}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -444,7 +495,7 @@ export const TasksContentView = ({
                 '&:hover': { color: 'text.primary' },
               }}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               variant="contained"
@@ -459,7 +510,7 @@ export const TasksContentView = ({
                 px: 2,
               }}
             >
-              Delete Selected
+              Eliminar seleccionadas
             </Button>
           </Box>
         </FloatingActionBar>
@@ -481,13 +532,15 @@ export const TasksContentView = ({
         }}
       >
         <DialogTitle sx={{ fontWeight: 700, px: 2, py: 1 }}>
-          Confirm Delete
+          Confirmar eliminación
         </DialogTitle>
         <DialogContent sx={{ px: 2, py: 1 }}>
           <DialogContentText sx={{ color: 'text.secondary', fontSize: '14px' }}>
-            Are you sure you want to delete {selectedTaskIds.size} selected{' '}
-            {selectedTaskIds.size === 1 ? 'task' : 'tasks'}? This action cannot
-            be undone.
+            ¿Estás seguro de que deseas eliminar {selectedTaskIds.size}{' '}
+            {selectedTaskIds.size === 1
+              ? 'tarea seleccionada'
+              : 'tareas seleccionadas'}
+            ? Esta acción no se puede deshacer.
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 2, py: 1.5, gap: 1 }}>
@@ -500,7 +553,7 @@ export const TasksContentView = ({
               color: 'text.secondary',
             }}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button
             onClick={(e) => handleConfirmDelete(e)}
@@ -519,7 +572,7 @@ export const TasksContentView = ({
             {isDeleting ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
-              'Delete'
+              'Eliminar'
             )}
           </Button>
         </DialogActions>

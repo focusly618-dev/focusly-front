@@ -505,29 +505,41 @@ export const TableStatusGroupRow = styled(Box, {
 }));
 
 export const TaskRow = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'statusColor' && prop !== 'isDone',
-})<{ statusColor?: string; isDone?: boolean }>(({ theme, isDone }) => ({
-  display: 'grid',
-  gridTemplateColumns:
-    '48px minmax(260px, 4fr) 110px 100px 120px 85px 75px 65px',
-  alignItems: 'center',
-  padding: '12px 24px',
-  backgroundColor: 'transparent',
-  opacity: isDone ? 0.65 : 1,
-  borderBottom:
-    theme.palette.mode === 'dark' ? '1px solid #22242b' : '1px solid #f3f4f6',
-  cursor: 'pointer',
-  transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
-  gap: '12px',
-  boxSizing: 'border-box',
-  minWidth: '880px',
+  shouldForwardProp: (prop) =>
+    prop !== 'statusColor' && prop !== 'isDone' && prop !== 'isSelected',
+})<{ statusColor?: string; isDone?: boolean; isSelected?: boolean }>(
+  ({ theme, isDone, isSelected }) => ({
+    display: 'grid',
+    gridTemplateColumns:
+      '48px minmax(260px, 4fr) 110px 100px 120px 85px 75px 65px',
+    alignItems: 'center',
+    padding: '12px 24px',
+    backgroundColor: isSelected
+      ? theme.palette.mode === 'dark'
+        ? 'rgba(0, 135, 103, 0.08)'
+        : 'rgba(0, 135, 103, 0.05)'
+      : 'transparent',
+    opacity: isDone ? 0.65 : 1,
+    borderBottom:
+      theme.palette.mode === 'dark' ? '1px solid #22242b' : '1px solid #f3f4f6',
+    cursor: 'pointer',
+    transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+    gap: '12px',
+    boxSizing: 'border-box',
+    minWidth: '880px',
 
-  '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.025)' : '#f9fafb',
-  },
+    '&:hover': {
+      backgroundColor: isSelected
+        ? theme.palette.mode === 'dark'
+          ? 'rgba(0, 135, 103, 0.12)'
+          : 'rgba(0, 135, 103, 0.08)'
+        : theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.025)'
+          : '#f9fafb',
+    },
 
-  '&:hover .checkbox-cell': {
-    opacity: 1,
-  },
-}));
+    '&:hover .checkbox-cell': {
+      opacity: 1,
+    },
+  }),
+);

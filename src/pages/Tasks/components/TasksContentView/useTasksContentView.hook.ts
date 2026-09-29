@@ -41,15 +41,17 @@ export const useTasksContentView = ({
 
   const isTaskReadOnly = useCallback(
     (t: TaskResponse) => {
-      if (!user) return true;
+      if (!t) return false;
+      if (t.is_owner !== undefined) return !t.is_owner;
+      if (!user) return false;
       if (t.task_type === 'GoogleTask' || t.google_event_id) {
         const organizerEmail = (t as unknown as { organizer_email?: string })
           .organizer_email;
-        if (organizerEmail) {
+        if (organizerEmail && user.email) {
           return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
         }
       }
-      if (t.user_id && t.user_id !== user.id) {
+      if (t.user_id && user.id && t.user_id !== user.id) {
         return true;
       }
       return false;
@@ -111,36 +113,30 @@ export const useTasksContentView = ({
     return displayedTasks.slice(start, start + PAGE_SIZE);
   }, [displayedTasks, page, PAGE_SIZE]);
 
-  const selectableDisplayedTasks = useMemo(() => {
-    return paginatedTasks.filter((t) => !isTaskReadOnly(t));
-  }, [paginatedTasks, isTaskReadOnly]);
-
   const isAllSelected = useMemo(() => {
-    if (selectableDisplayedTasks.length === 0) return false;
-    return selectableDisplayedTasks.every((task) =>
-      selectedTaskIds.has(task.id),
-    );
-  }, [selectableDisplayedTasks, selectedTaskIds]);
+    if (paginatedTasks.length === 0) return false;
+    return paginatedTasks.every((task) => selectedTaskIds.has(task.id));
+  }, [paginatedTasks, selectedTaskIds]);
 
   const isSomeSelected = useMemo(() => {
-    if (selectableDisplayedTasks.length === 0) return false;
-    const selectedCount = selectableDisplayedTasks.filter((task) =>
+    if (paginatedTasks.length === 0) return false;
+    const selectedCount = paginatedTasks.filter((task) =>
       selectedTaskIds.has(task.id),
     ).length;
-    return selectedCount > 0 && selectedCount < selectableDisplayedTasks.length;
-  }, [selectableDisplayedTasks, selectedTaskIds]);
+    return selectedCount > 0 && selectedCount < paginatedTasks.length;
+  }, [paginatedTasks, selectedTaskIds]);
 
   const handleToggleSelectAll = () => {
     if (isAllSelected) {
       setSelectedTaskIds((prev) => {
         const next = new Set(prev);
-        selectableDisplayedTasks.forEach((task) => next.delete(task.id));
+        paginatedTasks.forEach((task) => next.delete(task.id));
         return next;
       });
     } else {
       setSelectedTaskIds((prev) => {
         const next = new Set(prev);
-        selectableDisplayedTasks.forEach((task) => next.add(task.id));
+        paginatedTasks.forEach((task) => next.add(task.id));
         return next;
       });
     }

@@ -49,17 +49,18 @@ export const ListViewTask = ({
 
   const isReadOnly = useMemo(() => {
     if (!task) return false;
-    if (!user) return true;
+    if (task.is_owner !== undefined) return !task.is_owner;
+    if (!user) return false;
 
     if (task.task_type === 'GoogleTask' || task.google_event_id) {
       const organizerEmail = (task as unknown as { organizer_email?: string })
         .organizer_email;
-      if (organizerEmail) {
+      if (organizerEmail && user.email) {
         return organizerEmail.toLowerCase() !== user.email?.toLowerCase();
       }
     }
 
-    if (task.user_id && task.user_id !== user.id) {
+    if (task.user_id && user.id && task.user_id !== user.id) {
       return true;
     }
 
@@ -108,17 +109,6 @@ export const ListViewTask = ({
     }
   }, [task.deadline]);
 
-  const handleToggleDone = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!isReadOnly && updateTask) {
-      const nextStatus = isDone ? 'Todo' : 'Done';
-      await updateTask(task.id, {
-        ...task,
-        status: nextStatus as typeof task.status,
-      });
-    }
-  };
-
   return (
     <>
       <TaskRow
@@ -126,6 +116,7 @@ export const ListViewTask = ({
         statusColor={statusColor}
         className="task-row-item"
         isDone={isDone}
+        isSelected={isSelected}
       >
         {/* Cell 1: Checkbox */}
         <Box
@@ -134,22 +125,23 @@ export const ListViewTask = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            pointerEvents: isReadOnly ? 'none' : 'auto',
+            cursor: 'pointer',
           }}
           onClick={(e) => {
-            if (onToggleSelect && isSelected !== undefined) {
-              e.stopPropagation();
-              onToggleSelect(e);
-            } else {
-              handleToggleDone(e);
-            }
+            e.stopPropagation();
+            onToggleSelect?.(e);
           }}
         >
           <Checkbox
-            checked={isDone}
-            disabled={isReadOnly}
+            checked={Boolean(isSelected)}
             size="small"
-            onClick={handleToggleDone}
+            onChange={(e) => {
+              e.stopPropagation();
+              onToggleSelect?.(e as unknown as React.MouseEvent);
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
             icon={
               <Box
                 sx={{
