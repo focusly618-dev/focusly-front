@@ -10,6 +10,7 @@ import {
 import type { Task } from '@/redux/tasks/task.types';
 import { sileo } from '@/utils';
 import { headerContainerSx, headerIconButtonSx } from './TaskHeader.styles';
+import { isTaskCustomColor } from '../../TaskDetailModal.utils';
 
 interface TaskHeaderProps {
   color: string;
@@ -33,17 +34,39 @@ export const TaskHeader = ({
   isReadOnly,
   onOpenColorPicker,
 }: TaskHeaderProps) => {
+  const hasCustomColor = isTaskCustomColor(color);
+  const iconSx = headerIconButtonSx(hasCustomColor);
+
   return (
-    <Box sx={headerContainerSx}>
+    <Box sx={headerContainerSx(hasCustomColor, color, isFullScreen)}>
       {/* Eyebrow badge on the left */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.8,
+          ...(hasCustomColor
+            ? {
+                px: 1.2,
+                py: 0.5,
+                borderRadius: '20px',
+                backgroundColor: 'rgba(0, 0, 0, 0.12)',
+                backdropFilter: 'blur(8px)',
+              }
+            : {
+                py: 0.5,
+              }),
+        }}
+      >
         <Box
           sx={{
             width: 7,
             height: 7,
             borderRadius: '50%',
-            bgcolor: '#008767',
-            boxShadow: '0 0 6px rgba(0, 135, 103, 0.4)',
+            bgcolor: hasCustomColor ? '#0f172a' : '#008767',
+            boxShadow: hasCustomColor
+              ? 'none'
+              : '0 0 6px rgba(0, 135, 103, 0.4)',
           }}
         />
         <Typography
@@ -52,7 +75,7 @@ export const TaskHeader = ({
             fontWeight: 800,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: '#008767',
+            color: hasCustomColor ? '#0f172a' : '#008767',
           }}
         >
           {initialTask ? 'Detalles de Tarea' : 'Nueva Tarea'}
@@ -68,7 +91,7 @@ export const TaskHeader = ({
               size="small"
               onClick={(e) => onOpenColorPicker(e.currentTarget)}
               sx={{
-                ...headerIconButtonSx,
+                ...iconSx,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 0.6,
@@ -81,8 +104,10 @@ export const TaskHeader = ({
                   width: 14,
                   height: 14,
                   borderRadius: '50%',
-                  bgcolor: color || '#008767',
-                  border: '1.5px solid white',
+                  bgcolor: hasCustomColor ? color : '#008767',
+                  border: hasCustomColor
+                    ? '1.5px solid rgba(0,0,0,0.3)'
+                    : '1.5px solid white',
                   boxShadow: '0 0 0 1px rgba(0,0,0,0.2)',
                 }}
               />
@@ -93,7 +118,7 @@ export const TaskHeader = ({
 
         {initialTask && !initialTask.is_owner && (
           <Tooltip title="Esta tarea no puede ser modificada porque no eres el propietario">
-            <IconButton size="small" sx={headerIconButtonSx}>
+            <IconButton size="small" sx={iconSx}>
               <InfoIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Tooltip>
@@ -104,7 +129,7 @@ export const TaskHeader = ({
           <IconButton
             size="small"
             onClick={() => setIsFullScreen(!isFullScreen)}
-            sx={headerIconButtonSx}
+            sx={iconSx}
           >
             {isFullScreen ? (
               <MinimizeIcon sx={{ fontSize: 18 }} />
@@ -116,7 +141,7 @@ export const TaskHeader = ({
 
         {/* Close Button */}
         <Tooltip title="Cerrar" arrow>
-          <IconButton size="small" onClick={onClose} sx={headerIconButtonSx}>
+          <IconButton size="small" onClick={onClose} sx={iconSx}>
             <CloseIcon sx={{ fontSize: 19 }} />
           </IconButton>
         </Tooltip>
@@ -156,9 +181,9 @@ export const TaskHeader = ({
                 });
               }}
               sx={{
-                ...headerIconButtonSx,
+                ...iconSx,
                 '&:hover': {
-                  bgcolor: 'rgba(239, 68, 68, 0.1)',
+                  bgcolor: 'rgba(239, 68, 68, 0.15)',
                   color: '#ef4444',
                 },
               }}

@@ -18,6 +18,7 @@ import {
   dialogContentSx,
   titleInputPropsSx,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
+import { isTaskCustomColor } from './TaskDetailModal.utils';
 import { useTaskDetailModal } from './hooks/useTaskDetailModal.hooks';
 import { improveTaskAI } from '@/api/AI/apiAIPlanner';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
@@ -204,6 +205,8 @@ export const TaskDetailModal = ({
   const isPureGoogleTask =
     (initialTask as { task_type?: string })?.task_type === 'GoogleTask';
 
+  const hasCustomColor = isTaskCustomColor(color);
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Dialog
@@ -222,6 +225,9 @@ export const TaskDetailModal = ({
               maxHeight: isFullScreen ? '100%' : '90vh',
               margin: isFullScreen ? 0 : 2,
               borderRadius: isFullScreen ? 0 : '20px',
+              ...(hasCustomColor && {
+                borderColor: `${color}55`,
+              }),
             },
           },
           backdrop: { sx: modalBackdropSx },
@@ -295,7 +301,7 @@ export const TaskDetailModal = ({
               isReadOnly={isReadOnly}
               onOpenColorPicker={(el) => !isReadOnly && setColorAnchor(el)}
             />
-            <Box sx={{ p: 3, pt: 1 }}>
+            <Box sx={{ p: 3, pt: hasCustomColor ? 2 : 1 }}>
               <Box sx={{ px: 0.5, mb: 0.5 }}>
                 <TextField
                   fullWidth

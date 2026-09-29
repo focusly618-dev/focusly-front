@@ -65,6 +65,20 @@ export const PASTEL_COLORS: TaskColorOption[] = [
 
 export const TASK_COLORS = PASTEL_COLORS.map((c) => c.value);
 
+export const isTaskCustomColor = (color?: string | null): boolean => {
+  if (!color) return false;
+  const trimmed = color.trim().toUpperCase();
+  if (
+    !trimmed ||
+    trimmed === 'TRANSPARENT' ||
+    trimmed === '#1E293B' ||
+    trimmed === '#E0E7FF'
+  ) {
+    return false;
+  }
+  return true;
+};
+
 export const getColorName = (hex?: string): string | undefined => {
   if (!hex) return undefined;
   const upper = hex.toUpperCase();

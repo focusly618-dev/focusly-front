@@ -55,6 +55,7 @@ import {
   getColorName,
   formatDuration,
   parseDuration,
+  isTaskCustomColor,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 import {
@@ -1041,28 +1042,53 @@ export const TaskProperties = ({
               letterSpacing: '0.05em',
             }}
           >
-            Color de la tarea
+            Color de fondo
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-            <Box
-              sx={{
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                bgcolor: hoveredColor?.value || color || 'transparent',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            />
-            <Typography
-              sx={{
-                fontSize: '11.5px',
-                fontWeight: 600,
-                color: 'text.primary',
-              }}
-            >
-              {hoveredColor?.name || getColorName(color) || 'Personalizado'}
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {isTaskCustomColor(color) && (
+              <Typography
+                onClick={() => {
+                  setColor('');
+                  setColorAnchor(null);
+                  setHoveredColor(null);
+                }}
+                sx={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#ef4444',
+                  cursor: 'pointer',
+                  '&:hover': { textDecoration: 'underline' },
+                }}
+              >
+                Quitar fondo
+              </Typography>
+            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  bgcolor:
+                    hoveredColor?.value ||
+                    (isTaskCustomColor(color) ? color : 'transparent'),
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }}
+              />
+              <Typography
+                sx={{
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  color: 'text.primary',
+                }}
+              >
+                {hoveredColor?.name ||
+                  (isTaskCustomColor(color)
+                    ? getColorName(color) || 'Personalizado'
+                    : 'Sin fondo')}
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
@@ -1108,6 +1134,40 @@ export const TaskProperties = ({
             );
           })}
         </Box>
+
+        {isTaskCustomColor(color) && (
+          <Box
+            onClick={() => {
+              setColor('');
+              setColorAnchor(null);
+              setHoveredColor(null);
+            }}
+            sx={{
+              mt: 1.5,
+              pt: 1,
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 0.6,
+              py: 0.6,
+              borderRadius: '8px',
+              cursor: 'pointer',
+              color: 'text.secondary',
+              fontSize: '11.5px',
+              fontWeight: 600,
+              transition: 'all 0.15s ease',
+              '&:hover': {
+                bgcolor: 'rgba(239, 68, 68, 0.08)',
+                color: '#ef4444',
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 14 }} />
+            Quitar color de fondo
+          </Box>
+        )}
       </Popover>
 
       {/* Time Log Popover */}
