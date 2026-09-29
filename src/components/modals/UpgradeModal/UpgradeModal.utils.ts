@@ -36,7 +36,7 @@ export const UPGRADE_PLANS: UpgradePlan[] = [
     price: '$0',
     priceSuffix: '/ siempre gratis',
     features: [
-      { emoji: '📋', text: 'Límite de 4 conversaciones' },
+      { emoji: '📋', text: 'Prueba gratuita de 10 mensajes con IA' },
       { emoji: '⚡', text: 'Respuestas básicas del asistente' },
       { emoji: '❌', text: 'Sin IA en el editor de workspaces' },
     ],
@@ -86,14 +86,22 @@ export const UPGRADE_PLANS: UpgradePlan[] = [
     price: '$15',
     priceSuffix: '/ mes',
     features: [
-      { emoji: '🚀', text: 'Respuestas rápidas prioritarias', highlighted: true },
+      {
+        emoji: '🚀',
+        text: 'Respuestas rápidas prioritarias',
+        highlighted: true,
+      },
       {
         emoji: '🪄',
         boldText: 'IA en Editor ilimitada',
         subText: '(Fórmulas, traducción y bloques)',
         highlighted: true,
       },
-      { emoji: '👥', text: 'Trabajo en equipo colaborativo', highlighted: true },
+      {
+        emoji: '👥',
+        text: 'Trabajo en equipo colaborativo',
+        highlighted: true,
+      },
       {
         emoji: '📈',
         text: 'Insights profundos de productividad',

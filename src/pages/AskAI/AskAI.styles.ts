@@ -575,7 +575,6 @@ export const ChatHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  borderBottom: `1px solid ${theme.palette.divider}`,
   backgroundColor: surfaceColor(
     theme,
     'rgba(17, 18, 21, 0.85)',
@@ -605,3 +604,44 @@ export const StatusPill = styled(Box)(() => ({
     backgroundColor: '#22c55e',
   },
 }));
+
+export const TrialUpgradeBanner = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    marginBottom: '12px',
+    padding: '14px 18px',
+    borderRadius: '16px',
+    backgroundColor: isDark
+      ? surfaceColor(theme, '#18191e', '#1F1F20', '#ffffff')
+      : '#ffffff',
+    border: `1px solid ${isDark ? 'rgba(0, 135, 103, 0.4)' : 'rgba(0, 135, 103, 0.3)'}`,
+    borderLeft: '4px solid #008767',
+    boxShadow: isDark
+      ? '0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 135, 103, 0.12)'
+      : '0 6px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 135, 103, 0.08)',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '16px',
+    position: 'relative',
+    overflow: 'hidden',
+    animation: 'bannerSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    '@keyframes bannerSlideUp': {
+      from: {
+        opacity: 0,
+        transform: 'translateY(8px)',
+      },
+      to: {
+        opacity: 1,
+        transform: 'translateY(0)',
+      },
+    },
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '12px',
+      padding: '12px 14px',
+    },
+  };
+});

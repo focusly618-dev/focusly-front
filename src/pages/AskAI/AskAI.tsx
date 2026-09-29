@@ -35,6 +35,7 @@ import {
   ThumbUpOutlined as ThumbUpOutlinedIcon,
   Search as SearchIcon,
   Close as CloseIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
@@ -104,7 +105,7 @@ import {
   HistorySidebar,
   ChatAreaWrapper,
   ChatHeader,
-  StatusPill,
+  TrialUpgradeBanner,
 } from './AskAI.styles';
 
 import {
@@ -526,6 +527,60 @@ export const AskAI: React.FC = () => {
   } | null>(null);
   const [isDeletingConversation, setIsDeletingConversation] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+
+  // 10 Trial Messages tracking
+  const TRIAL_MESSAGE_LIMIT = 10;
+  const trialStorageKey = `focusly_ask_ai_user_messages_count_${user?.id || 'default'}`;
+  const proStorageKey = `focusly_is_pro_user_${user?.id || 'default'}`;
+
+  const [isProUser, setIsProUser] = useState<boolean>(() => {
+    return localStorage.getItem(proStorageKey) === 'true';
+  });
+
+  const [userMessageCount, setUserMessageCount] = useState<number>(() => {
+    const stored = localStorage.getItem(trialStorageKey);
+    if (stored !== null) {
+      const parsed = parseInt(stored, 10);
+      if (!isNaN(parsed)) return parsed;
+    }
+    return 0;
+  });
+
+  const isTrialLimitReached =
+    !isProUser && userMessageCount >= TRIAL_MESSAGE_LIMIT;
+
+  useEffect(() => {
+    const storedPro = localStorage.getItem(proStorageKey) === 'true';
+    setIsProUser(storedPro);
+    const storedCount = localStorage.getItem(trialStorageKey);
+    if (storedCount !== null) {
+      const parsed = parseInt(storedCount, 10);
+      if (!isNaN(parsed)) setUserMessageCount(parsed);
+    }
+  }, [proStorageKey, trialStorageKey]);
+
+  useEffect(() => {
+    const currentChatUserMsgs = messages.filter(
+      (m) => m.sender === 'user',
+    ).length;
+    if (currentChatUserMsgs > userMessageCount) {
+      setUserMessageCount(currentChatUserMsgs);
+      localStorage.setItem(trialStorageKey, String(currentChatUserMsgs));
+    }
+  }, [messages, trialStorageKey, userMessageCount]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as unknown as { resetAITrial?: () => void }).resetAITrial =
+        () => {
+          localStorage.removeItem(trialStorageKey);
+          localStorage.removeItem(proStorageKey);
+          setUserMessageCount(0);
+          setIsProUser(false);
+          console.log('[DEBUG] Focusly AI trial reset to 0');
+        };
+    }
+  }, [proStorageKey, trialStorageKey]);
   const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
   const [selectedContext, setSelectedContext] =
@@ -975,11 +1030,9 @@ export const AskAI: React.FC = () => {
 
       if (!trimmedText && currentFiles.length === 0) return;
 
-      if (FEATURE_FLAGS.LIMIT_AI_CONVERSATIONS && !activeConversationId) {
-        if (conversations.length >= 4) {
-          setIsUpgradeModalOpen(true);
-          return;
-        }
+      if (!isProUser && userMessageCount >= TRIAL_MESSAGE_LIMIT) {
+        setIsUpgradeModalOpen(true);
+        return;
       }
 
       let promptContent = trimmedText;
@@ -1033,6 +1086,12 @@ export const AskAI: React.FC = () => {
       setInputValue('');
       setAttachedFiles([]);
       setStatus('submitted');
+
+      if (!isProUser) {
+        const nextCount = userMessageCount + 1;
+        setUserMessageCount(nextCount);
+        localStorage.setItem(trialStorageKey, String(nextCount));
+      }
 
       const aiMsgId = `ai-${Date.now()}`;
       const aiMsg: Message = {
@@ -1113,6 +1172,10 @@ export const AskAI: React.FC = () => {
       selectedModel,
       selectedContext,
       attachedFiles,
+      isProUser,
+      userMessageCount,
+      trialStorageKey,
+      TRIAL_MESSAGE_LIMIT,
     ],
   );
 
@@ -1158,73 +1221,7 @@ export const AskAI: React.FC = () => {
       <ChatAreaWrapper>
         {/* ── Chat Header ── */}
         <ChatHeader>
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Box
-              sx={{
-                width: 38,
-                height: 38,
-                borderRadius: '10px',
-                bgcolor: (t) =>
-                  t.palette.mode === 'dark'
-                    ? 'rgba(0, 135, 103, 0.15)'
-                    : '#ffffff',
-                border: '1.5px solid',
-                borderColor: (t) =>
-                  t.palette.mode === 'dark'
-                    ? 'rgba(0, 135, 103, 0.4)'
-                    : '#a7f3d0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 6px rgba(0, 135, 103, 0.08)',
-                flexShrink: 0,
-              }}
-            >
-              <LuminaAnimatedFace
-                size={22}
-                primaryColor={primaryColor}
-                isSpeaking={status === 'streaming' || status === 'submitted'}
-              />
-            </Box>
-            <Box display="flex" flexDirection="column" gap={0.2}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight={800}
-                  color="text.primary"
-                  sx={{ fontSize: '15px', lineHeight: 1.2 }}
-                >
-                  Lumina AI
-                </Typography>
-                {status === 'streaming' || status === 'submitted' ? (
-                  <LuminaSpeakingWave
-                    isSpeaking={true}
-                    label={
-                      status === 'streaming' ? 'Hablando...' : 'Pensando...'
-                    }
-                  />
-                ) : (
-                  <StatusPill>
-                    <span className="status-dot" />
-                    En línea
-                  </StatusPill>
-                )}
-              </Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.secondary',
-                  fontSize: '11.5px',
-                  fontWeight: 500,
-                  lineHeight: 1.2,
-                }}
-              >
-                Tu copiloto inteligente para estructurar y ejecutar tareas
-              </Typography>
-            </Box>
-          </Box>
-
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box display="flex" justifyContent="flex-end" width="100%">
             <Button
               variant="outlined"
               size="small"
@@ -1232,6 +1229,7 @@ export const AskAI: React.FC = () => {
               startIcon={<ChatIcon sx={{ fontSize: 15 }} />}
               sx={{
                 borderRadius: '8px',
+
                 borderColor: 'divider',
                 textTransform: 'none',
                 color: 'text.primary',
@@ -2124,10 +2122,148 @@ export const AskAI: React.FC = () => {
               style={{ display: 'none' }}
             />
 
+            {/* Trial Limit Reached Banner (similar to ChatGPT upgrade card) */}
+            {isTrialLimitReached && (
+              <TrialUpgradeBanner>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    flex: 1,
+                    minWidth: 0,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 42,
+                      height: 42,
+                      borderRadius: '12px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(0, 135, 103, 0.2)'
+                          : '#ecfdf5',
+                      border: '1px solid',
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(0, 135, 103, 0.45)'
+                          : '#a7f3d0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#008767',
+                      flexShrink: 0,
+                      boxShadow: '0 2px 8px rgba(0, 135, 103, 0.15)',
+                    }}
+                  >
+                    <AutoAwesomeIcon sx={{ fontSize: 20 }} />
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 0.35,
+                      minWidth: 0,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '13.5px',
+                          color: 'text.primary',
+                          lineHeight: 1.25,
+                        }}
+                      >
+                        Has alcanzado el límite de tu chat de prueba
+                      </Typography>
+                      <Chip
+                        label={`${TRIAL_MESSAGE_LIMIT}/${TRIAL_MESSAGE_LIMIT} mensajes`}
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          bgcolor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(239, 68, 68, 0.15)'
+                              : '#fee2e2',
+                          color: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? '#fca5a5'
+                              : '#b91c1c',
+                          border: '1px solid',
+                          borderColor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(239, 68, 68, 0.3)'
+                              : '#fecaca',
+                        }}
+                      />
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: '12px',
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      Se agotaron los 10 mensajes de prueba con Lumina.
+                      Actualiza a Focusly Plus para continuar conversando sin
+                      límites y acceder a modelos avanzados.
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Button
+                  variant="contained"
+                  onClick={() => setIsUpgradeModalOpen(true)}
+                  endIcon={<AutoAwesomeIcon sx={{ fontSize: 15 }} />}
+                  sx={{
+                    borderRadius: '10px',
+                    bgcolor: '#008767',
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontSize: '12.5px',
+                    textTransform: 'none',
+                    px: 2.2,
+                    py: 0.9,
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    width: { xs: '100%', sm: 'auto' },
+                    boxShadow: '0 3px 12px rgba(0, 135, 103, 0.35)',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      bgcolor: '#007357',
+                      boxShadow: '0 5px 18px rgba(0, 135, 103, 0.45)',
+                      transform: 'translateY(-1px)',
+                    },
+                  }}
+                >
+                  Actualizar a Plus
+                </Button>
+              </TrialUpgradeBanner>
+            )}
+
             <PromptInput
               status={status}
               onStop={handleStopStream}
-              onSubmit={() => sendMessage(inputValue)}
+              onSubmit={() => {
+                if (isTrialLimitReached) {
+                  setIsUpgradeModalOpen(true);
+                } else {
+                  sendMessage(inputValue);
+                }
+              }}
               className="border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900/90 shadow-lg"
             >
               {(selectedContext || attachedFiles.length > 0) && (
@@ -2179,6 +2315,7 @@ export const AskAI: React.FC = () => {
               <PromptInputBody>
                 <PromptInputTextarea
                   value={inputValue}
+                  disabled={isTrialLimitReached}
                   onChange={(e) => {
                     const val = e.target.value;
                     setInputValue(val);
@@ -2188,9 +2325,11 @@ export const AskAI: React.FC = () => {
                     }
                   }}
                   placeholder={
-                    attachedFiles.length > 0
-                      ? 'Pregunta sobre los archivos adjuntos...'
-                      : 'Pregúntale a Lumina lo que necesites o escribe @ para contexto...'
+                    isTrialLimitReached
+                      ? 'Has alcanzado el límite de 10 mensajes de prueba. Actualiza a Plus para continuar...'
+                      : attachedFiles.length > 0
+                        ? 'Pregunta sobre los archivos adjuntos...'
+                        : 'Pregúntale a Lumina lo que necesites o escribe @ para contexto...'
                   }
                 />
               </PromptInputBody>
@@ -2199,9 +2338,12 @@ export const AskAI: React.FC = () => {
                 <PromptInputTools>
                   <PromptInputButton
                     onClick={() => {
-                      setContextAnchor(inputBoxRef.current);
-                      setContextMenuLevel('main');
+                      if (!isTrialLimitReached) {
+                        setContextAnchor(inputBoxRef.current);
+                        setContextMenuLevel('main');
+                      }
                     }}
+                    disabled={isTrialLimitReached}
                     className={
                       selectedContext
                         ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
@@ -2219,7 +2361,7 @@ export const AskAI: React.FC = () => {
 
                   <PromptInputButton
                     onClick={handleOpenFile}
-                    disabled={isProcessingFile}
+                    disabled={isProcessingFile || isTrialLimitReached}
                     title="Adjuntar archivo (PDF, DOCX, TXT, MD, etc. - Máx. 3MB)"
                   >
                     {isProcessingFile ? (
@@ -2232,6 +2374,7 @@ export const AskAI: React.FC = () => {
 
                   <PromptInputButton
                     onClick={(e) => setModelAnchor(e.currentTarget)}
+                    disabled={isTrialLimitReached}
                     title="Seleccionar modelo"
                   >
                     {selectedModel.startsWith('claude') ? (
@@ -2250,6 +2393,7 @@ export const AskAI: React.FC = () => {
                   status={status}
                   onStop={handleStopStream}
                   disabled={
+                    isTrialLimitReached ||
                     (!inputValue.trim() && attachedFiles.length === 0) ||
                     isProcessingFile
                   }
@@ -2648,6 +2792,10 @@ export const AskAI: React.FC = () => {
       <UpgradeModal
         open={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
+        onUpgradeSuccess={() => {
+          setIsProUser(true);
+          localStorage.setItem(proStorageKey, 'true');
+        }}
       />
 
       {/* Confirmation Modal to delete AI conversation */}

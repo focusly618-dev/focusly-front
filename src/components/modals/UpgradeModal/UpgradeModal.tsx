@@ -36,6 +36,7 @@ import {
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   open,
   onClose,
+  onUpgradeSuccess,
 }) => {
   const handleUpgrade = (planName: string) => {
     onClose();
@@ -44,6 +45,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       description: `¡Gracias por actualizar tu suscripción a ${planName}!`,
       duration: 4500,
     });
+    onUpgradeSuccess?.(planName);
   };
 
   return (
@@ -78,7 +80,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       {/* Plans Container */}
       <Box sx={plansContainerSx}>
         {UPGRADE_PLANS.map((plan) => (
-          <Box key={plan.id} sx={planCardSx(plan.featured ? 'featured' : 'default')}>
+          <Box
+            key={plan.id}
+            sx={planCardSx(plan.featured ? 'featured' : 'default')}
+          >
             <Box>
               {plan.popular ? (
                 <Box
