@@ -42,7 +42,7 @@ export const AnimatedContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const TasksContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: surfaceColor(theme, '#121318', '#19191A', '#fafbfd'),
+  backgroundColor: surfaceColor(theme, '#111215', '#111215', '#fafbfd'),
   height: '100vh',
   overflow: 'hidden',
   color: theme.palette.text.primary,

@@ -16,7 +16,7 @@ export const LibraryContainer = styled(Box)(({ theme }) => ({
   height: '100%',
   overflowY: 'auto',
   overflowX: 'hidden',
-  backgroundColor: surfaceColor(theme, '#121318', '#19191A', '#F3F4F6'),
+  backgroundColor: surfaceColor(theme, '#111215', '#111215', '#F3F4F6'),
   padding: theme.spacing(3.5),
   [theme.breakpoints.down('md')]: {
     padding: theme.spacing(2),
@@ -46,7 +46,7 @@ export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
 export const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
   maxWidth: '380px',
-  backgroundColor: surfaceColor(theme, '#1A1F2B', '#1F1F20', '#ffffff'),
+  backgroundColor: surfaceColor(theme, '#1e2025', '#1F1F20', '#ffffff'),
   borderRadius: '30px',
   [theme.breakpoints.down('sm')]: {
     maxWidth: 'none',
@@ -456,12 +456,7 @@ export const WorkspaceCard = styled(Card, {
     backgroundColor: isGradient
       ? 'transparent'
       : gradient ||
-        surfaceColor(
-          theme,
-          'rgba(26, 31, 43, 0.7)',
-          'rgba(36, 36, 37, 0.7)',
-          '#ffffff',
-        ),
+        surfaceColor(theme, '#18191e', 'rgba(36, 36, 37, 0.7)', '#ffffff'),
     backgroundImage: isGradient ? gradient : 'none',
     backgroundSize: 'cover',
     backdropFilter: isGradient ? 'none' : 'blur(12px)',

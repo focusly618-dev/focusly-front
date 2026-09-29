@@ -301,7 +301,10 @@ export const TasksContentView = ({
                 variant="body2"
                 sx={{
                   fontSize: '13px',
-                  color: 'text.secondary',
+                  color: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? '#717684'
+                      : 'text.secondary',
                   fontWeight: 500,
                 }}
               >
@@ -315,25 +318,26 @@ export const TasksContentView = ({
                   disabled={page === 1}
                   size="small"
                   sx={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: '8px',
+                    width: 32,
+                    height: 32,
+                    borderRadius: '6px',
                     border: '1px solid',
                     borderColor: (theme) =>
+                      theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
+                    color: (theme) =>
                       theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.1)'
-                        : '#e5e7eb',
-                    color: 'text.secondary',
+                        ? '#717684'
+                        : 'text.secondary',
                     bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.03)'
-                        : '#ffffff',
+                      theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
                     '&.Mui-disabled': {
-                      opacity: 0.4,
+                      opacity: 0.35,
                       borderColor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.05)'
-                          : '#f3f4f6',
+                        theme.palette.mode === 'dark' ? '#25272e' : '#f3f4f6',
+                    },
+                    '&:hover': {
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark' ? '#25272e' : '#f9fafb',
                     },
                   }}
                 >
@@ -348,15 +352,20 @@ export const TasksContentView = ({
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
                       sx={{
-                        minWidth: 30,
-                        width: 30,
-                        height: 30,
+                        minWidth: 32,
+                        width: 32,
+                        height: 32,
                         p: 0,
-                        borderRadius: '8px',
+                        borderRadius: '6px',
                         fontWeight: 700,
                         fontSize: '12.5px',
                         bgcolor: isActive ? '#008767' : 'transparent',
-                        color: isActive ? '#ffffff' : 'text.primary',
+                        color: isActive
+                          ? '#ffffff'
+                          : (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#8a8f98'
+                                : 'text.primary',
                         boxShadow: isActive
                           ? '0 1px 3px rgba(0, 135, 103, 0.3)'
                           : 'none',
@@ -365,7 +374,7 @@ export const TasksContentView = ({
                             ? '#007357'
                             : (theme) =>
                                 theme.palette.mode === 'dark'
-                                  ? 'rgba(255,255,255,0.06)'
+                                  ? '#25272e'
                                   : '#f3f4f6',
                         },
                       }}
@@ -380,25 +389,26 @@ export const TasksContentView = ({
                   disabled={page === totalPages || totalPages === 0}
                   size="small"
                   sx={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: '8px',
+                    width: 32,
+                    height: 32,
+                    borderRadius: '6px',
                     border: '1px solid',
                     borderColor: (theme) =>
+                      theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
+                    color: (theme) =>
                       theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.1)'
-                        : '#e5e7eb',
-                    color: 'text.secondary',
+                        ? '#717684'
+                        : 'text.secondary',
                     bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.03)'
-                        : '#ffffff',
+                      theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
                     '&.Mui-disabled': {
-                      opacity: 0.4,
+                      opacity: 0.35,
                       borderColor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.05)'
-                          : '#f3f4f6',
+                        theme.palette.mode === 'dark' ? '#25272e' : '#f3f4f6',
+                    },
+                    '&:hover': {
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark' ? '#25272e' : '#f9fafb',
                     },
                   }}
                 >

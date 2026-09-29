@@ -82,7 +82,8 @@ export const TasksHeader = ({
           <ChevronRightIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
           <Typography
             sx={{
-              color: '#008767',
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? '#2dd4bf' : '#008767',
               fontWeight: 600,
               fontSize: '13px',
             }}
@@ -113,21 +114,17 @@ export const TasksHeader = ({
           flexWrap: 'wrap',
         }}
       >
-        {/* Stats Capsule */}
+        {/* Stats Capsule matching screenshot */}
         <Box
           sx={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 1.2,
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(30, 58, 138, 0.2)'
-                : '#eff6ff',
+              theme.palette.mode === 'dark' ? '#111c2e' : '#eff6ff',
             border: '1px solid',
             borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(59, 130, 246, 0.3)'
-                : '#bfdbfe',
+              theme.palette.mode === 'dark' ? '#1e3557' : '#bfdbfe',
             borderRadius: '99px',
             px: 2,
             height: 38,
@@ -139,7 +136,7 @@ export const TasksHeader = ({
               fontSize: '12.5px',
               fontWeight: 600,
               color: (theme) =>
-                theme.palette.mode === 'dark' ? '#93c5fd' : '#1d4ed8',
+                theme.palette.mode === 'dark' ? '#60a5fa' : '#1d4ed8',
             }}
           >
             {pendingCount} Pendientes
@@ -149,9 +146,7 @@ export const TasksHeader = ({
               width: '1px',
               height: 14,
               bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(147, 197, 253, 0.4)'
-                  : '#bfdbfe',
+                theme.palette.mode === 'dark' ? '#1e3557' : '#bfdbfe',
             }}
           />
           <Typography
@@ -159,7 +154,7 @@ export const TasksHeader = ({
               fontSize: '12.5px',
               fontWeight: 600,
               color: (theme) =>
-                theme.palette.mode === 'dark' ? '#93c5fd' : '#1d4ed8',
+                theme.palette.mode === 'dark' ? '#60a5fa' : '#1d4ed8',
             }}
           >
             {completedCount} Completadas
@@ -173,36 +168,43 @@ export const TasksHeader = ({
               onClick={(e) => setDateMenuAnchor(e.currentTarget)}
               startIcon={
                 <CalendarTodayIcon
-                  sx={{ fontSize: 16, color: 'text.secondary' }}
+                  sx={{
+                    fontSize: 16,
+                    color: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? '#717684'
+                        : 'text.secondary',
+                  }}
                 />
               }
               endIcon={
                 <KeyboardArrowDownIcon
-                  sx={{ fontSize: 18, color: 'text.secondary' }}
+                  sx={{
+                    fontSize: 18,
+                    color: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? '#717684'
+                        : 'text.secondary',
+                  }}
                 />
               }
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '13px',
-                color: 'text.primary',
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? '#d1d5db' : 'text.primary',
                 bgcolor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.05)'
-                    : '#ffffff',
+                  theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
                 border: '1px solid',
                 borderColor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.1)'
-                    : '#e5e7eb',
+                  theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
                 borderRadius: '8px',
                 height: 38,
                 px: 1.75,
                 '&:hover': {
                   bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.08)'
-                      : '#f9fafb',
+                    theme.palette.mode === 'dark' ? '#25272e' : '#f9fafb',
                 },
               }}
             >

@@ -16,7 +16,7 @@ import { surfaceColor } from '@/context';
 export const Header = styled(AppBar)(({ theme }) => ({
   backgroundColor: surfaceColor(
     theme,
-    'rgba(15, 15, 16, 0.75)',
+    'rgba(17, 18, 21, 0.85)',
     'rgba(25, 25, 26, 0.75)',
     'rgba(255, 255, 255, 0.75)',
   ),
@@ -50,8 +50,8 @@ export const LogoIconWrapper = styled(Box)(({ theme }) => ({
   borderRadius: 8,
   backgroundColor:
     theme.palette.mode === 'dark'
-      ? 'rgba(96, 165, 250, 0.15)'
-      : 'rgba(59, 130, 246, 0.15)',
+      ? 'rgba(0, 135, 103, 0.15)'
+      : 'rgba(0, 135, 103, 0.15)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -106,7 +106,7 @@ export const NavbarLink = styled(Link)<{
 
 export const GetStartedButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
-  color: theme.palette.mode === 'dark' ? '#0F0F10' : '#ffffff',
+  color: '#ffffff',
   padding: '8px 18px',
   borderRadius: '8px',
   textTransform: 'none',
@@ -115,11 +115,8 @@ export const GetStartedButton = styled(Button)(({ theme }) => ({
   boxShadow: 'none',
   transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#93C5FD' : '#2563EB',
-    boxShadow:
-      theme.palette.mode === 'dark'
-        ? '0 4px 20px rgba(96, 165, 250, 0.2)'
-        : '0 4px 20px rgba(59, 130, 246, 0.2)',
+    backgroundColor: '#007357',
+    boxShadow: '0 4px 16px rgba(0, 135, 103, 0.3)',
     transform: 'translateY(-1px)',
   },
 }));

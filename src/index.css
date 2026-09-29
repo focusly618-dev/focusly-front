@@ -39,17 +39,17 @@
 }
 
 html.dark {
-  --bg-layout: #0B0F14;
-  --bg-panel: #111827;
-  --bg-card: #1A1F2B;
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-strong: rgba(255, 255, 255, 0.12);
-  --scrollbar-thumb: rgba(255, 255, 255, 0.12);
-  --scrollbar-track: rgba(0, 0, 0, 0.2);
-  --glow-color: rgba(99, 102, 241, 0.15);
+  --bg-layout: #111215;
+  --bg-panel: #18191e;
+  --bg-card: #18191e;
+  --border-subtle: #25272e;
+  --border-strong: #2e3037;
+  --scrollbar-thumb: #2e3037;
+  --scrollbar-track: transparent;
+  --glow-color: rgba(0, 135, 103, 0.15);
   
   background-color: var(--bg-layout);
-  color: #e0e2e9;
+  color: #e5e7eb;
 }
 
 body {

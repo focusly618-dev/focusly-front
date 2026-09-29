@@ -14,29 +14,29 @@ export const getDesignTokens = (mode: ThemeMode) => {
   const isDark = mode !== 'light';
   const isGray = mode === 'graydark';
 
-  // Surface colors: "graydark" swaps the near-black dark surfaces for neutral grays.
-  const surfaceDefault = isGray ? '#19191A' : isDark ? '#0F0F10' : '#FFFFFF';
-  const surfacePaper = isGray ? '#242425' : isDark ? '#202024' : '#FFFFFF';
+  // Surface colors matching new Dark Mode design palette
+  const surfaceDefault = isGray ? '#19191A' : isDark ? '#111215' : '#FFFFFF';
+  const surfacePaper = isGray ? '#242425' : isDark ? '#18191e' : '#FFFFFF';
   const surfacePaperAlpha = isGray
     ? 'rgba(36, 36, 37, 0.92)'
-    : 'rgba(32, 32, 36, 0.9)';
-  const surfaceDivider = isGray ? '#333333' : isDark ? '#2D2D30' : '#E5E5E5';
-  const surfaceInputBg = isGray ? '#1F1F20' : '#18181B';
+    : 'rgba(24, 25, 30, 0.94)';
+  const surfaceDivider = isGray ? '#333333' : isDark ? '#25272e' : '#E5E5E5';
+  const surfaceInputBg = isGray ? '#1F1F20' : '#1e2025';
 
   return createTheme({
     appMode: mode,
     palette: {
       mode: mode === 'light' ? 'light' : 'dark',
       primary: {
-        main: isDark ? '#10B981' : '#008767', // Focusly Emerald Brand
-        light: isDark ? '#34D399' : '#059669',
-        dark: isDark ? '#059669' : '#007357',
+        main: '#008767', // Focusly Emerald Brand
+        light: '#10B981',
+        dark: '#007357',
         contrastText: '#ffffff',
       },
       secondary: {
-        main: isDark ? '#34D399' : '#059669',
-        light: isDark ? '#6EE7B7' : '#10B981',
-        dark: isDark ? '#059669' : '#007357',
+        main: '#2dd4bf', // Mint teal accent
+        light: '#5eead4',
+        dark: '#14b8a6',
         contrastText: '#ffffff',
       },
       success: {
@@ -56,10 +56,8 @@ export const getDesignTokens = (mode: ThemeMode) => {
         paper: surfacePaper, // Cards background
       },
       text: {
-        // Gray Dark's lighter surfaces need brighter text to keep the same
-        // contrast punch regular Dark gets from its near-black background.
-        primary: isGray ? '#FFFFFF' : isDark ? '#F5F5F5' : '#111111',
-        secondary: isGray ? '#C4C4C8' : isDark ? '#A1A1AA' : '#6B7280',
+        primary: isGray ? '#FFFFFF' : isDark ? '#F3F4F6' : '#111111',
+        secondary: isGray ? '#C4C4C8' : isDark ? '#8A8F98' : '#6B7280',
         disabled: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
       },
       divider: surfaceDivider,
@@ -116,15 +114,13 @@ export const getDesignTokens = (mode: ThemeMode) => {
           },
           containedPrimary: {
             boxShadow: 'none',
-            background: isDark ? '#10B981' : '#008767',
+            background: '#008767',
             color: '#ffffff',
             border: 'none',
             '&:hover': {
-              boxShadow: isDark
-                ? '0 4px 20px rgba(16, 185, 129, 0.25)'
-                : '0 4px 20px rgba(0, 135, 103, 0.25)',
+              boxShadow: '0 4px 16px rgba(0, 135, 103, 0.3)',
               transform: 'translateY(-1px)',
-              backgroundColor: isDark ? '#34D399' : '#007357',
+              backgroundColor: '#007357',
             },
           },
         },
@@ -132,9 +128,9 @@ export const getDesignTokens = (mode: ThemeMode) => {
       MuiCheckbox: {
         styleOverrides: {
           root: {
-            color: isDark ? 'rgba(255, 255, 255, 0.3)' : '#D1D5DB',
+            color: isDark ? '#3a3d48' : '#D1D5DB',
             '&.Mui-checked': {
-              color: isDark ? '#10B981' : '#008767',
+              color: '#008767',
             },
           },
         },
@@ -143,7 +139,7 @@ export const getDesignTokens = (mode: ThemeMode) => {
         styleOverrides: {
           root: {
             '&.Mui-checked': {
-              color: isDark ? '#10B981' : '#008767',
+              color: '#008767',
             },
           },
         },
@@ -151,7 +147,7 @@ export const getDesignTokens = (mode: ThemeMode) => {
       MuiTabs: {
         styleOverrides: {
           indicator: {
-            backgroundColor: isDark ? '#10B981' : '#008767',
+            backgroundColor: '#008767',
           },
         },
       },
@@ -190,22 +186,20 @@ export const getDesignTokens = (mode: ThemeMode) => {
           root: {
             borderRadius: '8px',
             transition: 'all 0.2s ease-in-out',
-            backgroundColor: isDark ? surfaceInputBg : undefined, // Surface as background
+            backgroundColor: isDark ? surfaceInputBg : undefined,
             '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: isDark ? surfaceDivider : '#E5E5E5',
+              borderColor: isDark ? '#2e3037' : '#E5E5E5',
             },
             '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: isDark ? '#10B981' : '#008767',
+              borderColor: '#008767',
             },
             '&.Mui-focused': {
-              backgroundColor: isDark ? surfaceDefault : undefined,
+              backgroundColor: isDark ? surfaceInputBg : undefined,
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? '#10B981' : '#008767',
+                borderColor: '#008767',
                 borderWidth: '1.5px',
               },
-              boxShadow: isDark
-                ? '0 0 0 3px rgba(16, 185, 129, 0.15)'
-                : '0 0 0 3px rgba(0, 135, 103, 0.12)',
+              boxShadow: '0 0 0 3px rgba(0, 135, 103, 0.15)',
             },
           },
         },

@@ -204,15 +204,15 @@ export const PriorityChip = styled(Box, {
 
   if (priorityLevel === 3 || priorityLevel === 4) {
     // Alta
-    bg = theme.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2';
+    bg = theme.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.16)' : '#fee2e2';
     color = theme.palette.mode === 'dark' ? '#f87171' : '#dc2626';
   } else if (priorityLevel === 2) {
     // Media
-    bg = theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7';
+    bg = theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.14)' : '#fef3c7';
     color = theme.palette.mode === 'dark' ? '#fbbf24' : '#d97706';
-  } else if (priorityLevel === 1) {
+  } else if (priorityLevel === 1 || priorityLevel === 0) {
     // Baja
-    bg = theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.15)' : '#dcfce7';
+    bg = theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.16)' : '#dcfce7';
     color = theme.palette.mode === 'dark' ? '#34d399' : '#16a34a';
   }
 
@@ -255,7 +255,7 @@ export const DateChip = styled(Box)(({ theme }) => ({
   fontSize: '12px',
   fontWeight: 500,
   backgroundColor: 'transparent',
-  color: theme.palette.mode === 'dark' ? '#9ca3af' : '#4b5563',
+  color: theme.palette.mode === 'dark' ? '#8a8f98' : '#4b5563',
   transition: 'all 0.15s ease',
   width: 'fit-content',
   cursor: 'pointer',
@@ -396,7 +396,7 @@ export const AIText = styled(Typography)({
   letterSpacing: '0.05em',
 });
 
-// Table Styled Components
+// Table Styled Components matching screenshot
 export const TableWrapper = styled(Box)(({ theme }) => ({
   width: '100%',
   flex: 1,
@@ -404,23 +404,14 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   border:
-    theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.08)'
-      : '1px solid #e2e8f0',
+    theme.palette.mode === 'dark' ? '1px solid #25272e' : '1px solid #e2e8f0',
   borderRadius: '16px',
-  backgroundColor: surfaceColor(
-    theme,
-    'rgba(26, 29, 36, 0.95)',
-    'rgba(36, 36, 37, 0.95)',
-    '#ffffff',
-  ),
+  backgroundColor: surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
   overflowX: 'auto',
   overflowY: 'hidden',
   WebkitOverflowScrolling: 'touch',
   boxShadow:
-    theme.palette.mode === 'dark'
-      ? '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
-      : '0 1px 3px rgba(0, 0, 0, 0.02)',
+    theme.palette.mode === 'dark' ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.02)',
   marginBottom: '24px',
   boxSizing: 'border-box',
 }));
@@ -430,19 +421,11 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   gridTemplateColumns:
     '48px minmax(260px, 4fr) 110px 100px 120px 85px 75px 65px',
   padding: '12px 24px',
-  backgroundColor: surfaceColor(
-    theme,
-    'rgba(26, 31, 43, 0.6)',
-    'rgba(36, 36, 37, 0.6)',
-    '#f9fafb',
-  ),
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  color: surfaceColor(
-    theme,
-    'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.65)',
-    '#6B7280',
-  ),
+  backgroundColor: surfaceColor(theme, '#18191e', '#18191e', '#f9fafb'),
+  borderBottom: `1px solid ${
+    theme.palette.mode === 'dark' ? '#25272e' : theme.palette.divider
+  }`,
+  color: theme.palette.mode === 'dark' ? '#717684' : '#6B7280',
   fontWeight: 600,
   fontSize: '11px',
   textTransform: 'uppercase',
@@ -476,16 +459,12 @@ export const TableBodyContainer = styled(Box)(({ theme }) => ({
   },
   '&::-webkit-scrollbar-thumb': {
     background:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.08)'
-        : theme.palette.divider,
+      theme.palette.mode === 'dark' ? '#2e3037' : theme.palette.divider,
     borderRadius: '3px',
   },
   '&::-webkit-scrollbar-thumb:hover': {
     background:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.15)'
-        : theme.palette.text.secondary,
+      theme.palette.mode === 'dark' ? '#3a3d48' : theme.palette.text.secondary,
   },
 }));
 
@@ -498,13 +477,13 @@ export const TableStatusGroupRow = styled(Box, {
   padding: '8px 24px',
   backgroundColor: surfaceColor(
     theme,
-    'rgba(10, 14, 24, 0.95)',
-    'rgba(30, 30, 31, 0.95)',
+    '#14151a',
+    '#1c1d22',
     'rgba(232, 232, 232, 0.62)',
   ),
   borderBottom:
     theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.06)'
+      ? '1px solid #25272e'
       : '1px solid rgba(0, 0, 0, 0.07)',
   backdropFilter: 'blur(12px)',
   position: 'sticky',
@@ -518,8 +497,8 @@ export const TableStatusGroupRow = styled(Box, {
   '&:hover': {
     backgroundColor: surfaceColor(
       theme,
-      'rgba(20, 26, 40, 0.95)',
-      'rgba(40, 40, 41, 0.95)',
+      '#1c1d24',
+      '#23242a',
       'rgba(215, 218, 226, 0.97)',
     ),
   },
@@ -536,9 +515,7 @@ export const TaskRow = styled(Box, {
   backgroundColor: 'transparent',
   opacity: isDone ? 0.65 : 1,
   borderBottom:
-    theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.04)'
-      : '1px solid #f3f4f6',
+    theme.palette.mode === 'dark' ? '1px solid #22242b' : '1px solid #f3f4f6',
   cursor: 'pointer',
   transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   gap: '12px',
@@ -547,7 +524,7 @@ export const TaskRow = styled(Box, {
 
   '&:hover': {
     backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f9fafb',
+      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.025)' : '#f9fafb',
   },
 
   '&:hover .checkbox-cell': {

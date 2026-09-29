@@ -6,12 +6,10 @@ export const SidebarContainer = styled(Box, {
 })<{ collapsed?: boolean }>(({ theme, collapsed }) => ({
   width: collapsed ? 58 : 220,
   transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-  backgroundColor: surfaceColor(theme, '#111827', '#19191A', '#FAFAFA'),
+  backgroundColor: surfaceColor(theme, '#0e0f12', '#111215', '#FAFAFA'),
   backdropFilter: theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
   borderRight:
-    theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.05)'
-      : '1px solid #E5E7EB',
+    theme.palette.mode === 'dark' ? '1px solid #1e2025' : '1px solid #E5E7EB',
   height: '100vh',
   display: 'flex',
   flexDirection: 'column',
@@ -40,8 +38,8 @@ export const SidebarContainer = styled(Box, {
     padding: '6px 12px',
     backgroundColor: surfaceColor(
       theme,
-      'rgba(17, 24, 39, 0.8)',
-      'rgba(25, 25, 26, 0.8)',
+      'rgba(14, 15, 18, 0.85)',
+      'rgba(17, 18, 21, 0.85)',
       'rgba(255, 255, 255, 0.85)',
     ),
     backdropFilter: 'blur(20px)',
@@ -61,11 +59,10 @@ export const Logo = styled(Typography)(({ theme }) => ({
 }));
 
 export const AddTaskButton = styled(Button)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#ffffff',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
   border:
     theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.05)'
+      ? '1px solid #2e3037'
       : '1px solid rgba(0, 0, 0, 0.05)',
   color: theme.palette.text.primary,
   textTransform: 'none',
@@ -79,8 +76,7 @@ export const AddTaskButton = styled(Button)(({ theme }) => ({
     theme.palette.mode === 'dark' ? 'none' : '0 1px 2px rgba(0,0,0,0.02)',
   transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#fafafa',
+    backgroundColor: theme.palette.mode === 'dark' ? '#25272e' : '#fafafa',
     transform: 'translateY(-1px)',
     boxShadow:
       theme.palette.mode === 'dark'
@@ -98,23 +94,39 @@ export const NavItem = styled(ListItemButton, {
   minHeight: 34,
   backgroundColor: active
     ? theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.08)'
+      ? '#102d29'
       : '#EAECEF'
     : 'transparent',
-  color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+  color: active
+    ? theme.palette.mode === 'dark'
+      ? '#2dd4bf'
+      : theme.palette.text.primary
+    : theme.palette.mode === 'dark'
+      ? '#8a8f98'
+      : theme.palette.text.secondary,
   transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
     backgroundColor: active
       ? theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.12)'
+        ? '#133832'
         : '#E2E5E9'
       : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
+        ? 'rgba(255, 255, 255, 0.04)'
         : '#F3F4F6',
-    color: theme.palette.text.primary,
+    color: active
+      ? theme.palette.mode === 'dark'
+        ? '#2dd4bf'
+        : theme.palette.text.primary
+      : theme.palette.text.primary,
   },
   '& .MuiListItemIcon-root': {
-    color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+    color: active
+      ? theme.palette.mode === 'dark'
+        ? '#2dd4bf'
+        : theme.palette.text.primary
+      : theme.palette.mode === 'dark'
+        ? '#8a8f98'
+        : theme.palette.text.secondary,
     minWidth: 28,
     display: 'flex',
     alignItems: 'center',
@@ -137,7 +149,7 @@ export const NavItem = styled(ListItemButton, {
     borderLeft: 'none',
     borderBottom:
       active && theme.palette.mode === 'dark'
-        ? '3px solid #6366f1'
+        ? '3px solid #008767'
         : '3px solid transparent',
     padding: '6px 10px',
     display: 'flex',
@@ -161,15 +173,21 @@ export const SubNavItem = styled(ListItemButton, {
   minHeight: 28,
   backgroundColor: active
     ? theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.08)'
+      ? '#102d29'
       : 'rgba(0, 0, 0, 0.05)'
     : 'transparent',
-  color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+  color: active
+    ? theme.palette.mode === 'dark'
+      ? '#2dd4bf'
+      : theme.palette.text.primary
+    : theme.palette.mode === 'dark'
+      ? '#8a8f98'
+      : theme.palette.text.secondary,
   transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
     backgroundColor:
       theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
+        ? 'rgba(255, 255, 255, 0.04)'
         : 'rgba(0, 0, 0, 0.03)',
     color: theme.palette.text.primary,
   },
@@ -196,18 +214,22 @@ export const NavCountBadge = styled(Box, {
   textAlign: 'center',
   backgroundColor: active
     ? theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.12)'
+      ? 'rgba(45, 212, 191, 0.18)'
       : '#E5E7EB'
     : theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.08)'
+      ? '#25272e'
       : '#E5E7EB',
-  color: theme.palette.text.secondary,
+  color: active
+    ? theme.palette.mode === 'dark'
+      ? '#2dd4bf'
+      : theme.palette.text.primary
+    : theme.palette.text.secondary,
   marginLeft: 'auto',
   transition: 'all 0.15s ease',
 }));
 
 export const CategoryHeader = styled(Typography)(({ theme }) => ({
-  color: '#9CA3AF',
+  color: theme.palette.mode === 'dark' ? '#717684' : '#9CA3AF',
   fontWeight: 700,
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
@@ -297,13 +319,13 @@ export const WorkspaceItemRow = styled(Box, {
   margin: '2px 0',
   backgroundColor: isActive
     ? theme.palette.mode === 'dark'
-      ? 'rgba(59, 130, 246, 0.12)'
-      : 'rgba(59, 130, 246, 0.08)'
+      ? 'rgba(0, 135, 103, 0.18)'
+      : 'rgba(0, 135, 103, 0.08)'
     : 'transparent',
   color: isActive
     ? theme.palette.mode === 'dark'
-      ? '#93c5fd'
-      : '#1d4ed8'
+      ? '#2dd4bf'
+      : '#008767'
     : theme.palette.text.secondary,
   fontWeight: isActive ? 600 : 400,
   fontSize: '0.85rem',
@@ -322,8 +344,8 @@ export const WorkspaceItemRow = styled(Box, {
   '&:hover': {
     backgroundColor: isActive
       ? theme.palette.mode === 'dark'
-        ? 'rgba(59, 130, 246, 0.16)'
-        : 'rgba(59, 130, 246, 0.12)'
+        ? 'rgba(0, 135, 103, 0.24)'
+        : 'rgba(0, 135, 103, 0.12)'
       : theme.palette.mode === 'dark'
         ? 'rgba(255, 255, 255, 0.03)'
         : 'rgba(0, 0, 0, 0.02)',

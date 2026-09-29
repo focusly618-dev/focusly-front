@@ -72,30 +72,28 @@ export const StatusTabButton = muiStyled(Button, {
   color: active
     ? '#ffffff'
     : theme.palette.mode === 'dark'
-      ? '#d1d5db'
+      ? '#8a8f98'
       : '#374151',
   backgroundColor: active
     ? '#008767'
     : theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.04)'
+      ? '#1e2025'
       : '#ffffff',
   border: active
     ? '1px solid transparent'
-    : `1px solid ${
-        theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e5e7eb'
-      }`,
+    : `1px solid ${theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb'}`,
   boxShadow: active ? '0 1px 3px rgba(0, 135, 103, 0.25)' : 'none',
   transition: 'all 0.15s ease',
   '&:hover': {
     backgroundColor: active
       ? '#007357'
       : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.08)'
+        ? '#25272e'
         : '#f9fafb',
     borderColor: active
       ? 'transparent'
       : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.15)'
+        ? '#3a3d48'
         : '#d1d5db',
   },
 }));
@@ -112,14 +110,14 @@ export const TabCountBadge = muiStyled(Box, {
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: active
-    ? 'rgba(255, 255, 255, 0.24)'
+    ? 'rgba(0, 0, 0, 0.2)'
     : theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.1)'
+      ? '#282b33'
       : '#f3f4f6',
   color: active
     ? '#ffffff'
     : theme.palette.mode === 'dark'
-      ? '#9ca3af'
+      ? '#d1d5db'
       : '#4b5563',
   transition: 'all 0.15s ease',
 }));

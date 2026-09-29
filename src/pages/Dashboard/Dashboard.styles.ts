@@ -87,7 +87,7 @@ export const IconBox = styled(Box)<{ selected?: boolean }>(
     borderRadius: '8px',
     backgroundColor: selected
       ? theme.palette.primary.main
-      : surfaceColor(theme, '#2a3b4d', '#2A2A2C', theme.palette.grey[200]),
+      : surfaceColor(theme, '#1e2025', '#2A2A2C', theme.palette.grey[200]),
     color: selected ? '#ffffff' : theme.palette.text.secondary,
     transition: 'background-color 0.2s ease, color 0.2s ease',
   }),
@@ -194,7 +194,7 @@ export const IconContainer = styled(Box)(({ theme }) => ({
   borderRadius: '8px',
   backgroundColor: surfaceColor(
     theme,
-    '#233648',
+    '#1e2025',
     '#2A2A2C',
     theme.palette.grey[200],
   ),
@@ -451,7 +451,7 @@ export const ProfileInput = styled('input')(({ theme }) => ({
   border: `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
   backgroundColor: surfaceColor(
     theme,
-    'rgba(15, 23, 42, 0.5)',
+    '#1e2025',
     'rgba(31, 31, 32, 0.5)',
     theme.palette.background.paper,
   ),
@@ -466,7 +466,7 @@ export const ProfileInput = styled('input')(({ theme }) => ({
     borderColor: theme.palette.primary.main,
     backgroundColor: surfaceColor(
       theme,
-      'rgba(15, 23, 42, 0.8)',
+      '#25272e',
       'rgba(31, 31, 32, 0.8)',
       theme.palette.background.paper,
     ),
@@ -481,7 +481,7 @@ export const ProfileTextArea = styled('textarea')(({ theme }) => ({
   border: `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
   backgroundColor: surfaceColor(
     theme,
-    'rgba(15, 23, 42, 0.5)',
+    '#1e2025',
     'rgba(31, 31, 32, 0.5)',
     theme.palette.background.paper,
   ),
@@ -499,7 +499,7 @@ export const ProfileTextArea = styled('textarea')(({ theme }) => ({
     borderColor: theme.palette.primary.main,
     backgroundColor: surfaceColor(
       theme,
-      'rgba(15, 23, 42, 0.8)',
+      '#25272e',
       'rgba(31, 31, 32, 0.8)',
       theme.palette.background.paper,
     ),

@@ -87,7 +87,14 @@ export const TasksControlsBar = ({
             startAdornment: (
               <InputAdornment position="start">
                 <SearchIcon
-                  sx={{ color: 'text.secondary', fontSize: 18, ml: 0.5 }}
+                  sx={{
+                    color: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? '#717684'
+                        : 'text.secondary',
+                    fontSize: 18,
+                    ml: 0.5,
+                  }}
                 />
               </InputAdornment>
             ),
@@ -99,20 +106,14 @@ export const TasksControlsBar = ({
               height: 38,
               fontSize: '13px',
               bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.03)'
-                  : '#ffffff',
+                theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
               '& fieldset': {
                 borderColor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.1)'
-                    : '#e5e7eb',
+                  theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
               },
               '&:hover fieldset': {
                 borderColor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.2)'
-                    : '#d1d5db',
+                  theme.palette.mode === 'dark' ? '#3a3d48' : '#d1d5db',
               },
               '&.Mui-focused fieldset': {
                 borderColor: '#008767',
@@ -122,32 +123,33 @@ export const TasksControlsBar = ({
           }}
         />
 
-        {/* Priority Filter Dropdown Pill */}
+        {/* Priority Filter Dropdown Pill matching screenshot */}
         <Button
           onClick={(e) => setPriorityAnchor(e.currentTarget)}
           endIcon={
             <KeyboardArrowDownIcon
-              sx={{ fontSize: 18, color: 'text.secondary' }}
+              sx={{
+                fontSize: 18,
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? '#2dd4bf' : '#008767',
+              }}
             />
           }
           sx={{
             textTransform: 'none',
             fontWeight: 600,
             fontSize: '13px',
-            color:
-              priorityDisplayLabel !== 'Todas' ? '#008767' : 'text.primary',
+            color: (theme) =>
+              theme.palette.mode === 'dark' ? '#2dd4bf' : '#008767',
             bgcolor: (theme) =>
               theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
+                ? '#102d29'
+                : 'rgba(0, 135, 103, 0.08)',
             border: '1px solid',
-            borderColor:
-              priorityDisplayLabel !== 'Todas'
-                ? '#008767'
-                : (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.1)'
-                      : '#e5e7eb',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? '#175246'
+                : 'rgba(0, 135, 103, 0.25)',
             borderRadius: '8px',
             height: 38,
             px: 1.75,
@@ -155,8 +157,8 @@ export const TasksControlsBar = ({
             '&:hover': {
               bgcolor: (theme) =>
                 theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.06)'
-                  : '#f9fafb',
+                  ? '#133935'
+                  : 'rgba(0, 135, 103, 0.12)',
             },
           }}
         >
@@ -235,37 +237,36 @@ export const TasksControlsBar = ({
           </MenuItem>
         </Menu>
 
-        {/* Responsables Dropdown Pill */}
+        {/* Responsables Dropdown Pill matching screenshot */}
         <Button
           onClick={(e) => setAssigneeAnchor(e.currentTarget)}
           endIcon={
             <KeyboardArrowDownIcon
-              sx={{ fontSize: 18, color: 'text.secondary' }}
+              sx={{
+                fontSize: 18,
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? '#8a8f98' : 'text.secondary',
+              }}
             />
           }
           sx={{
             textTransform: 'none',
             fontWeight: 600,
             fontSize: '13px',
-            color: 'text.primary',
+            color: (theme) =>
+              theme.palette.mode === 'dark' ? '#8a8f98' : 'text.primary',
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.03)'
-                : '#ffffff',
+              theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
             border: '1px solid',
             borderColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.1)'
-                : '#e5e7eb',
+              theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
             borderRadius: '8px',
             height: 38,
             px: 1.75,
             whiteSpace: 'nowrap',
             '&:hover': {
               bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.06)'
-                  : '#f9fafb',
+                theme.palette.mode === 'dark' ? '#25272e' : '#f9fafb',
             },
           }}
         >
@@ -301,23 +302,19 @@ export const TasksControlsBar = ({
         </Menu>
       </Box>
 
-      {/* Right side: Segmented Lista / Kanban Toggle */}
+      {/* Right side: Segmented Lista / Kanban Toggle matching screenshot */}
       <Box
         id="joyride-tasks-view-toggle"
         sx={{
           display: 'flex',
           alignItems: 'center',
           bgcolor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255,255,255,0.04)'
-              : '#f3f4f6',
+            theme.palette.mode === 'dark' ? '#17181c' : '#f3f4f6',
           p: '3px',
           borderRadius: '8px',
           border: '1px solid',
           borderColor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255,255,255,0.08)'
-              : '#e5e7eb',
+            theme.palette.mode === 'dark' ? '#24262d' : '#e5e7eb',
         }}
       >
         <Button
@@ -335,21 +332,29 @@ export const TasksControlsBar = ({
             bgcolor:
               viewMode === 'list'
                 ? (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.14)'
-                      : '#ffffff'
+                    theme.palette.mode === 'dark' ? '#2b2d35' : '#ffffff'
                 : 'transparent',
-            color: viewMode === 'list' ? 'text.primary' : 'text.secondary',
-            boxShadow:
-              viewMode === 'list' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+            color:
+              viewMode === 'list'
+                ? (theme) =>
+                    theme.palette.mode === 'dark' ? '#ffffff' : 'text.primary'
+                : (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? '#717684'
+                      : 'text.secondary',
+            boxShadow: (theme) =>
+              viewMode === 'list' && theme.palette.mode !== 'dark'
+                ? '0 1px 2px rgba(0,0,0,0.06)'
+                : 'none',
             '&:hover': {
               bgcolor:
                 viewMode === 'list'
                   ? (theme) =>
+                      theme.palette.mode === 'dark' ? '#32353e' : '#ffffff'
+                  : (theme) =>
                       theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.18)'
-                        : '#ffffff'
-                  : 'rgba(0,0,0,0.04)',
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(0,0,0,0.04)',
             },
           }}
         >
@@ -370,21 +375,29 @@ export const TasksControlsBar = ({
             bgcolor:
               viewMode === 'board'
                 ? (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.14)'
-                      : '#ffffff'
+                    theme.palette.mode === 'dark' ? '#2b2d35' : '#ffffff'
                 : 'transparent',
-            color: viewMode === 'board' ? 'text.primary' : 'text.secondary',
-            boxShadow:
-              viewMode === 'board' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+            color:
+              viewMode === 'board'
+                ? (theme) =>
+                    theme.palette.mode === 'dark' ? '#ffffff' : 'text.primary'
+                : (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? '#717684'
+                      : 'text.secondary',
+            boxShadow: (theme) =>
+              viewMode === 'board' && theme.palette.mode !== 'dark'
+                ? '0 1px 2px rgba(0,0,0,0.06)'
+                : 'none',
             '&:hover': {
               bgcolor:
                 viewMode === 'board'
                   ? (theme) =>
+                      theme.palette.mode === 'dark' ? '#32353e' : '#ffffff'
+                  : (theme) =>
                       theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.18)'
-                        : '#ffffff'
-                  : 'rgba(0,0,0,0.04)',
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(0,0,0,0.04)',
             },
           }}
         >

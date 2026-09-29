@@ -136,7 +136,7 @@ export const SuggestionCard = styled(Box)(({ theme }) => {
         : theme.palette.divider
     }`,
     backgroundColor: isDark
-      ? surfaceColor(theme, '#18181B', '#242425', 'rgba(241, 245, 249, 0.5)')
+      ? surfaceColor(theme, '#18191e', '#242425', 'rgba(241, 245, 249, 0.5)')
       : 'rgba(241, 245, 249, 0.5)',
     cursor: 'pointer',
     transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -148,7 +148,7 @@ export const SuggestionCard = styled(Box)(({ theme }) => {
       transform: 'translateY(-2px)',
       borderColor: theme.palette.primary.main,
       backgroundColor: isDark
-        ? surfaceColor(theme, '#202024', '#2C2C2E', '#ffffff')
+        ? surfaceColor(theme, '#1e2025', '#2C2C2E', '#ffffff')
         : '#ffffff',
       boxShadow: isDark
         ? '0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(96, 165, 250, 0.1)'
@@ -242,14 +242,14 @@ export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
     backgroundColor: isUser
       ? '#008767'
       : theme.palette.mode === 'dark'
-        ? surfaceColor(theme, '#18181b', '#202022', '#ffffff')
+        ? surfaceColor(theme, '#18191e', '#202022', '#ffffff')
         : '#ffffff',
     color: isUser ? '#ffffff' : theme.palette.text.primary,
     fontSize: '14px',
     lineHeight: '1.65',
     border: isUser
       ? 'none'
-      : `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0'}`,
+      : `1px solid ${theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0'}`,
     boxShadow: isUser
       ? '0 2px 8px rgba(0, 135, 103, 0.2)'
       : theme.palette.mode === 'dark'
@@ -384,11 +384,11 @@ export const SuggestionsBar = styled(Box)(({ theme }) => ({
     padding: '5px 13px',
     borderRadius: '20px',
     border: `1px solid ${
-      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0'
+      theme.palette.mode === 'dark' ? '#2e3037' : '#e2e8f0'
     }`,
     backgroundColor:
       theme.palette.mode === 'dark'
-        ? surfaceColor(theme, '#18181b', '#202022', '#ffffff')
+        ? surfaceColor(theme, '#1e2025', '#202022', '#ffffff')
         : '#ffffff',
     color: theme.palette.text.primary,
     fontSize: '12px',
@@ -479,9 +479,9 @@ export const InputBox = styled(Paper)(({ theme }) => {
     width: '100%',
     maxWidth: '860px',
     backgroundColor: isDark
-      ? surfaceColor(theme, '#18181B', '#1F1F20', '#ffffff')
+      ? surfaceColor(theme, '#18191e', '#1F1F20', '#ffffff')
       : '#ffffff',
-    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0'}`,
+    border: `1px solid ${isDark ? '#2e3037' : '#e2e8f0'}`,
     boxShadow: isDark
       ? '0 4px 20px rgba(0, 0, 0, 0.25)'
       : '0 2px 10px rgba(0, 0, 0, 0.04)',
@@ -541,7 +541,7 @@ export const HistorySidebar = styled(Box)<{ isOpen?: boolean }>(
   ({ theme, isOpen = true }) => ({
     width: isOpen ? '300px' : '0px',
     height: '100%',
-    backgroundColor: surfaceColor(theme, '#131518', '#1c1d20', '#ffffff'),
+    backgroundColor: surfaceColor(theme, '#0e0f12', '#1c1d20', '#ffffff'),
     borderLeft: isOpen ? `1px solid ${theme.palette.divider}` : 'none',
     display: 'flex',
     flexDirection: 'column',
@@ -578,7 +578,7 @@ export const ChatHeader = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
   backgroundColor: surfaceColor(
     theme,
-    'rgba(15, 15, 16, 0.85)',
+    'rgba(17, 18, 21, 0.85)',
     'rgba(36, 36, 37, 0.4)',
     '#ffffff',
   ),

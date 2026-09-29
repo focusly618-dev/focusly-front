@@ -156,7 +156,10 @@ export const ListViewTask = ({
                   width: 17,
                   height: 17,
                   borderRadius: '4px',
-                  border: '1.5px solid #d1d5db',
+                  border: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? '1.5px solid #3a3d48'
+                      : '1.5px solid #d1d5db',
                   bgcolor: 'transparent',
                   transition: 'all 0.15s ease',
                   '&:hover': {
@@ -218,7 +221,7 @@ export const ListViewTask = ({
           )}
         </Box>
 
-        {/* Cell 3: Subtareas (Mini Progress Bar + Count) */}
+        {/* Cell 3: Subtareas (Mini Progress Bar + Count matching screenshot) */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {subtasksTotal > 0 ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -228,9 +231,7 @@ export const ListViewTask = ({
                   height: 5,
                   borderRadius: 3,
                   bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.1)'
-                      : '#e5e7eb',
+                    theme.palette.mode === 'dark' ? '#2a2c36' : '#e5e7eb',
                   overflow: 'hidden',
                 }}
               >
@@ -238,7 +239,8 @@ export const ListViewTask = ({
                   sx={{
                     width: `${Math.round((subtasksDone / subtasksTotal) * 100)}%`,
                     height: '100%',
-                    bgcolor: '#008767',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark' ? '#2dd4bf' : '#008767',
                     borderRadius: 3,
                     transition: 'width 0.3s ease',
                   }}
@@ -247,7 +249,8 @@ export const ListViewTask = ({
               <Typography
                 sx={{
                   fontSize: '11.5px',
-                  color: '#6b7280',
+                  color: (theme) =>
+                    theme.palette.mode === 'dark' ? '#8a8f98' : '#6b7280',
                   fontWeight: 600,
                   fontFamily: 'monospace',
                 }}
@@ -293,7 +296,13 @@ export const ListViewTask = ({
               cursor: isReadOnly ? 'default' : 'pointer',
             }}
           >
-            <CalendarTodayIcon sx={{ fontSize: 13, color: '#6b7280' }} />
+            <CalendarTodayIcon
+              sx={{
+                fontSize: 13,
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? '#717684' : '#6b7280',
+              }}
+            />
             <span>{formattedDate}</span>
           </DateChip>
         </Box>
@@ -341,12 +350,13 @@ export const ListViewTask = ({
             sx={{
               width: 28,
               height: 28,
-              color: '#6b7280',
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? '#717684' : '#6b7280',
               borderRadius: '6px',
               '&:hover': {
                 bgcolor: (theme) =>
                   theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.08)'
+                    ? 'rgba(255,255,255,0.06)'
                     : '#f3f4f6',
                 color: 'text.primary',
               },

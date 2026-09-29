@@ -8,7 +8,7 @@ export const PageContainer = styled(Box)(({ theme }) => ({
   padding: '32px',
   height: '100%',
   overflowY: 'auto',
-  backgroundColor: surfaceColor(theme, '#121318', '#19191A', '#fafbfd'),
+  backgroundColor: surfaceColor(theme, '#111215', '#111215', '#fafbfd'),
   color: theme.palette.text.primary,
 }));
 

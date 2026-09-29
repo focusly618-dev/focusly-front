@@ -120,8 +120,8 @@ export const SidebarHeader = ({ sidebar }: SidebarHeaderProps) => {
                 color: theme.palette.primary.main,
                 bgcolor:
                   theme.palette.mode === 'dark'
-                    ? 'rgba(99,102,241,0.12)'
-                    : 'rgba(99,102,241,0.08)',
+                    ? 'rgba(0, 135, 103, 0.15)'
+                    : 'rgba(0, 135, 103, 0.08)',
               },
             }}
           >
