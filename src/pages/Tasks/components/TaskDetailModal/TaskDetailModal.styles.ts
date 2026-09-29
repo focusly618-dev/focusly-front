@@ -218,32 +218,19 @@ export const titleInputPropsSx = {
     backgroundColor: 'transparent',
     borderRadius: '0px',
     padding: 0,
-    fontSize: '1.625rem',
+    fontSize: '1.45rem',
     fontWeight: 700,
     color: (theme: Theme) =>
       theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a',
-    borderBottom: (theme: Theme) =>
-      theme.palette.mode === 'dark'
-        ? '1px solid rgba(255, 255, 255, 0.12)'
-        : '1px solid rgba(0, 0, 0, 0.08)',
-    transition: 'border-bottom-color 0.2s ease, border-bottom-width 0.1s ease',
+    border: 'none',
     '& fieldset': { display: 'none' },
-    '&:hover': {
-      borderBottom: (theme: Theme) =>
-        theme.palette.mode === 'dark'
-          ? '1px solid rgba(255, 255, 255, 0.25)'
-          : '1px solid rgba(0, 0, 0, 0.18)',
-    },
-    '&.Mui-focused': {
-      backgroundColor: 'transparent',
-      boxShadow: 'none',
-      borderBottom: '2px solid #008767',
-      paddingBottom: '0px',
-    },
     '& input': {
       color: (theme: Theme) =>
         theme.palette.mode === 'dark' ? '#f8fafc' : '#0f172a',
-      padding: '8px 0px',
+      padding: '4px 0px',
+      fontSize: '1.45rem',
+      fontWeight: 700,
+      lineHeight: 1.3,
       '&::placeholder': {
         color: (theme: Theme) =>
           theme.palette.mode === 'dark'
@@ -363,33 +350,37 @@ export const saveButtonSx = {
 
 export const descriptionInputSx = {
   backgroundColor: (theme: Theme) =>
-    surfaceColor(theme, '#1e2025', '#2A2A2C', 'background.default'),
-  borderRadius: '12px',
-  mt: 1,
+    surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
+  borderRadius: '10px',
+  mt: 0.5,
   '& .MuiOutlinedInput-root': {
-    padding: '12px 16px',
-    '& fieldset': { borderColor: 'transparent' },
+    padding: '12px 14px',
+    borderRadius: '10px',
+    '& fieldset': {
+      borderColor: (theme: Theme) =>
+        theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
+    },
     '&:hover fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#2e3037' : 'divider',
+        theme.palette.mode === 'dark' ? '#3a3d48' : '#cbd5e1',
     },
     '&.Mui-focused fieldset': {
       borderColor: '#008767',
     },
     '&.Mui-focused': {
-      boxShadow: '0 0 0 3px rgba(0, 135, 103, 0.15)',
+      boxShadow: '0 0 0 2px rgba(0, 135, 103, 0.15)',
     },
   },
   '& .MuiInputBase-root': {
     color: 'text.primary',
   },
   '& textarea': {
-    fontSize: '14px',
+    fontSize: '13.5px',
     lineHeight: 1.6,
     color: 'text.primary',
     '&::placeholder': {
       color: 'text.secondary',
-      opacity: 0.7,
+      opacity: 0.8,
     },
   },
 };

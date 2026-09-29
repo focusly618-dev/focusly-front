@@ -1,8 +1,9 @@
 import type { Theme } from '@mui/material/styles';
+import { surfaceColor } from '@/context';
 
 export const subtasksContainerSx = {
-  px: 4,
-  mb: 2.5,
+  mt: 3,
+  mb: 2,
 };
 
 export const subtasksHeaderSx = {
@@ -13,79 +14,48 @@ export const subtasksHeaderSx = {
 };
 
 export const subtaskCountBadgeSx = (allCompleted: boolean) => ({
-  ml: 1.2,
-  px: 1,
-  py: 0.2,
-  borderRadius: '12px',
+  ml: 1,
+  px: 0.8,
+  py: 0.15,
+  borderRadius: '10px',
   bgcolor: allCompleted
     ? 'rgba(16, 185, 129, 0.15)'
     : (theme: Theme) =>
         theme.palette.mode === 'dark'
           ? 'rgba(0, 135, 103, 0.18)'
           : 'rgba(0, 135, 103, 0.1)',
-  color: allCompleted
-    ? '#10b981'
-    : (theme: Theme) => (theme.palette.mode === 'dark' ? '#10b981' : '#008767'),
+  color: allCompleted ? '#10b981' : '#008767',
   fontSize: '11px',
   fontWeight: 700,
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 0.5,
-  border: '1px solid',
-  borderColor: allCompleted
-    ? 'rgba(16, 185, 129, 0.3)'
-    : 'rgba(0, 135, 103, 0.25)',
-  transition: 'all 0.2s ease',
 });
 
 export const progressBarContainerSx = {
   width: '100%',
-  height: 4,
+  height: 3,
   borderRadius: 2,
   bgcolor: (theme: Theme) =>
     theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, 0.08)'
       : 'rgba(0, 0, 0, 0.06)',
   overflow: 'hidden',
-  mb: 2,
+  mb: 1.5,
 };
 
-export const subtaskItemSx = (completed: boolean) => ({
+export const subtaskItemSx = (completed?: boolean) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  py: 0.8,
-  px: 1.2,
+  py: 0.75,
+  px: 1,
   borderRadius: '8px',
-  bgcolor: (theme: Theme) =>
-    completed
-      ? theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.015)'
-        : 'rgba(0, 0, 0, 0.015)'
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.03)'
-        : 'rgba(0, 0, 0, 0.02)',
-  border: '1px solid',
-  borderColor: (theme: Theme) =>
-    completed
-      ? 'transparent'
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.06)'
-        : 'rgba(0, 0, 0, 0.06)',
-  transition: 'all 0.18s ease-in-out',
+  bgcolor: 'transparent',
+  opacity: completed ? 0.75 : 1,
+  transition: 'all 0.15s ease-in-out',
   '&:hover': {
     bgcolor: (theme: Theme) =>
       theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.06)'
-        : 'rgba(0, 0, 0, 0.04)',
-    borderColor: (theme: Theme) =>
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.12)'
-        : 'rgba(0, 0, 0, 0.1)',
-    '& .subtask-actions': {
-      opacity: 1,
-      visibility: 'visible',
-    },
+        ? 'rgba(255, 255, 255, 0.04)'
+        : 'rgba(0, 0, 0, 0.03)',
   },
 });
 
@@ -93,41 +63,41 @@ export const subtaskInputFormSx = {
   display: 'flex',
   alignItems: 'center',
   gap: 1,
-  mt: 1.2,
-  p: '4px 8px 4px 12px',
-  borderRadius: '8px',
+  mt: 1,
+  px: 1.5,
+  py: 0.8,
+  borderRadius: '10px',
   bgcolor: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.03)'
-      : 'rgba(0, 0, 0, 0.02)',
-  border: '1px dashed',
+    surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
+  border: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.15)'
-      : 'rgba(0, 0, 0, 0.15)',
+    theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
   transition: 'border-color 0.2s, background-color 0.2s',
   '&:focus-within': {
-    borderColor: 'primary.main',
-    bgcolor: (theme: Theme) =>
-      theme.palette.mode === 'dark'
-        ? 'rgba(0, 135, 103, 0.08)'
-        : 'rgba(0, 135, 103, 0.04)',
+    borderColor: '#008767',
+    boxShadow: '0 0 0 2px rgba(0, 135, 103, 0.15)',
   },
 };
 
 export const aiButtonSx = {
   textTransform: 'none',
-  borderRadius: '6px',
-  px: 1.2,
-  py: 0.3,
-  fontSize: '11px',
+  borderRadius: '20px',
+  px: 1.5,
+  py: 0.35,
+  fontSize: '11.5px',
   fontWeight: 600,
-  color: '#8b5cf6',
-  border: '1px solid rgba(139, 92, 246, 0.3)',
-  bgcolor: 'rgba(139, 92, 246, 0.06)',
-  gap: 0.6,
+  color: '#008767',
+  border: '1px solid rgba(0, 135, 103, 0.3)',
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(0, 135, 103, 0.15)'
+      : 'rgba(0, 135, 103, 0.06)',
+  gap: 0.5,
   '&:hover': {
-    bgcolor: 'rgba(139, 92, 246, 0.14)',
-    borderColor: '#8b5cf6',
+    bgcolor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(0, 135, 103, 0.25)'
+        : 'rgba(0, 135, 103, 0.12)',
+    borderColor: '#008767',
   },
 };

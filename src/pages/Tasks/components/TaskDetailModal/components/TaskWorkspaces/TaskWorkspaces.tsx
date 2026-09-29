@@ -61,7 +61,7 @@ export const TaskWorkspaces: React.FC<TaskWorkspacesProps> = ({
   if (!workspaces || workspaces.length === 0) return null;
 
   return (
-    <Box sx={{ px: 4, mb: 4 }}>
+    <Box sx={{ mt: 2, mb: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
         <WorkspaceIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
         <Typography

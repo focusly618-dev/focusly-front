@@ -1,113 +1,130 @@
-import { alpha, type Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
+import { surfaceColor } from '@/context';
 
 export const propertiesContainerSx = {
-  mt: 2,
-  px: 4,
-  mb: 4,
   display: 'flex',
   flexDirection: 'column',
   gap: 2,
 };
 
-export const metadataRowSx = {
+export const propertiesCardSx = {
+  p: 2,
+  borderRadius: '16px',
+  bgcolor: (theme: Theme) =>
+    surfaceColor(theme, '#1e2025', '#1e2025', '#f8fafc'),
+  border: '1px solid',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#25272e' : 'rgba(0, 0, 0, 0.06)',
   display: 'flex',
-  flexWrap: 'wrap',
-  gap: 2,
-  mb: 1,
+  flexDirection: 'column',
+  gap: 1.5,
 };
 
-export const metadataChipSx = (isHighPriority = false) => {
-  return {
-    bgcolor: (theme: Theme) => {
-      if (isHighPriority) {
-        return theme.palette.mode === 'dark'
-          ? alpha('#ef4444', 0.15)
-          : alpha('#ef4444', 0.08);
-      }
-      return theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
-        : 'rgba(0, 0, 0, 0.04)';
-    },
-    border: '1px solid',
-    borderColor: (theme: Theme) => {
-      if (isHighPriority) {
-        return theme.palette.mode === 'dark'
-          ? alpha('#ef4444', 0.25)
-          : alpha('#ef4444', 0.15);
-      }
-      return 'divider';
-    },
-    color: (theme: Theme) => {
-      if (isHighPriority) {
-        return '#ef4444';
-      }
-      return theme.palette.text.secondary;
-    },
-    borderRadius: '20px',
-    px: 1.5,
-    height: '28px',
-    fontSize: '12px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-    '&:hover': {
-      bgcolor: (theme: Theme) => {
-        if (isHighPriority) {
-          return theme.palette.mode === 'dark'
-            ? alpha('#ef4444', 0.25)
-            : alpha('#ef4444', 0.12);
-        }
-        return theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.1)'
-          : 'rgba(0, 0, 0, 0.08)';
-      },
-      transform: 'translateY(-0.5px)',
-    },
-    '& .MuiChip-icon': {
-      marginLeft: '-2px',
-      color: 'inherit',
-      fontSize: '14px',
-    },
-  };
+export const propertyRowSx = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  minHeight: '34px',
 };
 
-export const colorCircleSx = (color: string) => ({
-  width: 24,
-  height: 24,
-  borderRadius: '50%',
-  bgcolor: color,
+export const propertyLabelSx = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 1.25,
+  color: 'text.secondary',
+  minWidth: '110px',
+  '& svg': {
+    fontSize: 16,
+    color: 'text.secondary',
+  },
+  '& span, & p': {
+    fontSize: '13px',
+    fontWeight: 500,
+    color: 'text.secondary',
+  },
+};
+
+export const propertyPillSx = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 0.75,
+  px: 1.5,
+  py: 0.4,
+  borderRadius: '20px',
+  fontSize: '13px',
+  fontWeight: 600,
   cursor: 'pointer',
-  border: '2px solid white',
-  boxShadow: '0 0 0 1px rgba(0,0,0,0.1)',
-  transition: 'transform 0.2s',
-  '&:hover': { transform: 'scale(1.1)' },
-});
-
-export const timerInputSx = () => ({
-  width: '70px',
-  bgcolor: 'transparent',
+  transition: 'all 0.15s ease',
+  bgcolor: (theme: Theme) =>
+    surfaceColor(theme, '#25272e', '#25272e', '#ffffff'),
+  border: '1px solid',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#2e3037' : '#e2e8f0',
+  color: 'text.primary',
   '&:hover': {
-    bgcolor: 'action.hover',
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#3a3d48' : '#cbd5e1',
+    bgcolor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#2a2c35' : '#f1f5f9',
   },
-  borderRadius: '4px',
-  px: 0.5,
-  '& .MuiInputBase-input': {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: 'text.primary',
-    padding: 0,
+};
+
+export const scheduleGridSx = {
+  display: 'grid',
+  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+  gap: 2,
+  mt: 0.5,
+};
+
+export const scheduleBoxSx = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 1,
+  px: 1.75,
+  py: 1,
+  minHeight: '44px',
+  borderRadius: '10px',
+  border: '1px solid',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
+  bgcolor: (theme: Theme) =>
+    surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
+  cursor: 'pointer',
+  transition: 'border-color 0.15s ease',
+  '&:hover': {
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'dark' ? '#3a3d48' : '#cbd5e1',
   },
-});
+};
+
+export const timeSlotBannerSx = {
+  mt: 1.5,
+  px: 2,
+  py: 1.25,
+  borderRadius: '10px',
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(0, 135, 103, 0.18)'
+      : 'rgba(0, 135, 103, 0.09)',
+  border: '1px solid rgba(0, 135, 103, 0.22)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+};
 
 export const popoverPaperSx = {
   borderRadius: '12px',
   mt: 1,
-  boxShadow: 'none',
+  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.25)',
+  border: '1px solid',
+  borderColor: 'divider',
 };
 
 export const timerPopoverPaperSx = {
-  minWidth: 80,
+  minWidth: 100,
   borderRadius: '12px',
+  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.25)',
 };
 
 export const timeLogPopoverPaperSx = {

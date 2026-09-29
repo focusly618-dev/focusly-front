@@ -14,21 +14,12 @@ import {
 } from '@mui/material';
 import {
   Link as LinkIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
   VideoCall as VideoCallIcon,
-  Add as AddIcon,
   Launch as LaunchIcon,
   Close as CloseIcon,
   PersonAdd as PersonAddIcon,
-  LinkOff as LinkOffIcon,
 } from '@mui/icons-material';
 import {
-  resourcesContainerSx,
-  resourcesHeaderSx,
-  resourceCountSx,
-  addMeetButtonSx,
-  addResourceButtonSx,
   resourceItemSx,
   resourceIconContainerSx,
   resourceLinkButtonSx,
@@ -73,7 +64,6 @@ interface TaskResourcesProps {
 export const TaskResources = ({
   links,
   isLinksExpanded,
-  setIsLinksExpanded,
   isGeneratingMeet,
   handleGenerateMeet,
   hasMeetLink,
@@ -129,141 +119,115 @@ export const TaskResources = ({
   const showCollaboratorSection =
     hasMeetLink && (isAddingCollaborator || collaborators.length > 0);
 
-  const showEmptyLinks = () => {
-    return (
-      <Box display="flex" alignItems="center" gap={1}>
-        <LinkOffIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-        <Typography
-          variant="caption"
-          sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}
-        >
-          Sin enlaces ni recursos
-        </Typography>
-      </Box>
-    );
-  };
   return (
-    <Box sx={resourcesContainerSx}>
-      <Box
-        sx={resourcesHeaderSx(isLinksExpanded)}
-        onClick={() => setIsLinksExpanded(!isLinksExpanded)}
+    <Box sx={{ mt: 3, mb: 2 }}>
+      {/* Section Header */}
+      <Typography
+        sx={{
+          fontWeight: 700,
+          color: 'text.secondary',
+          fontSize: '11px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          mb: 1.25,
+        }}
       >
-        {isLoadingDetail && links.length === 0 ? (
-          <Box display="flex" alignItems="center" gap={1}>
-            <Skeleton variant="circular" width={16} height={16} />
-            <Skeleton variant="text" width={130} height={18} />
-          </Box>
-        ) : links.length === 0 ? (
-          showEmptyLinks()
-        ) : (
-          <Box display="flex" alignItems="center" gap={1}>
-            <LinkIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'text.secondary',
-                fontSize: '13px',
-                fontWeight: 500,
-              }}
-            >
-              Links and resources
-            </Typography>
-            {!isLinksExpanded && links.length > 0 && (
-              <Box sx={resourceCountSx}>{links.length}</Box>
-            )}
-          </Box>
-        )}
-        <Box display="flex" alignItems="center" gap={0.5}>
-          <IconButton
-            size="small"
-            sx={{ p: 0.5 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsLinksExpanded(!isLinksExpanded);
-            }}
-          >
-            {isLinksExpanded ? (
-              <ExpandLessIcon sx={{ fontSize: 18 }} />
+        Recursos Vinculados
+      </Typography>
+
+      {/* 2 Equal-Width Action Buttons */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+          gap: 2,
+          mb:
+            links.length > 0 ||
+            isAddingLink ||
+            (hasMeetLink && showCollaboratorSection)
+              ? 1.5
+              : 0,
+        }}
+      >
+        {/* Button 1: Añadir Meet */}
+        <Button
+          fullWidth
+          onClick={() => {
+            if (hasMeetLink) {
+              setIsAddingCollaborator((prev) => !prev);
+            } else {
+              handleGenerateMeet();
+            }
+          }}
+          disabled={isGeneratingMeet || isLoadingDetail}
+          startIcon={
+            isGeneratingMeet ? (
+              <CircularProgress size={16} color="inherit" />
             ) : (
-              <ExpandMoreIcon sx={{ fontSize: 18 }} />
-            )}
-          </IconButton>
-          {!isReadOnly && (
-            <AnimatePresence>
-              {isLinksExpanded && (
-                <Box
-                  component={motion.div}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                >
-                  {/* Add Meet Button */}
-                  <Button
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleGenerateMeet();
-                    }}
-                    disabled={
-                      isGeneratingMeet || hasMeetLink || isLoadingDetail
-                    }
-                    startIcon={
-                      isGeneratingMeet ? (
-                        <CircularProgress size={14} color="inherit" />
-                      ) : (
-                        <VideoCallIcon sx={{ fontSize: 16 }} />
-                      )
-                    }
-                    sx={addMeetButtonSx(hasMeetLink)}
-                  >
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={hasMeetLink ? 'added' : 'add'}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                      >
-                        {hasMeetLink ? 'Meet Added' : 'Add Meet'}
-                      </motion.span>
-                    </AnimatePresence>
-                  </Button>
+              <VideoCallIcon
+                sx={{
+                  fontSize: 18,
+                  color: hasMeetLink ? '#008767' : 'inherit',
+                }}
+              />
+            )
+          }
+          sx={{
+            py: 1,
+            borderRadius: '10px',
+            border: '1px solid',
+            borderColor: hasMeetLink ? '#008767' : 'divider',
+            bgcolor: hasMeetLink
+              ? (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(0, 135, 103, 0.15)'
+                    : 'rgba(0, 135, 103, 0.08)'
+              : (theme) =>
+                  theme.palette.mode === 'dark' ? '#18191e' : '#ffffff',
+            color: hasMeetLink ? '#008767' : 'text.primary',
+            textTransform: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            '&:hover': {
+              borderColor: '#008767',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(0, 135, 103, 0.2)'
+                  : 'rgba(0, 135, 103, 0.12)',
+            },
+          }}
+        >
+          {hasMeetLink ? 'Meet Añadido' : 'Añadir Meet'}
+        </Button>
 
-                  {hasMeetLink && (
-                    <Button
-                      size="small"
-                      startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsAddingCollaborator((prev) => !prev);
-                      }}
-                      disabled={isReadOnly || isLoadingDetail}
-                      sx={addResourceButtonSx}
-                    >
-                      Add Collaborators
-                    </Button>
-                  )}
-
-                  {/* Add Resource Button */}
-                  <Button
-                    size="small"
-                    startIcon={<AddIcon sx={{ fontSize: 16 }} />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsAddingLink(true);
-                    }}
-                    disabled={isReadOnly || isLoadingDetail}
-                    sx={addResourceButtonSx}
-                  >
-                    Add Resource
-                  </Button>
-                </Box>
-              )}
-            </AnimatePresence>
-          )}
-        </Box>
+        {/* Button 2: Añadir Enlace */}
+        <Button
+          fullWidth
+          onClick={() => setIsAddingLink(true)}
+          disabled={isReadOnly || isLoadingDetail}
+          startIcon={<LinkIcon sx={{ fontSize: 18 }} />}
+          sx={{
+            py: 1,
+            borderRadius: '10px',
+            border: '1px solid',
+            borderColor: isAddingLink ? '#008767' : 'divider',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark' ? '#18191e' : '#ffffff',
+            color: 'text.primary',
+            textTransform: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            '&:hover': {
+              borderColor: '#008767',
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.04)'
+                  : 'action.hover',
+            },
+          }}
+        >
+          Añadir Enlace
+        </Button>
       </Box>
 
       {/* Collaborators Section (Only when Meet is present) */}

@@ -14,18 +14,17 @@ import {
   Tooltip,
 } from '@mui/material';
 import {
-  AccessTime as AccessTimeIcon,
-  Groups as GroupsIcon,
-  Category as CategoryIcon,
   RadioButtonUnchecked as TodoIcon,
-  CalendarToday as PlannedIcon,
-  Visibility as VisibilityIcon,
-  PauseCircleOutline as OnHoldIcon,
-  CheckCircleOutline as CheckCircleOutlineIcon,
-  History as HistoryIcon,
-  Description as DescriptionIcon,
-  Timer as TimerIcon,
-  AutoFixHigh as AutoFixHighIcon,
+  InfoOutlined as PriorityIcon,
+  FolderOutlined as CategoryIcon,
+  LocalOfferOutlined as TagsIcon,
+  CalendarTodayOutlined as CalendarIcon,
+  AccessTimeRounded as TimeIcon,
+  PlayCircleOutlineRounded as TrackedIcon,
+  KeyboardArrowDownRounded as ChevronDownIcon,
+  Add as AddIcon,
+  Close as CloseIcon,
+  Groups as GroupsIcon,
   Assignment as AssignmentIcon,
   Brush as BrushIcon,
   Code as CodeIcon,
@@ -34,21 +33,14 @@ import {
   Psychology as PsychologyIcon,
   School as SchoolIcon,
   Person as PersonIcon,
-  Add as AddIcon,
-  Close as CloseIcon,
+  AutoFixHigh as AutoFixHighIcon,
+  CalendarToday as PlannedIcon,
 } from '@mui/icons-material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { format, isSameDay } from 'date-fns';
-import { surfaceColor } from '@/context';
+import { es } from 'date-fns/locale';
+import { PRIORITY_OPTIONS } from '@/components/ui';
 import {
-  PriorityBadge,
-  PRIORITY_OPTIONS,
-  getPriorityConfig,
-} from '@/components/ui';
-import {
-  propertyRowSx,
-  propertyLabelSx,
-  propertyValueSx,
   tagChipSx,
   addTagInputSx,
   datePickerPopperSx,
@@ -57,11 +49,6 @@ import {
   timePickerPaperSx,
   timePickerLayoutSx,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
-import {
-  getStatusIcon,
-  getCategoryIcon,
-} from '@/pages/Home/components/CreateTaskModal/components/TaskIcons';
-import { getSelectionChipSx } from '@/pages/Home/components/CreateTaskModal/components/TaskProperties/TaskProperties.utils';
 import {
   getTagColors,
   PASTEL_COLORS,
@@ -72,6 +59,13 @@ import {
 import type { TaskStatus } from '@/redux/tasks/task.types';
 import {
   propertiesContainerSx,
+  propertiesCardSx,
+  propertyRowSx,
+  propertyLabelSx,
+  propertyPillSx,
+  scheduleGridSx,
+  scheduleBoxSx,
+  timeSlotBannerSx,
   popoverPaperSx,
   timerPopoverPaperSx,
   timeLogPopoverPaperSx,
@@ -126,6 +120,52 @@ interface TaskPropertiesProps {
   isLoadingDetail?: boolean;
 }
 
+const STATUS_CONFIG: Record<string, { label: string; dotColor: string }> = {
+  Todo: { label: 'Por hacer', dotColor: '#008767' },
+  Planning: { label: 'Planificación', dotColor: '#0284c7' },
+  Scheduled: { label: 'Agendada', dotColor: '#8b5cf6' },
+  Review: { label: 'En revisión', dotColor: '#f59e0b' },
+  Pending: { label: 'Pendiente', dotColor: '#eab308' },
+  'On Hold': { label: 'En espera', dotColor: '#ec4899' },
+  Done: { label: 'Completada', dotColor: '#10b981' },
+  Backlog: { label: 'Backlog', dotColor: '#64748b' },
+  Archived: { label: 'Archivada', dotColor: '#475569' },
+};
+
+const PRIORITY_CONFIG: Record<
+  string,
+  { label: string; dotColor: string; bg: string; text: string; border: string }
+> = {
+  High: {
+    label: 'Alta',
+    dotColor: '#ef4444',
+    bg: 'rgba(239, 68, 68, 0.12)',
+    text: '#ef4444',
+    border: 'rgba(239, 68, 68, 0.3)',
+  },
+  Med: {
+    label: 'Media',
+    dotColor: '#d97706',
+    bg: 'rgba(245, 158, 11, 0.12)',
+    text: '#d97706',
+    border: 'rgba(245, 158, 11, 0.3)',
+  },
+  Low: {
+    label: 'Baja',
+    dotColor: '#3b82f6',
+    bg: 'rgba(59, 130, 246, 0.12)',
+    text: '#3b82f6',
+    border: 'rgba(59, 130, 246, 0.3)',
+  },
+  'No priority': {
+    label: 'Sin prioridad',
+    dotColor: '#64748b',
+    bg: 'rgba(100, 116, 139, 0.12)',
+    text: '#64748b',
+    border: 'rgba(100, 116, 139, 0.25)',
+  },
+};
+
 export const TaskProperties = ({
   status,
   setStatus,
@@ -177,7 +217,6 @@ export const TaskProperties = ({
   const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(
     null,
   );
-
   const [durationInputError, setDurationInputError] = useState<string | null>(
     null,
   );
@@ -192,12 +231,6 @@ export const TaskProperties = ({
   const [newLogDatePickerOpen, setNewLogDatePickerOpen] = useState(false);
   const [newLogDuration, setNewLogDuration] = useState('');
 
-  // The auto-scheduler can move a task's planned slot to a different day
-  // than its actual due date (e.g. bumping a weekend deadline to the next
-  // working day). `currentDate` here reflects the scheduled slot — show the
-  // real due date alongside it whenever the two fall on different days, so
-  // this never looks like it silently disagrees with the "Due Date" shown
-  // in the task list.
   const deadlineDate =
     deadline && !isNaN(new Date(deadline).getTime())
       ? new Date(deadline)
@@ -205,100 +238,115 @@ export const TaskProperties = ({
   const hasDifferentDueDate =
     deadlineDate && currentDate && !isSameDay(deadlineDate, currentDate);
 
+  const currentStatusConfig = STATUS_CONFIG[status] || {
+    label: status || 'Por hacer',
+    dotColor: '#008767',
+  };
+  const currentPriorityConfig =
+    PRIORITY_CONFIG[priority] || PRIORITY_CONFIG['Med'];
+
   return (
     <Box sx={propertiesContainerSx}>
-      {/* Metadata & Tags — right below the title */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
-        {/* Status */}
+      {/* Grouped Properties Card */}
+      <Box sx={propertiesCardSx}>
+        {/* Row 1: Estado */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <TodoIcon sx={{ fontSize: 16, color: '#3b82f6' }} />
-            <Typography
-              variant="caption"
-              sx={{ fontSize: '14px', fontWeight: 500 }}
-            >
-              Status
-            </Typography>
+            <TodoIcon />
+            <Typography>Estado</Typography>
           </Box>
-          <Box sx={propertyValueSx}>
-            <Chip
-              icon={getStatusIcon(status)}
-              label={status || 'Todo'}
-              onClick={(e) => isOwner && setStatusAnchor(e.currentTarget)}
+          <Box
+            onClick={(e) => isOwner && setStatusAnchor(e.currentTarget)}
+            sx={propertyPillSx}
+          >
+            <Box
               sx={{
-                ...getSelectionChipSx('status', status || 'Todo'),
-                pointerEvents: !isOwner ? 'none' : 'auto',
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                bgcolor: currentStatusConfig.dotColor,
               }}
+            />
+            <Typography sx={{ fontSize: '13px', fontWeight: 600 }}>
+              {currentStatusConfig.label}
+            </Typography>
+            <ChevronDownIcon
+              sx={{ fontSize: 16, color: 'text.secondary', ml: -0.25 }}
             />
           </Box>
         </Box>
 
-        {/* Priority */}
+        {/* Row 2: Prioridad */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <PriorityBadge priority={priority} size={18} />
-            <Typography
-              variant="caption"
-              sx={{ fontSize: '14px', fontWeight: 500 }}
-            >
-              Priority
-            </Typography>
+            <PriorityIcon />
+            <Typography>Prioridad</Typography>
           </Box>
-          <Box sx={propertyValueSx}>
-            <Chip
-              icon={<PriorityBadge priority={priority} size={16} />}
-              label={getPriorityConfig(priority).label}
-              onClick={(e) => isOwner && setPriorityAnchor(e.currentTarget)}
+          <Box
+            onClick={(e) => isOwner && setPriorityAnchor(e.currentTarget)}
+            sx={{
+              ...propertyPillSx,
+              bgcolor: currentPriorityConfig.bg,
+              borderColor: currentPriorityConfig.border,
+              color: currentPriorityConfig.text,
+              '&:hover': {
+                bgcolor: currentPriorityConfig.bg,
+                borderColor: currentPriorityConfig.text,
+              },
+            }}
+          >
+            <Box
               sx={{
-                ...getSelectionChipSx('priority', priority || 'No priority'),
-                pointerEvents: !isOwner ? 'none' : 'auto',
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                bgcolor: currentPriorityConfig.dotColor,
               }}
+            />
+            <Typography
+              sx={{ fontSize: '13px', fontWeight: 600, color: 'inherit' }}
+            >
+              {currentPriorityConfig.label}
+            </Typography>
+            <ChevronDownIcon
+              sx={{ fontSize: 16, color: 'inherit', ml: -0.25 }}
             />
           </Box>
         </Box>
 
-        {/* Category */}
+        {/* Row 3: Categoría */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <AutoFixHighIcon sx={{ fontSize: 16, color: '#8b5cf6' }} />
-            <Typography
-              variant="caption"
-              sx={{ fontSize: '14px', fontWeight: 500 }}
-            >
-              Category
-            </Typography>
+            <CategoryIcon />
+            <Typography>Categoría</Typography>
           </Box>
-          <Box sx={propertyValueSx}>
-            <Chip
-              icon={getCategoryIcon(category)}
-              label={category || 'General'}
-              onClick={(e) => isOwner && setCategoryAnchor(e.currentTarget)}
-              sx={{
-                ...getSelectionChipSx('category', category || 'General'),
-                pointerEvents: !isOwner ? 'none' : 'auto',
-              }}
+          <Box
+            onClick={(e) => isOwner && setCategoryAnchor(e.currentTarget)}
+            sx={propertyPillSx}
+          >
+            <Typography sx={{ fontSize: '13px', fontWeight: 600 }}>
+              {category || 'General'}
+            </Typography>
+            <ChevronDownIcon
+              sx={{ fontSize: 16, color: 'text.secondary', ml: -0.25 }}
             />
           </Box>
         </Box>
 
-        {/* Tags */}
+        {/* Row 4: Etiquetas */}
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
-            <DescriptionIcon
-              sx={{
-                fontSize: 16,
-                color: '#06b6d4',
-                transform: 'rotate(180deg)',
-              }}
-            />
-            <Typography
-              variant="caption"
-              sx={{ fontSize: '14px', fontWeight: 500 }}
-            >
-              Tags
-            </Typography>
+            <TagsIcon />
+            <Typography>Etiquetas</Typography>
           </Box>
-          <Box sx={propertyValueSx}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+              alignItems: 'center',
+            }}
+          >
             <AnimatePresence mode="popLayout" initial={false}>
               {tags.map((tag) => {
                 const colors = getTagColors(tag);
@@ -307,15 +355,9 @@ export const TaskProperties = ({
                     key={tag}
                     component={motion.div}
                     layout
-                    initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, x: -10 }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 400,
-                      damping: 30,
-                      mass: 0.8,
-                    }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
                   >
                     <Chip
                       label={tag}
@@ -330,9 +372,10 @@ export const TaskProperties = ({
                         color: colors.color,
                         border: '1px solid',
                         borderColor: colors.borderColor,
-                        borderRadius: '12px',
+                        borderRadius: '16px',
                         fontSize: '12px',
-                        height: '24px',
+                        fontWeight: 600,
+                        height: '26px',
                         '& .MuiChip-deleteIcon': {
                           color: colors.color,
                           fontSize: '14px',
@@ -369,7 +412,7 @@ export const TaskProperties = ({
                       }}
                       size="small"
                       sx={addTagInputSx}
-                      placeholder="#"
+                      placeholder="#etiqueta"
                     />
                   </Box>
                 ) : (
@@ -381,25 +424,24 @@ export const TaskProperties = ({
                     animate={{ opacity: 1, scale: 1 }}
                   >
                     <Chip
-                      icon={<AddIcon sx={{ fontSize: 14 }} />}
-                      label="Add Tag"
+                      icon={<AddIcon sx={{ fontSize: 13 }} />}
+                      label="Añadir"
                       onClick={
                         isLoadingDetail ? undefined : () => setIsAddingTag(true)
                       }
                       disabled={isLoadingDetail}
                       sx={{
-                        height: 28,
+                        height: 26,
                         fontSize: 12,
+                        fontWeight: 600,
                         bgcolor: 'transparent',
                         color: 'text.secondary',
                         border: '1px dashed',
                         borderColor: 'divider',
-                        opacity: isLoadingDetail ? 0.5 : 1,
-                        cursor: isLoadingDetail ? 'default' : 'pointer',
+                        borderRadius: '16px',
+                        cursor: 'pointer',
                         '&:hover': {
-                          bgcolor: isLoadingDetail
-                            ? 'transparent'
-                            : 'action.hover',
+                          bgcolor: 'action.hover',
                         },
                       }}
                     />
@@ -410,126 +452,56 @@ export const TaskProperties = ({
         </Box>
       </Box>
 
-      {/* Schedule & Time Tracking Card */}
-      <Box
-        sx={{
-          mb: 3,
-          p: 2.5,
-          borderRadius: '16px',
-          border: '1px solid',
-          borderColor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.08)'
-              : 'rgba(0, 0, 0, 0.08)',
-          background: (theme) =>
-            surfaceColor(
-              theme,
-              'linear-gradient(135deg, rgba(26, 31, 43, 0.4) 0%, rgba(15, 23, 42, 0.3) 100%)',
-              'linear-gradient(135deg, rgba(36, 36, 37, 0.4) 0%, rgba(31, 31, 32, 0.3) 100%)',
-              'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.5) 100%)',
-            ),
-          backdropFilter: 'blur(12px)',
-          boxShadow: (theme) =>
-            theme.palette.mode === 'dark'
-              ? '0 4px 20px rgba(0,0,0,0.2)'
-              : '0 4px 20px rgba(0,0,0,0.05)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        {/* Card Header */}
-        <Box display="flex" alignItems="center" gap={1}>
-          <AccessTimeIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 700,
-              color: 'text.secondary',
-              textTransform: 'uppercase',
-              fontSize: '11px',
-              letterSpacing: '0.05em',
-            }}
-          >
-            Schedule & Time Tracking
-          </Typography>
-        </Box>
-
-        {/* Card Body Grid */}
-        <Box
+      {/* PLANIFICACIÓN Y TIEMPOS */}
+      <Box sx={{ mt: 1 }}>
+        <Typography
           sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-            gap: 2.5,
+            fontSize: '11px',
+            fontWeight: 700,
+            color: 'text.secondary',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            mb: 1.25,
           }}
         >
-          {/* Column 1: Scheduling */}
-          <Box display="flex" flexDirection="column" gap={2}>
-            {/* Date */}
-            <Box display="flex" flexDirection="column" gap={0.5}>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: 'text.secondary',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                }}
+          Planificación y Tiempos
+        </Typography>
+
+        <Box sx={scheduleGridSx}>
+          {/* Row 1, Col 1: Fecha Planificada */}
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '12px',
+                fontWeight: 600,
+                mb: 0.5,
+                display: 'block',
+              }}
+            >
+              Fecha Planificada
+            </Typography>
+            <Box sx={{ position: 'relative' }}>
+              <Box
+                onClick={() => isOwner && setDatePickerOpen(true)}
+                sx={scheduleBoxSx}
               >
-                Scheduled Date
-              </Typography>
-              <Box sx={{ position: 'relative' }}>
-                <Box
-                  onClick={() => isOwner && setDatePickerOpen(true)}
-                  sx={{
-                    cursor: !isOwner ? 'default' : 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    color: 'text.primary',
-                    py: 1,
-                    px: 1.5,
-                    borderRadius: '10px',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    bgcolor: (theme) =>
-                      surfaceColor(
-                        theme,
-                        '#1A1F2B',
-                        '#1F1F20',
-                        'background.paper',
-                      ),
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      borderColor: !isOwner ? 'divider' : 'primary.main',
-                      bgcolor: !isOwner ? 'transparent' : 'action.hover',
-                    },
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 1.25,
-                    pointerEvents: !isOwner ? 'none' : 'auto',
-                  }}
-                >
-                  <Box
-                    sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CalendarIcon sx={{ fontSize: 16, color: '#008767' }} />
+                  <Typography
+                    sx={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'text.primary',
+                    }}
                   >
-                    <PlannedIcon
-                      sx={{
-                        fontSize: 16,
-                        color: currentDate ? 'primary.main' : 'text.disabled',
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        fontSize: '13.5px',
-                        fontWeight: 500,
-                        color: currentDate ? 'text.primary' : 'text.secondary',
-                      }}
-                    >
-                      {currentDate
-                        ? format(currentDate, 'PPP')
-                        : 'Sin fecha (Inbox)'}
-                    </Typography>
-                  </Box>
+                    {currentDate
+                      ? format(currentDate, "d 'de' MMM, yyyy", { locale: es })
+                      : 'Sin fecha (Inbox)'}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   {currentDate && isOwner && (
                     <IconButton
                       size="small"
@@ -537,188 +509,81 @@ export const TaskProperties = ({
                         e.stopPropagation();
                         setCurrentDate(null);
                       }}
-                      sx={{
-                        p: 0.25,
-                        color: 'text.secondary',
-                        '&:hover': {
-                          color: 'error.main',
-                          bgcolor: 'rgba(239, 68, 68, 0.1)',
-                        },
-                      }}
-                      title="Quitar fecha (Guardar en Inbox)"
+                      sx={{ p: 0.25, color: 'text.secondary' }}
                     >
-                      <CloseIcon sx={{ fontSize: 14 }} />
+                      <CloseIcon sx={{ fontSize: 13 }} />
                     </IconButton>
                   )}
-                </Box>
-                {hasDifferentDueDate && deadlineDate && (
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      display: 'block',
-                      mt: 0.5,
-                      fontSize: '11px',
-                      color: 'text.secondary',
-                    }}
-                  >
-                    Due {format(deadlineDate, 'PPP')}
-                  </Typography>
-                )}
-                <DatePicker
-                  open={datePickerOpen}
-                  onClose={() => setDatePickerOpen(false)}
-                  value={currentDate}
-                  onChange={(newValue) => {
-                    setCurrentDate(newValue);
-                    setDatePickerOpen(false);
-                  }}
-                  slotProps={{
-                    textField: {
-                      sx: {
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        opacity: 0,
-                        pointerEvents: 'none',
-                      },
-                    },
-                    popper: {
-                      sx: datePickerPopperSx,
-                      placement: 'bottom-start',
-                    },
-                    desktopPaper: {
-                      sx: datePickerPaperSx,
-                    },
-                  }}
-                />
-              </Box>
-            </Box>
-
-            {/* Start Time - Shown only when date is assigned */}
-            {currentDate && (
-              <Box display="flex" flexDirection="column" gap={0.5}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'text.secondary',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                  }}
-                >
-                  Start Time
-                </Typography>
-                <Box sx={{ position: 'relative' }}>
-                  <Box
-                    onClick={() => isOwner && setTimePickerOpen(true)}
-                    sx={{
-                      cursor: !isOwner ? 'default' : 'pointer',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: 'text.primary',
-                      py: 1,
-                      px: 1.5,
-                      borderRadius: '10px',
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      bgcolor: (theme) =>
-                        surfaceColor(
-                          theme,
-                          '#1A1F2B',
-                          '#1F1F20',
-                          'background.paper',
-                        ),
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: !isOwner ? 'divider' : 'primary.main',
-                        bgcolor: !isOwner ? 'transparent' : 'action.hover',
-                      },
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1.25,
-                      pointerEvents: !isOwner ? 'none' : 'auto',
-                    }}
-                  >
-                    <AccessTimeIcon
-                      sx={{ fontSize: 16, color: 'text.disabled' }}
-                    />
-                    {currentDate
-                      ? format(currentDate, 'hh:mm a')
-                      : 'Pick a time'}
-                  </Box>
-                  <TimePicker
-                    open={timePickerOpen}
-                    onClose={() => setTimePickerOpen(false)}
-                    value={currentDate}
-                    onChange={(newValue) => {
-                      setCurrentDate(newValue);
-                      setTimePickerOpen(false);
-                    }}
-                    slotProps={{
-                      textField: {
-                        sx: {
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          opacity: 0,
-                          pointerEvents: 'none',
-                        },
-                      },
-                      popper: {
-                        sx: timePickerPopperSx,
-                        placement: 'bottom-start',
-                      },
-                      desktopPaper: {
-                        sx: timePickerPaperSx,
-                      },
-                      layout: {
-                        sx: timePickerLayoutSx,
-                      },
-                    }}
+                  <ChevronDownIcon
+                    sx={{ fontSize: 18, color: 'text.secondary' }}
                   />
                 </Box>
               </Box>
-            )}
-          </Box>
-
-          {/* Column 2: Durations */}
-          <Box display="flex" flexDirection="column" gap={2}>
-            {/* Estimated Duration */}
-            <Box display="flex" flexDirection="column" gap={0.5}>
+              <DatePicker
+                open={datePickerOpen}
+                onClose={() => setDatePickerOpen(false)}
+                value={currentDate}
+                onChange={(newValue) => {
+                  setCurrentDate(newValue);
+                  setDatePickerOpen(false);
+                }}
+                slotProps={{
+                  textField: {
+                    sx: {
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      pointerEvents: 'none',
+                    },
+                  },
+                  popper: { sx: datePickerPopperSx, placement: 'bottom-start' },
+                  desktopPaper: { sx: datePickerPaperSx },
+                }}
+              />
+            </Box>
+            {hasDifferentDueDate && deadlineDate && (
               <Typography
                 variant="caption"
                 sx={{
+                  display: 'block',
+                  mt: 0.5,
+                  fontSize: '11px',
                   color: 'text.secondary',
-                  fontSize: '12px',
-                  fontWeight: 600,
                 }}
               >
-                Estimated Duration
+                Vence {format(deadlineDate, 'PPP')}
               </Typography>
+            )}
+          </Box>
+
+          {/* Row 1, Col 2: Duración Estimada */}
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '12px',
+                fontWeight: 600,
+                mb: 0.5,
+                display: 'block',
+              }}
+            >
+              Duración Estimada
+            </Typography>
+            <Box
+              sx={{
+                ...scheduleBoxSx,
+                cursor: 'text',
+                borderColor: durationInputError ? 'error.main' : undefined,
+              }}
+            >
               <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  py: 1,
-                  px: 1.5,
-                  borderRadius: '10px',
-                  border: '1px solid',
-                  borderColor: durationInputError ? 'error.main' : 'divider',
-                  bgcolor: (theme) =>
-                    surfaceColor(
-                      theme,
-                      '#1A1F2B',
-                      '#1F1F20',
-                      'background.paper',
-                    ),
-                  minHeight: '43px',
-                }}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}
               >
-                <TimerIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                <TimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                 <TextField
                   variant="standard"
                   value={duration}
@@ -744,7 +609,7 @@ export const TaskProperties = ({
                     );
                   }}
                   onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
-                  placeholder="2h 00m"
+                  placeholder="4 horas (o 2h 30m)"
                   InputProps={{
                     disableUnderline: true,
                     readOnly: !isOwner,
@@ -752,404 +617,226 @@ export const TaskProperties = ({
                   sx={{
                     flex: 1,
                     '& .MuiInputBase-input': {
-                      fontSize: '14px',
+                      fontSize: '13px',
                       fontWeight: 600,
                       color: 'text.primary',
                       padding: 0,
                     },
                   }}
                 />
-                <Popover
-                  open={Boolean(durationAnchor)}
-                  anchorEl={durationAnchor}
-                  onClose={() => setDurationAnchor(null)}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  disableAutoFocus
-                  disableEnforceFocus
-                  slotProps={{ paper: { sx: timerPopoverPaperSx } }}
-                >
-                  <List dense sx={{ py: 0 }}>
-                    {durationSuggestions.map((s) => (
-                      <MenuItem
-                        key={s}
-                        onClick={() => {
-                          setDuration(s);
-                          setDurationAnchor(null);
-                        }}
-                      >
-                        <ListItemText
-                          primary={s}
-                          primaryTypographyProps={{
-                            fontSize: '13px',
-                            fontWeight: 600,
-                          }}
-                        />
-                      </MenuItem>
-                    ))}
-                  </List>
-                </Popover>
               </Box>
-              {durationInputError && (
+              <Popover
+                open={Boolean(durationAnchor)}
+                anchorEl={durationAnchor}
+                onClose={() => setDurationAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                disableAutoFocus
+                disableEnforceFocus
+                slotProps={{ paper: { sx: timerPopoverPaperSx } }}
+              >
+                <List dense sx={{ py: 0 }}>
+                  {durationSuggestions.map((s) => (
+                    <MenuItem
+                      key={s}
+                      onClick={() => {
+                        setDuration(s);
+                        setDurationAnchor(null);
+                      }}
+                    >
+                      <ListItemText
+                        primary={s}
+                        primaryTypographyProps={{
+                          fontSize: '13px',
+                          fontWeight: 600,
+                        }}
+                      />
+                    </MenuItem>
+                  ))}
+                </List>
+              </Popover>
+            </Box>
+            {durationInputError && (
+              <Typography
+                variant="caption"
+                sx={{ color: 'error.main', fontSize: '10px', ml: 0.5 }}
+              >
+                {durationInputError}
+              </Typography>
+            )}
+          </Box>
+
+          {/* Row 2, Col 1: Hora de Inicio */}
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '12px',
+                fontWeight: 600,
+                mb: 0.5,
+                display: 'block',
+              }}
+            >
+              Hora de Inicio
+            </Typography>
+            <Box sx={{ position: 'relative' }}>
+              <Box
+                onClick={() => isOwner && setTimePickerOpen(true)}
+                sx={scheduleBoxSx}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <TimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                  <Typography
+                    sx={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'text.primary',
+                    }}
+                  >
+                    {currentDate ? format(currentDate, 'hh:mm a') : '10:00 AM'}
+                  </Typography>
+                </Box>
+                <ChevronDownIcon
+                  sx={{ fontSize: 18, color: 'text.secondary' }}
+                />
+              </Box>
+              <TimePicker
+                open={timePickerOpen}
+                onClose={() => setTimePickerOpen(false)}
+                value={currentDate}
+                onChange={(newValue) => {
+                  setCurrentDate(newValue);
+                  setTimePickerOpen(false);
+                }}
+                slotProps={{
+                  textField: {
+                    sx: {
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      pointerEvents: 'none',
+                    },
+                  },
+                  popper: { sx: timePickerPopperSx, placement: 'bottom-start' },
+                  desktopPaper: { sx: timePickerPaperSx },
+                  layout: { sx: timePickerLayoutSx },
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* Row 2, Col 2: Duración Real (Tracked) */}
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '12px',
+                fontWeight: 600,
+                mb: 0.5,
+                display: 'block',
+              }}
+            >
+              Duración Real (Tracked)
+            </Typography>
+            <Box
+              onClick={(e) => {
+                if (!isOwner) return;
+                setTimeLogAnchor((prev) => (prev ? null : e.currentTarget));
+              }}
+              sx={scheduleBoxSx}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <TrackedIcon sx={{ fontSize: 16, color: '#008767' }} />
                 <Typography
-                  variant="caption"
                   sx={{
-                    color: 'error.main',
-                    fontSize: '10px',
-                    ml: 0.5,
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: 'text.primary',
                   }}
                 >
-                  {durationInputError}
+                  {realTime || '0m'}
                 </Typography>
-              )}
+              </Box>
+              <Chip
+                label="LOGGED"
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  letterSpacing: '0.05em',
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(0, 135, 103, 0.2)'
+                      : 'rgba(0, 135, 103, 0.12)',
+                  color: '#008767',
+                  borderRadius: '4px',
+                }}
+              />
             </Box>
           </Box>
         </Box>
 
-        {/* Real Duration (Tracked) — Full Width */}
+        {/* Highlight Banner Capsule (Ventana Planificada de Tarea) */}
+        <Box sx={timeSlotBannerSx}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TimeIcon sx={{ fontSize: 16, color: '#008767' }} />
+            <Typography
+              sx={{ fontSize: '13px', fontWeight: 600, color: '#008767' }}
+            >
+              Ventana Planificada de Tarea
+            </Typography>
+          </Box>
+          <Typography
+            sx={{ fontSize: '13px', fontWeight: 700, color: '#008767' }}
+          >
+            {timeSlotDisplay ||
+              (currentDate
+                ? format(currentDate, 'hh:mm a')
+                : '10:15 AM - 2:15 PM')}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Embedded Created At if editing */}
+      {createdAt && (
         <Box
-          display="flex"
-          flexDirection="column"
-          gap={0.5}
-          sx={{ width: '100%' }}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            mt: 1,
+            pt: 1,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+          }}
         >
           <Typography
             variant="caption"
             sx={{
               color: 'text.secondary',
-              fontSize: '12px',
-              fontWeight: 600,
+              fontSize: '11px',
+              fontStyle: 'italic',
             }}
           >
-            Real Duration (Tracked)
+            Creado el{' '}
+            {new Date(createdAt).toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </Typography>
-          <Box
-            onClick={(e) => {
-              if (!isOwner) return;
-              setTimeLogAnchor((prev) => (prev ? null : e.currentTarget));
-            }}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              width: '100%',
-              gap: 1,
-              py: 1,
-              px: 1.5,
-              borderRadius: '10px',
-              border: '1px solid',
-              borderColor: 'divider',
-              bgcolor: (theme) =>
-                surfaceColor(theme, '#1A1F2B', '#1F1F20', 'background.paper'),
-              minHeight: '43px',
-              cursor: isOwner ? 'pointer' : 'default',
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: !isOwner ? 'divider' : 'primary.main',
-              },
-            }}
-          >
-            <HistoryIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-            <TextField
-              variant="standard"
-              value={realTime}
-              disabled={!isOwner}
-              placeholder="No time logged"
-              InputProps={{
-                disableUnderline: true,
-                readOnly: true,
-              }}
-              sx={{
-                flex: 1,
-                pointerEvents: 'none',
-                '& .MuiInputBase-input': {
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: 'text.primary',
-                  padding: 0,
-                },
-              }}
-            />
-          </Box>
-          <Popover
-            open={Boolean(timeLogAnchor)}
-            anchorEl={timeLogAnchor}
-            onClose={() => setTimeLogAnchor(null)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            slotProps={{ paper: { sx: timeLogPopoverPaperSx } }}
-          >
-            <Box onClick={(e) => e.stopPropagation()}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: 0.5,
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: 700,
-                    color: 'text.secondary',
-                    fontSize: '11px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  Log time
-                </Typography>
-                <IconButton
-                  size="small"
-                  onClick={() => setTimeLogAnchor(null)}
-                  sx={{
-                    p: 0.25,
-                    color: 'text.secondary',
-                    '&:hover': { color: 'text.primary' },
-                  }}
-                >
-                  <CloseIcon sx={{ fontSize: 14 }} />
-                </IconButton>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 0.75, mt: 1 }}>
-                <Box sx={{ position: 'relative', flex: 1 }}>
-                  <Box
-                    onClick={() => setNewLogDatePickerOpen(true)}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      fontSize: '13px',
-                      fontWeight: 500,
-                      py: 0.75,
-                      px: 1,
-                      borderRadius: '8px',
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    <PlannedIcon
-                      sx={{ fontSize: 14, color: 'text.disabled' }}
-                    />
-                    {newLogDate ? format(newLogDate, 'MMM d') : 'Date'}
-                  </Box>
-                  <DatePicker
-                    open={newLogDatePickerOpen}
-                    onClose={() => setNewLogDatePickerOpen(false)}
-                    value={newLogDate}
-                    onChange={(newValue) => {
-                      setNewLogDate(newValue);
-                      setNewLogDatePickerOpen(false);
-                    }}
-                    slotProps={{
-                      textField: {
-                        sx: {
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          opacity: 0,
-                          pointerEvents: 'none',
-                        },
-                      },
-                      popper: {
-                        sx: datePickerPopperSx,
-                        placement: 'bottom-start',
-                      },
-                      desktopPaper: {
-                        sx: datePickerPaperSx,
-                      },
-                    }}
-                  />
-                </Box>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  disabled={isLoadingDetail}
-                  value={newLogDuration}
-                  onChange={(e) =>
-                    setNewLogDuration(sanitizeDurationValue(e.target.value))
-                  }
-                  placeholder="2h"
-                  sx={{
-                    width: 64,
-                    '& .MuiInputBase-input': {
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      py: 0.85,
-                      px: 1,
-                    },
-                  }}
-                />
-                <IconButton
-                  size="small"
-                  disabled={isLoadingDetail}
-                  onClick={() => {
-                    const minutes = parseDuration(newLogDuration);
-                    if (minutes > 0 && newLogDate) {
-                      handleAddTimeLog(
-                        format(newLogDate, 'yyyy-MM-dd'),
-                        minutes,
-                      );
-                      setNewLogDuration('');
-                    }
-                  }}
-                  sx={{
-                    bgcolor: 'primary.main',
-                    color: '#fff',
-                    borderRadius: '8px',
-                    '&:hover': { bgcolor: 'primary.dark' },
-                  }}
-                >
-                  <AddIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Box>
-
-              {timeLogs.length > 0 ? (
-                <List
-                  dense
-                  sx={{ py: 0, mt: 1, maxHeight: 200, overflowY: 'auto' }}
-                >
-                  {timeLogs
-                    .map((entry, index) => ({ entry, index }))
-                    .sort((a, b) => b.entry.date.localeCompare(a.entry.date))
-                    .map(({ entry, index }) => (
-                      <MenuItem
-                        key={`${entry.date}-${index}`}
-                        disableRipple
-                        sx={{ px: 0.5, cursor: 'default' }}
-                      >
-                        <ListItemText
-                          primary={format(
-                            new Date(`${entry.date}T00:00:00`),
-                            'EEE, MMM d',
-                          )}
-                          secondary={formatDuration(entry.minutes)}
-                          primaryTypographyProps={{
-                            fontSize: '12px',
-                            fontWeight: 600,
-                          }}
-                          secondaryTypographyProps={{
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            color: 'text.primary',
-                          }}
-                        />
-                        {isOwner && (
-                          <IconButton
-                            size="small"
-                            onClick={() => handleRemoveTimeLog(index)}
-                            disabled={isLoadingDetail}
-                            sx={{ p: 0.3 }}
-                          >
-                            <CloseIcon sx={{ fontSize: 14 }} />
-                          </IconButton>
-                        )}
-                      </MenuItem>
-                    ))}
-                </List>
-              ) : (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: 'block',
-                    mt: 1.5,
-                    mb: 0.5,
-                    color: 'text.disabled',
-                    fontStyle: 'italic',
-                  }}
-                >
-                  No time logged yet.
-                </Typography>
-              )}
-            </Box>
-          </Popover>
         </Box>
-
-        {/* Visual Timeline Badge */}
-        {timeSlotDisplay && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              p: 1.5,
-              borderRadius: '10px',
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(99, 102, 241, 0.08)'
-                  : 'rgba(99, 102, 241, 0.04)',
-              border: '1px dashed',
-              borderColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(99, 102, 241, 0.3)'
-                  : 'rgba(99, 102, 241, 0.2)',
-              mt: 1,
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: 600,
-                color: 'primary.main',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-              }}
-            >
-              <TimerIcon sx={{ fontSize: 14 }} /> Scheduled Window
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 700,
-                color: 'text.primary',
-                letterSpacing: '0.02em',
-              }}
-            >
-              {timeSlotDisplay}
-            </Typography>
-          </Box>
-        )}
-
-        {/* Embedded Created At */}
-        {createdAt && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mt: 1,
-              pt: 1.5,
-              borderTop: '1px solid',
-              borderColor: 'divider',
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'text.secondary',
-                fontSize: '11px',
-                fontStyle: 'italic',
-              }}
-            >
-              Created on{' '}
-              {new Date(createdAt).toLocaleDateString(undefined, {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </Typography>
-          </Box>
-        )}
-      </Box>
+      )}
 
       {/* Popovers */}
+      {/* Status Popover */}
       <Popover
         open={Boolean(statusAnchor)}
         anchorEl={statusAnchor}
@@ -1168,56 +855,37 @@ export const TaskProperties = ({
             'Done',
             'Backlog',
             'Archived',
-          ].map((s) => (
-            <MenuItem
-              key={s}
-              onClick={() => {
-                setStatus(s as TaskStatus);
-                setStatusAnchor(null);
-              }}
-              sx={{ borderRadius: '8px', py: 1 }}
-            >
-              <Box display="flex" alignItems="center" gap={1.5}>
-                {s === 'Todo' && (
-                  <TodoIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                )}
-                {s === 'Planning' && (
-                  <PlannedIcon sx={{ fontSize: 18, color: 'info.main' }} />
-                )}
-                {s === 'Scheduled' && (
-                  <PlannedIcon sx={{ fontSize: 18, color: '#8b5cf6' }} />
-                )}
-                {s === 'Pending' && (
-                  <AccessTimeIcon
-                    sx={{ fontSize: 18, color: 'warning.main' }}
+          ].map((s) => {
+            const conf = STATUS_CONFIG[s] || { label: s, dotColor: '#008767' };
+            return (
+              <MenuItem
+                key={s}
+                onClick={() => {
+                  setStatus(s as TaskStatus);
+                  setStatusAnchor(null);
+                }}
+                sx={{ borderRadius: '8px', py: 1 }}
+              >
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: conf.dotColor,
+                    }}
                   />
-                )}
-                {s === 'On Hold' && (
-                  <OnHoldIcon sx={{ fontSize: 18, color: 'error.main' }} />
-                )}
-                {s === 'Review' && (
-                  <VisibilityIcon sx={{ fontSize: 18, color: '#06b6d4' }} />
-                )}
-                {s === 'Done' && (
-                  <CheckCircleOutlineIcon
-                    sx={{ fontSize: 18, color: 'success.main' }}
-                  />
-                )}
-                {s === 'Backlog' && (
-                  <HistoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                )}
-                {s === 'Archived' && (
-                  <HistoryIcon sx={{ fontSize: 18, color: '#4b5563' }} />
-                )}
-                <Typography variant="body2" fontWeight={500}>
-                  {s}
-                </Typography>
-              </Box>
-            </MenuItem>
-          ))}
+                  <Typography variant="body2" fontWeight={500}>
+                    {conf.label}
+                  </Typography>
+                </Box>
+              </MenuItem>
+            );
+          })}
         </Stack>
       </Popover>
 
+      {/* Priority Popover */}
       <Popover
         open={Boolean(priorityAnchor)}
         anchorEl={priorityAnchor}
@@ -1226,26 +894,37 @@ export const TaskProperties = ({
         PaperProps={{ sx: popoverPaperSx }}
       >
         <Stack sx={{ p: 1, minWidth: '160px' }}>
-          {PRIORITY_OPTIONS.map((pOpt) => (
-            <MenuItem
-              key={pOpt.id}
-              onClick={() => {
-                setPriority(pOpt.id as PriorityType);
-                setPriorityAnchor(null);
-              }}
-              sx={{ borderRadius: '8px', py: 1 }}
-            >
-              <Box display="flex" alignItems="center" gap={1.5}>
-                <PriorityBadge priority={pOpt.id} size={24} />
-                <Typography variant="body2" fontWeight={500}>
-                  {pOpt.label}
-                </Typography>
-              </Box>
-            </MenuItem>
-          ))}
+          {PRIORITY_OPTIONS.map((pOpt) => {
+            const conf = PRIORITY_CONFIG[pOpt.id] || PRIORITY_CONFIG['Med'];
+            return (
+              <MenuItem
+                key={pOpt.id}
+                onClick={() => {
+                  setPriority(pOpt.id as PriorityType);
+                  setPriorityAnchor(null);
+                }}
+                sx={{ borderRadius: '8px', py: 1 }}
+              >
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: conf.dotColor,
+                    }}
+                  />
+                  <Typography variant="body2" fontWeight={500}>
+                    {conf.label}
+                  </Typography>
+                </Box>
+              </MenuItem>
+            );
+          })}
         </Stack>
       </Popover>
 
+      {/* Category Popover */}
       <Popover
         open={Boolean(categoryAnchor)}
         anchorEl={categoryAnchor}
@@ -1326,6 +1005,7 @@ export const TaskProperties = ({
         </Stack>
       </Popover>
 
+      {/* Color Popover */}
       <Popover
         open={Boolean(colorAnchor)}
         anchorEl={colorAnchor}
@@ -1419,28 +1099,208 @@ export const TaskProperties = ({
                       ? '0 0 0 2px rgba(0,0,0,0.1)'
                       : '0 1px 2px rgba(0,0,0,0.05)',
                     transition: 'all 0.15s ease',
-                    transform: isSelected ? 'scale(1.08)' : 'scale(1)',
                     '&:hover': {
-                      transform: 'scale(1.16)',
-                      boxShadow: '0 3px 8px rgba(0,0,0,0.15)',
+                      transform: 'scale(1.15)',
                     },
                   }}
-                >
-                  {isSelected && (
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        bgcolor: 'text.primary',
-                        opacity: 0.8,
-                      }}
-                    />
-                  )}
-                </Box>
+                />
               </Tooltip>
             );
           })}
+        </Box>
+      </Popover>
+
+      {/* Time Log Popover */}
+      <Popover
+        open={Boolean(timeLogAnchor)}
+        anchorEl={timeLogAnchor}
+        onClose={() => setTimeLogAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        slotProps={{ paper: { sx: timeLogPopoverPaperSx } }}
+      >
+        <Box onClick={(e) => e.stopPropagation()}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 0.5,
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 700,
+                color: 'text.secondary',
+                fontSize: '11px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Registrar tiempo
+            </Typography>
+            <IconButton
+              size="small"
+              onClick={() => setTimeLogAnchor(null)}
+              sx={{
+                p: 0.25,
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary' },
+              }}
+            >
+              <CloseIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 0.75, mt: 1 }}>
+            <Box sx={{ position: 'relative', flex: 1 }}>
+              <Box
+                onClick={() => setNewLogDatePickerOpen(true)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  py: 0.75,
+                  px: 1,
+                  borderRadius: '8px',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <PlannedIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+                {newLogDate ? format(newLogDate, 'MMM d') : 'Date'}
+              </Box>
+              <DatePicker
+                open={newLogDatePickerOpen}
+                onClose={() => setNewLogDatePickerOpen(false)}
+                value={newLogDate}
+                onChange={(newValue) => {
+                  setNewLogDate(newValue);
+                  setNewLogDatePickerOpen(false);
+                }}
+                slotProps={{
+                  textField: {
+                    sx: {
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      pointerEvents: 'none',
+                    },
+                  },
+                  popper: {
+                    sx: datePickerPopperSx,
+                    placement: 'bottom-start',
+                  },
+                  desktopPaper: {
+                    sx: datePickerPaperSx,
+                  },
+                }}
+              />
+            </Box>
+            <TextField
+              variant="outlined"
+              size="small"
+              disabled={isLoadingDetail}
+              value={newLogDuration}
+              onChange={(e) =>
+                setNewLogDuration(sanitizeDurationValue(e.target.value))
+              }
+              placeholder="2h"
+              sx={{
+                width: 64,
+                '& .MuiInputBase-input': {
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  py: 0.85,
+                  px: 1,
+                },
+              }}
+            />
+            <IconButton
+              size="small"
+              disabled={isLoadingDetail}
+              onClick={() => {
+                const minutes = parseDuration(newLogDuration);
+                if (minutes > 0 && newLogDate) {
+                  handleAddTimeLog(format(newLogDate, 'yyyy-MM-dd'), minutes);
+                  setNewLogDuration('');
+                }
+              }}
+              sx={{
+                bgcolor: '#008767',
+                color: '#fff',
+                borderRadius: '8px',
+                '&:hover': { bgcolor: '#007357' },
+              }}
+            >
+              <AddIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Box>
+
+          {timeLogs.length > 0 ? (
+            <List
+              dense
+              sx={{ py: 0, mt: 1, maxHeight: 200, overflowY: 'auto' }}
+            >
+              {timeLogs
+                .map((entry, index) => ({ entry, index }))
+                .sort((a, b) => b.entry.date.localeCompare(a.entry.date))
+                .map(({ entry, index }) => (
+                  <MenuItem
+                    key={`${entry.date}-${index}`}
+                    disableRipple
+                    sx={{ px: 0.5, cursor: 'default' }}
+                  >
+                    <ListItemText
+                      primary={format(
+                        new Date(`${entry.date}T00:00:00`),
+                        'EEE, MMM d',
+                      )}
+                      secondary={formatDuration(entry.minutes)}
+                      primaryTypographyProps={{
+                        fontSize: '12px',
+                        fontWeight: 600,
+                      }}
+                      secondaryTypographyProps={{
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: 'text.primary',
+                      }}
+                    />
+                    {isOwner && (
+                      <IconButton
+                        size="small"
+                        onClick={() => handleRemoveTimeLog(index)}
+                        disabled={isLoadingDetail}
+                        sx={{ p: 0.3 }}
+                      >
+                        <CloseIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    )}
+                  </MenuItem>
+                ))}
+            </List>
+          ) : (
+            <Typography
+              variant="caption"
+              sx={{
+                display: 'block',
+                mt: 1.5,
+                mb: 0.5,
+                color: 'text.disabled',
+                fontStyle: 'italic',
+              }}
+            >
+              No hay tiempo registrado aún.
+            </Typography>
+          )}
         </Box>
       </Popover>
     </Box>

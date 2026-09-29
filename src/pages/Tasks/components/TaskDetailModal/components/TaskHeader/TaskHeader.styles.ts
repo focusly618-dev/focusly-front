@@ -1,30 +1,25 @@
-import { headerIconSx } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
+import type { Theme } from '@mui/material/styles';
 
-export const headerContainerSx = (isCustomColor: boolean, color: string) => ({
+export const headerContainerSx = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
   px: 3,
-  ...(isCustomColor
-    ? {
-        pt: 1,
-        pb: 20,
-        margin: '15px',
-      }
-    : {
-        pt: 2,
-        pb: 1,
-      }),
-  color: isCustomColor ? '#1e293b' : 'text.secondary',
-  backgroundColor: isCustomColor ? color : 'transparent',
-  borderTopLeftRadius: '8px',
-  borderTopRightRadius: '8px',
-});
+  pt: 2.5,
+  pb: 1,
+  color: 'text.secondary',
+};
 
-export const headerIconButtonSx = (isCustomColor: boolean) => ({
-  ...headerIconSx,
-  color: isCustomColor ? '#1e293b' : 'text.secondary',
+export const headerIconButtonSx = {
+  color: 'text.secondary',
+  p: 0.75,
+  borderRadius: '8px',
+  transition: 'all 0.15s ease-in-out',
   '&:hover': {
-    backgroundColor: isCustomColor ? 'rgba(0, 0, 0, 0.08)' : 'action.hover',
+    color: 'text.primary',
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.08)'
+        : 'rgba(0, 0, 0, 0.05)',
   },
-});
+};

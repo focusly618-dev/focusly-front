@@ -6,18 +6,13 @@ import {
   Button,
   InputBase,
   Tooltip,
-  Collapse,
   Skeleton,
 } from '@mui/material';
 import {
-  CheckCircleRounded as CheckedIcon,
-  RadioButtonUncheckedRounded as UncheckedIcon,
+  Check as CheckIcon,
   DeleteOutlineRounded as DeleteIcon,
   AutoAwesomeRounded as SparklesIcon,
-  FormatListBulletedRounded as SubtasksIcon,
   AddRounded as AddIcon,
-  KeyboardArrowDownRounded as ArrowDownIcon,
-  KeyboardArrowUpRounded as ArrowUpIcon,
 } from '@mui/icons-material';
 import type { Subtask } from '@/redux/tasks/task.types';
 import {
@@ -51,7 +46,6 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
   isReadOnly = false,
   isLoading = false,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
@@ -94,56 +88,29 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
     <Box sx={subtasksContainerSx}>
       {/* Header */}
       <Box sx={subtasksHeaderSx}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            cursor: 'pointer',
-            userSelect: 'none',
-          }}
-          onClick={() => setIsExpanded((prev) => !prev)}
-        >
-          <SubtasksIcon
-            sx={{
-              fontSize: 18,
-              color: 'text.secondary',
-              mr: 1,
-            }}
-          />
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography
-            variant="body2"
             sx={{
-              fontWeight: 600,
-              color: 'text.primary',
-              fontSize: '13px',
-              display: 'flex',
-              alignItems: 'center',
+              fontWeight: 700,
+              color: 'text.secondary',
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
             }}
           >
-            Subtasks
-            {total > 0 && (
-              <Box component="span" sx={subtaskCountBadgeSx(allCompleted)}>
-                {completedCount}/{total}
-              </Box>
-            )}
+            Subtareas
           </Typography>
-
-          <IconButton
-            size="small"
-            sx={{ ml: 0.5, p: 0.25, color: 'text.secondary' }}
-          >
-            {isExpanded ? (
-              <ArrowUpIcon sx={{ fontSize: 16 }} />
-            ) : (
-              <ArrowDownIcon sx={{ fontSize: 16 }} />
-            )}
-          </IconButton>
+          {total > 0 && (
+            <Box component="span" sx={subtaskCountBadgeSx(allCompleted)}>
+              {completedCount}/{total}
+            </Box>
+          )}
         </Box>
 
         {/* Action buttons */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {onImproveWithAI && !isReadOnly && (
-            <Tooltip title="Break task into actionable steps using Lumina AI">
+            <Tooltip title="Desglosar tarea en pasos con Lumina IA">
               <Button
                 size="small"
                 variant="outlined"
@@ -154,7 +121,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                   <SparklesIcon sx={{ fontSize: '13px !important' }} />
                 }
               >
-                Break down with AI
+                Desglosar con IA
               </Button>
             </Tooltip>
           )}
@@ -171,7 +138,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
               borderRadius: 2,
               background: allCompleted
                 ? 'linear-gradient(90deg, #10b981, #059669)'
-                : 'linear-gradient(90deg, #6366f1, #3b82f6)',
+                : 'linear-gradient(90deg, #008767, #2dd4bf)',
               transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
@@ -179,177 +146,181 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
       )}
 
       {/* Subtasks List */}
-      <Collapse in={isExpanded} timeout="auto">
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.7 }}>
-          {subtasks.map((subtask) => {
-            const isEditing = editingId === subtask.id;
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {subtasks.map((subtask) => {
+          const isEditing = editingId === subtask.id;
 
-            return (
-              <Box key={subtask.id} sx={subtaskItemSx(subtask.completed)}>
+          return (
+            <Box key={subtask.id} sx={subtaskItemSx(subtask.completed)}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flex: 1,
+                  minWidth: 0,
+                  mr: 1,
+                }}
+              >
+                {/* Custom Square Checkbox */}
                 <Box
+                  onClick={() =>
+                    !isReadOnly &&
+                    !(isLoading && !subtask.title) &&
+                    onToggleSubtask(subtask.id)
+                  }
                   sx={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: '4px',
+                    mr: 1.25,
                     display: 'flex',
                     alignItems: 'center',
-                    flex: 1,
-                    minWidth: 0,
-                    mr: 1,
+                    justifyContent: 'center',
+                    cursor: isReadOnly ? 'default' : 'pointer',
+                    transition: 'all 0.15s ease',
+                    bgcolor: subtask.completed ? '#008767' : 'transparent',
+                    border: '1.5px solid',
+                    borderColor: subtask.completed
+                      ? '#008767'
+                      : (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.3)'
+                            : 'rgba(0, 0, 0, 0.25)',
+                    '&:hover': {
+                      borderColor: '#008767',
+                      bgcolor: subtask.completed
+                        ? '#007357'
+                        : 'rgba(0, 135, 103, 0.08)',
+                    },
                   }}
                 >
-                  <IconButton
-                    size="small"
-                    disabled={isReadOnly || (isLoading && !subtask.title)}
-                    onClick={() => onToggleSubtask(subtask.id)}
-                    sx={{
-                      p: 0.4,
-                      mr: 1,
-                      color: subtask.completed ? '#10b981' : 'text.secondary',
-                      transition: 'transform 0.15s ease, color 0.2s ease',
-                      '&:hover': {
-                        transform: 'scale(1.15)',
-                        color: subtask.completed ? '#059669' : 'primary.main',
-                      },
-                    }}
-                  >
-                    {subtask.completed ? (
-                      <CheckedIcon sx={{ fontSize: 18 }} />
-                    ) : (
-                      <UncheckedIcon sx={{ fontSize: 18 }} />
-                    )}
-                  </IconButton>
-
-                  {isEditing ? (
-                    <InputBase
-                      autoFocus
-                      fullWidth
-                      value={editingTitle}
-                      onChange={(e) => setEditingTitle(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSaveEdit(subtask.id);
-                        if (e.key === 'Escape') setEditingId(null);
-                      }}
-                      onBlur={() => handleSaveEdit(subtask.id)}
-                      sx={{
-                        fontSize: '13px',
-                        py: 0,
-                        px: 0.5,
-                        borderRadius: '4px',
-                        border: '1px solid',
-                        borderColor: 'primary.main',
-                      }}
+                  {subtask.completed && (
+                    <CheckIcon
+                      sx={{ fontSize: 13, color: '#ffffff', strokeWidth: 1.5 }}
                     />
-                  ) : isLoading && !subtask.title ? (
-                    <Skeleton
-                      variant="text"
-                      width="65%"
-                      height={20}
-                      sx={{ borderRadius: '4px' }}
-                    />
-                  ) : (
-                    <Typography
-                      variant="body2"
-                      onDoubleClick={() =>
-                        !isLoading && handleStartEdit(subtask)
-                      }
-                      sx={{
-                        fontSize: '13px',
-                        color: subtask.completed
-                          ? 'text.secondary'
-                          : 'text.primary',
-                        textDecoration: subtask.completed
-                          ? 'line-through'
-                          : 'none',
-                        opacity: subtask.completed ? 0.65 : 1,
-                        cursor: isReadOnly || isLoading ? 'default' : 'pointer',
-                        transition: 'opacity 0.2s ease',
-                        wordBreak: 'break-word',
-                        userSelect: 'none',
-                      }}
-                    >
-                      {subtask.title}
-                    </Typography>
                   )}
                 </Box>
 
-                {/* Hover Actions */}
-                {!isReadOnly && (
-                  <Box
-                    className="subtask-actions"
+                {isEditing ? (
+                  <InputBase
+                    autoFocus
+                    fullWidth
+                    value={editingTitle}
+                    onChange={(e) => setEditingTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveEdit(subtask.id);
+                      if (e.key === 'Escape') setEditingId(null);
+                    }}
+                    onBlur={() => handleSaveEdit(subtask.id)}
                     sx={{
-                      opacity: 0,
-                      visibility: 'hidden',
-                      transition: 'opacity 0.15s ease',
-                      display: 'flex',
-                      alignItems: 'center',
+                      fontSize: '13.5px',
+                      py: 0,
+                      px: 0.5,
+                      borderRadius: '4px',
+                      border: '1px solid',
+                      borderColor: '#008767',
+                    }}
+                  />
+                ) : isLoading && !subtask.title ? (
+                  <Skeleton
+                    variant="text"
+                    width="65%"
+                    height={20}
+                    sx={{ borderRadius: '4px' }}
+                  />
+                ) : (
+                  <Typography
+                    variant="body2"
+                    onDoubleClick={() => !isLoading && handleStartEdit(subtask)}
+                    sx={{
+                      fontSize: '13.5px',
+                      color: subtask.completed
+                        ? 'text.secondary'
+                        : 'text.primary',
+                      textDecoration: subtask.completed
+                        ? 'line-through'
+                        : 'none',
+                      opacity: subtask.completed ? 0.65 : 1,
+                      cursor: isReadOnly || isLoading ? 'default' : 'pointer',
+                      transition: 'opacity 0.2s ease',
+                      wordBreak: 'break-word',
+                      userSelect: 'none',
                     }}
                   >
-                    <Tooltip title="Delete subtask">
-                      <IconButton
-                        size="small"
-                        disabled={isLoading}
-                        onClick={() => onRemoveSubtask(subtask.id)}
-                        sx={{
-                          p: 0.3,
-                          color: 'text.secondary',
-                          '&:hover': { color: 'error.main' },
-                        }}
-                      >
-                        <DeleteIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
+                    {subtask.title}
+                  </Typography>
                 )}
               </Box>
-            );
-          })}
 
-          {/* Quick Add Form */}
-          {!isReadOnly && (
-            <Box sx={subtaskInputFormSx}>
-              <AddIcon
-                sx={{
-                  fontSize: 16,
-                  color: 'text.secondary',
-                  opacity: isLoading ? 0.35 : 0.7,
-                }}
-              />
-              <InputBase
-                inputRef={inputRef}
-                fullWidth
-                placeholder={
-                  isLoading ? 'Loading...' : 'Add a step... (Press Enter)'
-                }
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isReadOnly || isLoading}
-                sx={{
-                  fontSize: '13px',
-                  color: 'text.primary',
-                }}
-              />
-              {newTitle.trim() && (
-                <Button
-                  size="small"
-                  variant="contained"
-                  onClick={handleAdd}
-                  disabled={isLoading}
-                  sx={{
-                    textTransform: 'none',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    px: 1.2,
-                    py: 0.2,
-                    minWidth: 0,
-                    boxShadow: 'none',
-                  }}
-                >
-                  Add
-                </Button>
+              {/* Delete Icon Button on right */}
+              {!isReadOnly && (
+                <Tooltip title="Eliminar subtarea">
+                  <IconButton
+                    size="small"
+                    disabled={isLoading}
+                    onClick={() => onRemoveSubtask(subtask.id)}
+                    sx={{
+                      p: 0.5,
+                      color: 'text.secondary',
+                      '&:hover': { color: 'error.main' },
+                    }}
+                  >
+                    <DeleteIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Tooltip>
               )}
             </Box>
-          )}
-        </Box>
-      </Collapse>
+          );
+        })}
+
+        {/* Quick Add Form */}
+        {!isReadOnly && (
+          <Box sx={subtaskInputFormSx}>
+            <AddIcon
+              sx={{
+                fontSize: 16,
+                color: 'text.secondary',
+                opacity: isLoading ? 0.35 : 0.7,
+              }}
+            />
+            <InputBase
+              inputRef={inputRef}
+              fullWidth
+              placeholder={isLoading ? 'Cargando...' : 'Añadir un paso...'}
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isReadOnly || isLoading}
+              sx={{
+                fontSize: '13px',
+                color: 'text.primary',
+              }}
+            />
+            {newTitle.trim() && (
+              <Button
+                size="small"
+                variant="contained"
+                onClick={handleAdd}
+                disabled={isLoading}
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  bgcolor: '#008767',
+                  '&:hover': { bgcolor: '#007357' },
+                  px: 1.5,
+                  py: 0.3,
+                  minWidth: 0,
+                  boxShadow: 'none',
+                  borderRadius: '6px',
+                }}
+              >
+                Añadir
+              </Button>
+            )}
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

@@ -5,7 +5,6 @@ import {
   TextField,
   Fade,
   Typography,
-  Tooltip,
   LinearProgress,
 } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
@@ -22,7 +21,6 @@ import {
 import { useTaskDetailModal } from './hooks/useTaskDetailModal.hooks';
 import { improveTaskAI } from '@/api/AI/apiAIPlanner';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
-import { getColorName } from './TaskDetailModal.utils';
 
 // Sub-components
 import { TaskProperties } from './components/TaskProperties/TaskProperties';
@@ -218,12 +216,12 @@ export const TaskDetailModal = ({
           paper: {
             sx: {
               ...paperPropsSx,
-              width: isFullScreen ? '100%' : '800px',
+              width: isFullScreen ? '100%' : '660px',
               height: isFullScreen ? '100%' : 'auto',
-              maxWidth: isFullScreen ? '100%' : '800px',
+              maxWidth: isFullScreen ? '100%' : '660px',
               maxHeight: isFullScreen ? '100%' : '90vh',
               margin: isFullScreen ? 0 : 2,
-              borderRadius: isFullScreen ? 0 : '16px',
+              borderRadius: isFullScreen ? 0 : '20px',
             },
           },
           backdrop: { sx: modalBackdropSx },
@@ -295,75 +293,50 @@ export const TaskDetailModal = ({
               initialTask={effectiveTask || initialTask}
               handleDelete={handleDelete}
               isReadOnly={isReadOnly}
+              onOpenColorPicker={(el) => !isReadOnly && setColorAnchor(el)}
             />
-            <Box sx={{ p: 3, pt: 1.5 }}>
-              <Box sx={{ px: 1, mb: 1 }}>
+            <Box sx={{ p: 3, pt: 1 }}>
+              <Box sx={{ px: 0.5, mb: 0.5 }}>
                 <TextField
                   fullWidth
                   variant="outlined"
-                  placeholder="Give your task a clear name..."
+                  placeholder="Completar informe de rendimiento trimestral"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  sx={{
-                    ...titleInputPropsSx,
-                    '& .MuiOutlinedInput-root': {
-                      ...titleInputPropsSx['& .MuiOutlinedInput-root'],
-                      paddingRight: '12px',
-                    },
-                  }}
+                  sx={titleInputPropsSx}
                   error={!!errors.title}
                   helperText={errors.title}
                   disabled={isReadOnly}
-                  InputProps={{
-                    endAdornment: (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          pr: 1,
-                          gap: 0.75,
-                        }}
-                      >
-                        {getColorName(color) && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontSize: '11px',
-                              fontWeight: 600,
-                              color: 'text.secondary',
-                              userSelect: 'none',
-                            }}
-                          >
-                            {getColorName(color)}
-                          </Typography>
-                        )}
-                        <Tooltip
-                          title={`Color: ${getColorName(color) || 'Personalizado'}`}
-                          arrow
-                        >
-                          <Box
-                            onClick={(e) =>
-                              !isReadOnly && setColorAnchor(e.currentTarget)
-                            }
-                            sx={{
-                              width: 20,
-                              height: 20,
-                              borderRadius: '50%',
-                              bgcolor: color || '#1e293b',
-                              cursor: isReadOnly ? 'default' : 'pointer',
-                              border: '2px solid white',
-                              boxShadow: '0 0 0 1px rgba(0,0,0,0.1)',
-                              transition: 'transform 0.2s',
-                              '&:hover': {
-                                transform: isReadOnly ? 'none' : 'scale(1.15)',
-                              },
-                            }}
-                          />
-                        </Tooltip>
-                      </Box>
-                    ),
-                  }}
                 />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    mt: 0.25,
+                    mb: 1.5,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: '13px',
+                      color: 'text.secondary',
+                    }}
+                  >
+                    Creado en
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: '#008767',
+                      cursor: 'pointer',
+                      '&:hover': { textDecoration: 'underline' },
+                    }}
+                  >
+                    Espacios / Proyectos
+                  </Typography>
+                </Box>
               </Box>
 
               <TaskProperties

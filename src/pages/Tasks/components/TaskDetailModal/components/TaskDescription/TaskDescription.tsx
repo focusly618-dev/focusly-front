@@ -8,7 +8,6 @@ import {
   Button,
 } from '@mui/material';
 import {
-  Description as DescriptionIcon,
   FormatBold as BoldIcon,
   FormatItalic as ItalicIcon,
   Highlight as HighlightIcon,
@@ -21,7 +20,6 @@ import {
 import { formatDescriptionToHtml } from '@/utils/formatDescription';
 import {
   descriptionContainerSx,
-  descriptionHeaderSx,
   descriptionInputSx,
 } from './TaskDescription.styles';
 
@@ -72,19 +70,17 @@ export const TaskDescription = ({
           mb: 1,
         }}
       >
-        <Box sx={descriptionHeaderSx}>
-          <DescriptionIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              fontSize: '13px',
-              fontWeight: 600,
-            }}
-          >
-            Description
-          </Typography>
-        </Box>
+        <Typography
+          sx={{
+            fontWeight: 700,
+            color: 'text.secondary',
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+          }}
+        >
+          Descripción
+        </Typography>
 
         {/* Rich Formatting Toolbar & Preview Toggle */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -239,10 +235,11 @@ export const TaskDescription = ({
               padding: '2px 6px',
               borderRadius: '4px',
               fontWeight: 600,
-              border: `1px solid ${theme.palette.mode === 'dark'
-                ? 'rgba(250, 204, 21, 0.45)'
-                : 'rgba(234, 179, 8, 0.5)'
-                }`,
+              border: `1px solid ${
+                theme.palette.mode === 'dark'
+                  ? 'rgba(250, 204, 21, 0.45)'
+                  : 'rgba(234, 179, 8, 0.5)'
+              }`,
             },
             '& strong': {
               fontWeight: 700,
@@ -285,7 +282,7 @@ export const TaskDescription = ({
           multiline
           fullWidth
           minRows={3}
-          placeholder="Add formatted details (H1 #, H2 ##, Bold **, Highlight ==text==, List -)..."
+          placeholder="Añade una descripción detallada de la tarea..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           sx={descriptionInputSx}
