@@ -34,4 +34,5 @@ export interface TasksControlsBarProps {
   onGoToPreviousPeriod: () => void;
   onGoToNextPeriod: () => void;
   setViewMode: (mode: 'list' | 'grid' | 'board' | 'workload') => void;
+  setPriorityFilter?: (priority: number | undefined) => void;
 }

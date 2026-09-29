@@ -2,10 +2,7 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { addDays, addMinutes } from 'date-fns';
 import { Typography, Box, LinearProgress, Button } from '@mui/material';
-import {
-  AutoAwesome as AutoAwesomeIcon,
-  Add as AddIcon,
-} from '@mui/icons-material';
+import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTasks } from './Tasks.hook';
@@ -67,6 +64,7 @@ export const Tasks = ({
     handleFinishOnboarding,
     deleteTasks,
     refetchTasks,
+    setPriorityFilter,
   } = useTasks();
 
   const isAIScheduleEnabled = isAIScheduleEnabledProp;
@@ -74,6 +72,13 @@ export const Tasks = ({
 
   const [searchParams] = useSearchParams();
   const urlFilter = searchParams.get('filter');
+
+  const pendingCount = filteredTasks
+    ? filteredTasks.filter((t) => t.status !== 'Done').length
+    : 0;
+  const completedCount = filteredTasks
+    ? filteredTasks.filter((t) => t.status === 'Done').length
+    : 0;
 
   const {
     headerTitle,
@@ -84,18 +89,18 @@ export const Tasks = ({
   } = useMemo(() => {
     if (urlFilter === 'inbox') {
       return {
-        headerTitle: 'Inbox',
+        headerTitle: 'Bandeja de Entrada',
         headerEyebrow: 'Bandeja de Entrada',
-        addButtonLabel: 'Add to Inbox',
+        addButtonLabel: 'Añadir a Bandeja',
         contextualInitialStart: null,
         showAIOrganize: false,
       };
     }
     if (urlFilter === 'today' || dateRange === 'today') {
       return {
-        headerTitle: 'Today',
+        headerTitle: 'Plan de Hoy',
         headerEyebrow: 'Plan de Hoy',
-        addButtonLabel: 'Add Task for Today',
+        addButtonLabel: 'Nueva Tarea para Hoy',
         contextualInitialStart: new Date(),
         showAIOrganize: false,
       };
@@ -106,17 +111,17 @@ export const Tasks = ({
       dateRange === 'this_month'
     ) {
       return {
-        headerTitle: 'Upcoming',
+        headerTitle: 'Próximas Tareas',
         headerEyebrow: 'Próximas Tareas',
-        addButtonLabel: 'Add Upcoming Task',
+        addButtonLabel: 'Nueva Tarea Próxima',
         contextualInitialStart: addDays(new Date(), 1),
         showAIOrganize: false,
       };
     }
     return {
-      headerTitle: undefined,
-      headerEyebrow: undefined,
-      addButtonLabel: 'Add New Task',
+      headerTitle: 'Próximas Tareas',
+      headerEyebrow: 'Próximas Tareas',
+      addButtonLabel: 'Nueva Tarea Próxima',
       contextualInitialStart: null,
       showAIOrganize: true,
     };
@@ -142,7 +147,7 @@ export const Tasks = ({
     {
       target: '#joyride-tasks-view-toggle',
       content:
-        'Switch between List, Grid, Board, and Workload views to find what works best for you.',
+        'Switch between List and Kanban views to find what works best for you.',
     },
     {
       target: '#joyride-tasks-search',
@@ -183,42 +188,9 @@ export const Tasks = ({
             height: '100%',
           }}
         >
-          <TasksControlsBar
-            viewMode={viewMode}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filterAnchorEl={filterAnchorEl}
-            sortAnchorEl={sortAnchorEl}
-            activeSort={activeSort ?? null}
-            activeFilterState={
-              activeFilterState ?? {
-                priorities: [],
-                categories: [],
-                statuses: [],
-              }
-            }
-            tags={tags}
-            tagSearchTerm={tagSearchTerm}
-            setTagSearchTerm={setTagSearchTerm}
-            handleFilterClick={handleFilterClick}
-            handleFilterClose={handleFilterClose}
-            handleApplyFilters={handleApplyFilters}
-            handleSortClose={handleSortClose}
-            handleApplySort={handleApplySort}
-            onAddTaskClick={() => setIsCreateTaskModalOpen(true)}
-            filteredTasks={filteredTasks}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            referenceDate={referenceDate}
-            periodLabel={periodLabel}
-            onGoToPreviousPeriod={goToPreviousPeriod}
-            onGoToNextPeriod={goToNextPeriod}
-            setViewMode={setViewMode}
-          />
-
           <Box
             sx={{
-              padding: '0 24px 24px 24px',
+              padding: { xs: '16px 20px', md: '20px 32px' },
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
@@ -226,56 +198,73 @@ export const Tasks = ({
               minHeight: 0,
             }}
           >
-            <TasksHeader title={headerTitle} eyebrow={headerEyebrow}>
-              <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-                {showAIOrganize && (
-                  <Button
-                    variant="contained"
-                    onClick={() => setIsAIPlannerOpen(true)}
-                    startIcon={<AutoAwesomeIcon />}
-                    sx={{
-                      borderRadius: '10px',
-                      textTransform: 'none',
-                      fontWeight: 700,
-                      boxShadow: 'none',
-                      height: 36,
-                      bgcolor: '#008767',
-                      color: '#ffffff',
-                      '&:hover': { bgcolor: '#007357', boxShadow: 'none' },
-                      fontSize: '0.8rem',
-                      px: 2,
-                    }}
-                  >
-                    AI Organize
-                  </Button>
-                )}
+            <TasksHeader
+              title={headerTitle}
+              eyebrow={headerEyebrow}
+              pendingCount={pendingCount}
+              completedCount={completedCount}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+              periodLabel={periodLabel}
+              addButtonLabel={addButtonLabel}
+              onAddTaskClick={() => setIsCreateTaskModalOpen(true)}
+            >
+              {showAIOrganize && (
                 <Button
-                  id="tasks-add-new-task-btn"
                   variant="contained"
-                  onClick={() => setIsCreateTaskModalOpen(true)}
-                  startIcon={
-                    <AddIcon sx={{ color: '#ffffff', fontSize: 18 }} />
-                  }
+                  onClick={() => setIsAIPlannerOpen(true)}
+                  startIcon={<AutoAwesomeIcon />}
                   sx={{
                     borderRadius: '8px',
                     textTransform: 'none',
                     fontWeight: 700,
                     boxShadow: 'none',
-                    height: 36,
+                    height: 38,
                     bgcolor: '#008767',
                     color: '#ffffff',
-                    '&:hover': {
-                      bgcolor: '#007357',
-                      boxShadow: 'none',
-                    },
+                    '&:hover': { bgcolor: '#007357', boxShadow: 'none' },
                     fontSize: '13px',
                     px: 2,
                   }}
                 >
-                  {addButtonLabel}
+                  AI Organize
                 </Button>
-              </Box>
+              )}
             </TasksHeader>
+
+            <TasksControlsBar
+              viewMode={viewMode}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              filterAnchorEl={filterAnchorEl}
+              sortAnchorEl={sortAnchorEl}
+              activeSort={activeSort ?? null}
+              activeFilterState={
+                activeFilterState ?? {
+                  priorities: [],
+                  categories: [],
+                  statuses: [],
+                }
+              }
+              tags={tags}
+              tagSearchTerm={tagSearchTerm}
+              setTagSearchTerm={setTagSearchTerm}
+              handleFilterClick={handleFilterClick}
+              handleFilterClose={handleFilterClose}
+              handleApplyFilters={handleApplyFilters}
+              handleSortClose={handleSortClose}
+              handleApplySort={handleApplySort}
+              onAddTaskClick={() => setIsCreateTaskModalOpen(true)}
+              filteredTasks={filteredTasks}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+              referenceDate={referenceDate}
+              periodLabel={periodLabel}
+              onGoToPreviousPeriod={goToPreviousPeriod}
+              onGoToNextPeriod={goToNextPeriod}
+              setViewMode={setViewMode}
+              setPriorityFilter={setPriorityFilter}
+            />
 
             <TasksContentView
               viewMode={viewMode}

@@ -9,6 +9,7 @@ import {
   DialogActions,
   Checkbox,
   CircularProgress,
+  IconButton,
 } from '@mui/material';
 import {
   CheckBox as CheckBoxIcon,
@@ -17,6 +18,8 @@ import {
   RadioButtonUnchecked as UncheckedIcon,
   CheckCircle as CheckedIcon,
   RemoveCircle as IndeterminateIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 
 import { AnimatedContainer, GridTaskContainer } from '../../Tasks.styles';
@@ -32,7 +35,6 @@ import {
   TableHeaderCell,
   TableBodyContainer,
 } from '../ListViewTask/ListViewTask.styles';
-import { TaskPaginator } from '../TaskPaginator';
 
 import type { TasksContentViewProps } from './TasksContentView.types';
 import { useTasksContentView } from './useTasksContentView.hook';
@@ -64,7 +66,6 @@ export const TasksContentView = ({
     setSelectedStatus,
     page,
     setPage,
-    pageSize,
     totalPages,
     paginatedTasks,
     isListView,
@@ -145,63 +146,30 @@ export const TasksContentView = ({
         </GridTaskContainer>
       ) : (
         <>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              borderBottom: (theme) =>
-                `1px solid ${
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.08)'
-                    : '#e2e8f0'
-                }`,
-              mb: 2,
-              gap: 2,
-              flexWrap: { xs: 'wrap', md: 'nowrap' },
-            }}
-          >
-            <StatusTabsContainer
-              sx={{
-                flex: 1,
-                minWidth: 0,
-                borderBottom: 'none',
-                mb: 0,
-              }}
-            >
-              {tabs.map((tab) => {
-                const count = tabCounts[tab.id] || 0;
-                return (
-                  <StatusTabButton
-                    key={tab.id}
+          <StatusTabsContainer>
+            {tabs.map((tab) => {
+              const count = tabCounts[tab.id] || 0;
+              return (
+                <StatusTabButton
+                  key={tab.id}
+                  active={selectedStatus === tab.id}
+                  tabColor={tab.color}
+                  onClick={() => {
+                    setSelectedStatus(tab.id);
+                    setPage(1);
+                  }}
+                >
+                  {tab.label}
+                  <TabCountBadge
                     active={selectedStatus === tab.id}
                     tabColor={tab.color}
-                    onClick={() => {
-                      setSelectedStatus(tab.id);
-                      setPage(1);
-                    }}
                   >
-                    {tab.label}
-                    <TabCountBadge
-                      active={selectedStatus === tab.id}
-                      tabColor={tab.color}
-                    >
-                      {count}
-                    </TabCountBadge>
-                  </StatusTabButton>
-                );
-              })}
-            </StatusTabsContainer>
-
-            <TaskPaginator
-              currentPage={page}
-              totalPages={totalPages}
-              totalItems={displayedTasks.length}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              isLoading={isLoading}
-            />
-          </Box>
+                    {count}
+                  </TabCountBadge>
+                </StatusTabButton>
+              );
+            })}
+          </StatusTabsContainer>
 
           <TableWrapper>
             {isLoading && filteredTasks.length === 0 ? (
@@ -218,8 +186,8 @@ export const TasksContentView = ({
               >
                 <EmptyState
                   icon={<CheckBoxIcon />}
-                  title="No tasks yet"
-                  description="Plan your day and boost your productivity. Create your first task to see it here."
+                  title="No hay tareas aún"
+                  description="Planifica tu día y mejora tu productividad. Crea tu primera tarea aquí."
                 />
               </Box>
             ) : showEmptyStateFiltered ? (
@@ -233,9 +201,9 @@ export const TasksContentView = ({
                 }}
               >
                 <EmptyState
-                  title="No tasks match your search"
-                  description="Try a different keyword or filter to find what you're looking for, or create a new task above."
-                  actionText="Clear all filters"
+                  title="No hay tareas que coincidan con la búsqueda"
+                  description="Prueba con otra palabra clave o limpia los filtros para ver tus tareas."
+                  actionText="Limpiar filtros"
                   onAction={() => setSearchTerm('')}
                 />
               </Box>
@@ -258,13 +226,11 @@ export const TasksContentView = ({
                         />
                       }
                       checkedIcon={
-                        <CheckedIcon
-                          sx={{ fontSize: 18, color: 'primary.main' }}
-                        />
+                        <CheckedIcon sx={{ fontSize: 18, color: '#008767' }} />
                       }
                       indeterminateIcon={
                         <IndeterminateIcon
-                          sx={{ fontSize: 18, color: 'primary.main' }}
+                          sx={{ fontSize: 18, color: '#008767' }}
                         />
                       }
                       sx={{
@@ -272,21 +238,14 @@ export const TasksContentView = ({
                       }}
                     />
                   </TableHeaderCell>
-                  <TableHeaderCell>Task Name</TableHeaderCell>
-                  <TableHeaderCell className="col-priority">
-                    Priority
-                  </TableHeaderCell>
-                  <TableHeaderCell className="col-date">
-                    Due Date
-                  </TableHeaderCell>
-                  <TableHeaderCell className="col-estimated">
-                    Estimated
-                  </TableHeaderCell>
-                  <TableHeaderCell className="col-actual">
-                    Actual
-                  </TableHeaderCell>
+                  <TableHeaderCell>NOMBRE DE LA TAREA</TableHeaderCell>
+                  <TableHeaderCell>SUBTAREAS</TableHeaderCell>
+                  <TableHeaderCell>PRIORIDAD</TableHeaderCell>
+                  <TableHeaderCell>FECHA LÍMITE</TableHeaderCell>
+                  <TableHeaderCell>ESTIMADO</TableHeaderCell>
+                  <TableHeaderCell>REAL</TableHeaderCell>
                   <TableHeaderCell sx={{ justifyContent: 'center' }}>
-                    Actions
+                    ACCIONES
                   </TableHeaderCell>
                 </TableHeader>
                 <TableBodyContainer>
@@ -296,6 +255,7 @@ export const TasksContentView = ({
                       task={task}
                       onTaskClick={handleTaskClick}
                       updateTask={updateTask}
+                      deleteTasks={deleteTasks}
                       isAIScheduleEnabled={isAIScheduleEnabled}
                       onStartFocus={onStartFocus}
                       isSelected={selectedTaskIds.has(task.id)}
@@ -313,8 +273,8 @@ export const TasksContentView = ({
                       }}
                     >
                       <EmptyState
-                        title={`No tasks in ${activeTab.label}`}
-                        description="Move a task here or change tabs to see tasks."
+                        title={`No hay tareas en ${activeTab.label}`}
+                        description="Mueve una tarea aquí o cambia de pestaña para ver tareas."
                       />
                     </Box>
                   )}
@@ -322,6 +282,131 @@ export const TasksContentView = ({
               </>
             )}
           </TableWrapper>
+
+          {/* Bottom Pagination matching screenshot */}
+          {displayedTasks.length > 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                pt: 1,
+                pb: 2,
+                px: 0.5,
+                flexWrap: 'wrap',
+                gap: 2,
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: '13px',
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                }}
+              >
+                Mostrando {paginatedTasks.length} de {displayedTasks.length}{' '}
+                tareas próximas en total
+              </Typography>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <IconButton
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  size="small"
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: '8px',
+                    border: '1px solid',
+                    borderColor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.1)'
+                        : '#e5e7eb',
+                    color: 'text.secondary',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.03)'
+                        : '#ffffff',
+                    '&.Mui-disabled': {
+                      opacity: 0.4,
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.05)'
+                          : '#f3f4f6',
+                    },
+                  }}
+                >
+                  <ChevronLeftIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+
+                {Array.from({ length: totalPages }).map((_, idx) => {
+                  const pageNum = idx + 1;
+                  const isActive = pageNum === page;
+                  return (
+                    <Button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      sx={{
+                        minWidth: 30,
+                        width: 30,
+                        height: 30,
+                        p: 0,
+                        borderRadius: '8px',
+                        fontWeight: 700,
+                        fontSize: '12.5px',
+                        bgcolor: isActive ? '#008767' : 'transparent',
+                        color: isActive ? '#ffffff' : 'text.primary',
+                        boxShadow: isActive
+                          ? '0 1px 3px rgba(0, 135, 103, 0.3)'
+                          : 'none',
+                        '&:hover': {
+                          bgcolor: isActive
+                            ? '#007357'
+                            : (theme) =>
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(255,255,255,0.06)'
+                                  : '#f3f4f6',
+                        },
+                      }}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+
+                <IconButton
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages || totalPages === 0}
+                  size="small"
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: '8px',
+                    border: '1px solid',
+                    borderColor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.1)'
+                        : '#e5e7eb',
+                    color: 'text.secondary',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.03)'
+                        : '#ffffff',
+                    '&.Mui-disabled': {
+                      opacity: 0.4,
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.05)'
+                          : '#f3f4f6',
+                    },
+                  }}
+                >
+                  <ChevronRightIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Box>
+            </Box>
+          )}
         </>
       )}
 

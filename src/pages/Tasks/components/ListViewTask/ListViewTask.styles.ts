@@ -193,30 +193,45 @@ export const CategoryChip = styled(Box)(({ theme }) => ({
 }));
 
 export const PriorityChip = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'priorityColor',
-})<{ priorityColor?: string }>(({ priorityColor }) => {
-  const defaultColor = priorityColor || '#6b7280';
-  const bg = alpha(defaultColor, 0.12);
-  const border = alpha(defaultColor, 0.25);
+  shouldForwardProp: (prop) =>
+    prop !== 'priorityColor' && prop !== 'priorityLevel',
+})<{ priorityColor?: string; priorityLevel?: number }>(({
+  theme,
+  priorityLevel,
+}) => {
+  let bg = '#f3f4f6';
+  let color = '#4b5563';
+
+  if (priorityLevel === 3 || priorityLevel === 4) {
+    // Alta
+    bg = theme.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2';
+    color = theme.palette.mode === 'dark' ? '#f87171' : '#dc2626';
+  } else if (priorityLevel === 2) {
+    // Media
+    bg = theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7';
+    color = theme.palette.mode === 'dark' ? '#fbbf24' : '#d97706';
+  } else if (priorityLevel === 1) {
+    // Baja
+    bg = theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.15)' : '#dcfce7';
+    color = theme.palette.mode === 'dark' ? '#34d399' : '#16a34a';
+  }
 
   return {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '3px',
-    padding: '2px 7px',
-    borderRadius: '4px',
-    fontSize: '11px',
-    fontWeight: 700,
+    justifyContent: 'center',
+    padding: '3px 12px',
+    borderRadius: '20px',
+    fontSize: '11.5px',
+    fontWeight: 600,
     backgroundColor: bg,
-    color: defaultColor,
-    border: `1px solid ${border}`,
+    color: color,
     transition: 'all 0.15s ease',
     width: 'fit-content',
     cursor: 'pointer',
     flexShrink: 0,
     '&:hover': {
-      backgroundColor: alpha(defaultColor, 0.2),
-      borderColor: alpha(defaultColor, 0.4),
+      filter: 'brightness(0.96)',
     },
   };
 });
@@ -235,23 +250,17 @@ export const DateChip = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: '6px',
-  padding: '4px 10px',
-  borderRadius: '20px',
-  fontSize: '11px',
-  fontWeight: 700,
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(0, 135, 103, 0.15)' : '#ecfdf5',
-  color: theme.palette.mode === 'dark' ? '#34d399' : '#008767',
-  border:
-    theme.palette.mode === 'dark'
-      ? '1px solid rgba(0, 135, 103, 0.25)'
-      : '1px solid #a7f3d0',
-  transition: 'all 0.2s ease',
+  padding: '3px 0',
+  borderRadius: '4px',
+  fontSize: '12px',
+  fontWeight: 500,
+  backgroundColor: 'transparent',
+  color: theme.palette.mode === 'dark' ? '#9ca3af' : '#4b5563',
+  transition: 'all 0.15s ease',
   width: 'fit-content',
   cursor: 'pointer',
   '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(0, 135, 103, 0.25)' : '#d1fae5',
+    color: theme.palette.text.primary,
   },
 }));
 
@@ -418,18 +427,16 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
 
 export const TableHeader = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: '55px minmax(150px, 3fr) 100px 117px 123px 80px 95px',
-  padding: '6px 40px 6px 24px',
+  gridTemplateColumns:
+    '48px minmax(260px, 4fr) 110px 100px 120px 85px 75px 65px',
+  padding: '12px 24px',
   backgroundColor: surfaceColor(
     theme,
     'rgba(26, 31, 43, 0.6)',
     'rgba(36, 36, 37, 0.6)',
-    'rgba(249, 250, 251, 0.8)',
+    '#f9fafb',
   ),
-  borderBottom:
-    theme.palette.mode === 'dark'
-      ? '1px solid rgba(255, 255, 255, 0.06)'
-      : '1px solid rgba(0, 0, 0, 0.06)',
+  borderBottom: `1px solid ${theme.palette.divider}`,
   color: surfaceColor(
     theme,
     'rgba(255, 255, 255, 0.5)',
@@ -444,7 +451,7 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   zIndex: 2,
   boxSizing: 'border-box',
-  minWidth: '825px',
+  minWidth: '880px',
 }));
 
 export const TableHeaderCell = styled(Box)(() => ({
@@ -460,7 +467,7 @@ export const TableBodyContainer = styled(Box)(({ theme }) => ({
   flex: 1,
   overflowY: 'auto',
   minHeight: 0,
-  minWidth: '825px',
+  minWidth: '880px',
   '&::-webkit-scrollbar': {
     width: '6px',
   },
@@ -488,7 +495,7 @@ export const TableStatusGroupRow = styled(Box, {
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
-  padding: '6px 40px 6px 24px',
+  padding: '8px 24px',
   backgroundColor: surfaceColor(
     theme,
     'rgba(10, 14, 24, 0.95)',
@@ -506,7 +513,7 @@ export const TableStatusGroupRow = styled(Box, {
   cursor: 'pointer',
   userSelect: 'none',
   transition: 'background-color 0.15s ease',
-  minWidth: '825px',
+  minWidth: '880px',
   boxSizing: 'border-box',
   '&:hover': {
     backgroundColor: surfaceColor(
@@ -519,33 +526,28 @@ export const TableStatusGroupRow = styled(Box, {
 }));
 
 export const TaskRow = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'statusColor',
-})<{ statusColor?: string }>(({ theme }) => ({
+  shouldForwardProp: (prop) => prop !== 'statusColor' && prop !== 'isDone',
+})<{ statusColor?: string; isDone?: boolean }>(({ theme, isDone }) => ({
   display: 'grid',
-  gridTemplateColumns: '55px minmax(150px, 3fr) 100px 117px 123px 80px 95px',
+  gridTemplateColumns:
+    '48px minmax(260px, 4fr) 110px 100px 120px 85px 75px 65px',
   alignItems: 'center',
-  padding: '5px 40px 5px 24px',
+  padding: '12px 24px',
   backgroundColor: 'transparent',
+  opacity: isDone ? 0.65 : 1,
   borderBottom:
     theme.palette.mode === 'dark'
       ? '1px solid rgba(255, 255, 255, 0.04)'
-      : '1px solid rgba(0, 0, 0, 0.04)',
+      : '1px solid #f3f4f6',
   cursor: 'pointer',
   transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   gap: '12px',
   boxSizing: 'border-box',
-  minWidth: '825px',
+  minWidth: '880px',
 
   '&:hover': {
     backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.02)'
-        : 'rgba(0, 0, 0, 0.015)',
-    transform: 'translateY(-0.5px)',
-    boxShadow:
-      theme.palette.mode === 'dark'
-        ? '0 2px 8px rgba(0, 0, 0, 0.2)'
-        : '0 2px 8px rgba(0, 0, 0, 0.01)',
+      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#f9fafb',
   },
 
   '&:hover .checkbox-cell': {

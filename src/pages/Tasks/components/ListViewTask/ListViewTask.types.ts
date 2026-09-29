@@ -5,6 +5,7 @@ export interface ListViewTaskProps {
   task: TaskResponse;
   onTaskClick: (task: TaskResponse) => void;
   updateTask?: (taskId: string, updates: TaskResponse) => Promise<void>;
+  deleteTasks?: (ids: string[]) => Promise<void>;
   isAIScheduleEnabled?: boolean;
   onStartFocus?: (task: Task) => void;
   isSelected?: boolean;

@@ -16,7 +16,7 @@ export const useTasksContentView = ({
 }: UseTasksContentViewProps) => {
   const { user } = useAppSelector((state) => state.auth);
 
-  const PAGE_SIZE = 24;
+  const PAGE_SIZE = 7;
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(),
   );
@@ -24,7 +24,7 @@ export const useTasksContentView = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [prevViewMode, setPrevViewMode] = useState(viewMode);
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
-  const [limit, setLimit] = useState(24);
+  const [limit, setLimit] = useState(7);
   const [page, setPage] = useState(1);
 
   // Sync state if view mode changes
@@ -73,8 +73,8 @@ export const useTasksContentView = ({
     return [
       {
         id: 'All',
-        label: 'All',
-        color: '#6366f1',
+        label: 'Todas',
+        color: '#008767',
         filter: () => true,
       },
       ...STATUS_SECTIONS,

@@ -1,83 +1,71 @@
-import { useSearchParams } from 'react-router-dom';
-import { Typography, Box, Select, MenuItem, IconButton } from '@mui/material';
-import { surfaceColor } from '@/context';
+import { useState } from 'react';
+import {
+  Box,
+  Button,
+  Menu,
+  MenuItem,
+  TextField,
+  InputAdornment,
+} from '@mui/material';
 import {
   Search as SearchIcon,
-  FilterList as FilterListIcon,
-  Sort as SortIcon,
-  GridView as GridViewIcon,
-  ViewList as ViewListIcon,
-  ViewColumn as ViewColumnIcon,
-  Balance as BalanceIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  ViewListRounded as ViewListIcon,
+  DashboardRounded as KanbanIcon,
+  FlagOutlined as FlagIcon,
+  PersonOutlineRounded as PersonIcon,
 } from '@mui/icons-material';
-import {
-  ControlsBar,
-  FilterButton,
-  SortButton,
-  StyledTextField,
-  ViewToggleGroup,
-  ViewToggleButton,
-} from '../../Tasks.styles';
-import { FilterPopover } from '../FilterPopover/FilterPopover';
-import { SortPopover } from '../SortPopover/SortPopover';
 import type { TasksControlsBarProps } from './TasksControlsBar.types';
-import type { DateRangeFilter } from '../../hooks/useTasksFilters.hook';
 
 export const TasksControlsBar = ({
   viewMode,
   searchTerm,
   setSearchTerm,
-  filterAnchorEl,
-  sortAnchorEl,
-  activeSort,
-  activeFilterState,
-  tags,
-  tagSearchTerm,
-  setTagSearchTerm,
-  handleFilterClick,
-  handleFilterClose,
-  handleApplyFilters,
-  handleSortClose,
-  handleApplySort,
-  filteredTasks,
-  dateRange,
-  setDateRange,
-  periodLabel,
-  onGoToPreviousPeriod,
-  onGoToNextPeriod,
   setViewMode,
+  activeFilterState,
+  setPriorityFilter,
 }: TasksControlsBarProps) => {
-  const [searchParams] = useSearchParams();
-  const urlFilter = searchParams.get('filter');
-  const urlTab = searchParams.get('tab');
-  const urlDateRange = searchParams.get('dateRange');
-  const hideDateSelector = Boolean(urlFilter || urlDateRange);
+  const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
+    null,
+  );
+  const [assigneeAnchor, setAssigneeAnchor] = useState<null | HTMLElement>(
+    null,
+  );
 
-  const pendingCount = filteredTasks
-    ? filteredTasks.filter((t) => t.status !== 'Done').length
-    : 0;
-  const completedCount = filteredTasks
-    ? filteredTasks.filter((t) => t.status === 'Done').length
-    : 0;
+  // Derive current priority label
+  const currentPriorityString = activeFilterState?.priorities?.[0];
+  const priorityDisplayLabel = currentPriorityString
+    ? currentPriorityString === 'High'
+      ? 'Alta'
+      : currentPriorityString === 'Medium'
+        ? 'Media'
+        : currentPriorityString === 'Low'
+          ? 'Baja'
+          : currentPriorityString
+    : 'Todas';
+
+  const handleSelectPriority = (level: number | undefined) => {
+    setPriorityAnchor(null);
+    if (setPriorityFilter) {
+      setPriorityFilter(level);
+    }
+  };
 
   return (
-    <ControlsBar
+    <Box
       id="joyride-tasks-filters"
       sx={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '16px 24px',
-        marginBottom: '0px',
+        padding: '0 0 16px 0',
         width: '100%',
         flexWrap: 'wrap',
-        gap: 2,
-        borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        gap: 1.5,
         boxSizing: 'border-box',
       }}
     >
+      {/* Left side: Search + Priority Filter + Responsables */}
       <Box
         sx={{
           display: 'flex',
@@ -85,276 +73,324 @@ export const TasksControlsBar = ({
           gap: 1.5,
           flex: 1,
           minWidth: '280px',
+          flexWrap: 'wrap',
         }}
       >
-        {/* Search Input styled matching screenshot */}
-        <StyledTextField
+        {/* Search Input matching screenshot */}
+        <TextField
           id="joyride-tasks-search"
-          placeholder="Search tasks, tags, or projects..."
+          placeholder="Buscar tareas, etiquetas..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          size="small"
           InputProps={{
             startAdornment: (
-              <SearchIcon
-                sx={{ color: 'text.secondary', mr: 1, fontSize: 18 }}
-              />
-            ),
-            endAdornment: (
-              <Box
-                sx={{
-                  border: '1px solid',
-                  borderColor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.1)'
-                      : '#e2e8f0',
-                  borderRadius: '4px',
-                  px: 0.75,
-                  py: 0.25,
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.05)'
-                      : '#f8fafc',
-                  color: 'text.secondary',
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  pointerEvents: 'none',
-                }}
-              >
-                ⌘K
-              </Box>
+              <InputAdornment position="start">
+                <SearchIcon
+                  sx={{ color: 'text.secondary', fontSize: 18, ml: 0.5 }}
+                />
+              </InputAdornment>
             ),
           }}
-          size="small"
           sx={{
-            flex: 1,
-            maxWidth: '360px',
+            width: { xs: '100%', sm: 260, md: 300 },
             '& .MuiOutlinedInput-root': {
-              borderRadius: '24px',
+              borderRadius: '8px',
+              height: 38,
+              fontSize: '13px',
               bgcolor: (theme) =>
                 theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.02)'
-                  : '#f8fafc',
+                  ? 'rgba(255,255,255,0.03)'
+                  : '#ffffff',
               '& fieldset': {
                 borderColor: (theme) =>
                   theme.palette.mode === 'dark'
-                    ? 'rgba(255,255,255,0.08)'
-                    : '#e2e8f0',
+                    ? 'rgba(255,255,255,0.1)'
+                    : '#e5e7eb',
+              },
+              '&:hover fieldset': {
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.2)'
+                    : '#d1d5db',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#008767',
+                borderWidth: '1.5px',
               },
             },
           }}
         />
 
-        {/* Filter Button */}
-        <FilterButton
-          onClick={(e) => handleFilterClick(e, 'filter')}
-          active={Boolean(filterAnchorEl)}
+        {/* Priority Filter Dropdown Pill */}
+        <Button
+          onClick={(e) => setPriorityAnchor(e.currentTarget)}
+          endIcon={
+            <KeyboardArrowDownIcon
+              sx={{ fontSize: 18, color: 'text.secondary' }}
+            />
+          }
           sx={{
-            borderRadius: '24px',
-            height: '36px',
-            border: (theme) =>
-              `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`,
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '13px',
+            color:
+              priorityDisplayLabel !== 'Todas' ? '#008767' : 'text.primary',
             bgcolor: (theme) =>
               theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.02)'
+                ? 'rgba(255,255,255,0.03)'
                 : '#ffffff',
-            px: 2,
+            border: '1px solid',
+            borderColor:
+              priorityDisplayLabel !== 'Todas'
+                ? '#008767'
+                : (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.1)'
+                      : '#e5e7eb',
+            borderRadius: '8px',
+            height: 38,
+            px: 1.75,
+            whiteSpace: 'nowrap',
+            '&:hover': {
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.06)'
+                  : '#f9fafb',
+            },
           }}
         >
-          <FilterListIcon sx={{ fontSize: 18, mr: 0.5 }} />
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Filter
-          </Typography>
-        </FilterButton>
-        <FilterPopover
-          open={Boolean(filterAnchorEl)}
-          anchorEl={filterAnchorEl}
-          onClose={handleFilterClose}
-          tags={tags}
-          tagSearchTerm={tagSearchTerm}
-          onTagSearchChange={setTagSearchTerm}
-          onApply={handleApplyFilters}
-          activeFilterState={activeFilterState}
-        />
+          Prioridad: {priorityDisplayLabel}
+        </Button>
+        <Menu
+          anchorEl={priorityAnchor}
+          open={Boolean(priorityAnchor)}
+          onClose={() => setPriorityAnchor(null)}
+          PaperProps={{
+            sx: {
+              borderRadius: '10px',
+              minWidth: '150px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              p: 0.5,
+            },
+          }}
+        >
+          <MenuItem
+            onClick={() => handleSelectPriority(undefined)}
+            selected={priorityDisplayLabel === 'Todas'}
+            sx={{
+              py: 0.8,
+              px: 1.5,
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: priorityDisplayLabel === 'Todas' ? 700 : 500,
+            }}
+          >
+            Todas
+          </MenuItem>
+          <MenuItem
+            onClick={() => handleSelectPriority(3)}
+            selected={priorityDisplayLabel === 'Alta'}
+            sx={{
+              gap: 1.2,
+              py: 0.8,
+              px: 1.5,
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: priorityDisplayLabel === 'Alta' ? 700 : 500,
+            }}
+          >
+            <FlagIcon sx={{ fontSize: 16, color: '#dc2626' }} />
+            Alta
+          </MenuItem>
+          <MenuItem
+            onClick={() => handleSelectPriority(2)}
+            selected={priorityDisplayLabel === 'Media'}
+            sx={{
+              gap: 1.2,
+              py: 0.8,
+              px: 1.5,
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: priorityDisplayLabel === 'Media' ? 700 : 500,
+            }}
+          >
+            <FlagIcon sx={{ fontSize: 16, color: '#d97706' }} />
+            Media
+          </MenuItem>
+          <MenuItem
+            onClick={() => handleSelectPriority(1)}
+            selected={priorityDisplayLabel === 'Baja'}
+            sx={{
+              gap: 1.2,
+              py: 0.8,
+              px: 1.5,
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: priorityDisplayLabel === 'Baja' ? 700 : 500,
+            }}
+          >
+            <FlagIcon sx={{ fontSize: 16, color: '#16a34a' }} />
+            Baja
+          </MenuItem>
+        </Menu>
 
-        {/* Sort Button */}
-        <SortButton
-          onClick={(e) => handleFilterClick(e, 'sort')}
-          active={Boolean(sortAnchorEl)}
+        {/* Responsables Dropdown Pill */}
+        <Button
+          onClick={(e) => setAssigneeAnchor(e.currentTarget)}
+          endIcon={
+            <KeyboardArrowDownIcon
+              sx={{ fontSize: 18, color: 'text.secondary' }}
+            />
+          }
           sx={{
-            borderRadius: '24px',
-            height: '36px',
-            border: (theme) =>
-              `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`,
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '13px',
+            color: 'text.primary',
             bgcolor: (theme) =>
               theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.02)'
+                ? 'rgba(255,255,255,0.03)'
                 : '#ffffff',
-            px: 2,
-          }}
-        >
-          <SortIcon sx={{ fontSize: 18, mr: 0.5 }} />
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Sort
-          </Typography>
-        </SortButton>
-        <SortPopover
-          open={Boolean(sortAnchorEl)}
-          anchorEl={sortAnchorEl}
-          onClose={handleSortClose}
-          onApply={handleApplySort}
-          activeSort={activeSort ?? undefined}
-        />
-
-        {/* Combined Stats & Date Selector Pill */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            bgcolor: (theme) =>
-              surfaceColor(theme, '#1c1f26', '#2a2a2c', '#eff6ff'),
             border: '1px solid',
             borderColor: (theme) =>
               theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.08)'
-                : '#bfdbfe',
-            borderRadius: '99px',
-            px: 2.2,
-            height: '36px',
-            boxSizing: 'border-box',
+                ? 'rgba(255,255,255,0.1)'
+                : '#e5e7eb',
+            borderRadius: '8px',
+            height: 38,
+            px: 1.75,
+            whiteSpace: 'nowrap',
+            '&:hover': {
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.06)'
+                  : '#f9fafb',
+            },
           }}
         >
-          <Typography
-            variant="body2"
+          Responsables
+        </Button>
+        <Menu
+          anchorEl={assigneeAnchor}
+          open={Boolean(assigneeAnchor)}
+          onClose={() => setAssigneeAnchor(null)}
+          PaperProps={{
+            sx: {
+              borderRadius: '10px',
+              minWidth: '160px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              p: 0.5,
+            },
+          }}
+        >
+          <MenuItem
+            onClick={() => setAssigneeAnchor(null)}
             sx={{
+              gap: 1.2,
+              py: 0.8,
+              px: 1.5,
+              borderRadius: '6px',
+              fontSize: '13px',
               fontWeight: 600,
-              color: (theme) =>
-                theme.palette.mode === 'dark' ? '#a5b4fc' : '#1e3a8a',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              fontSize: '12px',
-              whiteSpace: 'nowrap',
             }}
           >
-            <span>{pendingCount} Pending</span>
-            <span style={{ opacity: 0.5 }}>•</span>
-            <span>{completedCount} Completed</span>
-          </Typography>
-
-          {!hideDateSelector && (
-            <>
-              <Box
-                sx={{
-                  width: '1px',
-                  height: '18px',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.15)'
-                      : '#bfdbfe',
-                  mx: 2,
-                }}
-              />
-
-              <IconButton
-                onClick={onGoToPreviousPeriod}
-                disabled={dateRange === 'all'}
-                size="small"
-                sx={{
-                  p: 0.25,
-                  color: (theme) =>
-                    theme.palette.mode === 'dark' ? '#34d399' : '#008767',
-                }}
-              >
-                <ChevronLeftIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-
-              <Select
-                value={dateRange}
-                onChange={(e) =>
-                  setDateRange(e.target.value as DateRangeFilter)
-                }
-                renderValue={() => periodLabel}
-                size="small"
-                variant="standard"
-                disableUnderline
-                sx={{
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: (theme) =>
-                    theme.palette.mode === 'dark' ? '#34d399' : '#008767',
-                  '& .MuiSelect-select': {
-                    py: 0,
-                    pr: '20px !important',
-                  },
-                }}
-              >
-                <MenuItem value="all">All Tasks</MenuItem>
-                <MenuItem value="today">Today</MenuItem>
-                <MenuItem value="this_week">This Week</MenuItem>
-                <MenuItem value="this_month">This Month</MenuItem>
-              </Select>
-
-              <IconButton
-                onClick={onGoToNextPeriod}
-                disabled={dateRange === 'all'}
-                size="small"
-                sx={{
-                  p: 0.25,
-                  color: (theme) =>
-                    theme.palette.mode === 'dark' ? '#34d399' : '#008767',
-                }}
-              >
-                <ChevronRightIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            </>
-          )}
-        </Box>
+            <PersonIcon sx={{ fontSize: 16, color: '#008767' }} />
+            Todos los responsables
+          </MenuItem>
+        </Menu>
       </Box>
-      {!urlFilter && urlTab && (
-        <ViewToggleGroup
-          id="joyride-tasks-view-toggle"
+
+      {/* Right side: Segmented Lista / Kanban Toggle */}
+      <Box
+        id="joyride-tasks-view-toggle"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          bgcolor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.04)'
+              : '#f3f4f6',
+          p: '3px',
+          borderRadius: '8px',
+          border: '1px solid',
+          borderColor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : '#e5e7eb',
+        }}
+      >
+        <Button
+          size="small"
+          onClick={() => setViewMode('list')}
+          startIcon={<ViewListIcon sx={{ fontSize: 18 }} />}
           sx={{
-            borderRadius: '24px',
-            border: (theme) =>
-              `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#e2e8f0'}`,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.02)'
-                : '#ffffff',
-            overflow: 'hidden',
-            p: '2px',
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '12.5px',
+            borderRadius: '6px',
+            px: 1.5,
+            height: 32,
+            minWidth: 'auto',
+            bgcolor:
+              viewMode === 'list'
+                ? (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.14)'
+                      : '#ffffff'
+                : 'transparent',
+            color: viewMode === 'list' ? 'text.primary' : 'text.secondary',
+            boxShadow:
+              viewMode === 'list' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+            '&:hover': {
+              bgcolor:
+                viewMode === 'list'
+                  ? (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.18)'
+                        : '#ffffff'
+                  : 'rgba(0,0,0,0.04)',
+            },
           }}
         >
-          <ViewToggleButton
-            active={viewMode === 'list'}
-            onClick={() => setViewMode('list')}
-            sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
-          >
-            <ViewListIcon fontSize="small" />
-          </ViewToggleButton>
-          <ViewToggleButton
-            active={viewMode === 'grid'}
-            onClick={() => setViewMode('grid')}
-            sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
-          >
-            <GridViewIcon fontSize="small" />
-          </ViewToggleButton>
-          <ViewToggleButton
-            active={viewMode === 'board'}
-            onClick={() => setViewMode('board')}
-            sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
-          >
-            <ViewColumnIcon fontSize="small" />
-          </ViewToggleButton>
-          <ViewToggleButton
-            active={viewMode === 'workload'}
-            onClick={() => setViewMode('workload')}
-            sx={{ borderRadius: '24px', width: 34, height: 30, p: 0 }}
-          >
-            <BalanceIcon fontSize="small" />
-          </ViewToggleButton>
-        </ViewToggleGroup>
-      )}
-    </ControlsBar>
+          Lista
+        </Button>
+        <Button
+          size="small"
+          onClick={() => setViewMode('board')}
+          startIcon={<KanbanIcon sx={{ fontSize: 17 }} />}
+          sx={{
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '12.5px',
+            borderRadius: '6px',
+            px: 1.5,
+            height: 32,
+            minWidth: 'auto',
+            bgcolor:
+              viewMode === 'board'
+                ? (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.14)'
+                      : '#ffffff'
+                : 'transparent',
+            color: viewMode === 'board' ? 'text.primary' : 'text.secondary',
+            boxShadow:
+              viewMode === 'board' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+            '&:hover': {
+              bgcolor:
+                viewMode === 'board'
+                  ? (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.18)'
+                        : '#ffffff'
+                  : 'rgba(0,0,0,0.04)',
+            },
+          }}
+        >
+          Kanban
+        </Button>
+      </Box>
+    </Box>
   );
 };

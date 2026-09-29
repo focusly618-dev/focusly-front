@@ -3,81 +3,43 @@ import {
   Typography,
   Menu,
   MenuItem,
-  Tooltip,
   Checkbox,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import {
-  CalendarToday as CalendarTodayIcon,
+  CalendarTodayOutlined as CalendarTodayIcon,
   AutoAwesome as AutoAwesomeIcon,
-  PlayArrow as PlayIcon,
-  RadioButtonUnchecked as UncheckedIcon,
-  CheckCircle as CheckedIcon,
-  FormatListBulletedRounded as SubtasksIcon,
+  PlayArrowRounded as PlayIcon,
+  Check as CheckIcon,
+  EditOutlined as EditIcon,
+  DeleteOutlineRounded as DeleteIcon,
+  FlagOutlined as FlagIcon,
+  CheckCircleOutline as CompletedIcon,
 } from '@mui/icons-material';
 
 import {
   TaskRow,
   TaskTitle,
-  StatusBadge,
-  FocusIconButton,
   AIBadge,
   AIText,
   PriorityChip,
   DateChip,
-  TimeChip,
 } from './ListViewTask.styles';
-import {
-  differenceInHours,
-  differenceInDays,
-  differenceInWeeks,
-  differenceInMonths,
-  differenceInYears,
-} from 'date-fns';
 import type { Task } from '@/redux/tasks/task.types';
 import type { ListViewTaskProps } from './ListViewTask.types';
 import { useListViewTask } from './ListViewTask.hook';
 import { formatDuration } from '../TaskDetailModal/TaskDetailModal.utils';
-import { PriorityBadge, getPriorityConfig } from '@/components/ui';
-
-const formatTimeSinceCompletion = (dateString: string | undefined) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const now = new Date();
-
-  const hours = differenceInHours(now, date);
-  if (hours < 24) return `${hours}h ago`;
-
-  const days = differenceInDays(now, date);
-  if (days < 7) return `${days}d ago`;
-
-  const weeks = differenceInWeeks(now, date);
-  if (weeks < 4) return `${weeks}w ago`;
-
-  const months = differenceInMonths(now, date);
-  if (months < 12) return `${months}mo ago`;
-
-  const years = differenceInYears(now, date);
-  return `${years}y ago`;
-};
-
-const STATUS_MENU_ICON: Record<string, React.ReactNode> = {
-  Todo: <StatusBadge statusColor="#3b82f6" />,
-  Planning: <StatusBadge statusColor="#8b5cf6" />,
-  Pending: <StatusBadge statusColor="#f59e0b" />,
-  'On Hold': <StatusBadge statusColor="#ef4444" />,
-  Review: <StatusBadge statusColor="#06b6d4" />,
-  Done: <StatusBadge statusColor="#22c55e" />,
-  Backlog: <StatusBadge statusColor="#6b7280" />,
-  Scheduled: <StatusBadge statusColor="#8b5cf6" />,
-  Archived: <StatusBadge statusColor="#4b5563" />,
-};
 
 export const ListViewTask = ({
   task,
   onTaskClick,
   updateTask,
+  deleteTasks,
   isAIScheduleEnabled,
   onStartFocus,
   isSelected,
@@ -89,7 +51,6 @@ export const ListViewTask = ({
     if (!task) return false;
     if (!user) return true;
 
-    // Check Google Calendar event ownership
     if (task.task_type === 'GoogleTask' || task.google_event_id) {
       const organizerEmail = (task as unknown as { organizer_email?: string })
         .organizer_email;
@@ -98,7 +59,6 @@ export const ListViewTask = ({
       }
     }
 
-    // Check Focusly task ownership
     if (task.user_id && task.user_id !== user.id) {
       return true;
     }
@@ -107,8 +67,6 @@ export const ListViewTask = ({
   }, [task, user]);
 
   const {
-    statusAnchor,
-    setStatusAnchor,
     priorityAnchor,
     setPriorityAnchor,
     dateAnchor,
@@ -117,16 +75,49 @@ export const ListViewTask = ({
     handleDateSelect,
     handleStatusSelect,
     statusColor,
-    priorityColor,
   } = useListViewTask({ task, updateTask });
+
+  const [actionAnchor, setActionAnchor] = useState<null | HTMLElement>(null);
 
   const estimateMin = task.estimate_timer || task.estimate_minutes || 0;
   const realMin = task.real_timer || 0;
-  const isOverLimit = estimateMin > 0 && realMin > estimateMin;
 
   const subtasksTotal = task.subtasks?.length || 0;
   const subtasksDone = task.subtasks?.filter((s) => s.completed).length || 0;
-  const allSubtasksDone = subtasksTotal > 0 && subtasksDone === subtasksTotal;
+  const isDone = task.status === 'Done';
+
+  const priorityLabelMap: Record<number, string> = {
+    4: 'Alta',
+    3: 'Alta',
+    2: 'Media',
+    1: 'Baja',
+    0: 'Baja',
+  };
+  const priorityLabel = priorityLabelMap[task.priority_level ?? 2] || 'Media';
+
+  const formattedDate = useMemo(() => {
+    if (!task.deadline) return '-';
+    try {
+      const date = new Date(task.deadline);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+    } catch {
+      return '-';
+    }
+  }, [task.deadline]);
+
+  const handleToggleDone = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isReadOnly && updateTask) {
+      const nextStatus = isDone ? 'Todo' : 'Done';
+      await updateTask(task.id, {
+        ...task,
+        status: nextStatus as typeof task.status,
+      });
+    }
+  };
 
   return (
     <>
@@ -134,35 +125,60 @@ export const ListViewTask = ({
         onClick={() => onTaskClick(task)}
         statusColor={statusColor}
         className="task-row-item"
+        isDone={isDone}
       >
+        {/* Cell 1: Checkbox */}
         <Box
           className="checkbox-cell"
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            opacity: isReadOnly ? 0.35 : isSelected ? 1 : 0,
-            transition: 'opacity 0.2s ease',
             pointerEvents: isReadOnly ? 'none' : 'auto',
           }}
           onClick={(e) => {
-            e.stopPropagation();
-            if (!isReadOnly) {
-              onToggleSelect?.(e);
+            if (onToggleSelect && isSelected !== undefined) {
+              e.stopPropagation();
+              onToggleSelect(e);
+            } else {
+              handleToggleDone(e);
             }
           }}
         >
           <Checkbox
-            checked={isSelected || false}
+            checked={isDone}
             disabled={isReadOnly}
             size="small"
+            onClick={handleToggleDone}
             icon={
-              <UncheckedIcon
-                sx={{ fontSize: 18, color: 'text.secondary', opacity: 0.6 }}
+              <Box
+                sx={{
+                  width: 17,
+                  height: 17,
+                  borderRadius: '4px',
+                  border: '1.5px solid #d1d5db',
+                  bgcolor: 'transparent',
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    borderColor: '#008767',
+                  },
+                }}
               />
             }
             checkedIcon={
-              <CheckedIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+              <Box
+                sx={{
+                  width: 17,
+                  height: 17,
+                  borderRadius: '4px',
+                  bgcolor: '#008767',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <CheckIcon sx={{ fontSize: 13, color: '#ffffff' }} />
+              </Box>
             }
             sx={{
               padding: 0,
@@ -170,7 +186,7 @@ export const ListViewTask = ({
           />
         </Box>
 
-        {/* Cell 3: Title */}
+        {/* Cell 2: Title */}
         <Box
           sx={{
             minWidth: 0,
@@ -179,60 +195,75 @@ export const ListViewTask = ({
             gap: 1,
           }}
         >
-          <TaskTitle variant="body1" title={task.title}>
+          <TaskTitle
+            variant="body1"
+            title={task.title}
+            sx={{
+              fontWeight: 600,
+              fontSize: '13.5px',
+              color: isDone ? 'text.secondary' : 'text.primary',
+              textDecoration: isDone ? 'line-through' : 'none',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {task.title}
           </TaskTitle>
-          {subtasksTotal > 0 && (
-            <Tooltip
-              title={`${subtasksDone} of ${subtasksTotal} subtasks completed`}
-            >
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  px: '6px',
-                  py: '1px',
-                  borderRadius: '10px',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  bgcolor: allSubtasksDone
-                    ? 'rgba(16, 185, 129, 0.12)'
-                    : (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.08)'
-                          : 'rgba(0, 0, 0, 0.06)',
-                  color: allSubtasksDone ? '#10b981' : 'text.secondary',
-                  border: '1px solid',
-                  borderColor: allSubtasksDone
-                    ? 'rgba(16, 185, 129, 0.25)'
-                    : 'transparent',
-                  flexShrink: 0,
-                  userSelect: 'none',
-                }}
-              >
-                <SubtasksIcon sx={{ fontSize: 12 }} />
-                <span>
-                  {subtasksDone}/{subtasksTotal}
-                </span>
-              </Box>
-            </Tooltip>
-          )}
           {(isAIScheduleEnabled || task.use_ai) && (
             <AIBadge>
-              <AutoAwesomeIcon sx={{ fontSize: 13 }} />
+              <AutoAwesomeIcon sx={{ fontSize: 12 }} />
               <AIText>AI</AIText>
             </AIBadge>
           )}
         </Box>
 
-        {/* Cell 3: Priority */}
-        <Box
-          className="cell-priority"
-          sx={{ display: 'flex', alignItems: 'center' }}
-        >
+        {/* Cell 3: Subtareas (Mini Progress Bar + Count) */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {subtasksTotal > 0 ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{
+                  width: 38,
+                  height: 5,
+                  borderRadius: 3,
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.1)'
+                      : '#e5e7eb',
+                  overflow: 'hidden',
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${Math.round((subtasksDone / subtasksTotal) * 100)}%`,
+                    height: '100%',
+                    bgcolor: '#008767',
+                    borderRadius: 3,
+                    transition: 'width 0.3s ease',
+                  }}
+                />
+              </Box>
+              <Typography
+                sx={{
+                  fontSize: '11.5px',
+                  color: '#6b7280',
+                  fontWeight: 600,
+                  fontFamily: 'monospace',
+                }}
+              >
+                {subtasksDone}/{subtasksTotal}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography sx={{ opacity: 0.3, fontSize: '13px' }}>-</Typography>
+          )}
+        </Box>
+
+        {/* Cell 4: Prioridad */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <PriorityChip
-            priorityColor={priorityColor}
+            priorityLevel={task.priority_level}
             onClick={(e) => {
               e.stopPropagation();
               if (!isReadOnly) {
@@ -242,108 +273,207 @@ export const ListViewTask = ({
             sx={{
               pointerEvents: isReadOnly ? 'none' : 'auto',
               cursor: isReadOnly ? 'default' : 'pointer',
-              opacity: isReadOnly ? 0.8 : 1,
             }}
           >
-            <PriorityBadge priority={task.priority_level} size={15} />
-            <span>{getPriorityConfig(task.priority_level).label}</span>
+            {priorityLabel}
           </PriorityChip>
         </Box>
 
-        {/* Cell 4: Due Date */}
-        <Box
-          className="cell-date"
-          sx={{ display: 'flex', alignItems: 'center' }}
-        >
-          {task.deadline || task.status === 'Done' ? (
-            <DateChip
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!isReadOnly) {
-                  setDateAnchor(e.currentTarget);
-                }
-              }}
-              sx={{
-                pointerEvents: isReadOnly ? 'none' : 'auto',
-                cursor: isReadOnly ? 'default' : 'pointer',
-                opacity: isReadOnly ? 0.8 : 1,
-              }}
-            >
-              <CalendarTodayIcon sx={{ fontSize: 11, opacity: 0.7 }} />
-              <span>
-                {task.status === 'Done'
-                  ? formatTimeSinceCompletion(task.updated_at)
-                  : new Date(task.deadline!).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-              </span>
-            </DateChip>
-          ) : (
-            <Typography variant="caption" sx={{ opacity: 0.3 }}>
-              -
-            </Typography>
-          )}
+        {/* Cell 5: Fecha Límite */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <DateChip
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isReadOnly) {
+                setDateAnchor(e.currentTarget);
+              }
+            }}
+            sx={{
+              pointerEvents: isReadOnly ? 'none' : 'auto',
+              cursor: isReadOnly ? 'default' : 'pointer',
+            }}
+          >
+            <CalendarTodayIcon sx={{ fontSize: 13, color: '#6b7280' }} />
+            <span>{formattedDate}</span>
+          </DateChip>
         </Box>
 
-        {/* Cell 5: Estimated */}
-        <Box
-          className="cell-estimated"
-          sx={{ display: 'flex', alignItems: 'center' }}
-        >
-          {estimateMin > 0 ? (
-            <TimeChip variant="estimated">
-              {formatDuration(estimateMin)}
-            </TimeChip>
-          ) : (
-            <Typography variant="caption" sx={{ opacity: 0.3 }}>
-              -
-            </Typography>
-          )}
+        {/* Cell 6: Estimado */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography
+            sx={{
+              fontSize: '12.5px',
+              color: 'text.secondary',
+              fontWeight: 500,
+            }}
+          >
+            {estimateMin > 0 ? formatDuration(estimateMin) : '-'}
+          </Typography>
         </Box>
 
-        {/* Cell 6: Actual */}
-        <Box
-          className="cell-actual"
-          sx={{ display: 'flex', alignItems: 'center' }}
-        >
-          {realMin > 0 ? (
-            <TimeChip variant={isOverLimit ? 'actual-over' : 'actual'}>
-              {formatDuration(realMin)}
-            </TimeChip>
-          ) : estimateMin > 0 ? (
-            <TimeChip variant="estimated">0m</TimeChip>
-          ) : (
-            <Typography variant="caption" sx={{ opacity: 0.3 }}>
-              -
-            </Typography>
-          )}
+        {/* Cell 7: Real */}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography
+            sx={{
+              fontSize: '12.5px',
+              color: 'text.secondary',
+              fontWeight: 500,
+            }}
+          >
+            {realMin > 0 ? formatDuration(realMin) : '0m'}
+          </Typography>
         </Box>
 
-        {/* Cell 7: Actions */}
+        {/* Cell 8: Acciones (3 Vertical Bars Menu) */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 1,
           }}
         >
-          {onStartFocus && (
-            <Tooltip title="Start Focus Mode">
-              <FocusIconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onStartFocus(task as unknown as Task);
-                }}
-              >
-                <PlayIcon sx={{ fontSize: 20 }} />
-              </FocusIconButton>
-            </Tooltip>
-          )}
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              setActionAnchor(e.currentTarget);
+            }}
+            sx={{
+              width: 28,
+              height: 28,
+              color: '#6b7280',
+              borderRadius: '6px',
+              '&:hover': {
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.08)'
+                    : '#f3f4f6',
+                color: 'text.primary',
+              },
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="2"
+                y="2"
+                width="2.5"
+                height="12"
+                rx="1.25"
+                fill="currentColor"
+              />
+              <rect
+                x="6.75"
+                y="2"
+                width="2.5"
+                height="12"
+                rx="1.25"
+                fill="currentColor"
+              />
+              <rect
+                x="11.5"
+                y="2"
+                width="2.5"
+                height="12"
+                rx="1.25"
+                fill="currentColor"
+              />
+            </svg>
+          </IconButton>
         </Box>
       </TaskRow>
+
+      {/* Contextual Action Menu */}
+      <Menu
+        anchorEl={actionAnchor}
+        open={Boolean(actionAnchor)}
+        onClose={() => setActionAnchor(null)}
+        PaperProps={{
+          sx: {
+            borderRadius: '10px',
+            minWidth: '180px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            p: 0.5,
+          },
+        }}
+      >
+        {onStartFocus && (
+          <MenuItem
+            onClick={() => {
+              setActionAnchor(null);
+              onStartFocus(task as unknown as Task);
+            }}
+            sx={{ gap: 1.2, py: 0.8, borderRadius: '6px' }}
+          >
+            <ListItemIcon sx={{ minWidth: 'auto', color: '#008767' }}>
+              <PlayIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Iniciar Enfoque"
+              primaryTypographyProps={{ fontSize: '13px', fontWeight: 600 }}
+            />
+          </MenuItem>
+        )}
+
+        <MenuItem
+          onClick={() => {
+            setActionAnchor(null);
+            onTaskClick(task);
+          }}
+          sx={{ gap: 1.2, py: 0.8, borderRadius: '6px' }}
+        >
+          <ListItemIcon sx={{ minWidth: 'auto' }}>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Editar Tarea"
+            primaryTypographyProps={{ fontSize: '13px' }}
+          />
+        </MenuItem>
+
+        <MenuItem
+          onClick={async () => {
+            setActionAnchor(null);
+            await handleStatusSelect(isDone ? 'Todo' : 'Done');
+          }}
+          sx={{ gap: 1.2, py: 0.8, borderRadius: '6px' }}
+        >
+          <ListItemIcon sx={{ minWidth: 'auto' }}>
+            <CompletedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              isDone ? 'Marcar como Por Hacer' : 'Marcar como Completada'
+            }
+            primaryTypographyProps={{ fontSize: '13px' }}
+          />
+        </MenuItem>
+
+        <Divider sx={{ my: 0.5 }} />
+
+        {deleteTasks && (
+          <MenuItem
+            onClick={async () => {
+              setActionAnchor(null);
+              await deleteTasks([task.id]);
+            }}
+            sx={{ gap: 1.2, py: 0.8, borderRadius: '6px', color: '#dc2626' }}
+          >
+            <ListItemIcon sx={{ minWidth: 'auto', color: '#dc2626' }}>
+              <DeleteIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Eliminar Tarea"
+              primaryTypographyProps={{ fontSize: '13px', fontWeight: 600 }}
+            />
+          </MenuItem>
+        )}
+      </Menu>
 
       {/* Priority Quick Select */}
       <Menu
@@ -359,22 +489,20 @@ export const ListViewTask = ({
         }}
       >
         {[
-          { level: 4, id: 'Critical', label: 'Critical' },
-          { level: 3, id: 'High', label: 'High' },
-          { level: 2, id: 'Medium', label: 'Medium' },
-          { level: 1, id: 'Low', label: 'Low' },
-          { level: 0, id: 'None', label: 'None' },
+          { level: 3, label: 'Alta', color: '#dc2626' },
+          { level: 2, label: 'Media', color: '#d97706' },
+          { level: 1, label: 'Baja', color: '#16a34a' },
         ].map((p) => (
           <MenuItem
             key={p.level}
             onClick={() => handlePrioritySelect(p.level)}
             sx={{ gap: 1.2, py: 0.8, px: 1.5, borderRadius: '6px' }}
           >
-            <PriorityBadge priority={p.id} size={22} />
+            <FlagIcon sx={{ fontSize: 16, color: p.color }} />
             <Typography
               variant="body2"
               fontWeight={600}
-              sx={{ color: getPriorityConfig(p.id).color }}
+              sx={{ color: p.color }}
             >
               {p.label}
             </Typography>
@@ -396,52 +524,17 @@ export const ListViewTask = ({
         }}
       >
         <MenuItem onClick={() => handleDateSelect(0)} sx={{ py: 1 }}>
-          Today
+          Hoy
         </MenuItem>
         <MenuItem onClick={() => handleDateSelect(1)} sx={{ py: 1 }}>
-          Tomorrow
+          Mañana
         </MenuItem>
         <MenuItem onClick={() => handleDateSelect(3)} sx={{ py: 1 }}>
-          In 3 days
+          En 3 días
         </MenuItem>
         <MenuItem onClick={() => handleDateSelect(7)} sx={{ py: 1 }}>
-          Next week
+          Próxima semana
         </MenuItem>
-      </Menu>
-
-      {/* Status Quick Select */}
-      <Menu
-        anchorEl={statusAnchor}
-        open={Boolean(statusAnchor)}
-        onClose={() => setStatusAnchor(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '12px',
-            minWidth: '180px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-          },
-        }}
-      >
-        {[
-          'Todo',
-          'Planning',
-          'Scheduled',
-          'Pending',
-          'On Hold',
-          'Review',
-          'Done',
-          'Backlog',
-          'Archived',
-        ].map((s) => (
-          <MenuItem
-            key={s}
-            onClick={() => handleStatusSelect(s)}
-            sx={{ gap: 1.5 }}
-          >
-            {STATUS_MENU_ICON[s]}
-            <Typography variant="body2">{s}</Typography>
-          </MenuItem>
-        ))}
       </Menu>
     </>
   );
