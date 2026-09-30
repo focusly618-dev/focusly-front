@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import type { TaskDetailModalProps } from './types/TaskDetailModal.types';
@@ -55,6 +56,7 @@ export const TaskDetailModal = ({
   isAIScheduleEnabled,
   setIsAIScheduleEnabled,
 }: TaskDetailModalProps) => {
+  const { t } = useTranslation();
   const effectiveDelete = propHandleDelete || onDelete;
   const {
     effectiveTask,
@@ -306,7 +308,10 @@ export const TaskDetailModal = ({
                 <TextField
                   fullWidth
                   variant="outlined"
-                  placeholder="Completar informe de rendimiento trimestral"
+                  placeholder={t(
+                    'tasks.properties.titlePlaceholder',
+                    'Completar informe de rendimiento trimestral',
+                  )}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   sx={titleInputPropsSx}
@@ -329,7 +334,7 @@ export const TaskDetailModal = ({
                       color: 'text.secondary',
                     }}
                   >
-                    Creado en
+                    {t('tasks.properties.createdOn', 'Creado en')}
                   </Typography>
                   <Typography
                     sx={{
@@ -340,7 +345,10 @@ export const TaskDetailModal = ({
                       '&:hover': { textDecoration: 'underline' },
                     }}
                   >
-                    Espacios / Proyectos
+                    {t(
+                      'tasks.properties.workspacesProjects',
+                      'Espacios / Proyectos',
+                    )}
                   </Typography>
                 </Box>
               </Box>

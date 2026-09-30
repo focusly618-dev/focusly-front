@@ -38,30 +38,79 @@ export const parseRealTime = (time: string): number => {
 export interface TaskColorOption {
   value: string;
   name: string;
+  category?: 'pastel' | 'solid';
 }
 
 export const PASTEL_COLORS: TaskColorOption[] = [
-  { value: '#BAE6FD', name: 'Cielo' },
-  { value: '#DDD6FE', name: 'Lavanda' },
-  { value: '#A7F3D0', name: 'Menta' },
-  { value: '#C2D6C4', name: 'Salvia' },
-  { value: '#FED7AA', name: 'Melocotón' },
-  { value: '#FBCFE8', name: 'Rosa Pálido' },
-  { value: '#FECDD3', name: 'Cerezo' },
-  { value: '#FDE68A', name: 'Vainilla' },
-  { value: '#E9D5FF', name: 'Lila' },
-  { value: '#99F6E4', name: 'Eucalipto' },
-  { value: '#FCD34D', name: 'Miel' },
-  { value: '#FFD1BA', name: 'Coral Suave' },
-  { value: '#C6D8DF', name: 'Bruma' },
-  { value: '#D4B8E5', name: 'Malva' },
-  { value: '#E8DCB8', name: 'Arena' },
-  { value: '#C7D2FE', name: 'Periwinkle' },
-  { value: '#B5D5C5', name: 'Musgo' },
-  { value: '#F3C5B5', name: 'Terracota' },
-  { value: '#CBD5E1', name: 'Pizarra' },
-  { value: '#EDE0D4', name: 'Almendra' },
+  // ── Tonos Pasteles ──
+  { value: '#BAE6FD', name: 'Cielo', category: 'pastel' },
+  { value: '#DDD6FE', name: 'Lavanda', category: 'pastel' },
+  { value: '#A7F3D0', name: 'Menta', category: 'pastel' },
+  { value: '#C2D6C4', name: 'Salvia', category: 'pastel' },
+  { value: '#FED7AA', name: 'Melocotón', category: 'pastel' },
+  { value: '#FBCFE8', name: 'Rosa Pálido', category: 'pastel' },
+  { value: '#FECDD3', name: 'Cerezo', category: 'pastel' },
+  { value: '#FDE68A', name: 'Vainilla', category: 'pastel' },
+  { value: '#E9D5FF', name: 'Lila', category: 'pastel' },
+  { value: '#99F6E4', name: 'Eucalipto', category: 'pastel' },
+  { value: '#FCD34D', name: 'Miel', category: 'pastel' },
+  { value: '#FFD1BA', name: 'Coral Suave', category: 'pastel' },
+  { value: '#C6D8DF', name: 'Bruma', category: 'pastel' },
+  { value: '#D4B8E5', name: 'Malva', category: 'pastel' },
+  { value: '#E8DCB8', name: 'Arena', category: 'pastel' },
+  { value: '#C7D2FE', name: 'Periwinkle', category: 'pastel' },
+  { value: '#B5D5C5', name: 'Musgo', category: 'pastel' },
+  { value: '#F3C5B5', name: 'Terracota Suave', category: 'pastel' },
+  { value: '#CBD5E1', name: 'Pizarra', category: 'pastel' },
+  { value: '#EDE0D4', name: 'Almendra', category: 'pastel' },
+  { value: '#D9F99D', name: 'Matcha', category: 'pastel' },
+  { value: '#A5F3FC', name: 'Turquesa', category: 'pastel' },
+  { value: '#FECACA', name: 'Melón', category: 'pastel' },
+  { value: '#F5D0FE', name: 'Orquídea', category: 'pastel' },
+  { value: '#E0F2FE', name: 'Hielo', category: 'pastel' },
+
+  // ── Tonos Sólidos ──
+  { value: '#0284C7', name: 'Azul Océano', category: 'solid' },
+  { value: '#1D4ED8', name: 'Azul Marino', category: 'solid' },
+  { value: '#4338CA', name: 'Índigo Real', category: 'solid' },
+  { value: '#6D28D9', name: 'Violeta Profundo', category: 'solid' },
+  { value: '#7E22CE', name: 'Púrpura Imperial', category: 'solid' },
+  { value: '#BE185D', name: 'Frambuesa', category: 'solid' },
+  { value: '#E11D48', name: 'Rubí', category: 'solid' },
+  { value: '#EA580C', name: 'Coral Vivo', category: 'solid' },
+  { value: '#D97706', name: 'Ámbar Cálido', category: 'solid' },
+  { value: '#059669', name: 'Esmeralda', category: 'solid' },
+  { value: '#15803D', name: 'Verde Bosque', category: 'solid' },
+  { value: '#0F766E', name: 'Cerceta / Jade', category: 'solid' },
+  { value: '#0891B2', name: 'Cian', category: 'solid' },
+  { value: '#C2410C', name: 'Terracota', category: 'solid' },
+  { value: '#9F1239', name: 'Borgoña / Vino', category: 'solid' },
+  { value: '#334155', name: 'Grafito', category: 'solid' },
+  { value: '#1E293B', name: 'Carbón', category: 'solid' },
+  { value: '#4D7C0F', name: 'Oliva', category: 'solid' },
+  { value: '#78350F', name: 'Café', category: 'solid' },
+  { value: '#581C87', name: 'Ciruela', category: 'solid' },
 ];
+
+export const isColorDark = (hexColor?: string | null): boolean => {
+  if (!hexColor) return false;
+  let color = hexColor.trim();
+  if (color.startsWith('#')) {
+    color = color.slice(1);
+    if (color.length === 3) {
+      color = color
+        .split('')
+        .map((c) => c + c)
+        .join('');
+    }
+    const r = parseInt(color.slice(0, 2), 16) || 0;
+    const g = parseInt(color.slice(2, 4), 16) || 0;
+    const b = parseInt(color.slice(4, 6), 16) || 0;
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq < 145;
+  }
+  return false;
+};
 
 export const TASK_COLORS = PASTEL_COLORS.map((c) => c.value);
 

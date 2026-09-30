@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   CheckCircleOutline as CheckCircleIcon,
   Mic as MicIcon,
@@ -40,6 +41,7 @@ import type { EditorHeaderProps } from './EditorHeader.types';
 import { useEditorHeader } from './useEditorHeader.hook';
 
 export const EditorHeader = (props: EditorHeaderProps) => {
+  const { t } = useTranslation();
   const {
     onBack,
     selectTask,
@@ -96,8 +98,11 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     } catch (error) {
       console.error('Failed to export document as Word:', error);
       sileo.error({
-        title: 'Export failed',
-        description: 'Could not generate the Word document.',
+        title: t('workspaceEditor.exportFailed', 'Export failed'),
+        description: t(
+          'workspaceEditor.exportFailedDesc',
+          'Could not generate the Word document.',
+        ),
         fill: 'var(--sileo-error-bg)',
       });
     }
@@ -146,7 +151,8 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             whiteSpace: 'nowrap',
           }}
         >
-          {currentTitle?.trim() || 'Untitled Note'}
+          {currentTitle?.trim() ||
+            t('workspaceEditor.untitledNote', 'Untitled Note')}
         </Typography>
 
         {currentFolder?.name && (
@@ -190,7 +196,9 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         >
           <Box
             title={
-              saveState === 'saving' ? 'Saving changes...' : 'All changes saved'
+              saveState === 'saving'
+                ? t('workspaceEditor.savingChanges', 'Saving changes...')
+                : t('workspaceEditor.allChangesSaved', 'All changes saved')
             }
             sx={{
               display: 'flex',
@@ -237,7 +245,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
                     display: { xs: 'none', xl: 'inline-block' },
                   }}
                 >
-                  saving
+                  {t('workspaceEditor.saving', 'saving')}
                 </Typography>
               </>
             ) : saveState === 'saved' ? (
@@ -258,7 +266,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
                     display: { xs: 'none', xl: 'inline-block' },
                   }}
                 >
-                  saved
+                  {t('workspaceEditor.saved', 'saved')}
                 </Typography>
               </>
             ) : null}
@@ -349,7 +357,9 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         {onToggleSidebar && (
           <Tooltip
             title={
-              isRightSidebarOpen ? 'Cerrar panel' : 'Abrir panel acompañante'
+              isRightSidebarOpen
+                ? t('workspaceEditor.closeSidebar', 'Cerrar panel')
+                : t('workspaceEditor.openSidebar', 'Abrir panel acompañante')
             }
           >
             <IconButton
@@ -423,7 +433,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             <ListItemText
               primary={
                 sourceLanguage === 'auto'
-                  ? 'Detect Language'
+                  ? t('workspaceEditor.detectLanguage', 'Detect Language')
                   : getLanguageLabel(sourceLanguage)
               }
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
@@ -443,7 +453,11 @@ export const EditorHeader = (props: EditorHeaderProps) => {
               )}
             </ListItemIcon>
             <ListItemText
-              primary={isListening ? 'Stop Dictation' : 'Start Dictation'}
+              primary={
+                isListening
+                  ? t('workspaceEditor.stopDictation', 'Stop Dictation')
+                  : t('workspaceEditor.startDictation', 'Start Dictation')
+              }
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
             />
           </MenuItem>
@@ -461,7 +475,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
               <FlashOnIcon sx={{ fontSize: 18 }} />
             </ListItemIcon>
             <ListItemText
-              primary="Focus Mode"
+              primary={t('workspaceEditor.focusMode', 'Focus Mode')}
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
             />
           </MenuItem>
@@ -478,7 +492,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
               <ImportIcon sx={{ fontSize: 18 }} />
             </ListItemIcon>
             <ListItemText
-              primary="Import Document"
+              primary={t('workspaceEditor.importDocument', 'Import Document')}
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
             />
           </MenuItem>
@@ -492,7 +506,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
               <ExportIcon sx={{ fontSize: 18 }} />
             </ListItemIcon>
             <ListItemText
-              primary="Export Document"
+              primary={t('workspaceEditor.exportDocument', 'Export Document')}
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
             />
           </MenuItem>
@@ -525,7 +539,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
               <ExportIcon sx={{ fontSize: 18 }} />
             </ListItemIcon>
             <ListItemText
-              primary="Markdown (.md)"
+              primary={t('workspaceEditor.markdown', 'Markdown (.md)')}
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
             />
           </MenuItem>
@@ -534,7 +548,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
               <DescriptionIcon sx={{ fontSize: 18 }} />
             </ListItemIcon>
             <ListItemText
-              primary="Word (.docx)"
+              primary={t('workspaceEditor.word', 'Word (.docx)')}
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
             />
           </MenuItem>
@@ -558,7 +572,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         >
           <MenuItem onClick={() => handleSourceSelect('auto')}>
             <ListItemText
-              primary="Detect Language"
+              primary={t('workspaceEditor.detectLanguage', 'Detect Language')}
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
             />
           </MenuItem>
@@ -679,7 +693,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             '&:hover': { bgcolor: 'transparent' },
           }}
         >
-          VOLVER
+          {t('common.back', 'VOLVER')}
         </Button>
 
         {/* Center: MODO ENFOQUE Button */}
@@ -708,7 +722,9 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             },
           }}
         >
-          {isCentered ? 'VISTA NORMAL' : 'MODO ENFOQUE'}
+          {isCentered
+            ? t('workspaceEditor.normalView', 'VISTA NORMAL')
+            : t('workspaceEditor.focusMode', 'MODO ENFOQUE')}
         </Button>
 
         {/* Right: Info Circle Button */}

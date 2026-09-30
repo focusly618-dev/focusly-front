@@ -6,7 +6,10 @@ import {
   DropIndicator,
 } from './BoardView.styles';
 import { SortableTaskCard } from './SortableTaskCard.tsx';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, useTheme } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 
 interface BoardColumnProps {
   id: string;
@@ -21,6 +24,9 @@ export const BoardColumn = ({
   onTaskClick,
   activeId,
 }: BoardColumnProps) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
@@ -41,14 +47,83 @@ export const BoardColumn = ({
         ))
       ) : (
         <TaskPlaceholder isActive={!!isActive}>
-          <Box sx={{ textAlign: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              userSelect: 'none',
+              width: '100%',
+            }}
+          >
+            {isActive ? (
+              <FileDownloadOutlinedIcon
+                sx={{
+                  fontSize: 28,
+                  color: isDark ? '#10b981' : '#008767',
+                  mb: 0.75,
+                  animation: 'dropBounce 1s infinite',
+                  '@keyframes dropBounce': {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-4px)' },
+                  },
+                }}
+              />
+            ) : (
+              <InboxOutlinedIcon
+                sx={{
+                  fontSize: 28,
+                  color: isDark ? '#5a5e6a' : '#94a3b8',
+                  mb: 0.75,
+                  opacity: 0.85,
+                }}
+              />
+            )}
+
             <Typography
               variant="body2"
-              sx={{ color: 'text.secondary', mb: isActive ? 2 : 1 }}
+              sx={{
+                color: isActive
+                  ? isDark
+                    ? '#34d399'
+                    : '#008767'
+                  : isDark
+                    ? '#8A8F98'
+                    : '#64748b',
+                fontSize: '13px',
+                fontWeight: 600,
+                lineHeight: 1.3,
+              }}
             >
-              {isActive ? 'Release to drop here' : 'Drop tasks here'}
+              {isActive
+                ? t('tasks.board.releaseToDrop', 'Soltar aquí')
+                : t('tasks.board.dropTasksHere', 'Drop tasks here')}
             </Typography>
-            {isActive && <DropIndicator />}
+
+            <Typography
+              variant="caption"
+              sx={{
+                color: isDark ? '#5a5e6a' : '#94a3b8',
+                fontSize: '11px',
+                mt: 0.4,
+              }}
+            >
+              {isActive
+                ? t('tasks.board.dropToColumn', 'Asignar a esta columna')
+                : t('tasks.board.dragBetweenColumns', 'Arrastra tareas aquí')}
+            </Typography>
+
+            {isActive && (
+              <DropIndicator
+                sx={{
+                  width: '60px',
+                  mt: 1.5,
+                  backgroundColor: isDark ? '#10b981' : '#008767',
+                }}
+              />
+            )}
           </Box>
         </TaskPlaceholder>
       )}

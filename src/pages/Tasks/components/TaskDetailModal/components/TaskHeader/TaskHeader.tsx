@@ -10,7 +10,7 @@ import {
 import type { Task } from '@/redux/tasks/task.types';
 import { sileo } from '@/utils';
 import { headerContainerSx, headerIconButtonSx } from './TaskHeader.styles';
-import { isTaskCustomColor } from '../../TaskDetailModal.utils';
+import { isTaskCustomColor, isColorDark } from '../../TaskDetailModal.utils';
 
 interface TaskHeaderProps {
   color: string;
@@ -35,7 +35,18 @@ export const TaskHeader = ({
   onOpenColorPicker,
 }: TaskHeaderProps) => {
   const hasCustomColor = isTaskCustomColor(color);
-  const iconSx = headerIconButtonSx(hasCustomColor);
+  const isDark = hasCustomColor && isColorDark(color);
+  const iconSx = headerIconButtonSx(hasCustomColor, color);
+  const badgeTextColor = hasCustomColor
+    ? isDark
+      ? '#ffffff'
+      : '#0f172a'
+    : '#008767';
+  const badgeBg = hasCustomColor
+    ? isDark
+      ? 'rgba(255, 255, 255, 0.18)'
+      : 'rgba(0, 0, 0, 0.12)'
+    : undefined;
 
   return (
     <Box sx={headerContainerSx(hasCustomColor, color, isFullScreen)}>
@@ -50,7 +61,7 @@ export const TaskHeader = ({
                 px: 1.2,
                 py: 0.5,
                 borderRadius: '20px',
-                backgroundColor: 'rgba(0, 0, 0, 0.12)',
+                backgroundColor: badgeBg,
                 backdropFilter: 'blur(8px)',
               }
             : {
@@ -63,7 +74,7 @@ export const TaskHeader = ({
             width: 7,
             height: 7,
             borderRadius: '50%',
-            bgcolor: hasCustomColor ? '#0f172a' : '#008767',
+            bgcolor: badgeTextColor,
             boxShadow: hasCustomColor
               ? 'none'
               : '0 0 6px rgba(0, 135, 103, 0.4)',
@@ -75,7 +86,7 @@ export const TaskHeader = ({
             fontWeight: 800,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: hasCustomColor ? '#0f172a' : '#008767',
+            color: badgeTextColor,
           }}
         >
           {initialTask ? 'Detalles de Tarea' : 'Nueva Tarea'}

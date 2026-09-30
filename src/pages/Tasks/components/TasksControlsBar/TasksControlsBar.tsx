@@ -7,6 +7,7 @@ import {
   TextField,
   InputAdornment,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   Search as SearchIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
@@ -25,6 +26,7 @@ export const TasksControlsBar = ({
   activeFilterState,
   setPriorityFilter,
 }: TasksControlsBarProps) => {
+  const { t } = useTranslation();
   const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
     null,
   );
@@ -36,13 +38,13 @@ export const TasksControlsBar = ({
   const currentPriorityString = activeFilterState?.priorities?.[0];
   const priorityDisplayLabel = currentPriorityString
     ? currentPriorityString === 'High'
-      ? 'Alta'
+      ? t('tasks.priority.high', 'Alta')
       : currentPriorityString === 'Medium'
-        ? 'Media'
+        ? t('tasks.priority.medium', 'Media')
         : currentPriorityString === 'Low'
-          ? 'Baja'
+          ? t('tasks.priority.low', 'Baja')
           : currentPriorityString
-    : 'Todas';
+    : t('tasks.controls.all', 'Todas');
 
   const handleSelectPriority = (level: number | undefined) => {
     setPriorityAnchor(null);
@@ -79,7 +81,10 @@ export const TasksControlsBar = ({
         {/* Search Input matching screenshot */}
         <TextField
           id="joyride-tasks-search"
-          placeholder="Buscar tareas, etiquetas..."
+          placeholder={t(
+            'tasks.controls.searchPlaceholder',
+            'Buscar tareas, etiquetas...',
+          )}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
@@ -162,7 +167,7 @@ export const TasksControlsBar = ({
             },
           }}
         >
-          Prioridad: {priorityDisplayLabel}
+          {t('tasks.controls.priority', 'Prioridad')}: {priorityDisplayLabel}
         </Button>
         <Menu
           anchorEl={priorityAnchor}
@@ -179,61 +184,75 @@ export const TasksControlsBar = ({
         >
           <MenuItem
             onClick={() => handleSelectPriority(undefined)}
-            selected={priorityDisplayLabel === 'Todas'}
+            selected={priorityDisplayLabel === t('tasks.controls.all', 'Todas')}
             sx={{
               py: 0.8,
               px: 1.5,
               borderRadius: '6px',
               fontSize: '13px',
-              fontWeight: priorityDisplayLabel === 'Todas' ? 700 : 500,
+              fontWeight:
+                priorityDisplayLabel === t('tasks.controls.all', 'Todas')
+                  ? 700
+                  : 500,
             }}
           >
-            Todas
+            {t('tasks.controls.all', 'Todas')}
           </MenuItem>
           <MenuItem
             onClick={() => handleSelectPriority(3)}
-            selected={priorityDisplayLabel === 'Alta'}
+            selected={priorityDisplayLabel === t('tasks.priority.high', 'Alta')}
             sx={{
               gap: 1.2,
               py: 0.8,
               px: 1.5,
               borderRadius: '6px',
               fontSize: '13px',
-              fontWeight: priorityDisplayLabel === 'Alta' ? 700 : 500,
+              fontWeight:
+                priorityDisplayLabel === t('tasks.priority.high', 'Alta')
+                  ? 700
+                  : 500,
             }}
           >
             <FlagIcon sx={{ fontSize: 16, color: '#dc2626' }} />
-            Alta
+            {t('tasks.priority.high', 'Alta')}
           </MenuItem>
           <MenuItem
             onClick={() => handleSelectPriority(2)}
-            selected={priorityDisplayLabel === 'Media'}
+            selected={
+              priorityDisplayLabel === t('tasks.priority.medium', 'Media')
+            }
             sx={{
               gap: 1.2,
               py: 0.8,
               px: 1.5,
               borderRadius: '6px',
               fontSize: '13px',
-              fontWeight: priorityDisplayLabel === 'Media' ? 700 : 500,
+              fontWeight:
+                priorityDisplayLabel === t('tasks.priority.medium', 'Media')
+                  ? 700
+                  : 500,
             }}
           >
             <FlagIcon sx={{ fontSize: 16, color: '#d97706' }} />
-            Media
+            {t('tasks.priority.medium', 'Media')}
           </MenuItem>
           <MenuItem
             onClick={() => handleSelectPriority(1)}
-            selected={priorityDisplayLabel === 'Baja'}
+            selected={priorityDisplayLabel === t('tasks.priority.low', 'Baja')}
             sx={{
               gap: 1.2,
               py: 0.8,
               px: 1.5,
               borderRadius: '6px',
               fontSize: '13px',
-              fontWeight: priorityDisplayLabel === 'Baja' ? 700 : 500,
+              fontWeight:
+                priorityDisplayLabel === t('tasks.priority.low', 'Baja')
+                  ? 700
+                  : 500,
             }}
           >
             <FlagIcon sx={{ fontSize: 16, color: '#16a34a' }} />
-            Baja
+            {t('tasks.priority.low', 'Baja')}
           </MenuItem>
         </Menu>
 
@@ -270,7 +289,7 @@ export const TasksControlsBar = ({
             },
           }}
         >
-          Responsables
+          {t('tasks.controls.assignees', 'Responsables')}
         </Button>
         <Menu
           anchorEl={assigneeAnchor}
@@ -297,7 +316,7 @@ export const TasksControlsBar = ({
             }}
           >
             <PersonIcon sx={{ fontSize: 16, color: '#008767' }} />
-            Todos los responsables
+            {t('tasks.controls.allAssignees', 'Todos los responsables')}
           </MenuItem>
         </Menu>
       </Box>

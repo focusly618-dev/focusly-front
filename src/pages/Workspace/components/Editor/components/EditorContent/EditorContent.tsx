@@ -9,6 +9,7 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
+  alpha,
 } from '@mui/material';
 import EmojiPicker, { Theme as EmojiPickerTheme } from 'emoji-picker-react';
 import {
@@ -64,7 +65,7 @@ import {
   TitleInput,
   MarkdownEditorSurface,
 } from './EditorContent.styles';
-import { colorPalette } from '@/utils';
+import { colorPalette, isColorDark } from '@/utils';
 import { CuteRobotIcon } from '@/components/ui';
 import { MarkdownEditor } from '../../codemirror/MarkdownEditor';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
@@ -101,6 +102,9 @@ export const EditorContent = ({
   const isThemeDark = theme.palette.mode === 'dark';
   const editorSurfaceRef = useRef<HTMLDivElement>(null);
   const [liveSelectedText, setLiveSelectedText] = useState('');
+  const [coverColorCategory, setCoverColorCategory] = useState<
+    'all' | 'gradient' | 'pastel' | 'solid'
+  >('all');
 
   const {
     menuAnchor,
@@ -171,6 +175,7 @@ export const EditorContent = ({
   const handleCreateResume = () => {
     processTextWithAI('summarize');
   };
+  const isCoverDark = isColorDark(currentBgGradient || headerColor);
   // Ghost button styles reused for both cover actions
   const ghostBtnSx = (onCover: boolean) => ({
     display: 'flex',
@@ -187,28 +192,17 @@ export const EditorContent = ({
     transition: 'all 0.2s',
     ...(onCover
       ? {
-          color:
-            theme.palette.mode === 'dark'
-              ? 'rgba(255,255,255,0.9)'
-              : 'rgba(0,0,0,0.75)',
-          borderColor:
-            theme.palette.mode === 'dark'
-              ? 'rgba(255,255,255,0.2)'
-              : 'rgba(0,0,0,0.08)',
-          bgcolor:
-            theme.palette.mode === 'dark'
-              ? 'rgba(255,255,255,0.1)'
-              : 'rgba(255,255,255,0.4)',
+          color: isCoverDark ? '#ffffff' : '#0f172a',
+          borderColor: isCoverDark
+            ? 'rgba(255,255,255,0.28)'
+            : 'rgba(0,0,0,0.15)',
+          bgcolor: isCoverDark ? 'rgba(0,0,0,0.32)' : 'rgba(255,255,255,0.65)',
           backdropFilter: 'blur(12px)',
           '&:hover': {
-            bgcolor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.15)'
-                : 'rgba(255,255,255,0.6)',
-            borderColor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.4)'
-                : 'rgba(0,0,0,0.15)',
+            bgcolor: isCoverDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.9)',
+            borderColor: isCoverDark
+              ? 'rgba(255,255,255,0.45)'
+              : 'rgba(0,0,0,0.25)',
             transform: 'translateY(-1px)',
           },
         }
@@ -709,68 +703,304 @@ export const EditorContent = ({
         onClose={() => setColorAnchor(null)}
         PaperProps={{
           sx: {
-            borderRadius: '14px',
-            minWidth: '260px',
+            borderRadius: '16px',
+            minWidth: '310px',
+            maxWidth: '330px',
             mt: 1,
             boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
             border: '1px solid',
             borderColor: 'divider',
-            p: 1.5,
+            p: 1.75,
+            maxHeight: 460,
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': { width: '4px' },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'rgba(0,0,0,0.15)',
+              borderRadius: '4px',
+            },
           },
         }}
       >
-        <Typography
-          variant="caption"
-          sx={{
-            px: 0.5,
-            pb: 1,
-            display: 'block',
-            color: 'text.disabled',
-            fontWeight: 700,
-            letterSpacing: '0.8px',
-            textTransform: 'uppercase',
-          }}
-        >
-          Cover style
-        </Typography>
+        {/* Category Classification Chips */}
         <Box
           sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(7, 1fr)',
+            display: 'flex',
+            alignItems: 'center',
             gap: 0.75,
+            mb: 1.5,
+            px: 0.5,
+            overflowX: 'auto',
+            '&::-webkit-scrollbar': { display: 'none' },
           }}
         >
-          {colorPalette.map((c) => (
-            <Tooltip key={c.color} title={c.label} placement="top">
+          {[
+            {
+              id: 'all' as const,
+              label: 'Todos',
+              count: colorPalette.length - 1, // minus 'none'
+              dot: 'linear-gradient(135deg, #a5b4fc, #fbcfe8, #86efac)',
+            },
+            {
+              id: 'gradient' as const,
+              label: 'Gradientes',
+              count: colorPalette.filter(
+                (c) =>
+                  !c.color.startsWith('pastel_') &&
+                  !c.color.startsWith('solid_') &&
+                  c.color !== 'none',
+              ).length,
+              dot: 'linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%)',
+            },
+            {
+              id: 'pastel' as const,
+              label: 'Pasteles',
+              count: colorPalette.filter((c) => c.color.startsWith('pastel_'))
+                .length,
+              dot: '#fecdd3',
+            },
+            {
+              id: 'solid' as const,
+              label: 'Sólidos',
+              count: colorPalette.filter((c) => c.color.startsWith('solid_'))
+                .length,
+              dot: '#0284c7',
+            },
+          ].map((cat) => {
+            const isActive = coverColorCategory === cat.id;
+            return (
               <Box
-                onClick={() => handleColorSelect(c.color)}
+                key={cat.id}
+                onClick={() => setCoverColorCategory(cat.id)}
                 sx={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: '8px',
-                  background:
-                    c.gradient === 'none'
-                      ? isThemeDark
-                        ? '#1e1e1e'
-                        : '#f0f0f0'
-                      : c.gradient,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.6,
+                  px: 1,
+                  py: 0.4,
+                  borderRadius: '20px',
                   cursor: 'pointer',
-                  outline:
-                    headerColor === c.color ? '2.5px solid' : '1px solid',
-                  outlineColor:
-                    headerColor === c.color ? 'primary.main' : 'divider',
-                  outlineOffset: headerColor === c.color ? '2px' : '0px',
-                  transition: 'all 0.18s',
-                  position: 'relative',
+                  border: '1px solid',
+                  borderColor: isActive
+                    ? 'primary.main'
+                    : isThemeDark
+                      ? 'rgba(255,255,255,0.12)'
+                      : 'rgba(0,0,0,0.1)',
+                  bgcolor: isActive
+                    ? alpha(theme.palette.primary.main, 0.12)
+                    : isThemeDark
+                      ? 'rgba(255,255,255,0.04)'
+                      : 'rgba(0,0,0,0.03)',
+                  color: isActive ? 'primary.main' : 'text.secondary',
+                  fontSize: '11px',
+                  fontWeight: isActive ? 700 : 500,
+                  transition: 'all 0.15s ease',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
                   '&:hover': {
-                    transform: 'scale(1.15)',
-                    outlineColor: 'primary.main',
+                    bgcolor: isActive
+                      ? alpha(theme.palette.primary.main, 0.18)
+                      : isThemeDark
+                        ? 'rgba(255,255,255,0.08)'
+                        : 'rgba(0,0,0,0.06)',
+                    color: 'text.primary',
                   },
                 }}
-              />
-            </Tooltip>
-          ))}
+              >
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: cat.dot,
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                  }}
+                />
+                {cat.label} ({cat.count})
+              </Box>
+            );
+          })}
         </Box>
+
+        {/* Gradientes */}
+        {(coverColorCategory === 'all' ||
+          coverColorCategory === 'gradient') && (
+          <>
+            <Typography
+              variant="caption"
+              sx={{
+                px: 0.5,
+                pb: 0.75,
+                display: 'block',
+                color: 'text.secondary',
+                fontWeight: 800,
+                fontSize: '10px',
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Gradientes
+            </Typography>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, 1fr)',
+                gap: 0.75,
+                mb: 1.75,
+              }}
+            >
+              {colorPalette
+                .filter(
+                  (c) =>
+                    !c.color.startsWith('pastel_') &&
+                    !c.color.startsWith('solid_'),
+                )
+                .map((c) => (
+                  <Tooltip key={c.color} title={c.label} placement="top">
+                    <Box
+                      onClick={() => handleColorSelect(c.color)}
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '8px',
+                        background:
+                          c.gradient === 'none'
+                            ? isThemeDark
+                              ? '#1e1e1e'
+                              : '#f0f0f0'
+                            : c.gradient,
+                        cursor: 'pointer',
+                        outline:
+                          headerColor === c.color ? '2.5px solid' : '1px solid',
+                        outlineColor:
+                          headerColor === c.color ? 'primary.main' : 'divider',
+                        outlineOffset: headerColor === c.color ? '2px' : '0px',
+                        transition: 'all 0.18s',
+                        position: 'relative',
+                        '&:hover': {
+                          transform: 'scale(1.15)',
+                          outlineColor: 'primary.main',
+                        },
+                      }}
+                    />
+                  </Tooltip>
+                ))}
+            </Box>
+          </>
+        )}
+
+        {/* Tonos Pasteles */}
+        {(coverColorCategory === 'all' || coverColorCategory === 'pastel') && (
+          <>
+            <Typography
+              variant="caption"
+              sx={{
+                px: 0.5,
+                pb: 0.75,
+                display: 'block',
+                color: 'text.secondary',
+                fontWeight: 800,
+                fontSize: '10px',
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Tonos Pasteles
+            </Typography>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, 1fr)',
+                gap: 0.75,
+                mb: 1.75,
+              }}
+            >
+              {colorPalette
+                .filter((c) => c.color.startsWith('pastel_'))
+                .map((c) => (
+                  <Tooltip key={c.color} title={c.label} placement="top">
+                    <Box
+                      onClick={() => handleColorSelect(c.color)}
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '8px',
+                        background: c.gradient,
+                        cursor: 'pointer',
+                        outline:
+                          headerColor === c.color ? '2.5px solid' : '1px solid',
+                        outlineColor:
+                          headerColor === c.color ? 'primary.main' : 'divider',
+                        outlineOffset: headerColor === c.color ? '2px' : '0px',
+                        transition: 'all 0.18s',
+                        position: 'relative',
+                        '&:hover': {
+                          transform: 'scale(1.15)',
+                          outlineColor: 'primary.main',
+                        },
+                      }}
+                    />
+                  </Tooltip>
+                ))}
+            </Box>
+          </>
+        )}
+
+        {/* Tonos Sólidos */}
+        {(coverColorCategory === 'all' || coverColorCategory === 'solid') && (
+          <>
+            <Typography
+              variant="caption"
+              sx={{
+                px: 0.5,
+                pb: 0.75,
+                display: 'block',
+                color: 'text.secondary',
+                fontWeight: 800,
+                fontSize: '10px',
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Tonos Sólidos
+            </Typography>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, 1fr)',
+                gap: 0.75,
+                pb: 0.5,
+              }}
+            >
+              {colorPalette
+                .filter((c) => c.color.startsWith('solid_'))
+                .map((c) => (
+                  <Tooltip key={c.color} title={c.label} placement="top">
+                    <Box
+                      onClick={() => handleColorSelect(c.color)}
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '8px',
+                        background: c.gradient,
+                        cursor: 'pointer',
+                        outline:
+                          headerColor === c.color ? '2.5px solid' : '1px solid',
+                        outlineColor:
+                          headerColor === c.color ? 'primary.main' : 'divider',
+                        outlineOffset: headerColor === c.color ? '2px' : '0px',
+                        transition: 'all 0.18s',
+                        position: 'relative',
+                        '&:hover': {
+                          transform: 'scale(1.15)',
+                          outlineColor: 'primary.main',
+                        },
+                      }}
+                    />
+                  </Tooltip>
+                ))}
+            </Box>
+          </>
+        )}
       </Menu>
 
       {/* ── Icon Picker ── */}

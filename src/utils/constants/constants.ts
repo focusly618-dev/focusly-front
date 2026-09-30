@@ -1,4 +1,5 @@
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
+import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 
 export const BASE_EMPTY_TASK: Partial<Task> = {
   title: '',
@@ -25,4 +26,5 @@ export const DEFAULT_WORKSPACE_DATA = {
   emoji: undefined as string | undefined,
   background_color: undefined as string | undefined,
   card_show_background: false,
+  tasks: [] as TaskSearchItems[],
 };

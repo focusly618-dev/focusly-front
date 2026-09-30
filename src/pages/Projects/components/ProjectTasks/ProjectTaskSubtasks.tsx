@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -26,6 +27,7 @@ export const ProjectTaskSubtasks: React.FC<ProjectTaskSubtasksProps> = ({
   onAddSubtask,
   readOnly = false,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const [newStepTitle, setNewStepTitle] = useState('');
@@ -238,7 +240,10 @@ export const ProjectTaskSubtasks: React.FC<ProjectTaskSubtasksProps> = ({
             }}
           />
           <InputBase
-            placeholder="Add step... Press Enter"
+            placeholder={t(
+              'tasks.createProjectTaskModal.subtaskPlaceholder',
+              'Add step... Press Enter',
+            )}
             value={newStepTitle}
             onChange={(e) => setNewStepTitle(e.target.value)}
             onKeyDown={handleKeyDown}

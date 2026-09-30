@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   IconButton,
@@ -49,6 +50,7 @@ export const LibrarySearchHeader = ({
   noteFilterType = 'all',
   onNoteFilterChange,
 }: LibrarySearchHeaderProps) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
@@ -107,7 +109,7 @@ export const LibrarySearchHeader = ({
     >
       <StyledTextField
         id="joyride-workspace-search"
-        placeholder="Search workspaces..."
+        placeholder={t('nav.searchWorkspaces', 'Search workspaces...')}
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         size="small"
@@ -157,7 +159,12 @@ export const LibrarySearchHeader = ({
 
       {/* Filter & Sort Button for Notes */}
       {onNoteSortChange && onNoteFilterChange && (
-        <Tooltip title="Filter & Sort Notes">
+        <Tooltip
+          title={t(
+            'workspaceLibrary.filterAndSortNotes',
+            'Filter & Sort Notes',
+          )}
+        >
           <IconButton
             size="small"
             onClick={handleOpenFilterMenu}
@@ -194,7 +201,7 @@ export const LibrarySearchHeader = ({
       )}
 
       {/* View Mode Selector Button */}
-      <Tooltip title="Switch View Mode">
+      <Tooltip title={t('workspaceLibrary.switchViewMode', 'Switch View Mode')}>
         <IconButton
           size="small"
           onClick={handleOpenViewMenu}
@@ -269,7 +276,9 @@ export const LibrarySearchHeader = ({
             <ListItemIcon sx={{ minWidth: '32px !important' }}>
               <AccessTimeIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary="Recently Updated" />
+            <ListItemText
+              primary={t('projects.sort.recent', 'Recently Updated')}
+            />
             {noteSortBy === 'recent' && (
               <CheckIcon fontSize="small" sx={{ fontSize: 16 }} />
             )}
@@ -286,7 +295,9 @@ export const LibrarySearchHeader = ({
             <ListItemIcon sx={{ minWidth: '32px !important' }}>
               <SortByAlphaIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary="Title (A to Z)" />
+            <ListItemText
+              primary={t('projects.sort.nameAsc', 'Title (A to Z)')}
+            />
             {noteSortBy === 'title-asc' && (
               <CheckIcon fontSize="small" sx={{ fontSize: 16 }} />
             )}
@@ -307,7 +318,7 @@ export const LibrarySearchHeader = ({
               fontSize: '11px',
             }}
           >
-            Filter Notes
+            {t('workspaceLibrary.filterNotes', 'Filter Notes')}
           </Typography>
 
           <MenuItem
@@ -318,7 +329,9 @@ export const LibrarySearchHeader = ({
             }}
             sx={{ borderRadius: '8px', fontSize: '13px', py: 0.8 }}
           >
-            <ListItemText primary="All Notes" />
+            <ListItemText
+              primary={t('workspaceLibrary.allNotes', 'All Notes')}
+            />
             {noteFilterType === 'all' && (
               <CheckIcon fontSize="small" sx={{ fontSize: 16 }} />
             )}
@@ -335,7 +348,9 @@ export const LibrarySearchHeader = ({
             <ListItemIcon sx={{ minWidth: '32px !important' }}>
               <LinkIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary="Linked to Task" />
+            <ListItemText
+              primary={t('workspaceLibrary.linkedToTask', 'Linked to Task')}
+            />
             {noteFilterType === 'linked-task' && (
               <CheckIcon fontSize="small" sx={{ fontSize: 16 }} />
             )}
@@ -352,7 +367,12 @@ export const LibrarySearchHeader = ({
             <ListItemIcon sx={{ minWidth: '32px !important' }}>
               <WallpaperIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary="With Background Cover" />
+            <ListItemText
+              primary={t(
+                'workspaceLibrary.withBackgroundCover',
+                'With Background Cover',
+              )}
+            />
             {noteFilterType === 'has-cover' && (
               <CheckIcon fontSize="small" sx={{ fontSize: 16 }} />
             )}
@@ -394,7 +414,7 @@ export const LibrarySearchHeader = ({
             <GridViewIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText
-            primary="Gallery"
+            primary={t('workspaceLibrary.viewGallery', 'Gallery')}
             primaryTypographyProps={{ fontSize: '13px' }}
           />
           {viewMode === 'gallery' && (
@@ -416,7 +436,7 @@ export const LibrarySearchHeader = ({
             <AppsIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText
-            primary="Grid"
+            primary={t('workspaceLibrary.viewGrid', 'Grid')}
             primaryTypographyProps={{ fontSize: '13px' }}
           />
           {viewMode === 'grid' && (
@@ -438,7 +458,7 @@ export const LibrarySearchHeader = ({
             <ViewListIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText
-            primary="List"
+            primary={t('workspaceLibrary.viewList', 'List')}
             primaryTypographyProps={{ fontSize: '13px' }}
           />
           {viewMode === 'list' && (

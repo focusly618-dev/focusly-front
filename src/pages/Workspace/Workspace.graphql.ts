@@ -24,12 +24,24 @@ export const GET_WORKSPACES_PAGINATED = gql`
         card_show_background
         updatedAt
         createdAt
+        taskId
         task {
           id
           title
           status
           estimate_timer
           real_timer
+        }
+        tasks {
+          id
+          title
+          status
+          estimate_timer
+          real_timer
+          priority_level
+          category
+          deadline
+          workspace_id
         }
         projectId
       }
@@ -50,6 +62,7 @@ export const CREATE_WORKSPACE = gql`
       card_show_background
       createdAt
       updatedAt
+      taskId
       projectId
     }
   }
@@ -66,6 +79,7 @@ export const UPDATE_WORKSPACE = gql`
       card_show_background
       createdAt
       updatedAt
+      taskId
       projectId
     }
   }
@@ -95,6 +109,25 @@ export const GET_WORKSPACE_BY_ID = gql`
         real_timer
         priority_level
         notes_encrypted
+        links {
+          title
+          url
+        }
+        google_event_id
+        source
+        created_at
+      }
+      tasks {
+        id
+        title
+        status
+        estimate_timer
+        real_timer
+        priority_level
+        notes_encrypted
+        category
+        deadline
+        workspace_id
         links {
           title
           url

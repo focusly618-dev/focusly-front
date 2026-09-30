@@ -1,171 +1,223 @@
 import { Box, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { surfaceColor } from '@/context';
+import { styled, alpha } from '@mui/material/styles';
 
-export const BoardContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(3),
-  overflowX: 'auto',
-  paddingBottom: theme.spacing(2),
-  width: '100%',
-  alignItems: 'flex-start',
-  height: '100%',
-  minHeight: '600px',
-  WebkitOverflowScrolling: 'touch',
-}));
+export const BoardContainer = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    display: 'flex',
+    gap: theme.spacing(2.5),
+    overflowX: 'auto',
+    paddingBottom: theme.spacing(3),
+    width: '100%',
+    alignItems: 'flex-start',
+    height: '100%',
+    minHeight: '600px',
+    WebkitOverflowScrolling: 'touch',
+    '&::-webkit-scrollbar': {
+      height: '6px',
+    },
+    '&::-webkit-scrollbar-track': {
+      background: 'transparent',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: isDark ? '#2e3037' : '#cbd5e1',
+      borderRadius: '3px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+      background: isDark ? '#3a3d48' : '#94a3b8',
+    },
+  };
+});
 
-export const ColumnWrapper = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '320px',
-  minWidth: '280px',
-  [theme.breakpoints.down('sm')]: {
-    width: 'calc(100vw - 48px)',
+export const ColumnWrapper = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: isDark ? '#15161b' : '#f8fafc',
+    border: `1px solid ${isDark ? '#25272e' : '#e2e8f0'}`,
+    boxShadow: isDark
+      ? '0 4px 16px -2px rgba(0, 0, 0, 0.4)'
+      : '0 1px 4px rgba(0, 0, 0, 0.04)',
+    width: '320px',
     minWidth: '280px',
-  },
-  flexShrink: 0,
-}));
+    height: '100%',
+    borderRadius: '14px',
+    padding: '14px',
+    [theme.breakpoints.down('sm')]: {
+      width: 'calc(100vw - 48px)',
+      minWidth: '280px',
+    },
+    flexShrink: 0,
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+  };
+});
 
-export const ColumnHeader = styled(Box)<{ borderColor?: string }>(
-  ({ theme, borderColor }) => ({
+export const ColumnHeader = styled(Box)<{ borderColor?: string }>(({
+  theme,
+  borderColor,
+}) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingBottom: theme.spacing(1.5),
-    marginBottom: theme.spacing(2),
-    borderBottom:
-      theme.palette.mode === 'dark'
-        ? '1px solid rgba(255, 255, 255, 0.06)'
-        : `1px solid ${theme.palette.divider}`,
+    marginBottom: theme.spacing(1.75),
+    borderBottom: `1px solid ${isDark ? '#25272e' : '#e2e8f0'}`,
     position: 'relative',
     '&:after': {
       content: '""',
       position: 'absolute',
       bottom: 0,
       left: 0,
-      width: '40px',
-      height: '2px',
-      backgroundColor: borderColor || theme.palette.primary.main,
-      borderRadius: '1px',
+      width: '42px',
+      height: '2.5px',
+      backgroundColor:
+        borderColor || (isDark ? '#10b981' : theme.palette.primary.main),
+      borderRadius: '2px',
     },
-  }),
-);
+  };
+});
 
-export const ColumnTitle = styled(Typography)(({ theme }) => ({
-  fontWeight: 700,
-  fontSize: '14px',
-  textTransform: 'uppercase',
-  display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing(1),
-  color: theme.palette.text.primary,
-}));
+export const ColumnTitle = styled(Typography)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    fontWeight: 700,
+    fontSize: '13.5px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+    color: isDark ? '#F3F4F6' : theme.palette.text.primary,
+  };
+});
 
-export const TaskCountBadge = styled(Box)(({ theme }) => ({
-  backgroundColor: surfaceColor(
-    theme,
-    '#30363d',
-    '#2A2A2C',
-    theme.palette.grey[200],
-  ),
-  color: theme.palette.text.secondary,
-  borderRadius: '4px',
-  padding: '2px 6px',
-  fontSize: '12px',
-  fontWeight: 600,
-}));
+export const TaskCountBadge = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    backgroundColor: isDark ? '#25272e' : '#e2e8f0',
+    color: isDark ? '#8A8F98' : theme.palette.text.secondary,
+    borderRadius: '20px',
+    padding: '2px 8px',
+    fontSize: '11.5px',
+    fontWeight: 700,
+  };
+});
 
-export const DroppableArea = styled(Box)<{ isOver?: boolean }>(
-  ({ theme, isOver }) => ({
+export const DroppableArea = styled(Box)<{ isOver?: boolean }>(({
+  theme,
+  isOver,
+}) => {
+  const isDark = theme.palette.mode === 'dark';
+  const primaryColor = isDark ? '#10b981' : theme.palette.primary.main;
+  return {
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(2),
-    minHeight: '200px',
+    gap: theme.spacing(1.5),
+    minHeight: '220px',
     maxHeight: 'calc(100vh - 250px)',
     height: '100%',
-    padding: theme.spacing(1),
-    borderRadius: '12px',
+    padding: '4px',
+    borderRadius: '10px',
     backgroundColor: isOver
-      ? theme.palette.mode === 'dark'
-        ? 'rgba(99, 102, 241, 0.05)'
-        : 'rgba(59, 130, 246, 0.04)'
+      ? isDark
+        ? 'rgba(0, 135, 103, 0.08)'
+        : 'rgba(0, 135, 103, 0.04)'
       : 'transparent',
     border: isOver
-      ? `1px dashed ${theme.palette.mode === 'dark' ? '#6366f1' : theme.palette.primary.main}`
-      : '1px dashed transparent',
+      ? `1.5px dashed ${primaryColor}`
+      : '1.5px dashed transparent',
     transition: 'all 0.2s ease-in-out',
     overflowY: 'auto',
     overflowX: 'hidden',
     '&::-webkit-scrollbar': {
-      width: '6px',
+      width: '5px',
     },
     '&::-webkit-scrollbar-track': {
       background: 'transparent',
     },
     '&::-webkit-scrollbar-thumb': {
-      background:
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.1)'
-          : theme.palette.divider,
+      background: isDark ? '#2e3037' : '#cbd5e1',
       borderRadius: '3px',
     },
     '&::-webkit-scrollbar-thumb:hover': {
-      background:
-        theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.2)'
-          : theme.palette.text.disabled,
+      background: isDark ? '#3a3d48' : '#94a3b8',
     },
-  }),
-);
+  };
+});
 
-export const DropIndicator = styled(Box)(({ theme }) => ({
-  height: '4px',
-  backgroundColor: theme.palette.primary.main,
-  borderRadius: '2px',
-  margin: '4px 0',
-  boxShadow: `0 0 8px ${theme.palette.primary.main}`,
-  animation: 'pulse 1.5s ease-in-out infinite',
-  '@keyframes pulse': {
-    '0%, 100%': {
-      opacity: 1,
-      transform: 'scaleX(1)',
+export const DropIndicator = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  const color = isDark ? '#10b981' : '#008767';
+  return {
+    height: '3px',
+    backgroundColor: color,
+    borderRadius: '2px',
+    margin: '4px 0',
+    boxShadow: `0 0 10px ${alpha(color, 0.7)}`,
+    animation: 'pulse 1.5s ease-in-out infinite',
+    '@keyframes pulse': {
+      '0%, 100%': {
+        opacity: 1,
+        transform: 'scaleX(1)',
+      },
+      '50%': {
+        opacity: 0.6,
+        transform: 'scaleX(0.96)',
+      },
     },
-    '50%': {
-      opacity: 0.6,
-      transform: 'scaleX(0.95)',
-    },
-  },
-}));
+  };
+});
 
 export const TaskPlaceholder = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'isActive',
-})<{ isActive?: boolean }>(({ theme, isActive }) => ({
-  height: '120px',
-  border: isActive
-    ? `2px dashed ${theme.palette.primary.main}`
-    : `2px dashed ${theme.palette.divider}`,
-  borderRadius: '12px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: isActive
-    ? theme.palette.mode === 'dark'
-      ? 'rgba(59, 130, 246, 0.1)'
-      : 'rgba(59, 130, 246, 0.05)'
-    : 'transparent',
-  transition: 'all 0.2s ease',
-}));
+})<{ isActive?: boolean }>(({ theme, isActive }) => {
+  const isDark = theme.palette.mode === 'dark';
+  const primaryColor = isDark ? '#10b981' : theme.palette.primary.main;
+  return {
+    minHeight: '130px',
+    height: '100%',
+    maxHeight: '180px',
+    border: isActive
+      ? `2px dashed ${primaryColor}`
+      : `1.5px dashed ${isDark ? '#2a2d36' : '#cbd5e1'}`,
+    borderRadius: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    padding: '16px',
+    backgroundColor: isActive
+      ? isDark
+        ? alpha('#10b981', 0.12)
+        : alpha('#008767', 0.06)
+      : isDark
+        ? '#191a20'
+        : '#f8fafc',
+    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+    cursor: 'default',
+    '&:hover': {
+      borderColor: isDark ? '#3a3e4a' : '#94a3b8',
+      backgroundColor: isDark ? '#1b1d24' : '#f1f5f9',
+    },
+  };
+});
 
-export const DraggingCardPreview = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  border: `2px solid ${theme.palette.primary.main}`,
-  borderRadius: '12px',
-  padding: '16px',
-  boxShadow:
-    theme.palette.mode === 'dark'
-      ? '0 20px 40px -10px rgba(0, 0, 0, 0.8)'
-      : '0 20px 40px -10px rgba(0, 0, 0, 0.3)',
-  transform: 'rotate(2deg)',
-  cursor: 'grabbing',
-  opacity: 0.95,
-}));
+export const DraggingCardPreview = styled(Box)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    backgroundColor: isDark ? '#1c1d24' : '#ffffff',
+    border: `2px solid ${isDark ? '#10b981' : '#008767'}`,
+    borderRadius: '12px',
+    padding: '16px',
+    boxShadow: isDark
+      ? '0 20px 40px -10px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 135, 103, 0.25)'
+      : '0 20px 40px -10px rgba(0, 0, 0, 0.25)',
+    transform: 'rotate(2deg)',
+    cursor: 'grabbing',
+    opacity: 0.98,
+  };
+});

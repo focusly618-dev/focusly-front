@@ -128,36 +128,65 @@ export const WorkspaceListItem = ({
 
       {/* Task Link info */}
       <Box sx={{ minWidth: 140, display: { xs: 'none', lg: 'block' } }}>
-        {workspace.task ? (
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={0.5}
-            sx={{
-              color: 'primary.main',
-              '&:hover': { color: 'error.main' },
-              transition: 'color 0.2s',
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onUnlinkTask(workspace);
-            }}
-          >
-            <CheckBoxIcon sx={{ fontSize: 14 }} />
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: 700,
-                fontSize: '11px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                maxWidth: 120,
-              }}
-            >
-              {workspace.task.title}
-            </Typography>
-          </Box>
+        {(workspace.tasks && workspace.tasks.length > 0) || workspace.task ? (
+          (() => {
+            const list =
+              workspace.tasks && workspace.tasks.length > 0
+                ? workspace.tasks
+                : workspace.task
+                  ? [workspace.task]
+                  : [];
+            const first = list[0];
+            const extra = list.length - 1;
+            return (
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={0.75}
+                sx={{
+                  color: 'primary.main',
+                  '&:hover': { color: 'error.main' },
+                  transition: 'color 0.2s',
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUnlinkTask(workspace);
+                }}
+              >
+                <CheckBoxIcon sx={{ fontSize: 14 }} />
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '11px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 120,
+                  }}
+                >
+                  {first.title}
+                </Typography>
+                {extra > 0 && (
+                  <Box
+                    component="span"
+                    sx={{
+                      px: 0.6,
+                      py: 0.1,
+                      borderRadius: '10px',
+                      bgcolor: isDark
+                        ? 'rgba(92, 92, 246, 0.25)'
+                        : 'rgba(92, 92, 246, 0.12)',
+                      fontSize: '10px',
+                      fontWeight: 800,
+                    }}
+                  >
+                    +{extra}
+                  </Box>
+                )}
+              </Box>
+            );
+          })()
         ) : (
           <Typography
             variant="caption"

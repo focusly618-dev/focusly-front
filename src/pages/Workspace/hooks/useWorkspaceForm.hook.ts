@@ -27,7 +27,11 @@ export const useWorkspaceForm = () => {
     },
   });
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
-    refetchQueries: ['GetWorkspacesPaginated', 'GetWorkspaces'],
+    refetchQueries: [
+      'GetWorkspacesPaginated',
+      'GetWorkspaces',
+      'GetWorkspaceById',
+    ],
     update(cache) {
       cache.evict({ fieldName: 'workspacesPaginated' });
       cache.evict({ fieldName: 'workspaces' });

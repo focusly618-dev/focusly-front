@@ -454,7 +454,10 @@ export const WorkspaceLibrary = ({
                         variant="caption"
                         sx={{ color: 'text.secondary', fontSize: '12px' }}
                       >
-                        Crear una nota o documento
+                        {t(
+                          'workspaceLibrary.emptyFolder.subAction',
+                          'Crear una nota o documento',
+                        )}
                       </Typography>
                     </DashedCard>
                   )}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   Box,
@@ -58,6 +59,7 @@ import {
 export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
   props,
 ) => {
+  const { t } = useTranslation();
   const {
     // Theme
     isDark,
@@ -457,7 +459,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               ) : (
                 <Box sx={{ py: 2, px: 2, textAlign: 'center' }}>
                   <Typography sx={{ fontSize: '12px', color: secondaryText }}>
-                    No projects available
+                    {t('projects.noProjects', 'No projects available')}
                   </Typography>
                 </Box>
               )}
@@ -469,7 +471,9 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             <Typography
               sx={{ fontSize: '13px', fontWeight: 500, color: secondaryText }}
             >
-              {isEditing ? 'Edit Task' : 'New Task'}
+              {isEditing
+                ? t('tasks.actions.editTask', 'Edit Task')
+                : t('tasks.header.newTask', 'New Task')}
             </Typography>
             {sprintName && (
               <Chip
@@ -543,7 +547,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Task title..."
+              placeholder={t('tasks.createProjectTaskModal.titlePlaceholder')}
               style={{
                 width: '100%',
                 fontSize: '22px',
@@ -596,7 +600,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     fontWeight: 500,
                   }}
                 >
-                  Status
+                  {t('tasks.createProjectTaskModal.status')}
                 </Typography>
               </Stack>
               <Stack direction="row" alignItems="center" spacing={0.8}>
@@ -611,7 +615,9 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 <Typography
                   sx={{ fontSize: '12px', fontWeight: 600, color: headerText }}
                 >
-                  {currentStatusConfig.label}
+                  {t(`tasks.status.${currentStatusConfig.id}`, {
+                    defaultValue: currentStatusConfig.label,
+                  })}
                 </Typography>
                 <Typography sx={{ fontSize: '10px', color: secondaryText }}>
                   ▼
@@ -662,7 +668,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     }}
                   />
                   <Typography sx={{ fontSize: '13px', flex: 1 }}>
-                    {opt.label}
+                    {t(`tasks.status.${opt.id}`, { defaultValue: opt.label })}
                   </Typography>
                   {currentStatusConfig.id === opt.id && (
                     <CheckCircleIcon sx={{ fontSize: 15, color: '#10b981' }} />
@@ -697,7 +703,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     fontWeight: 500,
                   }}
                 >
-                  Priority
+                  {t('tasks.createProjectTaskModal.priority')}
                 </Typography>
               </Stack>
               <Box
@@ -715,7 +721,11 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 }}
               >
                 <PriorityBadge priority={currentPriorityConfig.id} size={16} />
-                <span>{currentPriorityConfig.label}</span>
+                <span>
+                  {t(`tasks.priorities.${currentPriorityConfig.id}`, {
+                    defaultValue: currentPriorityConfig.label,
+                  })}
+                </span>
                 <span
                   style={{ fontSize: '9px', opacity: 0.7, marginLeft: '2px' }}
                 >
@@ -763,7 +773,9 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   <Typography
                     sx={{ fontSize: '13px', fontWeight: 500, flex: 1 }}
                   >
-                    {pOpt.label}
+                    {t(`tasks.priorities.${pOpt.id}`, {
+                      defaultValue: pOpt.label,
+                    })}
                   </Typography>
                   {currentPriorityConfig.id === pOpt.id && (
                     <CheckCircleIcon sx={{ fontSize: 15, color: '#10b981' }} />
@@ -795,7 +807,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     fontWeight: 500,
                   }}
                 >
-                  Tags / Modules
+                  {t('tasks.createProjectTaskModal.tagsModules')}
                 </Typography>
               </Stack>
               <Stack
@@ -842,7 +854,9 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         }
                       }}
                       onBlur={handleAddTag}
-                      placeholder="Tag name..."
+                      placeholder={t(
+                        'tasks.createProjectTaskModal.tagPlaceholder',
+                      )}
                       style={{
                         height: 22,
                         fontSize: '11px',
@@ -910,11 +924,11 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     textTransform: 'uppercase',
                   }}
                 >
-                  Schedule & Execution
+                  {t('tasks.createProjectTaskModal.scheduleExecution')}
                 </Typography>
               </Stack>
               <Typography sx={{ fontSize: '11px', color: secondaryText }}>
-                Auto-synced to Daily Plan
+                {t('tasks.createProjectTaskModal.autoSynced')}
               </Typography>
             </Box>
 
@@ -947,7 +961,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       fontWeight: 600,
                     }}
                   >
-                    Due Date
+                    {t('tasks.createProjectTaskModal.dueDate')}
                   </Typography>
                   <input
                     type="date"
@@ -998,7 +1012,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         fontWeight: 600,
                       }}
                     >
-                      Duration
+                      {t('tasks.createProjectTaskModal.duration')}
                     </Typography>
                     <Typography
                       sx={{
@@ -1007,7 +1021,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         color: headerText,
                       }}
                     >
-                      {estimatedDuration || 'Set duration'}
+                      {estimatedDuration ||
+                        t('tasks.createProjectTaskModal.setDuration')}
                     </Typography>
                   </Box>
                 </Stack>
@@ -1075,7 +1090,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     textTransform: 'uppercase',
                   }}
                 >
-                  Linked Spec & PRD Anchor
+                  {t('tasks.createProjectTaskModal.linkedSpec')}
                 </Typography>
               </Stack>
               <Stack direction="row" alignItems="center" spacing={0.75}>
@@ -1100,7 +1115,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     },
                   }}
                 >
-                  Crear Workspace
+                  {t('tasks.createProjectTaskModal.createWorkspace')}
                 </Button>
                 <Button
                   size="small"
@@ -1124,8 +1139,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   }}
                 >
                   {isWorkspaceLinked
-                    ? 'Cambiar Workspace'
-                    : 'Vincular Workspace'}
+                    ? t('tasks.createProjectTaskModal.changeWorkspace')
+                    : t('tasks.createProjectTaskModal.linkWorkspace')}
                 </Button>
               </Stack>
             </Box>
@@ -1196,7 +1211,11 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
 
                 <Stack direction="row" alignItems="center" spacing={0.75}>
                   {/* Open workspace button */}
-                  <Tooltip title="Open workspace" arrow placement="top">
+                  <Tooltip
+                    title={t('tasks.createProjectTaskModal.openWorkspace')}
+                    arrow
+                    placement="top"
+                  >
                     <Box
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1234,7 +1253,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                           lineHeight: 1,
                         }}
                       >
-                        Open
+                        {t('tasks.createProjectTaskModal.openWorkspace')}
                       </Typography>
                     </Box>
                   </Tooltip>
@@ -1271,12 +1290,15 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         lineHeight: 1,
                       }}
                     >
-                      Linked
+                      {t('tasks.createProjectTaskModal.linked')}
                     </Typography>
                   </Box>
 
                   {/* Unlink button */}
-                  <Tooltip title="Unlink workspace" arrow>
+                  <Tooltip
+                    title={t('tasks.createProjectTaskModal.unlinkWorkspace')}
+                    arrow
+                  >
                     <IconButton
                       size="small"
                       onClick={(e) => {
@@ -1351,11 +1373,10 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         color: headerText,
                       }}
                     >
-                      Ningún workspace vinculado
+                      {t('tasks.createProjectTaskModal.noWorkspaceLinked')}
                     </Typography>
                     <Typography sx={{ fontSize: '11px', color: secondaryText }}>
-                      Haz clic para asociar esta tarea a una especificación o
-                      nota
+                      {t('tasks.createProjectTaskModal.clickToLink')}
                     </Typography>
                   </Box>
                 </Stack>
@@ -1388,7 +1409,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       },
                     }}
                   >
-                    + Crear
+                    + {t('tasks.createProjectTaskModal.add')}
                   </Button>
                   <Button
                     size="small"
@@ -1407,7 +1428,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       minWidth: 0,
                     }}
                   >
-                    + Seleccionar
+                    + {t('tasks.createProjectTaskModal.linkWorkspace')}
                   </Button>
                 </Stack>
               </Box>
@@ -1451,7 +1472,9 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 <InputBase
                   value={workspaceSearch}
                   onChange={(e) => setWorkspaceSearch(e.target.value)}
-                  placeholder="Buscar workspace o nota..."
+                  placeholder={t(
+                    'tasks.createProjectTaskModal.searchWorkspacePlaceholder',
+                  )}
                   fullWidth
                   autoFocus
                   sx={{
@@ -1491,7 +1514,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     },
                   }}
                 >
-                  + Crear workspace con título personalizado
+                  + {t('tasks.createProjectTaskModal.createWorkspace')}
                 </Button>
               </Box>
 
@@ -1552,13 +1575,16 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                             color: '#008767',
                           }}
                         >
-                          Crear &quot;{workspaceSearch.trim()}&quot;
+                          {t('tasks.createProjectTaskModal.add')} &quot;
+                          {workspaceSearch.trim()}&quot;
                         </Typography>
                         <Typography
                           noWrap
                           sx={{ fontSize: '10.5px', color: secondaryText }}
                         >
-                          Crear nuevo workspace con este título
+                          {t(
+                            'tasks.createProjectTaskModal.createWorkspaceDialogDesc',
+                          )}
                         </Typography>
                       </Box>
                     </Stack>
@@ -1575,8 +1601,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     sx={{ fontSize: '12px', color: secondaryText, mb: 1.5 }}
                   >
                     {workspaceSearch
-                      ? 'No se encontraron workspaces'
-                      : 'No hay workspaces en este proyecto'}
+                      ? t('workspaceLibrary.emptySearch.title')
+                      : t('tasks.createProjectTaskModal.noWorkspaceLinked')}
                   </Typography>
                   <Button
                     size="small"
@@ -1601,8 +1627,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     }}
                   >
                     {workspaceSearch.trim()
-                      ? `Crear "${workspaceSearch.trim()}"`
-                      : 'Crear nuevo workspace'}
+                      ? `${t('tasks.createProjectTaskModal.add')} "${workspaceSearch.trim()}"`
+                      : t('tasks.createProjectTaskModal.createWorkspace')}
                   </Button>
                 </Box>
               ) : (
@@ -1615,7 +1641,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         setSelectedWorkspaceId(ws.id);
                         setWorkspaceMenuAnchor(null);
                         sileo.success({
-                          title: 'Workspace vinculado',
+                          title: t('tasks.createProjectTaskModal.linked'),
                           description: ws.title || UNTITLED_WORKSPACE_TITLE,
                           duration: 2500,
                         });
@@ -1708,7 +1734,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   }}
                 >
                   <DeleteOutlineIcon sx={{ fontSize: 15 }} />
-                  Desvincular workspace
+                  {t('tasks.createProjectTaskModal.unlinkWorkspace')}
                 </MenuItem>,
               ]}
             </Menu>
@@ -1733,7 +1759,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   textTransform: 'uppercase',
                 }}
               >
-                Description & Context
+                {t('tasks.createProjectTaskModal.descAndContext')}
               </Typography>
 
               {/* Formatting Toolbar */}
@@ -1763,7 +1789,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setDescription(e.target.value)
               }
-              placeholder="Add a more detailed description..."
+              placeholder={t('tasks.createProjectTaskModal.descPlaceholder')}
               rows={3}
               style={{
                 width: '100%',
@@ -1801,7 +1827,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   textTransform: 'uppercase',
                 }}
               >
-                Subtasks{' '}
+                {t('tasks.createProjectTaskModal.subtasks')}{' '}
                 {subtasks.length > 0 &&
                   `(${completedCount}/${subtasks.length})`}
               </Typography>
@@ -1919,7 +1945,9 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       handleAddSubtask();
                     }
                   }}
-                  placeholder="Add subtask... (Press Enter)"
+                  placeholder={t(
+                    'tasks.createProjectTaskModal.subtaskPlaceholder',
+                  )}
                   style={{
                     flex: 1,
                     fontSize: '12.5px',
@@ -1964,7 +1992,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     minWidth: 'auto',
                   }}
                 >
-                  Add
+                  {t('tasks.createProjectTaskModal.add')}
                 </Button>
               </Box>
             </Stack>
@@ -2006,14 +2034,14 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               },
             }}
           >
-            Lumina AI Breakdown
+            {t('tasks.createProjectTaskModal.aiBreakdown')}
           </Button>
 
           {/* Actions on the Right */}
           <Stack direction="row" alignItems="center" spacing={2.5}>
             {/* Delete Button (Editing mode) */}
             {isEditing && onDelete && (
-              <Tooltip title="Eliminar tarea">
+              <Tooltip title={t('tasks.createProjectTaskModal.deleteTask')}>
                 <IconButton
                   size="small"
                   onClick={handleDeleteTask}
@@ -2058,7 +2086,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     fontWeight: 500,
                   }}
                 >
-                  Create more
+                  {t('tasks.createProjectTaskModal.createMore')}
                 </Typography>
               </Stack>
             )}
@@ -2074,7 +2102,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 '&:hover': { color: headerText, bgcolor: 'transparent' },
               }}
             >
-              Cancel
+              {t('tasks.createProjectTaskModal.cancel')}
             </Button>
 
             {/* Primary Action Button */}
@@ -2115,7 +2143,11 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 <CircularProgress size={16} sx={{ color: '#ffffff' }} />
               ) : (
                 <>
-                  <span>{isEditing ? 'Save Changes' : 'Create Task'}</span>
+                  <span>
+                    {isEditing
+                      ? t('tasks.createProjectTaskModal.saveChanges')
+                      : t('tasks.createProjectTaskModal.createTask')}
+                  </span>
                   <Box
                     sx={{
                       px: '5px',
@@ -2186,7 +2218,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             <Typography
               sx={{ fontSize: '15px', fontWeight: 700, color: headerText }}
             >
-              Crear Workspace
+              {t('tasks.createProjectTaskModal.createWorkspace')}
             </Typography>
           </Stack>
           <IconButton
@@ -2210,8 +2242,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             lineHeight: 1.4,
           }}
         >
-          Crea un nuevo workspace con el título que desees y se vinculará
-          automáticamente a esta tarea.
+          {t('tasks.createProjectTaskModal.createWorkspaceDialogDesc')}
         </Typography>
 
         {currentProjectName && (
@@ -2232,7 +2263,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             <Typography
               sx={{ fontSize: '11px', color: secondaryText, fontWeight: 500 }}
             >
-              Proyecto:
+              {t('tasks.createProjectTaskModal.project')}
             </Typography>
             <Typography
               sx={{ fontSize: '11px', color: headerText, fontWeight: 600 }}
@@ -2253,7 +2284,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               mb: 0.75,
             }}
           >
-            Título del Workspace
+            {t('tasks.createProjectTaskModal.workspaceTitle')}
           </Typography>
           <InputBase
             value={newWorkspaceTitle}
@@ -2268,7 +2299,9 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 handleCreateWorkspace();
               }
             }}
-            placeholder="Ej. Especificaciones técnicas, Requerimientos, PRD..."
+            placeholder={t(
+              'tasks.createProjectTaskModal.workspaceTitlePlaceholder',
+            )}
             autoFocus
             fullWidth
             sx={{
@@ -2302,7 +2335,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               color: secondaryText,
             }}
           >
-            Cancelar
+            {t('tasks.createProjectTaskModal.cancel')}
           </Button>
           <Button
             size="small"
@@ -2322,7 +2355,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             {isCreatingWorkspace ? (
               <CircularProgress size={16} sx={{ color: '#ffffff' }} />
             ) : (
-              'Crear y vincular'
+              t('tasks.createProjectTaskModal.createAndLink')
             )}
           </Button>
         </Stack>

@@ -37,6 +37,7 @@ export {
   PASTEL_COLORS,
   TASK_COLORS,
   getColorName,
+  isColorDark,
   type TaskColorOption,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 

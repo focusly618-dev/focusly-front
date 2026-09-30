@@ -11,10 +11,10 @@ export const SettingsLayout = styled(Box)(({ theme }) => ({
 }));
 
 export const SettingsSidebar = styled(Box)(({ theme }) => ({
-  width: 240,
+  width: '20%',
   flexShrink: 0,
   padding: theme.spacing(4, 2),
-  borderRight: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'}`,
+  borderLeft: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'}`,
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(1),
@@ -73,7 +73,7 @@ export const SidebarItem = styled(Box, {
 export const ContentArea = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(6, 8),
-  maxWidth: 860,
+  maxWidth: '80%',
   overflowY: 'auto',
   height: '100vh',
   '&::-webkit-scrollbar': {

@@ -13,7 +13,7 @@ import {
 import { useWorkspaceForm } from './useWorkspaceForm.hook';
 import { useWorkspaceTasks } from './useWorkspaceTasks.hook';
 import { useWorkspaceActions } from './useWorkspaceActions.hook';
-import type { WorkspaceTypes } from '../workspace.types';
+import type { WorkspaceTypes, TaskSearchItems } from '../workspace.types';
 
 interface UseWorkspaceProps {
   isEditorOpen?: boolean;
@@ -159,11 +159,13 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
             });
             const workspace = data?.workspace;
             if (workspace) {
+              const linkedList =
+                (workspace.tasks as unknown as TaskSearchItems[]) || [];
               reset({
                 id: workspace.id,
                 title: workspace.title,
                 content: workspace.content,
-                taskId: workspace.taskId || null,
+                taskId: workspace.taskId || (linkedList[0]?.id ?? null),
                 projectId: workspace.projectId,
                 groupId: workspace.groupId,
                 project: workspace.project,
@@ -171,9 +173,12 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
                 background_color: workspace.background_color,
                 card_show_background: workspace.card_show_background,
                 saveStatus: true,
+                tasks: linkedList,
               });
               if (workspace.task) {
                 handleSelectTask(workspace.task);
+              } else if (linkedList.length > 0) {
+                handleSelectTask(linkedList[0]);
               } else {
                 handleSelectTask(null);
               }
@@ -236,11 +241,12 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     newParams.set('workspaceId', workspace.id);
     setSearchParams(newParams);
 
+    const linkedList = (workspace.tasks as unknown as TaskSearchItems[]) || [];
     reset({
       id: workspace.id,
       title: workspace.title,
       content: workspace.content,
-      taskId: workspace.taskId || null,
+      taskId: workspace.taskId || (linkedList[0]?.id ?? null),
       projectId: workspace.projectId,
       groupId: workspace.groupId,
       project: workspace.project,
@@ -248,9 +254,12 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
       background_color: workspace.background_color,
       card_show_background: workspace.card_show_background,
       saveStatus: true,
+      tasks: linkedList,
     });
     if (workspace.task) {
       handleSelectTask(workspace.task);
+    } else if (linkedList.length > 0) {
+      handleSelectTask(linkedList[0]);
     } else {
       handleSelectTask(null);
     }

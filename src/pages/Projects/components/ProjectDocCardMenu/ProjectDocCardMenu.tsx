@@ -62,7 +62,7 @@ export const ProjectDocCardMenu: React.FC<ProjectDocCardMenuProps> = ({
           {t('workspaceLibrary.changeCover')}
         </MenuItem>
       ) : (
-        <Box sx={{ p: 1.5, width: 220 }}>
+        <Box sx={{ p: 1.5, width: 250 }}>
           <Box
             sx={{
               display: 'flex',
@@ -91,6 +91,16 @@ export const ProjectDocCardMenu: React.FC<ProjectDocCardMenuProps> = ({
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: 1,
               mb: 1.5,
+              maxHeight: 260,
+              overflowY: 'auto',
+              p: 0.5,
+              '&::-webkit-scrollbar': {
+                width: 4,
+              },
+              '&::-webkit-scrollbar-thumb': {
+                bgcolor: 'rgba(0,0,0,0.15)',
+                borderRadius: 2,
+              },
             }}
           >
             {Object.entries(colorPaletteMap).map(([name, { gradient }]) => (

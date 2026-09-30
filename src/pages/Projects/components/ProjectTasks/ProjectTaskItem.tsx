@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -44,6 +45,7 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
   onAddSubtask,
   initialExpanded = false,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const hasSubtasks = Boolean(task.subtasks && task.subtasks.length > 0);
@@ -82,7 +84,11 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
         }}
       >
         <PriorityBadge priority={priority} size={15} />
-        <span>{config.label}</span>
+        <span>
+          {t(`tasks.priorities.${priority.toLowerCase()}`, {
+            defaultValue: config.label,
+          })}
+        </span>
       </Box>
     );
   };
@@ -189,7 +195,9 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
 
           {/* Project Badge */}
           {projectName && (
-            <Tooltip title={`Project: ${projectName}`}>
+            <Tooltip
+              title={`${t('tasks.createProjectTaskModal.project', { defaultValue: 'Project:' })} ${projectName}`}
+            >
               <Box
                 sx={{
                   display: { xs: 'none', md: 'inline-flex' },
@@ -240,7 +248,9 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
 
           {/* Linked Spec / Workspace Badge */}
           {task.workspaceTitle && (
-            <Tooltip title={`Linked Spec: ${task.workspaceTitle}`}>
+            <Tooltip
+              title={`${t('tasks.createProjectTaskModal.linked', { defaultValue: 'Linked Spec' })}: ${task.workspaceTitle}`}
+            >
               <Box
                 sx={{
                   display: { xs: 'none', lg: 'inline-flex' },
@@ -354,7 +364,11 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
             >
               <FormatListBulletedIcon sx={{ fontSize: 12 }} />
               <span>
-                {completedSubtasksCount}/{totalSubtasksCount} subtasks
+                {t('tasks.subtasksCount', {
+                  completed: completedSubtasksCount,
+                  total: totalSubtasksCount,
+                  defaultValue: `${completedSubtasksCount}/${totalSubtasksCount} subtasks`,
+                })}
               </span>
             </Box>
           )}

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Button,
@@ -29,6 +30,7 @@ export const NoteOutlineList = ({
   onJump,
   documentTitle = 'Documento',
 }: NoteOutlineListProps) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
@@ -96,14 +98,19 @@ export const NoteOutlineList = ({
           <TocIcon sx={{ fontSize: 24 }} />
         </Box>
         <Typography sx={{ fontWeight: 600, fontSize: '13.5px' }}>
-          Sin encabezados en esta nota
+          {t(
+            'workspaceEditor.outline.noHeadings',
+            'Sin encabezados en esta nota',
+          )}
         </Typography>
         <Typography
           variant="body2"
           sx={{ color: 'text.secondary', fontSize: '12px', maxWidth: 260 }}
         >
-          Agrega títulos usando sintaxis markdown (<code># Título</code> o{' '}
-          <code>## Sección</code>) para construir el índice de navegación.
+          {t(
+            'workspaceEditor.outline.addHeadingsHint',
+            'Agrega títulos usando sintaxis markdown (# Título o ## Sección) para construir el índice de navegación.',
+          )}
         </Typography>
       </Box>
     );
@@ -131,7 +138,10 @@ export const NoteOutlineList = ({
         <InputBase
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Buscar en el índice..."
+          placeholder={t(
+            'workspaceEditor.outline.searchPlaceholder',
+            'Buscar en el índice...',
+          )}
           fullWidth
           sx={{
             fontSize: '12.5px',
@@ -181,9 +191,17 @@ export const NoteOutlineList = ({
                 textTransform: 'uppercase',
               }}
             >
-              Ubicación en el documento
+              {t(
+                'workspaceEditor.outline.locationInDoc',
+                'Ubicación en el documento',
+              )}
             </Typography>
-            <Tooltip title="Saltar a esta sección en el editor">
+            <Tooltip
+              title={t(
+                'workspaceEditor.outline.jumpTooltip',
+                'Saltar a esta sección en el editor',
+              )}
+            >
               <Button
                 size="small"
                 startIcon={<JumpIcon sx={{ fontSize: 13 }} />}
@@ -198,7 +216,7 @@ export const NoteOutlineList = ({
                   color: 'primary.main',
                 }}
               >
-                Ir a sección
+                {t('workspaceEditor.outline.goToSection', 'Ir a sección')}
               </Button>
             </Tooltip>
           </Box>
@@ -237,7 +255,10 @@ export const NoteOutlineList = ({
                     sx={{ fontSize: 13, color: 'text.disabled' }}
                   />
                   <Chip
-                    label={item.text || 'Sin título'}
+                    label={
+                      item.text ||
+                      t('workspaceEditor.untitledNote', 'Sin título')
+                    }
                     size="small"
                     onClick={() => handleItemClick(item)}
                     sx={{
@@ -274,7 +295,11 @@ export const NoteOutlineList = ({
             variant="caption"
             sx={{ color: 'text.secondary', py: 1.5, textAlign: 'center' }}
           >
-            No se encontraron secciones para "{searchQuery}"
+            {t(
+              'workspaceEditor.outline.noSectionsFound',
+              'No se encontraron secciones para "{{query}}"',
+              { query: searchQuery },
+            )}
           </Typography>
         ) : (
           filteredHeadings.map((h) => {
@@ -350,7 +375,7 @@ export const NoteOutlineList = ({
                         : 'text.secondary',
                   }}
                 >
-                  {h.text || 'Sin título'}
+                  {h.text || t('workspaceEditor.untitledNote', 'Sin título')}
                 </Typography>
               </Box>
             );

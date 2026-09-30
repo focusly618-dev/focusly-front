@@ -2,7 +2,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { Box } from '@mui/material';
 import { EditorContainer, MainEditorArea } from './WorkspaceEditor.styles';
 
-import type { WorkspaceEditorProps } from '../../workspace.types';
+import type {
+  WorkspaceEditorProps,
+  TaskSearchItems,
+} from '../../workspace.types';
 import { EditorHeader } from './components/EditorHeader/EditorHeader';
 import { EditorContent } from './components/EditorContent/EditorContent';
 import { EditorSidebar } from './components/EditorSidebar/EditorSidebar';
@@ -103,10 +106,21 @@ export const WorkspaceEditor = ({
 
   const workspaceId = watch('id');
   const primaryTaskId = watch('taskId');
+  const formTasks = watch('tasks') as TaskSearchItems[] | undefined;
 
   const linkedTasks = useMemo(() => {
     const availableTasks = tasksData?.tasks ?? [];
-    const linkedTaskIds = new Set<string>();
+    const taskMap = new Map<string, TaskSearchItems>();
+
+    if (formTasks && Array.isArray(formTasks)) {
+      formTasks.forEach((t) => {
+        if (t && t.id) taskMap.set(t.id, t);
+      });
+    }
+
+    if (selectTask?.id) {
+      taskMap.set(selectTask.id, selectTask);
+    }
 
     availableTasks.forEach((task) => {
       const belongsToWorkspace = Boolean(
@@ -118,22 +132,24 @@ export const WorkspaceEditor = ({
         task.id === selectTask?.id && task.id === primaryTaskId;
 
       if (belongsToWorkspace || isLegacyPrimaryTask) {
-        linkedTaskIds.add(task.id);
+        taskMap.set(task.id, task);
       }
     });
 
     Object.entries(linkedTaskOverrides).forEach(([taskId, isLinked]) => {
-      if (isLinked) linkedTaskIds.add(taskId);
-      else linkedTaskIds.delete(taskId);
+      if (!isLinked) {
+        taskMap.delete(taskId);
+      } else {
+        const found = availableTasks.find((t) => t.id === taskId);
+        if (found) {
+          taskMap.set(taskId, found);
+        }
+      }
     });
 
-    const linked = availableTasks.filter((task) => linkedTaskIds.has(task.id));
-    if (selectTask && linkedTaskIds.has(selectTask.id) && !linked.length) {
-      return [selectTask];
-    }
-
-    return linked;
+    return Array.from(taskMap.values());
   }, [
+    formTasks,
     linkedTaskOverrides,
     primaryTaskId,
     selectTask,
@@ -149,6 +165,26 @@ export const WorkspaceEditor = ({
         ...current,
         [task.id]: !isLinked,
       }));
+
+      const currentTasks =
+        (watch('tasks') as TaskSearchItems[] | undefined) || [];
+      if (isLinked) {
+        const updated = currentTasks.filter((t) => t.id !== task.id);
+        setValue('tasks', updated, { shouldDirty: true });
+        if (task.id === watch('taskId')) {
+          const nextPrimary = updated[0]?.id || null;
+          setValue('taskId', nextPrimary, { shouldDirty: true });
+          handleSelectTask(updated[0] || null);
+        }
+      } else {
+        const exists = currentTasks.some((t) => t.id === task.id);
+        const updated = exists ? currentTasks : [...currentTasks, task];
+        setValue('tasks', updated, { shouldDirty: true });
+        if (!watch('taskId')) {
+          setValue('taskId', task.id, { shouldDirty: true });
+          handleSelectTask(task);
+        }
+      }
 
       if (!workspaceId) {
         if (!isLinked) {
@@ -174,6 +210,7 @@ export const WorkspaceEditor = ({
       onUnlinkTask,
       selectTask?.id,
       setValue,
+      watch,
       workspaceId,
     ],
   );

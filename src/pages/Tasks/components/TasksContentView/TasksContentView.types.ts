@@ -47,7 +47,11 @@ export interface TasksContentViewProps {
   tasks: TaskResponse[];
   filteredTasks: TaskResponse[];
   handleTaskClick: (task: TaskResponse) => void;
-  updateTask: (taskId: string, updates: TaskResponse) => Promise<void>;
+  updateTask: (
+    taskId: string,
+    updates: TaskResponse,
+    options?: { silent?: boolean },
+  ) => Promise<void>;
   setSearchTerm: (term: string) => void;
   isAIScheduleEnabled?: boolean;
   setIsAIScheduleEnabled?: (enabled: boolean) => void;

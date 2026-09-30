@@ -57,7 +57,11 @@ export const useTasksMutations = ({
       ) || [],
   });
 
-  const updateTask = async (id: string, task: TaskResponse) => {
+  const updateTask = async (
+    id: string,
+    task: TaskResponse,
+    options?: { silent?: boolean },
+  ) => {
     try {
       const {
         title,
@@ -107,10 +111,12 @@ export const useTasksMutations = ({
         dispatch(upsertTaskRedux(mapResponseToTask(data.updateTask)));
       }
 
-      onSuccess?.(
-        'Task updated successfully!',
-        'Your changes have been saved.',
-      );
+      if (!options?.silent) {
+        onSuccess?.(
+          'Task updated successfully!',
+          'Your changes have been saved.',
+        );
+      }
     } catch (error) {
       handleMutationError(error, 'Error al actualizar la tarea');
     }

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { addDays, addMinutes } from 'date-fns';
 import { Typography, Box, LinearProgress, Button } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -27,6 +28,7 @@ export const Tasks = ({
   setIsAIScheduleEnabled: setIsAIScheduleEnabledProp,
   onStartFocus,
 }: TasksProps) => {
+  const { t } = useTranslation();
   const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
   const {
@@ -89,18 +91,18 @@ export const Tasks = ({
   } = useMemo(() => {
     if (urlFilter === 'inbox') {
       return {
-        headerTitle: 'Bandeja de Entrada',
-        headerEyebrow: 'Bandeja de Entrada',
-        addButtonLabel: 'Añadir a Bandeja',
+        headerTitle: t('tasks.header.inboxTitle', 'Bandeja de Entrada'),
+        headerEyebrow: t('tasks.header.inboxEyebrow', 'Bandeja de Entrada'),
+        addButtonLabel: t('tasks.header.addToInbox', 'Añadir a Bandeja'),
         contextualInitialStart: null,
         showAIOrganize: false,
       };
     }
     if (urlFilter === 'today' || dateRange === 'today') {
       return {
-        headerTitle: 'Plan de Hoy',
-        headerEyebrow: 'Plan de Hoy',
-        addButtonLabel: 'Nueva Tarea para Hoy',
+        headerTitle: t('tasks.header.todayTitle', 'Plan de Hoy'),
+        headerEyebrow: t('tasks.header.todayEyebrow', 'Plan de Hoy'),
+        addButtonLabel: t('tasks.header.newTaskToday', 'Nueva Tarea para Hoy'),
         contextualInitialStart: new Date(),
         showAIOrganize: false,
       };
@@ -111,21 +113,24 @@ export const Tasks = ({
       dateRange === 'this_month'
     ) {
       return {
-        headerTitle: 'Próximas Tareas',
-        headerEyebrow: 'Próximas Tareas',
-        addButtonLabel: 'Nueva Tarea Próxima',
+        headerTitle: t('tasks.header.upcomingTitle', 'Próximas Tareas'),
+        headerEyebrow: t('tasks.header.upcomingEyebrow', 'Próximas Tareas'),
+        addButtonLabel: t(
+          'tasks.header.newUpcomingTask',
+          'Nueva Tarea Próxima',
+        ),
         contextualInitialStart: addDays(new Date(), 1),
         showAIOrganize: false,
       };
     }
     return {
-      headerTitle: 'Próximas Tareas',
-      headerEyebrow: 'Próximas Tareas',
-      addButtonLabel: 'Nueva Tarea Próxima',
+      headerTitle: t('tasks.header.upcomingTitle', 'Próximas Tareas'),
+      headerEyebrow: t('tasks.header.upcomingEyebrow', 'Próximas Tareas'),
+      addButtonLabel: t('tasks.header.newUpcomingTask', 'Nueva Tarea Próxima'),
       contextualInitialStart: null,
       showAIOrganize: true,
     };
-  }, [urlFilter, dateRange]);
+  }, [urlFilter, dateRange, t]);
 
   const onboardingSteps: Step[] = [
     {
@@ -227,7 +232,7 @@ export const Tasks = ({
                     px: 2,
                   }}
                 >
-                  AI Organize
+                  {t('tasks.header.aiOrganize', 'AI Organize')}
                 </Button>
               )}
             </TasksHeader>

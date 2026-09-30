@@ -247,4 +247,173 @@ export const colorPalette: {
     gradient: '#cbd5e1',
     label: 'Pastel Slate',
   },
+  {
+    color: 'pastel_matcha',
+    gradient: '#d9f99d',
+    label: 'Pastel Matcha',
+  },
+  {
+    color: 'pastel_creme',
+    gradient: '#fef9c3',
+    label: 'Pastel Crème',
+  },
+  {
+    color: 'pastel_almond',
+    gradient: '#ede0d4',
+    label: 'Pastel Almond',
+  },
+  {
+    color: 'pastel_sage',
+    gradient: '#c2d6c4',
+    label: 'Pastel Sage',
+  },
+  {
+    color: 'pastel_sand',
+    gradient: '#e8dcb8',
+    label: 'Pastel Sand',
+  },
+  {
+    color: 'pastel_ice',
+    gradient: '#e0f2fe',
+    label: 'Pastel Ice',
+  },
+
+  // Sólidos / Solid vibrant colors (compatible con Dark y Light mode)
+  {
+    color: 'solid_blue',
+    gradient: '#0284c7',
+    label: 'Azul Océano',
+  },
+  {
+    color: 'solid_navy',
+    gradient: '#1d4ed8',
+    label: 'Azul Marino',
+  },
+  {
+    color: 'solid_indigo',
+    gradient: '#4338ca',
+    label: 'Índigo Real',
+  },
+  {
+    color: 'solid_purple',
+    gradient: '#7e22ce',
+    label: 'Púrpura Imperial',
+  },
+  {
+    color: 'solid_plum',
+    gradient: '#581c87',
+    label: 'Ciruela',
+  },
+  {
+    color: 'solid_ruby',
+    gradient: '#e11d48',
+    label: 'Rubí',
+  },
+  {
+    color: 'solid_crimson',
+    gradient: '#be185d',
+    label: 'Frambuesa',
+  },
+  {
+    color: 'solid_amber',
+    gradient: '#d97706',
+    label: 'Ámbar Cálido',
+  },
+  {
+    color: 'solid_emerald',
+    gradient: '#059669',
+    label: 'Esmeralda',
+  },
+  {
+    color: 'solid_forest',
+    gradient: '#15803d',
+    label: 'Verde Bosque',
+  },
+  {
+    color: 'solid_teal',
+    gradient: '#0f766e',
+    label: 'Cerceta / Teal',
+  },
+  {
+    color: 'solid_cyan',
+    gradient: '#0891b2',
+    label: 'Cian',
+  },
+  {
+    color: 'solid_terracotta',
+    gradient: '#c2410c',
+    label: 'Terracota Intenso',
+  },
+  {
+    color: 'solid_charcoal',
+    gradient: '#1e293b',
+    label: 'Carbón',
+  },
+  {
+    color: 'solid_slate',
+    gradient: '#334155',
+    label: 'Grafito',
+  },
+  {
+    color: 'solid_wine',
+    gradient: '#9f1239',
+    label: 'Borgoña / Vino',
+  },
+  {
+    color: 'solid_coffee',
+    gradient: '#78350f',
+    label: 'Café / Cuero',
+  },
 ];
+
+/**
+ * Calculates whether a color or gradient is dark to guarantee high-contrast text readability
+ */
+export const isColorDark = (colorStr?: string | null): boolean => {
+  if (!colorStr) return false;
+  const c = colorStr.trim().toLowerCase();
+  if (['none', 'transparent'].includes(c)) return false;
+
+  // Known dark presets
+  if (['midnight', 'obsidian', 'royal', 'blood'].includes(c)) return true;
+  if (
+    [
+      'solid_navy',
+      'solid_indigo',
+      'solid_purple',
+      'solid_plum',
+      'solid_ruby',
+      'solid_crimson',
+      'solid_forest',
+      'solid_teal',
+      'solid_charcoal',
+      'solid_slate',
+      'solid_wine',
+      'solid_coffee',
+      'solid_blue',
+      'solid_terracotta',
+      'solid_amber',
+    ].includes(c)
+  ) {
+    return true;
+  }
+
+  // If hex code is found anywhere
+  const hexMatch = c.match(/#([0-9a-f]{3,8})/i);
+  if (hexMatch) {
+    let hex = hexMatch[1];
+    if (hex.length === 3) {
+      hex = hex
+        .split('')
+        .map((x) => x + x)
+        .join('');
+    }
+    const r = parseInt(hex.slice(0, 2), 16) || 0;
+    const g = parseInt(hex.slice(2, 4), 16) || 0;
+    const b = parseInt(hex.slice(4, 6), 16) || 0;
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq < 145;
+  }
+
+  return false;
+};

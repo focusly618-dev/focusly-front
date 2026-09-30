@@ -35,16 +35,23 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+    event.preventDefault();
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (event?: React.SyntheticEvent) => {
+    event?.stopPropagation();
     setAnchorEl(null);
   };
 
-  const handleSelectLanguage = (code: SupportedLanguage) => {
+  const handleSelectLanguage = (
+    event: React.MouseEvent,
+    code: SupportedLanguage,
+  ) => {
+    event.stopPropagation();
+    event.preventDefault();
     changeLanguage(code);
-    handleClose();
+    setAnchorEl(null);
   };
 
   const currentLang =
@@ -74,7 +81,19 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <Menu
         anchorEl={anchorEl}
         open={open}
-        onClose={handleClose}
+        onClose={(e: unknown) => {
+          if (
+            e &&
+            typeof e === 'object' &&
+            'stopPropagation' in e &&
+            typeof (e as { stopPropagation: unknown }).stopPropagation ===
+              'function'
+          ) {
+            (e as { stopPropagation: () => void }).stopPropagation();
+          }
+          handleClose();
+        }}
+        onClick={(e) => e.stopPropagation()}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         slotProps={{
@@ -88,11 +107,9 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           <MenuItem
             key={option.code}
             selected={i18n.language === option.code}
-            onClick={() => handleSelectLanguage(option.code)}
+            onClick={(e) => handleSelectLanguage(e, option.code)}
           >
-            <ListItemIcon sx={menuItemIconSx}>
-              {option.flag}
-            </ListItemIcon>
+            <ListItemIcon sx={menuItemIconSx}>{option.flag}</ListItemIcon>
             <ListItemText
               primary={option.nativeLabel}
               primaryTypographyProps={{

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Button,
@@ -24,6 +25,7 @@ export const TaskActions = ({
   disabled,
   onClose,
 }: TaskActionsProps) => {
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
 
@@ -82,7 +84,7 @@ export const TaskActions = ({
                 },
               }}
             >
-              Mejorar con IA
+              {t('tasks.createProjectTaskModal.aiBreakdown', 'Mejorar con IA')}
             </Button>
             <Menu
               anchorEl={anchorEl}
@@ -93,20 +95,28 @@ export const TaskActions = ({
               }}
             >
               <MenuItem onClick={() => handleOptionClick('subtasks')}>
-                📋 Desglosar subtareas
+                📋{' '}
+                {t(
+                  'tasks.createProjectTaskModal.subtasks',
+                  'Desglosar subtareas',
+                )}
               </MenuItem>
               <MenuItem onClick={() => handleOptionClick('estimate')}>
-                ⏱️ Estimar tiempo
+                ⏱️ {t('tasks.properties.estimatedDuration', 'Estimar tiempo')}
               </MenuItem>
               <MenuItem onClick={() => handleOptionClick('priority')}>
-                🎯 Sugerir prioridad
+                🎯 {t('tasks.properties.priority', 'Sugerir prioridad')}
               </MenuItem>
               <Divider sx={{ my: 0.5 }} />
               <MenuItem
                 onClick={() => handleOptionClick('all')}
                 sx={{ fontWeight: 700, color: '#008767' }}
               >
-                ✨ Aplicar todas las mejoras
+                ✨{' '}
+                {t(
+                  'tasks.createProjectTaskModal.aiBreakdown',
+                  'Aplicar todas las mejoras',
+                )}
               </MenuItem>
             </Menu>
           </>
@@ -129,7 +139,7 @@ export const TaskActions = ({
             },
           }}
         >
-          Cancelar
+          {t('common.cancel', 'Cancelar')}
         </Button>
 
         {isReadOnly || (initialTask && !isDirty) ? (
@@ -157,9 +167,9 @@ export const TaskActions = ({
             {loadingSave ? (
               <CircularProgress size={20} color="inherit" />
             ) : initialTask && initialTask.user_id !== 'google-user' ? (
-              'Guardar Cambios'
+              t('tasks.createProjectTaskModal.saveChanges', 'Guardar Cambios')
             ) : (
-              'Crear Tarea'
+              t('tasks.createProjectTaskModal.createTask', 'Crear Tarea')
             )}
           </Button>
         )}

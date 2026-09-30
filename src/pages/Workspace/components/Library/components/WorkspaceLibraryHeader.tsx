@@ -14,14 +14,15 @@ import {
   Tooltip,
   Tabs,
   Tab,
+  alpha,
+  lighten,
+  darken,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Close as CloseIcon,
-  Tune as TuneIcon,
   GridViewOutlined as GridViewIcon,
   FormatListBulleted as FormatListBulletedIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
   SortByAlpha as SortByAlphaIcon,
   AccessTime as AccessTimeIcon,
   Description as DescriptionIcon,
@@ -140,9 +141,6 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
     setFilterMenuAnchor(null);
   };
 
-  const isProjectFilterActive =
-    projectSortBy !== 'recent' || projectColorFilter !== 'all';
-
   return (
     <>
       <LibraryHeader sx={{ mb: isInsideFolder ? 3 : 2 }}>
@@ -186,8 +184,8 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
               <StyledTextField
                 placeholder={
                   activeProjectTab === 'projects'
-                    ? 'Buscar proyectos...'
-                    : 'Buscar tareas...'
+                    ? t('projects.searchProjects', 'Buscar proyectos...')
+                    : t('projects.searchTasks', 'Buscar tareas...')
                 }
                 value={folderSearchTerm}
                 onChange={(e) => onFolderSearchChange(e.target.value)}
@@ -280,34 +278,34 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
               >
                 <Tab
                   value="projects"
-                  label="Ver proyectos"
+                  label={t('projects.tabs.viewProjects', 'Ver proyectos')}
                   icon={<GridViewIcon sx={{ fontSize: 16 }} />}
                   iconPosition="start"
                 />
                 <Tab
                   value="tasks"
-                  label="Ver tareas de los proyectos"
+                  label={t(
+                    'projects.tabs.viewTasks',
+                    'Ver tareas de los proyectos',
+                  )}
                   icon={<FormatListBulletedIcon sx={{ fontSize: 16 }} />}
                   iconPosition="start"
                 />
               </Tabs>
-              <Tooltip title="Filtrar y Ordenar">
+
+              <Tooltip title={t('projects.sort.title', 'Filtrar y Ordenar')}>
                 <IconButton
                   size="small"
                   onClick={handleOpenFilterMenu}
                   sx={{
                     border: `1px solid ${
-                      isProjectFilterActive
-                        ? '#008767'
-                        : isDark
-                          ? 'rgba(255,255,255,0.12)'
-                          : '#E5E7EB'
+                      isDark ? 'rgba(255,255,255,0.12)' : '#E5E7EB'
                     }`,
                     borderRadius: '8px',
                     p: 0.5,
                     width: '38px',
                     height: '38px',
-                    color: isProjectFilterActive ? '#008767' : 'text.secondary',
+                    color: filterMenuAnchor ? 'primary.main' : 'text.secondary',
                     bgcolor: isDark ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
                     transition: 'all 0.2s',
                     '&:hover': {
@@ -315,7 +313,7 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                     },
                   }}
                 >
-                  <TuneIcon sx={{ fontSize: 18 }} />
+                  <SortByAlphaIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
 
@@ -415,7 +413,9 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                   <ListItemIcon sx={{ minWidth: '32px !important' }}>
                     <AccessTimeIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary="Recently Updated" />
+                  <ListItemText
+                    primary={t('projects.sort.recent', 'Recently Updated')}
+                  />
                   {projectSortBy === 'recent' && (
                     <CheckIcon fontSize="small" sx={{ fontSize: 16 }} />
                   )}
@@ -432,7 +432,9 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                   <ListItemIcon sx={{ minWidth: '32px !important' }}>
                     <SortByAlphaIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary="Name (A to Z)" />
+                  <ListItemText
+                    primary={t('projects.sort.nameAsc', 'Name (A to Z)')}
+                  />
                   {projectSortBy === 'name-asc' && (
                     <CheckIcon fontSize="small" sx={{ fontSize: 16 }} />
                   )}
@@ -449,7 +451,9 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                   <ListItemIcon sx={{ minWidth: '32px !important' }}>
                     <DescriptionIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary="Most Notes" />
+                  <ListItemText
+                    primary={t('projects.sort.mostNotes', 'Most Notes')}
+                  />
                   {projectSortBy === 'notes-count' && (
                     <CheckIcon fontSize="small" sx={{ fontSize: 16 }} />
                   )}
@@ -470,7 +474,7 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                     fontSize: '11px',
                   }}
                 >
-                  Filter by Color
+                  {t('projects.sort.filterByColor', 'Filter by Color')}
                 </Typography>
 
                 <Box
@@ -526,14 +530,18 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
       </LibraryHeader>
 
       {/* ── Filter pills bar (below title row) ── */}
+      {/* ── Filter pills bar (below title row) ── */}
       {!isInsideFolder && (
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1.5,
+            gap: 1,
             mb: 3,
-            flexWrap: 'wrap',
+            overflowX: 'auto',
+            py: 0.5,
+            '&::-webkit-scrollbar': { display: 'none' },
+            scrollbarWidth: 'none',
           }}
         >
           <Typography
@@ -541,107 +549,259 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
             sx={{
               color: 'text.secondary',
               fontSize: '13px',
-              fontWeight: 500,
+              fontWeight: 600,
+              mr: 0.5,
+              flexShrink: 0,
             }}
           >
-            Filtrar por:
+            {t('projects.filterBy', 'Filtrar por:')}
           </Typography>
 
-          {/* Estado: Todos */}
-          <Button
-            size="small"
-            onClick={handleOpenFilterMenu}
-            endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 16 }} />}
-            sx={{
-              bgcolor: isDark ? 'rgba(0, 135, 103, 0.15)' : '#ECFDF5',
-              color: isDark ? '#34D399' : '#008767',
-              border: `1px solid ${
-                isDark ? 'rgba(0, 135, 103, 0.3)' : '#A7F3D0'
-              }`,
-              borderRadius: '20px',
-              textTransform: 'none',
-              fontWeight: 600,
-              fontSize: '12.5px',
-              px: 1.5,
-              height: '30px',
-              '&:hover': {
-                bgcolor: isDark ? 'rgba(0, 135, 103, 0.25)' : '#D1FAE5',
-              },
-            }}
-          >
-            Estado:{' '}
-            {projectColorFilter !== 'all' ? projectColorFilter : 'Todos'}
-          </Button>
+          {PROJECT_COLORS.map((c) => {
+            const isSelected = projectColorFilter === c.value;
+            const chipColor =
+              c.value === 'all' ? theme.palette.primary.main : c.value;
 
-          {/* Fecha de Modificación */}
-          <Button
-            size="small"
-            onClick={handleOpenFilterMenu}
-            endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 16 }} />}
-            sx={{
-              bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
-              color: 'text.secondary',
-              border: `1px solid ${
-                isDark ? 'rgba(255, 255, 255, 0.08)' : '#E5E7EB'
-              }`,
-              borderRadius: '20px',
-              textTransform: 'none',
-              fontWeight: 500,
-              fontSize: '12.5px',
-              px: 1.5,
-              height: '30px',
-              '&:hover': {
-                bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F9FAFB',
-              },
-            }}
-          >
-            Fecha de Modificación
-          </Button>
-
-          {/* Etiquetas */}
-          <Button
-            size="small"
-            onClick={handleOpenFilterMenu}
-            endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 16 }} />}
-            sx={{
-              bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
-              color: 'text.secondary',
-              border: `1px solid ${
-                isDark ? 'rgba(255, 255, 255, 0.08)' : '#E5E7EB'
-              }`,
-              borderRadius: '20px',
-              textTransform: 'none',
-              fontWeight: 500,
-              fontSize: '12.5px',
-              px: 1.5,
-              height: '30px',
-              '&:hover': {
-                bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F9FAFB',
-              },
-            }}
-          >
-            Etiquetas
-          </Button>
+            return (
+              <Box
+                key={c.value}
+                onClick={() => onProjectColorFilterChange(c.value)}
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  px: 1.5,
+                  py: 0.45,
+                  height: '30px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: isSelected
+                    ? isDark
+                      ? lighten(chipColor, 0.25)
+                      : chipColor
+                    : isDark
+                      ? 'rgba(255, 255, 255, 0.08)'
+                      : '#E5E7EB',
+                  bgcolor: isSelected
+                    ? alpha(chipColor, isDark ? 0.22 : 0.12)
+                    : isDark
+                      ? 'rgba(255, 255, 255, 0.04)'
+                      : '#FFFFFF',
+                  color: isSelected
+                    ? isDark
+                      ? lighten(chipColor, 0.4)
+                      : darken(chipColor, 0.15)
+                    : 'text.secondary',
+                  fontSize: '12px',
+                  fontWeight: isSelected ? 700 : 500,
+                  transition: 'all 0.18s ease',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
+                  boxShadow: isSelected
+                    ? `0 2px 6px ${alpha(chipColor, 0.25)}`
+                    : 'none',
+                  '&:hover': {
+                    bgcolor: isSelected
+                      ? alpha(chipColor, isDark ? 0.28 : 0.18)
+                      : isDark
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : '#F9FAFB',
+                    borderColor: isSelected
+                      ? isDark
+                        ? lighten(chipColor, 0.35)
+                        : chipColor
+                      : isDark
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : '#D1D5DB',
+                    color: isDark ? '#ffffff' : '#0f172a',
+                  },
+                }}
+              >
+                {c.value === 'all' ? (
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      background:
+                        'linear-gradient(135deg, #7c3aed, #3b82f6, #10b981, #f59e0b, #f43f5e)',
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: c.value,
+                      boxShadow: `0 0 0 1.5px ${alpha(c.value, 0.3)}`,
+                    }}
+                  />
+                )}
+                {c.name === 'All' ? t('common.all', 'Todos') : c.name}
+              </Box>
+            );
+          })}
 
           {/* Limpiar filtros */}
-          <Button
-            size="small"
-            onClick={() => {
-              onProjectSortChange('recent');
-              onProjectColorFilterChange('all');
-              onClearFolderSearch();
-            }}
+          {projectColorFilter !== 'all' && (
+            <Button
+              size="small"
+              onClick={() => {
+                onProjectSortChange('recent');
+                onProjectColorFilterChange('all');
+                onClearFolderSearch();
+              }}
+              sx={{
+                color: 'text.disabled',
+                textTransform: 'none',
+                fontSize: '12px',
+                fontWeight: 600,
+                ml: 0.5,
+                p: '3px 8px',
+                borderRadius: '8px',
+                minWidth: 'auto',
+                flexShrink: 0,
+                '&:hover': {
+                  color: 'error.main',
+                  bgcolor: alpha('#ef4444', 0.08),
+                },
+              }}
+            >
+              {t('projects.sort.resetFilters', 'Limpiar')}
+            </Button>
+          )}
+        </Box>
+      )}
+
+      {/* ── Note filter chips inside folder ── */}
+      {isInsideFolder && onNoteFilterChange && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            mb: 3,
+            overflowX: 'auto',
+            py: 0.5,
+            '&::-webkit-scrollbar': { display: 'none' },
+            scrollbarWidth: 'none',
+          }}
+        >
+          <Typography
+            variant="body2"
             sx={{
-              color: 'text.disabled',
-              textTransform: 'none',
-              fontSize: '12.5px',
-              p: 0,
-              minWidth: 'auto',
-              '&:hover': { color: 'text.primary', bgcolor: 'transparent' },
+              color: 'text.secondary',
+              fontSize: '13px',
+              fontWeight: 600,
+              mr: 0.5,
+              flexShrink: 0,
             }}
           >
-            Limpiar filtros
-          </Button>
+            {t('projects.filterBy', 'Filtrar por:')}
+          </Typography>
+
+          {[
+            {
+              id: 'all' as const,
+              label: t('common.all', 'Todos'),
+              dot: '#6366f1',
+            },
+            {
+              id: 'has-cover' as const,
+              label: t(
+                'workspaceLibrary.filters.hasCover',
+                'Con portada / color',
+              ),
+              dot: '#ec4899',
+            },
+            {
+              id: 'linked-task' as const,
+              label: t(
+                'workspaceLibrary.filters.linkedTask',
+                'Con tareas vinculadas',
+              ),
+              dot: '#10b981',
+            },
+          ].map((item) => {
+            const isSelected = noteFilterType === item.id;
+            return (
+              <Box
+                key={item.id}
+                onClick={() => onNoteFilterChange(item.id)}
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  px: 1.5,
+                  py: 0.45,
+                  height: '30px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: isSelected
+                    ? 'primary.main'
+                    : isDark
+                      ? 'rgba(255, 255, 255, 0.08)'
+                      : '#E5E7EB',
+                  bgcolor: isSelected
+                    ? alpha(theme.palette.primary.main, isDark ? 0.22 : 0.12)
+                    : isDark
+                      ? 'rgba(255, 255, 255, 0.04)'
+                      : '#FFFFFF',
+                  color: isSelected ? 'primary.main' : 'text.secondary',
+                  fontSize: '12px',
+                  fontWeight: isSelected ? 700 : 500,
+                  transition: 'all 0.18s ease',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
+                  '&:hover': {
+                    bgcolor: isSelected
+                      ? alpha(theme.palette.primary.main, isDark ? 0.28 : 0.18)
+                      : isDark
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : '#F9FAFB',
+                    color: isDark ? '#ffffff' : '#0f172a',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    bgcolor: item.dot,
+                  }}
+                />
+                {item.label}
+              </Box>
+            );
+          })}
+
+          {noteFilterType !== 'all' && (
+            <Button
+              size="small"
+              onClick={() => onNoteFilterChange('all')}
+              sx={{
+                color: 'text.disabled',
+                textTransform: 'none',
+                fontSize: '12px',
+                fontWeight: 600,
+                ml: 0.5,
+                p: '3px 8px',
+                borderRadius: '8px',
+                minWidth: 'auto',
+                flexShrink: 0,
+                '&:hover': {
+                  color: 'error.main',
+                  bgcolor: alpha('#ef4444', 0.08),
+                },
+              }}
+            >
+              {t('projects.sort.resetFilters', 'Limpiar')}
+            </Button>
+          )}
         </Box>
       )}
     </>

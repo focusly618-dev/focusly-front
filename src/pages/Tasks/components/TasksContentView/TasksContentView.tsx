@@ -11,6 +11,7 @@ import {
   CircularProgress,
   IconButton,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   CheckBox as CheckBoxIcon,
   Delete as DeleteIcon,
@@ -56,6 +57,7 @@ export const TasksContentView = ({
   isAIScheduleEnabled,
   onStartFocus,
 }: TasksContentViewProps) => {
+  const { t } = useTranslation();
   const {
     selectedTaskIds,
     isConfirmOpen,
@@ -113,14 +115,20 @@ export const TasksContentView = ({
       ) : !isListView && showEmptyStateTasks ? (
         <EmptyState
           icon={<CheckBoxIcon />}
-          title="No tasks yet"
-          description="Plan your day and boost your productivity. Create your first task to see it here."
+          title={t('tasks.empty.noTasksTitle', 'No tasks yet')}
+          description={t(
+            'tasks.empty.noTasksDesc',
+            'Plan your day and boost your productivity. Create your first task to see it here.',
+          )}
         />
       ) : !isListView && showEmptyStateFiltered ? (
         <EmptyState
-          title="No tasks match your search"
-          description="Try a different keyword or filter to find what you're looking for, or create a new task above."
-          actionText="Clear all filters"
+          title={t('tasks.empty.noMatchTitle', 'No tasks match your search')}
+          description={t(
+            'tasks.empty.noMatchDesc',
+            "Try a different keyword or filter to find what you're looking for, or create a new task above.",
+          )}
+          actionText={t('tasks.empty.clearFilters', 'Clear all filters')}
           onAction={() => setSearchTerm('')}
         />
       ) : viewMode === 'workload' ? (
@@ -184,8 +192,11 @@ export const TasksContentView = ({
               >
                 <EmptyState
                   icon={<CheckBoxIcon />}
-                  title="No hay tareas aún"
-                  description="Planifica tu día y mejora tu productividad. Crea tu primera tarea aquí."
+                  title={t('tasks.empty.noTasksTitle', 'No hay tareas aún')}
+                  description={t(
+                    'tasks.empty.noTasksDesc',
+                    'Planifica tu día y mejora tu productividad. Crea tu primera tarea aquí.',
+                  )}
                 />
               </Box>
             ) : showEmptyStateFiltered ? (
@@ -199,9 +210,15 @@ export const TasksContentView = ({
                 }}
               >
                 <EmptyState
-                  title="No hay tareas que coincidan con la búsqueda"
-                  description="Prueba con otra palabra clave o limpia los filtros para ver tus tareas."
-                  actionText="Limpiar filtros"
+                  title={t(
+                    'tasks.empty.noMatchTitle',
+                    'No hay tareas que coincidan con la búsqueda',
+                  )}
+                  description={t(
+                    'tasks.empty.noMatchDesc',
+                    'Prueba con otra palabra clave o limpia los filtros para ver tus tareas.',
+                  )}
+                  actionText={t('tasks.empty.clearFilters', 'Limpiar filtros')}
                   onAction={() => setSearchTerm('')}
                 />
               </Box>
@@ -287,14 +304,26 @@ export const TasksContentView = ({
                       }}
                     />
                   </TableHeaderCell>
-                  <TableHeaderCell>NOMBRE DE LA TAREA</TableHeaderCell>
-                  <TableHeaderCell>SUBTAREAS</TableHeaderCell>
-                  <TableHeaderCell>PRIORIDAD</TableHeaderCell>
-                  <TableHeaderCell>FECHA LÍMITE</TableHeaderCell>
-                  <TableHeaderCell>ESTIMADO</TableHeaderCell>
-                  <TableHeaderCell>REAL</TableHeaderCell>
+                  <TableHeaderCell>
+                    {t('tasks.columns.taskName', 'NOMBRE DE LA TAREA')}
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    {t('tasks.columns.subtasks', 'SUBTAREAS')}
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    {t('tasks.columns.priority', 'PRIORIDAD')}
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    {t('tasks.columns.deadline', 'FECHA LÍMITE')}
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    {t('tasks.columns.estimated', 'ESTIMADO')}
+                  </TableHeaderCell>
+                  <TableHeaderCell>
+                    {t('tasks.columns.real', 'REAL')}
+                  </TableHeaderCell>
                   <TableHeaderCell sx={{ justifyContent: 'center' }}>
-                    ACCIONES
+                    {t('tasks.columns.actions', 'ACCIONES')}
                   </TableHeaderCell>
                 </TableHeader>
                 <TableBodyContainer>
@@ -322,8 +351,14 @@ export const TasksContentView = ({
                       }}
                     >
                       <EmptyState
-                        title={`No hay tareas en ${activeTab.label}`}
-                        description="Mueve una tarea aquí o cambia de pestaña para ver tareas."
+                        title={t('tasks.empty.noTasksInTab', {
+                          tab: activeTab.label,
+                          defaultValue: `No hay tareas en ${activeTab.label}`,
+                        })}
+                        description={t(
+                          'tasks.empty.noTasksInTabDesc',
+                          'Mueve una tarea aquí o cambia de pestaña para ver tareas.',
+                        )}
                       />
                     </Box>
                   )}
@@ -358,7 +393,7 @@ export const TasksContentView = ({
                 }}
               >
                 Mostrando {paginatedTasks.length} de {displayedTasks.length}{' '}
-                tareas próximas en total
+                {t('tasks.header.upcomingTitle', 'tareas próximas en total')}
               </Typography>
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -476,10 +511,15 @@ export const TasksContentView = ({
               variant="body2"
               sx={{ fontWeight: 700, color: 'text.primary' }}
             >
-              {selectedTaskIds.size}{' '}
               {selectedTaskIds.size === 1
-                ? 'tarea seleccionada'
-                : 'tareas seleccionadas'}
+                ? t('tasks.bulk.selected_one', {
+                    count: selectedTaskIds.size,
+                    defaultValue: '1 tarea seleccionada',
+                  })
+                : t('tasks.bulk.selected_other', {
+                    count: selectedTaskIds.size,
+                    defaultValue: `${selectedTaskIds.size} tareas seleccionadas`,
+                  })}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -495,7 +535,7 @@ export const TasksContentView = ({
                 '&:hover': { color: 'text.primary' },
               }}
             >
-              Cancelar
+              {t('tasks.bulk.cancel', 'Cancelar')}
             </Button>
             <Button
               variant="contained"
@@ -510,7 +550,7 @@ export const TasksContentView = ({
                 px: 2,
               }}
             >
-              Eliminar seleccionadas
+              {t('tasks.bulk.deleteSelected', 'Eliminar seleccionadas')}
             </Button>
           </Box>
         </FloatingActionBar>
@@ -532,15 +572,20 @@ export const TasksContentView = ({
         }}
       >
         <DialogTitle sx={{ fontWeight: 700, px: 2, py: 1 }}>
-          Confirmar eliminación
+          {t('tasks.bulk.confirmTitle', 'Confirmar eliminación')}
         </DialogTitle>
         <DialogContent sx={{ px: 2, py: 1 }}>
           <DialogContentText sx={{ color: 'text.secondary', fontSize: '14px' }}>
-            ¿Estás seguro de que deseas eliminar {selectedTaskIds.size}{' '}
             {selectedTaskIds.size === 1
-              ? 'tarea seleccionada'
-              : 'tareas seleccionadas'}
-            ? Esta acción no se puede deshacer.
+              ? t('tasks.bulk.confirmDesc_one', {
+                  count: selectedTaskIds.size,
+                  defaultValue:
+                    '¿Estás seguro de que deseas eliminar 1 tarea seleccionada? Esta acción no se puede deshacer.',
+                })
+              : t('tasks.bulk.confirmDesc_other', {
+                  count: selectedTaskIds.size,
+                  defaultValue: `¿Estás seguro de que deseas eliminar ${selectedTaskIds.size} tareas seleccionadas? Esta acción no se puede deshacer.`,
+                })}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 2, py: 1.5, gap: 1 }}>
@@ -553,7 +598,7 @@ export const TasksContentView = ({
               color: 'text.secondary',
             }}
           >
-            Cancelar
+            {t('tasks.bulk.cancel', 'Cancelar')}
           </Button>
           <Button
             onClick={(e) => handleConfirmDelete(e)}
@@ -572,7 +617,7 @@ export const TasksContentView = ({
             {isDeleting ? (
               <CircularProgress size={18} color="inherit" />
             ) : (
-              'Eliminar'
+              t('tasks.bulk.deleteButton', 'Eliminar')
             )}
           </Button>
         </DialogActions>

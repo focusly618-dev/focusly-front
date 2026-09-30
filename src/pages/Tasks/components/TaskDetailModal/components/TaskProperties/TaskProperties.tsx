@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Box,
@@ -12,6 +13,7 @@ import {
   ListItemText,
   IconButton,
   Tooltip,
+  alpha,
 } from '@mui/material';
 import {
   RadioButtonUnchecked as TodoIcon,
@@ -56,6 +58,7 @@ import {
   formatDuration,
   parseDuration,
   isTaskCustomColor,
+  isColorDark,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 import {
@@ -200,6 +203,7 @@ export const TaskProperties = ({
   deadline,
   isLoadingDetail,
 }: TaskPropertiesProps) => {
+  const { t } = useTranslation();
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(
     null,
@@ -213,6 +217,9 @@ export const TaskProperties = ({
     value: string;
     name: string;
   } | null>(null);
+  const [colorCategoryFilter, setColorCategoryFilter] = useState<
+    'all' | 'pastel' | 'solid'
+  >('all');
 
   const [durationSuggestions, setDurationSuggestions] = useState<string[]>([]);
   const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(
@@ -239,6 +246,47 @@ export const TaskProperties = ({
   const hasDifferentDueDate =
     deadlineDate && currentDate && !isSameDay(deadlineDate, currentDate);
 
+  const getStatusLabel = (s: string) => {
+    switch (s) {
+      case 'Todo':
+        return t('tasks.status.todo', 'Por hacer');
+      case 'Planning':
+        return t('tasks.status.planning', 'Planificación');
+      case 'Scheduled':
+        return t('tasks.status.scheduled', 'Agendada');
+      case 'Review':
+        return t('tasks.status.review', 'En revisión');
+      case 'Pending':
+        return t('tasks.status.pending', 'Pendiente');
+      case 'On Hold':
+        return t('tasks.status.onHold', 'En espera');
+      case 'Done':
+        return t('tasks.status.done', 'Completada');
+      case 'Backlog':
+        return t('tasks.status.backlog', 'Backlog');
+      case 'Archived':
+        return t('tasks.status.archived', 'Archivada');
+      default:
+        return s || t('tasks.status.todo', 'Por hacer');
+    }
+  };
+
+  const getPriorityLabel = (p: string) => {
+    switch (p) {
+      case 'High':
+        return t('tasks.priority.high', 'Alta');
+      case 'Med':
+      case 'Medium':
+        return t('tasks.priority.medium', 'Media');
+      case 'Low':
+        return t('tasks.priority.low', 'Baja');
+      case 'No priority':
+        return t('tasks.priority.none', 'Sin prioridad');
+      default:
+        return p || t('tasks.priority.medium', 'Media');
+    }
+  };
+
   const currentStatusConfig = STATUS_CONFIG[status] || {
     label: status || 'Por hacer',
     dotColor: '#008767',
@@ -254,7 +302,7 @@ export const TaskProperties = ({
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
             <TodoIcon />
-            <Typography>Estado</Typography>
+            <Typography>{t('tasks.properties.status', 'Estado')}</Typography>
           </Box>
           <Box
             onClick={(e) => isOwner && setStatusAnchor(e.currentTarget)}
@@ -269,7 +317,7 @@ export const TaskProperties = ({
               }}
             />
             <Typography sx={{ fontSize: '13px', fontWeight: 600 }}>
-              {currentStatusConfig.label}
+              {getStatusLabel(status)}
             </Typography>
             <ChevronDownIcon
               sx={{ fontSize: 16, color: 'text.secondary', ml: -0.25 }}
@@ -281,7 +329,9 @@ export const TaskProperties = ({
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
             <PriorityIcon />
-            <Typography>Prioridad</Typography>
+            <Typography>
+              {t('tasks.properties.priority', 'Prioridad')}
+            </Typography>
           </Box>
           <Box
             onClick={(e) => isOwner && setPriorityAnchor(e.currentTarget)}
@@ -307,7 +357,7 @@ export const TaskProperties = ({
             <Typography
               sx={{ fontSize: '13px', fontWeight: 600, color: 'inherit' }}
             >
-              {currentPriorityConfig.label}
+              {getPriorityLabel(priority)}
             </Typography>
             <ChevronDownIcon
               sx={{ fontSize: 16, color: 'inherit', ml: -0.25 }}
@@ -319,7 +369,9 @@ export const TaskProperties = ({
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
             <CategoryIcon />
-            <Typography>Categoría</Typography>
+            <Typography>
+              {t('tasks.properties.category', 'Categoría')}
+            </Typography>
           </Box>
           <Box
             onClick={(e) => isOwner && setCategoryAnchor(e.currentTarget)}
@@ -338,7 +390,7 @@ export const TaskProperties = ({
         <Box sx={propertyRowSx}>
           <Box sx={propertyLabelSx}>
             <TagsIcon />
-            <Typography>Etiquetas</Typography>
+            <Typography>{t('tasks.properties.tags', 'Etiquetas')}</Typography>
           </Box>
           <Box
             sx={{
@@ -413,7 +465,10 @@ export const TaskProperties = ({
                       }}
                       size="small"
                       sx={addTagInputSx}
-                      placeholder="#etiqueta"
+                      placeholder={t(
+                        'tasks.properties.tagPlaceholder',
+                        '#etiqueta',
+                      )}
                     />
                   </Box>
                 ) : (
@@ -426,7 +481,7 @@ export const TaskProperties = ({
                   >
                     <Chip
                       icon={<AddIcon sx={{ fontSize: 13 }} />}
-                      label="Añadir"
+                      label={t('tasks.properties.addTag', 'Añadir')}
                       onClick={
                         isLoadingDetail ? undefined : () => setIsAddingTag(true)
                       }
@@ -465,7 +520,7 @@ export const TaskProperties = ({
             mb: 1.25,
           }}
         >
-          Planificación y Tiempos
+          {t('tasks.properties.scheduleAndTimes', 'Planificación y Tiempos')}
         </Typography>
 
         <Box sx={scheduleGridSx}>
@@ -481,7 +536,7 @@ export const TaskProperties = ({
                 display: 'block',
               }}
             >
-              Fecha Planificada
+              {t('tasks.properties.plannedDate', 'Fecha Planificada')}
             </Typography>
             <Box sx={{ position: 'relative' }}>
               <Box
@@ -499,7 +554,7 @@ export const TaskProperties = ({
                   >
                     {currentDate
                       ? format(currentDate, "d 'de' MMM, yyyy", { locale: es })
-                      : 'Sin fecha (Inbox)'}
+                      : t('tasks.dates.noDateInbox', 'Sin fecha (Inbox)')}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -572,7 +627,7 @@ export const TaskProperties = ({
                 display: 'block',
               }}
             >
-              Duración Estimada
+              {t('tasks.properties.estimatedDuration', 'Duración Estimada')}
             </Typography>
             <Box
               sx={{
@@ -610,7 +665,10 @@ export const TaskProperties = ({
                     );
                   }}
                   onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
-                  placeholder="4 horas (o 2h 30m)"
+                  placeholder={t(
+                    'tasks.properties.durationPlaceholder',
+                    '4 horas (o 2h 30m)',
+                  )}
                   InputProps={{
                     disableUnderline: true,
                     readOnly: !isOwner,
@@ -679,7 +737,7 @@ export const TaskProperties = ({
                 display: 'block',
               }}
             >
-              Hora de Inicio
+              {t('tasks.properties.startTime', 'Hora de Inicio')}
             </Typography>
             <Box sx={{ position: 'relative' }}>
               <Box
@@ -742,7 +800,7 @@ export const TaskProperties = ({
                 display: 'block',
               }}
             >
-              Duración Real (Tracked)
+              {t('tasks.properties.trackedDuration', 'Duración Real (Tracked)')}
             </Typography>
             <Box
               onClick={(e) => {
@@ -790,7 +848,10 @@ export const TaskProperties = ({
             <Typography
               sx={{ fontSize: '13px', fontWeight: 600, color: '#008767' }}
             >
-              Ventana Planificada de Tarea
+              {t(
+                'tasks.properties.plannedWindow',
+                'Ventana Planificada de Tarea',
+              )}
             </Typography>
           </Box>
           <Typography
@@ -824,7 +885,7 @@ export const TaskProperties = ({
               fontStyle: 'italic',
             }}
           >
-            Creado el{' '}
+            {t('tasks.properties.createdAt', 'Creado el')}{' '}
             {new Date(createdAt).toLocaleDateString(undefined, {
               month: 'short',
               day: 'numeric',
@@ -1042,7 +1103,7 @@ export const TaskProperties = ({
               letterSpacing: '0.05em',
             }}
           >
-            Color de fondo
+            {t('tasks.properties.backgroundColor', 'Color de fondo')}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {isTaskCustomColor(color) && (
@@ -1060,7 +1121,7 @@ export const TaskProperties = ({
                   '&:hover': { textDecoration: 'underline' },
                 }}
               >
-                Quitar fondo
+                {t('tasks.properties.removeBackground', 'Quitar fondo')}
               </Typography>
             )}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
@@ -1085,54 +1146,274 @@ export const TaskProperties = ({
               >
                 {hoveredColor?.name ||
                   (isTaskCustomColor(color)
-                    ? getColorName(color) || 'Personalizado'
-                    : 'Sin fondo')}
+                    ? getColorName(color) ||
+                      t('tasks.properties.custom', 'Personalizado')
+                    : t('tasks.properties.noBackground', 'Sin fondo'))}
               </Typography>
             </Box>
           </Box>
         </Box>
 
-        <Box sx={colorGridSx}>
-          {PASTEL_COLORS.map((item) => {
-            const isSelected =
-              color?.toUpperCase() === item.value.toUpperCase();
+        {/* Category Classification Chips */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.75,
+            mb: 1.5,
+            px: 0.5,
+          }}
+        >
+          {[
+            {
+              id: 'all' as const,
+              label: 'Todos',
+              count: 45,
+              dot: 'linear-gradient(135deg, #BAE6FD, #FBCFE8, #A7F3D0)',
+            },
+            {
+              id: 'pastel' as const,
+              label: 'Pasteles',
+              count: 25,
+              dot: '#BAE6FD',
+            },
+            {
+              id: 'solid' as const,
+              label: 'Sólidos',
+              count: 20,
+              dot: '#1D4ED8',
+            },
+          ].map((cat) => {
+            const isActive = colorCategoryFilter === cat.id;
             return (
-              <Tooltip key={item.value} title={item.name} arrow placement="top">
+              <Box
+                key={cat.id}
+                onClick={() => setColorCategoryFilter(cat.id)}
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.6,
+                  px: 1,
+                  py: 0.4,
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: isActive ? 'primary.main' : 'divider',
+                  bgcolor: (theme) =>
+                    isActive
+                      ? alpha(theme.palette.primary.main, 0.12)
+                      : theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(0,0,0,0.03)',
+                  color: isActive ? 'primary.main' : 'text.secondary',
+                  fontSize: '11px',
+                  fontWeight: isActive ? 700 : 500,
+                  transition: 'all 0.15s ease',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
+                  '&:hover': {
+                    bgcolor: (theme) =>
+                      isActive
+                        ? alpha(theme.palette.primary.main, 0.18)
+                        : theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'rgba(0,0,0,0.06)',
+                    color: 'text.primary',
+                  },
+                }}
+              >
                 <Box
-                  onClick={() => {
-                    setColor(item.value);
-                    setColorAnchor(null);
-                    setHoveredColor(null);
-                  }}
-                  onMouseEnter={() => setHoveredColor(item)}
-                  onMouseLeave={() => setHoveredColor(null)}
                   sx={{
-                    width: 32,
-                    height: 32,
+                    width: 8,
+                    height: 8,
                     borderRadius: '50%',
-                    bgcolor: item.value,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: isSelected
-                      ? '2px solid'
-                      : '1.5px solid rgba(0,0,0,0.1)',
-                    borderColor: isSelected
-                      ? 'text.primary'
-                      : 'rgba(0,0,0,0.1)',
-                    boxShadow: isSelected
-                      ? '0 0 0 2px rgba(0,0,0,0.1)'
-                      : '0 1px 2px rgba(0,0,0,0.05)',
-                    transition: 'all 0.15s ease',
-                    '&:hover': {
-                      transform: 'scale(1.15)',
-                    },
+                    background: cat.dot,
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
                   }}
                 />
-              </Tooltip>
+                {cat.label} ({cat.count})
+              </Box>
             );
           })}
+        </Box>
+
+        <Box
+          sx={{
+            maxHeight: 330,
+            overflowY: 'auto',
+            pr: 0.5,
+            '&::-webkit-scrollbar': { width: '4px' },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'rgba(0,0,0,0.15)',
+              borderRadius: '4px',
+            },
+          }}
+        >
+          {/* Pasteles Section */}
+          {(colorCategoryFilter === 'all' ||
+            colorCategoryFilter === 'pastel') && (
+            <>
+              <Typography
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  color: 'text.secondary',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  mb: 1,
+                  px: 0.5,
+                }}
+              >
+                Tonos Pasteles
+              </Typography>
+              <Box sx={{ ...colorGridSx, mb: 2 }}>
+                {PASTEL_COLORS.filter((c) => c.category === 'pastel').map(
+                  (item) => {
+                    const isSelected =
+                      color?.toUpperCase() === item.value.toUpperCase();
+                    return (
+                      <Tooltip
+                        key={item.value}
+                        title={item.name}
+                        arrow
+                        placement="top"
+                      >
+                        <Box
+                          onClick={() => {
+                            setColor(item.value);
+                            setColorAnchor(null);
+                            setHoveredColor(null);
+                          }}
+                          onMouseEnter={() => setHoveredColor(item)}
+                          onMouseLeave={() => setHoveredColor(null)}
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '50%',
+                            bgcolor: item.value,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: isSelected
+                              ? '2px solid'
+                              : '1.5px solid rgba(0,0,0,0.1)',
+                            borderColor: isSelected
+                              ? 'text.primary'
+                              : 'rgba(0,0,0,0.1)',
+                            boxShadow: isSelected
+                              ? '0 0 0 2px rgba(0,0,0,0.15)'
+                              : '0 1px 2px rgba(0,0,0,0.05)',
+                            transition: 'all 0.15s ease',
+                            '&:hover': {
+                              transform: 'scale(1.15)',
+                            },
+                          }}
+                        >
+                          {isSelected && (
+                            <Box
+                              sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                bgcolor: isColorDark(item.value)
+                                  ? '#ffffff'
+                                  : '#0f172a',
+                                opacity: 0.9,
+                              }}
+                            />
+                          )}
+                        </Box>
+                      </Tooltip>
+                    );
+                  },
+                )}
+              </Box>
+            </>
+          )}
+
+          {/* Sólidos Section */}
+          {(colorCategoryFilter === 'all' ||
+            colorCategoryFilter === 'solid') && (
+            <>
+              <Typography
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  color: 'text.secondary',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  mb: 1,
+                  px: 0.5,
+                }}
+              >
+                Tonos Sólidos
+              </Typography>
+              <Box sx={{ ...colorGridSx, pb: 0.5 }}>
+                {PASTEL_COLORS.filter((c) => c.category === 'solid').map(
+                  (item) => {
+                    const isSelected =
+                      color?.toUpperCase() === item.value.toUpperCase();
+                    return (
+                      <Tooltip
+                        key={item.value}
+                        title={item.name}
+                        arrow
+                        placement="top"
+                      >
+                        <Box
+                          onClick={() => {
+                            setColor(item.value);
+                            setColorAnchor(null);
+                            setHoveredColor(null);
+                          }}
+                          onMouseEnter={() => setHoveredColor(item)}
+                          onMouseLeave={() => setHoveredColor(null)}
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '50%',
+                            bgcolor: item.value,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: isSelected
+                              ? '2px solid'
+                              : '1.5px solid rgba(0,0,0,0.1)',
+                            borderColor: isSelected
+                              ? 'text.primary'
+                              : 'rgba(0,0,0,0.1)',
+                            boxShadow: isSelected
+                              ? '0 0 0 2px rgba(0,0,0,0.15)'
+                              : '0 1px 2px rgba(0,0,0,0.05)',
+                            transition: 'all 0.15s ease',
+                            '&:hover': {
+                              transform: 'scale(1.15)',
+                            },
+                          }}
+                        >
+                          {isSelected && (
+                            <Box
+                              sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                bgcolor: isColorDark(item.value)
+                                  ? '#ffffff'
+                                  : '#0f172a',
+                                opacity: 0.9,
+                              }}
+                            />
+                          )}
+                        </Box>
+                      </Tooltip>
+                    );
+                  },
+                )}
+              </Box>
+            </>
+          )}
         </Box>
 
         {isTaskCustomColor(color) && (
@@ -1165,7 +1446,10 @@ export const TaskProperties = ({
             }}
           >
             <CloseIcon sx={{ fontSize: 14 }} />
-            Quitar color de fondo
+            {t(
+              'tasks.properties.removeBackgroundColor',
+              'Quitar color de fondo',
+            )}
           </Box>
         )}
       </Popover>
@@ -1198,7 +1482,7 @@ export const TaskProperties = ({
                 letterSpacing: '0.04em',
               }}
             >
-              Registrar tiempo
+              {t('tasks.properties.logTime', 'Registrar tiempo')}
             </Typography>
             <IconButton
               size="small"
@@ -1358,7 +1642,10 @@ export const TaskProperties = ({
                 fontStyle: 'italic',
               }}
             >
-              No hay tiempo registrado aún.
+              {t(
+                'tasks.properties.noTimeLogged',
+                'No hay tiempo registrado aún.',
+              )}
             </Typography>
           )}
         </Box>

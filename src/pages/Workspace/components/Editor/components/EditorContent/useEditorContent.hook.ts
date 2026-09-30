@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation, type DocumentNode } from '@apollo/client';
 import { useAppSelector } from '@/redux/hooks';
 import type {
   UseEditorContentProps,
@@ -18,6 +18,8 @@ import {
   GET_TASKS_TITLES,
 } from '@/pages/Tasks/Tasks.graphql';
 import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
+import { GET_WORKSPACE_BY_ID } from '@/pages/Workspace/Workspace.graphql';
+import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 import type { AITaskPreviewData } from '../AITaskPreviewModal/AITaskPreviewModal';
 
 export const useEditorContent = ({
@@ -232,6 +234,7 @@ Text: "${selectedText}"`;
     if (!user) return;
     setIsCreatingTask(true);
     try {
+      const currentWorkspaceId = watch?.('id');
       const createTaskInput = {
         title: finalData.title || 'AI Task',
         notes_encrypted: finalData.description || '',
@@ -253,20 +256,45 @@ Text: "${selectedText}"`;
         user_id: user.id || '',
         status: 'Backlog',
         use_ai: true,
+        workspace_id: currentWorkspaceId || undefined,
       };
+
+      const refetchList: (
+        | string
+        | { query: DocumentNode; variables?: Record<string, unknown> }
+      )[] = [
+        { query: GET_TASKS, variables: { userId: user.id || '' } },
+        {
+          query: GET_TASKS_TITLES,
+          variables: { userId: user.id || '', limit: 24, offset: 0 },
+        },
+        'GetWorkspacesPaginated',
+        'GetWorkspaces',
+      ];
+      if (currentWorkspaceId) {
+        refetchList.push({
+          query: GET_WORKSPACE_BY_ID,
+          variables: { id: currentWorkspaceId },
+        });
+      }
 
       const { data } = await createTaskMutation({
         variables: { createTaskInput },
-        refetchQueries: [
-          { query: GET_TASKS, variables: { userId: user.id || '' } },
-          {
-            query: GET_TASKS_TITLES,
-            variables: { userId: user.id || '', limit: 24, offset: 0 },
-          },
-        ],
+        refetchQueries: refetchList,
       });
 
       if (data?.createTask) {
+        const createdTask = data.createTask as unknown as TaskSearchItems;
+        if (setValue && watch) {
+          const currentTasks =
+            (watch('tasks') as TaskSearchItems[] | undefined) || [];
+          setValue('tasks', [...currentTasks, createdTask], {
+            shouldDirty: true,
+          });
+          if (!watch('taskId')) {
+            setValue('taskId', createdTask.id, { shouldDirty: true });
+          }
+        }
         sileo.success({
           title: 'Task created!',
           description: 'New task has been added to your schedule.',

@@ -10,6 +10,7 @@ import {
   Divider,
 } from '@mui/material';
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/redux/hooks';
 import {
   CalendarTodayOutlined as CalendarTodayIcon,
@@ -45,6 +46,7 @@ export const ListViewTask = ({
   isSelected,
   onToggleSelect,
 }: ListViewTaskProps) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
 
   const isReadOnly = useMemo(() => {
@@ -88,13 +90,15 @@ export const ListViewTask = ({
   const isDone = task.status === 'Done';
 
   const priorityLabelMap: Record<number, string> = {
-    4: 'Alta',
-    3: 'Alta',
-    2: 'Media',
-    1: 'Baja',
-    0: 'Baja',
+    4: t('tasks.priority.high', 'Alta'),
+    3: t('tasks.priority.high', 'Alta'),
+    2: t('tasks.priority.medium', 'Media'),
+    1: t('tasks.priority.low', 'Baja'),
+    0: t('tasks.priority.low', 'Baja'),
   };
-  const priorityLabel = priorityLabelMap[task.priority_level ?? 2] || 'Media';
+  const priorityLabel =
+    priorityLabelMap[task.priority_level ?? 2] ||
+    t('tasks.priority.medium', 'Media');
 
   const formattedDate = useMemo(() => {
     if (!task.deadline) return '-';
@@ -416,7 +420,7 @@ export const ListViewTask = ({
               <PlayIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText
-              primary="Iniciar Enfoque"
+              primary={t('tasks.actions.startFocus', 'Iniciar Enfoque')}
               primaryTypographyProps={{ fontSize: '13px', fontWeight: 600 }}
             />
           </MenuItem>
@@ -433,7 +437,7 @@ export const ListViewTask = ({
             <EditIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText
-            primary="Editar Tarea"
+            primary={t('tasks.actions.editTask', 'Editar Tarea')}
             primaryTypographyProps={{ fontSize: '13px' }}
           />
         </MenuItem>
@@ -450,7 +454,9 @@ export const ListViewTask = ({
           </ListItemIcon>
           <ListItemText
             primary={
-              isDone ? 'Marcar como Por Hacer' : 'Marcar como Completada'
+              isDone
+                ? t('tasks.actions.markAsTodo', 'Marcar como Por Hacer')
+                : t('tasks.actions.markAsDone', 'Marcar como Completada')
             }
             primaryTypographyProps={{ fontSize: '13px' }}
           />
@@ -470,7 +476,7 @@ export const ListViewTask = ({
               <DeleteIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText
-              primary="Eliminar Tarea"
+              primary={t('tasks.actions.deleteTask', 'Eliminar Tarea')}
               primaryTypographyProps={{ fontSize: '13px', fontWeight: 600 }}
             />
           </MenuItem>
@@ -491,9 +497,21 @@ export const ListViewTask = ({
         }}
       >
         {[
-          { level: 3, label: 'Alta', color: '#dc2626' },
-          { level: 2, label: 'Media', color: '#d97706' },
-          { level: 1, label: 'Baja', color: '#16a34a' },
+          {
+            level: 3,
+            label: t('tasks.priority.high', 'Alta'),
+            color: '#dc2626',
+          },
+          {
+            level: 2,
+            label: t('tasks.priority.medium', 'Media'),
+            color: '#d97706',
+          },
+          {
+            level: 1,
+            label: t('tasks.priority.low', 'Baja'),
+            color: '#16a34a',
+          },
         ].map((p) => (
           <MenuItem
             key={p.level}
@@ -526,16 +544,16 @@ export const ListViewTask = ({
         }}
       >
         <MenuItem onClick={() => handleDateSelect(0)} sx={{ py: 1 }}>
-          Hoy
+          {t('tasks.dates.today', 'Hoy')}
         </MenuItem>
         <MenuItem onClick={() => handleDateSelect(1)} sx={{ py: 1 }}>
-          Mañana
+          {t('tasks.dates.tomorrow', 'Mañana')}
         </MenuItem>
         <MenuItem onClick={() => handleDateSelect(3)} sx={{ py: 1 }}>
-          En 3 días
+          {t('tasks.dates.in3Days', 'En 3 días')}
         </MenuItem>
         <MenuItem onClick={() => handleDateSelect(7)} sx={{ py: 1 }}>
-          Próxima semana
+          {t('tasks.dates.nextWeek', 'Próxima semana')}
         </MenuItem>
       </Menu>
     </>

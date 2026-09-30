@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Typography, Box, Button, Menu, MenuItem } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   CalendarTodayOutlined as CalendarTodayIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
@@ -22,13 +23,6 @@ interface TasksHeaderProps {
   children?: React.ReactNode;
 }
 
-const DATE_OPTIONS: { id: DateRangeFilter; label: string }[] = [
-  { id: 'all', label: 'Todas las Tareas' },
-  { id: 'today', label: 'Hoy' },
-  { id: 'this_week', label: 'Esta Semana' },
-  { id: 'this_month', label: 'Este Mes' },
-];
-
 export const TasksHeader = ({
   title,
   eyebrow,
@@ -41,19 +35,30 @@ export const TasksHeader = ({
   onAddTaskClick,
   children,
 }: TasksHeaderProps) => {
+  const { t } = useTranslation();
   const [dateMenuAnchor, setDateMenuAnchor] = useState<null | HTMLElement>(
     null,
   );
 
+  const dateOptions: { id: DateRangeFilter; label: string }[] = [
+    { id: 'all', label: t('tasks.dates.all', 'Todas las Tareas') },
+    { id: 'today', label: t('tasks.dates.today', 'Hoy') },
+    { id: 'this_week', label: t('tasks.dates.thisWeek', 'Esta Semana') },
+    { id: 'this_month', label: t('tasks.dates.thisMonth', 'Este Mes') },
+  ];
+
   const displayPeriodLabel = (() => {
-    if (dateRange === 'today') return 'Hoy';
-    if (dateRange === 'this_week') return 'Esta Semana';
-    if (dateRange === 'this_month') return 'Este Mes';
-    if (dateRange === 'all') return 'Todas las Tareas';
-    return periodLabel || 'Este Mes';
+    if (dateRange === 'today') return t('tasks.dates.today', 'Hoy');
+    if (dateRange === 'this_week')
+      return t('tasks.dates.thisWeek', 'Esta Semana');
+    if (dateRange === 'this_month')
+      return t('tasks.dates.thisMonth', 'Este Mes');
+    if (dateRange === 'all') return t('tasks.dates.all', 'Todas las Tareas');
+    return periodLabel || t('tasks.dates.thisMonth', 'Este Mes');
   })();
 
-  const currentSectionName = eyebrow || title || 'Próximas Tareas';
+  const currentSectionName =
+    eyebrow || title || t('tasks.header.upcomingTitle', 'Próximas Tareas');
 
   return (
     <Header
@@ -77,7 +82,7 @@ export const TasksHeader = ({
               fontSize: '13px',
             }}
           >
-            Agenda
+            {t('nav.agenda', 'Agenda')}
           </Typography>
           <ChevronRightIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
           <Typography
@@ -101,7 +106,7 @@ export const TasksHeader = ({
             lineHeight: 1.2,
           }}
         >
-          {title || 'Próximas Tareas'}
+          {title || t('tasks.header.upcomingTitle', 'Próximas Tareas')}
         </Title>
       </Box>
 
@@ -139,7 +144,7 @@ export const TasksHeader = ({
                 theme.palette.mode === 'dark' ? '#60a5fa' : '#1d4ed8',
             }}
           >
-            {pendingCount} Pendientes
+            {pendingCount} {t('tasks.header.pending', 'Pendientes')}
           </Typography>
           <Box
             sx={{
@@ -157,7 +162,7 @@ export const TasksHeader = ({
                 theme.palette.mode === 'dark' ? '#60a5fa' : '#1d4ed8',
             }}
           >
-            {completedCount} Completadas
+            {completedCount} {t('tasks.header.completed', 'Completadas')}
           </Typography>
         </Box>
 
@@ -223,7 +228,7 @@ export const TasksHeader = ({
                 },
               }}
             >
-              {DATE_OPTIONS.map((opt) => (
+              {dateOptions.map((opt) => (
                 <MenuItem
                   key={opt.id}
                   onClick={() => {
@@ -272,7 +277,8 @@ export const TasksHeader = ({
               px: 2,
             }}
           >
-            {addButtonLabel || 'Nueva Tarea Próxima'}
+            {addButtonLabel ||
+              t('tasks.header.newUpcomingTask', 'Nueva Tarea Próxima')}
           </Button>
         )}
       </Box>

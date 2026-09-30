@@ -107,7 +107,7 @@ export const LightningBadge = styled(Box)(({ theme }) => ({
   width: '24px',
   height: '24px',
   borderRadius: '50%',
-  backgroundColor: theme.palette.info.main, // Cyan color
+  backgroundColor: theme.palette.info.main,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

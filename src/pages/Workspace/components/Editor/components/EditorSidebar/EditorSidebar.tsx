@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Button,
@@ -30,7 +31,14 @@ import {
   PRIORITY_OPTIONS,
   getPriorityConfig,
 } from '@/components/ui';
-import { STATUS_LIST } from '@/pages/Home/components/CreateTaskModal/components/TaskIcons';
+const EDITOR_TASK_STATUSES = [
+  'Todo',
+  'Planning',
+  'Review',
+  'Pending',
+  'Done',
+] as const;
+
 import {
   getPriorityLevel,
   type PriorityType,
@@ -43,32 +51,59 @@ type InsightView = 'outline' | 'graph' | 'stats';
 
 const getStatusColor = (status?: string) => {
   const colors: Record<string, string> = {
-    Done: '#16a34a',
-    Todo: '#2563eb',
-    'To Do': '#2563eb',
-    'In Progress': '#2563eb',
-    Planning: '#7c3aed',
-    Pending: '#d97706',
-    'On Hold': '#dc2626',
-    Review: '#0891b2',
-    Backlog: '#64748b',
-    Scheduled: '#7c3aed',
-    Archived: '#64748b',
+    Done: '#10b981',
+    Todo: '#008767',
+    'To Do': '#008767',
+    Backlog: '#008767',
+    Planning: '#3b82f6',
+    Scheduled: '#3b82f6',
+    Review: '#06b6d4',
+    'In Review': '#06b6d4',
+    Pending: '#f59e0b',
+    'On Hold': '#f59e0b',
+    'In Progress': '#f59e0b',
+    in_progress: '#f59e0b',
   };
 
-  return colors[status || ''] || '#64748b';
+  return colors[status || ''] || '#008767';
 };
 
-const getStatusLabel = (status?: string) => {
-  if (!status || status === 'Todo') return 'To do';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getStatusLabel = (status?: string, t?: any) => {
+  if (!status || status === 'Todo' || status === 'Backlog') {
+    return t ? t('tasks.status.todo', 'Por hacer') : 'Por hacer';
+  }
+  if (status === 'Planning' || status === 'Scheduled') {
+    return t ? t('tasks.status.planning', 'Planificado') : 'Planificado';
+  }
+  if (status === 'Review' || status === 'in_review') {
+    return t ? t('tasks.status.review', 'En revisión') : 'En revisión';
+  }
+  if (
+    status === 'Pending' ||
+    status === 'On Hold' ||
+    status === 'in_progress' ||
+    status === 'In Progress'
+  ) {
+    return t ? t('tasks.status.pending', 'Pendiente') : 'Pendiente';
+  }
+  if (status === 'Done' || status === 'completed') {
+    return t ? t('tasks.status.done', 'Completada') : 'Completada';
+  }
   return status;
 };
 
-const formatDeadline = (deadline?: string) => {
-  if (!deadline) return 'Sin fecha';
+const formatDeadline = (
+  deadline?: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  t?: any,
+  lang = 'es-MX',
+) => {
+  if (!deadline) return t ? t('tasks.noDueDate', 'Sin fecha') : 'Sin fecha';
 
   const date = new Date(deadline);
-  if (Number.isNaN(date.getTime())) return 'Sin fecha';
+  if (Number.isNaN(date.getTime()))
+    return t ? t('tasks.noDueDate', 'Sin fecha') : 'Sin fecha';
 
   const today = new Date();
   const tomorrow = new Date();
@@ -79,10 +114,11 @@ const formatDeadline = (deadline?: string) => {
     left.getMonth() === right.getMonth() &&
     left.getFullYear() === right.getFullYear();
 
-  if (isSameDay(date, today)) return 'Hoy';
-  if (isSameDay(date, tomorrow)) return 'Mañana';
+  if (isSameDay(date, today)) return t ? t('tasks.dates.today', 'Hoy') : 'Hoy';
+  if (isSameDay(date, tomorrow))
+    return t ? t('tasks.dates.tomorrow', 'Mañana') : 'Mañana';
 
-  return new Intl.DateTimeFormat('es-MX', {
+  return new Intl.DateTimeFormat(lang, {
     day: 'numeric',
     month: 'short',
   }).format(date);
@@ -106,6 +142,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
     setShowPalette,
   } = props;
 
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const [activeInsightView, setActiveInsightView] =
     useState<InsightView>('stats');
@@ -199,20 +236,40 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
   };
 
   const viewTabs: { value: InsightView; label: string; icon: ReactNode }[] = [
-    { value: 'outline', label: 'Índice', icon: <TocIcon fontSize="small" /> },
-    { value: 'graph', label: 'Grafo', icon: <HubIcon fontSize="small" /> },
+    {
+      value: 'outline',
+      label: t('workspaceEditor.sidebar.outline', 'Índice'),
+      icon: <TocIcon fontSize="small" />,
+    },
+    {
+      value: 'graph',
+      label: t('workspaceEditor.sidebar.graph', 'Grafo'),
+      icon: <HubIcon fontSize="small" />,
+    },
     {
       value: 'stats',
-      label: 'Detalles',
+      label: t('workspaceEditor.sidebar.details', 'Detalles'),
       icon: <BarChartIcon fontSize="small" />,
     },
   ];
 
   const metrics = [
-    { label: 'Palabras', value: stats.words.toLocaleString('es-MX') },
-    { label: 'Caracteres', value: stats.chars.toLocaleString('es-MX') },
-    { label: 'Lectura', value: `${stats.readingTimeMinutes} min` },
-    { label: 'Encabezados', value: headings.length.toLocaleString('es-MX') },
+    {
+      label: t('workspaceEditor.sidebar.words', 'Palabras'),
+      value: stats.words.toLocaleString(i18n.language),
+    },
+    {
+      label: t('workspaceEditor.sidebar.characters', 'Caracteres'),
+      value: stats.chars.toLocaleString(i18n.language),
+    },
+    {
+      label: t('workspaceEditor.sidebar.readingTime', 'Lectura'),
+      value: `${stats.readingTimeMinutes} min`,
+    },
+    {
+      label: t('workspaceEditor.sidebar.headings', 'Encabezados'),
+      value: headings.length.toLocaleString(i18n.language),
+    },
   ];
 
   const tasksToList = useMemo(() => {
@@ -332,7 +389,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
             </Box>
 
             <IconButton
-              aria-label="Cerrar panel"
+              aria-label={t('workspaceEditor.closeSidebar', 'Cerrar panel')}
               onClick={() => setIsRightSidebarOpen(false)}
               size="small"
               sx={{
@@ -458,7 +515,10 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                             letterSpacing: '0.05em',
                           }}
                         >
-                          TAREAS VINCULADAS
+                          {t(
+                            'workspaceEditor.sidebar.linkedTasks',
+                            'TAREAS VINCULADAS',
+                          )}
                         </Typography>
                         {tasksToList.length > 0 && (
                           <Box
@@ -494,7 +554,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                           color: 'primary.main',
                         }}
                       >
-                        Vincular
+                        {t('workspaceEditor.sidebar.link', 'Vincular')}
                       </Button>
                     </Box>
 
@@ -525,7 +585,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                             activeFocusTaskId === task.id,
                           );
                           const statusColor = getStatusColor(task.status);
-                          const statusLabel = getStatusLabel(task.status);
+                          const statusLabel = getStatusLabel(task.status, t);
                           const durationLabel = task.estimate_timer
                             ? `${task.estimate_timer}m`
                             : '25m';
@@ -661,9 +721,17 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                                   </Tooltip>
 
                                   {onUnlinkTask && (
-                                    <Tooltip title="Desvincular tarea">
+                                    <Tooltip
+                                      title={t(
+                                        'workspaceEditor.sidebar.unlinkTask',
+                                        'Desvincular tarea',
+                                      )}
+                                    >
                                       <IconButton
-                                        aria-label="Desvincular tarea"
+                                        aria-label={t(
+                                          'workspaceEditor.sidebar.unlinkTask',
+                                          'Desvincular tarea',
+                                        )}
                                         size="small"
                                         onClick={() => onUnlinkTask(task)}
                                         sx={{
@@ -695,7 +763,12 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                                 }}
                               >
                                 {/* Status Dropdown Pill */}
-                                <Tooltip title="Cambiar estado">
+                                <Tooltip
+                                  title={t(
+                                    'tasks.changeStatus',
+                                    'Cambiar estado',
+                                  )}
+                                >
                                   <Box
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -761,7 +834,12 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                                 </Tooltip>
 
                                 {/* Priority Dropdown Pill */}
-                                <Tooltip title="Cambiar prioridad">
+                                <Tooltip
+                                  title={t(
+                                    'tasks.changePriority',
+                                    'Cambiar prioridad',
+                                  )}
+                                >
                                   <Box
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -809,7 +887,10 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                                         lineHeight: 1,
                                       }}
                                     >
-                                      {priority.label}
+                                      {t(
+                                        `tasks.priorities.${priority.id}`,
+                                        priority.label,
+                                      )}
                                     </Typography>
                                     <KeyboardArrowDownIcon
                                       sx={{
@@ -859,7 +940,11 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                                       variant="caption"
                                       sx={{ fontSize: '10px' }}
                                     >
-                                      {formatDeadline(task.deadline)}
+                                      {formatDeadline(
+                                        task.deadline,
+                                        t,
+                                        i18n.language,
+                                      )}
                                     </Typography>
                                   </Box>
                                 )}
@@ -885,7 +970,10 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                           variant="body2"
                           sx={{ color: 'text.secondary', fontSize: '12.5px' }}
                         >
-                          Sin tareas vinculadas
+                          {t(
+                            'workspaceEditor.sidebar.noLinkedTasks',
+                            'Sin tareas vinculadas',
+                          )}
                         </Typography>
                         <Button
                           size="small"
@@ -897,7 +985,10 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                             flexShrink: 0,
                           }}
                         >
-                          Vincular tarea
+                          {t(
+                            'workspaceEditor.sidebar.linkTask',
+                            'Vincular tarea',
+                          )}
                         </Button>
                       </Box>
                     )}
@@ -912,7 +1003,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                         letterSpacing: '0.05em',
                       }}
                     >
-                      DOCUMENTO
+                      {t('workspaceEditor.sidebar.document', 'DOCUMENTO')}
                     </Typography>
                     <Box
                       sx={{
@@ -960,7 +1051,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                         letterSpacing: '0.05em',
                       }}
                     >
-                      ESTRUCTURA
+                      {t('workspaceEditor.sidebar.structure', 'ESTRUCTURA')}
                     </Typography>
                     <Box
                       sx={{
@@ -970,10 +1061,28 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                       }}
                     >
                       {[
-                        ['Títulos principales', stats.h1Count],
-                        ['Secciones', stats.h2Count],
-                        ['Subsecciones', stats.h3Count],
-                        ['Párrafos', stats.paragraphs],
+                        [
+                          t(
+                            'workspaceEditor.sidebar.mainHeadings',
+                            'Títulos principales',
+                          ),
+                          stats.h1Count,
+                        ],
+                        [
+                          t('workspaceEditor.sidebar.sections', 'Secciones'),
+                          stats.h2Count,
+                        ],
+                        [
+                          t(
+                            'workspaceEditor.sidebar.subsections',
+                            'Subsecciones',
+                          ),
+                          stats.h3Count,
+                        ],
+                        [
+                          t('workspaceEditor.sidebar.paragraphs', 'Párrafos'),
+                          stats.paragraphs,
+                        ],
                       ].map(([label, value], index) => (
                         <Box
                           key={label}
@@ -1039,7 +1148,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           },
         }}
       >
-        {STATUS_LIST.map((statusName) => {
+        {EDITOR_TASK_STATUSES.map((statusName) => {
           const isSelected = statusMenu?.task.status === statusName;
           const sColor = getStatusColor(statusName);
 
@@ -1077,7 +1186,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                   color: isSelected ? 'text.primary' : 'text.secondary',
                 }}
               >
-                {getStatusLabel(statusName)}
+                {getStatusLabel(statusName, t)}
               </Typography>
             </MenuItem>
           );
@@ -1131,7 +1240,7 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
                   color: isSelected ? 'text.primary' : 'text.secondary',
                 }}
               >
-                {pOpt.label}
+                {t(`tasks.priorities.${pOpt.id}`, pOpt.label)}
               </Typography>
             </MenuItem>
           );

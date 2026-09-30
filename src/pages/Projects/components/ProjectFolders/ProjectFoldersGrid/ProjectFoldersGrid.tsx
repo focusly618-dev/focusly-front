@@ -14,6 +14,7 @@ import {
   CustomizeFolderModal,
   DeleteFolderModal,
 } from '../../../modals';
+import { useTranslation } from 'react-i18next';
 import type { ProjectFoldersGridProps } from './ProjectFoldersGrid.types';
 
 export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
@@ -27,6 +28,7 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
   onDeleteFolder,
   folderSearchTerm = '',
 }) => {
+  const { t } = useTranslation();
   const { state, actions } = useProjectFoldersGrid();
 
   return (
@@ -46,13 +48,13 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
               mb: 0.5,
             }}
           >
-            Nuevo Proyecto
+            {t('projects.newProject', 'Nuevo Proyecto')}
           </Typography>
           <Typography
             variant="caption"
             sx={{ color: 'text.secondary', fontSize: '12px' }}
           >
-            Crear una carpeta limpia
+            {t('projects.createCleanFolder', 'Crear una carpeta limpia')}
           </Typography>
         </DashedCard>
 
@@ -86,8 +88,16 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
           sx={{ color: 'text.secondary', fontSize: '13px' }}
         >
           {folderSearchTerm
-            ? `Mostrando ${groups.length} resultados para "${folderSearchTerm}"`
-            : `Mostrando ${groups.length} de ${groups.length} proyectos`}
+            ? t(
+                'projects.showingResultsFor',
+                `Mostrando ${groups.length} resultados para "${folderSearchTerm}"`,
+                { count: groups.length, term: folderSearchTerm },
+              )
+            : t(
+                'projects.showingCountOfTotal',
+                `Mostrando ${groups.length} de ${groups.length} proyectos`,
+                { current: groups.length, total: groups.length },
+              )}
         </Typography>
 
         <Pagination

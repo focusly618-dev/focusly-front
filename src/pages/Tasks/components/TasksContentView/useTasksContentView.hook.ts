@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/redux/hooks';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { STATUS_SECTIONS } from './TasksContentView.types';
@@ -14,6 +15,7 @@ export const useTasksContentView = ({
   viewMode,
   deleteTasks,
 }: UseTasksContentViewProps) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
 
   const PAGE_SIZE = 7;
@@ -75,13 +77,47 @@ export const useTasksContentView = ({
     return [
       {
         id: 'All',
-        label: 'Todas',
+        label: t('tasks.status.all', 'Todas'),
         color: '#008767',
         filter: () => true,
       },
-      ...STATUS_SECTIONS,
+      {
+        id: 'Todo',
+        label: t('tasks.status.todo', 'Por Hacer'),
+        color: '#008767',
+        filter: (tTask: TaskResponse) =>
+          tTask.status === 'Todo' ||
+          tTask.status === 'Backlog' ||
+          !tTask.status,
+      },
+      {
+        id: 'Planning',
+        label: t('tasks.status.planning', 'Planificado'),
+        color: '#3b82f6',
+        filter: (tTask: TaskResponse) =>
+          tTask.status === 'Planning' || tTask.status === 'Scheduled',
+      },
+      {
+        id: 'Review',
+        label: t('tasks.status.review', 'En Revisión'),
+        color: '#06b6d4',
+        filter: (tTask: TaskResponse) => tTask.status === 'Review',
+      },
+      {
+        id: 'Pending',
+        label: t('tasks.status.pending', 'Pendientes'),
+        color: '#f59e0b',
+        filter: (tTask: TaskResponse) =>
+          tTask.status === 'Pending' || tTask.status === 'On Hold',
+      },
+      {
+        id: 'Done',
+        label: t('tasks.status.done', 'Completadas'),
+        color: '#10b981',
+        filter: (tTask: TaskResponse) => tTask.status === 'Done',
+      },
     ];
-  }, []);
+  }, [t]);
 
   const tabCounts = useMemo(() => {
     const counts: Record<string, number> = {

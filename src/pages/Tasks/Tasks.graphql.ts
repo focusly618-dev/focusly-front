@@ -23,6 +23,7 @@ export const UPDATE_TASK = gql`
       user_id
       is_owner
       title
+      workspace_id
       notes_encrypted
       status
       category

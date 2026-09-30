@@ -451,15 +451,12 @@ export const WorkspaceCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== 'gradient' && prop !== 'compact',
 })<{ gradient?: string; compact?: boolean }>(({ theme, gradient, compact }) => {
   const isDark = theme.palette.mode === 'dark';
-  const isGradient = gradient?.startsWith('linear-gradient');
+  const hasGradient = Boolean(gradient && gradient !== 'none');
   return {
-    backgroundColor: isGradient
-      ? 'transparent'
-      : gradient ||
-        surfaceColor(theme, '#18191e', 'rgba(36, 36, 37, 0.7)', '#ffffff'),
-    backgroundImage: isGradient ? gradient : 'none',
+    background: hasGradient
+      ? gradient
+      : surfaceColor(theme, '#18191e', 'rgba(36, 36, 37, 0.7)', '#ffffff'),
     backgroundSize: 'cover',
-    backdropFilter: isGradient ? 'none' : 'blur(12px)',
     borderRadius: '12px',
     padding: theme.spacing(2),
     display: 'flex',
@@ -469,7 +466,7 @@ export const WorkspaceCard = styled(Card, {
     cursor: 'pointer',
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
     border: `1px solid ${
-      gradient
+      hasGradient
         ? isDark
           ? 'rgba(255, 255, 255, 0.25)'
           : 'rgba(0, 0, 0, 0.15)'
@@ -483,7 +480,7 @@ export const WorkspaceCard = styled(Card, {
     boxShadow: isDark
       ? '0 4px 20px -2px rgba(0, 0, 0, 0.3)'
       : '0 2px 8px -1px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02)',
-    '&::before': isGradient
+    '&::before': hasGradient
       ? {
           content: '""',
           position: 'absolute',
@@ -494,8 +491,8 @@ export const WorkspaceCard = styled(Card, {
           background: isDark
             ? 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 100%)'
             : 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.15) 100%)',
-          backdropFilter: 'blur(8px)',
           zIndex: 0,
+          pointerEvents: 'none',
         }
       : {},
     '& > *': {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -44,8 +45,12 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
   onAddTask,
   defaultExpanded = true,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const statusLabel = t(`tasks.status.${status.id}`, {
+    defaultValue: status.label,
+  });
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -131,7 +136,7 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
               letterSpacing: '-0.01em',
             }}
           >
-            {status.label}
+            {statusLabel}
           </Typography>
 
           {/* Task Count Badge */}
@@ -169,11 +174,13 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
               }}
             >
               <CheckIcon sx={{ fontSize: 14 }} />
-              <span>All clear</span>
+              <span>{t('tasks.allClear', 'All clear')}</span>
             </Box>
           )}
 
-          <Tooltip title={`Add task to ${status.label}`}>
+          <Tooltip
+            title={`${t('tasks.addTaskTo', 'Add task to')} ${statusLabel}`}
+          >
             <IconButton
               size="small"
               onClick={(e) => {
@@ -245,7 +252,7 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
           }}
           sx={{ fontSize: '12.5px', borderRadius: '6px', py: 0.75 }}
         >
-          Add task to {status.label}
+          {t('tasks.addTaskTo', 'Add task to')} {statusLabel}
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -254,7 +261,9 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
           }}
           sx={{ fontSize: '12.5px', borderRadius: '6px', py: 0.75 }}
         >
-          {isExpanded ? 'Collapse section' : 'Expand section'}
+          {isExpanded
+            ? t('tasks.collapseSection', 'Collapse section')
+            : t('tasks.expandSection', 'Expand section')}
         </MenuItem>
       </Menu>
 
@@ -312,7 +321,7 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
             {isAddingTask ? (
               <InputBase
                 autoFocus
-                placeholder={`Add task to ${status.label}... (Press Enter)`}
+                placeholder={`${t('tasks.addTaskTo', 'Add task to')} ${statusLabel}... (${t('tasks.pressEnter', 'Press Enter')})`}
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -342,8 +351,10 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
                     : 'rgba(0, 0, 0, 0.42)',
                 }}
               >
-                Add task to {status.label}...{' '}
-                <span style={{ opacity: 0.7 }}>(Press Enter)</span>
+                {t('tasks.addTaskTo', 'Add task to')} {statusLabel}...{' '}
+                <span style={{ opacity: 0.7 }}>
+                  ({t('tasks.pressEnter', 'Press Enter')})
+                </span>
               </Typography>
             )}
           </Box>

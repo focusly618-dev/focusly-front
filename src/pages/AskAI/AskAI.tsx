@@ -133,11 +133,6 @@ interface Message {
   text: string;
   rawContent?: string;
   html?: string;
-  // Populated only for messages loaded from history — the backend already
-  // parsed these out of the raw `[ACTION: ...]` tags before they ever left
-  // the server, so we don't need (and shouldn't rely on) client-side regex
-  // parsing of persisted content. A single AI reply can suggest several
-  // tasks (e.g. one per week of a month-long plan), hence the array.
   actions?: ParsedLuminaAction[];
   attachedFiles?: AttachedFileMeta[];
   createdAt?: string | Date;
@@ -1168,7 +1163,6 @@ export const AskAI: React.FC = () => {
       messages,
       biggestTask,
       activeConversationId,
-      conversations,
       selectedModel,
       selectedContext,
       attachedFiles,

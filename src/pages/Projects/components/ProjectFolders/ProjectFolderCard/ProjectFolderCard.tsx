@@ -22,7 +22,7 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
   onCustomize,
   onDelete,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     menuAnchorEl,
     isMenuOpen,
@@ -39,32 +39,59 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
     noteCount > 0 ? (index % 3 === 0 ? 'RECENT' : 'ACTIVE') : 'BORRADOR';
   const getRecentSnippet = () => {
     if (noteCount === 0) {
-      return 'Esta carpeta está vacía. Crea tu primer workspace para empezar...';
+      return t(
+        'workspaceLibrary.emptyFolderSnippet',
+        'Esta carpeta está vacía. Crea tu primer workspace para empezar...',
+      );
     }
     const nameLower = group.name.toLowerCase();
     if (nameLower.includes('nutric') || nameLower.includes('salud')) {
       if (index % 2 === 0) {
-        return 'Proteínas y macronutrientes esenciales para el rendimiento diario. Notas de la sesión del martes...';
+        return t(
+          'workspaceLibrary.snippets.nutrition1',
+          'Proteínas y macronutrientes esenciales para el rendimiento diario. Notas de la sesión del martes...',
+        );
       }
-      return 'Vitaminas liposolubles e hidrosolubles: diferencias clave y fuentes alimenticias recomendadas...';
+      return t(
+        'workspaceLibrary.snippets.nutrition2',
+        'Vitaminas liposolubles e hidrosolubles: diferencias clave y fuentes alimenticias recomendadas...',
+      );
     }
     if (
       nameLower.includes('sql') ||
       nameLower.includes('base') ||
       nameLower.includes('datos')
     ) {
-      return 'JOINs avanzados en SQL: INNER, LEFT, RIGHT y FULL OUTER JOIN con ejemplos prácticos de consultas...';
+      return t(
+        'workspaceLibrary.snippets.sql',
+        'JOINs avanzados en SQL: INNER, LEFT, RIGHT y FULL OUTER JOIN con ejemplos prácticos de consultas...',
+      );
     }
-    return `Plan de trabajo y notas clave asociadas a ${group.name}. Objetivos y entregables principales...`;
+    return t(
+      'workspaceLibrary.defaultSnippet',
+      'Plan de trabajo y notas clave asociadas a {{name}}. Objetivos y entregables principales...',
+      { name: group.name },
+    );
   };
 
   const formattedDate = group.updatedAt
-    ? new Date(group.updatedAt).toLocaleDateString('es-ES', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      })
-    : '28 sept 2026';
+    ? new Date(group.updatedAt).toLocaleDateString(
+        i18n.language === 'ja'
+          ? 'ja-JP'
+          : i18n.language === 'en'
+            ? 'en-US'
+            : 'es-ES',
+        {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        },
+      )
+    : i18n.language === 'ja'
+      ? '2026年9月28日'
+      : i18n.language === 'en'
+        ? 'Sep 28, 2026'
+        : '28 sept 2026';
 
   return (
     <CardContainer baseColor={baseColor} onClick={() => onSelect(group.id)}>
@@ -192,7 +219,7 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
               mb: 0.5,
             }}
           >
-            WORKSPACE RECIENTE
+            {t('workspaceLibrary.recentWorkspace', 'WORKSPACE RECIENTE')}
           </Typography>
           <Typography
             variant="caption"
@@ -237,10 +264,10 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
           }}
         >
           {statusLabel === 'ACTIVE'
-            ? 'ACTIVO'
+            ? t('workspaceLibrary.status.active', 'ACTIVO')
             : statusLabel === 'RECENT'
-              ? 'RECIENTE'
-              : 'BORRADOR'}
+              ? t('workspaceLibrary.status.recent', 'RECIENTE')
+              : t('workspaceLibrary.status.draft', 'BORRADOR')}
         </Box>
         <Box
           sx={{
@@ -254,7 +281,9 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
             '&:hover': { gap: 0.8 },
           }}
         >
-          <span>Abrir</span>
+          <span>
+            {t('tasks.createProjectTaskModal.openWorkspace', 'Abrir')}
+          </span>
           <span>➔</span>
         </Box>
       </StatusBar>

@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   IconButton,
@@ -46,6 +47,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
   rootIcon,
   onJump,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
@@ -201,33 +203,46 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
   // Node type label for inspector
   const getNodeTypeLabel = (node: GraphNode | null) => {
     if (!node || node.type === 'document' || node.level === 0)
-      return 'Documento Raíz';
-    if (node.level === 1) return 'Título Principal (H1)';
-    if (node.level === 2) return 'Sección (H2)';
-    return `Subsección (H${node.level})`;
+      return t('workspaceEditor.graph.rootDoc', 'Documento Raíz');
+    if (node.level === 1)
+      return t('workspaceEditor.graph.mainHeadingH1', 'Título Principal (H1)');
+    if (node.level === 2)
+      return t('workspaceEditor.graph.sectionH2', 'Sección (H2)');
+    return t(
+      'workspaceEditor.graph.subSection',
+      `Subsección (H${node.level})`,
+      { level: node.level },
+    );
   };
 
   // Outgoing connections description
   const getOutgoingLabel = (node: GraphNode | null) => {
-    if (!node) return '0 conexiones';
+    if (!node) return t('workspaceEditor.graph.noConnections', '0 conexiones');
     const outgoing = baseEdges.filter((e) => e.from === node.id);
-    if (outgoing.length === 0) return 'Sección terminal';
-    return `${outgoing.length} ${outgoing.length === 1 ? 'conexión' : 'conexiones'}`;
+    if (outgoing.length === 0)
+      return t('workspaceEditor.graph.terminalSection', 'Sección terminal');
+    return t(
+      'workspaceEditor.graph.connectionCount',
+      `${outgoing.length} ${outgoing.length === 1 ? 'conexión' : 'conexiones'}`,
+      { count: outgoing.length },
+    );
   };
 
   // Hierarchical location path for selected node
   const nodeBreadcrumbs = useMemo(() => {
+    const docLabel =
+      rootLabel || t('workspaceEditor.graph.document', 'Documento');
     if (!selectedNode) return [];
     if (
       selectedNode.type === 'document' ||
       selectedNode.level === 0 ||
       selectedNode.pos == null
     ) {
-      return [{ text: rootLabel || 'Documento', level: 0, pos: 0 }];
+      return [{ text: docLabel, level: 0, pos: 0 }];
     }
     const path = getHeadingPath(headings, selectedNode.pos);
-    return [{ text: rootLabel || 'Documento', level: 0, pos: 0 }, ...path];
-  }, [selectedNode, rootLabel, headings]);
+    return [{ text: docLabel, level: 0, pos: 0 }, ...path];
+  }, [selectedNode, rootLabel, headings, t]);
 
   return (
     <Box
@@ -354,10 +369,22 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
             }}
           >
             {[
-              { value: 'all', label: `Todos (${allNodes.length})` },
-              { value: 'h1', label: 'Títulos (H1)' },
-              { value: 'h2', label: 'Secciones (H2)' },
-              { value: 'h3', label: 'Subsecciones (H3+)' },
+              {
+                value: 'all',
+                label: `${t('common.all', 'Todos')} (${allNodes.length})`,
+              },
+              {
+                value: 'h1',
+                label: t('workspaceEditor.graph.tabH1', 'Títulos (H1)'),
+              },
+              {
+                value: 'h2',
+                label: t('workspaceEditor.graph.tabH2', 'Secciones (H2)'),
+              },
+              {
+                value: 'h3',
+                label: t('workspaceEditor.graph.tabH3', 'Subsecciones (H3+)'),
+              },
             ].map((tab) => {
               const isActive = activeFilter === tab.value;
               return (
@@ -417,7 +444,10 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
           <InputBase
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Filtrar nodos..."
+            placeholder={t(
+              'workspaceEditor.graph.filterNodesPlaceholder',
+              'Filtrar nodos...',
+            )}
             fullWidth
             sx={{
               fontSize: '13px',
@@ -480,7 +510,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
             transition: 'all 0.15s ease',
           }}
         >
-          Reorganizar
+          {t('workspaceEditor.graph.reorganize', 'Reorganizar')}
         </Button>
 
         <GraphCanvas
@@ -545,8 +575,10 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                 whiteSpace: 'nowrap',
               }}
             >
-              Escribe encabezados (# Sección) en tu nota para ramificar el grafo
-              en vivo
+              {t(
+                'workspaceEditor.graph.emptyGuideHint',
+                'Escribe encabezados (# Sección) en tu nota para ramificar el grafo en vivo',
+              )}
             </Typography>
           </Box>
         )}
@@ -572,7 +604,10 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
           <IconButton
             size="small"
             onClick={handleResetAll}
-            title="Restaurar posiciones y zoom"
+            title={t(
+              'workspaceEditor.graph.resetPositionsAndZoom',
+              'Restaurar posiciones y zoom',
+            )}
             sx={{ color: '#ffffff', p: 0.6 }}
           >
             <UndoIcon sx={{ fontSize: 16 }} />
@@ -580,7 +615,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
           <IconButton
             size="small"
             onClick={resetPanZoom}
-            title="Centrar vista"
+            title={t('workspaceEditor.graph.centerView', 'Centrar vista')}
             sx={{ color: '#ffffff', p: 0.6 }}
           >
             <RedoIcon sx={{ fontSize: 16 }} />
@@ -661,7 +696,8 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                   flexShrink: 0,
                 }}
               >
-                {selectedNode?.outgoingCount || 3} conex.
+                {selectedNode?.outgoingCount || 3}{' '}
+                {t('workspaceEditor.graph.connectionsShort', 'conex.')}
               </Box>
             </Box>
 
@@ -701,12 +737,17 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                   transition: 'all 0.2s ease',
                 }}
               >
-                {jumpFeedback ? '¡Listo!' : 'Saltar'}
+                {jumpFeedback
+                  ? t('workspaceEditor.graph.jumpDone', '¡Listo!')
+                  : t('workspaceEditor.graph.jump', 'Saltar')}
               </Button>
               <IconButton
                 size="small"
                 onClick={() => setIsInspectorCollapsed(false)}
-                title="Expandir detalles"
+                title={t(
+                  'workspaceEditor.graph.expandDetails',
+                  'Expandir detalles',
+                )}
                 sx={{ color: 'text.secondary', p: 0.4 }}
               >
                 <ExpandIcon sx={{ fontSize: 18 }} />
@@ -862,7 +903,10 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                 <IconButton
                   size="small"
                   onClick={() => setIsInspectorCollapsed(true)}
-                  title="Minimizar panel"
+                  title={t(
+                    'workspaceEditor.graph.minimizePanel',
+                    'Minimizar panel',
+                  )}
                   sx={{ color: 'text.secondary', p: 0.5 }}
                 >
                   <CollapseIcon sx={{ fontSize: 18 }} />
@@ -899,7 +943,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                     color: 'text.secondary',
                   }}
                 >
-                  Jerarquía:
+                  {t('workspaceEditor.graph.hierarchy', 'Jerarquía:')}
                 </Typography>
                 <Typography
                   noWrap
@@ -910,8 +954,12 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                   }}
                 >
                   {selectedNode?.type === 'document'
-                    ? 'Raíz'
-                    : `Nivel ${selectedNode?.level ?? 1}`}
+                    ? t('workspaceEditor.graph.root', 'Raíz')
+                    : t(
+                        'workspaceEditor.graph.level',
+                        `Nivel ${selectedNode?.level ?? 1}`,
+                        { level: selectedNode?.level ?? 1 },
+                      )}
                 </Typography>
               </Box>
 
@@ -936,7 +984,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
                     color: 'text.secondary',
                   }}
                 >
-                  Conexiones:
+                  {t('workspaceEditor.graph.connections', 'Conexiones:')}
                 </Typography>
                 <Typography
                   noWrap
@@ -978,8 +1026,14 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
               }}
             >
               {jumpFeedback
-                ? '¡Sección localizada en el editor!'
-                : 'Ir a sección en el editor'}
+                ? t(
+                    'workspaceEditor.graph.sectionLocated',
+                    '¡Sección localizada en el editor!',
+                  )
+                : t(
+                    'workspaceEditor.graph.goToSectionInEditor',
+                    'Ir a sección en el editor',
+                  )}
             </Button>
           </Box>
         )}

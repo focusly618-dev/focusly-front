@@ -125,18 +125,6 @@ export const Settings = () => {
   return (
     <SettingsLayout>
       {/* Left Sidebar */}
-      <SettingsSidebar>
-        {tabs.map((tab) => (
-          <SidebarItem
-            key={tab.id}
-            active={activeTab === tab.id}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.icon}
-            {tab.label}
-          </SidebarItem>
-        ))}
-      </SettingsSidebar>
 
       {/* Right Content Area */}
       <ContentArea>
@@ -193,7 +181,6 @@ export const Settings = () => {
           </Box>
         </UserProfileSummary>
 
-        {/* Active Tab Panel */}
         <Box>
           {activeTab === SettingsTab.Schedule && <ScheduleSettings />}
           {activeTab === SettingsTab.Focus && <FocusEngineSettings />}
@@ -204,6 +191,18 @@ export const Settings = () => {
           {activeTab === SettingsTab.Security && <SecuritySettings />}
         </Box>
       </ContentArea>
+      <SettingsSidebar>
+        {tabs.map((tab) => (
+          <SidebarItem
+            key={tab.id}
+            active={activeTab === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.icon}
+            {tab.label}
+          </SidebarItem>
+        ))}
+      </SettingsSidebar>
     </SettingsLayout>
   );
 };

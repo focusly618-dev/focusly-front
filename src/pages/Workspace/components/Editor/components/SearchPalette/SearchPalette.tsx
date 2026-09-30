@@ -1,5 +1,6 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -51,6 +52,7 @@ export const SearchPalette = ({
   linkedTaskIds,
   onToggleTask,
 }: SearchPaletteProps) => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -126,7 +128,10 @@ export const SearchPalette = ({
             <CommandInput
               id="search-tasks-input"
               name="search-tasks-input"
-              placeholder="Search tasks to link..."
+              placeholder={t(
+                'workspaceEditor.searchTasksToLink',
+                'Search tasks to link...',
+              )}
               autoFocus
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -151,7 +156,10 @@ export const SearchPalette = ({
                   letterSpacing: '0.04em',
                 }}
               >
-                TAREAS DISPONIBLES
+                {t(
+                  'workspaceEditor.palette.availableTasks',
+                  'TAREAS DISPONIBLES',
+                )}
               </ResultTitle>
               <Typography
                 variant="caption"
@@ -168,8 +176,13 @@ export const SearchPalette = ({
                   fontWeight: 600,
                 }}
               >
-                {selectedTaskIds.size} vinculada
-                {selectedTaskIds.size === 1 ? '' : 's'}
+                {t(
+                  'workspaceEditor.palette.linkedCount',
+                  '{{count}} vinculadas',
+                  {
+                    count: selectedTaskIds.size,
+                  },
+                )}
               </Typography>
             </ResultHeader>
 
@@ -180,7 +193,10 @@ export const SearchPalette = ({
                   color="text.secondary"
                   sx={{ fontSize: '13px' }}
                 >
-                  No se encontraron tareas
+                  {t(
+                    'workspaceEditor.palette.noTasksFound',
+                    'No se encontraron tareas',
+                  )}
                 </Typography>
               </Box>
             ) : (
@@ -315,7 +331,7 @@ export const SearchPalette = ({
           <PaletteFooter>
             <Box display="flex" alignItems="center">
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Press{' '}
+                {t('workspaceEditor.palette.pressKey', 'Presiona')}{' '}
                 <Box
                   component="span"
                   sx={{
@@ -328,7 +344,10 @@ export const SearchPalette = ({
                 >
                   Enter
                 </Box>{' '}
-                para vincular o quitar tareas
+                {t(
+                  'workspaceEditor.palette.toLinkOrUnlink',
+                  'para vincular o quitar tareas',
+                )}
               </Typography>
             </Box>
             <AddTaskButton
@@ -340,7 +359,7 @@ export const SearchPalette = ({
                 setShowPalette(false);
               }}
             >
-              + Crear tarea
+              + {t('tasks.createTask', 'Crear tarea')}
             </AddTaskButton>
           </PaletteFooter>
         </CommandPaletteContainer>
@@ -360,7 +379,7 @@ export const SearchPalette = ({
             noWrap
             sx={{ whiteSpace: 'nowrap', flex: 1, fontSize: '13px' }}
           >
-            Search tasks to link...
+            {t('workspaceEditor.searchTasksToLink', 'Search tasks to link...')}
           </Typography>
           <Box
             sx={{

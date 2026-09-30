@@ -227,6 +227,98 @@ export const colorPaletteMap: Record<
     gradient: '#cbd5e1',
     isLight: true,
   },
+  pastel_matcha: {
+    gradient: '#d9f99d',
+    isLight: true,
+  },
+  pastel_creme: {
+    gradient: '#fef9c3',
+    isLight: true,
+  },
+  pastel_almond: {
+    gradient: '#ede0d4',
+    isLight: true,
+  },
+  pastel_sage: {
+    gradient: '#c2d6c4',
+    isLight: true,
+  },
+  pastel_sand: {
+    gradient: '#e8dcb8',
+    isLight: true,
+  },
+  pastel_ice: {
+    gradient: '#e0f2fe',
+    isLight: true,
+  },
+  solid_blue: {
+    gradient: '#0284c7',
+    isLight: false,
+  },
+  solid_navy: {
+    gradient: '#1d4ed8',
+    isLight: false,
+  },
+  solid_indigo: {
+    gradient: '#4338ca',
+    isLight: false,
+  },
+  solid_purple: {
+    gradient: '#7e22ce',
+    isLight: false,
+  },
+  solid_plum: {
+    gradient: '#581c87',
+    isLight: false,
+  },
+  solid_ruby: {
+    gradient: '#e11d48',
+    isLight: false,
+  },
+  solid_crimson: {
+    gradient: '#be185d',
+    isLight: false,
+  },
+  solid_amber: {
+    gradient: '#d97706',
+    isLight: false,
+  },
+  solid_emerald: {
+    gradient: '#059669',
+    isLight: false,
+  },
+  solid_forest: {
+    gradient: '#15803d',
+    isLight: false,
+  },
+  solid_teal: {
+    gradient: '#0f766e',
+    isLight: false,
+  },
+  solid_cyan: {
+    gradient: '#0891b2',
+    isLight: false,
+  },
+  solid_terracotta: {
+    gradient: '#c2410c',
+    isLight: false,
+  },
+  solid_charcoal: {
+    gradient: '#1e293b',
+    isLight: false,
+  },
+  solid_slate: {
+    gradient: '#334155',
+    isLight: false,
+  },
+  solid_wine: {
+    gradient: '#9f1239',
+    isLight: false,
+  },
+  solid_coffee: {
+    gradient: '#78350f',
+    isLight: false,
+  },
 };
 
 export const iconMap: Record<string, React.ElementType> = {

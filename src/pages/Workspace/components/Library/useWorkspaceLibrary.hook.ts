@@ -9,8 +9,8 @@ import {
 import type { WorkspaceTypes } from '../../workspace.types';
 import { sileo } from '@/utils';
 
-const LIMIT = 8;
-const GROUP_LIMIT = 8;
+const LIMIT = 18;
+const GROUP_LIMIT = 18;
 
 export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
   const [searchTerm, setSearchTerm] = useState('');
