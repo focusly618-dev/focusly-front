@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import {
-  PlayCircleOutline as PlayCircleOutlineIcon,
   AutoAwesome as AutoAwesomeIcon,
   NotificationsNoneOutlined as NotificationsIcon,
   CheckCircleRounded as CheckCircleIcon,
@@ -42,8 +41,6 @@ import {
   NewBadgeText,
   HeroTitle,
   HeroSubtitle,
-  HeroPrimaryButton,
-  HeroSecondaryButton,
   FeaturesGrid,
   FeatureCard,
   MockupTextLine,
@@ -578,35 +575,10 @@ const LandingPage: React.FC = () => {
                 </HeroSubtitle>
 
                 <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
-                  spacing={2}
-                  pt={1}
-                  justifyContent="center"
-                >
-                  <HeroPrimaryButton
-                    variant="contained"
-                    component={NavLink}
-                    to="/login"
-                  >
-                    {t('landing.getStarted')}
-                  </HeroPrimaryButton>
-                  <HeroSecondaryButton
-                    variant="outlined"
-                    onClick={() => {
-                      const el = document.getElementById('how-it-works');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    startIcon={<PlayCircleOutlineIcon sx={{ fontSize: 20 }} />}
-                  >
-                    {t('landing.watchDemo')}
-                  </HeroSecondaryButton>
-                </Stack>
-
-                <Stack
                   direction="row"
                   spacing={1.5}
                   alignItems="center"
-                  pt={2}
+                  pt={3}
                   justifyContent="center"
                 >
                   <Stack direction="row" spacing={-1}>
@@ -708,26 +680,6 @@ const LandingPage: React.FC = () => {
                   >
                     {t('landing.ai.subheading')}
                   </Typography>
-                  <Button
-                    variant="contained"
-                    component={NavLink}
-                    to="/login"
-                    sx={{
-                      backgroundColor: '#FFFFFF',
-                      color: '#000000',
-                      borderRadius: '9999px',
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      alignSelf: 'flex-start',
-                      px: 3.5,
-                      py: 1.5,
-                      '&:hover': {
-                        backgroundColor: '#E4E4E7',
-                      },
-                    }}
-                  >
-                    {t('landing.ai.tryButton')}
-                  </Button>
                 </Stack>
               </Grid>
 

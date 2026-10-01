@@ -16,7 +16,6 @@ import {
   LogoIconWrapper,
   LogoText,
   NavbarLink,
-  GetStartedButton,
   MobileMenuButton,
   topStackSx,
   logoLinkSx,
@@ -72,9 +71,6 @@ const Navbar: React.FC = () => {
                 <DarkModeIcon sx={iconSx} />
               )}
             </IconButton>
-            <GetStartedButton variant="contained">
-              {t('nav.getStarted')}
-            </GetStartedButton>
           </Stack>
 
           <Stack

@@ -65,10 +65,10 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between items-center relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-emerald-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950/20 p-4 transition-colors duration-300">
+    <div className="min-h-screen w-full flex flex-col justify-between items-center relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-emerald-50/20 dark:from-[#0b0f14] dark:via-[#111215] dark:to-[#0f1715] p-4 transition-colors duration-300">
       {/* Ambient background glows */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-teal-500/10 dark:bg-teal-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/10 dark:bg-[#10b981]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-teal-500/10 dark:bg-[#008767]/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Theme Toggle Button Top Right */}
       <div className="absolute top-6 right-6 z-20">
@@ -77,7 +77,7 @@ export const Login: React.FC = () => {
           variant="ghost"
           aria-label={t('login.toggleTheme')}
           onClick={colorMode.toggleColorMode}
-          className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700/60 shadow-sm rounded-full p-2"
+          className="bg-white/80 dark:bg-[#18191e]/90 hover:dark:bg-[#22242c] backdrop-blur-md border border-slate-200 dark:border-[#25272e] shadow-sm rounded-full p-2 transition-colors"
         >
           {colorMode.mode !== 'light' ? (
             <LightModeIcon className="text-amber-400 text-lg" />
@@ -93,7 +93,7 @@ export const Login: React.FC = () => {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#008767] to-[#059669] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-[#008767]/25 group-hover:scale-105 transition-transform duration-200">
             F
           </div>
-          <span className="font-extrabold text-2xl tracking-tight text-slate-900 dark:text-white">
+          <span className="font-extrabold text-2xl tracking-tight text-slate-900 dark:text-[#F3F4F6]">
             Focusly
           </span>
         </NavLink>
@@ -101,18 +101,18 @@ export const Login: React.FC = () => {
 
       {/* Main HeroUI Card */}
       <div className="w-full max-w-md my-auto z-10 py-4">
-        <Card className="w-full shadow-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl overflow-hidden">
+        <Card className="w-full shadow-2xl border border-slate-200/80 dark:border-[#25272e] bg-white/95 dark:bg-[#18191e]/95 backdrop-blur-xl rounded-2xl overflow-hidden dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]">
           {linkSent ? (
             <CardContent className="p-8 text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4 ring-8 ring-emerald-50/50 dark:ring-emerald-950/30">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-[#10b981]/15 text-emerald-600 dark:text-[#10b981] flex items-center justify-center mb-4 ring-8 ring-emerald-50/50 dark:ring-[#10b981]/10">
                 <EmailIcon className="text-3xl" />
               </div>
-              <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              <CardTitle className="text-2xl font-bold text-slate-900 dark:text-[#F3F4F6] mb-2">
                 {t('login.checkEmail.title')}
               </CardTitle>
-              <CardDescription className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+              <CardDescription className="text-sm text-slate-500 dark:text-[#8A8F98] mb-6 leading-relaxed">
                 {t('login.checkEmail.desc')} <br />
-                <strong className="text-slate-800 dark:text-slate-200 font-semibold">
+                <strong className="text-slate-800 dark:text-[#F3F4F6] font-semibold">
                   {email}
                 </strong>
                 .
@@ -122,7 +122,7 @@ export const Login: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => setLinkSent(false)}
-                className="font-medium flex items-center gap-2"
+                className="font-medium flex items-center gap-2 border-slate-200 dark:border-[#25272e] bg-white dark:bg-[#14151a] hover:bg-slate-50 hover:dark:bg-[#1e2025] text-slate-700 dark:text-[#F3F4F6] transition-colors"
               >
                 <ArrowBackIcon className="text-sm" />
                 {t('login.checkEmail.back')}
@@ -132,12 +132,12 @@ export const Login: React.FC = () => {
             <>
               <CardHeader className="flex flex-col items-stretch px-8 pt-8 pb-2 gap-4">
                 <div className="text-center">
-                  <CardTitle className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">
+                  <CardTitle className="text-2xl font-extrabold text-slate-900 dark:text-[#F3F4F6] tracking-tight mb-1">
                     {isRegistering
                       ? t('login.signUpTitle')
                       : t('login.signInTitle')}
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                  <CardDescription className="text-xs sm:text-sm text-slate-500 dark:text-[#8A8F98]">
                     {t('login.subtitle')}
                   </CardDescription>
                 </div>
@@ -148,16 +148,16 @@ export const Login: React.FC = () => {
                   onSelectionChange={handleTabChange}
                   className="w-full"
                 >
-                  <TabList className="flex w-full bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl">
+                  <TabList className="flex w-full bg-slate-100 dark:bg-[#121316] dark:border dark:border-[#25272e]/80 p-1 rounded-xl">
                     <Tab
                       id="signin"
-                      className="flex-1 py-2 text-center text-sm font-semibold rounded-lg cursor-pointer transition-all data-[selected]:bg-white dark:data-[selected]:bg-slate-700 data-[selected]:shadow-sm data-[selected]:text-[#008767] dark:data-[selected]:text-[#10B981] text-slate-600 dark:text-slate-400"
+                      className="flex-1 py-2 text-center text-sm font-semibold rounded-lg cursor-pointer transition-all data-[selected]:bg-white dark:data-[selected]:bg-[#22242c] dark:data-[selected]:border dark:data-[selected]:border-[#2e3037] data-[selected]:shadow-sm data-[selected]:text-[#008767] dark:data-[selected]:text-[#10B981] text-slate-600 dark:text-[#8A8F98] hover:dark:text-[#F3F4F6]"
                     >
                       {t('login.tabs.signIn')}
                     </Tab>
                     <Tab
                       id="signup"
-                      className="flex-1 py-2 text-center text-sm font-semibold rounded-lg cursor-pointer transition-all data-[selected]:bg-white dark:data-[selected]:bg-slate-700 data-[selected]:shadow-sm data-[selected]:text-[#008767] dark:data-[selected]:text-[#10B981] text-slate-600 dark:text-slate-400"
+                      className="flex-1 py-2 text-center text-sm font-semibold rounded-lg cursor-pointer transition-all data-[selected]:bg-white dark:data-[selected]:bg-[#22242c] dark:data-[selected]:border dark:data-[selected]:border-[#2e3037] data-[selected]:shadow-sm data-[selected]:text-[#008767] dark:data-[selected]:text-[#10B981] text-slate-600 dark:text-[#8A8F98] hover:dark:text-[#F3F4F6]"
                     >
                       {t('login.tabs.signUp')}
                     </Tab>
@@ -172,7 +172,7 @@ export const Login: React.FC = () => {
                   fullWidth
                   isDisabled={isLoading}
                   onClick={() => loginGoogle()}
-                  className="w-full border border-slate-200 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium text-slate-700 dark:text-slate-200 py-3 rounded-xl flex items-center justify-center gap-3"
+                  className="w-full border border-slate-200 dark:border-[#25272e] bg-white dark:bg-[#14151a] hover:bg-slate-50 hover:dark:bg-[#1e2025] hover:dark:border-[#2e3037] font-medium text-slate-700 dark:text-[#F3F4F6] py-3 rounded-xl flex items-center justify-center gap-3 transition-colors"
                 >
                   <svg width="20" height="20" viewBox="0 0 18 18">
                     <path
@@ -196,11 +196,11 @@ export const Login: React.FC = () => {
                 </Button>
 
                 <div className="flex items-center my-3 gap-3">
-                  <Separator className="flex-1 bg-slate-200 dark:bg-slate-700/80 h-px" />
-                  <span className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">
+                  <Separator className="flex-1 bg-slate-200 dark:bg-[#25272e] h-px" />
+                  <span className="text-xs text-slate-400 dark:text-[#8A8F98] uppercase tracking-wider font-semibold">
                     {t('login.orWithEmail')}
                   </span>
-                  <Separator className="flex-1 bg-slate-200 dark:bg-slate-700/80 h-px" />
+                  <Separator className="flex-1 bg-slate-200 dark:bg-[#25272e] h-px" />
                 </div>
 
                 <form
@@ -213,35 +213,35 @@ export const Login: React.FC = () => {
                 >
                   {isRegistering && (
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      <Label className="text-xs font-semibold text-slate-700 dark:text-[#F3F4F6]">
                         {t('login.fullName')}
                       </Label>
                       <div className="relative flex items-center">
-                        <PersonIcon className="absolute left-3 text-slate-400 text-lg pointer-events-none" />
+                        <PersonIcon className="absolute left-3 text-slate-400 dark:text-[#8A8F98] text-lg pointer-events-none" />
                         <Input
                           placeholder={t('login.fullNamePlaceholder')}
                           disabled={isLoading}
                           value={fullName}
                           onChange={handleFullNameChange}
-                          className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#008767]/40 focus:border-[#008767] text-sm"
+                          className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#14151a] hover:dark:bg-[#17181f] focus:dark:bg-[#14151a] border border-slate-200 dark:border-[#25272e] rounded-xl text-slate-900 dark:text-[#F3F4F6] placeholder:text-slate-400 dark:placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#008767]/30 dark:focus:ring-[#10b981]/30 focus:border-[#008767] dark:focus:border-[#10b981] text-sm transition-all"
                         />
                       </div>
                     </div>
                   )}
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <Label className="text-xs font-semibold text-slate-700 dark:text-[#F3F4F6]">
                       {t('login.email')}
                     </Label>
                     <div className="relative flex items-center">
-                      <EmailIcon className="absolute left-3 text-slate-400 text-lg pointer-events-none" />
+                      <EmailIcon className="absolute left-3 text-slate-400 dark:text-[#8A8F98] text-lg pointer-events-none" />
                       <Input
                         placeholder={t('login.emailPlaceholder')}
                         type="email"
                         disabled={isLoading}
                         value={email}
                         onChange={handleEmailChange}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#008767]/40 focus:border-[#008767] text-sm"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#14151a] hover:dark:bg-[#17181f] focus:dark:bg-[#14151a] border border-slate-200 dark:border-[#25272e] rounded-xl text-slate-900 dark:text-[#F3F4F6] placeholder:text-slate-400 dark:placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#008767]/30 dark:focus:ring-[#10b981]/30 focus:border-[#008767] dark:focus:border-[#10b981] text-sm transition-all"
                       />
                     </div>
                   </div>
@@ -250,7 +250,7 @@ export const Login: React.FC = () => {
                     type="submit"
                     fullWidth
                     isDisabled={isLoading}
-                    className="w-full bg-[#008767] hover:bg-[#007357] text-white font-semibold shadow-md shadow-[#008767]/20 transition-all py-3 rounded-xl mt-2 flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-[#008767] hover:bg-[#007357] dark:bg-[#10b981] dark:hover:bg-[#059669] text-white font-semibold shadow-md shadow-[#008767]/20 dark:shadow-[#10b981]/25 transition-all py-3 rounded-xl mt-2 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {isLoading ? (
                       <Spinner size="sm" color="current" />
@@ -264,8 +264,12 @@ export const Login: React.FC = () => {
               </CardContent>
 
               <CardFooter className="px-8 pb-8 pt-2 flex flex-col items-center justify-center">
-                <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-                  {isRegistering ? t('login.hasAccount') : t('login.noAccount')}
+                <p className="text-xs text-slate-500 dark:text-[#8A8F98] text-center flex items-center justify-center gap-1.5">
+                  <span>
+                    {isRegistering
+                      ? t('login.hasAccount')
+                      : t('login.noAccount')}
+                  </span>
                   <button
                     type="button"
                     onClick={toggleRegister}
@@ -283,17 +287,28 @@ export const Login: React.FC = () => {
       </div>
 
       {/* Footer Links */}
-      <div className="pb-6 z-10 flex flex-wrap justify-center items-center gap-6 text-xs text-slate-400 dark:text-slate-500">
-        <Link href="#" className="text-xs text-slate-500 hover:underline">
+      <div className="pb-6 z-10 flex flex-wrap justify-center items-center gap-6 text-xs text-slate-500 dark:text-[#8A8F98]">
+        <Link
+          href="#"
+          className="text-xs text-slate-500 dark:text-[#8A8F98] hover:text-slate-800 hover:dark:text-[#F3F4F6] transition-colors"
+        >
           {t('login.termsOfService')}
         </Link>
-        <Link href="#" className="text-xs text-slate-500 hover:underline">
+        <Link
+          href="#"
+          className="text-xs text-slate-500 dark:text-[#8A8F98] hover:text-slate-800 hover:dark:text-[#F3F4F6] transition-colors"
+        >
           {t('login.privacyPolicy')}
         </Link>
-        <Link href="#" className="text-xs text-slate-500 hover:underline">
+        <Link
+          href="#"
+          className="text-xs text-slate-500 dark:text-[#8A8F98] hover:text-slate-800 hover:dark:text-[#F3F4F6] transition-colors"
+        >
           {t('login.helpCenter')}
         </Link>
-        <span>{t('login.copyright')}</span>
+        <span className="text-slate-400 dark:text-[#6B7280]">
+          {t('login.copyright')}
+        </span>
       </div>
     </div>
   );

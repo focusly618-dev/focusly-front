@@ -10,7 +10,6 @@ import {
   Paper,
   useTheme,
 } from '@mui/material';
-import { NavLink } from 'react-router-dom';
 import {
   FolderOutlined as FolderIcon,
   CheckBoxOutlined as CheckBoxIcon,
@@ -47,9 +46,6 @@ import {
   DarkReviewCard,
   AnalyticsProgressBar,
   AnalyticsProgressBarFill,
-  CtaBanner,
-  CtaPrimaryButton,
-  CtaSecondaryButton,
   FooterContainer,
   FooterLink,
 } from './FeaturesPage.styles';
@@ -2385,43 +2381,6 @@ const FeaturesPage: React.FC = () => {
                 </Paper>
               </Grid>
             </Grid>
-          </Container>
-        </FeatureSectionWrapper>
-
-        {/* --- CALL TO ACTION BLUE BANNER --- */}
-        <FeatureSectionWrapper bgColor="transparent" sx={{ border: 'none' }}>
-          <Container maxWidth="lg">
-            <CtaBanner>
-              <Typography
-                variant="h2"
-                sx={{
-                  color: '#FFFFFF',
-                  fontWeight: 800,
-                  fontSize: { xs: '2rem', md: '2.75rem' },
-                }}
-              >
-                Ready to find your flow?
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: 'rgba(255,255,255,0.85)',
-                  maxWidth: 500,
-                  lineHeight: 1.6,
-                }}
-              >
-                Join 10,000+ professionals who have reclaimed their focus with
-                Focusly.
-              </Typography>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} pt={1}>
-                <CtaPrimaryButton component={NavLink} to="/login">
-                  Get Started for Free
-                </CtaPrimaryButton>
-                <CtaSecondaryButton component={NavLink} to="/login">
-                  Schedule a Demo
-                </CtaSecondaryButton>
-              </Stack>
-            </CtaBanner>
           </Container>
         </FeatureSectionWrapper>
       </MainContent>

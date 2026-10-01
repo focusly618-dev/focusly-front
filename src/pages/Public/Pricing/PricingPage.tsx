@@ -154,14 +154,6 @@ const PricingPage: React.FC = () => {
                       </Stack>
                     ))}
                   </Stack>
-
-                  <PricingButton
-                    variant="outlined"
-                    component={NavLink}
-                    to="/login"
-                  >
-                    Get Started
-                  </PricingButton>
                 </PricingCard>
               </Grid>
 
