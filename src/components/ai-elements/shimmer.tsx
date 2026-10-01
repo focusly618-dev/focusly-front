@@ -1,23 +1,23 @@
-import React, {
-  memo,
-  useMemo,
-  type CSSProperties,
-  type ElementType,
-} from 'react';
-import { motion } from 'motion/react';
-import { cn } from '@/utils';
+import React, { memo, useMemo } from 'react';
+import { Box, type SxProps, type Theme } from '@mui/material';
+import { keyframes } from '@mui/material/styles';
+import { mergeSx } from '@/styles/mui';
 
 export interface TextShimmerProps {
   children: string;
-  as?: ElementType;
-  className?: string;
+  sx?: SxProps<Theme>;
   duration?: number;
   spread?: number;
 }
 
+const sweep = keyframes`
+  from { background-position: 100% center, 0 0; }
+  to { background-position: 0% center, 0 0; }
+`;
+
 const ShimmerComponent: React.FC<TextShimmerProps> = ({
   children,
-  className,
+  sx,
   duration = 2,
   spread = 2,
 }) => {
@@ -27,29 +27,26 @@ const ShimmerComponent: React.FC<TextShimmerProps> = ({
   );
 
   return (
-    <motion.span
-      animate={{ backgroundPosition: '0% center' }}
-      className={cn(
-        'relative inline-block bg-[length:250%_100%,auto] bg-clip-text text-transparent',
-        '[--bg:linear-gradient(90deg,#0000_calc(50%-var(--spread)),var(--color-primary,rgba(99,102,241,1)),#0000_calc(50%+var(--spread)))] [background-repeat:no-repeat,padding-box]',
-        className,
+    <Box
+      component="span"
+      sx={mergeSx(
+        (theme) => ({
+          position: 'relative',
+          display: 'inline-block',
+          color: 'transparent',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          backgroundRepeat: 'no-repeat, padding-box',
+          backgroundSize: '250% 100%, auto',
+          backgroundImage: `linear-gradient(90deg, transparent calc(50% - ${dynamicSpread}px), ${theme.palette.primary.main}, transparent calc(50% + ${dynamicSpread}px)), linear-gradient(${theme.palette.text.secondary}, ${theme.palette.text.secondary})`,
+          animation: `${sweep} ${duration}s linear infinite`,
+        }),
+        sx,
       )}
-      initial={{ backgroundPosition: '100% center' }}
-      style={
-        {
-          '--spread': `${dynamicSpread}px`,
-          backgroundImage:
-            'var(--bg), linear-gradient(currentColor, currentColor)',
-        } as CSSProperties
-      }
-      transition={{
-        duration,
-        ease: 'linear',
-        repeat: Number.POSITIVE_INFINITY,
-      }}
     >
       {children}
-    </motion.span>
+    </Box>
   );
 };
 

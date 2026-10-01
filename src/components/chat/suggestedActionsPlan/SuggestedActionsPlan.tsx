@@ -3,6 +3,7 @@ import {
   Box,
   Typography,
   Button,
+  ButtonBase,
   Dialog,
   IconButton,
   Chip,
@@ -44,6 +45,7 @@ import {
   getActionTitle,
 } from '../suggestedActionCard/actionExecution.utils';
 import { useSuggestedActionsPlan } from './useSuggestedActionsPlan.hook';
+import { brand, byMode, emerald, rose, truncateSx, zinc } from '@/styles/mui';
 import type {
   SuggestedActionsPlanProps,
   PlanItemStatus,
@@ -138,19 +140,56 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
       <Plan
         defaultOpen={true}
         isStreaming={isCreating}
-        className="my-3.5 border border-emerald-500/20 bg-white/80 dark:bg-zinc-900/90 shadow-lg dark:shadow-2xl"
+        sx={{
+          my: 1.75,
+          border: `1px solid ${emerald[500]}33`,
+          bgcolor: byMode('rgba(255, 255, 255, 0.8)', `${zinc[900]}e6`),
+          boxShadow: byMode(
+            '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+            '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          ),
+        }}
       >
-        <PlanHeader className="py-3 px-4">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex items-center justify-center size-8 rounded-xl bg-[#008767]/10 text-[#008767] dark:text-[#10B981] shrink-0">
+        <PlanHeader sx={{ py: 1.5, px: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.25,
+              minWidth: 0,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 32,
+                height: 32,
+                borderRadius: '12px',
+                bgcolor: `${brand.main}1a`,
+                color: byMode(brand.main, brand.dark),
+                flexShrink: 0,
+              }}
+            >
               <EventNoteIcon sx={{ fontSize: 18 }} />
-            </div>
-            <div className="min-w-0">
-              <PlanTitle className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 truncate">
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
+              <PlanTitle
+                sx={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  letterSpacing: '-0.025em',
+                  color: byMode(zinc[900], zinc[100]),
+                  ...truncateSx,
+                }}
+              >
                 {isRescheduleOnly ? 'Cambios sugeridos' : 'Plan sugerido'} ·{' '}
                 {actions.length} {planItemLabel}
               </PlanTitle>
-              <PlanDescription className="text-xs text-zinc-500 dark:text-zinc-400">
+              <PlanDescription
+                sx={{ fontSize: '12px', color: byMode(zinc[500], zinc[400]) }}
+              >
                 {isCompleted
                   ? isRescheduleOnly
                     ? 'Horarios actualizados en tu calendario'
@@ -159,10 +198,17 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                     ? `Aplicando acciones (${completedCount}/${actions.length})...`
                     : `${actions.length} acciones listas para confirmar`}
               </PlanDescription>
-            </div>
-          </div>
+            </Box>
+          </Box>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.75,
+              flexShrink: 0,
+            }}
+          >
             {isCompleted ? (
               <Chip
                 size="small"
@@ -210,10 +256,10 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
             </TooltipIconButton>
 
             <PlanTrigger />
-          </div>
+          </Box>
         </PlanHeader>
 
-        <PlanContent className="p-3 space-y-2">
+        <PlanContent sx={{ p: 1.5, gap: 1 }}>
           {actions.map((action, idx) => {
             const preview = previews[idx];
             const status = itemStatuses[idx];
@@ -223,74 +269,204 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
               <Task
                 key={idx}
                 defaultOpen={false}
-                className="border border-black/[0.06] dark:border-white/[0.06] bg-black/[0.015] dark:bg-white/[0.02]"
+                sx={{
+                  border: '1px solid',
+                  borderColor: byMode(
+                    'rgba(0, 0, 0, 0.06)',
+                    'rgba(255, 255, 255, 0.06)',
+                  ),
+                  bgcolor: byMode(
+                    'rgba(0, 0, 0, 0.015)',
+                    'rgba(255, 255, 255, 0.02)',
+                  ),
+                }}
               >
                 <TaskTrigger>
-                  <div className="flex items-center justify-between gap-2.5 w-full py-0.5">
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 1.25,
+                      width: '100%',
+                      py: 0.25,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.25,
+                        minWidth: 0,
+                        flex: 1,
+                      }}
+                    >
                       <TaskStatus status={taskStatus} />
-                      <div className="shrink-0">
+                      <Box sx={{ flexShrink: 0, display: 'flex' }}>
                         {getActionTypeIcon(action.type)}
-                      </div>
-                      <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">
+                      </Box>
+                      <Box
+                        component="span"
+                        sx={{
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          color: byMode(zinc[800], zinc[200]),
+                          ...truncateSx,
+                        }}
+                      >
                         {preview.title || getActionTitle(action)}
-                      </span>
-                    </div>
+                      </Box>
+                    </Box>
 
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.75,
+                        flexShrink: 0,
+                      }}
+                    >
                       {preview.dateLabel && (
-                        <span className="text-[10.5px] px-2 py-0.5 rounded-full font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/40">
+                        <Box
+                          component="span"
+                          sx={{
+                            fontSize: '10.5px',
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: '999px',
+                            fontWeight: 500,
+                            bgcolor: byMode(emerald[50], `${emerald[950]}66`),
+                            color: byMode(emerald[700], emerald[300]),
+                            border: '1px solid',
+                            borderColor: byMode(
+                              `${emerald[200]}80`,
+                              `${emerald[800]}66`,
+                            ),
+                          }}
+                        >
                           {preview.dateLabel}
-                        </span>
+                        </Box>
                       )}
                       {preview.durationLabel && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-md font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/60">
+                        <Box
+                          component="span"
+                          sx={{
+                            fontSize: '10px',
+                            px: 0.75,
+                            py: 0.25,
+                            borderRadius: '6px',
+                            fontWeight: 500,
+                            color: byMode(zinc[500], zinc[400]),
+                            bgcolor: byMode(zinc[100], `${zinc[800]}99`),
+                          }}
+                        >
                           {preview.durationLabel}
-                        </span>
+                        </Box>
                       )}
                       {preview.priorityLabel && (
-                        <span
-                          className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold text-white"
-                          style={{
-                            backgroundColor: preview.priorityColor || '#008767',
+                        <Box
+                          component="span"
+                          sx={{
+                            fontSize: '10px',
+                            px: 0.75,
+                            py: 0.25,
+                            borderRadius: '6px',
+                            fontWeight: 600,
+                            color: '#ffffff',
+                            bgcolor: preview.priorityColor || brand.main,
                           }}
                         >
                           {preview.priorityLabel}
-                        </span>
+                        </Box>
                       )}
-                    </div>
-                  </div>
+                    </Box>
+                  </Box>
                 </TaskTrigger>
 
                 <TaskContent>
                   {(preview.description || preview.contentPreview) && (
-                    <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                    <Box
+                      component="p"
+                      sx={{
+                        m: 0,
+                        fontSize: '12px',
+                        lineHeight: 1.625,
+                        color: byMode(zinc[600], zinc[300]),
+                      }}
+                    >
                       {preview.description || preview.contentPreview}
-                    </p>
+                    </Box>
                   )}
 
                   {preview.subtasks && preview.subtasks.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-black/5 dark:border-white/5 space-y-1">
-                      <span className="text-[10.5px] font-bold text-zinc-500 uppercase tracking-wider block">
+                    <Box
+                      sx={{
+                        mt: 1,
+                        pt: 1,
+                        borderTop: '1px solid',
+                        borderColor: byMode(
+                          'rgba(0, 0, 0, 0.05)',
+                          'rgba(255, 255, 255, 0.05)',
+                        ),
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 0.5,
+                      }}
+                    >
+                      <Box
+                        component="span"
+                        sx={{
+                          display: 'block',
+                          fontSize: '10.5px',
+                          fontWeight: 700,
+                          color: zinc[500],
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
                         Subtareas ({preview.subtasks.length}):
-                      </span>
+                      </Box>
                       {preview.subtasks.map((st, sIdx) => (
-                        <div
+                        <Box
                           key={sIdx}
-                          className="flex items-center justify-between text-xs py-0.5 text-zinc-700 dark:text-zinc-300"
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            fontSize: '12px',
+                            py: 0.25,
+                            color: byMode(zinc[700], zinc[300]),
+                          }}
                         >
-                          <div className="flex items-center gap-2">
-                            <span className="size-1.5 rounded-full bg-[#008767]" />
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                            }}
+                          >
+                            <Box
+                              component="span"
+                              sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
+                                bgcolor: brand.main,
+                              }}
+                            />
                             <span>{st.title}</span>
-                          </div>
+                          </Box>
                           {st.durationLabel && (
-                            <span className="text-[10px] text-zinc-400">
+                            <Box
+                              component="span"
+                              sx={{ fontSize: '10px', color: zinc[400] }}
+                            >
                               {st.durationLabel}
-                            </span>
+                            </Box>
                           )}
-                        </div>
+                        </Box>
                       ))}
-                    </div>
+                    </Box>
                   )}
                 </TaskContent>
               </Task>
@@ -298,21 +474,41 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
           })}
 
           {errorMessage && (
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs">
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                p: 1,
+                borderRadius: '8px',
+                bgcolor: `${rose[500]}1a`,
+                color: byMode(rose[600], rose[400]),
+                fontSize: '12px',
+              }}
+            >
               <ErrorOutlineIcon sx={{ fontSize: 16 }} />
               <span>{errorMessage}</span>
-            </div>
+            </Box>
           )}
         </PlanContent>
 
-        <PlanFooter className="flex items-center justify-between py-2 px-4 bg-zinc-50/60 dark:bg-zinc-900/40">
-          <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+        <PlanFooter
+          sx={{
+            py: 1,
+            px: 2,
+            bgcolor: byMode(`${zinc[50]}99`, `${zinc[900]}66`),
+          }}
+        >
+          <Box
+            component="span"
+            sx={{ fontSize: '11px', color: byMode(zinc[500], zinc[400]) }}
+          >
             {isCompleted
               ? 'Todas las acciones se han ejecutado correctamente'
               : `${actions.length - completedCount} pendientes de ejecutar`}
-          </span>
+          </Box>
 
-          <div className="flex items-center gap-2">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Button
               variant="text"
               size="small"
@@ -342,7 +538,7 @@ export const SuggestedActionsPlan: React.FC<SuggestedActionsPlanProps> = ({
                 {isCreating ? 'Creando...' : 'Crear todas'}
               </Button>
             )}
-          </div>
+          </Box>
         </PlanFooter>
       </Plan>
 
@@ -538,12 +734,24 @@ const TooltipIconButton: React.FC<{
   onClick: () => void;
   children: React.ReactNode;
 }> = ({ title, onClick, children }) => (
-  <button
-    type="button"
+  <ButtonBase
     title={title}
     onClick={onClick}
-    className="inline-flex items-center justify-center size-8 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+    sx={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 32,
+      height: 32,
+      borderRadius: '8px',
+      color: zinc[500],
+      transition: 'color 0.15s ease, background-color 0.15s ease',
+      '&:hover': {
+        color: byMode(zinc[900], zinc[100]),
+        bgcolor: byMode('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.05)'),
+      },
+    }}
   >
     {children}
-  </button>
+  </ButtonBase>
 );

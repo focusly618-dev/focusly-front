@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 import type { ThemeMode } from './ColorModeContext';
+import { baselineStyles } from './baseline';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -105,6 +106,9 @@ export const getDesignTokens = (mode: ThemeMode) => {
       borderRadius: 12, // Modernized border radius to 12px
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: baselineStyles,
+      },
       MuiButton: {
         styleOverrides: {
           root: {

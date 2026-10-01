@@ -5,15 +5,15 @@ import React, {
   useState,
   useMemo,
   useCallback,
-  type ComponentProps,
   type ReactNode,
 } from 'react';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from './collapsible';
-import { cn } from '@/utils';
+  Box,
+  ButtonBase,
+  Collapse,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
 import {
   BrainIcon,
   ChevronDownIcon,
@@ -21,6 +21,15 @@ import {
   CircleDashedIcon,
   CircleIcon,
 } from 'lucide-react';
+import {
+  brand,
+  byMode,
+  emerald,
+  mergeSx,
+  spin,
+  truncateSx,
+  zinc,
+} from '@/styles/mui';
 
 interface ChainOfThoughtContextValue {
   isOpen: boolean;
@@ -42,21 +51,22 @@ export const useChainOfThought = () => {
   return context;
 };
 
-export type ChainOfThoughtProps = ComponentProps<typeof Collapsible> & {
+export interface ChainOfThoughtProps {
   isStreaming?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-};
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
 
 export const ChainOfThought: React.FC<ChainOfThoughtProps> = ({
-  className,
+  sx,
   open: controlledOpen,
   defaultOpen = false,
   onOpenChange,
   isStreaming = false,
   children,
-  ...props
 }) => {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -76,163 +86,218 @@ export const ChainOfThought: React.FC<ChainOfThoughtProps> = ({
 
   return (
     <ChainOfThoughtContext.Provider value={contextValue}>
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        className={cn(
-          'not-prose w-full rounded-xl border border-emerald-500/20 bg-emerald-50/40 dark:bg-zinc-900/60 p-2.5 backdrop-blur-sm transition-all',
-          className,
+      <Box
+        sx={mergeSx(
+          {
+            width: '100%',
+            borderRadius: '12px',
+            border: `1px solid ${emerald[500]}33`,
+            bgcolor: byMode(`${emerald[50]}66`, `${zinc[900]}99`),
+            p: 1.25,
+            backdropFilter: 'blur(4px)',
+            transition: 'all 0.15s ease',
+          },
+          sx,
         )}
-        {...props}
       >
         {children}
-      </Collapsible>
+      </Box>
     </ChainOfThoughtContext.Provider>
   );
 };
 
-export type ChainOfThoughtHeaderProps = ComponentProps<
-  typeof CollapsibleTrigger
-> & {
+export interface ChainOfThoughtHeaderProps {
   icon?: ReactNode;
-};
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
+
+const iconSx = { width: 14, height: 14, flexShrink: 0 } as const;
 
 export const ChainOfThoughtHeader: React.FC<ChainOfThoughtHeaderProps> = ({
-  className,
   icon,
+  sx,
   children,
-  ...props
 }) => {
-  const { isOpen, isStreaming } = useChainOfThought();
+  const { isOpen, setIsOpen, isStreaming } = useChainOfThought();
 
   return (
-    <CollapsibleTrigger
-      className={cn(
-        'flex w-full items-center gap-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-[#008767] dark:hover:text-[#10B981] transition-colors cursor-pointer select-none text-left',
-        className,
+    <ButtonBase
+      disableRipple
+      onClick={() => setIsOpen(!isOpen)}
+      aria-expanded={isOpen}
+      sx={mergeSx(
+        {
+          display: 'flex',
+          width: '100%',
+          alignItems: 'center',
+          gap: 1,
+          fontSize: '12px',
+          lineHeight: '16px',
+          fontWeight: 500,
+          fontFamily: 'inherit',
+          color: byMode(zinc[700], zinc[300]),
+          textAlign: 'left',
+          userSelect: 'none',
+          transition: 'color 0.15s ease',
+          '&:hover': { color: byMode(brand.main, brand.dark) },
+        },
+        sx,
       )}
-      {...props}
     >
       {icon ??
         (isStreaming ? (
-          <CircleDashedIcon className="size-3.5 text-[#008767] animate-spin shrink-0" />
+          <Box
+            component={CircleDashedIcon}
+            sx={{
+              ...iconSx,
+              color: brand.main,
+              animation: `${spin} 1s linear infinite`,
+            }}
+          />
         ) : (
-          <BrainIcon className="size-3.5 text-[#008767] shrink-0" />
+          <Box component={BrainIcon} sx={{ ...iconSx, color: brand.main }} />
         ))}
-      <span className="flex-1 truncate">
+      <Box component="span" sx={{ flex: 1, ...truncateSx }}>
         {children ?? 'Proceso de análisis'}
-      </span>
-      <ChevronDownIcon
-        className={cn(
-          'size-3.5 text-zinc-400 transition-transform duration-200 shrink-0 ml-auto',
-          isOpen ? 'rotate-180' : 'rotate-0',
-        )}
+      </Box>
+      <Box
+        component={ChevronDownIcon}
+        sx={{
+          ...iconSx,
+          ml: 'auto',
+          color: zinc[400],
+          transition: 'transform 0.2s ease',
+          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        }}
       />
-    </CollapsibleTrigger>
+    </ButtonBase>
   );
 };
 
 export type ChainOfThoughtStepStatus = 'complete' | 'active' | 'pending';
 
-export type ChainOfThoughtStepProps = ComponentProps<'div'> & {
+export interface ChainOfThoughtStepProps {
   icon?: React.ComponentType<{ className?: string }>;
   label: ReactNode;
   description?: ReactNode;
   status?: ChainOfThoughtStepStatus;
-};
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
 
-const stepStatusStyles: Record<ChainOfThoughtStepStatus, string> = {
-  active: 'text-[#008767] dark:text-[#10B981] font-medium',
-  complete: 'text-zinc-500 dark:text-zinc-400',
-  pending: 'text-zinc-400/60 dark:text-zinc-600',
+const stepStatusSx: Record<ChainOfThoughtStepStatus, SxProps<Theme>> = {
+  active: { color: byMode(brand.main, brand.dark), fontWeight: 500 },
+  complete: { color: byMode(zinc[500], zinc[400]) },
+  pending: { color: byMode(`${zinc[400]}99`, zinc[600]) },
 };
 
 export const ChainOfThoughtStep: React.FC<ChainOfThoughtStepProps> = ({
-  className,
   icon: Icon,
   label,
   description,
   status = 'complete',
+  sx,
   children,
-  ...props
 }) => (
-  <div
-    className={cn(
-      'flex items-center gap-2 text-xs py-1 transition-all',
-      stepStatusStyles[status],
-      className,
+  <Box
+    sx={mergeSx(
+      {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        fontSize: '12px',
+        lineHeight: '16px',
+        py: 0.5,
+        transition: 'all 0.15s ease',
+      },
+      stepStatusSx[status],
+      sx,
     )}
-    {...props}
   >
-    <div className="relative flex items-center justify-center shrink-0 size-4">
+    <Box
+      sx={{
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+        width: 16,
+        height: 16,
+      }}
+    >
       {status === 'complete' && (
-        <CheckCircle2Icon className="size-3.5 text-emerald-500" />
+        <Box
+          component={CheckCircle2Icon}
+          sx={{ ...iconSx, color: emerald[500] }}
+        />
       )}
       {status === 'active' && (
-        <CircleDashedIcon className="size-3.5 text-[#008767] animate-spin" />
+        <Box
+          component={CircleDashedIcon}
+          sx={{
+            ...iconSx,
+            color: brand.main,
+            animation: `${spin} 1s linear infinite`,
+          }}
+        />
       )}
       {status === 'pending' && (
-        <CircleIcon className="size-2 text-zinc-300 dark:text-zinc-700" />
+        <Box
+          component={CircleIcon}
+          sx={{ width: 8, height: 8, color: byMode(zinc[300], zinc[700]) }}
+        />
       )}
-    </div>
+    </Box>
 
-    {Icon && <Icon className="size-3.5 shrink-0 opacity-75" />}
+    {Icon && <Box component={Icon} sx={{ ...iconSx, opacity: 0.75 }} />}
 
-    <div className="flex-1 min-w-0 truncate">
-      <div className="truncate">{label}</div>
+    <Box sx={{ flex: 1, minWidth: 0, ...truncateSx }}>
+      <Box sx={truncateSx}>{label}</Box>
       {description && (
-        <div className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate">
+        <Box
+          sx={{
+            fontSize: '10px',
+            color: byMode(zinc[400], zinc[500]),
+            ...truncateSx,
+          }}
+        >
           {description}
-        </div>
+        </Box>
       )}
       {children}
-    </div>
-  </div>
+    </Box>
+  </Box>
 );
 
-export type ChainOfThoughtContentProps = ComponentProps<
-  typeof CollapsibleContent
->;
+export interface ChainOfThoughtContentProps {
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
 
 export const ChainOfThoughtContent: React.FC<ChainOfThoughtContentProps> = ({
-  className,
+  sx,
   children,
-  ...props
-}) => (
-  <CollapsibleContent
-    className={cn(
-      'mt-2.5 pt-2 border-t border-emerald-500/10 space-y-1.5',
-      'data-[state=closed]:animate-out data-[state=open]:animate-in',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </CollapsibleContent>
-);
+}) => {
+  const { isOpen } = useChainOfThought();
 
-export const ChainOfThoughtSearchResults: React.FC<ComponentProps<'div'>> = ({
-  className,
-  children,
-  ...props
-}) => (
-  <div className={cn('flex flex-wrap gap-1.5 pt-1', className)} {...props}>
-    {children}
-  </div>
-);
-
-export const ChainOfThoughtSearchResult: React.FC<ComponentProps<'span'>> = ({
-  className,
-  children,
-  ...props
-}) => (
-  <span
-    className={cn(
-      'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/15',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </span>
-);
+  return (
+    <Collapse in={isOpen} timeout={200} unmountOnExit>
+      <Box
+        sx={mergeSx(
+          {
+            mt: 1.25,
+            pt: 1,
+            borderTop: `1px solid ${emerald[500]}1a`,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.75,
+          },
+          sx,
+        )}
+      >
+        {children}
+      </Box>
+    </Collapse>
+  );
+};

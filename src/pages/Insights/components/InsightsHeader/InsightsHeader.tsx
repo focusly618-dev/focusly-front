@@ -1,6 +1,13 @@
 import React from 'react';
-import { Button, Tabs, TabList, Tab } from '@heroui/react';
-import { useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  ButtonBase,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import {
   FileDownloadOutlined,
@@ -9,7 +16,28 @@ import {
   ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { surfaceColor } from '@/context';
+import { brand } from '@/styles/mui';
 import type { InsightsHeaderProps } from './InsightsHeader.types';
+
+const actionButtonSx = {
+  borderRadius: '12px',
+  fontSize: '12px',
+  fontWeight: 600,
+  textTransform: 'none',
+  px: 1.5,
+  py: 1,
+  gap: 0.75,
+  minWidth: 0,
+  '& .MuiButton-startIcon': { m: 0 },
+} as const;
+
+const navButtonSx = {
+  p: 0.5,
+  borderRadius: '8px',
+  color: 'text.secondary',
+  transition: 'background-color 0.15s ease',
+  '&.Mui-disabled': { opacity: 0.4 },
+} as const;
 
 export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
   filter,
@@ -39,135 +67,197 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
   const selectedTabBg = surfaceColor(theme, '#334155', '#2A2A2C', '#ffffff');
 
   return (
-    <div className="w-full flex flex-col gap-6 mb-6">
+    <Box
+      sx={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        mb: 3,
+      }}
+    >
       {/* Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1
-            className="text-2xl sm:text-3xl font-extrabold tracking-tight"
-            style={{ color: theme.palette.text.primary }}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { sm: 'center' },
+          justifyContent: 'space-between',
+          gap: 2,
+        }}
+      >
+        <Box>
+          <Typography
+            component="h1"
+            sx={{
+              m: 0,
+              fontSize: { xs: '24px', sm: '30px' },
+              lineHeight: { xs: '32px', sm: '36px' },
+              fontWeight: 800,
+              letterSpacing: '-0.025em',
+              color: 'text.primary',
+            }}
           >
             {t('insightsHeader.title', { period: getPeriodLabel(filter) })}
-          </h1>
-          <p
-            className="text-xs sm:text-sm mt-1"
-            style={{ color: theme.palette.text.secondary }}
+          </Typography>
+          <Typography
+            sx={{
+              mt: 0.5,
+              fontSize: { xs: '12px', sm: '14px' },
+              color: 'text.secondary',
+            }}
           >
             {t('insightsHeader.subtitle')}
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        {/* HeroUI Action Buttons */}
-        <div className="flex items-center gap-2">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Button
-            variant="outline"
-            className="rounded-xl text-xs font-semibold px-3 py-2 flex items-center gap-1.5"
-            style={{
-              border: `1px solid ${theme.palette.divider}`,
-              color: theme.palette.text.secondary,
+            variant="outlined"
+            startIcon={<FileDownloadOutlined sx={{ fontSize: 16 }} />}
+            sx={{
+              ...actionButtonSx,
+              borderColor: 'divider',
+              color: 'text.secondary',
             }}
           >
-            <FileDownloadOutlined className="text-base" />
-            <span>{t('insightsHeader.export')}</span>
+            {t('insightsHeader.export')}
           </Button>
 
-          <Button className="bg-[#008767] hover:bg-[#007357] text-white shadow-sm rounded-xl text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer">
-            <Add className="text-base" />
-            <span>{t('insightsHeader.createReport')}</span>
+          <Button
+            variant="contained"
+            disableElevation
+            startIcon={<Add sx={{ fontSize: 16 }} />}
+            sx={{
+              ...actionButtonSx,
+              px: 2,
+              bgcolor: brand.main,
+              color: '#ffffff',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+              '&:hover': { bgcolor: brand.hover },
+            }}
+          >
+            {t('insightsHeader.createReport')}
           </Button>
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Filter Tabs & Date Navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* HeroUI Filter Tabs */}
-        <Tabs
-          selectedKey={filter}
-          onSelectionChange={(key) =>
-            onFilterChange(String(key) as typeof filter)
-          }
-          className="w-auto"
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 1.5,
+        }}
+      >
+        <ToggleButtonGroup
+          exclusive
+          value={filter}
+          onChange={(_e, value: typeof filter | null) => {
+            if (value) onFilterChange(value);
+          }}
+          sx={{
+            p: 0.5,
+            gap: 0.5,
+            borderRadius: '16px',
+            bgcolor: pillBg,
+            border: 1,
+            borderColor: 'divider',
+          }}
         >
-          <TabList
-            className="flex p-1 rounded-2xl"
-            style={{
-              backgroundColor: pillBg,
-              border: `1px solid ${theme.palette.divider}`,
-            }}
-          >
-            {filters.map((f) => {
-              const isSelected = f === filter;
-              return (
-                <Tab
-                  key={f}
-                  id={f}
-                  className="px-4 py-1.5 text-xs font-semibold rounded-xl cursor-pointer transition-all outline-none"
-                  style={{
-                    backgroundColor: isSelected ? selectedTabBg : 'transparent',
-                    color: isSelected
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                    boxShadow: isSelected
-                      ? '0 1px 2px rgba(0,0,0,0.08)'
-                      : 'none',
-                  }}
-                >
-                  {getPeriodLabel(f)}
-                </Tab>
-              );
-            })}
-          </TabList>
-        </Tabs>
+          {filters.map((f) => (
+            <ToggleButton
+              key={f}
+              value={f}
+              disableRipple
+              sx={{
+                px: 2,
+                py: 0.75,
+                border: 'none',
+                borderRadius: '12px !important',
+                fontSize: '12px',
+                fontWeight: 600,
+                lineHeight: '16px',
+                textTransform: 'none',
+                color: 'text.secondary',
+                transition: 'all 0.15s ease',
+                '&.Mui-selected, &.Mui-selected:hover': {
+                  bgcolor: selectedTabBg,
+                  color: 'primary.main',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                },
+              }}
+            >
+              {getPeriodLabel(f)}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
 
         {filter === 'Monthly' && onNavigate && (
-          <div
-            className="flex items-center gap-2 rounded-2xl px-2 py-1"
-            style={{
-              backgroundColor: pillBg,
-              border: `1px solid ${theme.palette.divider}`,
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              borderRadius: '16px',
+              px: 1,
+              py: 0.5,
+              bgcolor: pillBg,
+              border: 1,
+              borderColor: 'divider',
             }}
           >
-            <button
-              type="button"
+            <ButtonBase
               onClick={() => onNavigate('prev')}
               aria-label={t('insightsHeader.previousMonth')}
-              className="p-1 rounded-lg transition-colors cursor-pointer"
-              style={{ color: theme.palette.text.secondary }}
+              sx={navButtonSx}
             >
-              <ChevronLeftIcon className="text-sm" />
-            </button>
+              <ChevronLeftIcon sx={{ fontSize: 14 }} />
+            </ButtonBase>
 
-            <span
-              className="text-xs font-semibold min-w-[90px] text-center select-none"
-              style={{ color: theme.palette.text.primary }}
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '12px',
+                fontWeight: 600,
+                minWidth: 90,
+                textAlign: 'center',
+                userSelect: 'none',
+                color: 'text.primary',
+              }}
             >
               {periodLabel}
-            </span>
+            </Typography>
 
-            <button
-              type="button"
+            <ButtonBase
               onClick={() => onNavigate('next')}
               aria-label={t('insightsHeader.nextMonth')}
               disabled={!baseDate}
-              className="p-1 rounded-lg transition-colors cursor-pointer disabled:opacity-40"
-              style={{ color: theme.palette.text.secondary }}
+              sx={navButtonSx}
             >
-              <ChevronRightIcon className="text-sm" />
-            </button>
+              <ChevronRightIcon sx={{ fontSize: 14 }} />
+            </ButtonBase>
 
             {baseDate && onReset && (
-              <button
-                type="button"
+              <ButtonBase
                 onClick={onReset}
-                className="text-[10px] font-bold hover:underline px-1 ml-1 cursor-pointer"
-                style={{ color: theme.palette.primary.main }}
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  px: 0.5,
+                  ml: 0.5,
+                  color: 'primary.main',
+                  '&:hover': { textDecoration: 'underline' },
+                }}
               >
                 {t('calendar.today')}
-              </button>
+              </ButtonBase>
             )}
-          </div>
+          </Box>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };

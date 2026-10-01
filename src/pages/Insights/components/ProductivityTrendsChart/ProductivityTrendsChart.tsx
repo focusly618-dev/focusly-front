@@ -1,13 +1,13 @@
 import React from 'react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from '@heroui/react';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
-import { Tooltip as MuiTooltip, useTheme, type Theme } from '@mui/material';
+import {
+  Box,
+  Card,
+  Tooltip as MuiTooltip,
+  Typography,
+  useTheme,
+  type Theme,
+} from '@mui/material';
 import {
   AreaChart,
   Area,
@@ -18,6 +18,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { surfaceColor } from '@/context';
+import { brand, byMode } from '@/styles/mui';
 import type {
   CustomTooltipProps,
   ProductivityTrendsChartProps,
@@ -36,46 +37,64 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   const theme = useTheme();
   if (active && payload && payload.length) {
     return (
-      <div
-        className="p-3 border rounded-xl shadow-xl backdrop-blur-md"
-        style={{
-          backgroundColor: surfaceColor(
+      <Box
+        sx={{
+          p: 1.5,
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: '12px',
+          boxShadow:
+            '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+          backdropFilter: 'blur(12px)',
+          bgcolor: surfaceColor(
             theme,
             'rgba(15, 23, 42, 0.95)',
             'rgba(36, 36, 37, 0.95)',
             'rgba(255, 255, 255, 0.95)',
           ),
-          borderColor: theme.palette.divider,
         }}
       >
-        <p
-          className="text-xs font-bold mb-1.5"
-          style={{ color: theme.palette.text.primary }}
+        <Typography
+          sx={{
+            fontSize: '12px',
+            fontWeight: 700,
+            mb: 0.75,
+            color: 'text.primary',
+          }}
         >
           {label}
-        </p>
+        </Typography>
         {payload.map((item) => (
-          <div
+          <Box
             key={item.name}
-            className="flex items-center gap-2 text-xs"
-            style={{ color: theme.palette.text.secondary }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              fontSize: '12px',
+              color: 'text.secondary',
+            }}
           >
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: item.color }}
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: item.color,
+              }}
             />
-            <span className="flex-1">
+            <Box component="span" sx={{ flex: 1 }}>
               {item.name === 'actual' ? 'Tiempo Real' : 'Objetivo'}:
-            </span>
-            <span
-              className="font-bold"
-              style={{ color: theme.palette.text.primary }}
+            </Box>
+            <Box
+              component="span"
+              sx={{ fontWeight: 700, color: 'text.primary' }}
             >
               {formatValue(item.value)}
-            </span>
-          </div>
+            </Box>
+          </Box>
         ))}
-      </div>
+      </Box>
     );
   }
   return null;
@@ -91,111 +110,139 @@ export const ProductivityTrendsChart: React.FC<
 
   return (
     <Card
-      className="shadow-sm backdrop-blur-sm rounded-2xl p-6 w-full"
-      style={{
-        border: `1px solid ${theme.palette.divider}`,
-        backgroundColor: theme.palette.background.paper,
+      elevation={0}
+      sx={{
+        width: '100%',
+        p: 3,
+        borderRadius: '16px',
+        border: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        backdropFilter: 'blur(4px)',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
       }}
     >
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between p-0 mb-6 gap-4">
-        <div>
-          <div className="flex items-center gap-1.5">
-            <CardTitle
-              className="text-lg font-bold"
-              style={{ color: theme.palette.text.primary }}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { sm: 'center' },
+          justifyContent: 'space-between',
+          mb: 3,
+          gap: 2,
+        }}
+      >
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+            <Typography
+              component="h3"
+              sx={{ fontSize: '18px', fontWeight: 700, color: 'text.primary' }}
             >
               Rendimiento de Enfoque
-            </CardTitle>
+            </Typography>
             <MuiTooltip
               title="Comparamos tu objetivo (estimado) contra el tiempo real registrado."
               arrow
             >
               <InfoIcon
-                className="text-sm cursor-help"
-                sx={{ color: 'text.disabled' }}
+                sx={{ fontSize: 14, cursor: 'help', color: 'text.disabled' }}
               />
             </MuiTooltip>
-          </div>
-          <CardDescription
-            className="text-xs mt-0.5"
-            style={{ color: theme.palette.text.secondary }}
+          </Box>
+          <Typography
+            sx={{ fontSize: '12px', mt: 0.25, color: 'text.secondary' }}
           >
             Objetivo Estimado vs. Tiempo Real
-          </CardDescription>
-        </div>
+          </Typography>
+        </Box>
 
         {/* Legend */}
-        <div
-          className="flex items-center gap-4 text-xs font-semibold"
-          style={{ color: theme.palette.text.secondary }}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            fontSize: '12px',
+            fontWeight: 600,
+            color: 'text.secondary',
+          }}
         >
-          <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#008767] dark:bg-[#10B981]" />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                bgcolor: byMode(brand.main, brand.dark),
+              }}
+            />
             <span>Tiempo Real</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: theme.palette.divider }}
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                bgcolor: 'divider',
+              }}
             />
             <span>Objetivo</span>
-          </div>
-        </div>
-      </CardHeader>
+          </Box>
+        </Box>
+      </Box>
 
-      <CardContent className="p-0">
-        <div className="w-full h-[260px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={data}
-              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-            >
-              <defs>
-                <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#008767" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#008767" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke={theme.palette.divider}
-              />
-              <XAxis
-                dataKey="label"
-                axisLine={false}
-                tickLine={false}
-                tick={{
-                  fill: axisTickColor(theme),
-                  fontSize: 11,
-                  fontWeight: 600,
-                }}
-                dy={15}
-              />
-              <YAxis hide={true} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Area
-                type="monotone"
-                dataKey="actual"
-                stroke="#008767"
-                strokeWidth={3.5}
-                fillOpacity={1}
-                fill="url(#colorActual)"
-                animationDuration={1500}
-              />
-              <Area
-                type="monotone"
-                dataKey="planned"
-                stroke={axisTickColor(theme)}
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                fill="none"
-                animationDuration={1500}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
+      <Box sx={{ width: '100%', height: 260 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#008767" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#008767" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke={theme.palette.divider}
+            />
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fill: axisTickColor(theme),
+                fontSize: 11,
+                fontWeight: 600,
+              }}
+              dy={15}
+            />
+            <YAxis hide={true} axisLine={false} tickLine={false} />
+            <Tooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="actual"
+              stroke="#008767"
+              strokeWidth={3.5}
+              fillOpacity={1}
+              fill="url(#colorActual)"
+              animationDuration={1500}
+            />
+            <Area
+              type="monotone"
+              dataKey="planned"
+              stroke={axisTickColor(theme)}
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              fill="none"
+              animationDuration={1500}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </Box>
     </Card>
   );
 };

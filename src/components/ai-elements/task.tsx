@@ -1,10 +1,11 @@
-import React, { type ComponentProps, type ReactNode } from 'react';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from './collapsible';
-import { cn } from '@/utils';
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
+import { Box, Collapse, type SxProps, type Theme } from '@mui/material';
 import {
   ChevronDownIcon,
   CheckCircle2Icon,
@@ -12,121 +13,230 @@ import {
   AlertCircleIcon,
   ClockIcon,
 } from 'lucide-react';
+import {
+  brand,
+  byMode,
+  emerald,
+  mergeSx,
+  rose,
+  spin,
+  truncateSx,
+  zinc,
+} from '@/styles/mui';
 
 export type TaskStatusType = 'pending' | 'in_progress' | 'completed' | 'error';
 
-export interface TaskStatusProps extends ComponentProps<'div'> {
-  status: TaskStatusType;
-}
-
-export const TaskStatus: React.FC<TaskStatusProps> = ({
-  status,
-  className,
-  ...props
-}) => {
-  return (
-    <div
-      className={cn(
-        'inline-flex items-center justify-center size-5 shrink-0 rounded-full transition-colors',
-        status === 'completed' && 'text-emerald-500 bg-emerald-500/10',
-        status === 'in_progress' &&
-          'text-[#008767] bg-[#008767]/10 animate-spin',
-        status === 'pending' && 'text-zinc-400 bg-zinc-500/10',
-        status === 'error' && 'text-rose-500 bg-rose-500/10',
-        className,
-      )}
-      data-slot="task-status"
-      {...props}
-    >
-      {status === 'completed' && <CheckCircle2Icon className="size-3.5" />}
-      {status === 'in_progress' && <CircleDashedIcon className="size-3.5" />}
-      {status === 'pending' && <ClockIcon className="size-3.5" />}
-      {status === 'error' && <AlertCircleIcon className="size-3.5" />}
-    </div>
-  );
+const statusSx: Record<TaskStatusType, SxProps<Theme>> = {
+  completed: { color: emerald[500], bgcolor: `${emerald[500]}1a` },
+  in_progress: {
+    color: brand.main,
+    bgcolor: `${brand.main}1a`,
+    animation: `${spin} 1s linear infinite`,
+  },
+  pending: { color: zinc[400], bgcolor: `${zinc[500]}1a` },
+  error: { color: rose[500], bgcolor: `${rose[500]}1a` },
 };
 
-export type TaskProps = ComponentProps<typeof Collapsible>;
+const statusIcon: Record<TaskStatusType, React.ElementType> = {
+  completed: CheckCircle2Icon,
+  in_progress: CircleDashedIcon,
+  pending: ClockIcon,
+  error: AlertCircleIcon,
+};
+
+export interface TaskStatusProps {
+  status: TaskStatusType;
+  sx?: SxProps<Theme>;
+}
+
+export const TaskStatus: React.FC<TaskStatusProps> = ({ status, sx }) => (
+  <Box
+    data-slot="task-status"
+    sx={mergeSx(
+      {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 20,
+        height: 20,
+        flexShrink: 0,
+        borderRadius: '50%',
+        transition: 'color 0.15s ease, background-color 0.15s ease',
+      },
+      statusSx[status],
+      sx,
+    )}
+  >
+    <Box component={statusIcon[status]} sx={{ width: 14, height: 14 }} />
+  </Box>
+);
+
+interface TaskContextValue {
+  isOpen: boolean;
+  toggle: () => void;
+}
+
+const TaskContext = createContext<TaskContextValue | null>(null);
+
+const useTask = () => {
+  const context = useContext(TaskContext);
+  if (!context) throw new Error('Task components must be used within Task');
+  return context;
+};
+
+export interface TaskProps {
+  defaultOpen?: boolean;
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
 
 export const Task: React.FC<TaskProps> = ({
   defaultOpen = false,
-  className,
-  ...props
-}) => (
-  <Collapsible
-    className={cn(
-      'rounded-xl border border-black/5 dark:border-white/5 bg-black/[0.015] dark:bg-white/[0.02] p-2.5 transition-all hover:bg-black/[0.03] dark:hover:bg-white/[0.04]',
-      className,
-    )}
-    defaultOpen={defaultOpen}
-    {...props}
-  />
-);
+  sx,
+  children,
+}) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const contextValue = useMemo(
+    () => ({ isOpen, toggle: () => setIsOpen((open) => !open) }),
+    [isOpen],
+  );
 
-export type TaskTriggerProps = ComponentProps<typeof CollapsibleTrigger> & {
+  return (
+    <TaskContext.Provider value={contextValue}>
+      <Box
+        sx={mergeSx(
+          {
+            borderRadius: '12px',
+            border: '1px solid',
+            borderColor: byMode(
+              'rgba(0, 0, 0, 0.05)',
+              'rgba(255, 255, 255, 0.05)',
+            ),
+            bgcolor: byMode(
+              'rgba(0, 0, 0, 0.015)',
+              'rgba(255, 255, 255, 0.02)',
+            ),
+            p: 1.25,
+            transition: 'background-color 0.15s ease',
+            '&:hover': {
+              bgcolor: byMode(
+                'rgba(0, 0, 0, 0.03)',
+                'rgba(255, 255, 255, 0.04)',
+              ),
+            },
+          },
+          sx,
+        )}
+      >
+        {children}
+      </Box>
+    </TaskContext.Provider>
+  );
+};
+
+export interface TaskTriggerProps {
   title?: string;
   icon?: ReactNode;
-};
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
 
 export const TaskTrigger: React.FC<TaskTriggerProps> = ({
   children,
-  className,
   title,
   icon,
-  ...props
-}) => (
-  <CollapsibleTrigger
-    asChild
-    className={cn('group cursor-pointer w-full text-left', className)}
-    {...props}
-  >
-    {children ?? (
-      <div className="flex w-full items-center justify-between gap-2 text-sm">
-        <div className="flex items-center gap-2 min-w-0">
-          {icon}
-          <span className="truncate font-medium text-zinc-800 dark:text-zinc-200">
-            {title}
-          </span>
-        </div>
-        <ChevronDownIcon className="size-4 shrink-0 text-zinc-400 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-      </div>
-    )}
-  </CollapsibleTrigger>
-);
+  sx,
+}) => {
+  const { isOpen, toggle } = useTask();
 
-export type TaskContentProps = ComponentProps<typeof CollapsibleContent>;
+  return (
+    <Box
+      role="button"
+      tabIndex={0}
+      aria-expanded={isOpen}
+      onClick={toggle}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      }}
+      sx={mergeSx({ cursor: 'pointer', width: '100%', textAlign: 'left' }, sx)}
+    >
+      {children ?? (
+        <Box
+          sx={{
+            display: 'flex',
+            width: '100%',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 1,
+            fontSize: '14px',
+          }}
+        >
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}
+          >
+            {icon}
+            <Box
+              component="span"
+              sx={{
+                ...truncateSx,
+                fontWeight: 500,
+                color: byMode(zinc[800], zinc[200]),
+              }}
+            >
+              {title}
+            </Box>
+          </Box>
+          <Box
+            component={ChevronDownIcon}
+            sx={{
+              width: 16,
+              height: 16,
+              flexShrink: 0,
+              color: zinc[400],
+              transition: 'transform 0.2s ease',
+              transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+        </Box>
+      )}
+    </Box>
+  );
+};
 
-export const TaskContent: React.FC<TaskContentProps> = ({
-  children,
-  className,
-  ...props
-}) => (
-  <CollapsibleContent
-    className={cn(
-      'mt-2.5 pt-2 border-t border-black/5 dark:border-white/5 space-y-1.5 text-xs text-zinc-500 dark:text-zinc-400',
-      'data-[state=closed]:animate-out data-[state=open]:animate-in',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </CollapsibleContent>
-);
+export interface TaskContentProps {
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
 
-export type TaskItemProps = ComponentProps<'div'>;
+export const TaskContent: React.FC<TaskContentProps> = ({ children, sx }) => {
+  const { isOpen } = useTask();
 
-export const TaskItem: React.FC<TaskItemProps> = ({
-  children,
-  className,
-  ...props
-}) => (
-  <div
-    className={cn(
-      'flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </div>
-);
+  return (
+    <Collapse in={isOpen} timeout={200} unmountOnExit>
+      <Box
+        sx={mergeSx(
+          {
+            mt: 1.25,
+            pt: 1,
+            borderTop: '1px solid',
+            borderColor: byMode(
+              'rgba(0, 0, 0, 0.05)',
+              'rgba(255, 255, 255, 0.05)',
+            ),
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.75,
+            fontSize: '12px',
+            color: byMode(zinc[500], zinc[400]),
+          },
+          sx,
+        )}
+      >
+        {children}
+      </Box>
+    </Collapse>
+  );
+};

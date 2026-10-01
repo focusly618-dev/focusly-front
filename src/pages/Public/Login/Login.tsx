@@ -1,22 +1,20 @@
 import React, { useEffect, useContext } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
+  Box,
   Button,
-  Input,
-  Label,
-  Separator,
+  ButtonBase,
+  Card,
+  CircularProgress,
+  Divider,
+  IconButton,
+  InputAdornment,
+  InputBase,
   Link,
-  Tabs,
-  TabList,
-  Tab,
-  Spinner,
-} from '@heroui/react';
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material';
 import {
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
@@ -26,7 +24,113 @@ import {
 } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
 import { ColorModeContext } from '@/context';
+import { brand, byMode, emerald, slate } from '@/styles/mui';
 import { useLogin } from './Login.hook';
+
+// Dark surfaces of the login screen.
+const dark = {
+  card: '#18191e',
+  border: '#25272e',
+  borderHover: '#2e3037',
+  input: '#14151a',
+  inputHover: '#17181f',
+  tabs: '#121316',
+  tabSelected: '#22242c',
+  hover: '#1e2025',
+  text: '#F3F4F6',
+  muted: '#8A8F98',
+  placeholder: '#6B7280',
+} as const;
+
+const mutedText = byMode(slate[500], dark.muted);
+const strongText = byMode(slate[900], dark.text);
+const accent = byMode(brand.main, brand.dark);
+
+const labelSx = {
+  display: 'block',
+  mb: 0.75,
+  fontSize: '12px',
+  fontWeight: 600,
+  color: byMode(slate[700], dark.text),
+} as const;
+
+const inputSx = {
+  width: '100%',
+  px: 1.5,
+  py: 1.25,
+  fontSize: '14px',
+  borderRadius: '12px',
+  border: '1px solid',
+  borderColor: byMode(slate[200], dark.border),
+  bgcolor: byMode(slate[50], dark.input),
+  color: byMode(slate[900], dark.text),
+  transition: 'all 0.15s ease',
+  '&:hover': { bgcolor: byMode(slate[50], dark.inputHover) },
+  '&.Mui-focused': {
+    borderColor: accent,
+    boxShadow: byMode(`0 0 0 2px ${brand.main}4d`, `0 0 0 2px ${brand.dark}4d`),
+  },
+  '& input': { p: 0 },
+  '& input::placeholder': {
+    color: byMode(slate[400], dark.placeholder),
+    opacity: 1,
+  },
+} as const;
+
+const inputIconSx = {
+  fontSize: 18,
+  color: byMode(slate[400], dark.muted),
+} as const;
+
+const secondaryButtonSx = {
+  textTransform: 'none',
+  fontWeight: 500,
+  border: '1px solid',
+  borderColor: byMode(slate[200], dark.border),
+  bgcolor: byMode('#ffffff', dark.input),
+  color: byMode(slate[700], dark.text),
+  transition: 'all 0.15s ease',
+  '&:hover': {
+    bgcolor: byMode(slate[50], dark.hover),
+    borderColor: byMode(slate[200], dark.borderHover),
+  },
+} as const;
+
+const footerLinkSx = {
+  fontSize: '12px',
+  color: mutedText,
+  textDecoration: 'none',
+  transition: 'color 0.15s ease',
+  '&:hover': { color: byMode(slate[800], dark.text) },
+} as const;
+
+const legalLinkSx = {
+  color: accent,
+  fontWeight: 600,
+  textDecoration: 'none',
+  '&:hover': { textDecoration: 'underline' },
+} as const;
+
+const GoogleLogo = () => (
+  <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
+    <path
+      d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"
+      fill="#4285F4"
+    />
+    <path
+      d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.683 5.482 18 9 18z"
+      fill="#34A853"
+    />
+    <path
+      d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"
+      fill="#FBBC05"
+    />
+    <path
+      d="M9 3.579c1.32 0 2.508.454 3.44 1.345l2.582-2.58C13.463.894 11.426 0 9 0 5.482 0 2.438 2.317.957 5.27l3.007 2.332C4.672 5.163 6.656 3.579 9 3.579z"
+      fill="#EA4335"
+    />
+  </svg>
+);
 
 export const Login: React.FC = () => {
   const { t } = useTranslation();
@@ -57,285 +161,554 @@ export const Login: React.FC = () => {
     }
   };
 
-  const handleTabChange = (key: React.Key) => {
-    const isSignupTab = key === 'signup';
+  const handleTabChange = (_e: React.MouseEvent, tab: string | null) => {
+    if (!tab) return;
+    const isSignupTab = tab === 'signup';
     if ((isSignupTab && !isRegistering) || (!isSignupTab && isRegistering)) {
       toggleRegister();
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between items-center relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-emerald-50/20 dark:from-[#0b0f14] dark:via-[#111215] dark:to-[#0f1715] p-4 transition-colors duration-300">
+    <Box
+      sx={{
+        minHeight: '100vh',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+        p: 2,
+        transition: 'background 0.3s ease',
+        background: byMode(
+          `linear-gradient(to bottom right, ${slate[50]}, ${slate[100]}, ${emerald[50]}33)`,
+          'linear-gradient(to bottom right, #0b0f14, #111215, #0f1715)',
+        ),
+      }}
+    >
       {/* Ambient background glows */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/10 dark:bg-[#10b981]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-teal-500/10 dark:bg-[#008767]/15 rounded-full blur-3xl pointer-events-none" />
+      <Box
+        sx={{
+          position: 'absolute',
+          top: -160,
+          left: -160,
+          width: 384,
+          height: 384,
+          borderRadius: '50%',
+          bgcolor: `${emerald[500]}1a`,
+          filter: 'blur(64px)',
+          pointerEvents: 'none',
+        }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: -160,
+          right: -160,
+          width: 384,
+          height: 384,
+          borderRadius: '50%',
+          bgcolor: byMode('rgba(20, 184, 166, 0.1)', `${brand.main}26`),
+          filter: 'blur(64px)',
+          pointerEvents: 'none',
+        }}
+      />
 
       {/* Theme Toggle Button Top Right */}
-      <div className="absolute top-6 right-6 z-20">
-        <Button
-          isIconOnly
-          variant="ghost"
+      <Box sx={{ position: 'absolute', top: 24, right: 24, zIndex: 20 }}>
+        <IconButton
           aria-label={t('login.toggleTheme')}
           onClick={colorMode.toggleColorMode}
-          className="bg-white/80 dark:bg-[#18191e]/90 hover:dark:bg-[#22242c] backdrop-blur-md border border-slate-200 dark:border-[#25272e] shadow-sm rounded-full p-2 transition-colors"
+          sx={{
+            p: 1,
+            border: '1px solid',
+            borderColor: byMode(slate[200], dark.border),
+            bgcolor: byMode('rgba(255, 255, 255, 0.8)', `${dark.card}e6`),
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            transition: 'background-color 0.15s ease',
+            '&:hover': {
+              bgcolor: byMode('rgba(255, 255, 255, 0.9)', dark.tabSelected),
+            },
+          }}
         >
           {colorMode.mode !== 'light' ? (
-            <LightModeIcon className="text-amber-400 text-lg" />
+            <LightModeIcon sx={{ fontSize: 18, color: '#fbbf24' }} />
           ) : (
-            <DarkModeIcon className="text-slate-700 text-lg" />
+            <DarkModeIcon sx={{ fontSize: 18, color: slate[700] }} />
           )}
-        </Button>
-      </div>
+        </IconButton>
+      </Box>
 
       {/* Header Logo */}
-      <div className="pt-8 pb-4 flex items-center justify-center z-10">
-        <NavLink to="/" className="flex items-center gap-3 no-underline group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#008767] to-[#059669] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-[#008767]/25 group-hover:scale-105 transition-transform duration-200">
+      <Box
+        sx={{
+          pt: 4,
+          pb: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10,
+        }}
+      >
+        <Box
+          component={NavLink}
+          to="/"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            textDecoration: 'none',
+            '&:hover .login-logo-mark': { transform: 'scale(1.05)' },
+          }}
+        >
+          <Box
+            className="login-logo-mark"
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: '12px',
+              background: `linear-gradient(to top right, ${brand.main}, ${emerald[600]})`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontWeight: 900,
+              fontSize: '20px',
+              boxShadow: `0 10px 15px -3px ${brand.main}40`,
+              transition: 'transform 0.2s ease',
+            }}
+          >
             F
-          </div>
-          <span className="font-extrabold text-2xl tracking-tight text-slate-900 dark:text-[#F3F4F6]">
+          </Box>
+          <Typography
+            component="span"
+            sx={{
+              fontWeight: 800,
+              fontSize: '24px',
+              letterSpacing: '-0.025em',
+              color: strongText,
+            }}
+          >
             Focusly
-          </span>
-        </NavLink>
-      </div>
+          </Typography>
+        </Box>
+      </Box>
 
-      {/* Main HeroUI Card */}
-      <div className="w-full max-w-md my-auto z-10 py-4">
-        <Card className="w-full shadow-2xl border border-slate-200/80 dark:border-[#25272e] bg-white/95 dark:bg-[#18191e]/95 backdrop-blur-xl rounded-2xl overflow-hidden dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]">
+      {/* Main Card */}
+      <Box sx={{ width: '100%', maxWidth: 448, my: 'auto', zIndex: 10, py: 2 }}>
+        <Card
+          elevation={0}
+          sx={{
+            width: '100%',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            border: '1px solid',
+            borderColor: byMode(`${slate[200]}cc`, dark.border),
+            bgcolor: byMode('rgba(255, 255, 255, 0.95)', `${dark.card}f2`),
+            backdropFilter: 'blur(24px)',
+            boxShadow: byMode(
+              '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              '0 20px 60px -15px rgba(0, 0, 0, 0.5)',
+            ),
+          }}
+        >
           {linkSent ? (
-            <CardContent className="p-8 text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-[#10b981]/15 text-emerald-600 dark:text-[#10b981] flex items-center justify-center mb-4 ring-8 ring-emerald-50/50 dark:ring-[#10b981]/10">
-                <EmailIcon className="text-3xl" />
-              </div>
-              <CardTitle className="text-2xl font-bold text-slate-900 dark:text-[#F3F4F6] mb-2">
+            <Box
+              sx={{
+                p: 4,
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mb: 2,
+                  bgcolor: byMode(emerald[50], `${brand.dark}26`),
+                  color: byMode(emerald[600], brand.dark),
+                  boxShadow: byMode(
+                    `0 0 0 8px ${emerald[50]}80`,
+                    `0 0 0 8px ${brand.dark}1a`,
+                  ),
+                }}
+              >
+                <EmailIcon sx={{ fontSize: 30 }} />
+              </Box>
+              <Typography
+                component="h2"
+                sx={{
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  mb: 1,
+                  color: strongText,
+                }}
+              >
                 {t('login.checkEmail.title')}
-              </CardTitle>
-              <CardDescription className="text-sm text-slate-500 dark:text-[#8A8F98] mb-6 leading-relaxed">
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  lineHeight: 1.625,
+                  mb: 3,
+                  color: mutedText,
+                }}
+              >
                 {t('login.checkEmail.desc')} <br />
-                <strong className="text-slate-800 dark:text-[#F3F4F6] font-semibold">
+                <Box
+                  component="strong"
+                  sx={{ fontWeight: 600, color: byMode(slate[800], dark.text) }}
+                >
                   {email}
-                </strong>
+                </Box>
                 .
                 <br />
                 {t('login.checkEmail.instructions')}
-              </CardDescription>
+              </Typography>
               <Button
-                variant="outline"
+                variant="outlined"
                 onClick={() => setLinkSent(false)}
-                className="font-medium flex items-center gap-2 border-slate-200 dark:border-[#25272e] bg-white dark:bg-[#14151a] hover:bg-slate-50 hover:dark:bg-[#1e2025] text-slate-700 dark:text-[#F3F4F6] transition-colors"
+                startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
+                sx={{ ...secondaryButtonSx, borderRadius: '10px', px: 2 }}
               >
-                <ArrowBackIcon className="text-sm" />
                 {t('login.checkEmail.back')}
               </Button>
-            </CardContent>
+            </Box>
           ) : (
             <>
-              <CardHeader className="flex flex-col items-stretch px-8 pt-8 pb-2 gap-4">
-                <div className="text-center">
-                  <CardTitle className="text-2xl font-extrabold text-slate-900 dark:text-[#F3F4F6] tracking-tight mb-1">
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  px: 4,
+                  pt: 4,
+                  pb: 1,
+                  gap: 2,
+                }}
+              >
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography
+                    component="h1"
+                    sx={{
+                      fontSize: '24px',
+                      fontWeight: 800,
+                      letterSpacing: '-0.025em',
+                      mb: 0.5,
+                      color: strongText,
+                    }}
+                  >
                     {isRegistering
                       ? t('login.signUpTitle')
                       : t('login.signInTitle')}
-                  </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm text-slate-500 dark:text-[#8A8F98]">
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: '12px', sm: '14px' },
+                      color: mutedText,
+                    }}
+                  >
                     {t('login.subtitle')}
-                  </CardDescription>
-                </div>
+                  </Typography>
+                </Box>
 
-                {/* HeroUI Tabs */}
-                <Tabs
-                  selectedKey={isRegistering ? 'signup' : 'signin'}
-                  onSelectionChange={handleTabChange}
-                  className="w-full"
-                >
-                  <TabList className="flex w-full bg-slate-100 dark:bg-[#121316] dark:border dark:border-[#25272e]/80 p-1 rounded-xl">
-                    <Tab
-                      id="signin"
-                      className="flex-1 py-2 text-center text-sm font-semibold rounded-lg cursor-pointer transition-all data-[selected]:bg-white dark:data-[selected]:bg-[#22242c] dark:data-[selected]:border dark:data-[selected]:border-[#2e3037] data-[selected]:shadow-sm data-[selected]:text-[#008767] dark:data-[selected]:text-[#10B981] text-slate-600 dark:text-[#8A8F98] hover:dark:text-[#F3F4F6]"
-                    >
-                      {t('login.tabs.signIn')}
-                    </Tab>
-                    <Tab
-                      id="signup"
-                      className="flex-1 py-2 text-center text-sm font-semibold rounded-lg cursor-pointer transition-all data-[selected]:bg-white dark:data-[selected]:bg-[#22242c] dark:data-[selected]:border dark:data-[selected]:border-[#2e3037] data-[selected]:shadow-sm data-[selected]:text-[#008767] dark:data-[selected]:text-[#10B981] text-slate-600 dark:text-[#8A8F98] hover:dark:text-[#F3F4F6]"
-                    >
-                      {t('login.tabs.signUp')}
-                    </Tab>
-                  </TabList>
-                </Tabs>
-              </CardHeader>
-
-              <CardContent className="px-8 py-4 space-y-4">
-                {/* HeroUI Google Button */}
-                <Button
-                  variant="outline"
+                <ToggleButtonGroup
+                  exclusive
                   fullWidth
-                  isDisabled={isLoading}
-                  onClick={() => loginGoogle()}
-                  className="w-full border border-slate-200 dark:border-[#25272e] bg-white dark:bg-[#14151a] hover:bg-slate-50 hover:dark:bg-[#1e2025] hover:dark:border-[#2e3037] font-medium text-slate-700 dark:text-[#F3F4F6] py-3 rounded-xl flex items-center justify-center gap-3 transition-colors"
+                  value={isRegistering ? 'signup' : 'signin'}
+                  onChange={handleTabChange}
+                  sx={{
+                    p: 0.5,
+                    gap: 0.5,
+                    borderRadius: '12px',
+                    bgcolor: byMode(slate[100], dark.tabs),
+                    border: byMode('none', `1px solid ${dark.border}cc`),
+                  }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 18 18">
-                    <path
-                      d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"
-                      fill="#4285F4"
-                    />
-                    <path
-                      d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.683 5.482 18 9 18z"
-                      fill="#34A853"
-                    />
-                    <path
-                      d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"
-                      fill="#FBBC05"
-                    />
-                    <path
-                      d="M9 3.579c1.32 0 2.508.454 3.44 1.345l2.582-2.58C13.463.894 11.426 0 9 0 5.482 0 2.438 2.317.957 5.27l3.007 2.332C4.672 5.163 6.656 3.579 9 3.579z"
-                      fill="#EA4335"
-                    />
-                  </svg>
-                  <span>{t('login.continueWithGoogle')}</span>
+                  {(['signin', 'signup'] as const).map((tab) => (
+                    <ToggleButton
+                      key={tab}
+                      value={tab}
+                      disableRipple
+                      sx={{
+                        flex: 1,
+                        py: 1,
+                        border: '1px solid transparent',
+                        borderRadius: '8px !important',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        color: byMode(slate[600], dark.muted),
+                        transition: 'all 0.15s ease',
+                        '&:hover': {
+                          bgcolor: 'transparent',
+                          color: byMode(slate[600], dark.text),
+                        },
+                        '&.Mui-selected, &.Mui-selected:hover': {
+                          bgcolor: byMode('#ffffff', dark.tabSelected),
+                          borderColor: byMode('transparent', dark.borderHover),
+                          color: accent,
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+                        },
+                      }}
+                    >
+                      {tab === 'signin'
+                        ? t('login.tabs.signIn')
+                        : t('login.tabs.signUp')}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Box>
+
+              <Box
+                sx={{
+                  px: 4,
+                  py: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  disabled={isLoading}
+                  onClick={() => loginGoogle()}
+                  startIcon={<GoogleLogo />}
+                  sx={{
+                    ...secondaryButtonSx,
+                    py: 1.5,
+                    borderRadius: '12px',
+                    gap: 0.5,
+                  }}
+                >
+                  {t('login.continueWithGoogle')}
                 </Button>
 
-                <div className="flex items-center my-3 gap-3">
-                  <Separator className="flex-1 bg-slate-200 dark:bg-[#25272e] h-px" />
-                  <span className="text-xs text-slate-400 dark:text-[#8A8F98] uppercase tracking-wider font-semibold">
-                    {t('login.orWithEmail')}
-                  </span>
-                  <Separator className="flex-1 bg-slate-200 dark:bg-[#25272e] h-px" />
-                </div>
+                <Divider
+                  sx={{
+                    my: 0.5,
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    color: byMode(slate[400], dark.muted),
+                    '&::before, &::after': {
+                      borderColor: byMode(slate[200], dark.border),
+                    },
+                  }}
+                >
+                  {t('login.orWithEmail')}
+                </Divider>
 
-                <form
-                  onSubmit={(e) => {
+                <Box
+                  component="form"
+                  onSubmit={(e: React.FormEvent) => {
                     e.preventDefault();
                     onSignIn();
                   }}
                   onKeyDown={handleKeyDown}
-                  className="space-y-4"
+                  sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                 >
                   {isRegistering && (
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold text-slate-700 dark:text-[#F3F4F6]">
+                    <Box>
+                      <Typography
+                        component="label"
+                        htmlFor="login-full-name"
+                        sx={labelSx}
+                      >
                         {t('login.fullName')}
-                      </Label>
-                      <div className="relative flex items-center">
-                        <PersonIcon className="absolute left-3 text-slate-400 dark:text-[#8A8F98] text-lg pointer-events-none" />
-                        <Input
-                          placeholder={t('login.fullNamePlaceholder')}
-                          disabled={isLoading}
-                          value={fullName}
-                          onChange={handleFullNameChange}
-                          className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#14151a] hover:dark:bg-[#17181f] focus:dark:bg-[#14151a] border border-slate-200 dark:border-[#25272e] rounded-xl text-slate-900 dark:text-[#F3F4F6] placeholder:text-slate-400 dark:placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#008767]/30 dark:focus:ring-[#10b981]/30 focus:border-[#008767] dark:focus:border-[#10b981] text-sm transition-all"
-                        />
-                      </div>
-                    </div>
+                      </Typography>
+                      <InputBase
+                        id="login-full-name"
+                        placeholder={t('login.fullNamePlaceholder')}
+                        disabled={isLoading}
+                        value={fullName}
+                        onChange={handleFullNameChange}
+                        startAdornment={
+                          <InputAdornment position="start">
+                            <PersonIcon sx={inputIconSx} />
+                          </InputAdornment>
+                        }
+                        sx={inputSx}
+                      />
+                    </Box>
                   )}
 
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-slate-700 dark:text-[#F3F4F6]">
+                  <Box>
+                    <Typography
+                      component="label"
+                      htmlFor="login-email"
+                      sx={labelSx}
+                    >
                       {t('login.email')}
-                    </Label>
-                    <div className="relative flex items-center">
-                      <EmailIcon className="absolute left-3 text-slate-400 dark:text-[#8A8F98] text-lg pointer-events-none" />
-                      <Input
-                        placeholder={t('login.emailPlaceholder')}
-                        type="email"
-                        disabled={isLoading}
-                        value={email}
-                        onChange={handleEmailChange}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#14151a] hover:dark:bg-[#17181f] focus:dark:bg-[#14151a] border border-slate-200 dark:border-[#25272e] rounded-xl text-slate-900 dark:text-[#F3F4F6] placeholder:text-slate-400 dark:placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#008767]/30 dark:focus:ring-[#10b981]/30 focus:border-[#008767] dark:focus:border-[#10b981] text-sm transition-all"
-                      />
-                    </div>
-                  </div>
+                    </Typography>
+                    <InputBase
+                      id="login-email"
+                      placeholder={t('login.emailPlaceholder')}
+                      type="email"
+                      disabled={isLoading}
+                      value={email}
+                      onChange={handleEmailChange}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <EmailIcon sx={inputIconSx} />
+                        </InputAdornment>
+                      }
+                      sx={inputSx}
+                    />
+                  </Box>
 
                   <Button
                     type="submit"
                     fullWidth
-                    isDisabled={isLoading}
-                    className="w-full bg-[#008767] hover:bg-[#007357] dark:bg-[#10b981] dark:hover:bg-[#059669] text-white font-semibold shadow-md shadow-[#008767]/20 dark:shadow-[#10b981]/25 transition-all py-3 rounded-xl mt-2 flex items-center justify-center gap-2 cursor-pointer"
+                    variant="contained"
+                    disableElevation
+                    disabled={isLoading}
+                    sx={{
+                      mt: 1,
+                      py: 1.5,
+                      borderRadius: '12px',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      fontSize: '14px',
+                      color: '#ffffff',
+                      bgcolor: accent,
+                      boxShadow: byMode(
+                        `0 4px 6px -1px ${brand.main}33`,
+                        `0 4px 6px -1px ${brand.dark}40`,
+                      ),
+                      '&:hover': { bgcolor: byMode(brand.hover, emerald[600]) },
+                    }}
                   >
                     {isLoading ? (
-                      <Spinner size="sm" color="current" />
+                      <CircularProgress size={18} color="inherit" />
                     ) : isRegistering ? (
                       t('login.createAccount')
                     ) : (
                       t('login.signIn')
                     )}
                   </Button>
-                </form>
+                </Box>
 
                 {/* Signing in creates the account, so acceptance is stated up front */}
-                <p className="text-xs leading-relaxed text-center text-slate-500 dark:text-[#8A8F98]">
+                <Typography
+                  sx={{
+                    fontSize: '12px',
+                    lineHeight: 1.625,
+                    textAlign: 'center',
+                    color: mutedText,
+                  }}
+                >
                   <Trans
                     i18nKey="legal.loginNotice"
                     components={{
                       terms: (
-                        <a
+                        <Link
                           href="/terms"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#008767] dark:text-[#10B981] font-semibold hover:underline"
+                          sx={legalLinkSx}
                         />
                       ),
                       privacy: (
-                        <a
+                        <Link
                           href="/privacy"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#008767] dark:text-[#10B981] font-semibold hover:underline"
+                          sx={legalLinkSx}
                         />
                       ),
                     }}
                   />
-                </p>
-              </CardContent>
+                </Typography>
+              </Box>
 
-              <CardFooter className="px-8 pb-8 pt-2 flex flex-col items-center justify-center">
-                <p className="text-xs text-slate-500 dark:text-[#8A8F98] text-center flex items-center justify-center gap-1.5">
+              <Box
+                sx={{
+                  px: 4,
+                  pb: 4,
+                  pt: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                <Typography
+                  component="div"
+                  sx={{
+                    fontSize: '12px',
+                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    color: mutedText,
+                  }}
+                >
                   <span>
                     {isRegistering
                       ? t('login.hasAccount')
                       : t('login.noAccount')}
                   </span>
-                  <button
-                    type="button"
+                  <ButtonBase
                     onClick={toggleRegister}
-                    className="text-[#008767] dark:text-[#10B981] font-semibold hover:underline bg-transparent border-0 cursor-pointer p-0"
+                    sx={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: accent,
+                      '&:hover': { textDecoration: 'underline' },
+                    }}
                   >
                     {isRegistering
                       ? t('login.signInHere')
                       : t('login.signUpHere')}
-                  </button>
-                </p>
-              </CardFooter>
+                  </ButtonBase>
+                </Typography>
+              </Box>
             </>
           )}
         </Card>
-      </div>
+      </Box>
 
       {/* Footer Links */}
-      <div className="pb-6 z-10 flex flex-wrap justify-center items-center gap-6 text-xs text-slate-500 dark:text-[#8A8F98]">
-        <Link
-          href="/terms"
-          className="text-xs text-slate-500 dark:text-[#8A8F98] hover:text-slate-800 hover:dark:text-[#F3F4F6] transition-colors"
-        >
+      <Box
+        sx={{
+          pb: 3,
+          zIndex: 10,
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 3,
+          fontSize: '12px',
+          color: mutedText,
+        }}
+      >
+        <Link href="/terms" sx={footerLinkSx}>
           {t('login.termsOfService')}
         </Link>
-        <Link
-          href="/privacy"
-          className="text-xs text-slate-500 dark:text-[#8A8F98] hover:text-slate-800 hover:dark:text-[#F3F4F6] transition-colors"
-        >
+        <Link href="/privacy" sx={footerLinkSx}>
           {t('login.privacyPolicy')}
         </Link>
-        <Link
-          href="#"
-          className="text-xs text-slate-500 dark:text-[#8A8F98] hover:text-slate-800 hover:dark:text-[#F3F4F6] transition-colors"
-        >
+        <Link href="#" sx={footerLinkSx}>
           {t('login.helpCenter')}
         </Link>
-        <span className="text-slate-400 dark:text-[#6B7280]">
+        <Box
+          component="span"
+          sx={{ color: byMode(slate[400], dark.placeholder) }}
+        >
           {t('login.copyright')}
-        </span>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

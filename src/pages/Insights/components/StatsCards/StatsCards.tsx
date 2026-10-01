@@ -1,21 +1,21 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@heroui/react';
-import { useTheme } from '@mui/material';
+import { Box, Card, Typography } from '@mui/material';
 import {
   AccessTime,
   CheckCircleOutline,
   Bolt,
   Psychology as BrainIcon,
 } from '@mui/icons-material';
+import { amber, brand, byMode, emerald, purple } from '@/styles/mui';
 import type { StatsCardsProps } from './StatsCards.types';
+
+const iconSx = { fontSize: 20 } as const;
 
 export const StatsCards: React.FC<StatsCardsProps> = ({
   totalFocusHours,
   taskCompletion,
   energyScore,
 }) => {
-  const theme = useTheme();
-
   const cards = [
     {
       title: 'TOTAL FOCUS',
@@ -26,10 +26,10 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
           ? '📈 +12% vs período anterior'
           : totalFocusHours.change,
       icon: (
-        <AccessTime className="text-[#008767] dark:text-[#10B981] text-xl" />
+        <AccessTime sx={{ ...iconSx, color: byMode(brand.main, brand.dark) }} />
       ),
-      iconBg: 'bg-emerald-50 dark:bg-emerald-950/60',
-      changeColor: 'text-emerald-600 dark:text-emerald-400',
+      iconBg: byMode(emerald[50], `${emerald[950]}99`),
+      changeColor: byMode(emerald[600], emerald[400]),
     },
     {
       title: 'TAREAS COMPLETADAS',
@@ -39,10 +39,12 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
           ? '📈 +5% vs período anterior'
           : taskCompletion.change,
       icon: (
-        <CheckCircleOutline className="text-emerald-600 dark:text-emerald-400 text-xl" />
+        <CheckCircleOutline
+          sx={{ ...iconSx, color: byMode(emerald[600], emerald[400]) }}
+        />
       ),
-      iconBg: 'bg-emerald-50 dark:bg-emerald-950/60',
-      changeColor: 'text-emerald-600 dark:text-emerald-400',
+      iconBg: byMode(emerald[50], `${emerald[950]}99`),
+      changeColor: byMode(emerald[600], emerald[400]),
     },
     {
       title: 'ENERGÍA PROMEDIO',
@@ -51,8 +53,8 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         energyScore.change === '0 pts'
           ? 'Rendimiento estable'
           : energyScore.change,
-      icon: <Bolt className="text-amber-500 text-xl" />,
-      iconBg: 'bg-amber-50 dark:bg-amber-950/60',
+      icon: <Bolt sx={{ ...iconSx, color: amber[500] }} />,
+      iconBg: byMode(amber[50], `${amber[950]}99`),
       changeColor: null,
     },
     {
@@ -60,57 +62,105 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
       value: '65%',
       change: 'Rango óptimo de enfoque',
       icon: (
-        <BrainIcon className="text-purple-600 dark:text-purple-400 text-xl" />
+        <BrainIcon
+          sx={{ ...iconSx, color: byMode(purple[600], purple[400]) }}
+        />
       ),
-      iconBg: 'bg-purple-50 dark:bg-purple-950/60',
-      changeColor: 'text-purple-600 dark:text-purple-400',
+      iconBg: byMode(purple[50], `${purple[950]}99`),
+      changeColor: byMode(purple[600], purple[400]),
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          lg: 'repeat(4, 1fr)',
+        },
+        gap: 2,
+      }}
+    >
       {cards.map((card, idx) => (
         <Card
           key={idx}
-          className="shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm rounded-2xl p-4"
-          style={{
-            border: `1px solid ${theme.palette.divider}`,
-            backgroundColor: theme.palette.background.paper,
+          elevation={0}
+          sx={{
+            p: 2,
+            borderRadius: '16px',
+            border: 1,
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            backdropFilter: 'blur(4px)',
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            transition: 'box-shadow 0.2s ease',
+            '&:hover': {
+              boxShadow:
+                '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+            },
           }}
         >
-          <CardHeader className="flex flex-row items-center justify-between p-0 mb-3">
-            <span
-              className="text-[10px] font-extrabold uppercase tracking-widest"
-              style={{ color: theme.palette.text.secondary }}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 1.5,
+            }}
+          >
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '10px',
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: 'text.secondary',
+              }}
             >
               {card.title}
-            </span>
-            <div
-              className={`p-2 rounded-xl ${card.iconBg} flex items-center justify-center`}
+            </Typography>
+            <Box
+              sx={{
+                p: 1,
+                borderRadius: '12px',
+                bgcolor: card.iconBg,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
               {card.icon}
-            </div>
-          </CardHeader>
-          <CardContent className="p-0 space-y-1">
-            <CardTitle
-              className="text-2xl sm:text-3xl font-extrabold tracking-tight"
-              style={{ color: theme.palette.text.primary }}
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            <Typography
+              component="h3"
+              sx={{
+                m: 0,
+                fontSize: { xs: '24px', sm: '30px' },
+                lineHeight: { xs: '32px', sm: '36px' },
+                fontWeight: 800,
+                letterSpacing: '-0.025em',
+                color: 'text.primary',
+              }}
             >
               {card.value}
-            </CardTitle>
-            <p
-              className={`text-xs font-semibold ${card.changeColor || ''}`}
-              style={
-                card.changeColor
-                  ? undefined
-                  : { color: theme.palette.text.secondary }
-              }
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: card.changeColor ?? 'text.secondary',
+              }}
             >
               {card.change}
-            </p>
-          </CardContent>
+            </Typography>
+          </Box>
         </Card>
       ))}
-    </div>
+    </Box>
   );
 };

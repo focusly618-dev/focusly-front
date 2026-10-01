@@ -1,82 +1,90 @@
-import React, { useId } from 'react';
-import { cn } from '@/utils';
+import React from 'react';
+import { Box } from '@mui/material';
+import { keyframes } from '@mui/material/styles';
+import { brand, byMode, emerald, mergeSx } from '@/styles/mui';
 import type { LuminaSpeakingWaveProps } from './LuminaSpeakingWave.types';
+
+const soundWaveBar = keyframes`
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+`;
+
+// Height (px), duration (s) and delay (s) of each bar.
+const BARS = [
+  { height: 10, duration: 0.8, delay: 0 },
+  { height: 14, duration: 1.1, delay: 0.15 },
+  { height: 16, duration: 0.9, delay: 0.3 },
+  { height: 12, duration: 1.25, delay: 0.1 },
+  { height: 8, duration: 0.75, delay: 0.25 },
+];
 
 export const LuminaSpeakingWave: React.FC<LuminaSpeakingWaveProps> = ({
   isSpeaking = true,
-  className,
+  sx,
   label,
   size = 'sm',
 }) => {
-  const baseId = useId();
-  const cleanId = baseId.replace(/:/g, '');
-
   if (!isSpeaking) return null;
 
   return (
-    <div
-      className={cn(
-        'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full select-none transition-all',
-        'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25',
-        className,
+    <Box
+      sx={mergeSx(
+        {
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 0.75,
+          px: 1.25,
+          py: 0.25,
+          borderRadius: '999px',
+          userSelect: 'none',
+          transition: 'all 0.15s ease',
+          bgcolor: byMode(`${emerald[500]}1a`, `${emerald[500]}33`),
+          color: byMode(emerald[600], emerald[400]),
+          border: `1px solid ${emerald[500]}40`,
+        },
+        sx,
       )}
     >
-      <style>{`
-        @keyframes soundWaveBar-${cleanId} {
-          0%, 100% {
-            transform: scaleY(0.25);
-          }
-          50% {
-            transform: scaleY(1);
-          }
-        }
-        .sound-bar-${cleanId} {
-          transform-origin: center bottom;
-          will-change: transform;
-        }
-      `}</style>
-      <div
-        className={cn(
-          'flex items-end gap-[2px]',
-          size === 'sm' ? 'h-3.5' : 'h-4',
-        )}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: '2px',
+          height: size === 'sm' ? 14 : 16,
+        }}
       >
-        <span
-          className={`sound-bar-${cleanId} w-[2px] h-2.5 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
-          style={{
-            animation: `soundWaveBar-${cleanId} 0.8s ease-in-out infinite`,
-          }}
-        />
-        <span
-          className={`sound-bar-${cleanId} w-[2px] h-3.5 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
-          style={{
-            animation: `soundWaveBar-${cleanId} 1.1s ease-in-out infinite 0.15s`,
-          }}
-        />
-        <span
-          className={`sound-bar-${cleanId} w-[2px] h-4 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
-          style={{
-            animation: `soundWaveBar-${cleanId} 0.9s ease-in-out infinite 0.3s`,
-          }}
-        />
-        <span
-          className={`sound-bar-${cleanId} w-[2px] h-3 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
-          style={{
-            animation: `soundWaveBar-${cleanId} 1.25s ease-in-out infinite 0.1s`,
-          }}
-        />
-        <span
-          className={`sound-bar-${cleanId} w-[2px] h-2 bg-gradient-to-t from-[#008767] to-[#059669] dark:from-[#10B981] dark:to-[#34D399] rounded-full`}
-          style={{
-            animation: `soundWaveBar-${cleanId} 0.75s ease-in-out infinite 0.25s`,
-          }}
-        />
-      </div>
+        {BARS.map(({ height, duration, delay }) => (
+          <Box
+            key={`${height}-${delay}`}
+            component="span"
+            sx={{
+              width: '2px',
+              height,
+              borderRadius: '999px',
+              transformOrigin: 'center bottom',
+              willChange: 'transform',
+              background: byMode(
+                `linear-gradient(to top, ${brand.main}, ${emerald[600]})`,
+                `linear-gradient(to top, ${brand.dark}, ${emerald[400]})`,
+              ),
+              animation: `${soundWaveBar} ${duration}s ease-in-out infinite ${delay}s`,
+            }}
+          />
+        ))}
+      </Box>
       {label && (
-        <span className="text-[11px] font-semibold tracking-tight leading-none">
+        <Box
+          component="span"
+          sx={{
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '-0.025em',
+            lineHeight: 1,
+          }}
+        >
           {label}
-        </span>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };

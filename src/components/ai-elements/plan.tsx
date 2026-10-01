@@ -3,19 +3,24 @@ import React, {
   createContext,
   useContext,
   useMemo,
-  type ComponentProps,
+  useState,
+  type ReactNode,
 } from 'react';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from './collapsible';
-import { cn } from '@/utils';
+  Box,
+  ButtonBase,
+  Collapse,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
 import { ChevronsUpDownIcon } from 'lucide-react';
 import { Shimmer } from './shimmer';
+import { byMode, mergeSx, visuallyHiddenSx, zinc } from '@/styles/mui';
 
 interface PlanContextValue {
   isStreaming: boolean;
+  isOpen: boolean;
+  toggle: () => void;
 }
 
 const PlanContext = createContext<PlanContextValue | null>(null);
@@ -28,165 +33,207 @@ export const usePlan = () => {
   return context;
 };
 
-export type PlanProps = ComponentProps<typeof Collapsible> & {
+interface SxChildrenProps {
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
+
+export interface PlanProps extends SxChildrenProps {
   isStreaming?: boolean;
-};
+  defaultOpen?: boolean;
+}
 
 export const Plan: React.FC<PlanProps> = ({
-  className,
+  sx,
   isStreaming = false,
   children,
   defaultOpen = true,
-  ...props
 }) => {
-  const contextValue = useMemo(() => ({ isStreaming }), [isStreaming]);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const contextValue = useMemo(
+    () => ({ isStreaming, isOpen, toggle: () => setIsOpen((open) => !open) }),
+    [isStreaming, isOpen],
+  );
 
   return (
     <PlanContext.Provider value={contextValue}>
-      <Collapsible
-        defaultOpen={defaultOpen}
-        className={cn(
-          'w-full rounded-2xl border border-white/10 dark:border-white/10 bg-white/70 dark:bg-zinc-900/80 backdrop-blur-md shadow-sm transition-all overflow-hidden',
-          className,
+      <Box
+        sx={mergeSx(
+          {
+            width: '100%',
+            borderRadius: '16px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            bgcolor: byMode('rgba(255, 255, 255, 0.7)', `${zinc[900]}cc`),
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            transition: 'all 0.15s ease',
+            overflow: 'hidden',
+          },
+          sx,
         )}
-        {...props}
       >
         {children}
-      </Collapsible>
+      </Box>
     </PlanContext.Provider>
   );
 };
 
-export type PlanHeaderProps = ComponentProps<'div'>;
-
-export const PlanHeader: React.FC<PlanHeaderProps> = ({
-  className,
-  ...props
-}) => (
-  <div
-    className={cn(
-      'flex items-center justify-between gap-3 px-4 py-3 border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]',
-      className,
-    )}
+export const PlanHeader: React.FC<SxChildrenProps> = ({ sx, children }) => (
+  <Box
     data-slot="plan-header"
-    {...props}
-  />
-);
-
-export type PlanTitleProps = ComponentProps<'h4'>;
-
-export const PlanTitle: React.FC<PlanTitleProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  const { isStreaming } = usePlan();
-
-  return (
-    <h4
-      className={cn(
-        'text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2',
-        className,
-      )}
-      data-slot="plan-title"
-      {...props}
-    >
-      {isStreaming && typeof children === 'string' ? (
-        <Shimmer>{children}</Shimmer>
-      ) : (
-        children
-      )}
-    </h4>
-  );
-};
-
-export type PlanDescriptionProps = ComponentProps<'p'>;
-
-export const PlanDescription: React.FC<PlanDescriptionProps> = ({
-  className,
-  children,
-  ...props
-}) => {
-  const { isStreaming } = usePlan();
-
-  return (
-    <p
-      className={cn('text-xs text-zinc-500 dark:text-zinc-400', className)}
-      data-slot="plan-description"
-      {...props}
-    >
-      {isStreaming && typeof children === 'string' ? (
-        <Shimmer>{children}</Shimmer>
-      ) : (
-        children
-      )}
-    </p>
-  );
-};
-
-export type PlanActionProps = ComponentProps<'div'>;
-
-export const PlanAction: React.FC<PlanActionProps> = ({
-  className,
-  ...props
-}) => (
-  <div
-    className={cn('flex items-center gap-2', className)}
-    data-slot="plan-action"
-    {...props}
-  />
-);
-
-export type PlanContentProps = ComponentProps<typeof CollapsibleContent>;
-
-export const PlanContent: React.FC<PlanContentProps> = ({
-  className,
-  children,
-  ...props
-}) => (
-  <CollapsibleContent
-    className={cn(
-      'px-4 py-3 space-y-2.5 transition-all data-[state=closed]:animate-out data-[state=open]:animate-in',
-      className,
+    sx={mergeSx(
+      {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 1.5,
+        px: 2,
+        py: 1.5,
+        borderBottom: '1px solid',
+        borderColor: byMode('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.05)'),
+        bgcolor: byMode('rgba(0, 0, 0, 0.02)', 'rgba(255, 255, 255, 0.02)'),
+      },
+      sx,
     )}
-    data-slot="plan-content"
-    {...props}
   >
     {children}
-  </CollapsibleContent>
+  </Box>
 );
 
-export type PlanFooterProps = ComponentProps<'div'>;
+export const PlanTitle: React.FC<SxChildrenProps> = ({ sx, children }) => {
+  const { isStreaming } = usePlan();
 
-export const PlanFooter: React.FC<PlanFooterProps> = ({
-  className,
-  ...props
-}) => (
-  <div
-    className={cn(
-      'flex items-center justify-between px-4 py-2.5 border-t border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01]',
-      className,
-    )}
+  return (
+    <Box
+      component="h4"
+      data-slot="plan-title"
+      sx={mergeSx(
+        {
+          m: 0,
+          fontSize: '14px',
+          lineHeight: '20px',
+          fontWeight: 600,
+          color: byMode(zinc[900], zinc[100]),
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+        },
+        sx,
+      )}
+    >
+      {isStreaming && typeof children === 'string' ? (
+        <Shimmer>{children}</Shimmer>
+      ) : (
+        children
+      )}
+    </Box>
+  );
+};
+
+export const PlanDescription: React.FC<SxChildrenProps> = ({
+  sx,
+  children,
+}) => {
+  const { isStreaming } = usePlan();
+
+  return (
+    <Box
+      component="p"
+      data-slot="plan-description"
+      sx={mergeSx(
+        {
+          m: 0,
+          fontSize: '12px',
+          lineHeight: '16px',
+          color: byMode(zinc[500], zinc[400]),
+        },
+        sx,
+      )}
+    >
+      {isStreaming && typeof children === 'string' ? (
+        <Shimmer>{children}</Shimmer>
+      ) : (
+        children
+      )}
+    </Box>
+  );
+};
+
+export const PlanContent: React.FC<SxChildrenProps> = ({ sx, children }) => {
+  const { isOpen } = usePlan();
+
+  return (
+    <Collapse in={isOpen} timeout={200}>
+      <Box
+        data-slot="plan-content"
+        sx={mergeSx(
+          {
+            px: 2,
+            py: 1.5,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1.25,
+          },
+          sx,
+        )}
+      >
+        {children}
+      </Box>
+    </Collapse>
+  );
+};
+
+export const PlanFooter: React.FC<SxChildrenProps> = ({ sx, children }) => (
+  <Box
     data-slot="plan-footer"
-    {...props}
-  />
-);
-
-export type PlanTriggerProps = ComponentProps<typeof CollapsibleTrigger>;
-
-export const PlanTrigger: React.FC<PlanTriggerProps> = ({
-  className,
-  ...props
-}) => (
-  <CollapsibleTrigger
-    className={cn(
-      'inline-flex items-center justify-center size-8 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer',
-      className,
+    sx={mergeSx(
+      {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        px: 2,
+        py: 1.25,
+        borderTop: '1px solid',
+        borderColor: byMode('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.05)'),
+        bgcolor: byMode('rgba(0, 0, 0, 0.01)', 'rgba(255, 255, 255, 0.01)'),
+      },
+      sx,
     )}
-    data-slot="plan-trigger"
-    {...props}
   >
-    <ChevronsUpDownIcon className="size-4" />
-    <span className="sr-only">Toggle plan</span>
-  </CollapsibleTrigger>
+    {children}
+  </Box>
 );
+
+export const PlanTrigger: React.FC<{ sx?: SxProps<Theme> }> = ({ sx }) => {
+  const { isOpen, toggle } = usePlan();
+
+  return (
+    <ButtonBase
+      data-slot="plan-trigger"
+      onClick={toggle}
+      aria-expanded={isOpen}
+      sx={mergeSx(
+        {
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 32,
+          height: 32,
+          borderRadius: '8px',
+          color: zinc[500],
+          transition: 'all 0.15s ease',
+          '&:hover': {
+            color: byMode(zinc[900], zinc[100]),
+            bgcolor: byMode('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.05)'),
+          },
+        },
+        sx,
+      )}
+    >
+      <Box component={ChevronsUpDownIcon} sx={{ width: 16, height: 16 }} />
+      <Box component="span" sx={visuallyHiddenSx}>
+        Toggle plan
+      </Box>
+    </ButtonBase>
+  );
+};

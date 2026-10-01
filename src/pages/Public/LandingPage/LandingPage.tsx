@@ -28,6 +28,7 @@ import {
   ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import Navbar from '@/components/layout/Navbar';
+import { pulse } from '@/styles/mui';
 import AnimatedHeroEditor from './components/AnimatedHeroEditor';
 
 import {
@@ -325,18 +326,19 @@ const AnimatedProjectMockup = () => {
                       }}
                     >
                       {typedProject}
-                      <span
-                        className="animate-pulse"
-                        style={{
+                      <Box
+                        component="span"
+                        sx={{
                           display: 'inline-block',
                           width: '2px',
                           height: '12px',
                           backgroundColor: '#a78bfa',
                           marginLeft: '2px',
+                          animation: `${pulse} 2s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
                         }}
                       >
                         |
-                      </span>
+                      </Box>
                     </Typography>
                   </Stack>
                 )}

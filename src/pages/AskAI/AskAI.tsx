@@ -86,6 +86,7 @@ import {
   extractUserIntent,
 } from '@/utils';
 import { surfaceColor } from '@/context';
+import { byMode, emerald, fadeIn, truncateSx, zinc } from '@/styles/mui';
 import {
   AskAIContainer,
   ChatScrollArea,
@@ -1574,20 +1575,42 @@ export const AskAI: React.FC = () => {
                           <ChainOfThought
                             defaultOpen={isStreamingOrSubmitted}
                             isStreaming={isStreamingOrSubmitted}
-                            className="my-1.5 w-full"
+                            sx={{ my: 0.75, width: '100%' }}
                           >
                             <ChainOfThoughtHeader>
-                              <span className="flex items-center gap-1.5 truncate">
-                                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.75,
+                                  ...truncateSx,
+                                }}
+                              >
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    fontWeight: 600,
+                                    color: byMode(zinc[800], zinc[200]),
+                                  }}
+                                >
                                   {isStreamingOrSubmitted
                                     ? 'El usuario está queriendo'
                                     : 'El usuario requirió'}
                                   :
-                                </span>
-                                <span className="font-normal text-zinc-600 dark:text-zinc-400 italic truncate">
+                                </Box>
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    fontWeight: 400,
+                                    fontStyle: 'italic',
+                                    color: byMode(zinc[600], zinc[400]),
+                                    ...truncateSx,
+                                  }}
+                                >
                                   {userIntent}
-                                </span>
-                              </span>
+                                </Box>
+                              </Box>
                             </ChainOfThoughtHeader>
                             <ChainOfThoughtContent>
                               <ChainOfThoughtStep
@@ -1620,10 +1643,42 @@ export const AskAI: React.FC = () => {
                                 }
                               />
                               {reasoningText && (
-                                <div className="mt-2.5 p-3 rounded-lg bg-zinc-100/80 dark:bg-zinc-800/60 border border-black/5 dark:border-white/5 font-mono text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed max-h-56 overflow-y-auto">
-                                  <div className="font-sans font-semibold text-[11px] text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1.5">
+                                <Box
+                                  sx={{
+                                    mt: 1.25,
+                                    p: 1.5,
+                                    borderRadius: '8px',
+                                    bgcolor: byMode(
+                                      `${zinc[100]}cc`,
+                                      `${zinc[800]}99`,
+                                    ),
+                                    border: '1px solid',
+                                    borderColor: byMode(
+                                      'rgba(0, 0, 0, 0.05)',
+                                      'rgba(255, 255, 255, 0.05)',
+                                    ),
+                                    fontFamily:
+                                      'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                                    fontSize: '12px',
+                                    lineHeight: 1.625,
+                                    color: byMode(zinc[700], zinc[300]),
+                                    maxHeight: 224,
+                                    overflowY: 'auto',
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      fontFamily: 'inherit',
+                                      fontWeight: 600,
+                                      fontSize: '11px',
+                                      color: byMode(emerald[600], emerald[400]),
+                                      textTransform: 'uppercase',
+                                      letterSpacing: '0.05em',
+                                      mb: 0.75,
+                                    }}
+                                  >
                                     Pensamiento de Lumina
-                                  </div>
+                                  </Box>
                                   <div
                                     dangerouslySetInnerHTML={{
                                       __html: renderMarkdown(
@@ -1633,7 +1688,7 @@ export const AskAI: React.FC = () => {
                                       ),
                                     }}
                                   />
-                                </div>
+                                </Box>
                               )}
                             </ChainOfThoughtContent>
                           </ChainOfThought>
@@ -1641,7 +1696,24 @@ export const AskAI: React.FC = () => {
 
                         {/* Loading interaction while AI is working */}
                         {!displayCleanText && isStreamingOrSubmitted && (
-                          <div className="flex items-center gap-2.5 py-2.5 px-3.5 my-1.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-500/15 w-fit animate-in fade-in duration-300">
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1.25,
+                              py: 1.25,
+                              px: 1.75,
+                              my: 0.75,
+                              borderRadius: '12px',
+                              bgcolor: byMode(
+                                `${emerald[50]}80`,
+                                `${emerald[950]}33`,
+                              ),
+                              border: `1px solid ${emerald[500]}26`,
+                              width: 'fit-content',
+                              animation: `${fadeIn} 0.3s ease`,
+                            }}
+                          >
                             <LuminaOrb
                               size={18}
                               state="thinking"
@@ -1649,11 +1721,15 @@ export const AskAI: React.FC = () => {
                             />
                             <Shimmer
                               duration={1.5}
-                              className="text-xs font-medium text-emerald-700 dark:text-emerald-400"
+                              sx={{
+                                fontSize: '12px',
+                                fontWeight: 500,
+                                color: byMode(emerald[700], emerald[400]),
+                              }}
                             >
                               Lumina está trabajando en tu solicitud...
                             </Shimmer>
-                          </div>
+                          </Box>
                         )}
 
                         {displayCleanText && (
@@ -1677,11 +1753,18 @@ export const AskAI: React.FC = () => {
                               </Typography>
                             )}
                             {hasPendingAction && (
-                              <div className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                              <Box
+                                sx={{
+                                  mt: 1,
+                                  fontSize: '12px',
+                                  fontWeight: 500,
+                                  color: byMode(emerald[600], emerald[400]),
+                                }}
+                              >
                                 <Shimmer duration={1.5}>
                                   Lumina está preparando los cambios...
                                 </Shimmer>
-                              </div>
+                              </Box>
                             )}
                           </MessageBubble>
                         )}
@@ -2103,8 +2186,8 @@ export const AskAI: React.FC = () => {
           </Menu>
 
           {/* AI Elements PromptInput */}
-          <div
-            className="w-full max-w-3xl"
+          <Box
+            sx={{ width: '100%', maxWidth: 768 }}
             ref={inputBoxRef as unknown as React.Ref<HTMLDivElement>}
           >
             <input
@@ -2258,7 +2341,14 @@ export const AskAI: React.FC = () => {
                   sendMessage(inputValue);
                 }
               }}
-              className="border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900/90 shadow-lg"
+              sx={{
+                border: '1px solid',
+                borderColor: byMode(
+                  'rgba(0, 0, 0, 0.1)',
+                  'rgba(255, 255, 255, 0.1)',
+                ),
+                bgcolor: byMode('rgba(255, 255, 255, 0.8)', `${zinc[900]}e6`),
+              }}
             >
               {(selectedContext || attachedFiles.length > 0) && (
                 <PromptInputHeader>
@@ -2338,19 +2428,25 @@ export const AskAI: React.FC = () => {
                       }
                     }}
                     disabled={isTrialLimitReached}
-                    className={
+                    sx={
                       selectedContext
-                        ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
-                        : ''
+                        ? {
+                            color: byMode(emerald[700], emerald[400]),
+                            bgcolor: byMode(emerald[50], `${emerald[950]}66`),
+                          }
+                        : undefined
                     }
                     title="Referenciar contexto (@)"
                   >
                     <AtIcon sx={{ fontSize: 16 }} />
-                    <span className="hidden sm:inline">
+                    <Box
+                      component="span"
+                      sx={{ display: { xs: 'none', sm: 'inline' } }}
+                    >
                       {selectedContext
                         ? `@${selectedContext.title}`
                         : 'Contexto'}
-                    </span>
+                    </Box>
                   </PromptInputButton>
 
                   <PromptInputButton
@@ -2363,7 +2459,12 @@ export const AskAI: React.FC = () => {
                     ) : (
                       <AttachFileIcon sx={{ fontSize: 16 }} />
                     )}
-                    <span className="hidden sm:inline">Adjuntar</span>
+                    <Box
+                      component="span"
+                      sx={{ display: { xs: 'none', sm: 'inline' } }}
+                    >
+                      Adjuntar
+                    </Box>
                   </PromptInputButton>
 
                   <PromptInputButton
@@ -2376,9 +2477,12 @@ export const AskAI: React.FC = () => {
                     ) : (
                       <GeminiIcon sx={{ fontSize: 14 }} />
                     )}
-                    <span className="hidden sm:inline">
+                    <Box
+                      component="span"
+                      sx={{ display: { xs: 'none', sm: 'inline' } }}
+                    >
                       {getModelLabel(selectedModel)}
-                    </span>
+                    </Box>
                     <ArrowDownIcon sx={{ fontSize: 14 }} />
                   </PromptInputButton>
                 </PromptInputTools>
@@ -2501,7 +2605,7 @@ export const AskAI: React.FC = () => {
                 Gemini 1.5 Flash
               </MenuItem>
             </Menu>
-          </div>
+          </Box>
 
           <Typography
             variant="caption"

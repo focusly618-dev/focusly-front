@@ -33,6 +33,12 @@ export const LegalContent = styled(Box)(({ theme }) => ({
     paddingLeft: theme.spacing(3),
     margin: theme.spacing(0, 0, 2),
   },
+  '& ul': {
+    listStyle: 'disc',
+  },
+  '& ol': {
+    listStyle: 'decimal',
+  },
   '& li': {
     marginBottom: theme.spacing(0.75),
   },

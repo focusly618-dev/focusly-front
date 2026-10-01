@@ -4,14 +4,15 @@ import React, {
   useRef,
   useEffect,
   useCallback,
-  type ComponentProps,
-  type HTMLAttributes,
-  type TextareaHTMLAttributes,
+  type ReactNode,
+  type ChangeEvent,
   type FormEvent,
   type KeyboardEvent,
+  type MouseEvent,
 } from 'react';
-import { cn } from '@/utils';
+import { Box, ButtonBase, type SxProps, type Theme } from '@mui/material';
 import { ArrowUpIcon, SquareIcon, Loader2Icon } from 'lucide-react';
+import { brand, byMode, mergeSx, spin, zinc } from '@/styles/mui';
 
 export type ChatStatus = 'ready' | 'submitted' | 'streaming' | 'error';
 
@@ -23,19 +24,23 @@ interface PromptInputContextValue {
 
 const PromptInputContext = createContext<PromptInputContextValue>({});
 
-export interface PromptInputProps extends HTMLAttributes<HTMLFormElement> {
+interface SxChildrenProps {
+  sx?: SxProps<Theme>;
+  children?: ReactNode;
+}
+
+export interface PromptInputProps extends SxChildrenProps {
   status?: ChatStatus;
   onStop?: () => void;
   onSubmit?: (e?: FormEvent) => void;
 }
 
 export const PromptInput: React.FC<PromptInputProps> = ({
-  className,
+  sx,
   status = 'ready',
   onStop,
   onSubmit,
   children,
-  ...props
 }) => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -50,65 +55,100 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     <PromptInputContext.Provider
       value={{ status, onStop, onSubmit: () => onSubmit?.() }}
     >
-      <form
+      <Box
+        component="form"
         onSubmit={handleSubmit}
-        className={cn(
-          'relative flex flex-col w-full rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900/90 backdrop-blur-md shadow-lg transition-all focus-within:border-[#008767]/50 dark:focus-within:border-[#008767]/50 focus-within:ring-2 focus-within:ring-[#008767]/15 p-2.5',
-          className,
-        )}
         data-slot="prompt-input"
-        {...props}
+        sx={mergeSx(
+          {
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            borderRadius: '16px',
+            border: '1px solid',
+            borderColor: byMode(
+              'rgba(0, 0, 0, 0.1)',
+              'rgba(255, 255, 255, 0.1)',
+            ),
+            bgcolor: byMode('rgba(255, 255, 255, 0.8)', `${zinc[900]}e6`),
+            backdropFilter: 'blur(12px)',
+            boxShadow:
+              '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+            transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+            p: 1.25,
+            '&:focus-within': {
+              borderColor: `${brand.main}80`,
+              boxShadow: `0 0 0 2px ${brand.main}26, 0 10px 15px -3px rgba(0, 0, 0, 0.1)`,
+            },
+          },
+          sx,
+        )}
       >
         {children}
-      </form>
+      </Box>
     </PromptInputContext.Provider>
   );
 };
 
-export type PromptInputHeaderProps = HTMLAttributes<HTMLDivElement>;
-
-export const PromptInputHeader: React.FC<PromptInputHeaderProps> = ({
-  className,
+export const PromptInputHeader: React.FC<SxChildrenProps> = ({
+  sx,
   children,
-  ...props
 }) => {
   if (!children) return null;
   return (
-    <div
-      className={cn(
-        'flex flex-wrap items-center gap-1.5 px-1 pb-2 border-b border-black/5 dark:border-white/5',
-        className,
-      )}
+    <Box
       data-slot="prompt-input-header"
-      {...props}
+      sx={mergeSx(
+        {
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 0.75,
+          px: 0.5,
+          pb: 1,
+          borderBottom: '1px solid',
+          borderColor: byMode(
+            'rgba(0, 0, 0, 0.05)',
+            'rgba(255, 255, 255, 0.05)',
+          ),
+        },
+        sx,
+      )}
     >
       {children}
-    </div>
+    </Box>
   );
 };
 
-export type PromptInputBodyProps = HTMLAttributes<HTMLDivElement>;
-
-export const PromptInputBody: React.FC<PromptInputBodyProps> = ({
-  className,
+export const PromptInputBody: React.FC<SxChildrenProps> = ({
+  sx,
   children,
-  ...props
 }) => (
-  <div
-    className={cn('relative flex-1 min-w-0 py-1', className)}
+  <Box
     data-slot="prompt-input-body"
-    {...props}
+    sx={mergeSx({ position: 'relative', flex: 1, minWidth: 0, py: 0.5 }, sx)}
   >
     {children}
-  </div>
+  </Box>
 );
 
-export interface PromptInputTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  maxRows?: number;
+export interface PromptInputTextareaProps {
+  value?: string;
+  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  onKeyDown?: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
+  onPaste?: React.ClipboardEventHandler<HTMLTextAreaElement>;
+  placeholder?: string;
+  rows?: number;
+  disabled?: boolean;
+  autoFocus?: boolean;
+  sx?: SxProps<Theme>;
 }
 
+const MAX_TEXTAREA_HEIGHT = 180;
+
 export const PromptInputTextarea: React.FC<PromptInputTextareaProps> = ({
-  className,
+  sx,
   value,
   onChange,
   onKeyDown,
@@ -124,7 +164,7 @@ export const PromptInputTextarea: React.FC<PromptInputTextareaProps> = ({
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
+    el.style.height = `${Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT)}px`;
   }, []);
 
   useEffect(() => {
@@ -146,156 +186,239 @@ export const PromptInputTextarea: React.FC<PromptInputTextareaProps> = ({
   };
 
   return (
-    <textarea
+    <Box
+      component="textarea"
       ref={textareaRef}
       value={value}
-      onChange={(e) => {
+      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
         onChange?.(e);
         adjustHeight();
       }}
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
       rows={rows}
-      className={cn(
-        'w-full resize-none border-none bg-transparent px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-0 leading-relaxed max-h-[180px]',
-        className,
-      )}
       data-slot="prompt-input-textarea"
+      sx={mergeSx(
+        {
+          width: '100%',
+          resize: 'none',
+          border: 'none',
+          outline: 'none',
+          bgcolor: 'transparent',
+          px: 1,
+          py: 0.75,
+          fontFamily: 'inherit',
+          fontSize: '14px',
+          lineHeight: 1.625,
+          color: byMode(zinc[900], zinc[100]),
+          maxHeight: MAX_TEXTAREA_HEIGHT,
+          '&::placeholder': { color: zinc[400], opacity: 1 },
+        },
+        sx,
+      )}
       {...props}
     />
   );
 };
 
-export type PromptInputFooterProps = HTMLAttributes<HTMLDivElement>;
-
-export const PromptInputFooter: React.FC<PromptInputFooterProps> = ({
-  className,
+export const PromptInputFooter: React.FC<SxChildrenProps> = ({
+  sx,
   children,
-  ...props
 }) => (
-  <div
-    className={cn(
-      'flex items-center justify-between gap-2 pt-1 px-1',
-      className,
-    )}
+  <Box
     data-slot="prompt-input-footer"
-    {...props}
+    sx={mergeSx(
+      {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 1,
+        pt: 0.5,
+        px: 0.5,
+      },
+      sx,
+    )}
   >
     {children}
-  </div>
+  </Box>
 );
 
-export type PromptInputToolsProps = HTMLAttributes<HTMLDivElement>;
-
-export const PromptInputTools: React.FC<PromptInputToolsProps> = ({
-  className,
+export const PromptInputTools: React.FC<SxChildrenProps> = ({
+  sx,
   children,
-  ...props
 }) => (
-  <div
-    className={cn('flex items-center gap-1.5 min-w-0 flex-wrap', className)}
+  <Box
     data-slot="prompt-input-tools"
-    {...props}
+    sx={mergeSx(
+      {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.75,
+        minWidth: 0,
+        flexWrap: 'wrap',
+      },
+      sx,
+    )}
   >
     {children}
-  </div>
+  </Box>
 );
 
-export interface PromptInputButtonProps extends ComponentProps<'button'> {
-  icon?: React.ReactNode;
+export interface PromptInputButtonProps extends SxChildrenProps {
+  icon?: ReactNode;
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+  disabled?: boolean;
+  title?: string;
 }
 
 export const PromptInputButton: React.FC<PromptInputButtonProps> = ({
-  className,
+  sx,
   children,
   icon,
-  type = 'button',
   ...props
 }) => (
-  <button
-    type={type}
-    className={cn(
-      'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 bg-black/[0.03] dark:bg-white/[0.04] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0',
-      className,
-    )}
+  <ButtonBase
+    type="button"
     data-slot="prompt-input-button"
+    sx={mergeSx(
+      {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.75,
+        px: 1.25,
+        py: 0.75,
+        borderRadius: '12px',
+        fontFamily: 'inherit',
+        fontSize: '12px',
+        fontWeight: 500,
+        flexShrink: 0,
+        color: byMode(zinc[600], zinc[300]),
+        bgcolor: byMode('rgba(0, 0, 0, 0.03)', 'rgba(255, 255, 255, 0.04)'),
+        transition: 'color 0.15s ease, background-color 0.15s ease',
+        '&:hover': {
+          color: byMode(zinc[900], zinc[100]),
+          bgcolor: byMode('rgba(0, 0, 0, 0.06)', 'rgba(255, 255, 255, 0.08)'),
+        },
+      },
+      sx,
+    )}
     {...props}
   >
     {icon}
     {children}
-  </button>
+  </ButtonBase>
 );
 
-export interface PromptInputSubmitProps extends ComponentProps<'button'> {
+export interface PromptInputSubmitProps extends SxChildrenProps {
   status?: ChatStatus;
   onStop?: () => void;
+  disabled?: boolean;
 }
 
+const roundButtonSx = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 32,
+  height: 32,
+  borderRadius: '50%',
+  flexShrink: 0,
+  transition: 'all 0.15s ease',
+} as const;
+
 export const PromptInputSubmit: React.FC<PromptInputSubmitProps> = ({
-  className,
+  sx,
   status: statusProp,
   onStop: onStopProp,
   disabled,
   children,
-  ...props
 }) => {
   const context = useContext(PromptInputContext);
   const status = statusProp || context.status || 'ready';
   const onStop = onStopProp || context.onStop;
 
-  const isStreaming = status === 'streaming';
-  const isSubmitted = status === 'submitted';
-
-  if (isStreaming) {
+  if (status === 'streaming') {
     return (
-      <button
+      <ButtonBase
         type="button"
         onClick={(e) => {
           e.preventDefault();
           onStop?.();
         }}
-        className={cn(
-          'inline-flex items-center justify-center size-8 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-all cursor-pointer shadow-sm shrink-0',
-          className,
-        )}
         title="Detener respuesta"
         data-slot="prompt-input-submit-stop"
+        sx={mergeSx(
+          {
+            ...roundButtonSx,
+            bgcolor: byMode(zinc[900], '#ffffff'),
+            color: byMode('#ffffff', zinc[900]),
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            '&:hover': { opacity: 0.9 },
+          },
+          sx,
+        )}
       >
-        <SquareIcon className="size-3.5 fill-current" />
-      </button>
+        <Box
+          component={SquareIcon}
+          sx={{ width: 14, height: 14, fill: 'currentColor' }}
+        />
+      </ButtonBase>
     );
   }
 
-  if (isSubmitted) {
+  if (status === 'submitted') {
     return (
-      <button
+      <ButtonBase
         type="button"
         disabled
-        className={cn(
-          'inline-flex items-center justify-center size-8 rounded-full bg-[#008767]/20 text-[#008767] dark:text-[#10B981] shrink-0 cursor-wait',
-          className,
-        )}
         title="Generando..."
         data-slot="prompt-input-submit-loading"
+        sx={mergeSx(
+          {
+            ...roundButtonSx,
+            bgcolor: `${brand.main}33`,
+            color: byMode(brand.main, brand.dark),
+            cursor: 'wait',
+          },
+          sx,
+        )}
       >
-        <Loader2Icon className="size-4 animate-spin" />
-      </button>
+        <Box
+          component={Loader2Icon}
+          sx={{
+            width: 16,
+            height: 16,
+            animation: `${spin} 1s linear infinite`,
+          }}
+        />
+      </ButtonBase>
     );
   }
 
   return (
-    <button
+    <ButtonBase
       type="submit"
       disabled={disabled}
-      className={cn(
-        'inline-flex items-center justify-center size-8 rounded-full bg-[#008767] hover:bg-[#007357] text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shadow-sm shrink-0',
-        className,
-      )}
       title="Enviar mensaje"
       data-slot="prompt-input-submit"
-      {...props}
+      sx={mergeSx(
+        {
+          ...roundButtonSx,
+          bgcolor: brand.main,
+          color: '#ffffff',
+          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+          '&:hover': { bgcolor: brand.hover },
+          '&.Mui-disabled': { opacity: 0.3 },
+        },
+        sx,
+      )}
     >
-      {children ?? <ArrowUpIcon className="size-4 stroke-[2.5]" />}
-    </button>
+      {children ?? (
+        <Box
+          component={ArrowUpIcon}
+          sx={{ width: 16, height: 16, strokeWidth: 2.5 }}
+        />
+      )}
+    </ButtonBase>
   );
 };

@@ -73,6 +73,33 @@ export interface WorkspaceLibraryHeaderProps {
   onProjectTabChange?: (tab: ProjectTab) => void;
 }
 
+// Quick sort options shown as chips under the title ("Filtrar por:").
+const PROJECT_SORT_CHIPS: {
+  value: ProjectSortOption;
+  labelKey: string;
+  fallback: string;
+  Icon: typeof AccessTimeIcon;
+}[] = [
+  {
+    value: 'recent',
+    labelKey: 'projects.sort.recent',
+    fallback: 'Recientemente Actualizado',
+    Icon: AccessTimeIcon,
+  },
+  {
+    value: 'name-asc',
+    labelKey: 'projects.sort.nameAsc',
+    fallback: 'Nombre (A a Z)',
+    Icon: SortByAlphaIcon,
+  },
+  {
+    value: 'notes-count',
+    labelKey: 'projects.sort.mostNotes',
+    fallback: 'Más Notas',
+    Icon: DescriptionIcon,
+  },
+];
+
 const PROJECT_COLORS = [
   { name: 'All', value: 'all' },
   { name: 'Purple', value: '#7c3aed' },
@@ -536,10 +563,10 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
+            gap: 1.25,
             mb: 3,
             overflowX: 'auto',
-            py: 0.5,
+            py: 0.75,
             '&::-webkit-scrollbar': { display: 'none' },
             scrollbarWidth: 'none',
           }}
@@ -557,23 +584,22 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
             {t('projects.filterBy', 'Filtrar por:')}
           </Typography>
 
-          {PROJECT_COLORS.map((c) => {
-            const isSelected = projectColorFilter === c.value;
-            const chipColor =
-              c.value === 'all' ? theme.palette.primary.main : c.value;
+          {PROJECT_SORT_CHIPS.map(({ value, labelKey, fallback, Icon }) => {
+            const isSelected = projectSortBy === value;
+            const chipColor = theme.palette.primary.main;
 
             return (
               <Box
-                key={c.value}
-                onClick={() => onProjectColorFilterChange(c.value)}
+                key={value}
+                onClick={() => onProjectSortChange(value)}
                 sx={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 0.75,
-                  px: 1.5,
-                  py: 0.45,
-                  height: '30px',
-                  borderRadius: '20px',
+                  gap: 1,
+                  px: 2.25,
+                  py: 1,
+                  minHeight: '38px',
+                  borderRadius: '999px',
                   cursor: 'pointer',
                   border: '1px solid',
                   borderColor: isSelected
@@ -593,7 +619,7 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                       ? lighten(chipColor, 0.4)
                       : darken(chipColor, 0.15)
                     : 'text.secondary',
-                  fontSize: '12px',
+                  fontSize: '13.5px',
                   fontWeight: isSelected ? 700 : 500,
                   transition: 'all 0.18s ease',
                   flexShrink: 0,
@@ -607,45 +633,18 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
                       : isDark
                         ? 'rgba(255, 255, 255, 0.08)'
                         : '#F9FAFB',
-                    borderColor: isSelected
-                      ? isDark
-                        ? lighten(chipColor, 0.35)
-                        : chipColor
-                      : isDark
-                        ? 'rgba(255, 255, 255, 0.2)'
-                        : '#D1D5DB',
                     color: isDark ? '#ffffff' : '#0f172a',
                   },
                 }}
               >
-                {c.value === 'all' ? (
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      background:
-                        'linear-gradient(135deg, #7c3aed, #3b82f6, #10b981, #f59e0b, #f43f5e)',
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: c.value,
-                      boxShadow: `0 0 0 1.5px ${alpha(c.value, 0.3)}`,
-                    }}
-                  />
-                )}
-                {c.name === 'All' ? t('common.all', 'Todos') : c.name}
+                <Icon sx={{ fontSize: 18 }} />
+                {t(labelKey, fallback)}
               </Box>
             );
           })}
 
           {/* Limpiar filtros */}
-          {projectColorFilter !== 'all' && (
+          {(projectSortBy !== 'recent' || projectColorFilter !== 'all') && (
             <Button
               size="small"
               onClick={() => {
