@@ -81,6 +81,8 @@ export const useLoginAuth = ({
     flow: 'auth-code',
     scope: 'https://www.googleapis.com/auth/calendar',
     redirect_uri: window.location.origin,
+    // @ts-expect-error: prompt is a valid Google OAuth parameter not included in UseGoogleLoginOptionsAuthCodeFlow types
+    prompt: 'consent',
     onSuccess: async (codeResponse) => {
       setIsLoading(true);
       try {
