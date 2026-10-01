@@ -3,16 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Alert, Box, Button, Container, Stack } from '@mui/material';
+import { Alert, Box, Button, Container } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
-import Navbar from '@/components/layout/Navbar';
-import {
-  Footer,
-  FooterLink,
-  FooterText,
-  MainContent,
-  PageWrapper,
-} from '@/pages/Public/LandingPage/LandingPage.styles';
+import { SiteLayout } from '@/pages/Public/Site/components/SiteLayout';
 import { LegalContent } from './LegalPage.styles';
 
 export type LegalDocument = 'terms' | 'privacy';
@@ -66,10 +59,8 @@ const LegalPage: React.FC<LegalPageProps> = ({ document: doc }) => {
   }, [doc, t]);
 
   return (
-    <PageWrapper>
-      <Navbar />
-
-      <MainContent>
+    <SiteLayout>
+      <Box component="main">
         <Container maxWidth="md" sx={{ py: { xs: 6, md: 10 } }}>
           <Button
             component={RouterLink}
@@ -95,23 +86,8 @@ const LegalPage: React.FC<LegalPageProps> = ({ document: doc }) => {
             </ReactMarkdown>
           </LegalContent>
         </Container>
-      </MainContent>
-
-      <Footer>
-        <Stack
-          direction="row"
-          spacing={3}
-          justifyContent="center"
-          sx={{ mb: 1.5 }}
-        >
-          <FooterLink href="/terms">{t('legal.termsTitle')}</FooterLink>
-          <FooterLink href="/privacy">{t('legal.privacyTitle')}</FooterLink>
-        </Stack>
-        <Box>
-          <FooterText variant="body2">© 2026 Focusly</FooterText>
-        </Box>
-      </Footer>
-    </PageWrapper>
+      </Box>
+    </SiteLayout>
   );
 };
 

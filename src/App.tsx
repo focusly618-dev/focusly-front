@@ -1,9 +1,8 @@
 import { Box } from '@mui/material';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import LandingPage from '@/pages/Public/LandingPage/LandingPage';
-import HowItWorksPage from '@/pages/Public/HowItWorks/HowItWorksPage';
-import FeaturesPage from '@/pages/Public/Features/FeaturesPage';
-import PricingPage from '@/pages/Public/Pricing/PricingPage';
+import HomePage from '@/pages/Public/Site/HomePage';
+import SitePage from '@/pages/Public/Site/SitePage';
+import { PAGES, PAGE_SLUGS } from '@/pages/Public/Site/routes';
 import LegalPage from '@/pages/Public/Legal/LegalPage';
 import { Login } from '@/pages/Public/Login/Login';
 import Profile from '@/pages/Profile/Profile';
@@ -40,7 +39,7 @@ function App() {
           />
           <Route
             path="/"
-            element={isLogged ? <Navigate to="/dashboard" /> : <LandingPage />}
+            element={isLogged ? <Navigate to="/dashboard" /> : <HomePage />}
           />
           <Route
             path="/tasks"
@@ -50,13 +49,27 @@ function App() {
                   <Navigate to={'/dashboard'} />
                 </>
               ) : (
-                <LandingPage />
+                <HomePage />
               )
             }
           />
-          <Route path="/features" element={<FeaturesPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
+          {/* Former standalone pages, now sections of the home page */}
+          <Route
+            path="/features"
+            element={<Navigate to="/#producto" replace />}
+          />
+          <Route
+            path="/how-it-works"
+            element={<Navigate to="/#como-funciona" replace />}
+          />
+          {/* Product, use-case and resource pages of the public site */}
+          {PAGE_SLUGS.map((slug) => (
+            <Route
+              key={slug}
+              path={PAGES[slug].path}
+              element={<SitePage key={slug} slug={slug} />}
+            />
+          ))}
           {/* Public for everyone, logged in or not (Google's OAuth review needs them too) */}
           <Route path="/terms" element={<LegalPage document="terms" />} />
           <Route path="/privacy" element={<LegalPage document="privacy" />} />

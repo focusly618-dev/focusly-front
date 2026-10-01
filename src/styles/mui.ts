@@ -81,6 +81,16 @@ export const spin = keyframes`
   to { transform: rotate(360deg); }
 `;
 
+export const blink = keyframes`
+  50% { opacity: 0; }
+`;
+
+/** Typing-dots pulse: dim, bright at 40%, dim again. */
+export const dotPulse = keyframes`
+  0%, 80%, 100% { opacity: .25; }
+  40% { opacity: 1; }
+`;
+
 export const pulse = keyframes`
   50% { opacity: 0.5; }
 `;

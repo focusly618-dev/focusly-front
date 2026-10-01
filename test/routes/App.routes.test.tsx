@@ -10,17 +10,13 @@ import { MemoryRouter } from 'react-router-dom';
 // because the developer only clicks through as their own, already-logged-in
 // account. Page components are stubbed so these tests only exercise the
 // guard logic, not each page's own data-fetching.
-vi.mock('@/pages/Public/LandingPage/LandingPage', () => ({
+vi.mock('@/pages/Public/Site/HomePage', () => ({
   default: () => <div>LANDING_PAGE</div>,
 }));
-vi.mock('@/pages/Public/HowItWorks/HowItWorksPage', () => ({
-  default: () => <div>HOW_IT_WORKS_PAGE</div>,
-}));
-vi.mock('@/pages/Public/Features/FeaturesPage', () => ({
-  default: () => <div>FEATURES_PAGE</div>,
-}));
-vi.mock('@/pages/Public/Pricing/PricingPage', () => ({
-  default: () => <div>PRICING_PAGE</div>,
+vi.mock('@/pages/Public/Site/SitePage', () => ({
+  default: ({ slug }: { slug: string }) => (
+    <div>{`SITE_PAGE_${slug.toUpperCase()}`}</div>
+  ),
 }));
 vi.mock('@/pages/Public/Login/Login', () => ({
   Login: () => <div>LOGIN_PAGE</div>,
@@ -142,5 +138,23 @@ describe('App route guards', () => {
     expect(screen.getByText(text)).toBeInTheDocument();
     renderAppAt(path, true);
     expect(screen.getAllByText(text)).toHaveLength(2);
+  });
+
+  // Product and resource pages of the public site stay reachable when
+  // logged in (the navbar then offers "Abrir Focusly" instead of sign-up).
+  it.each([
+    ['/pricing', 'SITE_PAGE_PRICING'],
+    ['/lumina', 'SITE_PAGE_LUMINA'],
+    ['/product/tasks', 'SITE_PAGE_TASKS'],
+    ['/for/students', 'SITE_PAGE_STUDENTS'],
+    ['/help', 'SITE_PAGE_HELP'],
+  ])('renders the site page at %s', (path, text) => {
+    renderAppAt(path, false);
+    expect(screen.getByText(text)).toBeInTheDocument();
+  });
+
+  it('sends the old /features page to the product section of the home page', () => {
+    renderAppAt('/features', false);
+    expect(screen.getByText('LANDING_PAGE')).toBeInTheDocument();
   });
 });

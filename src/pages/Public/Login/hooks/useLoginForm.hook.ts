@@ -1,9 +1,21 @@
 import { useState } from 'react';
 
+// The public site links here with ?mode=signup (and the beta form adds
+// &email=…) to open the sign-up tab directly.
+const getInitialParams = () => {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    email: params.get('email') ?? '',
+    signup: params.get('mode') === 'signup',
+  };
+};
+
 export const useLoginForm = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => getInitialParams().email);
   const [fullName, setFullName] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(
+    () => getInitialParams().signup,
+  );
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) =>
     setEmail(event.target.value);
