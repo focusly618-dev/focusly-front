@@ -15,7 +15,8 @@ const { store } = await import('@/redux/store');
 const { login, logout } = await import('@/redux/auth/auth.slice');
 const { setTasks } = await import('@/redux/tasks/task.slice');
 const { setEvents } = await import('@/redux/calendar/calendar.slice');
-const { AuthProviders } = await import('@/pages/Public/Login/types/Login.types');
+const { AuthProviders } =
+  await import('@/pages/Public/Login/types/Login.types');
 const { default: axiosInstance } = await import('@/api/axiosInstance');
 const { client } = await import('@/api/apollo');
 
@@ -23,7 +24,7 @@ const baseTask = {
   id: 't-1',
   user_id: 'account-a',
   title: 'Account A private task',
-  notes_encrypted: '',
+  notes: '',
   priority_level: 2,
   deadline: '2026-01-01T00:00:00.000Z',
   status: 'Todo' as const,

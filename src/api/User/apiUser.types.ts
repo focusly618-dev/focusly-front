@@ -27,5 +27,9 @@ export interface UserResponse {
   settings: UserSettings;
   createdAt: Timestamp;
   lastSyncAt: Timestamp;
+  // Terms/Privacy version the user accepted; the backend owns the current one.
+  termsVersion?: string | null;
+  termsAcceptedAt?: string | null;
+  needsTermsAcceptance?: boolean;
   [key: string]: unknown;
 }

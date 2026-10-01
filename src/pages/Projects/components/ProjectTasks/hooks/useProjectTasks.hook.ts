@@ -97,7 +97,7 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
       const q = searchTerm.trim().toLowerCase();
       projectOnlyTasks = projectOnlyTasks.filter((t) => {
         const titleMatch = t.title?.toLowerCase().includes(q);
-        const notesMatch = t.notes_encrypted?.toLowerCase().includes(q);
+        const notesMatch = t.notes?.toLowerCase().includes(q);
         const tagMatch = t.tags?.some((tg: string | { name?: string }) =>
           (typeof tg === 'string' ? tg : tg?.name)?.toLowerCase().includes(q),
         );
@@ -175,7 +175,7 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
         projectId: t.project_id || t.project?.id,
         workspaceId: t.workspace_id || t.workspace?.id,
         workspaceTitle: t.workspace?.title,
-        description: t.notes_encrypted || '',
+        description: t.notes || '',
         rawDeadline: t.deadline,
         modules: (t.tags || [])
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

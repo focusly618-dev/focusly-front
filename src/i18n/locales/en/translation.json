@@ -280,9 +280,14 @@
     "dangerZone": "Danger Zone",
     "deleteAccount": "Delete Account",
     "deleteAccountDesc": "Permanently remove your account and all of your data.",
-    "toast": {
-      "title": "Account deletion",
-      "desc": "Self-serve deletion is not available yet. Contact our support team to permanently delete your account and data."
+    "deleteConfirm": {
+      "title": "Delete your account?",
+      "subtitle": "This action cannot be undone",
+      "desc": "Your account, tasks, documents, projects, AI conversations and profile photo will be permanently deleted. If you connected Google Calendar, we'll revoke Focusly's access; your calendar events are not deleted.",
+      "confirm": "Delete account",
+      "cancel": "Cancel",
+      "success": "Your account was deleted",
+      "error": "We couldn't delete your account. Please try again."
     }
   },
   "tasksHeader": {
@@ -406,7 +411,7 @@
       "startTime": "Start Time",
       "endTime": "End Time",
       "setLater": "I'll set this later",
-      "privacyNote": "Your schedule is private and encrypted.",
+      "privacyNote": "Only you can see your schedule. We use it to plan your tasks.",
       "days": {
         "mon": "M",
         "tue": "T",
@@ -440,7 +445,7 @@
       "connectedHeading": "Calendar Connected!",
       "connectedDesc": "We successfully retrieved {{count}} events from your calendar.",
       "continue": "Continue",
-      "privacyNote": "Your data is encrypted and private."
+      "privacyNote": "We only read and update events in your primary calendar to sync them with your tasks. You can disconnect anytime."
     },
     "focusBlocks": {
       "heading": "Customize Focus Blocks",
@@ -545,7 +550,7 @@
       "heading": "Common Questions",
       "items": [
         { "q": "How does the Google Calendar integration work?", "a": "Focusly integrates with Google Calendar to sync all of your meetings and blocks instantly, preventing any double booking." },
-        { "q": "Is my data secure?", "a": "Yes, we encrypt all of your workspace data in transit and at rest, and respect your privacy." },
+        { "q": "Is my data secure?", "a": "Yes. Your data travels encrypted over HTTPS, is only used to provide the service, and is never sold. See our Privacy Notice for details." },
         { "q": "Can I use Focusly for free?", "a": "Absolutely, our Free plan includes all core task management and calendar utilities." }
       ]
     },
@@ -983,6 +988,24 @@
       "noLinkedTasks": "No linked tasks",
       "unlinkTask": "Unlink task"
     }
+  },
+  "legal": {
+    "termsTitle": "Terms and Conditions",
+    "privacyTitle": "Privacy Notice",
+    "backHome": "Back to home",
+    "onlySpanish": "This document is currently available in Spanish only.",
+    "loginNotice": "By continuing, you agree to Focusly's <terms>Terms and Conditions</terms> and <privacy>Privacy Notice</privacy>.",
+    "aiNotice": "AI can make mistakes. Your messages and task context are processed by a third-party AI provider. <privacy>Learn more</privacy>",
+    "settingsTitle": "Legal",
+    "settingsDesc": "Documents governing your use of Focusly and how your data is handled.",
+    "acceptModal": {
+      "title": "Terms and privacy",
+      "subtitle": "We need your consent to continue",
+      "newBody": "To use Focusly, please review and accept our <terms>Terms and Conditions</terms> and <privacy>Privacy Notice</privacy>.",
+      "updatedBody": "We've updated our <terms>Terms and Conditions</terms> and <privacy>Privacy Notice</privacy>. Please review and accept them to keep using Focusly.",
+      "accept": "I agree",
+      "logout": "Log out",
+      "error": "We couldn't save your acceptance. Please try again."
+    }
   }
 }
-

@@ -147,9 +147,9 @@ export const useTaskMutations = ({
     > = {
       title: { key: 'title', val: state.title, initial: initialTask.title },
       notes: {
-        key: 'notes_encrypted',
+        key: 'notes',
         val: currentNotes,
-        initial: initialTask.notes_encrypted,
+        initial: initialTask.notes,
       },
       status: { key: 'status', val: state.status, initial: initialTask.status },
       category: {

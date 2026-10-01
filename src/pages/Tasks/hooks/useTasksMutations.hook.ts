@@ -35,7 +35,7 @@ export const useTasksMutations = ({
     id: t.id,
     user_id: t.user_id || userId || '',
     title: t.title,
-    notes_encrypted: t.notes_encrypted || '',
+    notes: t.notes || '',
     estimate_timer: t.estimate_timer || 0,
     priority_level: t.priority_level || 2,
     deadline: t.deadline || '',
@@ -65,7 +65,7 @@ export const useTasksMutations = ({
     try {
       const {
         title,
-        notes_encrypted,
+        notes,
         status,
         estimate_timer,
         estimate_minutes,
@@ -85,7 +85,7 @@ export const useTasksMutations = ({
           updateTaskInput: {
             id,
             title,
-            notes_encrypted,
+            notes,
             status,
             // The table row field is estimate_timer; estimate_minutes is only
             // a fallback for callers still using the legacy field name.

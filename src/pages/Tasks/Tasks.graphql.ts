@@ -24,7 +24,7 @@ export const UPDATE_TASK = gql`
       is_owner
       title
       workspace_id
-      notes_encrypted
+      notes
       status
       category
       color
@@ -78,7 +78,7 @@ export const CREATE_TASK = gql`
       user_id
       is_owner
       title
-      notes_encrypted
+      notes
       status
       category
       color
@@ -176,7 +176,7 @@ export const GET_TASKS_PAGINATED = gql`
         id
         user_id
         title
-        notes_encrypted
+        notes
         status
         estimate_timer
         real_timer
@@ -226,7 +226,7 @@ export const GET_TASKS_CALENDAR = gql`
         user_id
         title
         status
-        notes_encrypted
+        notes
         estimated_start_date
         estimated_end_date
         deadline
@@ -304,7 +304,7 @@ export const GET_TASK_DETAIL = gql`
       id
       user_id
       title
-      notes_encrypted
+      notes
       status
       estimate_timer
       real_timer

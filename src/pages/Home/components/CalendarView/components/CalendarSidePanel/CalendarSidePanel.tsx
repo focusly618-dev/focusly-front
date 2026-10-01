@@ -545,7 +545,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       category?: string;
                       status?: string;
                       color?: string;
-                      notes_encrypted?: string;
+                      notes?: string;
                       subtasks?: Array<{
                         id: string;
                         title: string;
@@ -567,8 +567,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                   task?.color && task.color !== '#1e293b'
                     ? task.color
                     : (() => {
-                        const match =
-                          task?.notes_encrypted?.match(/\[COLOR:(.*?)\]/);
+                        const match = task?.notes?.match(/\[COLOR:(.*?)\]/);
                         return match && match[1] && match[1] !== '#1e293b'
                           ? match[1]
                           : undefined;

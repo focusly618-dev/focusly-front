@@ -337,7 +337,7 @@ export const useCalendarView = () => {
           !isNaN(new Date(task.estimated_start_date).getTime());
         const hasValidDeadline =
           task.deadline && !isNaN(new Date(task.deadline).getTime());
-        const desc = task.notes_encrypted || '';
+        const desc = task.notes || '';
         const hasStartDateMarker = /\[START_DATE:(.*?)\]/.test(desc);
 
         if (!hasEstimatedStart && !hasValidDeadline && !hasStartDateMarker)
@@ -352,7 +352,7 @@ export const useCalendarView = () => {
         return true;
       })
       .map((task: Task) => {
-        const desc = task.notes_encrypted || '';
+        const desc = task.notes || '';
         const startDateMatch = desc.match(/\[START_DATE:(.*?)\]/);
 
         const deadlineDate = task.deadline

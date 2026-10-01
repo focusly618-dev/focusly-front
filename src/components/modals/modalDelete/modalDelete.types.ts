@@ -4,4 +4,8 @@ export interface ModalItemsProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  subtitle?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  isLoading?: boolean;
 }

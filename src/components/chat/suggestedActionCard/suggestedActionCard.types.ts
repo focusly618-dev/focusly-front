@@ -9,7 +9,7 @@ export interface SuggestedActionCardProps {
 export interface ActionPreviewData {
   /** Task/workspace/group title, or note name */
   title?: string;
-  /** Task description (notes_encrypted) */
+  /** Task description */
   description?: string;
   /** Truncated, markdown-stripped preview of note/workspace content */
   contentPreview?: string;

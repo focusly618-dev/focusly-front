@@ -1781,8 +1781,12 @@ const LandingPage: React.FC = () => {
                 {t('landing.footer.legal')}
               </Typography>
               <Stack spacing={1.25}>
-                <FooterLink href="#">{t('landing.footer.terms')}</FooterLink>
-                <FooterLink href="#">{t('landing.footer.privacy')}</FooterLink>
+                <FooterLink href="/terms">
+                  {t('landing.footer.terms')}
+                </FooterLink>
+                <FooterLink href="/privacy">
+                  {t('landing.footer.privacy')}
+                </FooterLink>
               </Stack>
             </Grid>
           </Grid>

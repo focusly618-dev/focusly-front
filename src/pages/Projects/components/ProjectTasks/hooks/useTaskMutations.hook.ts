@@ -188,7 +188,7 @@ export const useTaskMutations = () => {
         real_timer: 0,
         category: 'General',
         tags,
-        notes_encrypted: input.description || '',
+        notes: input.description || '',
       };
 
       if (deadline) createTaskInput.deadline = deadline;
@@ -251,7 +251,7 @@ export const useTaskMutations = () => {
         updateTaskInput.subtasks = input.subtasks;
       }
       if (input.description !== undefined) {
-        updateTaskInput.notes_encrypted = input.description;
+        updateTaskInput.notes = input.description;
       }
       if (input.projectId !== undefined) {
         updateTaskInput.project_id = input.projectId || undefined;

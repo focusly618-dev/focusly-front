@@ -27,9 +27,9 @@ export const getEventColor = (event: {
     return { main: task.color, isCustom: true };
   }
 
-  // 2. Check for custom color tag in notes_encrypted
-  if (task?.notes_encrypted) {
-    const colorMatch = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
+  // 2. Check for custom color tag in notes
+  if (task?.notes) {
+    const colorMatch = task.notes.match(/\[COLOR:(.*?)\]/);
     if (
       colorMatch &&
       colorMatch[1] &&

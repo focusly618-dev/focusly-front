@@ -23,6 +23,18 @@ export const UserUpdate = async (
   return response.data;
 };
 
+// Records that the user accepted the current Terms and Privacy Notice.
+export const UserAcceptTerms = async (id: string): Promise<UserResponse> => {
+  const response = await axios.post(`/users/${id}/accept-terms`);
+  return response.data;
+};
+
+// Permanently deletes the account and all of its data on the backend.
+export const UserDelete = async (id: string): Promise<{ success: boolean }> => {
+  const response = await axios.delete(`/users/${id}`);
+  return response.data;
+};
+
 interface PresignAvatarUploadResponse {
   upload_url: string;
   object_key: string;
@@ -48,8 +60,9 @@ export interface UploadedAvatar {
 }
 
 export const uploadAvatarFile = async (file: File): Promise<UploadedAvatar> => {
-  const { upload_url, object_key, preview_url } =
-    await presignAvatarUpload(file.type);
+  const { upload_url, object_key, preview_url } = await presignAvatarUpload(
+    file.type,
+  );
 
   await fetch(upload_url, {
     method: 'PUT',

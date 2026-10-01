@@ -65,7 +65,7 @@ const baseTask = (overrides: Partial<Task> = {}): Task => ({
   id: 't-1',
   user_id: 'u-1',
   title: 'Task',
-  notes_encrypted: '',
+  notes: '',
   priority_level: 2,
   deadline: '2026-01-01T10:00:00.000Z',
   status: 'Todo',
@@ -130,14 +130,14 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
 
   it('FIXED: a task with a [START_DATE:] marker and a garbage deadline now falls back to a valid `end` instead of Invalid Date', () => {
     // The `[START_DATE:...]` regex branch (used for tasks whose real start
-    // time is embedded in notes_encrypted rather than estimated_start_date)
+    // time is embedded in notes rather than estimated_start_date)
     // used to recompute `end` from `task.deadline` with no isNaN guard —
     // it now falls back to start + the task's own duration, same as every
     // other date derivation in this memo.
     const { result } = renderWithTasks([
       baseTask({
         id: 'corrupted-task',
-        notes_encrypted: '[START_DATE:2026-01-01T09:00:00.000Z]',
+        notes: '[START_DATE:2026-01-01T09:00:00.000Z]',
         deadline: 'not-a-real-date',
         estimate_timer: 30,
       }),
@@ -159,13 +159,13 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
       baseTask({
         id: 'ghost-1',
         title: 'Duplicate Title',
-        notes_encrypted: '[START_DATE:2026-01-01T09:00:00.000Z]',
+        notes: '[START_DATE:2026-01-01T09:00:00.000Z]',
         deadline: 'invalid-date-a',
       }),
       baseTask({
         id: 'ghost-2',
         title: 'Duplicate Title',
-        notes_encrypted: '[START_DATE:2026-01-01T09:00:00.000Z]',
+        notes: '[START_DATE:2026-01-01T09:00:00.000Z]',
         deadline: 'invalid-date-b',
       }),
     ]);
@@ -182,13 +182,13 @@ describe('useCalendarView events memo — task changes reflecting on the calenda
       baseTask({
         id: 'ghost-a',
         title: 'Task A',
-        notes_encrypted: '[START_DATE:2026-01-01T09:00:00.000Z]',
+        notes: '[START_DATE:2026-01-01T09:00:00.000Z]',
         deadline: 'invalid-date-a',
       }),
       baseTask({
         id: 'ghost-b',
         title: 'Task B',
-        notes_encrypted: '[START_DATE:2026-01-01T09:00:00.000Z]',
+        notes: '[START_DATE:2026-01-01T09:00:00.000Z]',
         deadline: 'invalid-date-a',
       }),
     ]);

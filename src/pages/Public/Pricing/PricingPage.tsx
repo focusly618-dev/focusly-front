@@ -448,7 +448,7 @@ const PricingPage: React.FC = () => {
                   },
                   {
                     q: 'Is my data secure with Focusly?',
-                    a: 'Data security is our top priority. We use industry-standard encryption for data in transit and at rest.',
+                    a: 'Your data travels encrypted over HTTPS, is only used to provide the service, and is never sold. See our Privacy Notice for details.',
                   },
                 ].map((faq, idx) => {
                   const panelId = `panel-${idx}`;

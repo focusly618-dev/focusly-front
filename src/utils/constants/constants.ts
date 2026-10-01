@@ -3,7 +3,7 @@ import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 
 export const BASE_EMPTY_TASK: Partial<Task> = {
   title: '',
-  notes_encrypted: '',
+  notes: '',
   status: 'Todo' as TaskStatus,
   priority_level: 2,
   category: 'Personal',

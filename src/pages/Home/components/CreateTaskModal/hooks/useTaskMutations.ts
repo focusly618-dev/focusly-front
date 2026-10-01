@@ -81,7 +81,7 @@ export const useTaskMutations = ({
 
     const commonInput = {
       title: state.title,
-      notes_encrypted: `${cleanDesc} [COLOR:${state.color}]`,
+      notes: `${cleanDesc} [COLOR:${state.color}]`,
       estimate_timer: estimateTimer,
       real_timer: realTimer,
       tags: state.tags,
@@ -177,7 +177,7 @@ export const useTaskMutations = ({
 
     const updateInput: TaskInput = {
       title: state.title || initialTask.title,
-      notes_encrypted: `${cleanDesc} [COLOR:${taskColor}]`,
+      notes: `${cleanDesc} [COLOR:${taskColor}]`,
       status: state.status || initialTask.status,
       category: taskCategory,
       color: taskColor,

@@ -8,7 +8,7 @@ const baseTask = (overrides: Partial<Task> = {}): Task => ({
   id: 't-1',
   user_id: 'u-1',
   title: 'Existing task',
-  notes_encrypted: '',
+  notes: '',
   priority_level: 2,
   deadline: '2026-01-01T00:00:00.000Z',
   status: 'Todo',

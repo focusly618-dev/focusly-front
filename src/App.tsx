@@ -4,6 +4,7 @@ import LandingPage from '@/pages/Public/LandingPage/LandingPage';
 import HowItWorksPage from '@/pages/Public/HowItWorks/HowItWorksPage';
 import FeaturesPage from '@/pages/Public/Features/FeaturesPage';
 import PricingPage from '@/pages/Public/Pricing/PricingPage';
+import LegalPage from '@/pages/Public/Legal/LegalPage';
 import { Login } from '@/pages/Public/Login/Login';
 import Profile from '@/pages/Profile/Profile';
 import NotFoundPage from '@/pages/NotFound/page_not_found';
@@ -12,6 +13,7 @@ import { useSession } from '@/hooks/useSession';
 import { useAppSelector } from '@/redux/hooks';
 import { SessionExpiredBanner } from '@/components/ui/SessionExpiredBanner';
 import { ReleaseModal } from '@/components/ReleaseModal/ReleaseModal';
+import { TermsAcceptanceModal } from '@/components/TermsAcceptanceModal/TermsAcceptanceModal';
 
 function App() {
   const { isLogged } = useSession();
@@ -23,6 +25,8 @@ function App() {
     <>
       <SessionExpiredBanner />
       <ReleaseModal />
+      {/* After ReleaseModal so it stacks on top: terms come first */}
+      <TermsAcceptanceModal />
       <Box
         sx={{
           pt: sessionExpiredNotice ? { xs: '92px', sm: '102px' } : 0,
@@ -53,6 +57,9 @@ function App() {
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          {/* Public for everyone, logged in or not (Google's OAuth review needs them too) */}
+          <Route path="/terms" element={<LegalPage document="terms" />} />
+          <Route path="/privacy" element={<LegalPage document="privacy" />} />
           <Route
             path="/login"
             element={isLogged ? <Navigate to="/dashboard" /> : <Login />}

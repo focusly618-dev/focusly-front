@@ -317,7 +317,7 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
       <DescriptionContainer
         dangerouslySetInnerHTML={{
           __html:
-            formatDescriptionToHtml(task.notes_encrypted) ||
+            formatDescriptionToHtml(task.notes) ||
             '<p style="color: grey; font-style: italic;">No description provided for this task.</p>',
         }}
       />

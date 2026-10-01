@@ -237,7 +237,7 @@ Text: "${selectedText}"`;
       const currentWorkspaceId = watch?.('id');
       const createTaskInput = {
         title: finalData.title || 'AI Task',
-        notes_encrypted: finalData.description || '',
+        notes: finalData.description || '',
         estimate_timer: finalData.estimateTimer,
         real_timer: 0,
         tags: [],

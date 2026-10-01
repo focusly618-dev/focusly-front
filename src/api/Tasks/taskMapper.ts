@@ -57,7 +57,7 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     id: event.id,
     user_id: 'google-user',
     title: event.title || 'Untitled',
-    notes_encrypted: event.notes_encrypted || '',
+    notes: event.notes || '',
     estimate_timer: event.estimate_timer || 30,
     // 'High' (the only UI label >=3 levels resolve to) is stored as 4
     // elsewhere in the app (see AITaskPreviewModal) — defaulting to 4
@@ -125,7 +125,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     id: t.id,
     user_id: t.user_id || '',
     title: t.title || '',
-    notes_encrypted: t.notes_encrypted || '',
+    notes: t.notes || '',
     estimate_timer: t.estimate_timer || 0,
     real_timer: t.real_timer,
     duration: t.duration,
@@ -136,7 +136,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     color:
       t.color ||
       (() => {
-        const match = t.notes_encrypted?.match(/\[COLOR:(.*?)\]/);
+        const match = t.notes?.match(/\[COLOR:(.*?)\]/);
         return match ? match[1] : undefined;
       })(),
     created_at: safeISO(t.created_at) || new Date().toISOString(),

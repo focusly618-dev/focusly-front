@@ -2,7 +2,7 @@ export interface GoogleCalendarEvent {
   id: string;
   google_event_id: string;
   title: string;
-  notes_encrypted: string;
+  notes: string;
   deadline: string;
   estimated_start_date: string;
   status:

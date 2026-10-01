@@ -130,7 +130,7 @@ export const getActionPreviewData = (
 
     return {
       title: action.payload.title || 'AI Task',
-      description: action.payload.notes_encrypted || undefined,
+      description: action.payload.notes || undefined,
       dateLabel: deadline ? formatDateLabel(deadline) : undefined,
       timeRangeLabel,
       durationLabel: formatDuration(estimateTimer),
@@ -245,7 +245,7 @@ export const executeSingleAction = async (
       variables: {
         createTaskInput: {
           title: action.payload.title || 'AI Task',
-          notes_encrypted: `${action.payload.notes_encrypted || ''} [COLOR:#3b82f6]`,
+          notes: `${action.payload.notes || ''} [COLOR:#3b82f6]`,
           estimate_timer: estimateTimer,
           real_timer: 0,
           tags: [],
@@ -297,8 +297,8 @@ export const executeSingleAction = async (
     if (action.payload.title !== undefined) {
       updateTaskInput.title = action.payload.title;
     }
-    if (action.payload.notes_encrypted !== undefined) {
-      updateTaskInput.notes_encrypted = action.payload.notes_encrypted;
+    if (action.payload.notes !== undefined) {
+      updateTaskInput.notes = action.payload.notes;
     }
     if (action.payload.priority_level !== undefined) {
       updateTaskInput.priority_level = action.payload.priority_level;

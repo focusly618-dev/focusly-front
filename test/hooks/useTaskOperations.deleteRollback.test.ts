@@ -59,7 +59,7 @@ const baseTask: Task = {
   id: 'task-to-delete',
   user_id: 'u-1',
   title: 'Doomed task',
-  notes_encrypted: '',
+  notes: '',
   priority_level: 2,
   deadline: '2026-01-01T00:00:00.000Z',
   status: 'Todo',

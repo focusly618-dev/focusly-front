@@ -108,7 +108,7 @@ export const GET_WORKSPACE_BY_ID = gql`
         estimate_timer
         real_timer
         priority_level
-        notes_encrypted
+        notes
         links {
           title
           url
@@ -124,7 +124,7 @@ export const GET_WORKSPACE_BY_ID = gql`
         estimate_timer
         real_timer
         priority_level
-        notes_encrypted
+        notes
         category
         deadline
         workspace_id

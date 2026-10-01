@@ -36,7 +36,7 @@ export interface TaskResponse {
   is_owner?: boolean;
   title: string;
   description?: string;
-  notes_encrypted: string;
+  notes: string;
   estimate_timer: number;
   estimate_minutes: number;
   real_timer?: number;
@@ -99,7 +99,7 @@ export interface TaskResponse {
 export interface updateTask {
   id: string;
   title?: string;
-  notes_encrypted?: string;
+  notes?: string;
   estimate_timer?: number;
   priority_level?: number;
   deadline?: string;
@@ -124,7 +124,7 @@ export interface updateTask {
 export interface CreateTaskRequest {
   user_id: string;
   title: string;
-  notes_encrypted: string;
+  notes: string;
   estimate_timer: number;
   priority_level: number;
   deadline: string;

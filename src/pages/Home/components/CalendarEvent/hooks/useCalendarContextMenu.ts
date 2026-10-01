@@ -105,7 +105,7 @@ export const useCalendarContextMenu = (
         variables: {
           createTaskInput: {
             title: duplicateInput.title,
-            notes_encrypted: duplicateInput.notes_encrypted,
+            notes: duplicateInput.notes,
             estimate_timer: duplicateInput.estimate_timer,
             real_timer: 0,
             status: duplicateInput.status,
@@ -239,10 +239,7 @@ export const useCalendarContextMenu = (
       if (googleRes?.id && googleRes.id !== eventId) {
         dispatch(removeEvent({ id: googleRes.id }));
       }
-      if (
-        googleRes?.google_event_id &&
-        googleRes.google_event_id !== eventId
-      ) {
+      if (googleRes?.google_event_id && googleRes.google_event_id !== eventId) {
         dispatch(removeEvent({ id: googleRes.google_event_id }));
       }
       sileo.success({
@@ -287,15 +284,17 @@ export const useCalendarContextMenu = (
     handleClose();
     setIsDeleting(true);
 
-    const resourceAny = event.resource as {
-      id?: string;
-      google_event_id?: string;
-    } | undefined;
+    const resourceAny = event.resource as
+      | {
+          id?: string;
+          google_event_id?: string;
+        }
+      | undefined;
 
     const targetId =
       event.type === 'task'
-        ? (resourceAny?.id || event.id)
-        : (resourceAny?.google_event_id || resourceAny?.id || event.id);
+        ? resourceAny?.id || event.id
+        : resourceAny?.google_event_id || resourceAny?.id || event.id;
 
     try {
       if (onDeleteTaskProp) {
@@ -358,7 +357,7 @@ export const useCalendarContextMenu = (
         title: event.title || 'Focus Session',
         status: 'Pending',
         priority_level: 2,
-        notes_encrypted: '',
+        notes: '',
         estimate_timer: durationMinutes,
         real_timer: 0,
         deadline: (event.end || new Date()).toISOString(),

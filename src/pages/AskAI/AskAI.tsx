@@ -37,7 +37,7 @@ import {
   Close as CloseIcon,
   AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { FEATURE_FLAGS } from '@/config/featureFlags.config';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { setEvents } from '@/redux/calendar/calendar.slice';
@@ -1117,7 +1117,7 @@ export const AskAI: React.FC = () => {
           biggestTask
             ? {
                 title: biggestTask.title,
-                description: biggestTask.notes_encrypted || '',
+                description: biggestTask.notes || '',
                 status: biggestTask.status || 'Todo',
                 priority_level: biggestTask.priority_level ?? 0,
                 estimate_timer: biggestTask.estimate_timer ?? 0,
@@ -2394,6 +2394,26 @@ export const AskAI: React.FC = () => {
                 />
               </PromptInputFooter>
             </PromptInput>
+
+            <Typography
+              variant="caption"
+              component="p"
+              sx={{ mt: 1, textAlign: 'center', color: 'text.secondary' }}
+            >
+              <Trans
+                i18nKey="legal.aiNotice"
+                components={{
+                  privacy: (
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'inherit', textDecoration: 'underline' }}
+                    />
+                  ),
+                }}
+              />
+            </Typography>
 
             {/* Model Selector Menu (anchored to PromptInput model button) */}
             <Menu

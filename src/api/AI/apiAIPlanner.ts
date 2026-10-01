@@ -30,7 +30,7 @@ export const organizeTasksAI = async (
   const mappedTasks = tasks.map((t) => ({
     id: t.id,
     title: t.title,
-    description: t.notes_encrypted || '',
+    description: t.notes || '',
     priority:
       t.priority_level === 3 ? 'High' : t.priority_level === 2 ? 'Med' : 'Low',
     deadline: t.deadline || '',

@@ -23,8 +23,8 @@ export interface Task {
   /** FK */
   user_id: string;
   title: string;
-  /** AES-256 Encrypted (NFR-03.1) */
-  notes_encrypted: string;
+  /** Free-form task notes (stored as plain text) */
+  notes: string;
   /** For Workload Analysis (FR-20) */
   estimate_timer?: number;
   real_timer?: number | null;

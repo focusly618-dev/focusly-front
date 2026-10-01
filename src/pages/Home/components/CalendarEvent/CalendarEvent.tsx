@@ -108,7 +108,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
   }`;
 
   const taskResource = event.resource as Task | undefined;
-  const rawNotes = taskResource?.notes_encrypted || '';
+  const rawNotes = taskResource?.notes || '';
   const cleanNotes = rawNotes.replace(/\[.*?\]/g, '').trim();
 
   const {

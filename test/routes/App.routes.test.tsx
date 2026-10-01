@@ -40,6 +40,14 @@ vi.mock('@/components/ui/SessionExpiredBanner', () => ({
 vi.mock('@/components/ReleaseModal/ReleaseModal', () => ({
   ReleaseModal: () => null,
 }));
+vi.mock('@/components/TermsAcceptanceModal/TermsAcceptanceModal', () => ({
+  TermsAcceptanceModal: () => null,
+}));
+vi.mock('@/pages/Public/Legal/LegalPage', () => ({
+  default: ({ document }: { document: string }) => (
+    <div>{`LEGAL_PAGE_${document.toUpperCase()}`}</div>
+  ),
+}));
 
 const useSessionMock = vi.fn();
 vi.mock('@/hooks/useSession', () => ({
@@ -122,5 +130,17 @@ describe('App route guards', () => {
     renderAppAt('/tasks', false);
     expect(screen.getByText('LANDING_PAGE')).toBeInTheDocument();
     expect(screen.queryByText('LOGIN_PAGE')).not.toBeInTheDocument();
+  });
+
+  // The legal pages are linked from the login screen and Google's OAuth
+  // consent screen, so they must open for everyone, logged in or not.
+  it.each([
+    ['/terms', 'LEGAL_PAGE_TERMS'],
+    ['/privacy', 'LEGAL_PAGE_PRIVACY'],
+  ])('shows %s to anonymous and authenticated users alike', (path, text) => {
+    renderAppAt(path, false);
+    expect(screen.getByText(text)).toBeInTheDocument();
+    renderAppAt(path, true);
+    expect(screen.getAllByText(text)).toHaveLength(2);
   });
 });

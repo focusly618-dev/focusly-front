@@ -13,25 +13,37 @@ import {
   modalSx,
 } from './modalDelete.styles';
 
-export const ModalDelete = ({ title, description, open, onClose, onConfirm }: ModalItemsProps) => {
+export const ModalDelete = ({
+  title,
+  description,
+  open,
+  onClose,
+  onConfirm,
+  subtitle = 'Confirming permanent deletion',
+  confirmLabel = 'Delete Workspace',
+  cancelLabel = 'Cancel',
+  isLoading = false,
+}: ModalItemsProps) => {
   const modalActions = (
     <Box sx={actionsContainerSx}>
       <Button
         variant="contained"
         fullWidth
         onClick={onConfirm}
+        disabled={isLoading}
         sx={deleteButtonSx}
       >
-        Delete Workspace
+        {confirmLabel}
       </Button>
 
       <Button
         variant="outlined"
         fullWidth
         onClick={onClose}
+        disabled={isLoading}
         sx={cancelButtonSx}
       >
-        Cancel
+        {cancelLabel}
       </Button>
     </Box>
   );
@@ -41,7 +53,7 @@ export const ModalDelete = ({ title, description, open, onClose, onConfirm }: Mo
       open={open}
       onClose={onClose}
       title={title}
-      subtitle="Confirming permanent deletion"
+      subtitle={subtitle}
       icon={<WarningRoundedIcon sx={deleteIconSx} />}
       iconBgColor="rgba(242, 72, 72, 0.15)"
       actions={modalActions}

@@ -95,7 +95,7 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
             updateTaskInput: {
               id: item.taskId,
               title: targetTask.title,
-              notes_encrypted: targetTask.notes_encrypted || '',
+              notes: targetTask.notes || '',
               status: targetTask.status || 'Todo',
               estimate_timer: targetTask.estimate_timer || 0,
               priority_level: newPriorityLevel,

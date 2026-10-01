@@ -158,7 +158,7 @@ export const resolveSemanticTheme = (
   const task = event.resource as Task | undefined;
   const title = (event.title || '').toLowerCase();
   const category = (task?.category || '').toLowerCase();
-  const notes = (task?.notes_encrypted || '').toLowerCase();
+  const notes = (task?.notes || '').toLowerCase();
   const combined = `${title} ${category} ${notes}`;
 
   // 1. Wellness / Breaks / Physical Health & Personal calls (Green in screenshot)

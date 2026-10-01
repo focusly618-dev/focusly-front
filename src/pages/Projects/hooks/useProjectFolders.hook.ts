@@ -236,7 +236,7 @@ export const useProjectFolders = () => {
 
   interface SearchableTask {
     title?: string;
-    notes_encrypted?: string;
+    notes?: string;
     tags?: Array<string | { name?: string }>;
   }
 
@@ -246,7 +246,7 @@ export const useProjectFolders = () => {
       const q = debouncedSearchTerm.trim().toLowerCase();
       list = list.filter((t: SearchableTask) => {
         const titleMatch = t.title?.toLowerCase().includes(q);
-        const notesMatch = t.notes_encrypted?.toLowerCase().includes(q);
+        const notesMatch = t.notes?.toLowerCase().includes(q);
         const tagMatch = t.tags?.some((tg: string | { name?: string }) =>
           (typeof tg === 'string' ? tg : tg?.name)?.toLowerCase().includes(q),
         );

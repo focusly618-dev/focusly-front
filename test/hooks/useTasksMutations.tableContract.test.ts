@@ -36,7 +36,7 @@ const tableRowTask = {
   id: 'task-1',
   user_id: 'u-1',
   title: 'Ship table fix',
-  notes_encrypted: 'notes',
+  notes: 'notes',
   estimate_timer: 45,
   real_timer: 10,
   priority_level: 3,

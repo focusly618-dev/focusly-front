@@ -3,7 +3,7 @@ export interface LuminaActionPayload {
   id?: string;
   title?: string;
   name?: string;
-  notes_encrypted?: string;
+  notes?: string;
   estimate_timer?: number;
   priority_level?: number;
   /** ISO date (YYYY-MM-DD) this task should land on the calendar */

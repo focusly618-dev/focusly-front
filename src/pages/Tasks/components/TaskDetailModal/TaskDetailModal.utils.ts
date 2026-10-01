@@ -270,7 +270,7 @@ export const buildCreateTaskPayload = ({
 
   return {
     title: state.title,
-    notes_encrypted: `${cleanDesc} [COLOR:${state.color}]`,
+    notes: `${cleanDesc} [COLOR:${state.color}]`,
     estimate_timer: estimateTimer,
     real_timer: realTimer,
     tags: state.tags,

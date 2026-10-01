@@ -107,7 +107,7 @@ export interface TaskSearchItems {
   category?: string;
   deadline: string;
   created_at?: string;
-  notes_encrypted?: string;
+  notes?: string;
   links?: { title: string; url: string }[];
   google_event_id?: string;
   task_type?: 'PlatformTask' | 'GoogleTask';

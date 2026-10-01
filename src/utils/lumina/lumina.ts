@@ -74,22 +74,26 @@ function fallbackExtractPayload(
       const deadlineMatch = rawSegment.match(/"deadline"\s*:\s*"([^"]+)"/);
       const deadline = deadlineMatch ? deadlineMatch[1] : undefined;
 
-      let notes_encrypted = '';
-      const notesIndex = rawSegment.indexOf('"notes_encrypted": "');
+      let notes = '';
+      // "notes_encrypted" is the field's former name, still present in AI
+      // messages stored before the rename.
+      let notesKey = '"notes": "';
+      let notesIndex = rawSegment.indexOf(notesKey);
+      if (notesIndex === -1) {
+        notesKey = '"notes_encrypted": "';
+        notesIndex = rawSegment.indexOf(notesKey);
+      }
       if (notesIndex !== -1) {
-        const afterNotes = notesIndex + '"notes_encrypted": "'.length;
+        const afterNotes = notesIndex + notesKey.length;
         const endMatch = rawSegment
           .slice(afterNotes)
           .match(/"(?:\s*,\s*"[a-z_]+"|\s*\}\]|\s*\}\s*$)/);
         if (endMatch && endMatch.index !== undefined) {
-          notes_encrypted = rawSegment.slice(
-            afterNotes,
-            afterNotes + endMatch.index,
-          );
+          notes = rawSegment.slice(afterNotes, afterNotes + endMatch.index);
         } else {
-          notes_encrypted = rawSegment.slice(afterNotes);
+          notes = rawSegment.slice(afterNotes);
         }
-        notes_encrypted = notes_encrypted
+        notes = notes
           .replace(/\\n/g, '\n')
           .replace(/\\"/g, '"')
           .replace(/\\\\/g, '\\');
@@ -100,7 +104,7 @@ function fallbackExtractPayload(
         estimate_timer,
         priority_level,
         deadline,
-        notes_encrypted,
+        notes,
       };
     }
   } catch (err) {
@@ -108,6 +112,17 @@ function fallbackExtractPayload(
   }
   return null;
 }
+
+// AI messages stored before the rename still carry "notes_encrypted".
+const normalizeLegacyPayload = (
+  raw: LuminaActionPayload & { notes_encrypted?: string },
+): LuminaActionPayload => {
+  const { notes_encrypted, ...payload } = raw;
+  if (notes_encrypted !== undefined && payload.notes === undefined) {
+    payload.notes = notes_encrypted;
+  }
+  return payload;
+};
 
 /**
  * Extracts all `[ACTION: TYPE { ... }]` tags from text with balanced JSON brace parsing,
@@ -223,7 +238,7 @@ export const extractLuminaActionTags = (
 
     const payloadRaw = text.slice(braceStart, braceEnd + 1);
     try {
-      const payload = JSON.parse(payloadRaw) as LuminaActionPayload;
+      const payload = normalizeLegacyPayload(JSON.parse(payloadRaw));
       tags.push({
         type: typeCandidate as ParsedLuminaAction['type'],
         payload,

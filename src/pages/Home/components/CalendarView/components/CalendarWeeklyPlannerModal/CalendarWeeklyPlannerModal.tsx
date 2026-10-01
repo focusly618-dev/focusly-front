@@ -119,7 +119,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
               updateTaskInput: {
                 id: targetTask.id,
                 title: targetTask.title,
-                notes_encrypted: targetTask.notes_encrypted || '',
+                notes: targetTask.notes || '',
                 status: targetTask.status || 'Todo',
                 estimate_timer: targetTask.estimate_timer || 0,
                 priority_level: targetTask.priority_level,

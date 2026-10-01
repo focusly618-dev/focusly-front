@@ -143,9 +143,7 @@ export const GridViewTask = ({
             overflow: 'hidden',
           }}
         >
-          {task.description ||
-            task.notes_encrypted ||
-            'No description provided.'}
+          {task.description || task.notes || 'No description provided.'}
         </Typography>
       </Box>
 

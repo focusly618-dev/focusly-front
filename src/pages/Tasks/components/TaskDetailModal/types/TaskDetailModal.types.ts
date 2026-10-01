@@ -55,7 +55,7 @@ export interface UseTaskDetailModalProps {
 
 export interface TaskInput {
   title: string;
-  notes_encrypted: string;
+  notes: string;
   estimate_timer: number;
   real_timer: number;
   tags: string[];

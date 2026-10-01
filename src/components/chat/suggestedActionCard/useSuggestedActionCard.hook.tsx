@@ -24,7 +24,7 @@ export const useSuggestedActionCard = (
 
   // Generate a stable, compact key for this action to track completion in localStorage.
   // We use a fingerprint of a few discriminating fields rather than JSON.stringify(payload)
-  // because payload.content / payload.notes_encrypted can be thousands of characters long,
+  // because payload.content / payload.notes can be thousands of characters long,
   // which would make the key itself megabytes-large and degrade localStorage performance.
   const actionKey = useMemo(() => {
     const {

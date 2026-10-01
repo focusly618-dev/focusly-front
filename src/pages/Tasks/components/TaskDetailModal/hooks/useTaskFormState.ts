@@ -48,7 +48,7 @@ export const useTaskFormState = ({
 
     const {
       title,
-      notes_encrypted = '',
+      notes = '',
       priority_level,
       status,
       category,
@@ -58,17 +58,17 @@ export const useTaskFormState = ({
       real_timer,
     } = initialTask;
 
-    // Use color field directly if available, otherwise fall back to parsing from notes_encrypted
+    // Use color field directly if available, otherwise fall back to parsing from notes
     let color = initialColor;
-    if (!color && notes_encrypted) {
-      const colorMatch = notes_encrypted.match(/\[COLOR:(.*?)\]/);
+    if (!color && notes) {
+      const colorMatch = notes.match(/\[COLOR:(.*?)\]/);
       if (colorMatch && colorMatch[1]) {
         color = colorMatch[1];
       }
     }
     color = color && color !== '#1e293b' ? color : '#E0E7FF';
 
-    const cleanDesc = notes_encrypted
+    const cleanDesc = notes
       .replace(/\[START_DATE:(.*?)\]/g, '')
       .replace(/\[COLOR:(.*?)\]/g, '')
       .replace(
@@ -122,7 +122,7 @@ export const useTaskFormState = ({
 
   useEffect(() => {
     if (!initialTask?.id) return;
-    const sig = `${initialTask.id}-${initialTask.color}-${initialTask.notes_encrypted?.length}`;
+    const sig = `${initialTask.id}-${initialTask.color}-${initialTask.notes?.length}`;
     if (lastSyncedTaskFormRef.current === sig) return;
     lastSyncedTaskFormRef.current = sig;
 

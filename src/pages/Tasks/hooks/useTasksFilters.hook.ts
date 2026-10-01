@@ -182,7 +182,7 @@ export const useTasksFilters = (
             task.title
               .toLowerCase()
               .includes(debouncedSearchTerm.toLowerCase()) ||
-            task.notes_encrypted
+            task.notes
               ?.toLowerCase()
               .includes(debouncedSearchTerm.toLowerCase()),
         );

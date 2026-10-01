@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   Card,
   CardHeader,
@@ -261,6 +261,31 @@ export const Login: React.FC = () => {
                     )}
                   </Button>
                 </form>
+
+                {/* Signing in creates the account, so acceptance is stated up front */}
+                <p className="text-xs leading-relaxed text-center text-slate-500 dark:text-[#8A8F98]">
+                  <Trans
+                    i18nKey="legal.loginNotice"
+                    components={{
+                      terms: (
+                        <a
+                          href="/terms"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#008767] dark:text-[#10B981] font-semibold hover:underline"
+                        />
+                      ),
+                      privacy: (
+                        <a
+                          href="/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#008767] dark:text-[#10B981] font-semibold hover:underline"
+                        />
+                      ),
+                    }}
+                  />
+                </p>
               </CardContent>
 
               <CardFooter className="px-8 pb-8 pt-2 flex flex-col items-center justify-center">
@@ -289,13 +314,13 @@ export const Login: React.FC = () => {
       {/* Footer Links */}
       <div className="pb-6 z-10 flex flex-wrap justify-center items-center gap-6 text-xs text-slate-500 dark:text-[#8A8F98]">
         <Link
-          href="#"
+          href="/terms"
           className="text-xs text-slate-500 dark:text-[#8A8F98] hover:text-slate-800 hover:dark:text-[#F3F4F6] transition-colors"
         >
           {t('login.termsOfService')}
         </Link>
         <Link
-          href="#"
+          href="/privacy"
           className="text-xs text-slate-500 dark:text-[#8A8F98] hover:text-slate-800 hover:dark:text-[#F3F4F6] transition-colors"
         >
           {t('login.privacyPolicy')}
