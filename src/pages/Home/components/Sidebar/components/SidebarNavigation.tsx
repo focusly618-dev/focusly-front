@@ -625,8 +625,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
       >
         <NavItem
           id="joyride-mobile-profile"
-          active={activeTab === TaskBar.Settings}
-          onClick={() => changeStatusTab(TaskBar.Settings)}
+          onClick={sidebar.openProfile}
           sx={{
             justifyContent: 'center',
             p: '8px 12px',
@@ -642,10 +641,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                 width: 24,
                 height: 24,
                 border: '1.5px solid',
-                borderColor:
-                  activeTab === TaskBar.Settings
-                    ? theme.palette.primary.main
-                    : 'transparent',
+                borderColor: 'transparent',
               }}
             >
               {sidebar.user?.name?.charAt(0)}

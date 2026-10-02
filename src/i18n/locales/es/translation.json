@@ -52,14 +52,6 @@
     "searchWorkspaces": "Buscar espacios de trabajo..."
   },
   "settings": {
-    "title": "Configuración",
-    "account": "Cuenta",
-    "appearance": "Apariencia",
-    "focusEngine": "Motor de Enfoque",
-    "integrations": "Integraciones",
-    "notifications": "Notificaciones",
-    "schedule": "Horario",
-    "security": "Seguridad",
     "theme": {
       "title": "Tema",
       "subtitle": "Elige la apariencia de Focusly en este dispositivo.",
@@ -69,21 +61,10 @@
     },
     "language": {
       "title": "Idioma",
-      "subtitle": "Selecciona tu idioma de preferencia para la interfaz.",
       "spanish": "Español",
       "english": "English",
       "japanese": "日本語"
-    },
-    "descriptions": {
-      "schedule": "Configura tu disponibilidad, ritmo de trabajo y deja que nuestra IA optimice tus ventanas de máxima productividad.",
-      "focus": "Define la duración de tus bloques de enfoque y descanso, y gestiona los parámetros del escudo contra distracciones.",
-      "notifications": "Controla cómo y cuándo recibes alertas de sesiones de enfoque, descansos y resúmenes.",
-      "account": "Gestiona tu nombre visible, tu avatar y cómo inicias sesión en tu cuenta.",
-      "integrations": "Gestiona las cuentas externas que Focusly usa para sincronizar tu calendario y generar enlaces de Meet.",
-      "security": "Gestiona tus sesiones de autenticación y elimina o cierra sesión en tu cuenta.",
-      "default": "Gestiona tu sistema de enfoque y tus preferencias de identidad."
-    },
-    "focusStyleBadge": "Estilo de Enfoque: Creador de Trabajo Profundo"
+    }
   },
   "calendar": {
     "title": "Calendario",
@@ -126,124 +107,16 @@
       "markAllRead": "Marcar todas como leídas"
     }
   },
-  "profile": {
-    "brand": "Enfoque Inteligente",
-    "plan": "Plan Gratuito",
-    "nav": {
-      "general": "Perfil General",
-      "schedule": "Horario y Energía",
-      "focus": "Motor de Enfoque",
-      "notifications": "Notificaciones",
-      "logout": "Cerrar Sesión"
-    },
-    "general": {
-      "title": "Perfil General",
-      "subtitle": "Gestiona tu información personal, la seguridad de tu cuenta y tus preferencias básicas.",
-      "picture": {
-        "title": "Foto de Perfil",
-        "avatarTitle": "Tu Avatar",
-        "avatarDesc": "Se mostrará en tu perfil y en los espacios de equipo.",
-        "upload": "Subir Nueva",
-        "remove": "Eliminar"
-      },
-      "personal": {
-        "title": "Información Personal",
-        "fullName": "Nombre Completo",
-        "jobTitle": "Puesto de Trabajo",
-        "email": "Correo Electrónico",
-        "bio": "Biografía",
-        "bioCounter": "{{count}} / 250 caracteres"
-      }
-    }
-  },
-  "scheduleSettings": {
-    "title": "Tus Horas Doradas",
-    "aiBeta": "IA BETA",
-    "highConfidence": "Alta Confianza",
-    "windowDesc": "Esta es tu ventana de mayor energía. Focusly programa el trabajo de enfoque profundo durante este período.",
-    "energyPeak": "PICO DE ENERGÍA",
-    "autoProtectTitle": "Auto-proteger Horas Doradas",
-    "autoProtectDesc": "Focusly protegerá automáticamente tus horas de mayor rendimiento."
-  },
-  "focusEngineSettings": {
-    "shield": {
-      "title": "Escudo de Enfoque",
-      "bannerTitle": "¿Quieres bloquear sitios web y aplicaciones de verdad?",
-      "bannerDesc": "Para habilitar el bloqueo en tiempo real en tu navegador, asegúrate de descargar nuestra extensión oficial <companionLink>Focusly Guard Companion</companionLink>. Una vez instalada, esta extensión bloqueará automáticamente las webs distractoras de tu lista durante tus sesiones de enfoque.",
-      "social": {
-        "label": "Redes Sociales",
-        "desc": "Bloquea Twitter, Instagram, Facebook"
-      },
-      "media": {
-        "label": "Noticias y Medios",
-        "desc": "Bloquea YouTube, Netflix, Reddit"
-      },
-      "blocklistTitle": "Sitios Bloqueados",
-      "placeholder": "ej. facebook.com"
-    },
-    "deepLock": {
-      "title": "Modo Bloqueo Profundo",
-      "enableTitle": "Activar Sistema de Bloqueo",
-      "enableDesc": "Cuando está activado, finalizar una sesión de enfoque requiere una acción intencional y cronometrada. Esto refuerza los hábitos de concentración y evita la cancelación impulsiva."
-    },
-    "calendar": {
-      "title": "Protección de Calendario",
-      "syncTitle": "Sincronización con Google Calendar",
-      "syncDesc": "Los bloques de enfoque protegen automáticamente la disponibilidad de tu calendario al rechazar reuniones nuevas."
-    }
-  },
   "notificationSettings": {
-    "channels": {
-      "title": "Canales de Entrega",
-      "inApp": {
-        "title": "Notificaciones en la App",
-        "desc": "Recibe alertas de sesiones de enfoque directamente en la app."
-      },
-      "email": {
-        "title": "Resumen por Correo",
-        "desc": "Resúmenes diarios y semanales enviados a {{email}}"
-      },
-      "push": {
-        "title": "Notificaciones de Escritorio",
-        "desc": "Notificaciones nativas del sistema cuando el navegador está minimizado.",
-        "blocked": "⚠️ Las notificaciones push están bloqueadas por tu navegador."
-      }
-    },
-    "pushBlockedAlert": "Las notificaciones están bloqueadas en tu navegador. Actívalas en la configuración del sitio de tu navegador.",
     "sound": {
       "title": "Sonido de Notificación",
-      "desc": "Elige un tono de notificación. Haz clic en una tarjeta para escucharlo y establecerlo.",
       "classicChime": "Campanilla Clásica",
       "digitalTone": "Tono Digital",
       "softBell": "Campana Suave",
       "successArpeggio": "Arpegio de Éxito"
-    },
-    "alerts": {
-      "title": "Alertas de Sesión y Descanso",
-      "preview": "Escuchar Sonido",
-      "sessionStart": {
-        "title": "Inicio de Sesión",
-        "desc": "Alerta activada 5 minutos antes de tu bloque de trabajo profundo programado."
-      },
-      "breakReminder": {
-        "title": "Recordatorio de Descanso",
-        "desc": "Notificación cuando bajan los bloques de energía o se completa un bloque de enfoque."
-      },
-      "sessionEnd": {
-        "title": "Fin de Sesión",
-        "desc": "Alerta activada inmediatamente cuando el temporizador de enfoque llega a cero."
-      }
     }
   },
   "accountSettings": {
-    "identity": {
-      "title": "Identidad de Perfil",
-      "googleAccount": "Cuenta de Google",
-      "magicLink": "Inicio de Sesión por Enlace Mágico",
-      "avatarHint": "Haz clic en tu foto para subir una nueva.",
-      "removeAvatar": "Eliminar foto"
-    },
-    "displayName": "Nombre Visible",
     "emailAddress": "Correo Electrónico",
     "emailManagedBy": "Gestionado por tu proveedor de inicio de sesión y no se puede cambiar aquí.",
     "toast": {
@@ -252,8 +125,6 @@
     }
   },
   "integrationsSettings": {
-    "connectedApps": "Aplicaciones Conectadas",
-    "desc": "Gestiona las cuentas externas que Focusly usa para sincronizar tu calendario y generar enlaces de Meet.",
     "googleCalendar": "Google Calendar y Meet",
     "connectedAs": "Conectado como {{email}}",
     "notConnected": "No conectado",
@@ -267,19 +138,13 @@
     }
   },
   "securitySettings": {
-    "sessionTitle": "Cuenta y Sesión",
-    "sessionDesc": "Gestiona tu sesión de inicio activa para este espacio de trabajo. Para cambiar de cuenta o cerrar sesión, usa la opción de abajo.",
     "activeSession": "Sesión Activa",
-    "signedInBrowser": "Sesión iniciada en este navegador.",
-    "signOut": "Cerrar sesión en Focusly",
     "signInMethod": "Método de Inicio de Sesión",
     "google": "Google",
     "magicLink": "Enlace Mágico",
     "googleDesc": "Inicias sesión con tu cuenta de Google. No hay una contraseña separada de Focusly que gestionar.",
     "magicLinkDesc": "Inicias sesión con un enlace mágico sin contraseña enviado a tu correo.",
-    "dangerZone": "Zona de Peligro",
     "deleteAccount": "Eliminar Cuenta",
-    "deleteAccountDesc": "Elimina permanentemente tu cuenta y todos tus datos.",
     "deleteConfirm": {
       "title": "¿Eliminar tu cuenta?",
       "subtitle": "Esta acción no se puede deshacer",
@@ -297,8 +162,87 @@
   "endSessionModal": {
     "title": "¿Terminar Sesión de Enfoque?",
     "confirmText": "¿Seguro que quieres terminar esta sesión antes de tiempo?",
-    "warningText": "Detenerla ahora puede afectar el seguimiento de tu progreso diario y tu racha.",
+    "warningText": "El tiempo que llevas se guardará en la tarea.",
     "endSession": "Terminar Sesión"
+  },
+  "focusTimer": {
+    "timeUp": "¡Tiempo cumplido! Completa la tarea o suma 5 minutos para seguir."
+  },
+  "profilePage": {
+    "title": "Configuración",
+    "back": "Volver",
+    "logout": "Cerrar sesión",
+    "nav": {
+      "account": "Perfil",
+      "workFocus": "Horario y enfoque",
+      "notifications": "Notificaciones",
+      "appearance": "Apariencia",
+      "integrations": "Integraciones",
+      "privacy": "Privacidad y seguridad"
+    },
+    "descriptions": {
+      "account": "Tu foto, tu nombre y la cuenta con la que inicias sesión.",
+      "workFocus": "Cuándo trabajas y cuánto dura una sesión de enfoque. Focusly usa esto para acomodar tus tareas.",
+      "notifications": "Cómo te avisa Focusly cuando una tarea está por empezar.",
+      "appearance": "Tema e idioma de Focusly en este dispositivo.",
+      "integrations": "Cuentas externas que Focusly usa para sincronizar tu calendario y crear enlaces de Meet.",
+      "privacy": "Tu sesión, los documentos legales y la eliminación de tu cuenta."
+    },
+    "account": {
+      "photoTitle": "Foto de perfil",
+      "photoDesc": "Se muestra en el menú lateral de Focusly. Formatos JPG, PNG o WebP.",
+      "upload": "Subir foto",
+      "remove": "Quitar foto",
+      "nameTitle": "Nombre",
+      "nameDesc": "El nombre con el que apareces en Focusly.",
+      "nameError": "No pudimos guardar tu nombre. Inténtalo de nuevo."
+    },
+    "workFocus": {
+      "daysTitle": "Días laborables",
+      "daysDesc": "Marca los días en que trabajas. El planificador automático y el plan semanal de Lumina solo acomodan tareas en esos días.",
+      "hoursTitle": "Horario laboral",
+      "hoursDesc": "Las tareas y los bloques de enfoque se programan dentro de este horario, en los días que marcaste.",
+      "start": "Inicio",
+      "end": "Fin",
+      "focusTitle": "Duración de una sesión de enfoque",
+      "focusDesc": "Lo que dura el temporizador del modo enfoque cuando la tarea no tiene un tiempo estimado.",
+      "minutes": "{{count}} min",
+      "save": "Guardar cambios",
+      "discard": "Descartar",
+      "savedTitle": "Preferencias guardadas",
+      "savedDesc": "Focusly usará este horario para acomodar tus tareas.",
+      "saveError": "No pudimos guardar tus preferencias. Inténtalo de nuevo.",
+      "errors": {
+        "noDays": "Elige al menos un día.",
+        "hours": "La hora de fin debe ser posterior a la de inicio."
+      }
+    },
+    "notifications": {
+      "remindersTitle": "Recordatorios de tareas",
+      "remindersDesc": "Te avisa 5 minutos y 1 minuto antes de que empiece una tarea con hora: muestra un aviso en Focusly y reproduce el sonido que elijas abajo. Si lo desactivas, no recibirás ningún recordatorio en este dispositivo.",
+      "systemTitle": "Notificaciones del sistema",
+      "systemDesc": "Muestra además cada recordatorio como notificación de tu sistema operativo, para que lo veas aunque Focusly esté en otra pestaña o minimizado. Requiere el permiso del navegador.",
+      "allow": "Permitir",
+      "permission": {
+        "granted": "Permitidas en este navegador.",
+        "default": "Aún no has dado permiso en este navegador.",
+        "denied": "Bloqueadas por el navegador. Actívalas desde la configuración del sitio (el ícono a la izquierda de la dirección).",
+        "unsupported": "Este navegador no admite notificaciones del sistema."
+      },
+      "soundDesc": "El sonido de cada recordatorio. Toca una opción para escucharla y elegirla; se guarda en este dispositivo."
+    },
+    "appearance": {
+      "languageDesc": "Idioma de la interfaz en este dispositivo."
+    },
+    "integrations": {
+      "googleDesc": "Permite que Focusly lea y cree eventos en tu Google Calendar para mostrar tu agenda, programar tus tareas y generar enlaces de Meet. Puedes revocar el acceso desde tu cuenta de Google."
+    },
+    "privacy": {
+      "sessionDesc": "Cierra tu sesión en este navegador. Tus datos se quedan guardados y vuelves a entrar con tu método de inicio de sesión.",
+      "termsAccepted": "Aceptaste la versión {{version}} el {{date}}.",
+      "termsAcceptedNoVersion": "Aceptaste los términos el {{date}}.",
+      "deleteDesc": "Borra para siempre tu cuenta, tus tareas, documentos, proyectos y conversaciones con Lumina. No se puede deshacer."
+    }
   },
   "insightsHeader": {
     "title": "{{period}} Insights",

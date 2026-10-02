@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, useTheme } from '@mui/material';
 import {
   TimerContainer,
@@ -19,8 +20,10 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
   formatTime,
   progress,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const isTimeUp = timeLeft <= 0;
 
   return (
     <>
@@ -51,7 +54,10 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
               )}
               <TimerCard
                 label="MINUTES"
-                sx={{ width: hasHours ? 180 : 220, height: hasHours ? 200 : 240 }}
+                sx={{
+                  width: hasHours ? 180 : 220,
+                  height: hasHours ? 200 : 240,
+                }}
               >
                 <Typography
                   variant="h2"
@@ -68,7 +74,10 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
               <TimerSeparator>:</TimerSeparator>
               <TimerCard
                 label="SECONDS"
-                sx={{ width: hasHours ? 180 : 220, height: hasHours ? 200 : 240 }}
+                sx={{
+                  width: hasHours ? 180 : 220,
+                  height: hasHours ? 200 : 240,
+                }}
               >
                 <Typography
                   variant="h2"
@@ -91,9 +100,12 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
         <ProgressLabels>
           <Typography
             variant="caption"
-            sx={{ color: theme.palette.text.secondary, fontWeight: 600 }}
+            sx={{
+              color: isTimeUp ? 'warning.main' : theme.palette.text.secondary,
+              fontWeight: 600,
+            }}
           >
-            Session Progress
+            {isTimeUp ? t('focusTimer.timeUp') : 'Session Progress'}
           </Typography>
           <Typography
             variant="caption"
@@ -106,7 +118,9 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
           sx={{
             height: 6,
             width: '100%',
-            bgcolor: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(226, 232, 240, 0.5)',
+            bgcolor: isDark
+              ? 'rgba(30, 41, 59, 0.5)'
+              : 'rgba(226, 232, 240, 0.5)',
             borderRadius: 3,
             overflow: 'hidden',
           }}

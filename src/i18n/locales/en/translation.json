@@ -52,14 +52,6 @@
     "searchWorkspaces": "Search workspaces..."
   },
   "settings": {
-    "title": "Settings",
-    "account": "Account",
-    "appearance": "Appearance",
-    "focusEngine": "Focus Engine",
-    "integrations": "Integrations",
-    "notifications": "Notifications",
-    "schedule": "Schedule",
-    "security": "Security",
     "theme": {
       "title": "Theme",
       "subtitle": "Choose how Focusly looks on this device.",
@@ -69,21 +61,10 @@
     },
     "language": {
       "title": "Language",
-      "subtitle": "Select your preferred language for the interface.",
       "spanish": "Español",
       "english": "English",
       "japanese": "日本語"
-    },
-    "descriptions": {
-      "schedule": "Configure your availability, work rhythm, and let our AI optimize your peak productivity windows.",
-      "focus": "Define your focus and break block duration and manage distraction shield parameters.",
-      "notifications": "Control how and when you receive alerts for focus sessions, breaks, and digests.",
-      "account": "Manage your display name, avatar, and how your account is signed in.",
-      "integrations": "Manage the external accounts Focusly uses to sync your calendar and generate Meet links.",
-      "security": "Manage your authentication sessions and delete or sign out of your account.",
-      "default": "Manage your focus system and identity preferences."
-    },
-    "focusStyleBadge": "Focus Style: Deep Work Creator"
+    }
   },
   "calendar": {
     "title": "Calendar",
@@ -126,124 +107,16 @@
       "markAllRead": "Mark all read"
     }
   },
-  "profile": {
-    "brand": "Intelligent Focus",
-    "plan": "Free Plan",
-    "nav": {
-      "general": "General Profile",
-      "schedule": "Schedule & Energy",
-      "focus": "Focus Engine",
-      "notifications": "Notifications",
-      "logout": "Log Out"
-    },
-    "general": {
-      "title": "General Profile",
-      "subtitle": "Manage your personal information, account security, and basic preferences.",
-      "picture": {
-        "title": "Profile Picture",
-        "avatarTitle": "Your Avatar",
-        "avatarDesc": "This will be displayed on your profile and in team spaces.",
-        "upload": "Upload New",
-        "remove": "Remove"
-      },
-      "personal": {
-        "title": "Personal Information",
-        "fullName": "Full Name",
-        "jobTitle": "Job Title",
-        "email": "Email Address",
-        "bio": "Bio",
-        "bioCounter": "{{count}} / 250 characters"
-      }
-    }
-  },
-  "scheduleSettings": {
-    "title": "Your Golden Hours",
-    "aiBeta": "AI BETA",
-    "highConfidence": "High Confidence",
-    "windowDesc": "This is your highest energy window. Focusly schedules deep focus work during this period.",
-    "energyPeak": "ENERGY PEAK",
-    "autoProtectTitle": "Auto-protect Golden Hours",
-    "autoProtectDesc": "Focusly will automatically protect your highest performance hours."
-  },
-  "focusEngineSettings": {
-    "shield": {
-      "title": "Focus Shield",
-      "bannerTitle": "Want to actually block distracting websites and apps?",
-      "bannerDesc": "To enable real-time blocking in your browser, make sure to download our official extension <companionLink>Focusly Guard Companion</companionLink>. Once installed, this extension will automatically block distracting websites from your list during your focus sessions.",
-      "social": {
-        "label": "Social Media",
-        "desc": "Block Twitter, Instagram, Facebook"
-      },
-      "media": {
-        "label": "News & Media",
-        "desc": "Block YouTube, Netflix, Reddit"
-      },
-      "blocklistTitle": "Blocked Websites",
-      "placeholder": "e.g. facebook.com"
-    },
-    "deepLock": {
-      "title": "Deep Lock Mode",
-      "enableTitle": "Enable Lockout System",
-      "enableDesc": "When enabled, ending a focus session requires intentional, timed action. This reinforces concentration habits and prevents impulse cancellation."
-    },
-    "calendar": {
-      "title": "Calendar Protection",
-      "syncTitle": "Google Calendar Sync",
-      "syncDesc": "Focus blocks automatically protect your calendar availability by declining new meetings."
-    }
-  },
   "notificationSettings": {
-    "channels": {
-      "title": "Delivery Channels",
-      "inApp": {
-        "title": "In-App Notifications",
-        "desc": "Receive focus session alerts directly in the app."
-      },
-      "email": {
-        "title": "Email Summary",
-        "desc": "Daily and weekly summaries sent to {{email}}"
-      },
-      "push": {
-        "title": "Desktop Push Notifications",
-        "desc": "OS-native notifications when the browser is minimized.",
-        "blocked": "⚠️ Push notifications are blocked by your browser."
-      }
-    },
-    "pushBlockedAlert": "Notifications are blocked in your browser. Please enable them in your browser site settings.",
     "sound": {
       "title": "Notification Sound",
-      "desc": "Pick a notification chime. Click a card to preview and set it.",
       "classicChime": "Classic Chime",
       "digitalTone": "Digital Tone",
       "softBell": "Soft Bell",
       "successArpeggio": "Success Arpeggio"
-    },
-    "alerts": {
-      "title": "Session & Break Alerts",
-      "preview": "Preview Sound",
-      "sessionStart": {
-        "title": "Session Start",
-        "desc": "Alert triggered 5 minutes before your scheduled deep work block."
-      },
-      "breakReminder": {
-        "title": "Break Reminder",
-        "desc": "Notification when energy blocks drop or a focus block is complete."
-      },
-      "sessionEnd": {
-        "title": "Session End",
-        "desc": "Alert triggered immediately when focus timer hits zero."
-      }
     }
   },
   "accountSettings": {
-    "identity": {
-      "title": "Profile Identity",
-      "googleAccount": "Google Account",
-      "magicLink": "Magic Link Sign-in",
-      "avatarHint": "Click your photo to upload a new one.",
-      "removeAvatar": "Remove photo"
-    },
-    "displayName": "Display Name",
     "emailAddress": "Email Address",
     "emailManagedBy": "Managed by your sign-in provider and can't be changed here.",
     "toast": {
@@ -252,8 +125,6 @@
     }
   },
   "integrationsSettings": {
-    "connectedApps": "Connected Apps",
-    "desc": "Manage the external accounts Focusly uses to sync your calendar and generate Meet links.",
     "googleCalendar": "Google Calendar & Meet",
     "connectedAs": "Connected as {{email}}",
     "notConnected": "Not connected",
@@ -267,19 +138,13 @@
     }
   },
   "securitySettings": {
-    "sessionTitle": "Account & Session",
-    "sessionDesc": "Manage your active login session for this workspace. To switch accounts or sign out, use the option below.",
     "activeSession": "Active Session",
-    "signedInBrowser": "Signed in on this browser.",
-    "signOut": "Sign out of Focusly",
     "signInMethod": "Sign-in Method",
     "google": "Google",
     "magicLink": "Magic Link",
     "googleDesc": "You sign in with your Google account. There is no separate Focusly password to manage.",
     "magicLinkDesc": "You sign in with a passwordless magic link sent to your email.",
-    "dangerZone": "Danger Zone",
     "deleteAccount": "Delete Account",
-    "deleteAccountDesc": "Permanently remove your account and all of your data.",
     "deleteConfirm": {
       "title": "Delete your account?",
       "subtitle": "This action cannot be undone",
@@ -297,8 +162,87 @@
   "endSessionModal": {
     "title": "End Focus Session?",
     "confirmText": "Are you sure you want to end this session early?",
-    "warningText": "Stopping now might affect your daily progress tracking and streak.",
+    "warningText": "The time you've tracked so far will be saved to the task.",
     "endSession": "End Session"
+  },
+  "focusTimer": {
+    "timeUp": "Time's up! Complete the task or add 5 minutes to keep going."
+  },
+  "profilePage": {
+    "title": "Settings",
+    "back": "Back",
+    "logout": "Log out",
+    "nav": {
+      "account": "Profile",
+      "workFocus": "Schedule & focus",
+      "notifications": "Notifications",
+      "appearance": "Appearance",
+      "integrations": "Integrations",
+      "privacy": "Privacy & security"
+    },
+    "descriptions": {
+      "account": "Your photo, your name and the account you sign in with.",
+      "workFocus": "When you work and how long a focus session lasts. Focusly uses this to fit your tasks in.",
+      "notifications": "How Focusly lets you know a task is about to start.",
+      "appearance": "Focusly's theme and language on this device.",
+      "integrations": "External accounts Focusly uses to sync your calendar and create Meet links.",
+      "privacy": "Your session, the legal documents and deleting your account."
+    },
+    "account": {
+      "photoTitle": "Profile photo",
+      "photoDesc": "Shown in Focusly's side menu. JPG, PNG or WebP.",
+      "upload": "Upload photo",
+      "remove": "Remove photo",
+      "nameTitle": "Name",
+      "nameDesc": "The name you appear with in Focusly.",
+      "nameError": "We couldn't save your name. Please try again."
+    },
+    "workFocus": {
+      "daysTitle": "Work days",
+      "daysDesc": "Mark the days you work. The automatic scheduler and Lumina's weekly plan only place tasks on those days.",
+      "hoursTitle": "Work hours",
+      "hoursDesc": "Tasks and focus blocks are scheduled within these hours, on the days you marked.",
+      "start": "Start",
+      "end": "End",
+      "focusTitle": "Focus session length",
+      "focusDesc": "How long the focus mode timer runs when a task has no time estimate.",
+      "minutes": "{{count}} min",
+      "save": "Save changes",
+      "discard": "Discard",
+      "savedTitle": "Preferences saved",
+      "savedDesc": "Focusly will use these hours to fit your tasks in.",
+      "saveError": "We couldn't save your preferences. Please try again.",
+      "errors": {
+        "noDays": "Pick at least one day.",
+        "hours": "The end time must be after the start time."
+      }
+    },
+    "notifications": {
+      "remindersTitle": "Task reminders",
+      "remindersDesc": "Alerts you 5 minutes and 1 minute before a timed task starts: shows a notice in Focusly and plays the sound you pick below. Turn it off and you won't get any reminders on this device.",
+      "systemTitle": "System notifications",
+      "systemDesc": "Also shows each reminder as an operating system notification, so you see it even when Focusly is in another tab or minimized. Requires the browser's permission.",
+      "allow": "Allow",
+      "permission": {
+        "granted": "Allowed in this browser.",
+        "default": "You haven't granted permission in this browser yet.",
+        "denied": "Blocked by the browser. Turn them on from the site settings (the icon to the left of the address).",
+        "unsupported": "This browser doesn't support system notifications."
+      },
+      "soundDesc": "The sound each reminder plays. Tap an option to hear it and pick it; it's saved on this device."
+    },
+    "appearance": {
+      "languageDesc": "Interface language on this device."
+    },
+    "integrations": {
+      "googleDesc": "Lets Focusly read and create events in your Google Calendar to show your schedule, schedule your tasks and generate Meet links. You can revoke access from your Google account."
+    },
+    "privacy": {
+      "sessionDesc": "Signs you out in this browser. Your data stays saved and you sign back in with your usual method.",
+      "termsAccepted": "You accepted version {{version}} on {{date}}.",
+      "termsAcceptedNoVersion": "You accepted the terms on {{date}}.",
+      "deleteDesc": "Permanently deletes your account, tasks, documents, projects and conversations with Lumina. This can't be undone."
+    }
   },
   "insightsHeader": {
     "title": "{{period}} Insights",

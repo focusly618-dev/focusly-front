@@ -54,7 +54,6 @@ export const useHome = () => {
     } else {
       localStorage.removeItem('focus_mode_task');
     }
-    localStorage.removeItem('focus_mode_subtask_index');
     localStorage.setItem('ai_schedule_enabled', String(isAIScheduleEnabled));
   }, [isFocusModeOpen, activeFocusTask, isAIScheduleEnabled]);
 
@@ -102,11 +101,9 @@ export const useHome = () => {
     return isNaN(date.getTime()) ? null : date;
   }, [searchParams]);
 
+  // Switching tasks remounts FocusMode (it's keyed by task id), and the new
+  // instance logs whatever time the previous task's session hadn't saved.
   const handleStartFocus = (task?: Task | TaskSearchItems | null) => {
-    if (task?.id !== activeFocusTask?.id) {
-      localStorage.removeItem('focus_mode_time_left');
-      localStorage.removeItem('focus_mode_is_active');
-    }
     if (task) {
       setActiveFocusTask(task as Task);
     }

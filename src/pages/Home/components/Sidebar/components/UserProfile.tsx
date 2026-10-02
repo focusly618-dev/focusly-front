@@ -5,7 +5,6 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/ui';
-import { TaskBar } from '../types/Sidebar.types';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
 
 interface UserProfileProps {
@@ -13,7 +12,7 @@ interface UserProfileProps {
 }
 
 export const UserProfile = ({ sidebar }: UserProfileProps) => {
-  const { user, theme, colorMode, changeStatusTab, isCollapsed } = sidebar;
+  const { user, theme, colorMode, openProfile, isCollapsed } = sidebar;
   const { t } = useTranslation();
 
   return (
@@ -43,7 +42,7 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
       }}
     >
       <Box
-        onClick={() => changeStatusTab(TaskBar.Settings)}
+        onClick={openProfile}
         sx={{
           display: 'flex',
           alignItems: 'center',

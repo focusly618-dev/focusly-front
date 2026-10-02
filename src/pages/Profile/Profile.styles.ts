@@ -1,134 +1,237 @@
-import { Box, Paper, Button, TextField, styled } from '@mui/material';
+import { Box, ButtonBase, Typography, alpha, styled } from '@mui/material';
 
-export const ProfilePageContainer = styled(Box)(({ theme }) => ({
-  minHeight: '100vh',
+/* ── Page layout ─────────────────────────────────────────────── */
+
+export const PageLayout = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  height: '100vh',
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
-  display: 'flex',
-  flexDirection: 'column',
-}));
-
-export const TopBar = styled(Box)(({ theme }) => ({
-  height: '64px',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '0 32px',
-  backgroundColor: theme.palette.background.default,
-}));
-
-export const ContentContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flex: 1,
-  overflow: 'hidden',
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
-    overflowY: 'auto',
+    height: 'auto',
+    minHeight: '100vh',
   },
 }));
 
-export const Sidebar = styled(Box)(({ theme }) => ({
-  width: '280px',
-  borderRight: `1px solid ${theme.palette.divider}`,
-  padding: '24px',
+export const Sidebar = styled('aside')(({ theme }) => ({
+  width: 272,
+  flexShrink: 0,
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: theme.palette.background.default,
+  gap: theme.spacing(3),
+  padding: theme.spacing(3, 2),
+  borderRight: `1px solid ${theme.palette.divider}`,
+  overflowY: 'auto',
   [theme.breakpoints.down('md')]: {
     width: '100%',
+    gap: theme.spacing(2),
+    padding: theme.spacing(2),
     borderRight: 'none',
     borderBottom: `1px solid ${theme.palette.divider}`,
-    padding: '16px',
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflowX: 'auto',
-    gap: '12px',
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    '&::-webkit-scrollbar': {
-      display: 'none',
-    },
-  },
-}));
-
-export const MainContent = styled(Box)(({ theme }) => ({
-  flex: 1,
-  padding: '40px',
-  overflowY: 'auto',
-  backgroundColor: theme.palette.background.default,
-  [theme.breakpoints.down('md')]: {
-    padding: '24px 16px',
     overflowY: 'visible',
-    height: 'auto',
   },
 }));
 
-export const UserCard = styled(Box)(({ theme }) => ({
+export const BackButton = styled(ButtonBase)(({ theme }) => ({
+  alignSelf: 'flex-start',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  padding: theme.spacing(0.75, 1.25, 0.75, 0.75),
+  borderRadius: 8,
+  fontFamily: 'inherit',
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  color: theme.palette.text.secondary,
+  transition: 'background-color 0.15s ease, color 0.15s ease',
+  '& svg': { fontSize: 18 },
+  '&:hover': {
+    color: theme.palette.text.primary,
+    backgroundColor: theme.palette.action.hover,
+  },
+  '&.Mui-focusVisible': {
+    outline: `2px solid ${theme.palette.primary.main}`,
+    outlineOffset: 2,
+  },
+}));
+
+export const UserSummary = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '12px',
-  padding: '12px 16px',
-  borderRadius: '12px',
-  backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
-  marginBottom: '24px',
+  gap: theme.spacing(1.5),
+  padding: theme.spacing(0, 1),
+  minWidth: 0,
+}));
+
+export const NavList = styled('nav')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(0.5),
   [theme.breakpoints.down('md')]: {
-    marginBottom: 0,
-    padding: '8px 12px',
+    flexDirection: 'row',
+    overflowX: 'auto',
+    margin: theme.spacing(0, -2),
+    padding: theme.spacing(0, 2),
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
   },
 }));
 
-export const MenuButton = styled(Button)<{ active?: boolean }>(
-  ({ theme, active }) => ({
-    justifyContent: 'flex-start',
-    textTransform: 'none',
-    padding: '10px 16px',
-    borderRadius: '8px',
-    color: active ? theme.palette.text.primary : theme.palette.text.secondary,
-    backgroundColor: active ? theme.palette.action.selected : 'transparent',
-    fontWeight: active ? 600 : 400,
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover,
-      color: theme.palette.text.primary,
-    },
-    gap: '12px',
-    marginBottom: '4px',
-    [theme.breakpoints.down('md')]: {
-      marginBottom: 0,
-      flexShrink: 0,
-    },
-  }),
-);
-
-export const SectionCard = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  backgroundImage: 'none',
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: '16px',
-  padding: '24px',
-  marginBottom: '24px',
-}));
-
-export const DarkInput = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: theme.palette.background.default,
-    borderRadius: '8px',
+export const NavItem = styled(ButtonBase, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
+  justifyContent: 'flex-start',
+  gap: theme.spacing(1.5),
+  width: '100%',
+  padding: theme.spacing(1, 1.5),
+  borderRadius: 8,
+  fontFamily: 'inherit',
+  fontSize: '0.875rem',
+  fontWeight: active ? 600 : 500,
+  textAlign: 'left',
+  whiteSpace: 'nowrap',
+  color: active ? theme.palette.text.primary : theme.palette.text.secondary,
+  backgroundColor: active
+    ? alpha(theme.palette.primary.main, 0.1)
+    : 'transparent',
+  transition: 'background-color 0.15s ease, color 0.15s ease',
+  '& svg': {
+    fontSize: 20,
+    color: active ? theme.palette.primary.main : 'inherit',
+  },
+  '&:hover': {
     color: theme.palette.text.primary,
-    '& fieldset': {
-      borderColor: theme.palette.divider,
-    },
-    '&:hover fieldset': {
-      borderColor: theme.palette.text.secondary,
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: theme.palette.primary.main,
-    },
+    backgroundColor: active
+      ? alpha(theme.palette.primary.main, 0.14)
+      : theme.palette.action.hover,
   },
-  '& .MuiInputLabel-root': {
-    color: theme.palette.text.secondary,
+  '&.Mui-focusVisible': {
+    outline: `2px solid ${theme.palette.primary.main}`,
+    outlineOffset: -2,
   },
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: theme.palette.primary.main,
+  [theme.breakpoints.down('md')]: {
+    width: 'auto',
+    flexShrink: 0,
   },
+}));
+
+export const Content = styled('main')(({ theme }) => ({
+  flex: 1,
+  minWidth: 0,
+  overflowY: 'auto',
+  padding: theme.spacing(6, 6, 10),
+  [theme.breakpoints.down('lg')]: {
+    padding: theme.spacing(5, 4, 8),
+  },
+  [theme.breakpoints.down('md')]: {
+    overflowY: 'visible',
+    padding: theme.spacing(3, 2, 6),
+  },
+}));
+
+export const ContentInner = styled(Box)({
+  maxWidth: 720,
+  margin: '0 auto',
+});
+
+/* ── Section building blocks ─────────────────────────────────── */
+
+export const Card = styled(Box)(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: 12,
+  backgroundColor: theme.palette.background.paper,
+  padding: theme.spacing(3),
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2),
+  },
+  '& + &': {
+    marginTop: theme.spacing(2),
+  },
+}));
+
+export const DangerCard = styled(Card)(({ theme }) => ({
+  borderColor: alpha(theme.palette.error.main, 0.3),
+}));
+
+export const CardTitle = styled(Typography)(({ theme }) => ({
+  fontSize: '0.95rem',
+  fontWeight: 700,
+  color: theme.palette.text.primary,
+}));
+
+export const CardDescription = styled(Typography)(({ theme }) => ({
+  fontSize: '0.825rem',
+  lineHeight: 1.5,
+  color: theme.palette.text.secondary,
+  marginTop: theme.spacing(0.5),
+}));
+
+export const Divider = styled('hr')(({ theme }) => ({
+  border: 'none',
+  borderTop: `1px solid ${theme.palette.divider}`,
+  margin: theme.spacing(2.5, 0),
+}));
+
+export const OptionGrid = styled(Box)(({ theme }) => ({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+  gap: theme.spacing(1.5),
+  marginTop: theme.spacing(2),
+}));
+
+export const OptionCard = styled(ButtonBase, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: theme.spacing(1.5),
+  padding: theme.spacing(1.75),
+  borderRadius: 10,
+  fontFamily: 'inherit',
+  textAlign: 'left',
+  border: `1px solid ${active ? theme.palette.primary.main : theme.palette.divider}`,
+  backgroundColor: active
+    ? alpha(theme.palette.primary.main, 0.08)
+    : 'transparent',
+  color: theme.palette.text.primary,
+  transition: 'border-color 0.15s ease, background-color 0.15s ease',
+  '&:hover': {
+    borderColor: active
+      ? theme.palette.primary.main
+      : alpha(theme.palette.primary.main, 0.5),
+  },
+  '&.Mui-focusVisible': {
+    outline: `2px solid ${theme.palette.primary.main}`,
+    outlineOffset: 2,
+  },
+}));
+
+export const OptionIcon = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
+  width: 32,
+  height: 32,
+  borderRadius: 8,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: active ? theme.palette.primary.main : theme.palette.text.secondary,
+  backgroundColor: active
+    ? alpha(theme.palette.primary.main, 0.12)
+    : theme.palette.action.hover,
+  '& svg': { fontSize: 18 },
+}));
+
+export const Pill = styled('span')(({ theme }) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: theme.spacing(0.5),
+  padding: theme.spacing(0.25, 1),
+  borderRadius: 999,
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  color: theme.palette.primary.main,
+  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+  '& svg': { fontSize: 14 },
 }));

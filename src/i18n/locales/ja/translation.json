@@ -52,14 +52,6 @@
     "searchWorkspaces": "ワークスペースを検索..."
   },
   "settings": {
-    "title": "設定",
-    "account": "アカウント",
-    "appearance": "外観",
-    "focusEngine": "フォーカスエンジン",
-    "integrations": "連携",
-    "notifications": "通知",
-    "schedule": "スケジュール",
-    "security": "セキュリティ",
     "theme": {
       "title": "テーマ",
       "subtitle": "Focuslyの表示スタイルを選択します。",
@@ -69,21 +61,10 @@
     },
     "language": {
       "title": "言語",
-      "subtitle": "インターフェースの表示言語を選択します。",
       "spanish": "Español",
       "english": "English",
       "japanese": "日本語"
-    },
-    "descriptions": {
-      "schedule": "空き時間や作業リズムを設定し、AIに生産性が最も高くなる時間帯を最適化させましょう。",
-      "focus": "フォーカスと休憩ブロックの長さを設定し、集中妨害シールドのパラメータを管理します。",
-      "notifications": "フォーカスセッション、休憩、ダイジェストの通知方法とタイミングを管理します。",
-      "account": "表示名、アバター、アカウントのサインイン方法を管理します。",
-      "integrations": "Focuslyがカレンダーの同期やMeetリンクの生成に使用する外部アカウントを管理します。",
-      "security": "認証セッションを管理し、アカウントを削除またはサインアウトします。",
-      "default": "フォーカスシステムとアイデンティティ設定を管理します。"
-    },
-    "focusStyleBadge": "フォーカススタイル: ディープワーク・クリエイター"
+    }
   },
   "calendar": {
     "title": "カレンダー",
@@ -126,124 +107,16 @@
       "markAllRead": "すべて既読にする"
     }
   },
-  "profile": {
-    "brand": "インテリジェント・フォーカス",
-    "plan": "無料プラン",
-    "nav": {
-      "general": "一般プロフィール",
-      "schedule": "スケジュールとエネルギー",
-      "focus": "フォーカスエンジン",
-      "notifications": "通知",
-      "logout": "ログアウト"
-    },
-    "general": {
-      "title": "一般プロフィール",
-      "subtitle": "個人情報、アカウントのセキュリティ、基本設定を管理します。",
-      "picture": {
-        "title": "プロフィール写真",
-        "avatarTitle": "あなたのアバター",
-        "avatarDesc": "プロフィールやチームスペースに表示されます。",
-        "upload": "新しくアップロード",
-        "remove": "削除"
-      },
-      "personal": {
-        "title": "個人情報",
-        "fullName": "氏名",
-        "jobTitle": "役職",
-        "email": "メールアドレス",
-        "bio": "自己紹介",
-        "bioCounter": "{{count}} / 250文字"
-      }
-    }
-  },
-  "scheduleSettings": {
-    "title": "あなたのゴールデンアワー",
-    "aiBeta": "AI ベータ",
-    "highConfidence": "高い信頼度",
-    "windowDesc": "これはあなたの最もエネルギーが高い時間帯です。Focuslyはこの時間にディープフォーカス作業をスケジュールします。",
-    "energyPeak": "エネルギーピーク",
-    "autoProtectTitle": "ゴールデンアワーを自動保護",
-    "autoProtectDesc": "Focuslyがあなたの最も生産性が高い時間帯を自動的に保護します。"
-  },
-  "focusEngineSettings": {
-    "shield": {
-      "title": "フォーカスシールド",
-      "bannerTitle": "気を散らすウェブサイトやアプリを本当にブロックしたいですか？",
-      "bannerDesc": "ブラウザでリアルタイムのブロックを有効にするには、公式拡張機能<companionLink>Focusly Guard Companion</companionLink>をダウンロードしてください。インストール後、フォーカスセッション中にリストの気を散らすサイトを自動的にブロックします。",
-      "social": {
-        "label": "ソーシャルメディア",
-        "desc": "Twitter、Instagram、Facebookをブロック"
-      },
-      "media": {
-        "label": "ニュース・メディア",
-        "desc": "YouTube、Netflix、Redditをブロック"
-      },
-      "blocklistTitle": "ブロック済みサイト",
-      "placeholder": "例: facebook.com"
-    },
-    "deepLock": {
-      "title": "ディープロックモード",
-      "enableTitle": "ロックアウトシステムを有効化",
-      "enableDesc": "有効にすると、フォーカスセッションを終了するには意図的で時間のかかる操作が必要になります。これにより集中習慣が強化され、衝動的なキャンセルを防ぎます。"
-    },
-    "calendar": {
-      "title": "カレンダー保護",
-      "syncTitle": "Google カレンダー同期",
-      "syncDesc": "フォーカスブロックは新しい会議を自動的に断ることで、カレンダーの空き状況を保護します。"
-    }
-  },
   "notificationSettings": {
-    "channels": {
-      "title": "配信チャネル",
-      "inApp": {
-        "title": "アプリ内通知",
-        "desc": "フォーカスセッションのアラートをアプリ内で直接受け取ります。"
-      },
-      "email": {
-        "title": "メールサマリー",
-        "desc": "{{email}} に日次・週次のサマリーを送信します"
-      },
-      "push": {
-        "title": "デスクトップ プッシュ通知",
-        "desc": "ブラウザが最小化されているときにOSネイティブの通知を表示します。",
-        "blocked": "⚠️ プッシュ通知はブラウザによってブロックされています。"
-      }
-    },
-    "pushBlockedAlert": "通知はブラウザでブロックされています。ブラウザのサイト設定で有効にしてください。",
     "sound": {
       "title": "通知音",
-      "desc": "通知音を選択してください。カードをクリックしてプレビュー・設定できます。",
       "classicChime": "クラシックチャイム",
       "digitalTone": "デジタルトーン",
       "softBell": "ソフトベル",
       "successArpeggio": "サクセス・アルペジオ"
-    },
-    "alerts": {
-      "title": "セッション・休憩アラート",
-      "preview": "音をプレビュー",
-      "sessionStart": {
-        "title": "セッション開始",
-        "desc": "予定されたディープワークブロックの5分前にアラートが発生します。"
-      },
-      "breakReminder": {
-        "title": "休憩リマインダー",
-        "desc": "エネルギーブロックが低下した、またはフォーカスブロックが完了したときに通知します。"
-      },
-      "sessionEnd": {
-        "title": "セッション終了",
-        "desc": "フォーカスタイマーがゼロになると即座にアラートが発生します。"
-      }
     }
   },
   "accountSettings": {
-    "identity": {
-      "title": "プロフィール情報",
-      "googleAccount": "Google アカウント",
-      "magicLink": "マジックリンク・サインイン",
-      "avatarHint": "写真をクリックして新しい画像をアップロードします。",
-      "removeAvatar": "写真を削除"
-    },
-    "displayName": "表示名",
     "emailAddress": "メールアドレス",
     "emailManagedBy": "サインインプロバイダーによって管理されており、ここでは変更できません。",
     "toast": {
@@ -252,8 +125,6 @@
     }
   },
   "integrationsSettings": {
-    "connectedApps": "連携アプリ",
-    "desc": "Focuslyがカレンダーの同期やMeetリンクの生成に使用する外部アカウントを管理します。",
     "googleCalendar": "Google カレンダー & Meet",
     "connectedAs": "{{email}} として接続済み",
     "notConnected": "未接続",
@@ -267,19 +138,13 @@
     }
   },
   "securitySettings": {
-    "sessionTitle": "アカウントとセッション",
-    "sessionDesc": "このワークスペースの有効なログインセッションを管理します。アカウントを切り替えたりサインアウトするには、以下のオプションを使用してください。",
     "activeSession": "有効なセッション",
-    "signedInBrowser": "このブラウザでサインインしています。",
-    "signOut": "Focuslyからサインアウト",
     "signInMethod": "サインイン方法",
     "google": "Google",
     "magicLink": "マジックリンク",
     "googleDesc": "Googleアカウントでサインインしています。管理する別のFocuslyパスワードはありません。",
     "magicLinkDesc": "メールに送信されたパスワード不要のマジックリンクでサインインしています。",
-    "dangerZone": "危険な操作",
     "deleteAccount": "アカウントを削除",
-    "deleteAccountDesc": "アカウントとすべてのデータを完全に削除します。",
     "deleteConfirm": {
       "title": "アカウントを削除しますか？",
       "subtitle": "この操作は元に戻せません",
@@ -297,8 +162,87 @@
   "endSessionModal": {
     "title": "フォーカスセッションを終了しますか？",
     "confirmText": "本当にこのセッションを早めに終了しますか？",
-    "warningText": "今終了すると、1日の進捗トラッキングや連続記録に影響する可能性があります。",
+    "warningText": "ここまでの時間はタスクに記録されます。",
     "endSession": "セッションを終了"
+  },
+  "focusTimer": {
+    "timeUp": "時間になりました！タスクを完了するか、5分追加して続けましょう。"
+  },
+  "profilePage": {
+    "title": "設定",
+    "back": "戻る",
+    "logout": "ログアウト",
+    "nav": {
+      "account": "プロフィール",
+      "workFocus": "勤務時間と集中",
+      "notifications": "通知",
+      "appearance": "外観",
+      "integrations": "連携",
+      "privacy": "プライバシーとセキュリティ"
+    },
+    "descriptions": {
+      "account": "プロフィール写真、名前、ログインに使うアカウント。",
+      "workFocus": "働く時間と集中セッションの長さ。Focusly はこれをもとにタスクを配置します。",
+      "notifications": "タスクの開始が近づいたときに Focusly がお知らせする方法。",
+      "appearance": "このデバイスでの Focusly のテーマと言語。",
+      "integrations": "Focusly がカレンダーの同期と Meet リンクの作成に使う外部アカウント。",
+      "privacy": "セッション、法的文書、アカウントの削除。"
+    },
+    "account": {
+      "photoTitle": "プロフィール写真",
+      "photoDesc": "Focusly のサイドメニューに表示されます。JPG、PNG、WebP に対応。",
+      "upload": "写真をアップロード",
+      "remove": "写真を削除",
+      "nameTitle": "名前",
+      "nameDesc": "Focusly で表示される名前です。",
+      "nameError": "名前を保存できませんでした。もう一度お試しください。"
+    },
+    "workFocus": {
+      "daysTitle": "勤務日",
+      "daysDesc": "働く曜日を選んでください。自動スケジューラーと Lumina の週間プランは、選んだ曜日にだけタスクを配置します。",
+      "hoursTitle": "勤務時間",
+      "hoursDesc": "タスクと集中ブロックは、選んだ曜日のこの時間内に配置されます。",
+      "start": "開始",
+      "end": "終了",
+      "focusTitle": "集中セッションの長さ",
+      "focusDesc": "タスクに見積もり時間がないときの、集中モードのタイマーの長さです。",
+      "minutes": "{{count}}分",
+      "save": "変更を保存",
+      "discard": "破棄",
+      "savedTitle": "設定を保存しました",
+      "savedDesc": "この勤務時間をもとにタスクを配置します。",
+      "saveError": "設定を保存できませんでした。もう一度お試しください。",
+      "errors": {
+        "noDays": "少なくとも1日選んでください。",
+        "hours": "終了時刻は開始時刻より後にしてください。"
+      }
+    },
+    "notifications": {
+      "remindersTitle": "タスクのリマインダー",
+      "remindersDesc": "時間が設定されたタスクの開始5分前と1分前にお知らせします。Focusly 内に通知を表示し、下で選んだ音を鳴らします。オフにすると、このデバイスではリマインダーを受け取りません。",
+      "systemTitle": "システム通知",
+      "systemDesc": "リマインダーを OS の通知としても表示し、Focusly が別のタブにあるときや最小化されているときでも気づけるようにします。ブラウザの許可が必要です。",
+      "allow": "許可する",
+      "permission": {
+        "granted": "このブラウザで許可されています。",
+        "default": "このブラウザではまだ許可されていません。",
+        "denied": "ブラウザでブロックされています。サイトの設定（アドレス左のアイコン）から許可してください。",
+        "unsupported": "このブラウザはシステム通知に対応していません。"
+      },
+      "soundDesc": "リマインダーで鳴る音です。選ぶと試聴でき、このデバイスに保存されます。"
+    },
+    "appearance": {
+      "languageDesc": "このデバイスでの表示言語。"
+    },
+    "integrations": {
+      "googleDesc": "Focusly が Google カレンダーの予定を読み取り・作成できるようにし、予定の表示、タスクのスケジュール、Meet リンクの作成に使います。アクセスは Google アカウントからいつでも取り消せます。"
+    },
+    "privacy": {
+      "sessionDesc": "このブラウザからログアウトします。データは保存されたままで、いつものログイン方法で再びログインできます。",
+      "termsAccepted": "{{date}}にバージョン {{version}} に同意しました。",
+      "termsAcceptedNoVersion": "{{date}}に利用規約に同意しました。",
+      "deleteDesc": "アカウント、タスク、ドキュメント、プロジェクト、Lumina との会話を完全に削除します。元に戻せません。"
+    }
   },
   "insightsHeader": {
     "title": "{{period}}のインサイト",

@@ -56,9 +56,10 @@ export const FocusMode: React.FC<FocusModeProps> = ({
     handleMouseDown,
     handleCloseRequest,
     confirmExit,
+    endSession,
   } = ui;
 
-  const { timeLeft, setTimeLeft, progress, formatTime, isActive, setIsActive } =
+  const { timeLeft, addTime, progress, formatTime, isActive, setIsActive } =
     timer;
 
   const {
@@ -108,7 +109,7 @@ export const FocusMode: React.FC<FocusModeProps> = ({
                 <CompletesSessionModal
                   activeTask={activeItem as unknown as Task}
                   todaysTasks={todaysTasks as unknown as Task[]}
-                  onClose={onClose}
+                  onClose={endSession}
                 />
               ) : (
                 <>
@@ -127,7 +128,7 @@ export const FocusMode: React.FC<FocusModeProps> = ({
                   <FocusFooter
                     isActive={isActive}
                     setIsActive={setIsActive}
-                    setTimeLeft={setTimeLeft}
+                    onAddTime={() => addTime(5 * 60)}
                     handleCompleteTask={handleCompleteTask}
                   />
                 </>

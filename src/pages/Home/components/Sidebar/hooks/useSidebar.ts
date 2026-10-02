@@ -1,5 +1,5 @@
 import { useState, useMemo, useContext } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTheme } from '@mui/material';
 import { useQuery, useMutation } from '@apollo/client';
 import { startOfWeek, addDays, startOfMonth } from 'date-fns';
@@ -21,6 +21,10 @@ import type {
 } from '@/pages/Workspace/workspace.types';
 import { TaskBar, type SidebarProps } from '../types/Sidebar.types';
 import {
+  profilePath,
+  type ProfileLocationState,
+} from '@/pages/Profile/profileSections';
+import {
   GET_NOTIFICATIONS,
   MARK_NOTIFICATION_AS_READ,
   MARK_ALL_NOTIFICATIONS_AS_READ,
@@ -41,6 +45,16 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // The profile page's Back button returns to wherever it was opened from.
+  const openProfile = () => {
+    const state: ProfileLocationState = {
+      backTo: `${location.pathname}${location.search}`,
+    };
+    navigate(profilePath(), { state });
+  };
 
   // Collapsed state
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -534,6 +548,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     colorMode,
     theme,
     user,
+    openProfile,
     searchParams,
     setSearchParams,
     workspacesData,

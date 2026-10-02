@@ -101,6 +101,16 @@ describe('App route guards', () => {
     expect(screen.getByText('PROFILE_PAGE')).toBeInTheDocument();
   });
 
+  it('guards the profile section routes too', () => {
+    renderAppAt('/profile/notifications', false);
+    expect(screen.getByText('LOGIN_PAGE')).toBeInTheDocument();
+  });
+
+  it('lets an authenticated user open a profile section directly', () => {
+    renderAppAt('/profile/notifications', true);
+    expect(screen.getByText('PROFILE_PAGE')).toBeInTheDocument();
+  });
+
   it('sends an authenticated user hitting "/" straight to the dashboard instead of the marketing page', () => {
     renderAppAt('/', true);
     expect(screen.getByText('DASHBOARD_PAGE')).toBeInTheDocument();

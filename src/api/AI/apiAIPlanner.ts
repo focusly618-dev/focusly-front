@@ -1,5 +1,6 @@
 import axiosInstance from '../axiosInstance';
 import type { Task } from '@/redux/tasks/task.types';
+import type { WorkHoursConfig } from '@/api/User/apiUser.types';
 import type {
   AICalendarPlannerResponse,
   AIImproveTaskResponse,
@@ -79,6 +80,39 @@ export interface AIAvailability {
     end?: string;
   };
 }
+
+const WEEKDAY_NAMES = {
+  Mon: 'Monday',
+  Tue: 'Tuesday',
+  Wed: 'Wednesday',
+  Thu: 'Thursday',
+  Fri: 'Friday',
+  Sat: 'Saturday',
+  Sun: 'Sunday',
+} as const;
+
+/**
+ * The user's work hours (user.settings.workHoursConfig) as planner
+ * availability. Undefined when they aren't set, so the server default applies.
+ */
+export const availabilityFromSettings = (
+  settings: unknown,
+): AIAvailability | undefined => {
+  const config = (
+    settings as { workHoursConfig?: Partial<WorkHoursConfig> } | null
+  )?.workHoursConfig;
+  const { selectedDays, startTime, endTime } = config ?? {};
+  if (!selectedDays?.length || !startTime || !endTime) return undefined;
+
+  return Object.fromEntries(
+    Object.entries(WEEKDAY_NAMES).map(([code, name]) => [
+      name,
+      selectedDays.includes(code)
+        ? { available: true, start: startTime, end: endTime }
+        : { available: false },
+    ]),
+  );
+};
 /**
  * Distributes pending tasks over the week's days.
  */

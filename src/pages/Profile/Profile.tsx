@@ -1,481 +1,135 @@
-import React, { useState } from 'react';
+import type { ComponentType } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Avatar, Box, Typography } from '@mui/material';
 import {
-  Typography,
-  Box,
-  Button,
-  Avatar,
-  Stack,
-  InputAdornment,
-  SvgIcon,
-  CircularProgress,
-  type SvgIconProps,
-} from '@mui/material';
-import {
-  ProfilePageContainer,
-  TopBar,
-  ContentContainer,
-  Sidebar,
-  MainContent,
-  UserCard,
-  MenuButton,
-  SectionCard,
-  DarkInput,
-} from './Profile.styles';
-import {
-  Person as PersonIcon,
-  Schedule as ScheduleIcon,
-  Notifications as NotificationsIcon,
+  ArrowBack as ArrowBackIcon,
   Logout as LogoutIcon,
-  Email as EmailIcon,
-  WorkOutline as JobIcon,
-  Translate as LanguageIcon,
 } from '@mui/icons-material';
 import { useProfile } from './hooks/useProfile.hook';
-import { ScheduleSettings } from '../Settings/components/ScheduleSettings';
-import { FocusEngineSettings } from '../Settings/components/FocusEngineSettings';
-import { NotificationSettings } from '../Settings/components/NotificationSettings';
-import { LanguageSelector } from '@/components/ui';
+import {
+  PROFILE_SECTIONS,
+  profilePath,
+  type ProfileSectionSlug,
+} from './profileSections';
+import {
+  BackButton,
+  Content,
+  ContentInner,
+  NavItem,
+  NavList,
+  PageLayout,
+  Sidebar,
+  UserSummary,
+} from './Profile.styles';
+import { AccountSection } from './sections/AccountSection';
+import { WorkFocusSection } from './sections/WorkFocusSection';
+import { NotificationsSection } from './sections/NotificationsSection';
+import { AppearanceSection } from './sections/AppearanceSection';
+import { IntegrationsSection } from './sections/IntegrationsSection';
+import { PrivacySection } from './sections/PrivacySection';
 
-const Profile: React.FC = () => {
-  const { t } = useTranslation();
-  const {
-    user,
-    fullName,
-    setFullName,
-    jobTitle,
-    setJobTitle,
-    email,
-    setEmail,
-    bio,
-    setBio,
-    handleLogout,
-    getInitials,
-    cancelEdit,
-    fileInputRef,
-    isUploadingImage,
-    handleImageClick,
-    handleFileChange,
-    handleRemoveImage,
-  } = useProfile();
-
-  const [activeTab, setActiveTab] = useState<
-    'profile' | 'schedule' | 'focus' | 'notifications'
-  >('profile');
-
-  return (
-    <ProfilePageContainer>
-      {/* Top Bar */}
-      <TopBar>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box
-            sx={{
-              width: 32,
-              height: 32,
-              borderRadius: '8px',
-              bgcolor: 'primary.main',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <BoltIcon sx={{ color: 'primary.contrastText' }} />
-          </Box>
-          <Typography variant="h6" fontWeight="bold">
-            {t('profile.brand')}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          {activeTab === 'profile' && (
-            <>
-              <Button
-                sx={{
-                  color: 'text.secondary',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                }}
-                onClick={cancelEdit}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button
-                variant="contained"
-                sx={{
-                  bgcolor: 'primary.main',
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                  fontWeight: 600,
-                  boxShadow: 'none',
-                  '&:hover': { bgcolor: 'primary.dark' },
-                }}
-              >
-                {t('common.save')}
-              </Button>
-            </>
-          )}
-          <Avatar
-            src={user?.picture}
-            alt={user?.name}
-            sx={{
-              width: 32,
-              height: 32,
-              border: '2px solid',
-              borderColor: 'divider',
-            }}
-          >
-            {getInitials(user?.name)}
-          </Avatar>
-        </Box>
-      </TopBar>
-
-      <ContentContainer>
-        {/* Sidebar */}
-        <Sidebar>
-          <UserCard sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Avatar
-              src={user?.picture}
-              sx={{
-                width: 40,
-                height: 40,
-                bgcolor: 'warning.main',
-                color: 'warning.contrastText',
-              }}
-            >
-              {getInitials(user?.name)}
-            </Avatar>
-            <Box sx={{ overflow: 'hidden' }}>
-              <Typography variant="subtitle2" fontWeight="bold" noWrap>
-                {user?.name || 'Alex Morgan'}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('profile.plan')}
-              </Typography>
-            </Box>
-          </UserCard>
-
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'row', md: 'column' },
-              gap: 0.5,
-              flex: 1,
-              overflowX: { xs: 'auto', md: 'visible' },
-              width: '100%',
-              whiteSpace: 'nowrap',
-              '&::-webkit-scrollbar': {
-                display: 'none',
-              },
-            }}
-          >
-            <MenuButton
-              active={activeTab === 'profile'}
-              onClick={() => setActiveTab('profile')}
-              startIcon={<PersonIcon />}
-            >
-              {t('profile.nav.general')}
-            </MenuButton>
-            <MenuButton
-              active={activeTab === 'schedule'}
-              onClick={() => setActiveTab('schedule')}
-              startIcon={<ScheduleIcon />}
-            >
-              {t('profile.nav.schedule')}
-            </MenuButton>
-            <MenuButton
-              active={activeTab === 'focus'}
-              onClick={() => setActiveTab('focus')}
-              startIcon={<BoltIcon />}
-            >
-              {t('profile.nav.focus')}
-            </MenuButton>
-            <MenuButton
-              active={activeTab === 'notifications'}
-              onClick={() => setActiveTab('notifications')}
-              startIcon={<NotificationsIcon />}
-            >
-              {t('profile.nav.notifications')}
-            </MenuButton>
-          </Box>
-
-          <Button
-            startIcon={<LogoutIcon />}
-            sx={{
-              color: 'text.secondary',
-              justifyContent: 'flex-start',
-              textTransform: 'none',
-              mt: { xs: 0, md: 2 },
-              ml: { xs: 1.5, md: 0 },
-              flexShrink: 0,
-              '&:hover': { color: 'error.main', bgcolor: 'action.hover' },
-            }}
-            onClick={handleLogout}
-          >
-            {t('profile.nav.logout')}
-          </Button>
-        </Sidebar>
-
-        {/* Main Content */}
-        <MainContent>
-          {activeTab === 'profile' && (
-            <>
-              <Box mb={4}>
-                <Typography variant="h4" fontWeight="bold" gutterBottom>
-                  {t('profile.general.title')}
-                </Typography>
-                <Typography color="text.secondary">
-                  {t('profile.general.subtitle')}
-                </Typography>
-              </Box>
-
-              {/* Profile Picture Section */}
-              <SectionCard>
-                <Box
-                  sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}
-                >
-                  <PersonIcon sx={{ color: 'primary.main' }} />
-                  <Typography variant="h6" fontWeight="bold">
-                    {t('profile.general.picture.title')}
-                  </Typography>
-                </Box>
-
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <Box sx={{ position: 'relative', width: 80, height: 80 }}>
-                    <Avatar
-                      src={user?.picture}
-                      onClick={isUploadingImage ? undefined : handleImageClick}
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        bgcolor: '#a7f3d0',
-                        color: '#065f46',
-                        fontSize: '2rem',
-                        cursor: isUploadingImage ? 'default' : 'pointer',
-                      }}
-                    >
-                      {getInitials(user?.name)}
-                    </Avatar>
-                    {isUploadingImage && (
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          inset: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '50%',
-                          bgcolor: 'rgba(0,0,0,0.4)',
-                        }}
-                      >
-                        <CircularProgress size={28} sx={{ color: '#fff' }} />
-                      </Box>
-                    )}
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      hidden
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={handleFileChange}
-                    />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      {t('profile.general.picture.avatarTitle')}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      display="block"
-                      mb={2}
-                    >
-                      {t('profile.general.picture.avatarDesc')}
-                    </Typography>
-                    <Stack direction="row" spacing={2}>
-                      <Button
-                        variant="outlined"
-                        disabled={isUploadingImage}
-                        onClick={handleImageClick}
-                        sx={{
-                          color: 'text.secondary',
-                          borderColor: 'divider',
-                          textTransform: 'none',
-                          bgcolor: 'action.hover',
-                          '&:hover': {
-                            borderColor: 'text.primary',
-                            bgcolor: 'action.selected',
-                          },
-                        }}
-                      >
-                        {t('profile.general.picture.upload')}
-                      </Button>
-                      <Button
-                        disabled={isUploadingImage || !user?.picture}
-                        onClick={handleRemoveImage}
-                        sx={{ color: 'error.main', textTransform: 'none' }}
-                      >
-                        {t('profile.general.picture.remove')}
-                      </Button>
-                    </Stack>
-                  </Box>
-                </Box>
-              </SectionCard>
-
-              {/* Personal Information Section */}
-              <SectionCard>
-                <Box
-                  sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}
-                >
-                  <PersonIcon sx={{ color: 'primary.main' }} />
-                  <Typography variant="h6" fontWeight="bold">
-                    {t('profile.general.personal.title')}
-                  </Typography>
-                </Box>
-
-                <Stack spacing={3}>
-                  <Stack direction="row" spacing={3}>
-                    <Box flex={1}>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        mb={1}
-                        display="block"
-                      >
-                        {t('profile.general.personal.fullName')}
-                      </Typography>
-                      <DarkInput
-                        fullWidth
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                      />
-                    </Box>
-                    <Box flex={1}>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        mb={1}
-                        display="block"
-                      >
-                        {t('profile.general.personal.jobTitle')}
-                      </Typography>
-                      <DarkInput
-                        fullWidth
-                        value={jobTitle}
-                        onChange={(e) => setJobTitle(e.target.value)}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <JobIcon
-                                sx={{ color: 'text.secondary', fontSize: 20 }}
-                              />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Box>
-                  </Stack>
-
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      mb={1}
-                      display="block"
-                    >
-                      {t('profile.general.personal.email')}
-                    </Typography>
-                    <DarkInput
-                      fullWidth
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <EmailIcon
-                              sx={{ color: 'text.secondary', fontSize: 20 }}
-                            />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      mb={1}
-                      display="block"
-                    >
-                      {t('profile.general.personal.bio')}
-                    </Typography>
-                    <DarkInput
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      helperText={
-                        <Typography
-                          variant="caption"
-                          sx={{ color: 'text.secondary', float: 'right' }}
-                        >
-                          {t('profile.general.personal.bioCounter', {
-                            count: bio.length,
-                          })}
-                        </Typography>
-                      }
-                    />
-                  </Box>
-                </Stack>
-              </SectionCard>
-
-              {/* Language Section */}
-              <SectionCard>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 2,
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <LanguageIcon sx={{ color: 'primary.main' }} />
-                    <Box>
-                      <Typography variant="h6" fontWeight="bold">
-                        {t('settings.language.title')}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        display="block"
-                      >
-                        {t('settings.language.subtitle')}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <LanguageSelector variant="full" />
-                </Box>
-              </SectionCard>
-            </>
-          )}
-
-          {activeTab === 'schedule' && <ScheduleSettings />}
-          {activeTab === 'focus' && <FocusEngineSettings />}
-          {activeTab === 'notifications' && <NotificationSettings />}
-        </MainContent>
-      </ContentContainer>
-    </ProfilePageContainer>
-  );
+const SECTION_CONTENT: Record<ProfileSectionSlug, ComponentType> = {
+  account: AccountSection,
+  'work-focus': WorkFocusSection,
+  notifications: NotificationsSection,
+  appearance: AppearanceSection,
+  integrations: IntegrationsSection,
+  privacy: PrivacySection,
 };
 
-const BoltIcon = (props: SvgIconProps) => (
-  <SvgIcon
-    {...props}
-    sx={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, ...props.sx }}
-  >
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-  </SvgIcon>
-);
+const Profile = () => {
+  const { t } = useTranslation();
+  const { user, section, state, openSection, goBack, handleLogout } =
+    useProfile();
+
+  if (!section) {
+    return <Navigate to={profilePath()} replace state={state} />;
+  }
+
+  const SectionContent = SECTION_CONTENT[section.slug];
+
+  return (
+    <PageLayout>
+      <Sidebar>
+        <BackButton onClick={goBack}>
+          <ArrowBackIcon />
+          {t('profilePage.back')}
+        </BackButton>
+
+        <UserSummary sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Avatar
+            src={user?.picture || undefined}
+            alt={user?.name || ''}
+            sx={{ width: 40, height: 40 }}
+          >
+            {user?.name?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ fontWeight: 700, fontSize: '0.9rem' }} noWrap>
+              {user?.name || t('profilePage.title')}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              noWrap
+              sx={{ display: 'block' }}
+            >
+              {user?.email}
+            </Typography>
+          </Box>
+        </UserSummary>
+
+        <NavList aria-label={t('profilePage.title')}>
+          {PROFILE_SECTIONS.map(({ slug, key, icon: Icon }) => (
+            <NavItem
+              key={slug}
+              active={slug === section.slug}
+              aria-current={slug === section.slug ? 'page' : undefined}
+              onClick={() => openSection(slug)}
+            >
+              <Icon />
+              {t(`profilePage.nav.${key}`)}
+            </NavItem>
+          ))}
+        </NavList>
+
+        <Box sx={{ flex: 1, display: { xs: 'none', md: 'block' } }} />
+
+        <NavItem
+          onClick={handleLogout}
+          sx={{
+            display: { xs: 'none', md: 'inline-flex' },
+            '&:hover': { color: 'error.main' },
+          }}
+        >
+          <LogoutIcon />
+          {t('profilePage.logout')}
+        </NavItem>
+      </Sidebar>
+
+      <Content>
+        <ContentInner>
+          <Box component="header" sx={{ mb: 3 }}>
+            <Typography
+              component="h1"
+              sx={{
+                fontSize: { xs: '1.5rem', md: '1.75rem' },
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {t(`profilePage.nav.${section.key}`)}
+            </Typography>
+            <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+              {t(`profilePage.descriptions.${section.key}`)}
+            </Typography>
+          </Box>
+          <SectionContent />
+        </ContentInner>
+      </Content>
+    </PageLayout>
+  );
+};
 
 export default Profile;

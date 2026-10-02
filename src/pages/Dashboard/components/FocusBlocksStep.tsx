@@ -11,7 +11,8 @@ import {
   StyledSlider,
 } from '../Dashboard.styles';
 
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { updateUser } from '@/redux/auth/auth.slice';
 import { UserUpdate, type UserResponse } from '@/api/User/apiUser';
 
 interface FocusBlocksStepProps {
@@ -21,6 +22,7 @@ interface FocusBlocksStepProps {
 const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
   const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const [focusLength, setFocusLength] = useState<number>(45);
   const [shortBreak, setShortBreak] = useState<number>(5);
   const [longBreak, setLongBreak] = useState<number>(15);
@@ -56,13 +58,14 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
           string,
           unknown
         >;
-        await UserUpdate(user.id, {
+        const updated = await UserUpdate(user.id, {
           settings: {
             ...currentSettings,
             focusDurationPref: focusLength,
             breakDurationPref: shortBreak,
           },
         } as Partial<UserResponse>);
+        dispatch(updateUser({ settings: updated.settings }));
       } catch (error) {
         console.error('Failed to save focus blocks', error);
       }

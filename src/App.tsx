@@ -81,6 +81,10 @@ function App() {
             path="/profile"
             element={isLogged ? <Profile /> : <Navigate to="/login" />}
           />
+          <Route
+            path="/profile/:section"
+            element={isLogged ? <Profile /> : <Navigate to="/login" />}
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Box>

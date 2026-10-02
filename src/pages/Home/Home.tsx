@@ -8,7 +8,8 @@ import Projects from '../Projects/Projects';
 import { FocusMode } from './components/FocusMode/FocusMode';
 import { TaskDetailModal } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal';
 import { useHome } from './hooks/useHome.hook';
-import { Settings } from '../Settings/Settings';
+import { Navigate } from 'react-router-dom';
+import { profilePath } from '@/pages/Profile/profileSections';
 import type { Task } from '@/redux/tasks/task.types';
 import { OnboardingTour } from '@/components/Onboarding';
 import { AskAI } from '../AskAI/AskAI';
@@ -86,7 +87,10 @@ export const Home = () => {
             />
           )}
           {activeTab === TaskBar.Insights && <Insights />}
-          {activeTab === TaskBar.Settings && <Settings />}
+          {/* Settings moved to its own page; old ?tab=Settings links land there */}
+          {activeTab === TaskBar.Settings && (
+            <Navigate to={profilePath()} replace />
+          )}
           {activeTab === TaskBar.AskAI && <AskAI />}
         </MainContent>
       </LayoutContainer>

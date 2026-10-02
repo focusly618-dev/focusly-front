@@ -16,7 +16,11 @@ import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { useAppSelector } from '@/redux/hooks';
 import { useMutation } from '@apollo/client';
 import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
-import { planWeeklyAI, type AIWeeklyPlanDayItem } from '@/api/AI/apiAIPlanner';
+import {
+  availabilityFromSettings,
+  planWeeklyAI,
+  type AIWeeklyPlanDayItem,
+} from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
 import { startOfWeek, addDays, format } from 'date-fns';
@@ -55,7 +59,10 @@ export const CalendarWeeklyPlannerModal: React.FC<
             return;
           }
 
-          const res = await planWeeklyAI(pendingTasks);
+          const res = await planWeeklyAI(
+            pendingTasks,
+            availabilityFromSettings(user?.settings),
+          );
           setWeeklyPlan(res.weeklyPlan || []);
           setSummary(res.recommendationSummary || '');
         } catch (e) {
@@ -75,7 +82,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
       };
       fetchWeeklyPlan();
     }
-  }, [open, tasks, onClose, t]);
+  }, [open, tasks, onClose, t, user?.settings]);
 
   const getDayDate = (dayName: string) => {
     const monday = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday = 1
