@@ -3,6 +3,7 @@ import { Box, Typography, keyframes } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { LuminaAnimatedFace } from '@/components/ui';
 import { aiStreamService } from '@/services/aiStreamService';
+import { surfaceColor } from '@/context';
 
 const floatIn = keyframes`
   from {
@@ -70,9 +71,12 @@ export const AIGeneratingIndicator: React.FC<AIGeneratingIndicatorProps> = ({
         py: 1.2,
         borderRadius: '9999px',
         bgcolor: (theme) =>
-          theme.palette.mode === 'dark'
-            ? 'rgba(15, 15, 22, 0.88)'
-            : 'rgba(255, 255, 255, 0.92)',
+          surfaceColor(
+            theme,
+            'rgba(15, 15, 22, 0.88)',
+            'rgba(25, 25, 25, 0.88)',
+            'rgba(255, 255, 255, 0.92)',
+          ),
         backdropFilter: 'blur(16px)',
         border: '1px solid',
         borderColor: (theme) =>

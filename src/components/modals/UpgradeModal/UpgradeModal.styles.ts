@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react';
 import type { SxProps, Theme } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const dialogPaperSx: SxProps<Theme> = {
   borderRadius: '12px',
@@ -7,7 +7,7 @@ export const dialogPaperSx: SxProps<Theme> = {
   width: '840px',
   maxWidth: 'calc(100vw - 32px)',
   bgcolor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#191919' : '#ffffff',
+    surfaceColor(theme, '#191919', '#222222', '#ffffff'),
   backgroundImage: 'none',
   boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.25)',
   border: '1px solid',
@@ -67,9 +67,9 @@ export const bulletTextSx = (highlighted?: boolean): SxProps<Theme> => ({
   fontWeight: highlighted ? 600 : 400,
 });
 
-export const bulletSubTextStyle: CSSProperties = {
+export const bulletSubTextSx: SxProps<Theme> = {
   fontWeight: 400,
-  color: 'var(--mui-palette-text-secondary)',
+  color: 'text.secondary',
 };
 
 export const headerRowSx: SxProps<Theme> = {

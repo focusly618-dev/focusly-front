@@ -186,7 +186,7 @@ export const AvatarWrapper = styled(Box, {
     flexShrink: 0,
     overflow: 'visible',
     position: 'relative',
-    backgroundColor: isDark ? '#1e2029' : '#ffffff',
+    backgroundColor: surfaceColor(theme, '#1e2029', '#2C2C2C', '#ffffff'),
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -249,7 +249,7 @@ export const MessageBubble = styled(Box)<{ isUser?: boolean }>(
     lineHeight: '1.65',
     border: isUser
       ? 'none'
-      : `1px solid ${theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0'}`,
+      : `1px solid ${surfaceColor(theme, '#25272e', '#333333', '#e2e8f0')}`,
     boxShadow: isUser
       ? '0 2px 8px rgba(0, 135, 103, 0.2)'
       : theme.palette.mode === 'dark'
@@ -383,9 +383,7 @@ export const SuggestionsBar = styled(Box)(({ theme }) => ({
     gap: '6px',
     padding: '5px 13px',
     borderRadius: '20px',
-    border: `1px solid ${
-      theme.palette.mode === 'dark' ? '#2e3037' : '#e2e8f0'
-    }`,
+    border: `1px solid ${surfaceColor(theme, '#2e3037', '#3E3E3E', '#e2e8f0')}`,
     backgroundColor:
       theme.palette.mode === 'dark'
         ? surfaceColor(theme, '#1e2025', '#202022', '#ffffff')
@@ -481,7 +479,7 @@ export const InputBox = styled(Paper)(({ theme }) => {
     backgroundColor: isDark
       ? surfaceColor(theme, '#18191e', '#1F1F20', '#ffffff')
       : '#ffffff',
-    border: `1px solid ${isDark ? '#2e3037' : '#e2e8f0'}`,
+    border: `1px solid ${surfaceColor(theme, '#2e3037', '#3E3E3E', '#e2e8f0')}`,
     boxShadow: isDark
       ? '0 4px 20px rgba(0, 0, 0, 0.25)'
       : '0 2px 10px rgba(0, 0, 0, 0.04)',
@@ -583,26 +581,6 @@ export const ChatHeader = styled(Box)(({ theme }) => ({
   ),
   backdropFilter: 'blur(10px)',
   zIndex: 10,
-}));
-
-export const StatusPill = styled(Box)(() => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '4px',
-  padding: '2px 8px',
-  borderRadius: '12px',
-  backgroundColor: '#f0fdf4',
-  color: '#16a34a',
-  border: '1px solid #bbf7d0',
-  fontSize: '11px',
-  fontWeight: 600,
-  lineHeight: 1,
-  '& .status-dot': {
-    width: '6px',
-    height: '6px',
-    borderRadius: '50%',
-    backgroundColor: '#22c55e',
-  },
 }));
 
 export const TrialUpgradeBanner = styled(Box)(({ theme }) => {

@@ -2,6 +2,7 @@ import React from 'react';
 import { useTheme } from '@mui/material';
 import type { GraphNode, GraphSettings } from '../NoteGraphView.types';
 import { getNodeDimensions, truncate } from '../utils/graphLayout.utils';
+import { surfaceColor } from '@/context';
 
 interface GraphNodeItemProps {
   node: GraphNode;
@@ -128,7 +129,7 @@ export const GraphNodeItem: React.FC<GraphNodeItemProps> = ({
             width={width}
             height={height}
             rx={14}
-            fill={isDark ? '#1e293b' : '#ffffff'}
+            fill={surfaceColor(theme, '#1e293b', '#373737', '#ffffff')}
             stroke="#6366f1"
             strokeWidth={2}
             style={{
@@ -189,7 +190,7 @@ export const GraphNodeItem: React.FC<GraphNodeItemProps> = ({
             width={width}
             height={height}
             rx={14}
-            fill={isDark ? '#1e293b' : '#ffffff'}
+            fill={surfaceColor(theme, '#1e293b', '#373737', '#ffffff')}
             stroke="#4f46e5"
             strokeWidth={2.5}
             style={{
@@ -258,8 +259,12 @@ export const GraphNodeItem: React.FC<GraphNodeItemProps> = ({
             width={width}
             height={height}
             rx={12}
-            fill={isDark ? '#1e293b' : '#ffffff'}
-            stroke={isHovered ? '#6366f1' : isDark ? '#334155' : '#cbd5e1'}
+            fill={surfaceColor(theme, '#1e293b', '#373737', '#ffffff')}
+            stroke={
+              isHovered
+                ? '#6366f1'
+                : surfaceColor(theme, '#334155', '#515151', '#cbd5e1')
+            }
             strokeWidth={isHovered ? 2 : 1.5}
             style={{
               filter: isHovered

@@ -26,6 +26,7 @@ import { colorPaletteMap, iconMap } from '../constants/library.constants';
 import type { WorkspaceTypes } from '../../../workspace.types';
 import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import { UNTITLED_WORKSPACE_TITLE, colorPalette, isColorDark } from '@/utils';
+import { surfaceColor } from '@/context';
 
 interface WorkspaceCardItemProps {
   workspace: WorkspaceTypes;
@@ -903,7 +904,7 @@ export const WorkspaceCardItem = ({
             maxHeight: 280,
             overflowY: 'auto',
             borderRadius: '12px',
-            bgcolor: isDark ? '#1e293b' : '#ffffff',
+            bgcolor: surfaceColor(theme, '#1e293b', '#373737', '#ffffff'),
             boxShadow: isDark
               ? '0 10px 25px -5px rgba(0,0,0,0.6), 0 8px 10px -6px rgba(0,0,0,0.6)'
               : '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',

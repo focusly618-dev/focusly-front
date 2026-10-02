@@ -9,6 +9,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { getDesignTokens } from './theme';
 
 import { ColorModeContext, type ThemeMode } from './ColorModeContext';
+import { applyModeToDocument } from './documentMode';
 
 const VALID_MODES: ThemeMode[] = ['light', 'dark', 'graydark'];
 
@@ -22,7 +23,7 @@ export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     localStorage.setItem('themeMode', mode);
-    document.documentElement.classList.toggle('dark', mode !== 'light');
+    applyModeToDocument(mode);
   }, [mode]);
 
   const applyModeChange = useCallback(

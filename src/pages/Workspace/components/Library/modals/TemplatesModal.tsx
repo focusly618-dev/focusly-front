@@ -42,6 +42,7 @@ import {
   ForumOutlined as FeedbackIcon,
 } from '@mui/icons-material';
 import type { ProjectGroupTypes } from '../../../workspace.types';
+import { surfaceColor } from '@/context';
 
 export interface TemplateItem {
   id: string;
@@ -1618,7 +1619,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
               flex: 1,
               overflowY: 'auto',
               p: 4,
-              bgcolor: isDark ? '#090d14' : '#ffffff',
+              bgcolor: surfaceColor(theme, '#090d14', '#161616', '#ffffff'),
               fontFamily: 'Inter, system-ui, sans-serif',
               fontSize: '14px',
               lineHeight: 1.6,
@@ -1660,7 +1661,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                 fontSize: '13px',
               },
               '& .md-code-block': {
-                bgcolor: isDark ? '#0f172a' : '#1e293b',
+                bgcolor: surfaceColor(theme, '#0f172a', '#242424', '#1e293b'),
                 color: '#38bdf8',
                 p: 2,
                 borderRadius: '8px',

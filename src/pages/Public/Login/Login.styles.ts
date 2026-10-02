@@ -8,6 +8,7 @@ import {
   styled,
   Link,
 } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 // --- Global Page Wrapper ---
 export const PageWrapper = styled(Box)(({ theme }) => ({
@@ -19,7 +20,7 @@ export const PageWrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   position: 'relative',
   overflowX: 'hidden',
-  backgroundColor: theme.palette.mode === 'dark' ? '#0F0F10' : '#F9FAFB',
+  backgroundColor: surfaceColor(theme, '#0F0F10', '#171717', '#F9FAFB'),
   color: theme.palette.text.primary,
 }));
 

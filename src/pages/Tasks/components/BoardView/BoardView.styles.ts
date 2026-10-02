@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
+import { surfaceColor } from '@/context';
 
 export const BoardContainer = styled(Box)(({ theme }) => {
-  const isDark = theme.palette.mode === 'dark';
   return {
     display: 'flex',
     gap: theme.spacing(2.5),
@@ -20,11 +20,11 @@ export const BoardContainer = styled(Box)(({ theme }) => {
       background: 'transparent',
     },
     '&::-webkit-scrollbar-thumb': {
-      background: isDark ? '#2e3037' : '#cbd5e1',
+      background: surfaceColor(theme, '#2e3037', '#3E3E3E', '#cbd5e1'),
       borderRadius: '3px',
     },
     '&::-webkit-scrollbar-thumb:hover': {
-      background: isDark ? '#3a3d48' : '#94a3b8',
+      background: surfaceColor(theme, '#3a3d48', '#4D4D4D', '#94a3b8'),
     },
   };
 });
@@ -34,8 +34,8 @@ export const ColumnWrapper = styled(Box)(({ theme }) => {
   return {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: isDark ? '#15161b' : '#f8fafc',
-    border: `1px solid ${isDark ? '#25272e' : '#e2e8f0'}`,
+    backgroundColor: surfaceColor(theme, '#15161b', '#202020', '#f8fafc'),
+    border: `1px solid ${surfaceColor(theme, '#25272e', '#333333', '#e2e8f0')}`,
     boxShadow: isDark
       ? '0 4px 16px -2px rgba(0, 0, 0, 0.4)'
       : '0 1px 4px rgba(0, 0, 0, 0.04)',
@@ -64,7 +64,7 @@ export const ColumnHeader = styled(Box)<{ borderColor?: string }>(({
     justifyContent: 'space-between',
     paddingBottom: theme.spacing(1.5),
     marginBottom: theme.spacing(1.75),
-    borderBottom: `1px solid ${isDark ? '#25272e' : '#e2e8f0'}`,
+    borderBottom: `1px solid ${surfaceColor(theme, '#25272e', '#333333', '#e2e8f0')}`,
     position: 'relative',
     '&:after': {
       content: '""',
@@ -97,7 +97,7 @@ export const ColumnTitle = styled(Typography)(({ theme }) => {
 export const TaskCountBadge = styled(Box)(({ theme }) => {
   const isDark = theme.palette.mode === 'dark';
   return {
-    backgroundColor: isDark ? '#25272e' : '#e2e8f0',
+    backgroundColor: surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),
     color: isDark ? '#8A8F98' : theme.palette.text.secondary,
     borderRadius: '20px',
     padding: '2px 8px',
@@ -139,11 +139,11 @@ export const DroppableArea = styled(Box)<{ isOver?: boolean }>(({
       background: 'transparent',
     },
     '&::-webkit-scrollbar-thumb': {
-      background: isDark ? '#2e3037' : '#cbd5e1',
+      background: surfaceColor(theme, '#2e3037', '#3E3E3E', '#cbd5e1'),
       borderRadius: '3px',
     },
     '&::-webkit-scrollbar-thumb:hover': {
-      background: isDark ? '#3a3d48' : '#94a3b8',
+      background: surfaceColor(theme, '#3a3d48', '#4D4D4D', '#94a3b8'),
     },
   };
 });
@@ -182,7 +182,7 @@ export const TaskPlaceholder = styled(Box, {
     maxHeight: '180px',
     border: isActive
       ? `2px dashed ${primaryColor}`
-      : `1.5px dashed ${isDark ? '#2a2d36' : '#cbd5e1'}`,
+      : `1.5px dashed ${surfaceColor(theme, '#2a2d36', '#3B3B3B', '#cbd5e1')}`,
     borderRadius: '12px',
     display: 'flex',
     flexDirection: 'column',
@@ -194,14 +194,12 @@ export const TaskPlaceholder = styled(Box, {
       ? isDark
         ? alpha('#10b981', 0.12)
         : alpha('#008767', 0.06)
-      : isDark
-        ? '#191a20'
-        : '#f8fafc',
+      : surfaceColor(theme, '#191a20', '#252525', '#f8fafc'),
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'default',
     '&:hover': {
-      borderColor: isDark ? '#3a3e4a' : '#94a3b8',
-      backgroundColor: isDark ? '#1b1d24' : '#f1f5f9',
+      borderColor: surfaceColor(theme, '#3a3e4a', '#4E4E4E', '#94a3b8'),
+      backgroundColor: surfaceColor(theme, '#1b1d24', '#282828', '#f1f5f9'),
     },
   };
 });
@@ -209,7 +207,7 @@ export const TaskPlaceholder = styled(Box, {
 export const DraggingCardPreview = styled(Box)(({ theme }) => {
   const isDark = theme.palette.mode === 'dark';
   return {
-    backgroundColor: isDark ? '#1c1d24' : '#ffffff',
+    backgroundColor: surfaceColor(theme, '#1c1d24', '#292929', '#ffffff'),
     border: `2px solid ${isDark ? '#10b981' : '#008767'}`,
     borderRadius: '12px',
     padding: '16px',

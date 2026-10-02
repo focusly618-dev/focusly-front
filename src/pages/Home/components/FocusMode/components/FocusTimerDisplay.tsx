@@ -8,6 +8,7 @@ import {
   ProgressContainer,
   ProgressLabels,
 } from '../FocusMode.styles';
+import { surfaceColor } from '@/context';
 
 interface FocusTimerDisplayProps {
   timeLeft: number;
@@ -22,7 +23,6 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
   const isTimeUp = timeLeft <= 0;
 
   return (
@@ -118,9 +118,12 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
           sx={{
             height: 6,
             width: '100%',
-            bgcolor: isDark
-              ? 'rgba(30, 41, 59, 0.5)'
-              : 'rgba(226, 232, 240, 0.5)',
+            bgcolor: surfaceColor(
+              theme,
+              'rgba(30, 41, 59, 0.5)',
+              'rgba(55, 55, 55, 0.5)',
+              'rgba(226, 232, 240, 0.5)',
+            ),
             borderRadius: 3,
             overflow: 'hidden',
           }}

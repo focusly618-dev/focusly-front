@@ -1,5 +1,6 @@
 import type { SxProps, Theme } from '@mui/material';
 import { alpha } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const summaryCardContentSx: SxProps<Theme> = {
   display: 'flex',
@@ -30,7 +31,7 @@ export const dialogPaperSx: SxProps<Theme> = {
   width: '480px',
   maxWidth: 'calc(100vw - 32px)',
   bgcolor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#191919' : '#ffffff',
+    surfaceColor(theme, '#191919', '#222222', '#ffffff'),
   backgroundImage: 'none',
   boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.25)',
   border: '1px solid',

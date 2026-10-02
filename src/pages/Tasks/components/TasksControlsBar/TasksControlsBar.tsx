@@ -17,6 +17,7 @@ import {
   PersonOutlineRounded as PersonIcon,
 } from '@mui/icons-material';
 import type { TasksControlsBarProps } from './TasksControlsBar.types';
+import { surfaceColor } from '@/context';
 
 export const TasksControlsBar = ({
   viewMode,
@@ -111,14 +112,14 @@ export const TasksControlsBar = ({
               height: 38,
               fontSize: '13px',
               bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
+                surfaceColor(theme, '#1e2025', '#1F1F20', '#ffffff'),
               '& fieldset': {
                 borderColor: (theme) =>
-                  theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
+                  surfaceColor(theme, '#2e3037', '#3E3E3E', '#e5e7eb'),
               },
               '&:hover fieldset': {
                 borderColor: (theme) =>
-                  theme.palette.mode === 'dark' ? '#3a3d48' : '#d1d5db',
+                  surfaceColor(theme, '#3a3d48', '#4D4D4D', '#d1d5db'),
               },
               '&.Mui-focused fieldset': {
                 borderColor: '#008767',
@@ -275,17 +276,17 @@ export const TasksControlsBar = ({
             color: (theme) =>
               theme.palette.mode === 'dark' ? '#8a8f98' : 'text.primary',
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
+              surfaceColor(theme, '#1e2025', '#1F1F20', '#ffffff'),
             border: '1px solid',
             borderColor: (theme) =>
-              theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
+              surfaceColor(theme, '#2e3037', '#3E3E3E', '#e5e7eb'),
             borderRadius: '8px',
             height: 38,
             px: 1.75,
             whiteSpace: 'nowrap',
             '&:hover': {
               bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? '#25272e' : '#f9fafb',
+                surfaceColor(theme, '#25272e', '#333333', '#f9fafb'),
             },
           }}
         >
@@ -328,12 +329,12 @@ export const TasksControlsBar = ({
           display: 'flex',
           alignItems: 'center',
           bgcolor: (theme) =>
-            theme.palette.mode === 'dark' ? '#17181c' : '#f3f4f6',
+            surfaceColor(theme, '#17181c', '#222222', '#f3f4f6'),
           p: '3px',
           borderRadius: '8px',
           border: '1px solid',
           borderColor: (theme) =>
-            theme.palette.mode === 'dark' ? '#24262d' : '#e5e7eb',
+            surfaceColor(theme, '#24262d', '#323232', '#e5e7eb'),
         }}
       >
         <Button
@@ -351,7 +352,7 @@ export const TasksControlsBar = ({
             bgcolor:
               viewMode === 'list'
                 ? (theme) =>
-                    theme.palette.mode === 'dark' ? '#2b2d35' : '#ffffff'
+                    surfaceColor(theme, '#2b2d35', '#3B3B3B', '#ffffff')
                 : 'transparent',
             color:
               viewMode === 'list'
@@ -369,7 +370,7 @@ export const TasksControlsBar = ({
               bgcolor:
                 viewMode === 'list'
                   ? (theme) =>
-                      theme.palette.mode === 'dark' ? '#32353e' : '#ffffff'
+                      surfaceColor(theme, '#32353e', '#444444', '#ffffff')
                   : (theme) =>
                       theme.palette.mode === 'dark'
                         ? 'rgba(255,255,255,0.04)'
@@ -394,7 +395,7 @@ export const TasksControlsBar = ({
             bgcolor:
               viewMode === 'board'
                 ? (theme) =>
-                    theme.palette.mode === 'dark' ? '#2b2d35' : '#ffffff'
+                    surfaceColor(theme, '#2b2d35', '#3B3B3B', '#ffffff')
                 : 'transparent',
             color:
               viewMode === 'board'
@@ -412,7 +413,7 @@ export const TasksControlsBar = ({
               bgcolor:
                 viewMode === 'board'
                   ? (theme) =>
-                      theme.palette.mode === 'dark' ? '#32353e' : '#ffffff'
+                      surfaceColor(theme, '#32353e', '#444444', '#ffffff')
                   : (theme) =>
                       theme.palette.mode === 'dark'
                         ? 'rgba(255,255,255,0.04)'

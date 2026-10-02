@@ -39,6 +39,7 @@ import {
   useGraphSettings,
 } from './NoteGraphView.hooks';
 import { GraphCanvas } from './components/GraphCanvas';
+import { surfaceColor } from '@/context';
 
 export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
   rootLabel,
@@ -257,7 +258,7 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
         right: isFullscreen ? 0 : 'auto',
         bottom: isFullscreen ? 0 : 'auto',
         zIndex: isFullscreen ? 1400 : 1,
-        bgcolor: isDark ? '#090d16' : '#ffffff',
+        bgcolor: surfaceColor(theme, '#090d16', '#161616', '#ffffff'),
       }}
     >
       {/* Top Bar: Controls & Filters */}
@@ -269,7 +270,12 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 1.5,
-          bgcolor: isDark ? 'rgba(15, 23, 42, 0.4)' : '#ffffff',
+          bgcolor: surfaceColor(
+            theme,
+            'rgba(15, 23, 42, 0.4)',
+            'rgba(36, 36, 36, 0.4)',
+            '#ffffff',
+          ),
           borderBottom: '1px solid',
           borderColor: 'divider',
           flexShrink: 0,
@@ -493,9 +499,12 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
             borderRadius: '10px',
             px: 1.5,
             py: 0.4,
-            bgcolor: isDark
-              ? 'rgba(15, 23, 42, 0.88)'
-              : 'rgba(255, 255, 255, 0.92)',
+            bgcolor: surfaceColor(
+              theme,
+              'rgba(15, 23, 42, 0.88)',
+              'rgba(36, 36, 36, 0.88)',
+              'rgba(255, 255, 255, 0.92)',
+            ),
             backdropFilter: 'blur(8px)',
             borderColor: 'divider',
             color: 'text.primary',
@@ -504,7 +513,12 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
             textTransform: 'none',
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
             '&:hover': {
-              bgcolor: isDark ? 'rgba(15, 23, 42, 0.98)' : '#ffffff',
+              bgcolor: surfaceColor(
+                theme,
+                'rgba(15, 23, 42, 0.98)',
+                'rgba(36, 36, 36, 0.98)',
+                '#ffffff',
+              ),
               borderColor: 'primary.main',
             },
             transition: 'all 0.15s ease',
@@ -546,9 +560,12 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
               top: 18,
               left: '50%',
               transform: 'translateX(-50%)',
-              bgcolor: isDark
-                ? 'rgba(15, 23, 42, 0.88)'
-                : 'rgba(255, 255, 255, 0.95)',
+              bgcolor: surfaceColor(
+                theme,
+                'rgba(15, 23, 42, 0.88)',
+                'rgba(36, 36, 36, 0.88)',
+                'rgba(255, 255, 255, 0.95)',
+              ),
               backdropFilter: 'blur(10px)',
               border: '1px solid',
               borderColor: isDark
@@ -592,7 +609,12 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
             display: 'flex',
             alignItems: 'center',
             borderRadius: '9999px',
-            bgcolor: isDark ? 'rgba(30, 41, 59, 0.9)' : 'rgba(51, 65, 85, 0.9)',
+            bgcolor: surfaceColor(
+              theme,
+              'rgba(30, 41, 59, 0.9)',
+              'rgba(55, 55, 55, 0.9)',
+              'rgba(51, 65, 85, 0.9)',
+            ),
             backdropFilter: 'blur(8px)',
             p: '3px 6px',
             gap: 0.25,
@@ -630,9 +652,12 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
               bottom: 12,
               left: 14,
               right: 14,
-              bgcolor: isDark
-                ? 'rgba(15, 23, 42, 0.94)'
-                : 'rgba(255, 255, 255, 0.95)',
+              bgcolor: surfaceColor(
+                theme,
+                'rgba(15, 23, 42, 0.94)',
+                'rgba(36, 36, 36, 0.94)',
+                'rgba(255, 255, 255, 0.95)',
+              ),
               borderRadius: '9999px',
               border: '1px solid',
               borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#e2e8f0',
@@ -761,7 +786,12 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
               bottom: 12,
               left: 12,
               right: 12,
-              bgcolor: isDark ? 'rgba(15, 23, 42, 0.95)' : '#ffffff',
+              bgcolor: surfaceColor(
+                theme,
+                'rgba(15, 23, 42, 0.95)',
+                'rgba(36, 36, 36, 0.95)',
+                '#ffffff',
+              ),
               borderRadius: '16px',
               border: '1px solid',
               borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#e2e8f0',

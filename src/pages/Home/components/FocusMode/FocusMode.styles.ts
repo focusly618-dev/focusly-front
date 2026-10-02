@@ -262,10 +262,12 @@ export const PlayPauseButton = styled(IconButton)(({ theme }) => ({
   borderRadius: '20px',
   margin: '0 16px',
   '&:hover': {
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(51, 65, 85, 0.8)'
-        : 'rgba(203, 213, 225, 0.8)',
+    backgroundColor: surfaceColor(
+      theme,
+      'rgba(51, 65, 85, 0.8)',
+      'rgba(81, 81, 81, 0.8)',
+      'rgba(203, 213, 225, 0.8)',
+    ),
   },
 }));
 
@@ -669,10 +671,12 @@ export const NextTaskButton = styled(Button)(({ theme }) => ({
 }));
 
 export const BreakButton = styled(Button)(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(51, 65, 85, 0.5)'
-      : 'rgba(226, 232, 240, 0.8)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(51, 65, 85, 0.5)',
+    'rgba(81, 81, 81, 0.5)',
+    'rgba(226, 232, 240, 0.8)',
+  ),
   color: theme.palette.text.primary,
   padding: `${theme.spacing(2)} ${theme.spacing(3)}`,
   borderRadius: '16px',

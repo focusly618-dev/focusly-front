@@ -59,7 +59,7 @@ export const Logo = styled(Typography)(({ theme }) => ({
 }));
 
 export const AddTaskButton = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
+  backgroundColor: surfaceColor(theme, '#1e2025', '#1F1F20', '#ffffff'),
   border:
     theme.palette.mode === 'dark'
       ? '1px solid #2e3037'
@@ -76,7 +76,7 @@ export const AddTaskButton = styled(Button)(({ theme }) => ({
     theme.palette.mode === 'dark' ? 'none' : '0 1px 2px rgba(0,0,0,0.02)',
   transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#25272e' : '#fafafa',
+    backgroundColor: surfaceColor(theme, '#25272e', '#333333', '#fafafa'),
     transform: 'translateY(-1px)',
     boxShadow:
       theme.palette.mode === 'dark'
@@ -216,9 +216,7 @@ export const NavCountBadge = styled(Box, {
     ? theme.palette.mode === 'dark'
       ? 'rgba(45, 212, 191, 0.18)'
       : '#E5E7EB'
-    : theme.palette.mode === 'dark'
-      ? '#25272e'
-      : '#E5E7EB',
+    : surfaceColor(theme, '#25272e', '#333333', '#E5E7EB'),
   color: active
     ? theme.palette.mode === 'dark'
       ? '#2dd4bf'

@@ -9,6 +9,7 @@ import {
 } from '@mui/icons-material';
 import { Header, Title } from '../../Tasks.styles';
 import type { DateRangeFilter } from '../../hooks/useTasksFilters.hook';
+import { surfaceColor } from '@/context';
 
 interface TasksHeaderProps {
   title?: string;
@@ -200,16 +201,16 @@ export const TasksHeader = ({
                 color: (theme) =>
                   theme.palette.mode === 'dark' ? '#d1d5db' : 'text.primary',
                 bgcolor: (theme) =>
-                  theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
+                  surfaceColor(theme, '#1e2025', '#1F1F20', '#ffffff'),
                 border: '1px solid',
                 borderColor: (theme) =>
-                  theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
+                  surfaceColor(theme, '#2e3037', '#3E3E3E', '#e5e7eb'),
                 borderRadius: '8px',
                 height: 38,
                 px: 1.75,
                 '&:hover': {
                   bgcolor: (theme) =>
-                    theme.palette.mode === 'dark' ? '#25272e' : '#f9fafb',
+                    surfaceColor(theme, '#25272e', '#333333', '#f9fafb'),
                 },
               }}
             >

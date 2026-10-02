@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const GridWrapper = styled(Box)(() => ({
   marginTop: '24px',
@@ -31,7 +32,7 @@ export const DashedCard = styled(Box)(({ theme }) => ({
   cursor: 'pointer',
   minHeight: '235px',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-  backgroundColor: theme.palette.mode === 'dark' ? '#1C1C1E' : '#FFFFFF',
+  backgroundColor: surfaceColor(theme, '#1C1C1E', '#262626', '#FFFFFF'),
   '&:hover': {
     borderColor: '#008767',
     transform: 'translateY(-2px)',

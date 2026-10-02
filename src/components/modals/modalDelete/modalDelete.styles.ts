@@ -1,4 +1,4 @@
-import type { SxProps, Theme } from '@mui/material';
+import { alpha, type SxProps, type Theme } from '@mui/material';
 
 export const deleteButtonSx: SxProps<Theme> = {
   bgcolor: '#f24848',
@@ -7,21 +7,22 @@ export const deleteButtonSx: SxProps<Theme> = {
 };
 
 export const cancelButtonSx: SxProps<Theme> = {
-  color: '#cbd5e1',
-  borderColor: '#283447',
-  '&:hover': { borderColor: '#475569', bgcolor: 'rgba(255,255,255,0.05)' },
+  color: 'text.secondary',
+  borderColor: 'divider',
+  '&:hover': { borderColor: 'text.secondary', bgcolor: 'action.hover' },
 };
 
 export const descriptionBoxSx: SxProps<Theme> = {
-  background: '#1a2432',
+  bgcolor: (theme) => alpha(theme.palette.error.main, 0.06),
   padding: 2.5,
   borderRadius: 2,
   mt: 1,
-  border: '1px solid #283447',
+  border: '1px solid',
+  borderColor: (theme) => alpha(theme.palette.error.main, 0.2),
 };
 
 export const descriptionTextSx: SxProps<Theme> = {
-  color: '#cbd5e1',
+  color: 'text.secondary',
   lineHeight: 1.6,
 };
 
@@ -37,6 +38,7 @@ export const deleteIconSx: SxProps<Theme> = {
 };
 
 export const modalSx: SxProps<Theme> = {
-  bgcolor: '#151c28',
-  border: '1px solid #283447',
+  bgcolor: 'background.paper',
+  border: '1px solid',
+  borderColor: 'divider',
 };

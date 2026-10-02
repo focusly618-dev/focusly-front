@@ -8,6 +8,7 @@ import type {
 } from '../NoteGraphView.types';
 import { GraphEdgeItem } from './GraphEdgeItem';
 import { GraphNodeItem } from './GraphNodeItem';
+import { surfaceColor } from '@/context';
 
 interface GraphCanvasProps {
   svgRef: React.RefObject<SVGSVGElement | null>;
@@ -95,7 +96,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         y={-canvasHeight * 2}
         width={canvasWidth * 5}
         height={canvasHeight * 5}
-        fill={isDark ? '#090d16' : '#f8fafc'}
+        fill={surfaceColor(theme, '#090d16', '#161616', '#f8fafc')}
       />
       <rect
         x={-canvasWidth * 2}

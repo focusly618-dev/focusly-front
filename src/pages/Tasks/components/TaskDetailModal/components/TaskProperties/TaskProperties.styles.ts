@@ -11,10 +11,10 @@ export const propertiesCardSx = {
   p: 2,
   borderRadius: '16px',
   bgcolor: (theme: Theme) =>
-    surfaceColor(theme, '#1e2025', '#1e2025', '#f8fafc'),
+    surfaceColor(theme, '#1e2025', '#1F1F20', '#f8fafc'),
   border: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#25272e' : 'rgba(0, 0, 0, 0.06)',
+    surfaceColor(theme, '#25272e', '#333333', 'rgba(0, 0, 0, 0.06)'),
   display: 'flex',
   flexDirection: 'column',
   gap: 1.5,
@@ -56,16 +56,16 @@ export const propertyPillSx = {
   cursor: 'pointer',
   transition: 'all 0.15s ease',
   bgcolor: (theme: Theme) =>
-    surfaceColor(theme, '#25272e', '#25272e', '#ffffff'),
+    surfaceColor(theme, '#25272e', '#333333', '#ffffff'),
   border: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#2e3037' : '#e2e8f0',
+    surfaceColor(theme, '#2e3037', '#3E3E3E', '#e2e8f0'),
   color: 'text.primary',
   '&:hover': {
     borderColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#3a3d48' : '#cbd5e1',
+      surfaceColor(theme, '#3a3d48', '#4D4D4D', '#cbd5e1'),
     bgcolor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#2a2c35' : '#f1f5f9',
+      surfaceColor(theme, '#2a2c35', '#3A3A3A', '#f1f5f9'),
   },
 };
 
@@ -87,14 +87,14 @@ export const scheduleBoxSx = {
   borderRadius: '10px',
   border: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
+    surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),
   bgcolor: (theme: Theme) =>
     surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
   cursor: 'pointer',
   transition: 'border-color 0.15s ease',
   '&:hover': {
     borderColor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#3a3d48' : '#cbd5e1',
+      surfaceColor(theme, '#3a3d48', '#4D4D4D', '#cbd5e1'),
   },
 };
 

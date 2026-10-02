@@ -71,7 +71,7 @@ export const subtaskInputFormSx = {
     surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
   border: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
+    surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),
   transition: 'border-color 0.2s, background-color 0.2s',
   '&:focus-within': {
     borderColor: '#008767',

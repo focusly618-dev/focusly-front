@@ -1,5 +1,6 @@
 import { Box, Button } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
+import { surfaceColor } from '@/context';
 
 export const FloatingActionBar = muiStyled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -12,10 +13,12 @@ export const FloatingActionBar = muiStyled(Box)(({ theme }) => ({
   gap: '24px',
   padding: '12px 24px',
   borderRadius: '16px',
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(35, 37, 42, 0.85)'
-      : 'rgba(255, 255, 255, 0.85)',
+  backgroundColor: surfaceColor(
+    theme,
+    'rgba(35, 37, 42, 0.85)',
+    'rgba(49, 49, 49, 0.85)',
+    'rgba(255, 255, 255, 0.85)',
+  ),
   border: `1px solid ${theme.palette.divider}`,
   backdropFilter: 'blur(20px)',
   boxShadow: '0 20px 40px 0 rgba(0, 0, 0, 0.25)',
@@ -76,25 +79,19 @@ export const StatusTabButton = muiStyled(Button, {
       : '#374151',
   backgroundColor: active
     ? '#008767'
-    : theme.palette.mode === 'dark'
-      ? '#1e2025'
-      : '#ffffff',
+    : surfaceColor(theme, '#1e2025', '#1F1F20', '#ffffff'),
   border: active
     ? '1px solid transparent'
-    : `1px solid ${theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb'}`,
+    : `1px solid ${surfaceColor(theme, '#2e3037', '#3E3E3E', '#e5e7eb')}`,
   boxShadow: active ? '0 1px 3px rgba(0, 135, 103, 0.25)' : 'none',
   transition: 'all 0.15s ease',
   '&:hover': {
     backgroundColor: active
       ? '#007357'
-      : theme.palette.mode === 'dark'
-        ? '#25272e'
-        : '#f9fafb',
+      : surfaceColor(theme, '#25272e', '#333333', '#f9fafb'),
     borderColor: active
       ? 'transparent'
-      : theme.palette.mode === 'dark'
-        ? '#3a3d48'
-        : '#d1d5db',
+      : surfaceColor(theme, '#3a3d48', '#4D4D4D', '#d1d5db'),
   },
 }));
 
@@ -111,9 +108,7 @@ export const TabCountBadge = muiStyled(Box, {
   justifyContent: 'center',
   backgroundColor: active
     ? 'rgba(0, 0, 0, 0.2)'
-    : theme.palette.mode === 'dark'
-      ? '#282b33'
-      : '#f3f4f6',
+    : surfaceColor(theme, '#282b33', '#383838', '#f3f4f6'),
   color: active
     ? '#ffffff'
     : theme.palette.mode === 'dark'

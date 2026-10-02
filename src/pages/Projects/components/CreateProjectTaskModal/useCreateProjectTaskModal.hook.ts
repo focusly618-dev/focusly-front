@@ -12,6 +12,7 @@ import type {
   CreateProjectTaskModalProps,
   ProjectOption,
 } from './CreateProjectTaskModal.types';
+import { surfaceColor } from '@/context';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -353,9 +354,9 @@ export function useCreateProjectTaskModal({
 
   // ── Theme tokens ───────────────────────────────────────────────────────────
   const themeTokens = {
-    surfaceBg: isDark ? '#141417' : '#ffffff',
-    cardBg: isDark ? '#1a1a1f' : '#f8fafc',
-    cardBorder: isDark ? '#27272a' : '#e2e8f0',
+    surfaceBg: surfaceColor(theme, '#141417', '#1E1E1E', '#ffffff'),
+    cardBg: surfaceColor(theme, '#1a1a1f', '#252525', '#f8fafc'),
+    cardBorder: surfaceColor(theme, '#27272a', '#333333', '#e2e8f0'),
     secondaryText: isDark ? '#a1a1aa' : '#64748b',
     headerText: isDark ? '#f4f4f5' : '#0f172a',
   };

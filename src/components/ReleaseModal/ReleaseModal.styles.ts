@@ -1,5 +1,6 @@
 import { styled, Box, Typography, Button } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const sparklesIconSx: SxProps<Theme> = { fontSize: 28 };
 
@@ -21,7 +22,7 @@ export const lightningIconSx: SxProps<Theme> = {
 export const syncIconSx: SxProps<Theme> = { color: '#60a5fa', fontSize: 16 };
 
 export const ModalContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#0f1115' : '#ffffff',
+  backgroundColor: surfaceColor(theme, '#0f1115', '#1A1A1A', '#ffffff'),
   borderRadius: '24px',
   padding: theme.spacing(4, 3, 3, 3),
   display: 'flex',

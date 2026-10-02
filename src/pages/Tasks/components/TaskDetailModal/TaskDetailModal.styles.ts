@@ -15,11 +15,11 @@ export const darkInputSx = {
     borderRadius: '12px',
     '& fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#2e3037' : '#e2e8f0',
+        surfaceColor(theme, '#2e3037', '#3E3E3E', '#e2e8f0'),
     },
     '&:hover fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#3a3d48' : '#cbd5e1',
+        surfaceColor(theme, '#3a3d48', '#4D4D4D', '#cbd5e1'),
     },
     '&.Mui-focused fieldset': {
       borderColor: '#008767',
@@ -67,11 +67,11 @@ export const darkInputSxTimers = {
     fontSize: '14px',
     '& fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#2e3037' : '#e2e8f0',
+        surfaceColor(theme, '#2e3037', '#3E3E3E', '#e2e8f0'),
     },
     '&:hover fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#3a3d48' : '#cbd5e1',
+        surfaceColor(theme, '#3a3d48', '#4D4D4D', '#cbd5e1'),
     },
     '&.Mui-focused fieldset': {
       borderColor: '#008767',
@@ -119,7 +119,7 @@ export const paperPropsSx = {
   borderRadius: '16px',
   border: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
+    surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),
   backdropFilter: (theme: Theme) =>
     theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
   WebkitBackdropFilter: (theme: Theme) =>
@@ -156,7 +156,7 @@ export const dialogTitleSx = {
   fontWeight: 700,
   borderBottom: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
+    surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),
   padding: '16px 24px',
   color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#fff' : '#0f172a'),
   backgroundColor: (theme: Theme) =>
@@ -258,8 +258,7 @@ export const menuPaperPropsSx = {
       'background.paper',
     ),
   border: '1px solid',
-  borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#25272e' : 'divider',
+  borderColor: 'divider',
   color: (theme: Theme) => (theme.palette.mode === 'dark' ? '#f3f4f6' : '#000'),
   boxShadow: (theme: Theme) =>
     theme.palette.mode === 'dark'
@@ -305,7 +304,7 @@ export const dialogActionsSx = {
     surfaceColor(theme, '#18191e', '#242425', '#ffffff'),
   borderTop: '1px solid',
   borderColor: (theme: Theme) =>
-    theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
+    surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),
   display: 'flex',
   justifyContent: 'flex-end',
   gap: '12px',
@@ -358,11 +357,11 @@ export const descriptionInputSx = {
     borderRadius: '10px',
     '& fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#25272e' : '#e2e8f0',
+        surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),
     },
     '&:hover fieldset': {
       borderColor: (theme: Theme) =>
-        theme.palette.mode === 'dark' ? '#3a3d48' : '#cbd5e1',
+        surfaceColor(theme, '#3a3d48', '#4D4D4D', '#cbd5e1'),
     },
     '&.Mui-focused fieldset': {
       borderColor: '#008767',
@@ -575,7 +574,12 @@ export const timePickerPaperSx = {
 export const timePickerLayoutSx = {
   '& .MuiPickersLayout-contentWrapper': {
     bgcolor: (theme: Theme) =>
-      theme.palette.mode === 'dark' ? '#111827' : 'background.default',
+      surfaceColor(
+        theme,
+        '#111827',
+        '#242424',
+        theme.palette.background.default,
+      ),
   },
   '& .MuiMultiSectionDigitalClockSection-item.Mui-selected, & .MuiMultiSectionDigitalClockSectionItem-root.Mui-selected':
     {

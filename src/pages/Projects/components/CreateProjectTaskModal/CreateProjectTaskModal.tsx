@@ -16,6 +16,7 @@ import {
   Divider,
   Tooltip,
   alpha,
+  useTheme,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -55,11 +56,13 @@ import {
   STATUS_OPTIONS,
   DURATION_OPTIONS,
 } from './useCreateProjectTaskModal.hook';
+import { surfaceColor } from '@/context';
 
 export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
   props,
 ) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const {
     // Theme
     isDark,
@@ -305,7 +308,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 sx: {
                   borderRadius: '12px',
                   mt: 0.75,
-                  bgcolor: isDark ? '#18181b' : '#ffffff',
+                  bgcolor: surfaceColor(theme, '#18181b', '#222222', '#ffffff'),
                   backgroundImage: 'none',
                   border: `1px solid ${
                     isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
@@ -510,7 +513,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 px: '6px',
                 py: '2px',
                 borderRadius: '4px',
-                bgcolor: isDark ? '#27272a' : '#f1f5f9',
+                bgcolor: surfaceColor(theme, '#27272a', '#333333', '#f1f5f9'),
                 color: secondaryText,
                 fontSize: '11px',
                 fontWeight: 600,
@@ -584,7 +587,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 px: 1.5,
                 py: 0.8,
                 borderRadius: '8px',
-                bgcolor: isDark ? '#232328' : '#ffffff',
+                bgcolor: surfaceColor(theme, '#232328', '#2F2F2F', '#ffffff'),
                 border: `1px solid ${statusMenuAnchor ? currentStatusConfig.color : alpha(cardBorder, 0.8)}`,
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
@@ -632,7 +635,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               PaperProps={{
                 sx: {
                   borderRadius: '10px',
-                  bgcolor: isDark ? '#1a1b22' : '#ffffff',
+                  bgcolor: surfaceColor(theme, '#1a1b22', '#262626', '#ffffff'),
                   border: `1px solid ${cardBorder}`,
                   boxShadow: isDark
                     ? '0 12px 32px rgba(0, 0, 0, 0.5)'
@@ -687,7 +690,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 px: 1.5,
                 py: 0.8,
                 borderRadius: '8px',
-                bgcolor: isDark ? '#232328' : '#ffffff',
+                bgcolor: surfaceColor(theme, '#232328', '#2F2F2F', '#ffffff'),
                 border: `1px solid ${priorityMenuAnchor ? currentPriorityConfig.color : alpha(cardBorder, 0.8)}`,
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
@@ -741,7 +744,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               PaperProps={{
                 sx: {
                   borderRadius: '10px',
-                  bgcolor: isDark ? '#1a1b22' : '#ffffff',
+                  bgcolor: surfaceColor(theme, '#1a1b22', '#262626', '#ffffff'),
                   border: `1px solid ${cardBorder}`,
                   boxShadow: isDark
                     ? '0 12px 32px rgba(0, 0, 0, 0.5)'
@@ -793,7 +796,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 px: 1.5,
                 py: 0.8,
                 borderRadius: '8px',
-                bgcolor: isDark ? '#232328' : '#ffffff',
+                bgcolor: surfaceColor(theme, '#232328', '#2F2F2F', '#ffffff'),
                 border: `1px solid ${alpha(cardBorder, 0.8)}`,
                 gridColumn: { xs: '1', sm: '1 / -1' },
               }}
@@ -863,7 +866,12 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                         padding: '0 8px',
                         borderRadius: '4px',
                         border: `1px solid ${isDark ? '#007357' : '#008767'}`,
-                        background: isDark ? '#18181b' : '#ffffff',
+                        background: surfaceColor(
+                          theme,
+                          '#18181b',
+                          '#222222',
+                          '#ffffff',
+                        ),
                         color: headerText,
                         outline: 'none',
                         width: '90px',
@@ -947,7 +955,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   gap: 1.5,
                   p: 1.2,
                   borderRadius: '8px',
-                  bgcolor: isDark ? '#232328' : '#ffffff',
+                  bgcolor: surfaceColor(theme, '#232328', '#2F2F2F', '#ffffff'),
                   border: `1px solid ${alpha(cardBorder, 0.8)}`,
                 }}
               >
@@ -994,7 +1002,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   gap: 1.5,
                   p: 1.2,
                   borderRadius: '8px',
-                  bgcolor: isDark ? '#232328' : '#ffffff',
+                  bgcolor: surfaceColor(theme, '#232328', '#2F2F2F', '#ffffff'),
                   border: `1px solid ${durationMenuAnchor ? '#008767' : alpha(cardBorder, 0.8)}`,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -1038,7 +1046,12 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 PaperProps={{
                   sx: {
                     borderRadius: '10px',
-                    bgcolor: isDark ? '#1a1b22' : '#ffffff',
+                    bgcolor: surfaceColor(
+                      theme,
+                      '#1a1b22',
+                      '#262626',
+                      '#ffffff',
+                    ),
                     border: `1px solid ${cardBorder}`,
                     minWidth: 130,
                     p: 0.5,
@@ -1155,7 +1168,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   justifyContent: 'space-between',
                   p: 1.5,
                   borderRadius: '8px',
-                  bgcolor: isDark ? '#232328' : '#ffffff',
+                  bgcolor: surfaceColor(theme, '#232328', '#2F2F2F', '#ffffff'),
                   border: `1px solid ${alpha('#008767', 0.35)}`,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -1445,7 +1458,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   maxHeight: 400,
                   borderRadius: '14px',
                   p: 1,
-                  bgcolor: isDark ? '#1e1e24' : '#ffffff',
+                  bgcolor: surfaceColor(theme, '#1e1e24', '#2A2A2A', '#ffffff'),
                   border: `1px solid ${cardBorder}`,
                   boxShadow: isDark
                     ? '0 16px 36px rgba(0,0,0,0.6)'
@@ -1847,7 +1860,12 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     border: `1px solid ${cardBorder}`,
                     transition: 'background-color 0.15s ease',
                     '&:hover': {
-                      bgcolor: isDark ? '#232328' : '#f1f5f9',
+                      bgcolor: surfaceColor(
+                        theme,
+                        '#232328',
+                        '#2F2F2F',
+                        '#f1f5f9',
+                      ),
                     },
                   }}
                 >
@@ -1898,7 +1916,12 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                           height: 20,
                           fontSize: '10.5px',
                           fontWeight: 600,
-                          bgcolor: isDark ? '#27272a' : '#ffffff',
+                          bgcolor: surfaceColor(
+                            theme,
+                            '#27272a',
+                            '#333333',
+                            '#ffffff',
+                          ),
                           color: secondaryText,
                           border: `1px solid ${cardBorder}`,
                           borderRadius: '5px',
@@ -1967,7 +1990,12 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     padding: '2px 4px',
                     borderRadius: '4px',
                     border: `1px solid ${cardBorder}`,
-                    background: isDark ? '#27272a' : '#ffffff',
+                    background: surfaceColor(
+                      theme,
+                      '#27272a',
+                      '#333333',
+                      '#ffffff',
+                    ),
                     color: secondaryText,
                     outline: 'none',
                   }}
@@ -2008,7 +2036,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             alignItems: 'center',
             justifyContent: 'space-between',
             borderTop: `1px solid ${alpha(cardBorder, 0.8)}`,
-            bgcolor: isDark ? '#17171b' : '#fafafa',
+            bgcolor: surfaceColor(theme, '#17171b', '#212121', '#fafafa'),
           }}
         >
           {/* Lumina AI Breakdown Trigger */}
@@ -2184,7 +2212,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
           sx: {
             borderRadius: '16px',
             p: 2.5,
-            bgcolor: isDark ? '#1a1a1f' : '#ffffff',
+            bgcolor: surfaceColor(theme, '#1a1a1f', '#252525', '#ffffff'),
             border: `1px solid ${cardBorder}`,
             boxShadow: isDark
               ? '0 20px 40px rgba(0,0,0,0.7)'

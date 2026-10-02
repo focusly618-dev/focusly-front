@@ -70,6 +70,7 @@ import { CuteRobotIcon } from '@/components/ui';
 import { MarkdownEditor } from '../../codemirror/MarkdownEditor';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 import { EditorAskAI } from '../EditorAskAI/EditorAskAI';
+import { surfaceColor } from '@/context';
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
@@ -518,10 +519,12 @@ export const EditorContent = ({
                 left: 0,
                 right: 0,
                 bottom: 0,
-                bgcolor:
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(15, 23, 42, 0.45)'
-                    : 'rgba(255, 255, 255, 0.45)',
+                bgcolor: surfaceColor(
+                  theme,
+                  'rgba(15, 23, 42, 0.45)',
+                  'rgba(36, 36, 36, 0.45)',
+                  'rgba(255, 255, 255, 0.45)',
+                ),
                 backdropFilter: 'blur(4px)',
                 display: 'flex',
                 alignItems: 'center',

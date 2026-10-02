@@ -23,6 +23,12 @@ export const getDesignTokens = (mode: ThemeMode) => {
     : 'rgba(24, 25, 30, 0.94)';
   const surfaceDivider = isGray ? '#333333' : isDark ? '#25272e' : '#E5E5E5';
   const surfaceInputBg = isGray ? '#1F1F20' : '#1e2025';
+  const surfaceInputBorder = isGray
+    ? '#3E3E3E'
+    : isDark
+      ? '#2e3037'
+      : '#E5E5E5';
+  const controlIdle = isGray ? '#4D4D4D' : isDark ? '#3a3d48' : '#D1D5DB';
 
   return createTheme({
     appMode: mode,
@@ -132,7 +138,7 @@ export const getDesignTokens = (mode: ThemeMode) => {
       MuiCheckbox: {
         styleOverrides: {
           root: {
-            color: isDark ? '#3a3d48' : '#D1D5DB',
+            color: controlIdle,
             '&.Mui-checked': {
               color: '#008767',
             },
@@ -192,7 +198,7 @@ export const getDesignTokens = (mode: ThemeMode) => {
             transition: 'all 0.2s ease-in-out',
             backgroundColor: isDark ? surfaceInputBg : undefined,
             '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: isDark ? '#2e3037' : '#E5E5E5',
+              borderColor: surfaceInputBorder,
             },
             '&:hover .MuiOutlinedInput-notchedOutline': {
               borderColor: '#008767',

@@ -35,6 +35,7 @@ import type { Task } from '@/redux/tasks/task.types';
 import type { ListViewTaskProps } from './ListViewTask.types';
 import { useListViewTask } from './ListViewTask.hook';
 import { formatDuration } from '../TaskDetailModal/TaskDetailModal.utils';
+import { surfaceColor } from '@/context';
 
 export const ListViewTask = ({
   task,
@@ -227,7 +228,7 @@ export const ListViewTask = ({
                   height: 5,
                   borderRadius: 3,
                   bgcolor: (theme) =>
-                    theme.palette.mode === 'dark' ? '#2a2c36' : '#e5e7eb',
+                    surfaceColor(theme, '#2a2c36', '#3A3A3A', '#e5e7eb'),
                   overflow: 'hidden',
                 }}
               >

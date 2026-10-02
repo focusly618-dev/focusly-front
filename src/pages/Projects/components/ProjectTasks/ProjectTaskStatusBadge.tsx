@@ -7,6 +7,7 @@ import {
   type ProjectStatusConfig,
   type ProjectTaskStatusId,
 } from './projectTasks.types';
+import { surfaceColor } from '@/context';
 
 export interface ProjectTaskStatusBadgeProps {
   status: ProjectTaskStatusId;
@@ -133,7 +134,7 @@ export const ProjectTaskStatusBadge: React.FC<ProjectTaskStatusBadgeProps> = ({
             sx: {
               mt: 0.5,
               borderRadius: '12px',
-              bgcolor: isDark ? '#1a1b22' : '#ffffff',
+              bgcolor: surfaceColor(theme, '#1a1b22', '#262626', '#ffffff'),
               border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
               boxShadow: isDark
                 ? '0 12px 32px rgba(0, 0, 0, 0.5)'

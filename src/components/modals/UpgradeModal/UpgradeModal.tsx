@@ -19,7 +19,7 @@ import {
   bulletRowSx,
   bulletEmojiSx,
   bulletTextSx,
-  bulletSubTextStyle,
+  bulletSubTextSx,
   ctaButtonSx,
   headerRowSx,
   logoTitleRowSx,
@@ -141,9 +141,9 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                         <>
                           <strong>{feature.boldText}</strong>
                           <br />
-                          <span style={bulletSubTextStyle}>
+                          <Box component="span" sx={bulletSubTextSx}>
                             {feature.subText}
-                          </span>
+                          </Box>
                         </>
                       ) : (
                         feature.text

@@ -1836,10 +1836,12 @@ export const AskAI: React.FC = () => {
                   fontWeight: 600,
                   px: 2,
                   py: 0.6,
-                  bgcolor:
-                    theme.palette.mode === 'dark'
-                      ? 'rgba(36, 36, 41, 0.92)'
-                      : 'rgba(255, 255, 255, 0.92)',
+                  bgcolor: surfaceColor(
+                    theme,
+                    'rgba(36, 36, 41, 0.92)',
+                    'rgba(48, 48, 48, 0.92)',
+                    'rgba(255, 255, 255, 0.92)',
+                  ),
                   color: 'text.primary',
                   backdropFilter: 'blur(10px)',
                   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
@@ -1849,8 +1851,12 @@ export const AskAI: React.FC = () => {
                       ? 'rgba(255, 255, 255, 0.1)'
                       : 'rgba(0, 0, 0, 0.08)',
                   '&:hover': {
-                    bgcolor:
-                      theme.palette.mode === 'dark' ? '#2e2e35' : '#f0f0f2',
+                    bgcolor: surfaceColor(
+                      theme,
+                      '#2e2e35',
+                      '#3C3C3C',
+                      '#f0f0f2',
+                    ),
                   },
                 }}
               >
@@ -2930,7 +2936,7 @@ export const AskAI: React.FC = () => {
             p: 1,
             maxWidth: '420px',
             width: '100%',
-            bgcolor: theme.palette.mode === 'dark' ? '#18181b' : '#ffffff',
+            bgcolor: surfaceColor(theme, '#18181b', '#222222', '#ffffff'),
             border: `1px solid ${theme.palette.divider}`,
             boxShadow:
               theme.palette.mode === 'dark'

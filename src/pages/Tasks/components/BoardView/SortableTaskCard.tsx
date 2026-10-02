@@ -9,6 +9,7 @@ import { Tag } from '../GridViewTask/GridViewTask.styles';
 import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import { memo, useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
+import { surfaceColor } from '@/context';
 
 interface SortableTaskCardProps {
   task: TaskResponse;
@@ -125,12 +126,10 @@ export const SortableTaskCard = memo(
               ? isDark
                 ? alpha(theme.palette.primary.main, 0.18)
                 : alpha(theme.palette.primary.main, 0.08)
-              : isDark
-                ? '#1c1d24'
-                : '#ffffff',
+              : surfaceColor(theme, '#1c1d24', '#292929', '#ffffff'),
             border: isDropTarget
               ? `2px solid ${isDark ? '#10b981' : '#008767'}`
-              : `1px solid ${isDark ? '#282a32' : '#e2e8f0'}`,
+              : `1px solid ${surfaceColor(theme, '#282a32', '#373737', '#e2e8f0')}`,
             borderLeft:
               task.color && task.color !== 'none'
                 ? `3.5px solid ${task.color}`
@@ -152,8 +151,13 @@ export const SortableTaskCard = memo(
             transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               transform: isOverlay ? 'none' : 'translateY(-2px)',
-              backgroundColor: isDark ? '#22242c' : '#ffffff',
-              borderColor: isDark ? '#3a3d48' : '#cbd5e1',
+              backgroundColor: surfaceColor(
+                theme,
+                '#22242c',
+                '#313131',
+                '#ffffff',
+              ),
+              borderColor: surfaceColor(theme, '#3a3d48', '#4D4D4D', '#cbd5e1'),
               boxShadow: isDark
                 ? '0 8px 24px -6px rgba(0, 0, 0, 0.6)'
                 : '0 6px 16px -5px rgba(0, 0, 0, 0.1)',
@@ -324,9 +328,7 @@ export const SortableTaskCard = memo(
                         ? isDark
                           ? 'rgba(16, 185, 129, 0.16)'
                           : '#dcfce7'
-                        : isDark
-                          ? '#22242b'
-                          : '#f1f5f9',
+                        : surfaceColor(theme, '#22242b', '#303030', '#f1f5f9'),
                     border: `1px solid ${
                       isDark
                         ? task.subtasks.filter((s) => s.completed).length ===
@@ -360,8 +362,8 @@ export const SortableTaskCard = memo(
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  bgcolor: isDark ? '#25272e' : '#f1f5f9',
-                  border: `1px solid ${isDark ? '#32353e' : '#e2e8f0'}`,
+                  bgcolor: surfaceColor(theme, '#25272e', '#333333', '#f1f5f9'),
+                  border: `1px solid ${surfaceColor(theme, '#32353e', '#444444', '#e2e8f0')}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

@@ -1,5 +1,6 @@
 import { styled, alpha } from '@mui/material/styles';
 import { Box } from '@mui/material';
+import { surfaceColor } from '@/context';
 
 export const CardContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'baseColor',
@@ -15,7 +16,7 @@ export const CardContainer = styled(Box, {
   cursor: 'pointer',
   minHeight: '235px',
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-  backgroundColor: theme.palette.mode === 'dark' ? '#1C1C1E' : '#FFFFFF',
+  backgroundColor: surfaceColor(theme, '#1C1C1E', '#262626', '#FFFFFF'),
   boxShadow:
     theme.palette.mode === 'dark' ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.03)',
   '&:hover': {

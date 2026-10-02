@@ -1,6 +1,7 @@
 import { EditorView } from '@codemirror/view';
 import type { Extension } from '@codemirror/state';
 import { alpha, type Theme } from '@mui/material/styles';
+import { surfaceColor } from '@/context';
 
 // Editor chrome + every `.cm-live-*` class the live-preview decorations
 // apply (see extensions/livePreview/*). Kept in one Compartment so a
@@ -221,9 +222,12 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         height: '32px',
         borderRadius: '8px',
         border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)'}`,
-        backgroundColor: isDark
-          ? 'rgba(24, 24, 27, 0.88)'
-          : 'rgba(255, 255, 255, 0.92)',
+        backgroundColor: surfaceColor(
+          theme,
+          'rgba(24, 24, 27, 0.88)',
+          'rgba(34, 34, 34, 0.88)',
+          'rgba(255, 255, 255, 0.92)',
+        ),
         backdropFilter: 'blur(8px)',
         color: theme.palette.error.main,
         cursor: 'pointer',
@@ -249,7 +253,7 @@ export const buildEditorTheme = (theme: Theme): Extension => {
 
       // Fenced code blocks — seamless unified container
       '.cm-code-block-line': {
-        backgroundColor: isDark ? '#111827' : '#f8fafc',
+        backgroundColor: surfaceColor(theme, '#111827', '#242424', '#f8fafc'),
         fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
         fontSize: '0.88em',
         padding: '2px 14px',

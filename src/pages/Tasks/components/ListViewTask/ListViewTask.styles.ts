@@ -421,10 +421,8 @@ export const TableHeader = styled(Box)(({ theme }) => ({
   gridTemplateColumns:
     '48px minmax(260px, 4fr) 110px 100px 120px 85px 75px 65px',
   padding: '12px 24px',
-  backgroundColor: surfaceColor(theme, '#18191e', '#18191e', '#f9fafb'),
-  borderBottom: `1px solid ${
-    theme.palette.mode === 'dark' ? '#25272e' : theme.palette.divider
-  }`,
+  backgroundColor: surfaceColor(theme, '#18191e', '#242425', '#f9fafb'),
+  borderBottom: `1px solid ${theme.palette.divider}`,
   color: theme.palette.mode === 'dark' ? '#717684' : '#6B7280',
   fontWeight: 600,
   fontSize: '11px',
@@ -458,13 +456,21 @@ export const TableBodyContainer = styled(Box)(({ theme }) => ({
     background: 'transparent',
   },
   '&::-webkit-scrollbar-thumb': {
-    background:
-      theme.palette.mode === 'dark' ? '#2e3037' : theme.palette.divider,
+    background: surfaceColor(
+      theme,
+      '#2e3037',
+      '#3E3E3E',
+      theme.palette.divider,
+    ),
     borderRadius: '3px',
   },
   '&::-webkit-scrollbar-thumb:hover': {
-    background:
-      theme.palette.mode === 'dark' ? '#3a3d48' : theme.palette.text.secondary,
+    background: surfaceColor(
+      theme,
+      '#3a3d48',
+      '#4D4D4D',
+      theme.palette.text.secondary,
+    ),
   },
 }));
 

@@ -116,9 +116,9 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               sx={{ ml: 2.5 }}
             >
               Time:{' '}
-              <b style={{ color: 'var(--mui-palette-text-primary)' }}>
+              <Box component="b" sx={{ color: 'text.primary' }}>
                 {formatMinutes(hoveredData.value)}
-              </b>
+              </Box>
             </Typography>
           </Box>
         )}

@@ -9,8 +9,18 @@ export const CalendarContainer = styled(Box, {
   // ── Use the SAME colors as the global MUI theme ──
   const bgDefault = surfaceColor(theme, '#111215', '#111215', '#fafbfd');
   const bgPaper = theme.palette.background.paper; // #18191e (dark) / #ffffff (light)
-  const divider = isDark ? '#25272e' : 'rgba(0, 0, 0, 0.06)';
-  const dividerStrong = isDark ? '#2e3037' : 'rgba(0, 0, 0, 0.08)';
+  const divider = surfaceColor(
+    theme,
+    '#25272e',
+    '#333333',
+    'rgba(0, 0, 0, 0.06)',
+  );
+  const dividerStrong = surfaceColor(
+    theme,
+    '#2e3037',
+    '#3E3E3E',
+    'rgba(0, 0, 0, 0.08)',
+  );
   const textPrimary = theme.palette.text.primary;
   const textSecondary = theme.palette.text.secondary;
 
@@ -431,9 +441,12 @@ export const DraftActionBar = styled(Box)(({ theme }) => {
     gap: theme.spacing(3),
     padding: theme.spacing(1.25, 2.75),
     borderRadius: '9999px',
-    backgroundColor: isDark
-      ? 'rgba(28, 28, 30, 0.94)'
-      : 'rgba(255, 255, 255, 0.96)',
+    backgroundColor: surfaceColor(
+      theme,
+      'rgba(28, 28, 30, 0.94)',
+      'rgba(38, 38, 38, 0.94)',
+      'rgba(255, 255, 255, 0.96)',
+    ),
     border: '1px solid',
     borderColor: isDark
       ? 'rgba(168, 85, 247, 0.35)'

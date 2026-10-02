@@ -407,21 +407,21 @@ export const TasksContentView = ({
                     borderRadius: '6px',
                     border: '1px solid',
                     borderColor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
+                      surfaceColor(theme, '#2e3037', '#3E3E3E', '#e5e7eb'),
                     color: (theme) =>
                       theme.palette.mode === 'dark'
                         ? '#717684'
                         : 'text.secondary',
                     bgcolor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
+                      surfaceColor(theme, '#1e2025', '#1F1F20', '#ffffff'),
                     '&.Mui-disabled': {
                       opacity: 0.35,
                       borderColor: (theme) =>
-                        theme.palette.mode === 'dark' ? '#25272e' : '#f3f4f6',
+                        surfaceColor(theme, '#25272e', '#333333', '#f3f4f6'),
                     },
                     '&:hover': {
                       bgcolor: (theme) =>
-                        theme.palette.mode === 'dark' ? '#25272e' : '#f9fafb',
+                        surfaceColor(theme, '#25272e', '#333333', '#f9fafb'),
                     },
                   }}
                 >
@@ -457,9 +457,12 @@ export const TasksContentView = ({
                           bgcolor: isActive
                             ? '#007357'
                             : (theme) =>
-                                theme.palette.mode === 'dark'
-                                  ? '#25272e'
-                                  : '#f3f4f6',
+                                surfaceColor(
+                                  theme,
+                                  '#25272e',
+                                  '#333333',
+                                  '#f3f4f6',
+                                ),
                         },
                       }}
                     >
@@ -478,21 +481,21 @@ export const TasksContentView = ({
                     borderRadius: '6px',
                     border: '1px solid',
                     borderColor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#2e3037' : '#e5e7eb',
+                      surfaceColor(theme, '#2e3037', '#3E3E3E', '#e5e7eb'),
                     color: (theme) =>
                       theme.palette.mode === 'dark'
                         ? '#717684'
                         : 'text.secondary',
                     bgcolor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#1e2025' : '#ffffff',
+                      surfaceColor(theme, '#1e2025', '#1F1F20', '#ffffff'),
                     '&.Mui-disabled': {
                       opacity: 0.35,
                       borderColor: (theme) =>
-                        theme.palette.mode === 'dark' ? '#25272e' : '#f3f4f6',
+                        surfaceColor(theme, '#25272e', '#333333', '#f3f4f6'),
                     },
                     '&:hover': {
                       bgcolor: (theme) =>
-                        theme.palette.mode === 'dark' ? '#25272e' : '#f9fafb',
+                        surfaceColor(theme, '#25272e', '#333333', '#f9fafb'),
                     },
                   }}
                 >

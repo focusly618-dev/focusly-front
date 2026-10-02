@@ -26,6 +26,7 @@ import {
   resourceRemoveButtonSx,
   addResourceFormSx,
 } from './TaskResources.styles';
+import { surfaceColor } from '@/context';
 
 interface Link {
   title: string;
@@ -182,8 +183,7 @@ export const TaskResources = ({
                   theme.palette.mode === 'dark'
                     ? 'rgba(0, 135, 103, 0.15)'
                     : 'rgba(0, 135, 103, 0.08)'
-              : (theme) =>
-                  theme.palette.mode === 'dark' ? '#18191e' : '#ffffff',
+              : (theme) => surfaceColor(theme, '#18191e', '#242425', '#ffffff'),
             color: hasMeetLink ? '#008767' : 'text.primary',
             textTransform: 'none',
             fontSize: '13px',
@@ -212,7 +212,7 @@ export const TaskResources = ({
             border: '1px solid',
             borderColor: isAddingLink ? '#008767' : 'divider',
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? '#18191e' : '#ffffff',
+              surfaceColor(theme, '#18191e', '#242425', '#ffffff'),
             color: 'text.primary',
             textTransform: 'none',
             fontSize: '13px',
