@@ -21,6 +21,8 @@ export const fetchEditResult = async (prompt: string): Promise<string> => {
       credentials: 'include',
       body: JSON.stringify({
         messages: [{ role: 'user', content: prompt }],
+        // One-shot rewrite: keep it out of the Lumina history.
+        persist: false,
         system_context:
           'You are a helpful AI writing assistant integrated into the Focusly workspace editor. Help users refine, summarize, expand, translate, or rewrite their text. Always respond concisely and only with the requested output, no preambles or explanations.',
       }),
@@ -74,86 +76,6 @@ export const generateWorkspaceTitle = async (
     `Generate a short, specific title (3-7 words, no quotes, no trailing punctuation) for a document that starts like this:\n\n${plainTextContent.slice(0, 1500)}`,
   );
   return raw.replace(/^["'“”]+|["'“”]+$/g, '').trim();
-};
-
-export const EDIT_PROPOSAL_START = '<<<FOCUSLY_PROPOSED_EDIT>>>';
-export const EDIT_PROPOSAL_END = '<<<END_PROPOSED_EDIT>>>';
-
-const buildDocumentContext = (documentText: string): string =>
-  `You are Lumina, the AI assistant embedded directly in a Focusly workspace note editor. The user is currently looking at this exact document — never ask them to paste or describe it, you already have it below, and it takes priority over any other document/workspace mentioned above with the same or a different title.
-
-=== CURRENT DOCUMENT CONTENT ===
-${documentText || '(empty document)'}
-=== END DOCUMENT CONTENT ===
-
-Answer the user's question conversationally, using the document above as context (e.g. "the idea in point 1" refers to a heading/point in that document).
-
-If — and only if — the user is asking you to change, rewrite, clarify, expand, shorten, or otherwise edit the document itself, do this instead: write one short sentence describing what you changed, then on new lines include the COMPLETE revised document (the whole thing, not just the changed part, in the same Markdown formatting) wrapped exactly like this, with no other text after it:
-${EDIT_PROPOSAL_START}
-(full revised document markdown here)
-${EDIT_PROPOSAL_END}
-
-This explicitly includes any request to save, insert, write, add, or keep something directly in this document/note/editor (e.g. "agrégalo a la nota", "escríbelo en el documento", "guárdalo aquí", "ponlo en el editor", "add this to my note") — treat that exactly like an edit request and use the block above right away, merging the new content into the existing document. Do not just ask for permission first when the user has already asked for this explicitly.
-
-If the user has NOT asked for an edit — they're just asking a question, or you are the one offering to save something for them — do not include that block. Answering normally and asking "¿quieres que lo agregue a la nota?" is fine, but do not assume a "sí" in the next message; the user has a button in the UI to add your last reply to the document themselves at any time, so you don't need to chase confirmation across turns.`;
-
-export const fetchAssistantResult = async (
-  messages: AIMessage[],
-  documentText: string,
-): Promise<string> => {
-  const endpoint = getAIEndpoint();
-  const makeRequest = () =>
-    fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        messages,
-        document_context: buildDocumentContext(documentText),
-      }),
-    });
-
-  let response = await makeRequest();
-
-  if (response.status === 401) {
-    try {
-      const { store } = await import('@/redux/store');
-      const user = store.getState().auth.user;
-      if (user) {
-        await axios.post(
-          `${API_BASE_URL}/auth/refresh`,
-          { userId: user.id },
-          { withCredentials: true },
-        );
-        response = await makeRequest();
-      }
-    } catch (refreshErr) {
-      console.error(
-        'Failed to refresh token during assistant fetch:',
-        refreshErr,
-      );
-    }
-  }
-
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
-
-  const reader = response.body?.getReader();
-  if (!reader) {
-    throw new Error('No response body reader');
-  }
-
-  const decoder = new TextDecoder();
-  let result = '';
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    result += decoder.decode(value, { stream: true });
-  }
-  return result.trim();
 };
 
 export const fetchChatStreamResponse = async (

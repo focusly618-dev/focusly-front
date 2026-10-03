@@ -244,6 +244,158 @@
       "deleteDesc": "Borra para siempre tu cuenta, tus tareas, documentos, proyectos y conversaciones con Lumina. No se puede deshacer."
     }
   },
+  "editorAI": {
+    "launcher": "Pregúntale a Lumina",
+    "conversationTitle": "📝 {{title}}",
+    "untitled": "Documento sin título",
+    "header": {
+      "title": "Lumina",
+      "subtitle": "Sobre «{{title}}»",
+      "newChat": "Nueva conversación",
+      "minimize": "Minimizar"
+    },
+    "empty": {
+      "title": "¿En qué te ayudo con este documento?",
+      "description": "Pregunta lo que quieras sobre la nota o usa una acción rápida. Selecciona texto para ver acciones sobre ese fragmento.",
+      "withSelection": "Tienes texto seleccionado: elige una acción o escribe qué quieres hacer con él."
+    },
+    "actions": {
+      "label": "Acciones rápidas",
+      "improve": {
+        "label": "Mejorar redacción",
+        "hint": "Reescribe la selección más clara y fluida"
+      },
+      "fix": {
+        "label": "Corregir",
+        "hint": "Corrige ortografía y gramática de la selección"
+      },
+      "shorter": {
+        "label": "Más corto",
+        "hint": "Resume la selección"
+      },
+      "longer": {
+        "label": "Más largo",
+        "hint": "Desarrolla la selección"
+      },
+      "translate": {
+        "label": "Traducir",
+        "hint": "Traduce la selección a otro idioma"
+      },
+      "explain": {
+        "label": "Explicar",
+        "hint": "Explica la selección sin cambiarla"
+      },
+      "matchStyle": {
+        "label": "Igualar estilo",
+        "hint": "Adapta la selección al estilo del documento"
+      },
+      "summarize": {
+        "label": "Resumir",
+        "hint": "Resume todo el documento"
+      },
+      "continue": {
+        "label": "Continuar escribiendo",
+        "hint": "Escribe a partir del cursor"
+      },
+      "extractTasks": {
+        "label": "Extraer tareas",
+        "hint": "Propone tareas a partir del documento"
+      },
+      "proofread": {
+        "label": "Revisar ortografía",
+        "hint": "Corrige la ortografía de todo el documento"
+      }
+    },
+    "prompts": {
+      "improve": "Mejora la redacción del texto seleccionado: más claro y fluido, con el mismo significado e idioma.",
+      "fix": "Corrige la ortografía y la gramática del texto seleccionado sin cambiar su estilo.",
+      "shorter": "Haz más corto el texto seleccionado, conservando las ideas clave.",
+      "longer": "Desarrolla más el texto seleccionado con detalle y contexto útiles, en el mismo estilo.",
+      "translate": "Traduce el texto seleccionado al {{language}}.",
+      "explain": "Explica el texto seleccionado de forma sencilla.",
+      "matchStyle": "Adapta el texto seleccionado al estilo de escritura del resto del documento (tono, vocabulario y forma de construir las frases), sin cambiar su significado.",
+      "summarize": "Resume este documento de forma clara y concisa.",
+      "continue": "Continúa escribiendo desde donde está mi cursor, siguiendo el tono y la estructura del documento.",
+      "extractTasks": "Extrae las tareas accionables de este documento y propónmelas como tareas de Focusly.",
+      "proofread": "Revisa la ortografía y la gramática de todo el documento y corrige los errores sin cambiar el estilo."
+    },
+    "quote": {
+      "selection": "Selección",
+      "cursor": "Antes del cursor"
+    },
+    "status": {
+      "thinking": "Pensando…",
+      "preparingEdit": "Preparando los cambios en tu documento…",
+      "preparingTasks": "Preparando tareas…",
+      "editProposed": "Propuso cambios en el documento",
+      "stopped": "Respuesta detenida.",
+      "error": "No se pudo completar la respuesta."
+    },
+    "fragment": {
+      "docChanged": "El documento cambió mientras Lumina escribía. Inserta el texto donde quieras:",
+      "editChanged": "El documento cambió desde que pediste el cambio. Revísalo contra la versión actual:"
+    },
+    "message": {
+      "copy": "Copiar",
+      "insertAtCursor": "Insertar en el cursor",
+      "replaceSelection": "Reemplazar selección",
+      "retry": "Reintentar",
+      "stop": "Detener",
+      "reviewEdit": "Revisar cambios"
+    },
+    "diff": {
+      "review": "Revisa los cambios en el documento: lo tachado se elimina y lo subrayado se agrega.",
+      "accept": "Aceptar",
+      "discard": "Descartar",
+      "applied": "Cambios aplicados a tu documento",
+      "discarded": "Cambios descartados"
+    },
+    "selection": {
+      "attached": "Selección: «{{text}}»",
+      "detached": "La selección no se enviará",
+      "detach": "No enviar la selección",
+      "attach": "Usar"
+    },
+    "input": {
+      "placeholder": "Pregúntale a Lumina sobre este documento…",
+      "placeholderSelection": "¿Qué hago con el texto seleccionado?",
+      "send": "Enviar"
+    },
+    "disclaimer": "Lumina puede equivocarse. Revisa los cambios antes de aceptarlos.",
+    "toasts": {
+      "inserted": "Agregado a tu documento",
+      "copied": "Copiado"
+    },
+    "errors": {
+      "title": "Lumina no pudo responder",
+      "retry": "Intenta de nuevo en un momento.",
+      "copy": "No se pudo copiar"
+    },
+    "launcherWriting": "Lumina está escribiendo…",
+    "launcherReady": "Respuesta lista",
+    "backgroundHint": "Puedes salir del editor: Lumina seguirá trabajando en segundo plano.",
+    "history": {
+      "title": "Chats de este documento",
+      "open": "Ver chats",
+      "back": "Volver al chat",
+      "empty": "Aún no hay chats en este documento.",
+      "untitled": "Chat sin título",
+      "active": "Abierto",
+      "delete": "Eliminar chat",
+      "confirmDelete": "¿Eliminar?",
+      "yes": "Sí",
+      "no": "No",
+      "loadError": "No se pudieron cargar los chats.",
+      "deleteError": "No se pudo eliminar el chat."
+    },
+    "background": {
+      "writing": "Lumina está escribiendo",
+      "done": "Lumina terminó",
+      "in": "En «{{title}}»",
+      "open": "Abrir «{{title}}»",
+      "dismiss": "Descartar aviso"
+    }
+  },
   "insightsHeader": {
     "title": "{{period}} Insights",
     "periods": {

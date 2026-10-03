@@ -15,6 +15,7 @@ import { buildMarkdownExtensions } from './extensions';
 import { buildEditorTheme } from './theme/editorTheme';
 import { buildHighlightStyle } from './theme/highlightStyle';
 import { createImperativeApi } from './imperativeApi';
+import { diffRangesField } from './extensions/diffReview';
 import type {
   MarkdownEditorProps,
   MarkdownEditorRef,
@@ -60,7 +61,12 @@ export const MarkdownEditor = forwardRef<
           placeholder,
         }),
         EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
+          // While a diff is under review the document holds both versions
+          // (struck-through and added text). Reporting that would autosave
+          // the mix; the resolution reports the final text instead.
+          const reviewingDiff =
+            (update.state.field(diffRangesField, false) ?? []).length > 0;
+          if (update.docChanged && !reviewingDiff) {
             debouncedOnChange(update.state.doc.toString());
           }
           if (update.selectionSet) {

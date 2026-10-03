@@ -5,9 +5,35 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Focusly</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script>
+      // Apply the saved theme before first paint (no light flash on dark
+      // themes). Mirrors applyModeToDocument in src/context/theme.
+      (function () {
+        var mode = 'dark';
+        try {
+          var saved = localStorage.getItem('themeMode');
+          if (saved === 'light' || saved === 'dark' || saved === 'graydark')
+            mode = saved;
+        } catch (e) {}
+        var root = document.documentElement;
+        root.classList.toggle('light', mode === 'light');
+        root.classList.toggle('dark', mode !== 'light');
+        root.classList.toggle('graydark', mode === 'graydark');
+        root.style.colorScheme = mode === 'light' ? 'light' : 'dark';
+      })();
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="root"></div>

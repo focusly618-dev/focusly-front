@@ -1,26 +1,47 @@
-import { useRef, type RefObject } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { useEffect, useRef, type RefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Button,
   IconButton,
   InputBase,
+  Skeleton,
+  Tooltip,
   Typography,
-  useTheme,
-  Grow,
 } from '@mui/material';
 import {
-  Send as SendIcon,
+  ArrowUpward as SendIcon,
+  StopRounded as StopIcon,
   Close as CloseIcon,
-  Check as CheckIcon,
-  AutoFixHigh as StyleIcon,
-  Summarize as SummarizeIcon,
-  NoteAdd as NoteAddIcon,
+  KeyboardArrowDown as MinimizeIcon,
+  AddCommentOutlined as NewChatIcon,
+  HistoryRounded as HistoryIcon,
+  ArrowBackRounded as BackIcon,
+  FormatQuote as QuoteIcon,
 } from '@mui/icons-material';
-import { LuminaAnimatedFace, LuminaOrb } from '@/components/ui';
-import { useEditorAskAI } from './useEditorAskAI.hook';
+import { LuminaAnimatedFace } from '@/components/ui';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
+import { useEditorAskAI } from './useEditorAskAI.hook';
+import { AssistantMessage } from './components/AssistantMessage';
+import { UserMessage } from './components/UserMessage';
+import { QuickActions } from './components/QuickActions';
+import { ConversationList } from './components/ConversationList';
+import {
+  AvatarFrame,
+  ContextChip,
+  Dock,
+  Footer,
+  InputShell,
+  Kbd,
+  Launcher,
+  Panel,
+  PanelHeader,
+  ReadyDot,
+  ReviewBar,
+  SendButton,
+  ThinkingDots,
+  Thread,
+} from './EditorAskAI.styles';
 
 interface EditorAskAIProps {
   markdownEditorRef: RefObject<MarkdownEditorRef | null>;
@@ -28,492 +49,338 @@ interface EditorAskAIProps {
   // onSelectionChange) — only ever changes from a real selection change
   // inside the editor, never from focusing this panel's own input.
   selectedText: string;
+  /** The open document: its id keys the saved threads. */
+  workspaceId?: string | null;
+  documentTitle?: string;
 }
 
-const SUMMARIZE_ACTION = {
-  id: 'summarize',
-  label: 'Resumir con IA',
-  icon: SummarizeIcon,
-  mode: 'send' as const,
-  text: 'Resume este documento de forma clara y concisa.',
-};
+const isMac =
+  typeof navigator !== 'undefined' &&
+  /mac|iphone|ipad/i.test(navigator.userAgent);
+const SHORTCUT = isMac ? '⌘J' : 'Ctrl J';
 
-const buildStyleAction = (selectedText: string) => ({
-  id: 'style',
-  label: 'Adaptar estilo de escritura',
-  icon: StyleIcon,
-  mode: 'send' as const,
-  text: `Adapta el estilo de redacción de esta parte seleccionada para que coincida con el estilo de escritura del resto del documento (mismo tono, vocabulario y forma de construir las frases), sin cambiar su significado: "${selectedText}"`,
-});
-
-// Renders Lumina's reply with real Markdown (bold, lists, etc.) instead of
-// showing the literal "**...**" syntax — mapped onto MUI primitives so it
-// matches the bubble's own typography instead of raw browser default styles.
-const noteMarkdownComponents = {
-  p: ({ children }: { children?: React.ReactNode }) => (
-    <Typography variant="body2" sx={{ mb: 0.75, '&:last-child': { mb: 0 } }}>
-      {children}
-    </Typography>
-  ),
-  strong: ({ children }: { children?: React.ReactNode }) => (
-    <Box component="strong" sx={{ fontWeight: 700 }}>
-      {children}
-    </Box>
-  ),
-  em: ({ children }: { children?: React.ReactNode }) => (
-    <Box component="em" sx={{ fontStyle: 'italic' }}>
-      {children}
-    </Box>
-  ),
-  ul: ({ children }: { children?: React.ReactNode }) => (
-    <Box component="ul" sx={{ pl: 2.5, m: 0, mb: 0.75 }}>
-      {children}
-    </Box>
-  ),
-  ol: ({ children }: { children?: React.ReactNode }) => (
-    <Box component="ol" sx={{ pl: 2.5, m: 0, mb: 0.75 }}>
-      {children}
-    </Box>
-  ),
-  li: ({ children }: { children?: React.ReactNode }) => (
-    <Typography component="li" variant="body2" sx={{ mb: 0.25 }}>
-      {children}
-    </Typography>
-  ),
-  code: ({ children }: { children?: React.ReactNode }) => (
-    <Box
-      component="code"
-      sx={{
-        fontFamily: 'ui-monospace, monospace',
-        bgcolor: 'action.hover',
-        px: 0.5,
-        py: 0.1,
-        borderRadius: '4px',
-        fontSize: '0.85em',
-      }}
-    >
-      {children}
-    </Box>
-  ),
-  // Fenced code blocks (```...```) come through as <pre><code>...</code></pre>
-  // — the `code` override above already handles the inner element, this
-  // just gives the block itself a monospace background instead of the
-  // browser's unstyled default.
-  pre: ({ children }: { children?: React.ReactNode }) => (
-    <Box
-      component="pre"
-      sx={{
-        m: 0,
-        mb: 0.75,
-        p: 1,
-        borderRadius: '8px',
-        bgcolor: 'action.hover',
-        overflowX: 'auto',
-        fontSize: '0.85em',
-        lineHeight: 1.5,
-        '& code': { bgcolor: 'transparent', p: 0 },
-      }}
-    >
-      {children}
-    </Box>
-  ),
-  h1: ({ children }: { children?: React.ReactNode }) => (
-    <Typography variant="subtitle1" fontWeight={800} sx={{ mb: 0.75, mt: 1 }}>
-      {children}
-    </Typography>
-  ),
-  h2: ({ children }: { children?: React.ReactNode }) => (
-    <Typography variant="subtitle2" fontWeight={800} sx={{ mb: 0.75, mt: 1 }}>
-      {children}
-    </Typography>
-  ),
-  h3: ({ children }: { children?: React.ReactNode }) => (
-    <Typography variant="body2" fontWeight={700} sx={{ mb: 0.5, mt: 0.75 }}>
-      {children}
-    </Typography>
-  ),
-  // GFM tables (needs remarkGfm, passed to <ReactMarkdown> below) — without
-  // these overrides a table renders with zero borders/spacing via the
-  // browser's bare defaults, which reads as "not styled at all".
-  table: ({ children }: { children?: React.ReactNode }) => (
-    <Box
-      sx={{
-        overflowX: 'auto',
-        mb: 0.75,
-        borderRadius: '8px',
-        border: '1px solid',
-        borderColor: 'divider',
-      }}
-    >
-      <Box
-        component="table"
-        sx={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          fontSize: '0.85em',
-        }}
-      >
-        {children}
-      </Box>
-    </Box>
-  ),
-  thead: ({ children }: { children?: React.ReactNode }) => (
-    <Box component="thead" sx={{ bgcolor: 'action.hover' }}>
-      {children}
-    </Box>
-  ),
-  tr: ({ children }: { children?: React.ReactNode }) => (
-    <Box
-      component="tr"
-      sx={{
-        '&:not(:last-of-type)': {
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-        },
-      }}
-    >
-      {children}
-    </Box>
-  ),
-  th: ({ children }: { children?: React.ReactNode }) => (
-    <Box
-      component="th"
-      sx={{ textAlign: 'left', fontWeight: 700, px: 1, py: 0.6 }}
-    >
-      {children}
-    </Box>
-  ),
-  td: ({ children }: { children?: React.ReactNode }) => (
-    <Box component="td" sx={{ px: 1, py: 0.6, verticalAlign: 'top' }}>
-      {children}
-    </Box>
-  ),
-};
-
-export const EditorAskAI: React.FC<EditorAskAIProps> = ({
+export const EditorAskAI = ({
   markdownEditorRef,
   selectedText,
-}) => {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-  const inputRef = useRef<HTMLInputElement>(null);
+  workspaceId,
+  documentTitle,
+}: EditorAskAIProps) => {
+  const { t } = useTranslation();
+  const ai = useEditorAskAI({
+    markdownEditorRef,
+    workspaceId,
+    documentTitle,
+    selectedText,
+  });
 
-  const {
-    isOpen,
-    open,
-    close,
-    inputValue,
-    setInputValue,
-    isLoading,
-    note,
-    hasPendingDiff,
-    handleSubmit,
-    handleQuickAction,
-    handleResolveDiff,
-    handleInsertNote,
-  } = useEditorAskAI({ markdownEditorRef });
+  const threadRef = useRef<HTMLDivElement>(null);
+  // Follow new text only while the user is reading at the bottom.
+  const stickToBottom = useRef(true);
+  useEffect(() => {
+    const thread = threadRef.current;
+    if (thread && stickToBottom.current) thread.scrollTop = thread.scrollHeight;
+  }, [ai.messages, ai.view]);
 
-  const glowBg = isDark ? '#1e1b4b' : '#e0f2fe';
-  const glowBorder = `${theme.palette.primary.main}30`;
-  const glowShadow = `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`;
+  const canEdit = !ai.isBusy;
+  const lastAssistantId = [...ai.messages]
+    .reverse()
+    .find((m) => m.role === 'assistant')?.id;
+  const selectionPreview = selectedText.trim().replace(/\s+/g, ' ');
 
-  const showQuickActions =
-    isOpen && !note && !hasPendingDiff && !inputValue.trim() && !isLoading;
-
-  const trimmedSelection = selectedText.trim();
-  const hasSelection = Boolean(trimmedSelection);
-
-  const quickActions = hasSelection
-    ? [buildStyleAction(trimmedSelection), SUMMARIZE_ACTION]
-    : [SUMMARIZE_ACTION];
+  if (!ai.isOpen) {
+    return (
+      <Dock>
+        <Launcher
+          onClick={ai.open}
+          aria-keyshortcuts={isMac ? 'Meta+J' : 'Control+J'}
+        >
+          <LuminaAnimatedFace size={22} />
+          <Typography variant="body2" fontWeight={700} color="text.primary">
+            {ai.isStreaming
+              ? t('editorAI.launcherWriting')
+              : ai.unseen
+                ? t('editorAI.launcherReady')
+                : t('editorAI.launcher')}
+          </Typography>
+          {ai.isStreaming ? (
+            <ThinkingDots aria-hidden>
+              <span />
+              <span />
+              <span />
+            </ThinkingDots>
+          ) : ai.unseen ? (
+            <ReadyDot aria-hidden />
+          ) : (
+            <Kbd>{SHORTCUT}</Kbd>
+          )}
+        </Launcher>
+      </Dock>
+    );
+  }
 
   return (
-    <Box
-      sx={{
-        // Fixed to the viewport (not the scrolling note surface) so it stays
-        // put like Google Docs' Gemini button, instead of scrolling away
-        // with a long document.
-        position: 'fixed',
-        left: '50%',
-        bottom: 32,
-        transform: 'translateX(-50%)',
-        zIndex: 1200,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 1,
-        // Same width collapsed or open, so the button never has to jump
-        // size — only its inner shape morphs (icon+label vs icon+input).
-        width: 'min(90%, 560px)',
-      }}
-    >
-      {(note || hasPendingDiff) && (
-        <Box
-          sx={{
-            width: '100%',
-            px: 2,
-            py: 1.25,
-            borderRadius: '14px',
-            bgcolor: theme.palette.background.paper,
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-            animation: 'askAiFadeIn 0.2s ease-out',
-            '@keyframes askAiFadeIn': {
-              from: { opacity: 0, transform: 'translateY(6px)' },
-              to: { opacity: 1, transform: 'translateY(0)' },
-            },
-          }}
-        >
-          {note && (
-            <Box
-              sx={{
-                maxHeight: '45vh',
-                overflowY: 'auto',
-                mb: hasPendingDiff ? 1 : 0,
-              }}
-            >
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={noteMarkdownComponents}
-              >
-                {note}
-              </ReactMarkdown>
-            </Box>
-          )}
-          {note && !hasPendingDiff && (
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                size="small"
-                onClick={handleInsertNote}
-                startIcon={<NoteAddIcon sx={{ fontSize: 15 }} />}
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  fontSize: '11.5px',
-                  borderRadius: '8px',
-                  color: theme.palette.primary.main,
-                }}
-              >
-                Agregar a la nota
-              </Button>
-            </Box>
-          )}
-          {hasPendingDiff && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ flex: 1 }}
-              >
-                Lo tachado se eliminaría, lo subrayado se agregaría.
-              </Typography>
+    <Dock>
+      <Panel role="dialog" aria-label={t('editorAI.header.title')}>
+        <PanelHeader>
+          {ai.view === 'history' ? (
+            <Tooltip title={t('editorAI.history.back')}>
               <IconButton
                 size="small"
-                onClick={() => handleResolveDiff('reject')}
-                sx={{
-                  color: 'error.main',
-                  border: '1px solid',
-                  borderColor: 'error.main',
-                  borderRadius: '8px',
-                  px: 1,
-                }}
+                onClick={ai.showChat}
+                aria-label={t('editorAI.history.back')}
               >
-                <CloseIcon sx={{ fontSize: 16 }} />
-                <Typography variant="caption" fontWeight={700} sx={{ ml: 0.5 }}>
-                  Descartar
-                </Typography>
+                <BackIcon sx={{ fontSize: 18 }} />
               </IconButton>
-              <IconButton
-                size="small"
-                onClick={() => handleResolveDiff('accept')}
-                sx={{
-                  color: '#fff',
-                  bgcolor: 'success.main',
-                  borderRadius: '8px',
-                  px: 1,
-                  '&:hover': { bgcolor: 'success.dark' },
-                }}
-              >
-                <CheckIcon sx={{ fontSize: 16 }} />
-                <Typography variant="caption" fontWeight={700} sx={{ ml: 0.5 }}>
-                  Aceptar
-                </Typography>
-              </IconButton>
-            </Box>
+            </Tooltip>
+          ) : (
+            <AvatarFrame>
+              <LuminaAnimatedFace size={20} />
+            </AvatarFrame>
           )}
-        </Box>
-      )}
-
-      {showQuickActions && (
-        <Box
-          sx={{
-            width: '100%',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 0.75,
-            justifyContent: 'center',
-            animation: 'askAiFadeIn 0.2s ease-out',
-          }}
-        >
-          {quickActions.map((action) => {
-            const ActionIcon = action.icon;
-            return (
-              <Box
-                key={action.id}
-                onClick={() => {
-                  if (action.mode === 'send') {
-                    handleQuickAction(action.text);
-                  } else {
-                    setInputValue(action.text);
-                    inputRef.current?.focus();
-                  }
-                }}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.6,
-                  px: 1.25,
-                  py: 0.6,
-                  borderRadius: '999px',
-                  bgcolor: theme.palette.background.paper,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  '&:hover': {
-                    borderColor: theme.palette.primary.main,
-                    transform: 'translateY(-1px)',
-                  },
-                }}
-              >
-                <ActionIcon
-                  sx={{ fontSize: 15, color: theme.palette.primary.main }}
-                />
-                <Typography variant="caption" fontWeight={600}>
-                  {action.label}
-                </Typography>
-              </Box>
-            );
-          })}
-        </Box>
-      )}
-
-      <Box sx={{ position: 'relative', width: '100%', minHeight: 48 }}>
-        <Grow in={isOpen} unmountOnExit style={{ transformOrigin: 'bottom' }}>
-          <Box
-            sx={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              px: 1.5,
-              py: 0.75,
-              borderRadius: '999px',
-              bgcolor: glowBg,
-              border: `1px solid ${glowBorder}`,
-              boxShadow: glowShadow,
-            }}
-          >
-            <LuminaAnimatedFace size={24} />
-            <InputBase
-              inputRef={inputRef}
-              autoFocus
-              fullWidth
-              placeholder="Pregúntale a Lumina sobre este documento…"
-              value={inputValue}
-              disabled={isLoading || hasPendingDiff}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-                if (e.key === 'Escape') close();
-              }}
-              sx={{
-                fontSize: '14px',
-                color: 'text.primary',
-                '& input::placeholder': { opacity: 0.7 },
-              }}
-            />
-            {isLoading ? (
-              <LuminaOrb size={20} state="thinking" sx={{ mr: 0.5 }} />
-            ) : (
-              <IconButton
-                size="small"
-                onClick={handleSubmit}
-                disabled={!inputValue.trim() || hasPendingDiff}
-                sx={{ color: theme.palette.primary.main }}
-              >
-                <SendIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            )}
-            <IconButton
-              size="small"
-              onClick={close}
-              disabled={hasPendingDiff}
-              sx={{ color: 'text.secondary' }}
-            >
-              <CloseIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </Box>
-        </Grow>
-
-        <Grow
-          in={!isOpen}
-          unmountOnExit
-          style={{ transformOrigin: 'bottom center' }}
-        >
-          <Box
-            onClick={open}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') open();
-            }}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 1,
-              px: 2,
-              py: 1,
-              borderRadius: '999px',
-              bgcolor: theme.palette.primary.main,
-              border: `1px solid ${glowBorder}`,
-              boxShadow: glowShadow,
-              cursor: 'pointer',
-              width: '100%',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              animation: 'askAiPulseGlow 2.4s infinite ease-in-out',
-              '@keyframes askAiPulseGlow': {
-                '0%, 100%': { boxShadow: glowShadow },
-                '50%': {
-                  boxShadow: `0 8px 32px rgba(15, 23, 76, 0.3), 0 0 22px ${theme.palette.primary.main}30`,
-                },
-              },
-              '&:hover': {
-                transform: 'translateY(-1px)',
-              },
-              transition: 'transform 0.15s ease',
-            }}
-          >
-            <LuminaAnimatedFace size={22} />
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
-              variant="body2"
-              fontWeight={700}
-              color="text.primary"
-              sx={{ letterSpacing: '0.2px' }}
+              sx={{ fontSize: '0.9rem', fontWeight: 700, lineHeight: 1.2 }}
             >
-              Pregúntale a Lumina
+              {t('editorAI.header.title')}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              noWrap
+              sx={{ display: 'block' }}
+            >
+              {t('editorAI.header.subtitle', {
+                title: documentTitle?.trim() || t('editorAI.untitled'),
+              })}
             </Typography>
           </Box>
-        </Grow>
-      </Box>
-    </Box>
+          {ai.canPersist && ai.view === 'chat' && (
+            <Tooltip title={t('editorAI.history.open')}>
+              <IconButton
+                size="small"
+                onClick={ai.showHistory}
+                aria-label={t('editorAI.history.open')}
+              >
+                <HistoryIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
+          )}
+          <Tooltip title={t('editorAI.header.newChat')}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={ai.newConversation}
+                disabled={ai.messages.length === 0 || ai.hasPendingDiff}
+                aria-label={t('editorAI.header.newChat')}
+              >
+                <NewChatIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={`${t('editorAI.header.minimize')} (${SHORTCUT})`}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={ai.close}
+                disabled={ai.hasPendingDiff}
+                aria-label={t('editorAI.header.minimize')}
+              >
+                <MinimizeIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </PanelHeader>
+
+        <Thread
+          ref={threadRef}
+          aria-live="polite"
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            stickToBottom.current =
+              el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+          }}
+        >
+          {ai.view === 'history' ? (
+            <ConversationList
+              conversations={ai.session.conversations}
+              status={ai.session.conversationsStatus}
+              activeId={ai.session.conversationId}
+              disabled={ai.isBusy}
+              onOpen={ai.openConversation}
+              onDelete={ai.deleteConversation}
+              onNew={ai.newConversation}
+              onReload={ai.reloadConversations}
+            />
+          ) : ai.isLoadingHistory && ai.messages.length === 0 ? (
+            <Box>
+              <Skeleton width="55%" sx={{ ml: 'auto' }} height={36} />
+              <Skeleton width="80%" height={64} />
+            </Box>
+          ) : ai.messages.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 2, px: 1 }}>
+              <Typography sx={{ fontWeight: 700, mb: 0.5 }}>
+                {t('editorAI.empty.title')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {ai.hasSelection
+                  ? t('editorAI.empty.withSelection')
+                  : t('editorAI.empty.description')}
+              </Typography>
+            </Box>
+          ) : (
+            ai.messages.map((message) =>
+              message.role === 'user' ? (
+                <UserMessage key={message.id} content={message.content} />
+              ) : (
+                <AssistantMessage
+                  key={message.id}
+                  message={message}
+                  isLast={message.id === lastAssistantId}
+                  workspaceId={workspaceId}
+                  canEdit={canEdit}
+                  hasSelection={ai.hasSelection}
+                  onCopy={ai.copy}
+                  onInsert={ai.insertText}
+                  onRetry={ai.retry}
+                  onReviewEdit={ai.reviewEdit}
+                />
+              ),
+            )
+          )}
+        </Thread>
+
+        {ai.view === 'chat' && (
+          <Footer>
+            {ai.hasPendingDiff ? (
+              <ReviewBar>
+                <Typography variant="body2" sx={{ flex: 1, minWidth: 180 }}>
+                  {t('editorAI.diff.review')}
+                </Typography>
+                <Button
+                  size="small"
+                  color="inherit"
+                  variant="outlined"
+                  onClick={() => ai.resolveDiff('reject')}
+                  sx={{ px: 1.5, py: 0.5 }}
+                >
+                  {t('editorAI.diff.discard')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={() => ai.resolveDiff('accept')}
+                  sx={{ px: 1.5, py: 0.5 }}
+                >
+                  {t('editorAI.diff.accept')}
+                </Button>
+              </ReviewBar>
+            ) : (
+              <QuickActions
+                hasSelection={ai.hasSelection}
+                disabled={ai.isBusy}
+                onRun={ai.runAction}
+              />
+            )}
+
+            {ai.hasSelection && !ai.hasPendingDiff && (
+              <ContextChip>
+                <QuoteIcon />
+                <Box
+                  component="span"
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {ai.selectionAttached
+                    ? t('editorAI.selection.attached', {
+                        text: selectionPreview,
+                      })
+                    : t('editorAI.selection.detached')}
+                </Box>
+                {ai.selectionAttached ? (
+                  <IconButton
+                    size="small"
+                    onClick={ai.detachSelection}
+                    aria-label={t('editorAI.selection.detach')}
+                    sx={{ p: 0.25 }}
+                  >
+                    <CloseIcon sx={{ fontSize: 14 }} />
+                  </IconButton>
+                ) : (
+                  <Button
+                    size="small"
+                    onClick={ai.attachSelection}
+                    sx={{ minWidth: 0, px: 0.75, py: 0, fontSize: '0.75rem' }}
+                  >
+                    {t('editorAI.selection.attach')}
+                  </Button>
+                )}
+              </ContextChip>
+            )}
+
+            <InputShell>
+              <InputBase
+                autoFocus
+                fullWidth
+                multiline
+                maxRows={6}
+                value={ai.inputValue}
+                disabled={ai.hasPendingDiff}
+                placeholder={
+                  ai.selectionAttached
+                    ? t('editorAI.input.placeholderSelection')
+                    : t('editorAI.input.placeholder')
+                }
+                onChange={(e) => ai.setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (
+                    e.key === 'Enter' &&
+                    !e.shiftKey &&
+                    !e.nativeEvent.isComposing
+                  ) {
+                    e.preventDefault();
+                    ai.submit();
+                  }
+                  if (e.key === 'Escape') ai.close();
+                }}
+                inputProps={{ 'aria-label': t('editorAI.input.placeholder') }}
+                sx={{ fontSize: '0.875rem', py: 0.6, color: 'text.primary' }}
+              />
+              {ai.isStreaming ? (
+                <Tooltip title={t('editorAI.message.stop')}>
+                  <SendButton
+                    active
+                    onClick={ai.stop}
+                    aria-label={t('editorAI.message.stop')}
+                  >
+                    <StopIcon sx={{ fontSize: 18 }} />
+                  </SendButton>
+                </Tooltip>
+              ) : (
+                <SendButton
+                  active={Boolean(ai.inputValue.trim()) && !ai.isBusy}
+                  disabled={!ai.inputValue.trim() || ai.isBusy}
+                  onClick={ai.submit}
+                  aria-label={t('editorAI.input.send')}
+                >
+                  <SendIcon sx={{ fontSize: 18 }} />
+                </SendButton>
+              )}
+            </InputShell>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ textAlign: 'center', fontSize: '0.7rem' }}
+            >
+              {ai.isStreaming
+                ? t('editorAI.backgroundHint')
+                : t('editorAI.disclaimer')}
+            </Typography>
+          </Footer>
+        )}
+      </Panel>
+    </Dock>
   );
 };

@@ -13,6 +13,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { SessionExpiredBanner } from '@/components/ui/SessionExpiredBanner';
 import { ReleaseModal } from '@/components/ReleaseModal/ReleaseModal';
 import { TermsAcceptanceModal } from '@/components/TermsAcceptanceModal/TermsAcceptanceModal';
+import { EditorAIBackgroundIndicator } from '@/components/AI/EditorAIBackgroundIndicator';
 
 function App() {
   const { isLogged } = useSession();
@@ -26,6 +27,8 @@ function App() {
       <ReleaseModal />
       {/* After ReleaseModal so it stacks on top: terms come first */}
       <TermsAcceptanceModal />
+      {/* Editor assistant replies keep running when the user leaves the note */}
+      {isLogged && <EditorAIBackgroundIndicator />}
       <Box
         sx={{
           pt: sessionExpiredNotice ? { xs: '92px', sm: '102px' } : 0,

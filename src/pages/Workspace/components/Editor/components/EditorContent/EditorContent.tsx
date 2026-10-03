@@ -103,6 +103,7 @@ export const EditorContent = ({
   const isThemeDark = theme.palette.mode === 'dark';
   const editorSurfaceRef = useRef<HTMLDivElement>(null);
   const [liveSelectedText, setLiveSelectedText] = useState('');
+  const workspaceId = (watch?.('id') as string | undefined) || null;
   const [coverColorCategory, setCoverColorCategory] = useState<
     'all' | 'gradient' | 'pastel' | 'solid'
   >('all');
@@ -581,9 +582,13 @@ export const EditorContent = ({
             </Box>
           )}
 
+          {/* Keyed by document so switching notes starts on that note's thread */}
           <EditorAskAI
+            key={workspaceId ?? 'unsaved'}
             markdownEditorRef={markdownEditorRef}
             selectedText={liveSelectedText}
+            workspaceId={workspaceId}
+            documentTitle={currentTitle}
           />
         </MarkdownEditorSurface>
       </Box>

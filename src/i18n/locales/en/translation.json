@@ -244,6 +244,158 @@
       "deleteDesc": "Permanently deletes your account, tasks, documents, projects and conversations with Lumina. This can't be undone."
     }
   },
+  "editorAI": {
+    "launcher": "Ask Lumina",
+    "conversationTitle": "📝 {{title}}",
+    "untitled": "Untitled document",
+    "header": {
+      "title": "Lumina",
+      "subtitle": "About “{{title}}”",
+      "newChat": "New conversation",
+      "minimize": "Minimize"
+    },
+    "empty": {
+      "title": "How can I help with this document?",
+      "description": "Ask anything about the note or use a quick action. Select text to see actions for that passage.",
+      "withSelection": "You have text selected: pick an action or tell me what to do with it."
+    },
+    "actions": {
+      "label": "Quick actions",
+      "improve": {
+        "label": "Improve writing",
+        "hint": "Rewrite the selection clearer and smoother"
+      },
+      "fix": {
+        "label": "Fix",
+        "hint": "Fix spelling and grammar in the selection"
+      },
+      "shorter": {
+        "label": "Shorter",
+        "hint": "Condense the selection"
+      },
+      "longer": {
+        "label": "Longer",
+        "hint": "Expand the selection"
+      },
+      "translate": {
+        "label": "Translate",
+        "hint": "Translate the selection into another language"
+      },
+      "explain": {
+        "label": "Explain",
+        "hint": "Explain the selection without changing it"
+      },
+      "matchStyle": {
+        "label": "Match style",
+        "hint": "Adapt the selection to the document's style"
+      },
+      "summarize": {
+        "label": "Summarize",
+        "hint": "Summarize the whole document"
+      },
+      "continue": {
+        "label": "Continue writing",
+        "hint": "Write on from the cursor"
+      },
+      "extractTasks": {
+        "label": "Extract tasks",
+        "hint": "Suggest tasks from the document"
+      },
+      "proofread": {
+        "label": "Proofread",
+        "hint": "Fix spelling across the whole document"
+      }
+    },
+    "prompts": {
+      "improve": "Improve the writing of the selected text: clearer and smoother, same meaning and language.",
+      "fix": "Fix the spelling and grammar of the selected text without changing its style.",
+      "shorter": "Make the selected text shorter, keeping the key ideas.",
+      "longer": "Expand the selected text with useful detail and context, in the same style.",
+      "translate": "Translate the selected text into {{language}}.",
+      "explain": "Explain the selected text in simple terms.",
+      "matchStyle": "Adapt the selected text to the writing style of the rest of the document (tone, vocabulary and sentence structure), without changing its meaning.",
+      "summarize": "Summarize this document clearly and concisely.",
+      "continue": "Continue writing from where my cursor is, following the document's tone and structure.",
+      "extractTasks": "Extract the actionable tasks from this document and suggest them as Focusly tasks.",
+      "proofread": "Proofread the whole document for spelling and grammar and fix the mistakes without changing the style."
+    },
+    "quote": {
+      "selection": "Selection",
+      "cursor": "Before the cursor"
+    },
+    "status": {
+      "thinking": "Thinking…",
+      "preparingEdit": "Preparing the changes to your document…",
+      "preparingTasks": "Preparing tasks…",
+      "editProposed": "Proposed changes to the document",
+      "stopped": "Response stopped.",
+      "error": "The response couldn't be completed."
+    },
+    "fragment": {
+      "docChanged": "The document changed while Lumina was writing. Insert the text wherever you like:",
+      "editChanged": "The document changed since you asked. Review the change against the current version:"
+    },
+    "message": {
+      "copy": "Copy",
+      "insertAtCursor": "Insert at cursor",
+      "replaceSelection": "Replace selection",
+      "retry": "Retry",
+      "stop": "Stop",
+      "reviewEdit": "Review changes"
+    },
+    "diff": {
+      "review": "Review the changes in the document: struck-through text is removed and underlined text is added.",
+      "accept": "Accept",
+      "discard": "Discard",
+      "applied": "Changes applied to your document",
+      "discarded": "Changes discarded"
+    },
+    "selection": {
+      "attached": "Selection: “{{text}}”",
+      "detached": "The selection won't be sent",
+      "detach": "Don't send the selection",
+      "attach": "Use"
+    },
+    "input": {
+      "placeholder": "Ask Lumina about this document…",
+      "placeholderSelection": "What should I do with the selected text?",
+      "send": "Send"
+    },
+    "disclaimer": "Lumina can make mistakes. Review changes before accepting them.",
+    "toasts": {
+      "inserted": "Added to your document",
+      "copied": "Copied"
+    },
+    "errors": {
+      "title": "Lumina couldn't respond",
+      "retry": "Try again in a moment.",
+      "copy": "Couldn't copy"
+    },
+    "launcherWriting": "Lumina is writing…",
+    "launcherReady": "Reply ready",
+    "backgroundHint": "You can leave the editor: Lumina keeps working in the background.",
+    "history": {
+      "title": "Chats in this document",
+      "open": "View chats",
+      "back": "Back to chat",
+      "empty": "No chats in this document yet.",
+      "untitled": "Untitled chat",
+      "active": "Open",
+      "delete": "Delete chat",
+      "confirmDelete": "Delete?",
+      "yes": "Yes",
+      "no": "No",
+      "loadError": "Couldn't load the chats.",
+      "deleteError": "Couldn't delete the chat."
+    },
+    "background": {
+      "writing": "Lumina is writing",
+      "done": "Lumina finished",
+      "in": "In “{{title}}”",
+      "open": "Open “{{title}}”",
+      "dismiss": "Dismiss"
+    }
+  },
   "insightsHeader": {
     "title": "{{period}} Insights",
     "periods": {

@@ -258,6 +258,7 @@ export const executeSingleAction = async (
           status: 'Backlog',
           use_ai: true,
           subtasks: formattedSubtasks,
+          workspace_id: action.payload.workspace_id || undefined,
           // The user picked this exact day on purpose (a day-by-day plan,
           // including deliberate weekend days) — never let the
           // auto-scheduler move it. skip_scheduling only protects THIS

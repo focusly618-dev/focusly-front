@@ -244,6 +244,158 @@
       "deleteDesc": "アカウント、タスク、ドキュメント、プロジェクト、Lumina との会話を完全に削除します。元に戻せません。"
     }
   },
+  "editorAI": {
+    "launcher": "Lumina に質問",
+    "conversationTitle": "📝 {{title}}",
+    "untitled": "無題のドキュメント",
+    "header": {
+      "title": "Lumina",
+      "subtitle": "「{{title}}」について",
+      "newChat": "新しい会話",
+      "minimize": "最小化"
+    },
+    "empty": {
+      "title": "このドキュメントで何をお手伝いしましょうか？",
+      "description": "ノートについて何でも質問するか、クイックアクションを使ってください。テキストを選択すると、その部分へのアクションが表示されます。",
+      "withSelection": "テキストが選択されています。アクションを選ぶか、どうしたいか入力してください。"
+    },
+    "actions": {
+      "label": "クイックアクション",
+      "improve": {
+        "label": "文章を改善",
+        "hint": "選択部分をより明確で自然に書き直します"
+      },
+      "fix": {
+        "label": "修正",
+        "hint": "選択部分のスペルと文法を直します"
+      },
+      "shorter": {
+        "label": "短くする",
+        "hint": "選択部分を要約します"
+      },
+      "longer": {
+        "label": "長くする",
+        "hint": "選択部分を膨らませます"
+      },
+      "translate": {
+        "label": "翻訳",
+        "hint": "選択部分を別の言語に翻訳します"
+      },
+      "explain": {
+        "label": "説明",
+        "hint": "選択部分を変更せずに説明します"
+      },
+      "matchStyle": {
+        "label": "文体を合わせる",
+        "hint": "選択部分をドキュメントの文体に合わせます"
+      },
+      "summarize": {
+        "label": "要約",
+        "hint": "ドキュメント全体を要約します"
+      },
+      "continue": {
+        "label": "続きを書く",
+        "hint": "カーソル位置から書き進めます"
+      },
+      "extractTasks": {
+        "label": "タスクを抽出",
+        "hint": "ドキュメントからタスクを提案します"
+      },
+      "proofread": {
+        "label": "校正",
+        "hint": "ドキュメント全体のスペルを直します"
+      }
+    },
+    "prompts": {
+      "improve": "選択したテキストの文章を、意味と言語はそのままに、より明確で自然になるよう改善してください。",
+      "fix": "選択したテキストのスペルと文法を、文体を変えずに修正してください。",
+      "shorter": "選択したテキストを、要点を残して短くしてください。",
+      "longer": "選択したテキストを、同じ文体で有用な詳細や背景を加えて膨らませてください。",
+      "translate": "選択したテキストを{{language}}に翻訳してください。",
+      "explain": "選択したテキストをわかりやすく説明してください。",
+      "matchStyle": "選択したテキストを、意味を変えずに、ドキュメントの他の部分の文体（トーン、語彙、文の組み立て方）に合わせてください。",
+      "summarize": "このドキュメントを明確かつ簡潔に要約してください。",
+      "continue": "ドキュメントのトーンと構成に沿って、カーソルの位置から続きを書いてください。",
+      "extractTasks": "このドキュメントから実行可能なタスクを抽出し、Focusly のタスクとして提案してください。",
+      "proofread": "ドキュメント全体のスペルと文法を確認し、文体を変えずに誤りを修正してください。"
+    },
+    "quote": {
+      "selection": "選択範囲",
+      "cursor": "カーソルの前"
+    },
+    "status": {
+      "thinking": "考え中…",
+      "preparingEdit": "ドキュメントの変更を準備しています…",
+      "preparingTasks": "タスクを準備しています…",
+      "editProposed": "ドキュメントへの変更を提案しました",
+      "stopped": "応答を停止しました。",
+      "error": "応答を完了できませんでした。"
+    },
+    "fragment": {
+      "docChanged": "Lumina が書いている間にドキュメントが変更されました。好きな場所にテキストを挿入してください：",
+      "editChanged": "依頼後にドキュメントが変更されました。現在の版と比べて確認してください："
+    },
+    "message": {
+      "copy": "コピー",
+      "insertAtCursor": "カーソル位置に挿入",
+      "replaceSelection": "選択範囲を置き換え",
+      "retry": "再試行",
+      "stop": "停止",
+      "reviewEdit": "変更を確認"
+    },
+    "diff": {
+      "review": "ドキュメントの変更を確認してください。取り消し線の部分は削除され、下線の部分が追加されます。",
+      "accept": "適用",
+      "discard": "破棄",
+      "applied": "ドキュメントに変更を適用しました",
+      "discarded": "変更を破棄しました"
+    },
+    "selection": {
+      "attached": "選択範囲：「{{text}}」",
+      "detached": "選択範囲は送信されません",
+      "detach": "選択範囲を送信しない",
+      "attach": "使う"
+    },
+    "input": {
+      "placeholder": "このドキュメントについて Lumina に質問…",
+      "placeholderSelection": "選択したテキストをどうしますか？",
+      "send": "送信"
+    },
+    "disclaimer": "Lumina は間違えることがあります。適用する前に変更を確認してください。",
+    "toasts": {
+      "inserted": "ドキュメントに追加しました",
+      "copied": "コピーしました"
+    },
+    "errors": {
+      "title": "Lumina が応答できませんでした",
+      "retry": "しばらくしてからもう一度お試しください。",
+      "copy": "コピーできませんでした"
+    },
+    "launcherWriting": "Lumina が書いています…",
+    "launcherReady": "回答の準備ができました",
+    "backgroundHint": "エディターを離れても大丈夫です。Lumina はバックグラウンドで作業を続けます。",
+    "history": {
+      "title": "このドキュメントのチャット",
+      "open": "チャット一覧",
+      "back": "チャットに戻る",
+      "empty": "このドキュメントにはまだチャットがありません。",
+      "untitled": "無題のチャット",
+      "active": "表示中",
+      "delete": "チャットを削除",
+      "confirmDelete": "削除しますか？",
+      "yes": "はい",
+      "no": "いいえ",
+      "loadError": "チャットを読み込めませんでした。",
+      "deleteError": "チャットを削除できませんでした。"
+    },
+    "background": {
+      "writing": "Lumina が書いています",
+      "done": "Lumina が完了しました",
+      "in": "「{{title}}」",
+      "open": "「{{title}}」を開く",
+      "dismiss": "閉じる"
+    }
+  },
   "insightsHeader": {
     "title": "{{period}}のインサイト",
     "periods": {

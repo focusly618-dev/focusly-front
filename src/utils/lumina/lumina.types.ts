@@ -12,6 +12,8 @@ export interface LuminaActionPayload {
   estimated_start_date?: string;
   estimated_end_date?: string;
   groupId?: string;
+  /** CREATE_TASK from the editor: the document the task gets linked to. */
+  workspace_id?: string;
   content?: string;
   markdown?: string;
   content_encrypted?: string;
