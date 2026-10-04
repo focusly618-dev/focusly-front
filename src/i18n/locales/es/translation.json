@@ -908,6 +908,7 @@
     "andMore": "y {{count}} más"
   },
   "projectTasks": {
+    "attendees": "Invitados: {{names}}",
     "empty": {
       "title": "Aún no hay tareas en tus proyectos",
       "description": "Crea tareas dentro de un proyecto para verlas aquí agrupadas por estado.",
@@ -942,7 +943,7 @@
     "toggleSubtasks": "Mostrar u ocultar subtareas",
     "linkedDocument": "Documento vinculado",
     "addTo": "Añadir tarea a {{status}}",
-    "quickAddPlaceholder": "Nueva tarea en {{status}} (Enter para guardar, Esc para cancelar)",
+    "quickAddPlaceholder": "Nueva tarea en {{status}} (Enter para añadir otra, Esc para cerrar)",
     "allProjects": "Todos los proyectos",
     "showEmptyStatuses": "Mostrar estados vacíos",
     "columns": {
@@ -1275,6 +1276,17 @@
       "warning": "Se eliminará junto con sus subtareas y no se puede deshacer."
     },
     "createProjectTaskModal": {
+      "noEstimate": "Sin estimación",
+      "selectProject": "Elegir proyecto",
+      "toast": {
+        "titleRequired": "Falta el título",
+        "titleRequiredDesc": "Escribe un título para la tarea.",
+        "taskUpdated": "Tarea actualizada",
+        "workspaceTitleRequired": "Falta el título",
+        "workspaceTitleRequiredDesc": "Escribe un título para el workspace.",
+        "workspaceLinked": "Workspace creado y vinculado",
+        "workspaceCreateFailed": "No se pudo crear el workspace. Inténtalo de nuevo."
+      },
       "titlePlaceholder": "Título de la tarea...",
       "status": "Estado",
       "priority": "Prioridad",

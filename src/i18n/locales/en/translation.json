@@ -908,6 +908,7 @@
     "andMore": "and {{count}} more"
   },
   "projectTasks": {
+    "attendees": "Invited: {{names}}",
     "empty": {
       "title": "No tasks in your projects yet",
       "description": "Create tasks inside a project to see them here, grouped by status.",
@@ -942,7 +943,7 @@
     "toggleSubtasks": "Show or hide subtasks",
     "linkedDocument": "Linked document",
     "addTo": "Add task to {{status}}",
-    "quickAddPlaceholder": "New task in {{status}} (Enter to save, Esc to cancel)",
+    "quickAddPlaceholder": "New task in {{status}} (Enter to add another, Esc to close)",
     "allProjects": "All projects",
     "showEmptyStatuses": "Show empty statuses",
     "columns": {
@@ -1275,6 +1276,17 @@
       "warning": "It will be deleted along with its subtasks and cannot be undone."
     },
     "createProjectTaskModal": {
+      "noEstimate": "No estimate",
+      "selectProject": "Choose project",
+      "toast": {
+        "titleRequired": "Title required",
+        "titleRequiredDesc": "Enter a title for the task.",
+        "taskUpdated": "Task updated",
+        "workspaceTitleRequired": "Title required",
+        "workspaceTitleRequiredDesc": "Enter a title for the workspace.",
+        "workspaceLinked": "Workspace created and linked",
+        "workspaceCreateFailed": "Couldn't create the workspace. Try again."
+      },
       "titlePlaceholder": "Task title...",
       "status": "Status",
       "priority": "Priority",

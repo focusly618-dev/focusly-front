@@ -10,7 +10,7 @@ import {
 } from '@mui/icons-material';
 import { EmptyState } from '@/components/ui';
 import { useMultiSelect } from '../../hooks/useMultiSelect.hook';
-import { SelectionToolbar } from '../SelectionToolbar';
+import { SelectButton, SelectionToolbar } from '../SelectionToolbar';
 import { ConfirmDeleteDialog } from '../../modals/ConfirmDeleteDialog/ConfirmDeleteDialog';
 import type { ProjectOption } from '../CreateProjectTaskModal/CreateProjectTaskModal.types';
 import { ProjectTasksByStatus } from './ProjectTasksByStatus';
@@ -134,6 +134,11 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
       showEmptyStatuses={view.showEmptyStatuses}
       onShowEmptyStatusesChange={view.setShowEmptyStatuses}
       projects={isAllProjects ? projects : undefined}
+      selectAction={
+        tasks.length > 0 && !selection.state.isSelecting ? (
+          <SelectButton onStart={selection.actions.startSelecting} />
+        ) : undefined
+      }
     />
   );
 
@@ -177,41 +182,42 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
     <Box>
       {toolbar}
 
-      <Box sx={{ mb: 1.5 }}>
-        <SelectionToolbar
-          isSelecting={selection.state.isSelecting}
-          selectedCount={selection.state.selectedCount}
-          allSelected={selection.actions.areAllSelected(shown)}
-          hasItems={shown.length > 0}
-          onStart={selection.actions.startSelecting}
-          onCancel={selection.actions.stopSelecting}
-          onToggleAll={() => selection.actions.toggleAll(shown)}
-          onDelete={() => setConfirmDelete(true)}
-        >
-          <Button
-            size="small"
-            disabled={!selected.length}
-            startIcon={<CompleteIcon sx={{ fontSize: 18 }} />}
-            onClick={async () => {
-              await projectTasks.setProjectTasksStatus(selected, 'completed');
-              selection.actions.stopSelecting();
-            }}
-            sx={{ textTransform: 'none', fontWeight: 600, color: '#008767' }}
+      {selection.state.isSelecting && (
+        <Box sx={{ mb: 1.5 }}>
+          <SelectionToolbar
+            isSelecting
+            selectedCount={selection.state.selectedCount}
+            allSelected={selection.actions.areAllSelected(shown)}
+            hasItems={shown.length > 0}
+            onCancel={selection.actions.stopSelecting}
+            onToggleAll={() => selection.actions.toggleAll(shown)}
+            onDelete={() => setConfirmDelete(true)}
           >
-            {t('projectTasks.bulk.complete')}
-          </Button>
-          <Button
-            size="small"
-            disabled={!selected.length}
-            startIcon={<MoveIcon sx={{ fontSize: 18 }} />}
-            onClick={(e) => setMoveAnchor(e.currentTarget)}
-            aria-haspopup="menu"
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          >
-            {t('projectTasks.bulk.move')}
-          </Button>
-        </SelectionToolbar>
-      </Box>
+            <Button
+              size="small"
+              disabled={!selected.length}
+              startIcon={<CompleteIcon sx={{ fontSize: 18 }} />}
+              onClick={async () => {
+                await projectTasks.setProjectTasksStatus(selected, 'completed');
+                selection.actions.stopSelecting();
+              }}
+              sx={{ textTransform: 'none', fontWeight: 600, color: '#008767' }}
+            >
+              {t('projectTasks.bulk.complete')}
+            </Button>
+            <Button
+              size="small"
+              disabled={!selected.length}
+              startIcon={<MoveIcon sx={{ fontSize: 18 }} />}
+              onClick={(e) => setMoveAnchor(e.currentTarget)}
+              aria-haspopup="menu"
+              sx={{ textTransform: 'none', fontWeight: 600 }}
+            >
+              {t('projectTasks.bulk.move')}
+            </Button>
+          </SelectionToolbar>
+        </Box>
+      )}
 
       {shown.length === 0 ? (
         <EmptyState

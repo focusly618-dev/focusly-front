@@ -174,19 +174,24 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
         }),
       );
 
-      const collaborator = t.collaborators?.[0];
-      const assignee = collaborator
-        ? {
-            name: collaborator.name || 'User',
-            initials: (collaborator.name || 'U')
-              .split(' ')
+      // Collaborators are the invitees of the task's calendar event; they
+      // used to be shown as if the first one were the task's assignee.
+      const attendees = (t.collaborators || [])
+        .map((c: { name?: string; email?: string; avatar?: string }) => {
+          const name = c.name || c.email || '';
+          return {
+            name,
+            initials: name
+              .split(/[\s@.]+/)
+              .filter(Boolean)
               .map((w: string) => w[0])
               .join('')
               .toUpperCase()
               .slice(0, 2),
-            avatarUrl: collaborator.avatar,
-          }
-        : undefined;
+            avatarUrl: c.avatar,
+          };
+        })
+        .filter((a: { name: string }) => a.name);
 
       const project = t.project
         ? {
@@ -215,7 +220,7 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
         dueDateHighlight,
         completed: isCompleted,
         subtasks,
-        assignee,
+        attendees,
         project,
         projectId: t.project_id || t.project?.id,
         workspaceId: t.workspace_id || t.workspace?.id,

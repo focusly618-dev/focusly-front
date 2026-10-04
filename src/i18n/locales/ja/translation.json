@@ -884,6 +884,7 @@
     "andMore": "他 {{count}} 件"
   },
   "projectTasks": {
+    "attendees": "招待者: {{names}}",
     "empty": {
       "title": "プロジェクトにタスクはまだありません",
       "description": "プロジェクト内でタスクを作成すると、ここにステータス別に表示されます。",
@@ -918,7 +919,7 @@
     "toggleSubtasks": "サブタスクの表示を切り替え",
     "linkedDocument": "リンクされたドキュメント",
     "addTo": "{{status}} にタスクを追加",
-    "quickAddPlaceholder": "{{status}} に新しいタスク（Enter で保存、Esc で取消）",
+    "quickAddPlaceholder": "{{status}} に新しいタスク（Enter で続けて追加、Esc で閉じる）",
     "allProjects": "すべてのプロジェクト",
     "showEmptyStatuses": "空のステータスを表示",
     "columns": {
@@ -1244,6 +1245,17 @@
       "warning": "サブタスクも一緒に削除され、元に戻せません。"
     },
     "createProjectTaskModal": {
+      "noEstimate": "見積もりなし",
+      "selectProject": "プロジェクトを選択",
+      "toast": {
+        "titleRequired": "タイトルが必要です",
+        "titleRequiredDesc": "タスクのタイトルを入力してください。",
+        "taskUpdated": "タスクを更新しました",
+        "workspaceTitleRequired": "タイトルが必要です",
+        "workspaceTitleRequiredDesc": "ワークスペースのタイトルを入力してください。",
+        "workspaceLinked": "ワークスペースを作成してリンクしました",
+        "workspaceCreateFailed": "ワークスペースを作成できませんでした。もう一度お試しください。"
+      },
       "titlePlaceholder": "タスク名...",
       "status": "ステータス",
       "priority": "優先度",

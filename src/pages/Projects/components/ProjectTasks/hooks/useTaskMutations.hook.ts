@@ -1,4 +1,4 @@
-import { useApolloClient, useMutation } from '@apollo/client';
+import { useApolloClient, useMutation, type ApolloCache } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import {
@@ -137,6 +137,23 @@ export const useTaskMutations = () => {
   const [createTaskMutation, { loading: creating }] = useMutation(CREATE_TASK);
   const [updateTaskMutation, { loading: updating }] = useMutation(UPDATE_TASK);
   const [deleteTaskMutation, { loading: deleting }] = useMutation(DELETE_TASK);
+  const client = useApolloClient();
+
+  // Shows a change on screen before the server answers. The optimistic layer
+  // is dropped once the request settles: the server's data takes over, or the
+  // change disappears if the request failed.
+  const withOptimisticChange = async <T>(
+    apply: (cache: ApolloCache<unknown>) => void,
+    run: () => Promise<T>,
+  ) => {
+    const layerId = `project-task-${generateSubtaskId()}`;
+    client.cache.recordOptimisticTransaction(apply, layerId);
+    try {
+      return await run();
+    } finally {
+      client.cache.removeOptimistic(layerId);
+    }
+  };
 
   const getRefetchQueries = () => {
     if (!user?.id) return [];
@@ -246,10 +263,13 @@ export const useTaskMutations = () => {
       if (input.priority !== undefined)
         updateTaskInput.priority_level = mapPriorityToBackend(input.priority);
       if (input.duration !== undefined) {
+        // An empty estimate removes it (null); the backend keeps it otherwise.
         updateTaskInput.estimate_timer =
           typeof input.duration === 'number'
             ? input.duration
-            : parseDuration(input.duration);
+            : input.duration
+              ? parseDuration(input.duration)
+              : null;
       }
       if (input.dueDate !== undefined) {
         // An empty date removes it: the backend treats null as "no date".
@@ -304,7 +324,15 @@ export const useTaskMutations = () => {
   const setProjectTaskStatus = (
     task: ProjectTaskItemData,
     status: ProjectTaskStatusId,
-  ) => updateProjectTask({ id: task.id, status });
+  ) =>
+    withOptimisticChange(
+      (cache) =>
+        cache.modify({
+          id: cache.identify({ __typename: 'Task', id: task.id }),
+          fields: { status: () => mapStatusToBackend(status) },
+        }),
+      () => updateProjectTask({ id: task.id, status }),
+    );
 
   const toggleProjectTaskComplete = async (task: ProjectTaskItemData) => {
     const isCurrentlyDone =
@@ -353,28 +381,38 @@ export const useTaskMutations = () => {
 
     // The backend replaces the whole list, so every subtask has to go back
     // with its estimate and completion date or they get erased.
-    return updateProjectTask({
-      id: taskId,
-      subtasks: currentSubtasks.map((s) => {
-        if (s.id !== subtaskId) {
+    const run = () =>
+      updateProjectTask({
+        id: taskId,
+        subtasks: currentSubtasks.map((s) => {
+          if (s.id !== subtaskId) {
+            return {
+              id: s.id,
+              title: s.title,
+              completed: s.completed,
+              completed_at: s.completedAt ?? null,
+              estimate_timer: s.estimateTimer ?? null,
+            };
+          }
+          const completed = !s.completed;
           return {
             id: s.id,
             title: s.title,
-            completed: s.completed,
-            completed_at: s.completedAt ?? null,
+            completed,
+            completed_at: completed ? new Date().toISOString() : null,
             estimate_timer: s.estimateTimer ?? null,
           };
-        }
-        const completed = !s.completed;
-        return {
-          id: s.id,
-          title: s.title,
-          completed,
-          completed_at: completed ? new Date().toISOString() : null,
-          estimate_timer: s.estimateTimer ?? null,
-        };
-      }),
-    });
+        }),
+      });
+
+    return withOptimisticChange(
+      (cache) =>
+        cache.modify({
+          id: cache.identify({ __typename: 'Subtask', id: subtaskId }),
+          fields: { completed: (value: boolean) => !value },
+        }),
+      run,
+    );
   };
 
   const addProjectSubtask = async (
@@ -405,8 +443,6 @@ export const useTaskMutations = () => {
       ],
     });
   };
-
-  const client = useApolloClient();
 
   const removeTaskById = async (taskId: string) => {
     await deleteTaskMutation({ variables: { id: taskId } });

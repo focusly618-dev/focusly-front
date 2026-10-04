@@ -1,4 +1,5 @@
 import type { ProjectGroupTypes } from '@/pages/Workspace/workspace.types';
+import type { MultiSelect } from '@/pages/Projects/hooks/useMultiSelect.hook';
 
 export interface ProjectFoldersGridProps {
   groups: ProjectGroupTypes[];
@@ -17,4 +18,6 @@ export interface ProjectFoldersGridProps {
   ) => Promise<unknown> | void;
   onDeleteFolders: (ids: string[]) => Promise<unknown> | void;
   folderSearchTerm?: string;
+  /** Owned by the page, whose filters row has the "Select" button. */
+  selection: MultiSelect<ProjectGroupTypes>;
 }

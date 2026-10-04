@@ -345,7 +345,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     letterSpacing: '0.06em',
                   }}
                 >
-                  Select Project
+                  {t('tasks.createProjectTaskModal.selectProject')}
                 </Typography>
                 {projects && projects.length > 0 && (
                   <Typography
@@ -1062,6 +1062,21 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                   },
                 }}
               >
+                <MenuItem
+                  onClick={() => {
+                    setEstimatedDuration('');
+                    setDurationMenuAnchor(null);
+                  }}
+                  selected={!estimatedDuration}
+                  sx={{
+                    fontSize: '13px',
+                    py: 0.7,
+                    borderRadius: '6px',
+                    color: secondaryText,
+                  }}
+                >
+                  {t('tasks.createProjectTaskModal.noEstimate')}
+                </MenuItem>
                 {DURATION_OPTIONS.map((dur) => (
                   <MenuItem
                     key={dur}

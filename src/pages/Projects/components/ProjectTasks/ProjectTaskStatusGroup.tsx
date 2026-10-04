@@ -65,8 +65,8 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
     if (e.key === 'Enter' && newTaskTitle.trim()) {
       e.preventDefault();
       onAddTask?.(status.id, newTaskTitle.trim());
+      // Stays open for the next one; Esc or leaving it empty closes it.
       setNewTaskTitle('');
-      setIsAddingTask(false);
     } else if (e.key === 'Escape') {
       setIsAddingTask(false);
       setNewTaskTitle('');

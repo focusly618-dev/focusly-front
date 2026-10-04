@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Avatar,
+  AvatarGroup,
   Box,
   Checkbox,
   Collapse,
@@ -461,21 +462,39 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
             gap: 0.5,
           }}
         >
-          {task.assignee && (
-            <Tooltip title={task.assignee.name}>
-              <Avatar
-                src={task.assignee.avatarUrl}
+          {task.attendees && task.attendees.length > 0 && (
+            <Tooltip
+              title={t('projectTasks.attendees', {
+                names: task.attendees.map((a) => a.name).join(', '),
+              })}
+            >
+              <AvatarGroup
+                max={3}
+                aria-label={t('projectTasks.attendees', {
+                  names: task.attendees.map((a) => a.name).join(', '),
+                })}
                 sx={{
-                  width: 22,
-                  height: 22,
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  bgcolor: task.assignee.color || '#0d9488',
-                  color: '#ffffff',
+                  '& .MuiAvatar-root': {
+                    width: 22,
+                    height: 22,
+                    fontSize: '10px',
+                    fontWeight: 700,
+                  },
                 }}
               >
-                {task.assignee.initials}
-              </Avatar>
+                {task.attendees.map((attendee) => (
+                  <Avatar
+                    key={attendee.name}
+                    src={attendee.avatarUrl}
+                    sx={{
+                      bgcolor: attendee.color || '#0d9488',
+                      color: '#ffffff',
+                    }}
+                  >
+                    {attendee.initials}
+                  </Avatar>
+                ))}
+              </AvatarGroup>
             </Tooltip>
           )}
           {!selectionMode && onChangeStatus && (

@@ -43,6 +43,8 @@ export interface ProjectTasksToolbarProps {
   onShowEmptyStatusesChange: (value: boolean) => void;
   /** Given in the all-projects view: lets the user narrow to one. */
   projects?: ProjectOption[];
+  /** The "Select" button, at the end of the filters row. */
+  selectAction?: React.ReactNode;
 }
 
 /** Progress, quick filters and ordering for the project tasks view. */
@@ -57,6 +59,7 @@ export const ProjectTasksToolbar: React.FC<ProjectTasksToolbarProps> = ({
   showEmptyStatuses,
   onShowEmptyStatusesChange,
   projects,
+  selectAction,
 }) => {
   const { t } = useTranslation();
   const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
@@ -318,6 +321,7 @@ export const ProjectTasksToolbar: React.FC<ProjectTasksToolbarProps> = ({
         >
           {t(`projectTasks.sort.${sort}`)}
         </Button>
+        {selectAction}
         <Menu
           anchorEl={sortAnchor}
           open={Boolean(sortAnchor)}

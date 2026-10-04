@@ -57,3 +57,7 @@ export const useMultiSelect = <T extends { id: string }>() => {
     },
   };
 };
+
+export type MultiSelect<T extends { id: string }> = ReturnType<
+  typeof useMultiSelect<T>
+>;

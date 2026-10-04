@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { ProjectGroupTypes } from '@/pages/Workspace/workspace.types';
-import { useMultiSelect } from '@/pages/Projects/hooks/useMultiSelect.hook';
 
 export const useProjectFoldersGrid = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -9,7 +8,6 @@ export const useProjectFoldersGrid = () => {
     null,
   );
   const [groupsToDelete, setGroupsToDelete] = useState<ProjectGroupTypes[]>([]);
-  const selection = useMultiSelect<ProjectGroupTypes>();
 
   const openCreate = () => setIsCreateOpen(true);
   const closeCreate = () => setIsCreateOpen(false);
@@ -35,7 +33,6 @@ export const useProjectFoldersGrid = () => {
       isDeleteOpen: groupsToDelete.length > 0,
       selectedGroup,
       groupsToDelete,
-      selection: selection.state,
     },
     actions: {
       openCreate,
@@ -44,7 +41,6 @@ export const useProjectFoldersGrid = () => {
       closeCustomize,
       openDelete,
       closeDelete,
-      selection: selection.actions,
     },
   };
 };

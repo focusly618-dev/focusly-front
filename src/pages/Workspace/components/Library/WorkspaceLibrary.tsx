@@ -54,7 +54,10 @@ import {
 } from '@/pages/Projects/components/ProjectTasks';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { CreateProjectTaskModal } from '@/pages/Projects/components/CreateProjectTaskModal';
-import { SelectionToolbar } from '@/pages/Projects/components/SelectionToolbar';
+import {
+  SelectButton,
+  SelectionToolbar,
+} from '@/pages/Projects/components/SelectionToolbar';
 import {
   CreateFolderModal,
   DeleteWorkspacesModal,
@@ -131,6 +134,7 @@ export const WorkspaceLibrary = ({
 
   // ── Workspace Selection & Deletion ──
   const workspaceSelection = useMultiSelect<WorkspaceTypes>();
+  const folderSelection = useMultiSelect<ProjectGroupTypes>();
   const [workspacesToDelete, setWorkspacesToDelete] = useState<
     WorkspaceTypes[]
   >([]);
@@ -138,6 +142,7 @@ export const WorkspaceLibrary = ({
   if (selectedGroupId !== prevGroupId) {
     setPrevGroupId(selectedGroupId);
     workspaceSelection.actions.stopSelecting();
+    folderSelection.actions.stopSelecting();
   }
 
   const handleConfirmDeleteWorkspaces = async (ids: string[]) => {
@@ -349,7 +354,27 @@ export const WorkspaceLibrary = ({
         onCreateTask={() => openNewTask()}
         folderView={folderView}
         projectTab={projectTab}
-        onProjectTabChange={(tab: ProjectTab) => dispatch(setProjectTab(tab))}
+        onProjectTabChange={(tab: ProjectTab) => {
+          folderSelection.actions.stopSelecting();
+          dispatch(setProjectTab(tab));
+        }}
+        selectAction={
+          isInsideFolder
+            ? folderView === 'documents' &&
+              notes.data.notes.length > 0 &&
+              !workspaceSelection.state.isSelecting && (
+                <SelectButton
+                  onStart={workspaceSelection.actions.startSelecting}
+                />
+              )
+            : projectTab === 'projects' &&
+              folders.data.groups.length > 0 &&
+              !folderSelection.state.isSelecting && (
+                <SelectButton
+                  onStart={folderSelection.actions.startSelecting}
+                />
+              )
+        }
       />
 
       {/* ── Content View ── */}
@@ -369,6 +394,7 @@ export const WorkspaceLibrary = ({
             onUpdateFolder={folders.actions.updateFolder}
             onDeleteFolders={folders.actions.deleteFolders}
             folderSearchTerm={folders.state.folderSearchTerm}
+            selection={folderSelection}
           />
         )
       ) : (
@@ -404,28 +430,25 @@ export const WorkspaceLibrary = ({
                 </Typography>
               )}
 
-              {!notes.state.error &&
-                (notes.data.notes.length > 0 ||
-                  workspaceSelection.state.isSelecting) && (
-                  <SelectionToolbar
-                    isSelecting={workspaceSelection.state.isSelecting}
-                    selectedCount={workspaceSelection.state.selectedCount}
-                    allSelected={workspaceSelection.actions.areAllSelected(
-                      notes.data.notes,
-                    )}
-                    hasItems={notes.data.notes.length > 0}
-                    onStart={workspaceSelection.actions.startSelecting}
-                    onCancel={workspaceSelection.actions.stopSelecting}
-                    onToggleAll={() =>
-                      workspaceSelection.actions.toggleAll(notes.data.notes)
-                    }
-                    onDelete={() =>
-                      setWorkspacesToDelete(
-                        workspaceSelection.state.selectedItems,
-                      )
-                    }
-                  />
-                )}
+              {!notes.state.error && workspaceSelection.state.isSelecting && (
+                <SelectionToolbar
+                  isSelecting
+                  selectedCount={workspaceSelection.state.selectedCount}
+                  allSelected={workspaceSelection.actions.areAllSelected(
+                    notes.data.notes,
+                  )}
+                  hasItems={notes.data.notes.length > 0}
+                  onCancel={workspaceSelection.actions.stopSelecting}
+                  onToggleAll={() =>
+                    workspaceSelection.actions.toggleAll(notes.data.notes)
+                  }
+                  onDelete={() =>
+                    setWorkspacesToDelete(
+                      workspaceSelection.state.selectedItems,
+                    )
+                  }
+                />
+              )}
 
               {!notes.state.error && (
                 <GridContainer viewMode={viewMode}>

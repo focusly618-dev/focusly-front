@@ -31,8 +31,8 @@ export interface ProjectSubtaskItem {
   completedAt?: string | null;
 }
 
-export interface ProjectTaskAssignee {
-  id?: string;
+/** Someone invited to the task's calendar event (not an owner/assignee). */
+export interface ProjectTaskAttendee {
   name: string;
   initials: string;
   avatarUrl?: string;
@@ -55,7 +55,7 @@ export interface ProjectTaskItemData {
   duration?: string;
   dueDate?: string;
   dueDateHighlight?: DueDateHighlight;
-  assignee?: ProjectTaskAssignee;
+  attendees?: ProjectTaskAttendee[];
   subtasks?: ProjectSubtaskItem[];
   completed?: boolean;
   project?: ProjectInfo;

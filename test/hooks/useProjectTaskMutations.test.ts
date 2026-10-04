@@ -10,6 +10,9 @@ const mocks = vi.hoisted(() => ({
   dismiss: vi.fn(),
   refetchQueries: vi.fn(),
   evict: vi.fn(),
+  modify: vi.fn(),
+  recordOptimistic: vi.fn(),
+  removeOptimistic: vi.fn(),
 }));
 
 vi.mock('@apollo/client', async (importOriginal) => {
@@ -30,8 +33,28 @@ vi.mock('@apollo/client', async (importOriginal) => {
     useApolloClient: () => ({
       cache: {
         evict: mocks.evict,
-        identify: ({ id }: { id: string }) => `Task:${id}`,
+        identify: ({ __typename, id }: { __typename?: string; id: string }) =>
+          `${__typename ?? 'Task'}:${id}`,
         gc: vi.fn(),
+        modify: mocks.modify,
+        // Runs the transaction right away, like the real cache does.
+        recordOptimisticTransaction: (
+          transaction: (cache: unknown) => void,
+          id: string,
+        ) => {
+          mocks.recordOptimistic(id);
+          transaction({
+            identify: ({
+              __typename,
+              id: entityId,
+            }: {
+              __typename: string;
+              id: string;
+            }) => `${__typename}:${entityId}`,
+            modify: mocks.modify,
+          });
+        },
+        removeOptimistic: mocks.removeOptimistic,
       },
       refetchQueries: mocks.refetchQueries,
     }),
@@ -119,6 +142,53 @@ describe('useTaskMutations', () => {
 
     act(() => toast.button.onClick());
     expect(sentStatus(2)).toBe('Planning');
+  });
+
+  it('shows a new status before the server answers and drops it afterwards', async () => {
+    let answer: (value: unknown) => void = () => {};
+    mocks.update.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answer = resolve;
+      }),
+    );
+    const { result } = renderHook(() => useTaskMutations());
+
+    let pending: Promise<unknown> = Promise.resolve();
+    act(() => {
+      pending = result.current.setProjectTaskStatus(task, 'completed');
+    });
+
+    const change = mocks.modify.mock.calls[0][0];
+    expect(change.id).toBe('Task:t-1');
+    expect(change.fields.status()).toBe('Done');
+    expect(mocks.removeOptimistic).not.toHaveBeenCalled();
+
+    await act(async () => {
+      answer({ data: { updateTask: null } });
+      await pending;
+    });
+    expect(mocks.removeOptimistic).toHaveBeenCalledWith(
+      mocks.recordOptimistic.mock.calls[0][0],
+    );
+  });
+
+  it('drops the optimistic change when the server rejects it', async () => {
+    mocks.update.mockRejectedValueOnce(new Error('offline'));
+    const { result } = renderHook(() => useTaskMutations());
+
+    await act(async () => {
+      await expect(
+        result.current.toggleProjectSubtask('t-1', 's-2', [
+          { id: 's-1', title: 'Uno', completed: true },
+          { id: 's-2', title: 'Dos', completed: false },
+        ]),
+      ).rejects.toThrow('offline');
+    });
+
+    const change = mocks.modify.mock.calls[0][0];
+    expect(change.id).toBe('Subtask:s-2');
+    expect(change.fields.completed(false)).toBe(true);
+    expect(mocks.removeOptimistic).toHaveBeenCalledTimes(1);
   });
 
   it('deletes several tasks with one refetch and one toast', async () => {

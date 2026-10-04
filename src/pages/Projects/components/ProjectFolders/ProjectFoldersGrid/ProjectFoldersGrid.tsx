@@ -28,28 +28,27 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
   onUpdateFolder,
   onDeleteFolders,
   folderSearchTerm = '',
+  selection: { state: selection, actions: selectionActions },
 }) => {
   const { t } = useTranslation();
   const { state, actions } = useProjectFoldersGrid();
-  const { selection } = state;
 
   const handleConfirmDelete = async (ids: string[]) => {
     await onDeleteFolders(ids);
-    actions.selection.stopSelecting();
+    selectionActions.stopSelecting();
   };
 
   return (
     <GridWrapper>
-      {(groups.length > 0 || selection.isSelecting) && (
+      {selection.isSelecting && (
         <Box sx={{ mb: 2 }}>
           <SelectionToolbar
-            isSelecting={selection.isSelecting}
+            isSelecting
             selectedCount={selection.selectedCount}
-            allSelected={actions.selection.areAllSelected(groups)}
+            allSelected={selectionActions.areAllSelected(groups)}
             hasItems={groups.length > 0}
-            onStart={actions.selection.startSelecting}
-            onCancel={actions.selection.stopSelecting}
-            onToggleAll={() => actions.selection.toggleAll(groups)}
+            onCancel={selectionActions.stopSelecting}
+            onToggleAll={() => selectionActions.toggleAll(groups)}
             onDelete={() => actions.openDelete(selection.selectedItems)}
           />
         </Box>
@@ -91,8 +90,8 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
             onCustomize={actions.openCustomize}
             onDelete={actions.openDelete}
             selectionMode={selection.isSelecting}
-            selected={actions.selection.isSelected(group.id)}
-            onToggleSelect={actions.selection.toggle}
+            selected={selectionActions.isSelected(group.id)}
+            onToggleSelect={selectionActions.toggle}
           />
         ))}
       </FoldersGrid>

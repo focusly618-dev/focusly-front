@@ -6,12 +6,37 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
+/** Starts selecting; lives in a row with other controls, not on its own. */
+export const SelectButton: React.FC<{ onStart: () => void }> = ({
+  onStart,
+}) => {
+  const { t } = useTranslation();
+  return (
+    <Button
+      size="small"
+      startIcon={<CheckBoxOutlinedIcon sx={{ fontSize: 18 }} />}
+      onClick={onStart}
+      sx={{
+        textTransform: 'none',
+        fontWeight: 600,
+        fontSize: '13px',
+        color: 'text.secondary',
+        borderRadius: '8px',
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+        '&:hover': { color: '#008767' },
+      }}
+    >
+      {t('selection.select')}
+    </Button>
+  );
+};
+
 export interface SelectionToolbarProps {
   isSelecting: boolean;
   selectedCount: number;
   allSelected: boolean;
   hasItems: boolean;
-  onStart: () => void;
   onCancel: () => void;
   onToggleAll: () => void;
   onDelete: () => void;
@@ -24,7 +49,6 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
   selectedCount,
   allSelected,
   hasItems,
-  onStart,
   onCancel,
   onToggleAll,
   onDelete,
@@ -32,28 +56,8 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  if (!isSelecting) {
-    if (!hasItems) return null;
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          size="small"
-          startIcon={<CheckBoxOutlinedIcon sx={{ fontSize: 18 }} />}
-          onClick={onStart}
-          sx={{
-            textTransform: 'none',
-            fontWeight: 600,
-            fontSize: '13px',
-            color: 'text.secondary',
-            borderRadius: '8px',
-            '&:hover': { color: '#008767' },
-          }}
-        >
-          {t('selection.select')}
-        </Button>
-      </Box>
-    );
-  }
+  // Idle, only the small "Select" button shows, in the filters row above.
+  if (!isSelecting) return null;
 
   return (
     <Box

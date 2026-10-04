@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTheme, alpha } from '@mui/material';
 import { sileo, UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import { PRIORITY_OPTIONS, isCustomEmoji } from '@/components/ui';
@@ -84,7 +85,7 @@ export function useCreateProjectTaskModal({
   task,
   projects,
   selectedProjectId,
-  projectName = 'Select Project',
+  projectName,
   projectEmoji = '📁',
   linkedWorkspaceId,
   defaultStatus,
@@ -93,6 +94,7 @@ export function useCreateProjectTaskModal({
   onUpdate,
   onDelete,
 }: CreateProjectTaskModalProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const isEditing = Boolean(task);
@@ -118,7 +120,10 @@ export function useCreateProjectTaskModal({
       ? projects.find((p) => p.id === selectedProjectId)
       : projects?.[0]);
 
-  const currentProjectName = selectedProject?.name || projectName;
+  const currentProjectName =
+    selectedProject?.name ||
+    projectName ||
+    t('tasks.createProjectTaskModal.selectProject');
   const currentProjectColor = selectedProject?.color || '#3b82f6';
   const currentProjectEmoji =
     selectedProject?.emoji ||
@@ -176,8 +181,10 @@ export function useCreateProjectTaskModal({
     ).trim();
     if (!titleToUse) {
       sileo.warning({
-        title: 'Título requerido',
-        description: 'Por favor escribe un título para el workspace.',
+        title: t('tasks.createProjectTaskModal.toast.workspaceTitleRequired'),
+        description: t(
+          'tasks.createProjectTaskModal.toast.workspaceTitleRequiredDesc',
+        ),
         duration: 3000,
       });
       return;
@@ -205,8 +212,8 @@ export function useCreateProjectTaskModal({
         setWorkspaceMenuAnchor(null);
         await refetchWorkspaces();
         sileo.success({
-          title: 'Workspace creado y vinculado',
-          description: `"${newWs.title || titleToUse}"`,
+          title: t('tasks.createProjectTaskModal.toast.workspaceLinked'),
+          description: newWs.title || titleToUse,
           duration: 2500,
         });
         return newWs;
@@ -214,8 +221,7 @@ export function useCreateProjectTaskModal({
     } catch (err) {
       console.error('Error al crear workspace:', err);
       sileo.error({
-        title: 'Error',
-        description: 'No se pudo crear el workspace. Intenta de nuevo.',
+        title: t('tasks.createProjectTaskModal.toast.workspaceCreateFailed'),
         duration: 3000,
       });
     }
@@ -442,8 +448,8 @@ export function useCreateProjectTaskModal({
   const handleCreateTask = async () => {
     if (!title.trim()) {
       sileo.warning({
-        title: 'Title required',
-        description: 'Please enter a title for the task.',
+        title: t('tasks.createProjectTaskModal.toast.titleRequired'),
+        description: t('tasks.createProjectTaskModal.toast.titleRequiredDesc'),
         duration: 3000,
       });
       return;
@@ -463,8 +469,8 @@ export function useCreateProjectTaskModal({
           await onCreate({ ...changes, id: task.id });
         }
         sileo.success({
-          title: 'Task updated',
-          description: `"${title.trim()}" saved successfully.`,
+          title: t('tasks.createProjectTaskModal.toast.taskUpdated'),
+          description: title.trim(),
           duration: 2500,
         });
         onClose();
@@ -516,10 +522,9 @@ export function useCreateProjectTaskModal({
     if (priority !== initial.priority) {
       changes.priority = currentPriorityConfig.id;
     }
-    // An emptied date removes it. The backend can't clear an estimate, so
-    // only a new one is sent.
+    // An emptied date or estimate removes it.
     if (dueDate !== initial.dueDate) changes.dueDate = dueDate;
-    if (estimatedDuration && estimatedDuration !== initial.estimatedDuration) {
+    if (estimatedDuration !== initial.estimatedDuration) {
       changes.estimatedDuration = estimatedDuration;
     }
     if (!isSameList(modules, initial.modules)) changes.modules = modules;

@@ -149,7 +149,10 @@ describe('ProjectTasksView', () => {
 
   it('completes several tasks at once', async () => {
     render(<Harness />);
+    // Idle, only the Select button shows (in the filters row), no toolbar.
+    expect(screen.queryByText('selection.selectAll')).not.toBeInTheDocument();
     fireEvent.click(screen.getByText('selection.select'));
+    expect(screen.getByText('selection.selectAll')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('checkbox', { name: 'Comprar verduras' }));
     fireEvent.click(
       screen.getByRole('checkbox', { name: 'Escribir capítulo' }),

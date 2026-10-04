@@ -74,6 +74,8 @@ export interface WorkspaceLibraryHeaderProps {
   onProjectTabChange?: (tab: ProjectTab) => void;
   /** Inside a project: which of its views is open. */
   folderView?: 'documents' | 'tasks';
+  /** The "Select" button, at the end of the filters row. */
+  selectAction?: React.ReactNode;
 }
 
 // Quick sort options shown as chips under the title ("Filtrar por:").
@@ -137,6 +139,7 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
   projectTab,
   onProjectTabChange,
   folderView = 'documents',
+  selectAction,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -588,114 +591,126 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1.25,
+            gap: 1,
             mb: 3,
-            overflowX: 'auto',
-            py: 0.75,
-            '&::-webkit-scrollbar': { display: 'none' },
-            scrollbarWidth: 'none',
+            minWidth: 0,
           }}
         >
-          <Typography
-            variant="body2"
+          <Box
             sx={{
-              color: 'text.secondary',
-              fontSize: '13px',
-              fontWeight: 600,
-              mr: 0.5,
-              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.25,
+              flex: 1,
+              minWidth: 0,
+              overflowX: 'auto',
+              py: 0.75,
+              '&::-webkit-scrollbar': { display: 'none' },
+              scrollbarWidth: 'none',
             }}
           >
-            {t('projects.filterBy', 'Filtrar por:')}
-          </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '13px',
+                fontWeight: 600,
+                mr: 0.5,
+                flexShrink: 0,
+              }}
+            >
+              {t('projects.filterBy', 'Filtrar por:')}
+            </Typography>
 
-          {PROJECT_SORT_CHIPS.map(({ value, labelKey, fallback, Icon }) => {
-            const isSelected = projectSortBy === value;
-            const chipColor = theme.palette.primary.main;
+            {PROJECT_SORT_CHIPS.map(({ value, labelKey, fallback, Icon }) => {
+              const isSelected = projectSortBy === value;
+              const chipColor = theme.palette.primary.main;
 
-            return (
-              <Box
-                key={value}
-                onClick={() => onProjectSortChange(value)}
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: 2.25,
-                  py: 1,
-                  minHeight: '38px',
-                  borderRadius: '999px',
-                  cursor: 'pointer',
-                  border: '1px solid',
-                  borderColor: isSelected
-                    ? isDark
-                      ? lighten(chipColor, 0.25)
-                      : chipColor
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : '#E5E7EB',
-                  bgcolor: isSelected
-                    ? alpha(chipColor, isDark ? 0.22 : 0.12)
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.04)'
-                      : '#FFFFFF',
-                  color: isSelected
-                    ? isDark
-                      ? lighten(chipColor, 0.4)
-                      : darken(chipColor, 0.15)
-                    : 'text.secondary',
-                  fontSize: '13.5px',
-                  fontWeight: isSelected ? 700 : 500,
-                  transition: 'all 0.18s ease',
-                  flexShrink: 0,
-                  whiteSpace: 'nowrap',
-                  boxShadow: isSelected
-                    ? `0 2px 6px ${alpha(chipColor, 0.25)}`
-                    : 'none',
-                  '&:hover': {
-                    bgcolor: isSelected
-                      ? alpha(chipColor, isDark ? 0.28 : 0.18)
+              return (
+                <Box
+                  key={value}
+                  onClick={() => onProjectSortChange(value)}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    px: 2.25,
+                    py: 1,
+                    minHeight: '38px',
+                    borderRadius: '999px',
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    borderColor: isSelected
+                      ? isDark
+                        ? lighten(chipColor, 0.25)
+                        : chipColor
                       : isDark
                         ? 'rgba(255, 255, 255, 0.08)'
-                        : '#F9FAFB',
-                    color: isDark ? '#ffffff' : '#0f172a',
+                        : '#E5E7EB',
+                    bgcolor: isSelected
+                      ? alpha(chipColor, isDark ? 0.22 : 0.12)
+                      : isDark
+                        ? 'rgba(255, 255, 255, 0.04)'
+                        : '#FFFFFF',
+                    color: isSelected
+                      ? isDark
+                        ? lighten(chipColor, 0.4)
+                        : darken(chipColor, 0.15)
+                      : 'text.secondary',
+                    fontSize: '13.5px',
+                    fontWeight: isSelected ? 700 : 500,
+                    transition: 'all 0.18s ease',
+                    flexShrink: 0,
+                    whiteSpace: 'nowrap',
+                    boxShadow: isSelected
+                      ? `0 2px 6px ${alpha(chipColor, 0.25)}`
+                      : 'none',
+                    '&:hover': {
+                      bgcolor: isSelected
+                        ? alpha(chipColor, isDark ? 0.28 : 0.18)
+                        : isDark
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : '#F9FAFB',
+                      color: isDark ? '#ffffff' : '#0f172a',
+                    },
+                  }}
+                >
+                  <Icon sx={{ fontSize: 18 }} />
+                  {t(labelKey, fallback)}
+                </Box>
+              );
+            })}
+
+            {/* Limpiar filtros */}
+            {(projectSortBy !== 'recent' || projectColorFilter !== 'all') && (
+              <Button
+                size="small"
+                onClick={() => {
+                  onProjectSortChange('recent');
+                  onProjectColorFilterChange('all');
+                  onClearFolderSearch();
+                }}
+                sx={{
+                  color: 'text.disabled',
+                  textTransform: 'none',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  ml: 0.5,
+                  p: '3px 8px',
+                  borderRadius: '8px',
+                  minWidth: 'auto',
+                  flexShrink: 0,
+                  '&:hover': {
+                    color: 'error.main',
+                    bgcolor: alpha('#ef4444', 0.08),
                   },
                 }}
               >
-                <Icon sx={{ fontSize: 18 }} />
-                {t(labelKey, fallback)}
-              </Box>
-            );
-          })}
-
-          {/* Limpiar filtros */}
-          {(projectSortBy !== 'recent' || projectColorFilter !== 'all') && (
-            <Button
-              size="small"
-              onClick={() => {
-                onProjectSortChange('recent');
-                onProjectColorFilterChange('all');
-                onClearFolderSearch();
-              }}
-              sx={{
-                color: 'text.disabled',
-                textTransform: 'none',
-                fontSize: '12px',
-                fontWeight: 600,
-                ml: 0.5,
-                p: '3px 8px',
-                borderRadius: '8px',
-                minWidth: 'auto',
-                flexShrink: 0,
-                '&:hover': {
-                  color: 'error.main',
-                  bgcolor: alpha('#ef4444', 0.08),
-                },
-              }}
-            >
-              {t('projects.sort.resetFilters', 'Limpiar')}
-            </Button>
-          )}
+                {t('projects.sort.resetFilters', 'Limpiar')}
+              </Button>
+            )}
+          </Box>
+          {selectAction}
         </Box>
       )}
 
@@ -707,125 +722,140 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
             alignItems: 'center',
             gap: 1,
             mb: 3,
-            overflowX: 'auto',
-            py: 0.5,
-            '&::-webkit-scrollbar': { display: 'none' },
-            scrollbarWidth: 'none',
+            minWidth: 0,
           }}
         >
-          <Typography
-            variant="body2"
+          <Box
             sx={{
-              color: 'text.secondary',
-              fontSize: '13px',
-              fontWeight: 600,
-              mr: 0.5,
-              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flex: 1,
+              minWidth: 0,
+              overflowX: 'auto',
+              py: 0.5,
+              '&::-webkit-scrollbar': { display: 'none' },
+              scrollbarWidth: 'none',
             }}
           >
-            {t('projects.filterBy', 'Filtrar por:')}
-          </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '13px',
+                fontWeight: 600,
+                mr: 0.5,
+                flexShrink: 0,
+              }}
+            >
+              {t('projects.filterBy', 'Filtrar por:')}
+            </Typography>
 
-          {[
-            {
-              id: 'all' as const,
-              label: t('common.all', 'Todos'),
-              dot: '#6366f1',
-            },
-            {
-              id: 'has-cover' as const,
-              label: t(
-                'workspaceLibrary.filters.hasCover',
-                'Con portada / color',
-              ),
-              dot: '#ec4899',
-            },
-            {
-              id: 'linked-task' as const,
-              label: t(
-                'workspaceLibrary.filters.linkedTask',
-                'Con tareas vinculadas',
-              ),
-              dot: '#10b981',
-            },
-          ].map((item) => {
-            const isSelected = noteFilterType === item.id;
-            return (
-              <Box
-                key={item.id}
-                onClick={() => onNoteFilterChange(item.id)}
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.75,
-                  px: 1.5,
-                  py: 0.45,
-                  height: '30px',
-                  borderRadius: '20px',
-                  cursor: 'pointer',
-                  border: '1px solid',
-                  borderColor: isSelected
-                    ? 'primary.main'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : '#E5E7EB',
-                  bgcolor: isSelected
-                    ? alpha(theme.palette.primary.main, isDark ? 0.22 : 0.12)
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.04)'
-                      : '#FFFFFF',
-                  color: isSelected ? 'primary.main' : 'text.secondary',
-                  fontSize: '12px',
-                  fontWeight: isSelected ? 700 : 500,
-                  transition: 'all 0.18s ease',
-                  flexShrink: 0,
-                  whiteSpace: 'nowrap',
-                  '&:hover': {
-                    bgcolor: isSelected
-                      ? alpha(theme.palette.primary.main, isDark ? 0.28 : 0.18)
+            {[
+              {
+                id: 'all' as const,
+                label: t('common.all', 'Todos'),
+                dot: '#6366f1',
+              },
+              {
+                id: 'has-cover' as const,
+                label: t(
+                  'workspaceLibrary.filters.hasCover',
+                  'Con portada / color',
+                ),
+                dot: '#ec4899',
+              },
+              {
+                id: 'linked-task' as const,
+                label: t(
+                  'workspaceLibrary.filters.linkedTask',
+                  'Con tareas vinculadas',
+                ),
+                dot: '#10b981',
+              },
+            ].map((item) => {
+              const isSelected = noteFilterType === item.id;
+              return (
+                <Box
+                  key={item.id}
+                  onClick={() => onNoteFilterChange(item.id)}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    px: 1.5,
+                    py: 0.45,
+                    height: '30px',
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    borderColor: isSelected
+                      ? 'primary.main'
                       : isDark
                         ? 'rgba(255, 255, 255, 0.08)'
-                        : '#F9FAFB',
-                    color: isDark ? '#ffffff' : '#0f172a',
+                        : '#E5E7EB',
+                    bgcolor: isSelected
+                      ? alpha(theme.palette.primary.main, isDark ? 0.22 : 0.12)
+                      : isDark
+                        ? 'rgba(255, 255, 255, 0.04)'
+                        : '#FFFFFF',
+                    color: isSelected ? 'primary.main' : 'text.secondary',
+                    fontSize: '12px',
+                    fontWeight: isSelected ? 700 : 500,
+                    transition: 'all 0.18s ease',
+                    flexShrink: 0,
+                    whiteSpace: 'nowrap',
+                    '&:hover': {
+                      bgcolor: isSelected
+                        ? alpha(
+                            theme.palette.primary.main,
+                            isDark ? 0.28 : 0.18,
+                          )
+                        : isDark
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : '#F9FAFB',
+                      color: isDark ? '#ffffff' : '#0f172a',
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      bgcolor: item.dot,
+                    }}
+                  />
+                  {item.label}
+                </Box>
+              );
+            })}
+
+            {noteFilterType !== 'all' && (
+              <Button
+                size="small"
+                onClick={() => onNoteFilterChange('all')}
+                sx={{
+                  color: 'text.disabled',
+                  textTransform: 'none',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  ml: 0.5,
+                  p: '3px 8px',
+                  borderRadius: '8px',
+                  minWidth: 'auto',
+                  flexShrink: 0,
+                  '&:hover': {
+                    color: 'error.main',
+                    bgcolor: alpha('#ef4444', 0.08),
                   },
                 }}
               >
-                <Box
-                  sx={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: '50%',
-                    bgcolor: item.dot,
-                  }}
-                />
-                {item.label}
-              </Box>
-            );
-          })}
-
-          {noteFilterType !== 'all' && (
-            <Button
-              size="small"
-              onClick={() => onNoteFilterChange('all')}
-              sx={{
-                color: 'text.disabled',
-                textTransform: 'none',
-                fontSize: '12px',
-                fontWeight: 600,
-                ml: 0.5,
-                p: '3px 8px',
-                borderRadius: '8px',
-                minWidth: 'auto',
-                flexShrink: 0,
-                '&:hover': {
-                  color: 'error.main',
-                  bgcolor: alpha('#ef4444', 0.08),
-                },
-              }}
-            >
-              {t('projects.sort.resetFilters', 'Limpiar')}
-            </Button>
-          )}
+                {t('projects.sort.resetFilters', 'Limpiar')}
+              </Button>
+            )}
+          </Box>
+          {selectAction}
         </Box>
       )}
     </>
