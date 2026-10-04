@@ -396,6 +396,209 @@
       "dismiss": "Descartar aviso"
     }
   },
+  "actionPlan": {
+    "header": {
+      "title": "Plan de Lumina",
+      "changesTitle": "Cambios sugeridos",
+      "review": "Revisa los detalles y elige qué crear.",
+      "running": "Creando {{done}} de {{total}}…",
+      "done": "Listo: todo lo seleccionado ya está en Focusly.",
+      "someFailed": "Algunos elementos no se pudieron crear."
+    },
+    "summary": {
+      "projects_one": "{{count}} proyecto",
+      "projects_other": "{{count}} proyectos",
+      "documents_one": "{{count}} documento",
+      "documents_other": "{{count}} documentos",
+      "tasks_one": "{{count}} tarea",
+      "tasks_other": "{{count}} tareas",
+      "subtasks_one": "{{count}} subtarea",
+      "subtasks_other": "{{count}} subtareas",
+      "updates_one": "{{count}} cambio",
+      "updates_other": "{{count}} cambios",
+      "deletions_one": "{{count}} eliminación",
+      "deletions_other": "{{count}} eliminaciones",
+      "events_one": "{{count}} evento",
+      "events_other": "{{count}} eventos",
+      "guests_one": "{{count}} invitado",
+      "guests_other": "{{count}} invitados"
+    },
+    "sections": {
+      "otherTasks": "Otras tareas",
+      "updates": "Cambios en lo que ya existe",
+      "deletions": "Se eliminarán",
+      "events": "Eventos de Google Calendar"
+    },
+    "footer": {
+      "selectAll": "Todo",
+      "selectNone": "Ninguno",
+      "errors": "Revisa los elementos marcados con error.",
+      "running": "Creando…",
+      "create_one": "Crear {{count}} elemento",
+      "create_other": "Crear {{count}} elementos",
+      "apply_one": "Aplicar {{count}} cambio",
+      "apply_other": "Aplicar {{count}} cambios",
+      "retry_one": "Reintentar {{count}}",
+      "retry_other": "Reintentar {{count}}",
+      "done_one": "{{count}} elemento listo",
+      "done_other": "{{count}} elementos listos",
+      "delete_one": "Eliminar {{count}}",
+      "delete_other": "Eliminar {{count}}"
+    },
+    "status": {
+      "done": "Creado",
+      "error": "No se pudo crear",
+      "skipped": "Omitido"
+    },
+    "edit": {
+      "edit": "Editar antes de crear",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "title": "Título",
+      "start": "Inicio",
+      "name": "Nombre"
+    },
+    "details": {
+      "show": "Ver detalles",
+      "hide": "Ocultar detalles"
+    },
+    "priority": {
+      "1": "Baja",
+      "2": "Media",
+      "3": "Alta",
+      "4": "Urgente"
+    },
+    "untitledTask": "Tarea sin título",
+    "untitledNote": "Nota sin título",
+    "untitledDocument": "Documento sin título",
+    "task": {
+      "subtaskCount_one": "{{count}} subtarea",
+      "subtaskCount_other": "{{count}} subtareas",
+      "subtasks": "Subtareas",
+      "notes": "Notas"
+    },
+    "open": {
+      "task": "Ver tarea",
+      "document": "Abrir documento",
+      "project": "Abrir proyecto",
+      "calendar": "Abrir en Google Calendar",
+      "meet": "Unirse a Meet"
+    },
+    "document": {
+      "label": "Documento",
+      "note": "Nota",
+      "sections_one": "{{count}} sección",
+      "sections_other": "{{count}} secciones",
+      "words_one": "~{{count}} palabra",
+      "words_other": "~{{count}} palabras",
+      "linkedTasks_one": "{{count}} tarea vinculada",
+      "linkedTasks_other": "{{count}} tareas vinculadas",
+      "outline": "Secciones del documento",
+      "showContent": "Ver documento completo",
+      "hideContent": "Ocultar documento"
+    },
+    "project": {
+      "new": "Proyecto nuevo",
+      "existing": "Proyecto existente",
+      "existingFallback": "Proyecto existente",
+      "documents_one": "{{count}} documento",
+      "documents_other": "{{count}} documentos",
+      "tasks_one": "{{count}} tarea",
+      "tasks_other": "{{count}} tareas"
+    },
+    "fields": {
+      "title": "Título",
+      "start": "Inicio",
+      "end": "Fin",
+      "priority": "Prioridad",
+      "duration": "Duración",
+      "notes": "Notas",
+      "status": "Estado",
+      "document": "Documento",
+      "project": "Proyecto",
+      "when": "Fecha",
+      "location": "Lugar",
+      "description": "Descripción",
+      "guests": "Invitados",
+      "meet": "Google Meet"
+    },
+    "update": {
+      "changes_one": "{{count}} cambio",
+      "changes_other": "{{count}} cambios",
+      "notesReplaced": "Se reemplazan las notas",
+      "unknownTask": "Tarea existente",
+      "aDocument": "Un documento",
+      "aProject": "Un proyecto"
+    },
+    "insert": {
+      "title": "Agregar al documento abierto",
+      "hint": "Se inserta en el documento que tienes abierto"
+    },
+    "taskStatus": {
+      "todo": "Por hacer",
+      "planning": "En planificación",
+      "pending": "Pendiente",
+      "onHold": "En pausa",
+      "review": "En revisión",
+      "done": "Hecha",
+      "backlog": "Backlog",
+      "scheduled": "Programada",
+      "archived": "Archivada"
+    },
+    "subtasks": {
+      "add_one": "+{{count}} nueva",
+      "add_other": "+{{count}} nuevas",
+      "complete_one": "{{count}} completada",
+      "complete_other": "{{count}} completadas",
+      "reopen_one": "{{count}} reabierta",
+      "reopen_other": "{{count}} reabiertas",
+      "remove_one": "{{count}} eliminada",
+      "remove_other": "{{count}} eliminadas",
+      "missing": "No encontré estas subtareas: {{titles}}"
+    },
+    "delete": {
+      "permanent": "Se elimina para siempre",
+      "alsoGoogle": "También de Google Calendar",
+      "confirm_one": "Entiendo que {{count}} tarea se eliminará de forma permanente.",
+      "confirm_other": "Entiendo que {{count}} tareas se eliminarán de forma permanente.",
+      "confirmEvents_one": "Entiendo que {{count}} evento se cancelará y sus invitados recibirán un aviso.",
+      "confirmEvents_other": "Entiendo que {{count}} eventos se cancelarán y sus invitados recibirán un aviso.",
+      "confirmMixed_one": "Entiendo que {{count}} elemento se eliminará de forma permanente.",
+      "confirmMixed_other": "Entiendo que {{count}} elementos se eliminarán de forma permanente."
+    },
+    "event": {
+      "untitled": "Evento sin título",
+      "unknown": "Evento de tu calendario",
+      "allDay": "Todo el día",
+      "meet": "Google Meet",
+      "meetCreated": "Se creará un enlace de Google Meet para la reunión.",
+      "meetAdded": "Se añade un enlace de Meet",
+      "guests_one": "{{count}} invitado",
+      "guests_other": "{{count}} invitados",
+      "guestsNotice": "Google enviará una invitación por correo a cada invitado.",
+      "updateNotice": "Los invitados recibirán un aviso del cambio.",
+      "addGuests_one": "+{{count}} invitado",
+      "addGuests_other": "+{{count}} invitados",
+      "removeGuests_one": "−{{count}} invitado",
+      "removeGuests_other": "−{{count}} invitados",
+      "descriptionReplaced": "Se reemplaza la descripción",
+      "organizedBy": "Organiza {{email}}",
+      "notOrganizerHint": "No organizas este evento: solo quien lo organiza puede cambiar la hora o los invitados para todos.",
+      "cancel": "Se cancela",
+      "cancelNotice_one": "{{count}} invitado recibirá la cancelación",
+      "cancelNotice_other": "{{count}} invitados recibirán la cancelación",
+      "needsCalendar": "Requiere Google Calendar",
+      "connectHint": "Conecta Google Calendar para que Lumina pueda crear y editar tus eventos.",
+      "connect": "Conectar Google Calendar",
+      "you": "Tú",
+      "response": {
+        "accepted": "Aceptó",
+        "declined": "Rechazó",
+        "tentative": "Quizás",
+        "needsAction": "Sin responder"
+      }
+    }
+  },
   "insightsHeader": {
     "title": "{{period}} Insights",
     "periods": {
@@ -694,10 +897,113 @@
     "mediumSlate": "Pizarra Medio",
     "darkSlate": "Pizarra Oscuro"
   },
+  "selection": {
+    "select": "Seleccionar",
+    "selectAll": "Seleccionar todo",
+    "selectedCount_one": "{{count}} seleccionado",
+    "selectedCount_other": "{{count}} seleccionados",
+    "deleteCount": "Eliminar ({{count}})"
+  },
+  "deleteConfirm": {
+    "andMore": "y {{count}} más"
+  },
+  "projectTasks": {
+    "attendees": "Invitados: {{names}}",
+    "empty": {
+      "title": "Aún no hay tareas en tus proyectos",
+      "description": "Crea tareas dentro de un proyecto para verlas aquí agrupadas por estado.",
+      "action": "Crear tarea"
+    },
+    "emptySearch": {
+      "title": "No se encontraron tareas",
+      "description": "Ninguna tarea coincide con tu búsqueda. Prueba con otras palabras."
+    },
+    "error": {
+      "title": "No se pudieron cargar las tareas",
+      "description": "Revisa tu conexión e inténtalo de nuevo.",
+      "retry": "Reintentar"
+    },
+    "loadMore": "Cargar más tareas",
+    "loadingMore": "Cargando…",
+    "toast": {
+      "authError": "Inicia sesión de nuevo para continuar",
+      "created": "Tarea creada",
+      "createFailed": "No se pudo crear la tarea",
+      "updateFailed": "No se pudo actualizar la tarea",
+      "deleted_one": "Tarea eliminada",
+      "deleted_other": "{{count}} tareas eliminadas",
+      "deleteFailed": "No se pudieron eliminar algunas tareas",
+      "completed": "Tarea completada",
+      "undo": "Deshacer"
+    },
+    "moveTo": "Mover a",
+    "changeStatus": "Cambiar estado",
+    "markDone": "Marcar como completada",
+    "markNotDone": "Marcar como no completada",
+    "toggleSubtasks": "Mostrar u ocultar subtareas",
+    "linkedDocument": "Documento vinculado",
+    "addTo": "Añadir tarea a {{status}}",
+    "quickAddPlaceholder": "Nueva tarea en {{status}} (Enter para añadir otra, Esc para cerrar)",
+    "allProjects": "Todos los proyectos",
+    "showEmptyStatuses": "Mostrar estados vacíos",
+    "columns": {
+      "task": "Tarea",
+      "project": "Proyecto",
+      "due": "Fecha",
+      "priority": "Prioridad",
+      "estimate": "Est."
+    },
+    "summary": {
+      "completed": "{{done}} de {{total}} completadas",
+      "progress": "Progreso: {{percent}}%",
+      "remaining": "{{time}} pendientes",
+      "overdue_one": "{{count}} vencida",
+      "overdue_other": "{{count}} vencidas",
+      "loaded": "Mostrando {{loaded}} de {{total}}"
+    },
+    "filters": {
+      "overdue": "Vencidas",
+      "noDate": "Sin fecha",
+      "highPriority": "Prioridad alta",
+      "clear": "Quitar filtros"
+    },
+    "sort": {
+      "dueDate": "Por fecha",
+      "priority": "Por prioridad",
+      "title": "Por nombre",
+      "recent": "Más recientes"
+    },
+    "emptyProject": {
+      "title": "Este proyecto aún no tiene tareas",
+      "description": "Crea la primera para empezar a organizar el trabajo del proyecto."
+    },
+    "emptyFilters": {
+      "title": "Ninguna tarea coincide con los filtros",
+      "description": "Quita algún filtro para ver más tareas."
+    },
+    "bulk": {
+      "complete": "Completar",
+      "move": "Mover a…"
+    },
+    "bulkDelete": {
+      "title_one": "¿Eliminar {{count}} tarea?",
+      "title_other": "¿Eliminar {{count}} tareas?",
+      "description_one": "Se eliminará de forma permanente, con sus subtareas.",
+      "description_other": "Se eliminarán de forma permanente, con sus subtareas."
+    }
+  },
   "workspaceLibrary": {
     "toast": {
       "deleteProjectsTitle": "Eliminar Proyectos",
       "deleteProjectsDesc": "¿Seguro que quieres eliminar los siguientes proyectos: {{names}}? Los espacios de trabajo dentro se desvincularán pero no se eliminarán.",
+      "projectsDeleted_one": "Proyecto eliminado",
+      "projectsDeleted_other": "{{count}} proyectos eliminados",
+      "projectsDeleteFailed_one": "No se pudo eliminar {{count}} proyecto.",
+      "projectsDeleteFailed_other": "No se pudieron eliminar {{count}} proyectos.",
+      "workspacesDeleted_one": "Espacio de trabajo eliminado",
+      "workspacesDeleted_other": "{{count}} espacios de trabajo eliminados",
+      "workspacesDeleteFailed_one": "No se pudo eliminar {{count}} espacio de trabajo.",
+      "workspacesDeleteFailed_other": "No se pudieron eliminar {{count}} espacios de trabajo.",
       "deletedTitle": "Proyectos eliminados"
     },
     "breadcrumb": {
@@ -708,8 +1014,7 @@
     "newWorkspace": "Nuevo Workspace",
     "status": {
       "recent": "Reciente",
-      "draft": "Borrador",
-      "active": "Activo"
+      "empty": "Vacío"
     },
     "notesInside_one": "{{count}} nota dentro",
     "notesInside_other": "{{count}} notas dentro",
@@ -727,12 +1032,6 @@
     },
     "recentWorkspace": "WORKSPACE RECIENTE",
     "emptyFolderSnippet": "Esta carpeta está vacía. Crea tu primer workspace para empezar...",
-    "defaultSnippet": "Plan de trabajo y notas clave asociadas a {{name}}. Objetivos y entregables principales...",
-    "snippets": {
-      "nutrition1": "Proteínas y macronutrientes esenciales para el rendimiento diario. Notas de la sesión del martes...",
-      "nutrition2": "Vitaminas liposolubles e hidrosolubles: diferencias clave y fuentes alimenticias recomendadas...",
-      "sql": "JOINs avanzados en SQL: INNER, LEFT, RIGHT y FULL OUTER JOIN con ejemplos prácticos de consultas..."
-    },
     "filterAndSortNotes": "Filtrar y Ordenar Notas",
     "switchViewMode": "Cambiar Modo de Vista",
     "sortNotes": "Ordenar Notas",
@@ -744,6 +1043,25 @@
     "viewGrid": "Cuadrícula",
     "viewList": "Lista",
     "deleteWorkspace": "Eliminar Espacio de Trabajo",
+    "deleteDialog": {
+      "title": "Eliminar proyecto",
+      "description": "¿Seguro que quieres eliminar el proyecto \"{{name}}\"?",
+      "bulkTitle": "Eliminar {{count}} proyectos",
+      "bulkDescription": "¿Seguro que quieres eliminar los siguientes {{count}} proyectos?",
+      "workspacesWarning_one": "Este proyecto tiene {{count}} espacio de trabajo dentro. Se eliminará junto con el proyecto y no podrás recuperarlo.",
+      "workspacesWarning_other": "Este proyecto tiene {{count}} espacios de trabajo dentro. Se eliminarán junto con el proyecto y no podrás recuperarlos.",
+      "bulkWorkspacesWarning_one": "Se borrará información: estos proyectos contienen {{count}} espacio de trabajo que también se eliminará de forma permanente.",
+      "bulkWorkspacesWarning_other": "Se borrará información: estos proyectos contienen {{count}} espacios de trabajo en total que también se eliminarán de forma permanente.",
+      "noWorkspacesWarning": "Esta acción no se puede deshacer."
+    },
+    "deleteWorkspacesDialog": {
+      "title": "Eliminar espacio de trabajo",
+      "description": "¿Seguro que quieres eliminar \"{{name}}\"?",
+      "bulkTitle": "Eliminar {{count}} espacios de trabajo",
+      "bulkDescription": "¿Seguro que quieres eliminar los siguientes {{count}} espacios de trabajo?",
+      "warning_one": "Su contenido se borrará de forma permanente. Esta acción no se puede deshacer.",
+      "warning_other": "Se borrará el contenido de {{count}} espacios de trabajo de forma permanente. Esta acción no se puede deshacer."
+    },
     "renameFolder": "Renombrar Carpeta",
     "customizeStyle": "Personalizar Estilo",
     "deleteFolder": "Eliminar Carpeta",
@@ -759,7 +1077,27 @@
       "title": "Crear Nueva Carpeta"
     },
     "namePlaceholder": "ej. Plan de Sprint, Personal, Marketing",
-    "createFolder": "Crear Carpeta"
+    "createFolder": "Crear Carpeta",
+    "editedOn": "Editado el {{date}}",
+    "card": {
+      "created": "Creado",
+      "taskStatus": "Estado de la tarea",
+      "time": "Tiempo est. / real",
+      "none": "Ninguna",
+      "noTask": "Sin tarea vinculada",
+      "more_one": "+{{count}} más",
+      "more_other": "+{{count}} más",
+      "doneCount": "{{done}}/{{total}} hechas",
+      "linkedTasks_one": "Tareas vinculadas ({{count}})",
+      "linkedTasks_other": "Tareas vinculadas ({{count}})",
+      "noContent": "Aún sin contenido",
+      "options": "Opciones del documento"
+    },
+    "folderView": {
+      "label": "Vista del proyecto",
+      "documents": "Documentos",
+      "tasks": "Tareas"
+    }
   },
   "allProjectsModal": {
     "title": "Todas las Carpetas",
@@ -834,7 +1172,6 @@
     "status": {
       "all": "Todas",
       "todo": "Por Hacer",
-      "inProgress": "En Progreso",
       "planning": "Planificado",
       "scheduled": "Agendada",
       "review": "En Revisión",
@@ -848,7 +1185,8 @@
       "high": "Alta",
       "medium": "Media",
       "low": "Baja",
-      "none": "Sin prioridad"
+      "none": "Sin prioridad",
+      "critical": "Urgente"
     },
     "columns": {
       "taskName": "NOMBRE DE LA TAREA",
@@ -866,16 +1204,12 @@
       "markAsDone": "Marcar como Completada",
       "deleteTask": "Eliminar Tarea"
     },
-    "allClear": "Todo listo",
-    "addTaskTo": "Añadir tarea a",
-    "collapseSection": "Contraer sección",
-    "expandSection": "Expandir sección",
-    "pressEnter": "Presiona Enter",
     "subtasksCount": "{{completed}}/{{total}} subtareas",
     "dates": {
       "all": "Todas las Tareas",
       "today": "Hoy",
       "tomorrow": "Mañana",
+      "overdue": "Vencida",
       "in3Days": "En 3 días",
       "nextWeek": "Próxima semana",
       "thisWeek": "Esta Semana",
@@ -932,7 +1266,27 @@
       "noTimeLogged": "No hay tiempo registrado aún.",
       "titlePlaceholder": "Completar informe de rendimiento trimestral"
     },
+    "projectRequired": {
+      "title": "Elige un proyecto",
+      "description": "Crea un proyecto primero: las tareas de esta vista siempre pertenecen a uno."
+    },
+    "deleteTaskDialog": {
+      "title": "Eliminar tarea",
+      "description": "¿Seguro que quieres eliminar la tarea \"{{title}}\"?",
+      "warning": "Se eliminará junto con sus subtareas y no se puede deshacer."
+    },
     "createProjectTaskModal": {
+      "noEstimate": "Sin estimación",
+      "selectProject": "Elegir proyecto",
+      "toast": {
+        "titleRequired": "Falta el título",
+        "titleRequiredDesc": "Escribe un título para la tarea.",
+        "taskUpdated": "Tarea actualizada",
+        "workspaceTitleRequired": "Falta el título",
+        "workspaceTitleRequiredDesc": "Escribe un título para el workspace.",
+        "workspaceLinked": "Workspace creado y vinculado",
+        "workspaceCreateFailed": "No se pudo crear el workspace. Inténtalo de nuevo."
+      },
       "titlePlaceholder": "Título de la tarea...",
       "status": "Estado",
       "priority": "Prioridad",

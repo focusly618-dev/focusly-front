@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation, useApolloClient } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
 import {
   GET_PROJECT_GROUPS_PAGINATED,
   CREATE_PROJECT_GROUP,
   UPDATE_PROJECT_GROUP,
   DELETE_PROJECT_GROUP,
 } from '../../Workspace/Workspace.graphql';
-import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { setProjectTab } from '@/redux/tasks/task.slice';
 import type { ProjectTab } from '@/redux/tasks/task.types';
@@ -19,11 +19,12 @@ const GROUP_LIMIT = 8;
 export type { ProjectSortOption };
 
 export const useProjectFolders = () => {
+  const { t } = useTranslation();
+  const apolloClient = useApolloClient();
   const dispatch = useAppDispatch();
   const activeProjectTab = useAppSelector(
     (state) => state.task.projectTab || 'projects',
   );
-  const user = useAppSelector((state) => state.auth.user);
 
   const [groupPage, setGroupPage] = useState(1);
   const [folderSearchTerm, setFolderSearchTerm] = useState('');
@@ -56,23 +57,6 @@ export const useProjectFolders = () => {
     nextFetchPolicy: 'cache-first',
   });
 
-  const {
-    data: tasksData,
-    loading: loadingTasks,
-    refetch: refetchTasks,
-  } = useQuery(GET_TASKS, {
-    variables: {
-      userId: user?.id || '',
-      filters: {
-        searchTerm: debouncedSearchTerm.trim() || undefined,
-      },
-      limit: 100,
-      offset: 0,
-    },
-    skip: activeProjectTab !== 'tasks' || !user?.id,
-    fetchPolicy: 'cache-and-network',
-    nextFetchPolicy: 'cache-first',
-  });
   // Mutations
   const [createGroupMutation, { loading: creatingGroup }] = useMutation(
     CREATE_PROJECT_GROUP,
@@ -88,12 +72,9 @@ export const useProjectFolders = () => {
     },
   );
 
-  const [deleteGroupMutation, { loading: deletingGroup }] = useMutation(
-    DELETE_PROJECT_GROUP,
-    {
-      refetchQueries: ['GetProjectGroupsPaginated', 'GetProjectGroups'],
-    },
-  );
+  // No refetchQueries here: deleteFolders refetches once after the whole batch.
+  const [deleteGroupMutation, { loading: deletingGroup }] =
+    useMutation(DELETE_PROJECT_GROUP);
 
   const createFolder = async (
     name: string,
@@ -155,26 +136,59 @@ export const useProjectFolders = () => {
     }
   };
 
-  const deleteFolder = async (id: string) => {
-    try {
-      await deleteGroupMutation({
-        variables: { id },
+  const deleteFolders = async (ids: string[]) => {
+    if (!ids.length) return 0;
+
+    const results = await Promise.allSettled(
+      ids.map((id) => deleteGroupMutation({ variables: { id } })),
+    );
+    const failed = results.filter(
+      (r): r is PromiseRejectedResult => r.status === 'rejected',
+    );
+    const deletedCount = ids.length - failed.length;
+    failed.forEach((r) =>
+      console.error('Error deleting project folder:', r.reason),
+    );
+
+    if (deletedCount > 0) {
+      // The backend deletes a project's workspaces along with it, so refresh
+      // the workspace lists too.
+      await apolloClient.refetchQueries({
+        include: [
+          'GetProjectGroupsPaginated',
+          'GetProjectGroups',
+          'GetWorkspacesPaginated',
+        ],
       });
+
+      // Step back if the current page no longer exists.
+      const previousTotal = projectGroupsData?.result?.totalCount ?? 0;
+      const remainingPages = Math.max(
+        1,
+        Math.ceil((previousTotal - deletedCount) / GROUP_LIMIT),
+      );
+      if (groupPage > remainingPages) setGroupPage(remainingPages);
+
       sileo.success({
-        title: 'Folder deleted',
-        description: 'Folder has been removed.',
+        title: t('workspaceLibrary.toast.projectsDeleted', {
+          count: deletedCount,
+        }),
         duration: 3000,
       });
-      return true;
-    } catch (err) {
-      console.error('Error deleting project folder:', err);
+    }
+
+    if (failed.length > 0) {
       sileo.error({
         title: 'Error',
-        description: 'Failed to delete folder.',
+        description: t('workspaceLibrary.toast.projectsDeleteFailed', {
+          count: failed.length,
+        }),
         duration: 3000,
       });
-      throw err;
+      if (deletedCount === 0) throw failed[0].reason;
     }
+
+    return deletedCount;
   };
 
   const rawGroups: ProjectGroupTypes[] = useMemo(() => {
@@ -187,14 +201,7 @@ export const useProjectFolders = () => {
   }, [projectGroupsData]);
   const totalGroups = projectGroupsData?.result?.totalCount ?? rawGroups.length;
 
-  const rawTasks = useMemo(
-    () => tasksData?.result?.tasks || tasksData?.tasks || [],
-    [tasksData],
-  );
-  const totalTasks = tasksData?.result?.totalCount ?? rawTasks.length;
-
-  const currentTotal = activeProjectTab === 'tasks' ? totalTasks : totalGroups;
-  const totalGroupPages = Math.max(1, Math.ceil(currentTotal / GROUP_LIMIT));
+  const totalGroupPages = Math.max(1, Math.ceil(totalGroups / GROUP_LIMIT));
 
   // Client-side filtering & sorting
   const filteredGroups = useMemo(() => {
@@ -234,28 +241,6 @@ export const useProjectFolders = () => {
     return list;
   }, [rawGroups, debouncedSearchTerm, projectColorFilter, projectSortBy]);
 
-  interface SearchableTask {
-    title?: string;
-    notes?: string;
-    tags?: Array<string | { name?: string }>;
-  }
-
-  const filteredTasks = useMemo(() => {
-    let list = [...rawTasks];
-    if (debouncedSearchTerm.trim()) {
-      const q = debouncedSearchTerm.trim().toLowerCase();
-      list = list.filter((t: SearchableTask) => {
-        const titleMatch = t.title?.toLowerCase().includes(q);
-        const notesMatch = t.notes?.toLowerCase().includes(q);
-        const tagMatch = t.tags?.some((tg: string | { name?: string }) =>
-          (typeof tg === 'string' ? tg : tg?.name)?.toLowerCase().includes(q),
-        );
-        return Boolean(titleMatch || notesMatch || tagMatch);
-      });
-    }
-    return list;
-  }, [rawTasks, debouncedSearchTerm]);
-
   return {
     state: {
       activeProjectTab,
@@ -265,9 +250,8 @@ export const useProjectFolders = () => {
       debouncedSearchTerm,
       projectSortBy,
       projectColorFilter,
-      loading: activeProjectTab === 'tasks' ? loadingTasks : loadingGroups,
+      loading: loadingGroups,
       loadingGroups,
-      loadingTasks,
       isMutating: creatingGroup || updatingGroup || deletingGroup,
     },
     data: {
@@ -275,9 +259,6 @@ export const useProjectFolders = () => {
       allGroups: filteredGroups,
       rawGroups,
       totalGroups,
-      tasks: filteredTasks,
-      rawTasks,
-      totalTasks,
     },
     actions: {
       setGroupPage,
@@ -293,15 +274,9 @@ export const useProjectFolders = () => {
       setProjectColorFilter,
       createFolder,
       updateFolder,
-      deleteFolder,
+      deleteFolders,
       refetchPaginatedGroups,
-      refetchTasks,
-      refetch: () => {
-        if (activeProjectTab === 'tasks') {
-          return refetchTasks();
-        }
-        return refetchPaginatedGroups();
-      },
+      refetch: refetchPaginatedGroups,
     },
   };
 };

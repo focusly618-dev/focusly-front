@@ -7,15 +7,16 @@ export const GridWrapper = styled(Box)(() => ({
   paddingBottom: '32px',
 }));
 
+// Columns follow the space the grid has (not the window, which also holds
+// the sidebar), and every row is as tall as the tallest card, so all cards
+// share one size.
 export const FoldersGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: '1fr',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 270px), 1fr))',
+  gridAutoRows: '1fr',
   gap: '20px',
-  [theme.breakpoints.up('sm')]: {
-    gridTemplateColumns: 'repeat(2, 1fr)',
-  },
-  [theme.breakpoints.up('md')]: {
-    gridTemplateColumns: 'repeat(3, 1fr)',
+  [theme.breakpoints.down('sm')]: {
+    gap: '14px',
   },
 }));
 

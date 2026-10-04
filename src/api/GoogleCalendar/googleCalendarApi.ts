@@ -18,6 +18,14 @@ export const fetchGoogleEvents = async (
   return (response.data || []) as GoogleCalendarEvent[];
 };
 
+/** One event as Google has it right now (guests included). */
+export const fetchGoogleEvent = async (
+  eventId: string,
+): Promise<RawGoogleEvent> => {
+  const response = await axios.get(`/google-calendar/events/${eventId}`);
+  return response.data;
+};
+
 export const createGoogleEvent = async (
   event: Partial<RawGoogleEvent>,
 ): Promise<RawGoogleEvent> => {

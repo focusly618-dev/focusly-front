@@ -5,6 +5,7 @@ import {
   Card,
   alpha,
   lighten,
+  Tabs,
   TextField,
 } from '@mui/material';
 import { surfaceColor } from '@/context';
@@ -433,15 +434,21 @@ export const GridContainer = styled(Box, {
       ...scrollbarStyles,
     };
   }
+  // Columns follow the grid's own width; every row is as tall as the
+  // tallest card, so all cards share one size.
   return {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gridTemplateColumns:
+      activeLayout === 'grid'
+        ? 'repeat(auto-fill, minmax(min(100%, 220px), 1fr))'
+        : 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
+    gridAutoRows: '1fr',
     gap: '20px',
     overflowY: 'auto',
     paddingBottom: '24px',
     paddingTop: '16px',
     [theme.breakpoints.down('sm')]: {
-      gridTemplateColumns: '1fr',
+      gap: '14px',
     },
     ...scrollbarStyles,
   };
@@ -463,6 +470,7 @@ export const WorkspaceCard = styled(Card, {
     flexDirection: 'column',
     minHeight: compact ? '130px' : '300px',
     height: '100%',
+    minWidth: 0,
     cursor: 'pointer',
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
     border: `1px solid ${
@@ -653,7 +661,7 @@ export const BadgeChip = styled(Box, {
 
 export const PropertyGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
+  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
   gap: theme.spacing(1.5),
   marginTop: theme.spacing(1.5),
   marginBottom: theme.spacing(1.5),
@@ -665,6 +673,7 @@ export const PropertyItem = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   gap: '2px',
+  minWidth: 0,
 });
 
 export const PropertyLabel = styled(Typography)(({ theme }) => ({
@@ -674,6 +683,9 @@ export const PropertyLabel = styled(Typography)(({ theme }) => ({
   textTransform: 'uppercase',
   letterSpacing: '0.5px',
   opacity: 0.8,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 }));
 
 export const PropertyValue = styled(Typography)(({ theme }) => ({
@@ -684,3 +696,45 @@ export const PropertyValue = styled(Typography)(({ theme }) => ({
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 }));
+
+/** Pill-style tabs (Projects / Tasks, Documents / Tasks). */
+export const SegmentedTabs = styled(Tabs)(({ theme }) => {
+  const isDark = theme.palette.mode === 'dark';
+  return {
+    minHeight: 38,
+    height: 38,
+    maxWidth: '100%',
+    padding: 3,
+    borderRadius: 10,
+    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#E5E7EB'}`,
+    '& .MuiTabs-indicator': { display: 'none' },
+    '& .MuiTabs-flexContainer': { gap: 3, height: '100%' },
+    '& .MuiTab-root': {
+      minWidth: 0,
+      minHeight: 32,
+      height: 32,
+      padding: '4px 12px',
+      borderRadius: 7,
+      fontSize: '12.5px',
+      fontWeight: 500,
+      textTransform: 'none',
+      whiteSpace: 'nowrap',
+      color: theme.palette.text.secondary,
+      transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+      '&.Mui-selected': {
+        color: isDark ? '#ffffff' : '#111827',
+        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#F3F4F6',
+        fontWeight: 600,
+      },
+      '&:hover': { color: theme.palette.text.primary },
+      '&.Mui-focusVisible': { outline: '2px solid #008767' },
+    },
+    // On phones the tabs share the width and drop their icons.
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      '& .MuiTab-root': { flex: 1, padding: '4px 8px' },
+      '& .MuiTab-icon': { display: 'none' },
+    },
+  };
+});

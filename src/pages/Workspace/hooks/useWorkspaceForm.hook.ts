@@ -6,7 +6,7 @@ import { CREATE_WORKSPACE, UPDATE_WORKSPACE } from '../Workspace.graphql';
 import type { WorkspaceFormData } from '../workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
 import { generateWorkspaceTitle } from '@/api/AI/apiAI';
-import { stripMarkdown } from '@/components/chat/suggestedActionCard/actionExecution.utils';
+import { stripMarkdown } from '@/components/chat/actionPlan/actionExecution';
 
 // Below this many characters of actual (non-markdown) text, there isn't
 // enough signal yet for a meaningful AI title — wait for more content

@@ -396,6 +396,186 @@
       "dismiss": "閉じる"
     }
   },
+  "actionPlan": {
+    "header": {
+      "title": "Lumina のプラン",
+      "changesTitle": "提案された変更",
+      "review": "詳細を確認して、作成するものを選んでください。",
+      "running": "{{total}} 件中 {{done}} 件を作成中…",
+      "done": "完了：選択したものはすべて Focusly に追加されました。",
+      "someFailed": "一部の項目を作成できませんでした。"
+    },
+    "summary": {
+      "projects_other": "プロジェクト {{count}} 件",
+      "documents_other": "ドキュメント {{count}} 件",
+      "tasks_other": "タスク {{count}} 件",
+      "subtasks_other": "サブタスク {{count}} 件",
+      "updates_other": "変更 {{count}} 件",
+      "deletions_other": "削除 {{count}} 件",
+      "events_one": "{{count}} 件の予定",
+      "events_other": "{{count}} 件の予定",
+      "guests_one": "{{count}} 人のゲスト",
+      "guests_other": "{{count}} 人のゲスト"
+    },
+    "sections": {
+      "otherTasks": "その他のタスク",
+      "updates": "既存の項目の変更",
+      "deletions": "削除されるもの",
+      "events": "Google カレンダーの予定"
+    },
+    "footer": {
+      "selectAll": "すべて",
+      "selectNone": "なし",
+      "errors": "エラーのある項目を確認してください。",
+      "running": "作成中…",
+      "create_other": "{{count}} 件を作成",
+      "apply_other": "{{count}} 件の変更を適用",
+      "retry_other": "{{count}} 件を再試行",
+      "done_other": "{{count}} 件完了",
+      "delete_other": "{{count}} 件を削除"
+    },
+    "status": {
+      "done": "作成済み",
+      "error": "作成できませんでした",
+      "skipped": "スキップ"
+    },
+    "edit": {
+      "edit": "作成前に編集",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "title": "タイトル",
+      "start": "開始",
+      "name": "名前"
+    },
+    "details": {
+      "show": "詳細を表示",
+      "hide": "詳細を隠す"
+    },
+    "priority": {
+      "1": "低",
+      "2": "中",
+      "3": "高",
+      "4": "緊急"
+    },
+    "untitledTask": "無題のタスク",
+    "untitledNote": "無題のメモ",
+    "untitledDocument": "無題のドキュメント",
+    "task": {
+      "subtaskCount_other": "サブタスク {{count}} 件",
+      "subtasks": "サブタスク",
+      "notes": "メモ"
+    },
+    "open": {
+      "task": "タスクを表示",
+      "document": "ドキュメントを開く",
+      "project": "プロジェクトを開く",
+      "calendar": "Google カレンダーで開く",
+      "meet": "Meet に参加"
+    },
+    "document": {
+      "label": "ドキュメント",
+      "note": "メモ",
+      "sections_other": "{{count}} セクション",
+      "words_other": "約 {{count}} 語",
+      "linkedTasks_other": "関連タスク {{count}} 件",
+      "outline": "ドキュメントのセクション",
+      "showContent": "ドキュメント全体を表示",
+      "hideContent": "ドキュメントを隠す"
+    },
+    "project": {
+      "new": "新しいプロジェクト",
+      "existing": "既存のプロジェクト",
+      "existingFallback": "既存のプロジェクト",
+      "documents_other": "ドキュメント {{count}} 件",
+      "tasks_other": "タスク {{count}} 件"
+    },
+    "fields": {
+      "title": "タイトル",
+      "start": "開始",
+      "end": "終了",
+      "priority": "優先度",
+      "duration": "所要時間",
+      "notes": "メモ",
+      "status": "ステータス",
+      "document": "ドキュメント",
+      "project": "プロジェクト",
+      "when": "日時",
+      "location": "場所",
+      "description": "説明",
+      "guests": "ゲスト",
+      "meet": "Google Meet"
+    },
+    "update": {
+      "changes_other": "変更 {{count}} 件",
+      "notesReplaced": "メモが置き換えられます",
+      "unknownTask": "既存のタスク",
+      "aDocument": "ドキュメント",
+      "aProject": "プロジェクト"
+    },
+    "insert": {
+      "title": "開いているドキュメントに追加",
+      "hint": "開いているドキュメントに挿入されます"
+    },
+    "taskStatus": {
+      "todo": "未着手",
+      "planning": "計画中",
+      "pending": "保留中",
+      "onHold": "一時停止",
+      "review": "レビュー中",
+      "done": "完了",
+      "backlog": "バックログ",
+      "scheduled": "予定済み",
+      "archived": "アーカイブ済み"
+    },
+    "subtasks": {
+      "add_other": "+{{count}} 件追加",
+      "complete_other": "{{count}} 件完了",
+      "reopen_other": "{{count}} 件再開",
+      "remove_other": "{{count}} 件削除",
+      "missing": "次のサブタスクが見つかりません：{{titles}}"
+    },
+    "delete": {
+      "permanent": "完全に削除されます",
+      "alsoGoogle": "Google カレンダーからも削除",
+      "confirm_other": "{{count}} 件のタスクが完全に削除されることを理解しました。",
+      "confirmEvents_one": "{{count}} 件の予定がキャンセルされ、ゲストに通知されることを理解しました。",
+      "confirmEvents_other": "{{count}} 件の予定がキャンセルされ、ゲストに通知されることを理解しました。",
+      "confirmMixed_one": "{{count}} 件の項目が完全に削除されることを理解しました。",
+      "confirmMixed_other": "{{count}} 件の項目が完全に削除されることを理解しました。"
+    },
+    "event": {
+      "untitled": "無題の予定",
+      "unknown": "カレンダーの予定",
+      "allDay": "終日",
+      "meet": "Google Meet",
+      "meetCreated": "会議用の Google Meet リンクが作成されます。",
+      "meetAdded": "Meet リンクを追加",
+      "guests_one": "{{count}} 人のゲスト",
+      "guests_other": "{{count}} 人のゲスト",
+      "guestsNotice": "Google が各ゲストに招待メールを送信します。",
+      "updateNotice": "ゲストに変更が通知されます。",
+      "addGuests_one": "+{{count}} 人のゲスト",
+      "addGuests_other": "+{{count}} 人のゲスト",
+      "removeGuests_one": "−{{count}} 人のゲスト",
+      "removeGuests_other": "−{{count}} 人のゲスト",
+      "descriptionReplaced": "説明が置き換えられます",
+      "organizedBy": "主催者: {{email}}",
+      "notOrganizerHint": "あなたはこの予定の主催者ではありません。全員の時間やゲストを変更できるのは主催者だけです。",
+      "cancel": "キャンセル",
+      "cancelNotice_one": "{{count}} 人のゲストにキャンセルが通知されます",
+      "cancelNotice_other": "{{count}} 人のゲストにキャンセルが通知されます",
+      "needsCalendar": "Google カレンダーが必要です",
+      "connectHint": "Lumina が予定を作成・編集できるように Google カレンダーを接続してください。",
+      "connect": "Google カレンダーを接続",
+      "you": "あなた",
+      "response": {
+        "accepted": "承諾",
+        "declined": "辞退",
+        "tentative": "未定",
+        "needsAction": "未回答"
+      }
+    }
+  },
   "insightsHeader": {
     "title": "{{period}}のインサイト",
     "periods": {
@@ -694,10 +874,108 @@
     "mediumSlate": "ミディアムスレート",
     "darkSlate": "ダークスレート"
   },
+  "selection": {
+    "select": "選択",
+    "selectAll": "すべて選択",
+    "selectedCount_other": "{{count}} 件選択中",
+    "deleteCount": "削除 ({{count}})"
+  },
+  "deleteConfirm": {
+    "andMore": "他 {{count}} 件"
+  },
+  "projectTasks": {
+    "attendees": "招待者: {{names}}",
+    "empty": {
+      "title": "プロジェクトにタスクはまだありません",
+      "description": "プロジェクト内でタスクを作成すると、ここにステータス別に表示されます。",
+      "action": "タスクを作成"
+    },
+    "emptySearch": {
+      "title": "タスクが見つかりません",
+      "description": "検索に一致するタスクはありません。別の言葉で試してください。"
+    },
+    "error": {
+      "title": "タスクを読み込めませんでした",
+      "description": "接続を確認して、もう一度お試しください。",
+      "retry": "再試行"
+    },
+    "loadMore": "さらにタスクを読み込む",
+    "loadingMore": "読み込み中…",
+    "toast": {
+      "authError": "続行するには再度サインインしてください",
+      "created": "タスクを作成しました",
+      "createFailed": "タスクを作成できませんでした",
+      "updateFailed": "タスクを更新できませんでした",
+      "deleted_one": "タスクを削除しました",
+      "deleted_other": "{{count}} 件のタスクを削除しました",
+      "deleteFailed": "一部のタスクを削除できませんでした",
+      "completed": "タスクを完了しました",
+      "undo": "元に戻す"
+    },
+    "moveTo": "移動先",
+    "changeStatus": "ステータスを変更",
+    "markDone": "完了にする",
+    "markNotDone": "未完了に戻す",
+    "toggleSubtasks": "サブタスクの表示を切り替え",
+    "linkedDocument": "リンクされたドキュメント",
+    "addTo": "{{status}} にタスクを追加",
+    "quickAddPlaceholder": "{{status}} に新しいタスク（Enter で続けて追加、Esc で閉じる）",
+    "allProjects": "すべてのプロジェクト",
+    "showEmptyStatuses": "空のステータスを表示",
+    "columns": {
+      "task": "タスク",
+      "project": "プロジェクト",
+      "due": "期限",
+      "priority": "優先度",
+      "estimate": "見積"
+    },
+    "summary": {
+      "completed": "{{total}} 件中 {{done}} 件完了",
+      "progress": "進捗: {{percent}}%",
+      "remaining": "残り {{time}}",
+      "overdue_one": "{{count}} 件期限切れ",
+      "overdue_other": "{{count}} 件期限切れ",
+      "loaded": "{{total}} 件中 {{loaded}} 件を表示"
+    },
+    "filters": {
+      "overdue": "期限切れ",
+      "noDate": "期限なし",
+      "highPriority": "優先度高",
+      "clear": "フィルターを解除"
+    },
+    "sort": {
+      "dueDate": "期限順",
+      "priority": "優先度順",
+      "title": "名前順",
+      "recent": "新しい順"
+    },
+    "emptyProject": {
+      "title": "このプロジェクトにはまだタスクがありません",
+      "description": "最初のタスクを作成して、プロジェクトの作業を整理しましょう。"
+    },
+    "emptyFilters": {
+      "title": "フィルターに一致するタスクはありません",
+      "description": "フィルターを外すと、さらにタスクが表示されます。"
+    },
+    "bulk": {
+      "complete": "完了にする",
+      "move": "移動…"
+    },
+    "bulkDelete": {
+      "title_one": "{{count}} 件のタスクを削除しますか？",
+      "title_other": "{{count}} 件のタスクを削除しますか？",
+      "description_one": "サブタスクを含め、完全に削除されます。",
+      "description_other": "サブタスクを含め、完全に削除されます。"
+    }
+  },
   "workspaceLibrary": {
     "toast": {
       "deleteProjectsTitle": "プロジェクトを削除",
       "deleteProjectsDesc": "次のプロジェクトを削除してもよろしいですか：{{names}}？中のワークスペースはリンク解除されますが削除はされません。",
+      "projectsDeleted_other": "{{count}} 件のプロジェクトを削除しました",
+      "projectsDeleteFailed_other": "{{count}} 件のプロジェクトを削除できませんでした。",
+      "workspacesDeleted_other": "{{count}} 件のワークスペースを削除しました",
+      "workspacesDeleteFailed_other": "{{count}} 件のワークスペースを削除できませんでした。",
       "deletedTitle": "プロジェクトを削除しました"
     },
     "breadcrumb": {
@@ -708,8 +986,7 @@
     "newWorkspace": "新しいワークスペース",
     "status": {
       "recent": "最近",
-      "draft": "下書き",
-      "active": "アクティブ"
+      "empty": "空"
     },
     "notesInside_one": "{{count}}件のノート",
     "notesInside_other": "{{count}}件のノート",
@@ -727,12 +1004,6 @@
     },
     "recentWorkspace": "最近のワークスペース",
     "emptyFolderSnippet": "このフォルダーは空です。最初のワークスペースを作成して始めましょう...",
-    "defaultSnippet": "{{name}} に関連する作業計画と重要なメモ。主要な目標と成果物...",
-    "snippets": {
-      "nutrition1": "日々のパフォーマンスに必要な必須栄養素とタンパク質。火曜日のセッションメモ...",
-      "nutrition2": "脂溶性・水溶性ビタミンの主な違いと推奨される食品源...",
-      "sql": "高度なSQL JOIN：実用的なクエリ例を含むINNER、LEFT、RIGHT、FULL OUTER JOIN..."
-    },
     "filterAndSortNotes": "ノートのフィルターと並べ替え",
     "switchViewMode": "表示モードを切り替え",
     "sortNotes": "ノートの並べ替え",
@@ -744,6 +1015,22 @@
     "viewGrid": "グリッド",
     "viewList": "リスト",
     "deleteWorkspace": "ワークスペースを削除",
+    "deleteDialog": {
+      "title": "プロジェクトを削除",
+      "description": "プロジェクト「{{name}}」を削除してもよろしいですか？",
+      "bulkTitle": "{{count}} 件のプロジェクトを削除",
+      "bulkDescription": "次の {{count}} 件のプロジェクトを削除してもよろしいですか？",
+      "workspacesWarning_other": "このプロジェクトには {{count}} 件のワークスペースがあります。プロジェクトと一緒に削除され、復元できません。",
+      "bulkWorkspacesWarning_other": "データが削除されます：これらのプロジェクトには合計 {{count}} 件のワークスペースがあり、完全に削除されます。",
+      "noWorkspacesWarning": "この操作は元に戻せません。"
+    },
+    "deleteWorkspacesDialog": {
+      "title": "ワークスペースを削除",
+      "description": "「{{name}}」を削除してもよろしいですか？",
+      "bulkTitle": "{{count}} 件のワークスペースを削除",
+      "bulkDescription": "次の {{count}} 件のワークスペースを削除してもよろしいですか？",
+      "warning_other": "{{count}} 件のワークスペースの内容が完全に削除されます。この操作は元に戻せません。"
+    },
     "renameFolder": "フォルダ名を変更",
     "customizeStyle": "スタイルをカスタマイズ",
     "deleteFolder": "フォルダを削除",
@@ -759,7 +1046,27 @@
       "title": "新しいフォルダを作成"
     },
     "namePlaceholder": "例：スプリントプラン、個人、マーケティング",
-    "createFolder": "フォルダを作成"
+    "createFolder": "フォルダを作成",
+    "editedOn": "{{date}} に編集",
+    "card": {
+      "created": "作成日",
+      "taskStatus": "タスクの状態",
+      "time": "見積 / 実績",
+      "none": "なし",
+      "noTask": "リンクされたタスクなし",
+      "more_one": "+{{count}} 件",
+      "more_other": "+{{count}} 件",
+      "doneCount": "{{done}}/{{total}} 完了",
+      "linkedTasks_one": "リンクされたタスク ({{count}})",
+      "linkedTasks_other": "リンクされたタスク ({{count}})",
+      "noContent": "まだ内容がありません",
+      "options": "ドキュメントのオプション"
+    },
+    "folderView": {
+      "label": "プロジェクトの表示",
+      "documents": "ドキュメント",
+      "tasks": "タスク"
+    }
   },
   "allProjectsModal": {
     "title": "すべてのフォルダ",
@@ -834,7 +1141,6 @@
     "status": {
       "all": "すべて",
       "todo": "未着手",
-      "inProgress": "進行中",
       "planning": "計画中",
       "scheduled": "予定済み",
       "review": "レビュー中",
@@ -848,7 +1154,8 @@
       "high": "高",
       "medium": "中",
       "low": "低",
-      "none": "優先度なし"
+      "none": "優先度なし",
+      "critical": "緊急"
     },
     "columns": {
       "taskName": "タスク名",
@@ -866,16 +1173,12 @@
       "markAsDone": "完了に変更",
       "deleteTask": "タスクを削除"
     },
-    "allClear": "すべて完了",
-    "addTaskTo": "タスクを追加：",
-    "collapseSection": "セクションを折りたたむ",
-    "expandSection": "セクションを展開",
-    "pressEnter": "Enterキーを押す",
     "subtasksCount": "{{completed}}/{{total}} サブタスク",
     "dates": {
       "all": "すべてのタスク",
       "today": "今日",
       "tomorrow": "明日",
+      "overdue": "期限切れ",
       "in3Days": "3日以内",
       "nextWeek": "来週",
       "thisWeek": "今週",
@@ -932,7 +1235,27 @@
       "noTimeLogged": "記録された時間はまだありません。",
       "titlePlaceholder": "四半期パフォーマンスレポートを完成させる"
     },
+    "projectRequired": {
+      "title": "プロジェクトを選択",
+      "description": "先にプロジェクトを作成してください。このビューのタスクは必ずプロジェクトに属します。"
+    },
+    "deleteTaskDialog": {
+      "title": "タスクを削除",
+      "description": "タスク「{{title}}」を削除してもよろしいですか？",
+      "warning": "サブタスクも一緒に削除され、元に戻せません。"
+    },
     "createProjectTaskModal": {
+      "noEstimate": "見積もりなし",
+      "selectProject": "プロジェクトを選択",
+      "toast": {
+        "titleRequired": "タイトルが必要です",
+        "titleRequiredDesc": "タスクのタイトルを入力してください。",
+        "taskUpdated": "タスクを更新しました",
+        "workspaceTitleRequired": "タイトルが必要です",
+        "workspaceTitleRequiredDesc": "ワークスペースのタイトルを入力してください。",
+        "workspaceLinked": "ワークスペースを作成してリンクしました",
+        "workspaceCreateFailed": "ワークスペースを作成できませんでした。もう一度お試しください。"
+      },
       "titlePlaceholder": "タスク名...",
       "status": "ステータス",
       "priority": "優先度",

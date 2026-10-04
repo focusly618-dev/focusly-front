@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTheme, alpha } from '@mui/material';
 import { sileo, UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import { PRIORITY_OPTIONS, isCustomEmoji } from '@/components/ui';
@@ -13,16 +14,18 @@ import type {
   ProjectOption,
 } from './CreateProjectTaskModal.types';
 import { surfaceColor } from '@/context';
+import { parseDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import { mapStatusFromBackend } from '../ProjectTasks/hooks/useTaskMutations.hook';
+import { DEFAULT_PROJECT_STATUSES } from '../ProjectTasks/projectTasks.types';
+import { toDateInputValue } from '../ProjectTasks/projectTaskDates';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-export const STATUS_OPTIONS = [
-  { id: 'backlog', label: 'Backlog', color: '#64748b' },
-  { id: 'todo', label: 'To Do', color: '#94a3b8' },
-  { id: 'in_progress', label: 'In Progress', color: '#3b82f6' },
-  { id: 'review', label: 'Review', color: '#8b5cf6' },
-  { id: 'done', label: 'Done', color: '#10b981' },
-];
+// The project tasks view's statuses, so an existing task opens with its real
+// status (and its usual name) instead of falling back.
+export const STATUS_OPTIONS = DEFAULT_PROJECT_STATUSES.map(
+  ({ id, label, labelKey, color }) => ({ id, label, labelKey, color }),
+);
 
 export const DURATION_OPTIONS = [
   '15m',
@@ -42,7 +45,37 @@ export interface Subtask {
   title: string;
   time?: string;
   completed?: boolean;
+  // Backend values carried through so a save doesn't erase them.
+  estimateTimer?: number | null;
+  completedAt?: string | null;
 }
+
+// What the form showed when an existing task was opened; on save only the
+// fields that differ from it are sent, so untouched data is never rewritten.
+interface FormSnapshot {
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  dueDate: string;
+  estimatedDuration: string;
+  modules: string[];
+  subtasks: Subtask[];
+  projectId?: string;
+  workspaceId: string | null;
+}
+
+const toSubtaskPayload = (list: Subtask[]) =>
+  list.map((s) => ({
+    id: s.id,
+    title: s.title,
+    completed: Boolean(s.completed),
+    completed_at: s.completedAt ?? null,
+    estimate_timer: parseDuration(s.time) || s.estimateTimer || null,
+  }));
+
+const isSameList = (a: unknown[], b: unknown[]) =>
+  JSON.stringify(a) === JSON.stringify(b);
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
@@ -52,14 +85,16 @@ export function useCreateProjectTaskModal({
   task,
   projects,
   selectedProjectId,
-  projectName = 'Select Project',
+  projectName,
   projectEmoji = '📁',
   linkedWorkspaceId,
   defaultStatus,
+  defaultTitle,
   onCreate,
   onUpdate,
   onDelete,
 }: CreateProjectTaskModalProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const isEditing = Boolean(task);
@@ -73,13 +108,22 @@ export function useCreateProjectTaskModal({
   const [projectMenuAnchor, setProjectMenuAnchor] =
     useState<null | HTMLElement>(null);
 
+  const taskProject = task
+    ? projects?.find(
+        (p) => p.id === task.projectId || p.id === task.project?.id,
+      )
+    : undefined;
   const selectedProject =
     selectedProjectOverride ||
+    taskProject ||
     (selectedProjectId && projects
       ? projects.find((p) => p.id === selectedProjectId)
       : projects?.[0]);
 
-  const currentProjectName = selectedProject?.name || projectName;
+  const currentProjectName =
+    selectedProject?.name ||
+    projectName ||
+    t('tasks.createProjectTaskModal.selectProject');
   const currentProjectColor = selectedProject?.color || '#3b82f6';
   const currentProjectEmoji =
     selectedProject?.emoji ||
@@ -137,8 +181,10 @@ export function useCreateProjectTaskModal({
     ).trim();
     if (!titleToUse) {
       sileo.warning({
-        title: 'Título requerido',
-        description: 'Por favor escribe un título para el workspace.',
+        title: t('tasks.createProjectTaskModal.toast.workspaceTitleRequired'),
+        description: t(
+          'tasks.createProjectTaskModal.toast.workspaceTitleRequiredDesc',
+        ),
         duration: 3000,
       });
       return;
@@ -166,8 +212,8 @@ export function useCreateProjectTaskModal({
         setWorkspaceMenuAnchor(null);
         await refetchWorkspaces();
         sileo.success({
-          title: 'Workspace creado y vinculado',
-          description: `"${newWs.title || titleToUse}"`,
+          title: t('tasks.createProjectTaskModal.toast.workspaceLinked'),
+          description: newWs.title || titleToUse,
           duration: 2500,
         });
         return newWs;
@@ -175,8 +221,7 @@ export function useCreateProjectTaskModal({
     } catch (err) {
       console.error('Error al crear workspace:', err);
       sileo.error({
-        title: 'Error',
-        description: 'No se pudo crear el workspace. Intenta de nuevo.',
+        title: t('tasks.createProjectTaskModal.toast.workspaceCreateFailed'),
         duration: 3000,
       });
     }
@@ -223,9 +268,9 @@ export function useCreateProjectTaskModal({
     return null;
   }, [availableWorkspaces, selectedWorkspaceId]);
 
-  const isWorkspaceLinked = Boolean(
-    selectedWorkspace || selectedWorkspaceId || task?.workspaceId,
-  );
+  // selectedWorkspaceId starts as the task's link, so after "unlink" this has
+  // to stop counting the task's original workspace.
+  const isWorkspaceLinked = Boolean(selectedWorkspace || selectedWorkspaceId);
   const displayWorkspaceTitle =
     selectedWorkspace?.title?.trim() ||
     (selectedWorkspaceId ? UNTITLED_WORKSPACE_TITLE : '');
@@ -257,91 +302,83 @@ export function useCreateProjectTaskModal({
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [newSubtaskTime, setNewSubtaskTime] = useState('15m');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const initialSnapshotRef = useRef<FormSnapshot | null>(null);
+  // Which open/task the form was last filled for. The parent re-renders with
+  // fresh `projects`/`task` objects while the modal is open (refetches,
+  // sockets), and refilling on each of those wiped what the user was typing.
+  const filledForRef = useRef<string | null>(null);
 
   // ── Sync form with task prop or reset for new task ─────────────────────────
   useEffect(() => {
-    if (open) {
-      if (task) {
-        setTitle(task.title || '');
-        setDescription(task.description || '');
-        setStatus(task.status || defaultStatus || 'in_progress');
-        setPriority(task.priority || 'Medium');
+    if (!open) {
+      filledForRef.current = null;
+      return;
+    }
+    const fillKey = task?.id ?? 'new';
+    if (filledForRef.current === fillKey) return;
+    filledForRef.current = fillKey;
 
-        if (task.rawDeadline) {
-          try {
-            setDueDate(new Date(task.rawDeadline).toISOString().slice(0, 10));
-          } catch {
-            setDueDate(task.rawDeadline.slice(0, 10));
-          }
-        } else if (task.dueDate && /^\d{4}-\d{2}-\d{2}/.test(task.dueDate)) {
-          setDueDate(task.dueDate.slice(0, 10));
-        } else {
-          setDueDate('');
-        }
+    setIsDeleteConfirmOpen(false);
+    setSelectedProjectOverride(undefined);
 
-        setEstimatedDuration(task.duration || '30m');
-        setModules(
+    if (task) {
+      const initialDueDate = toDateInputValue(task.rawDeadline);
+
+      const initial: FormSnapshot = {
+        title: task.title || '',
+        description: task.description || '',
+        status: mapStatusFromBackend(task.status || defaultStatus),
+        priority: task.priority || 'Medium',
+        dueDate: initialDueDate,
+        // No estimate stays empty instead of silently becoming 30m.
+        estimatedDuration: task.duration || '',
+        modules:
           task.modules && task.modules.length > 0
             ? task.modules
             : task.tag
               ? [task.tag]
               : [],
-        );
-        setSubtasks(
-          (task.subtasks || []).map((s) => ({
-            id: s.id,
-            title: s.title,
-            time: s.duration || '15m',
-            completed: Boolean(s.completed),
-          })),
-        );
-        setSelectedWorkspaceId(task.workspaceId || linkedWorkspaceId || null);
+        subtasks: (task.subtasks || []).map((s) => ({
+          id: s.id,
+          title: s.title,
+          time: s.duration || '',
+          completed: Boolean(s.completed),
+          estimateTimer: s.estimateTimer ?? null,
+          completedAt: s.completedAt ?? null,
+        })),
+        projectId: task.projectId || task.project?.id,
+        workspaceId: task.workspaceId || linkedWorkspaceId || null,
+      };
+      initialSnapshotRef.current = initial;
 
-        const matchedProject = projects?.find(
-          (p) => p.id === task.projectId || p.id === task.project?.id,
-        );
-        if (matchedProject) {
-          setSelectedProjectOverride(matchedProject);
-        } else if (selectedProjectId && projects) {
-          setSelectedProjectOverride(
-            projects.find((p) => p.id === selectedProjectId),
-          );
-        } else {
-          setSelectedProjectOverride(undefined);
-        }
-      } else {
-        setTitle('');
-        setDescription('');
-        setStatus(defaultStatus || 'in_progress');
-        setPriority('Medium');
-        setDueDate('');
-        setEstimatedDuration('30m');
-        setModules([]);
-        setSubtasks([]);
-        setSelectedWorkspaceId(linkedWorkspaceId || null);
-        if (selectedProjectId && projects) {
-          setSelectedProjectOverride(
-            projects.find((p) => p.id === selectedProjectId),
-          );
-        } else {
-          setSelectedProjectOverride(undefined);
-        }
-      }
+      setTitle(initial.title);
+      setDescription(initial.description);
+      setStatus(initial.status);
+      setPriority(initial.priority);
+      setDueDate(initial.dueDate);
+      setEstimatedDuration(initial.estimatedDuration);
+      setModules(initial.modules);
+      setSubtasks(initial.subtasks);
+      setSelectedWorkspaceId(initial.workspaceId);
+    } else {
+      initialSnapshotRef.current = null;
+      setTitle(defaultTitle || '');
+      setDescription('');
+      setStatus(defaultStatus || 'in_progress');
+      setPriority('Medium');
+      setDueDate('');
+      setEstimatedDuration('30m');
+      setModules([]);
+      setSubtasks([]);
+      setSelectedWorkspaceId(linkedWorkspaceId || null);
     }
-  }, [
-    open,
-    task,
-    linkedWorkspaceId,
-    defaultStatus,
-    selectedProjectId,
-    projects,
-  ]);
+  }, [open, task, linkedWorkspaceId, defaultStatus, defaultTitle]);
 
   // ── Derived config ─────────────────────────────────────────────────────────
   const currentStatusConfig =
-    STATUS_OPTIONS.find(
-      (s) => s.id === status || s.label.toLowerCase() === status.toLowerCase(),
-    ) || STATUS_OPTIONS[2];
+    STATUS_OPTIONS.find((s) => s.id === mapStatusFromBackend(status)) ||
+    STATUS_OPTIONS[1];
 
   const currentPriorityConfig =
     PRIORITY_OPTIONS.find(
@@ -365,7 +402,15 @@ export function useCreateProjectTaskModal({
 
   const toggleSubtask = (id: string) => {
     setSubtasks((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, completed: !s.completed } : s)),
+      prev.map((s) =>
+        s.id === id
+          ? {
+              ...s,
+              completed: !s.completed,
+              completedAt: s.completed ? null : new Date().toISOString(),
+            }
+          : s,
+      ),
     );
   };
 
@@ -403,8 +448,8 @@ export function useCreateProjectTaskModal({
   const handleCreateTask = async () => {
     if (!title.trim()) {
       sileo.warning({
-        title: 'Title required',
-        description: 'Please enter a title for the task.',
+        title: t('tasks.createProjectTaskModal.toast.titleRequired'),
+        description: t('tasks.createProjectTaskModal.toast.titleRequiredDesc'),
         duration: 3000,
       });
       return;
@@ -412,34 +457,37 @@ export function useCreateProjectTaskModal({
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        title: title.trim(),
-        status: currentStatusConfig.id,
-        priority: currentPriorityConfig.id,
-        modules,
-        dueDate: dueDate || undefined,
-        estimatedDuration,
-        description: description.trim(),
-        subtasks,
-        projectId: selectedProject?.id,
-        workspaceId: selectedWorkspaceId || undefined,
-      };
-
       if (isEditing && task) {
+        const changes = getChangedFields();
+        if (Object.keys(changes).length === 0) {
+          onClose();
+          return;
+        }
         if (onUpdate) {
-          await onUpdate(task.id, payload);
+          await onUpdate(task.id, changes);
         } else if (onCreate) {
-          await onCreate({ ...payload, id: task.id });
+          await onCreate({ ...changes, id: task.id });
         }
         sileo.success({
-          title: 'Task updated',
-          description: `"${title.trim()}" saved successfully.`,
+          title: t('tasks.createProjectTaskModal.toast.taskUpdated'),
+          description: title.trim(),
           duration: 2500,
         });
         onClose();
       } else {
         if (onCreate) {
-          await onCreate(payload);
+          await onCreate({
+            title: title.trim(),
+            status: currentStatusConfig.id,
+            priority: currentPriorityConfig.id,
+            modules,
+            dueDate: dueDate || undefined,
+            estimatedDuration,
+            description: description.trim(),
+            subtasks: toSubtaskPayload(subtasks),
+            projectId: selectedProject?.id,
+            workspaceId: selectedWorkspaceId || undefined,
+          });
         }
 
         if (createMore) {
@@ -458,17 +506,55 @@ export function useCreateProjectTaskModal({
     }
   };
 
-  const handleDeleteTask = async () => {
-    if (!task?.id || !onDelete) return;
-    setIsSubmitting(true);
-    try {
-      await onDelete(task.id);
-      onClose();
-    } catch (err) {
-      console.error('Failed to delete task:', err);
-    } finally {
-      setIsSubmitting(false);
+  // Only what the user actually changed. Re-sending untouched values used to
+  // reopen completed tasks, drop statuses the form can't show (Scheduled,
+  // Planning…), reset deadline times and move tasks to another project.
+  const getChangedFields = (): Record<string, unknown> => {
+    const initial = initialSnapshotRef.current;
+    if (!initial) return {};
+    const changes: Record<string, unknown> = {};
+
+    if (title.trim() !== initial.title.trim()) changes.title = title.trim();
+    if (description !== initial.description) {
+      changes.description = description.trim();
     }
+    if (status !== initial.status) changes.status = currentStatusConfig.id;
+    if (priority !== initial.priority) {
+      changes.priority = currentPriorityConfig.id;
+    }
+    // An emptied date or estimate removes it.
+    if (dueDate !== initial.dueDate) changes.dueDate = dueDate;
+    if (estimatedDuration !== initial.estimatedDuration) {
+      changes.estimatedDuration = estimatedDuration;
+    }
+    if (!isSameList(modules, initial.modules)) changes.modules = modules;
+    if (!isSameList(subtasks, initial.subtasks)) {
+      changes.subtasks = toSubtaskPayload(subtasks);
+    }
+    if (
+      selectedProjectOverride &&
+      selectedProjectOverride.id !== initial.projectId
+    ) {
+      changes.projectId = selectedProjectOverride.id;
+    }
+    // null means the user unlinked the workspace.
+    if (selectedWorkspaceId !== initial.workspaceId) {
+      changes.workspaceId = selectedWorkspaceId;
+    }
+    return changes;
+  };
+
+  const handleDeleteTask = () => {
+    if (!task?.id || !onDelete) return;
+    setIsDeleteConfirmOpen(true);
+  };
+
+  // Runs from the confirm dialog, which shows the progress and stays open if
+  // the delete fails (the mutation hook already reports the error).
+  const confirmDeleteTask = async () => {
+    if (!task?.id || !onDelete) return;
+    await onDelete(task.id);
+    onClose();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -584,6 +670,9 @@ export function useCreateProjectTaskModal({
     handleRemoveTag,
     handleCreateTask,
     handleDeleteTask,
+    confirmDeleteTask,
+    isDeleteConfirmOpen,
+    closeDeleteConfirm: () => setIsDeleteConfirmOpen(false),
     handleKeyDown,
     handleRedirectWorkspace,
   };

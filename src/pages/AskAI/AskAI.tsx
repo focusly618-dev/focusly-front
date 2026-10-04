@@ -59,8 +59,7 @@ import {
   deleteAIConversation,
   type AIConversation,
 } from '@/api/AI/apiAI';
-import { SuggestedActionCard } from '@/components/chat/suggestedActionCard/SuggestedActionCard';
-import { SuggestedActionsPlan } from '@/components/chat/suggestedActionsPlan/SuggestedActionsPlan';
+import { ActionPlan } from '@/components/chat/actionPlan/ActionPlan';
 import {
   PromptInput,
   PromptInputHeader,
@@ -1769,12 +1768,7 @@ export const AskAI: React.FC = () => {
                           </MessageBubble>
                         )}
 
-                        {actions.length === 1 && (
-                          <SuggestedActionCard action={actions[0]} />
-                        )}
-                        {actions.length > 1 && (
-                          <SuggestedActionsPlan actions={actions} />
-                        )}
+                        {actions.length > 0 && <ActionPlan actions={actions} />}
                         <AIMessageActions>
                           <button
                             type="button"

@@ -2,372 +2,249 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Typography,
+  ButtonBase,
+  Collapse,
   IconButton,
   InputBase,
-  Menu,
-  MenuItem,
-  useTheme,
-  Collapse,
-  alpha,
   Tooltip,
+  Typography,
+  alpha,
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import AddIcon from '@mui/icons-material/Add';
-import CheckIcon from '@mui/icons-material/Check';
 import { ProjectTaskItem } from './ProjectTaskItem';
 import type {
   ProjectStatusConfig,
   ProjectTaskItemData,
+  ProjectTaskStatusId,
 } from './projectTasks.types';
-import CreateProjectTaskModal from '../CreateProjectTaskModal';
-import { surfaceColor } from '@/context';
 
 export interface ProjectTaskStatusGroupProps {
   status: ProjectStatusConfig;
   tasks: ProjectTaskItemData[];
+  showProject?: boolean;
   onTaskClick?: (task: ProjectTaskItemData) => void;
   onToggleComplete?: (task: ProjectTaskItemData) => void;
+  onChangeStatus?: (
+    task: ProjectTaskItemData,
+    status: ProjectTaskStatusId,
+  ) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onAddSubtask?: (taskId: string, title: string) => void;
+  /** An empty title asks for the full task form. */
   onAddTask?: (statusId: string, title: string) => void;
   defaultExpanded?: boolean;
+  selectionMode?: boolean;
+  isSelected?: (taskId: string) => boolean;
+  onToggleSelect?: (task: ProjectTaskItemData) => void;
 }
 
 export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
   status,
   tasks,
+  showProject,
   onTaskClick,
   onToggleComplete,
+  onChangeStatus,
   onToggleSubtask,
   onAddSubtask,
   onAddTask,
   defaultExpanded = true,
+  selectionMode = false,
+  isSelected,
+  onToggleSelect,
 }) => {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-  const statusLabel = t(`tasks.status.${status.id}`, {
-    defaultValue: status.label,
-  });
+  const statusLabel = t(status.labelKey, { defaultValue: status.label });
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const groupId = `project-status-${status.id}`;
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newTaskTitle.trim()) {
       e.preventDefault();
       onAddTask?.(status.id, newTaskTitle.trim());
+      // Stays open for the next one; Esc or leaving it empty closes it.
       setNewTaskTitle('');
-      setIsAddingTask(false);
     } else if (e.key === 'Escape') {
       setIsAddingTask(false);
       setNewTaskTitle('');
     }
   };
 
-  const isCompletedGroup =
-    status.isCompleted || status.id.toLowerCase() === 'completed';
-
   return (
-    <Box sx={{ mb: 2 }}>
-      {/* ── Status Header Row ── */}
+    <Box component="section" aria-labelledby={`${groupId}-title`}>
+      {/* ── Header ── */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          py: 0.75,
-          px: 1,
+          gap: 1,
           mb: 0.75,
-          borderRadius: '8px',
-          userSelect: 'none',
-          transition: 'background-color 0.15s ease',
-          '&:hover': {
-            bgcolor: isDark
-              ? 'rgba(255, 255, 255, 0.02)'
-              : 'rgba(0, 0, 0, 0.02)',
-          },
         }}
       >
-        {/* Left: Caret + Dot + Status Title + Count */}
-        <Box
-          onClick={() => setIsExpanded(!isExpanded)}
+        <ButtonBase
+          onClick={() => setIsExpanded((v) => !v)}
+          aria-expanded={isExpanded}
+          aria-controls={groupId}
           sx={{
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            cursor: 'pointer',
+            py: 0.5,
+            px: 0.75,
+            borderRadius: '8px',
+            '&:hover': { bgcolor: 'action.hover' },
+            '&.Mui-focusVisible': { outline: '2px solid #008767' },
           }}
         >
-          <IconButton
-            size="small"
+          <KeyboardArrowDownIcon
             sx={{
-              p: '2px',
-              color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-            }}
-          >
-            {isExpanded ? (
-              <KeyboardArrowDownIcon sx={{ fontSize: 18 }} />
-            ) : (
-              <KeyboardArrowRightIcon sx={{ fontSize: 18 }} />
-            )}
-          </IconButton>
-
-          {/* Status Color Dot */}
-          <Box
-            sx={{
-              width: 7,
-              height: 7,
-              borderRadius: '50%',
-              bgcolor: status.dotColor || status.color,
-              boxShadow: `0 0 6px ${alpha(status.dotColor || status.color, 0.6)}`,
+              fontSize: 18,
+              color: 'text.secondary',
+              transition: 'transform 0.15s ease',
+              transform: isExpanded ? 'none' : 'rotate(-90deg)',
             }}
           />
-
-          {/* Status Name */}
+          <Box
+            sx={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              bgcolor: status.dotColor,
+              boxShadow: `0 0 6px ${alpha(status.dotColor, 0.6)}`,
+            }}
+          />
           <Typography
+            id={`${groupId}-title`}
+            component="h3"
             sx={{
               fontSize: '13.5px',
               fontWeight: 700,
-              color: isDark ? '#f4f4f5' : '#09090b',
+              color: 'text.primary',
               letterSpacing: '-0.01em',
             }}
           >
             {statusLabel}
           </Typography>
-
-          {/* Task Count Badge */}
           <Box
+            component="span"
             sx={{
-              px: '6px',
+              px: '7px',
               py: '1px',
               borderRadius: '10px',
               fontSize: '11px',
-              fontWeight: 600,
-              bgcolor: isDark
-                ? 'rgba(255, 255, 255, 0.07)'
-                : 'rgba(0, 0, 0, 0.06)',
-              color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
-              minWidth: 18,
+              fontWeight: 650,
+              bgcolor: alpha(status.dotColor, 0.14),
+              color: status.dotColor,
+              minWidth: 20,
               textAlign: 'center',
             }}
           >
             {tasks.length}
           </Box>
-        </Box>
+        </ButtonBase>
 
-        {/* Right Action: Menu or "All clear" for completed */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {isCompletedGroup && tasks.length > 0 && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                color: '#10b981',
-                fontSize: '11.5px',
-                fontWeight: 600,
-                pr: 1,
-              }}
-            >
-              <CheckIcon sx={{ fontSize: 14 }} />
-              <span>{t('tasks.allClear', 'All clear')}</span>
-            </Box>
-          )}
-
-          <Tooltip
-            title={`${t('tasks.addTaskTo', 'Add task to')} ${statusLabel}`}
-          >
+        {!selectionMode && (
+          <Tooltip title={t('projectTasks.addTo', { status: statusLabel })}>
             <IconButton
               size="small"
-              onClick={(e) => {
-                e.stopPropagation();
+              aria-label={t('projectTasks.addTo', { status: statusLabel })}
+              onClick={() => {
                 setIsExpanded(true);
                 setIsAddingTask(true);
               }}
-              sx={{
-                p: '3px',
-                color: isDark
-                  ? 'rgba(255, 255, 255, 0.5)'
-                  : 'rgba(0, 0, 0, 0.4)',
-                borderRadius: '6px',
-                '&:hover': {
-                  color: isDark ? '#ffffff' : '#000000',
-                  bgcolor: isDark
-                    ? 'rgba(255, 255, 255, 0.08)'
-                    : 'rgba(0, 0, 0, 0.04)',
-                },
-              }}
+              sx={{ p: '3px', color: 'text.secondary', borderRadius: '6px' }}
             >
               <AddIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Tooltip>
-
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuAnchorEl(e.currentTarget);
-            }}
-            sx={{
-              p: '3px',
-              color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-              '&:hover': {
-                color: isDark ? '#ffffff' : '#000000',
-              },
-            }}
-          >
-            <MoreHorizIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Box>
+        )}
       </Box>
 
-      {/* ── Status Menu ── */}
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={() => setMenuAnchorEl(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '10px',
-            bgcolor: surfaceColor(theme, '#1a1b22', '#262626', '#ffffff'),
-            border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
-            boxShadow: isDark
-              ? '0 12px 32px rgba(0, 0, 0, 0.5)'
-              : '0 8px 24px rgba(0, 0, 0, 0.1)',
-            minWidth: 140,
-            p: 0.5,
-          },
-        }}
-      >
-        <MenuItem
-          onClick={() => {
-            setIsExpanded(true);
-            setIsAddingTask(true);
-            setMenuAnchorEl(null);
-            setOpenModal(true);
-          }}
-          sx={{ fontSize: '12.5px', borderRadius: '6px', py: 0.75 }}
-        >
-          {t('tasks.addTaskTo', 'Add task to')} {statusLabel}
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setIsExpanded(!isExpanded);
-            setMenuAnchorEl(null);
-          }}
-          sx={{ fontSize: '12.5px', borderRadius: '6px', py: 0.75 }}
-        >
-          {isExpanded
-            ? t('tasks.collapseSection', 'Collapse section')
-            : t('tasks.expandSection', 'Expand section')}
-        </MenuItem>
-      </Menu>
-
-      {/* ── Tasks List (Collapsible) ── */}
+      {/* ── Tasks ── */}
       <Collapse in={isExpanded} timeout={200} unmountOnExit>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <Box
+          id={groupId}
+          sx={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
+        >
           {tasks.map((task) => (
             <ProjectTaskItem
               key={task.id}
               task={task}
+              showProject={showProject}
               onTaskClick={onTaskClick}
               onToggleComplete={onToggleComplete}
+              onChangeStatus={onChangeStatus}
               onToggleSubtask={onToggleSubtask}
               onAddSubtask={onAddSubtask}
+              selectionMode={selectionMode}
+              selected={isSelected?.(task.id)}
+              onToggleSelect={onToggleSelect}
             />
           ))}
 
-          {/* Quick Add Task Button / Input */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              px: 2,
-              py: 1,
-              borderRadius: '8px',
-              bgcolor: isAddingTask
-                ? isDark
-                  ? 'rgba(255, 255, 255, 0.03)'
-                  : 'rgba(0, 0, 0, 0.02)'
-                : 'transparent',
-              border: isAddingTask
-                ? `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`
-                : '1px dashed transparent',
-              cursor: isAddingTask ? 'text' : 'pointer',
-              transition: 'all 0.15s ease',
-              '&:hover': !isAddingTask
-                ? {
-                    bgcolor: isDark
-                      ? 'rgba(255, 255, 255, 0.02)'
-                      : 'rgba(0, 0, 0, 0.02)',
-                  }
-                : {},
-            }}
-            onClick={() => setIsAddingTask(true)}
-          >
-            <AddIcon
-              sx={{
-                fontSize: 16,
-                color: isDark
-                  ? 'rgba(255, 255, 255, 0.4)'
-                  : 'rgba(0, 0, 0, 0.4)',
-              }}
-            />
-            {isAddingTask ? (
-              <InputBase
-                autoFocus
-                placeholder={`${t('tasks.addTaskTo', 'Add task to')} ${statusLabel}... (${t('tasks.pressEnter', 'Press Enter')})`}
-                value={newTaskTitle}
-                onChange={(e) => setNewTaskTitle(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onBlur={() => {
-                  if (!newTaskTitle.trim()) setIsAddingTask(false);
-                }}
-                fullWidth
+          {/* Quick add */}
+          {!selectionMode &&
+            (isAddingTask ? (
+              <Box
                 sx={{
-                  fontSize: '13px',
-                  color: isDark ? '#f4f4f5' : '#18181b',
-                  '& input::placeholder': {
-                    color: isDark
-                      ? 'rgba(255, 255, 255, 0.35)'
-                      : 'rgba(0, 0, 0, 0.4)',
-                    opacity: 1,
-                    fontSize: '13px',
-                  },
-                }}
-              />
-            ) : (
-              <Typography
-                sx={{
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  color: isDark
-                    ? 'rgba(255, 255, 255, 0.38)'
-                    : 'rgba(0, 0, 0, 0.42)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: 2,
+                  py: 0.75,
+                  borderRadius: '10px',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
                 }}
               >
-                {t('tasks.addTaskTo', 'Add task to')} {statusLabel}...{' '}
-                <span style={{ opacity: 0.7 }}>
-                  ({t('tasks.pressEnter', 'Press Enter')})
-                </span>
-              </Typography>
-            )}
-          </Box>
+                <AddIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                <InputBase
+                  autoFocus
+                  fullWidth
+                  placeholder={t('projectTasks.quickAddPlaceholder', {
+                    status: statusLabel,
+                  })}
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onBlur={() => {
+                    if (!newTaskTitle.trim()) setIsAddingTask(false);
+                  }}
+                  inputProps={{
+                    'aria-label': t('projectTasks.addTo', {
+                      status: statusLabel,
+                    }),
+                  }}
+                  sx={{ fontSize: '13px' }}
+                />
+              </Box>
+            ) : (
+              <ButtonBase
+                onClick={() => setIsAddingTask(true)}
+                sx={{
+                  justifyContent: 'flex-start',
+                  gap: 1,
+                  px: 2,
+                  py: 0.85,
+                  borderRadius: '10px',
+                  color: 'text.secondary',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  '&:hover': { bgcolor: 'action.hover' },
+                  '&.Mui-focusVisible': { outline: '2px solid #008767' },
+                }}
+              >
+                <AddIcon sx={{ fontSize: 16 }} />
+                {t('projectTasks.addTo', { status: statusLabel })}
+              </ButtonBase>
+            ))}
         </Box>
       </Collapse>
-      <CreateProjectTaskModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        onCreate={(taskData) => {
-          onAddTask?.(status.id, String(taskData.title || ''));
-        }}
-      />
     </Box>
   );
 };

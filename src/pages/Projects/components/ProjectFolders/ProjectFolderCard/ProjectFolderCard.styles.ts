@@ -15,6 +15,8 @@ export const CardContainer = styled(Box, {
   flexDirection: 'column',
   cursor: 'pointer',
   minHeight: '235px',
+  height: '100%',
+  minWidth: 0,
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   backgroundColor: surfaceColor(theme, '#1C1C1E', '#262626', '#FFFFFF'),
   boxShadow:

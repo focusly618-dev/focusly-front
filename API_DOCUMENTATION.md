@@ -47,7 +47,7 @@ Este documento detalla las APIs principales registradas en el proyecto Focusly, 
   - `sort`: `TaskSortInput` (Opcional: field, direction)
 - **Información Recibida (Resultado)**:
   - Un array de objetos `Task` con campos como:
-    - `id`, `title`, `notes_encrypted`, `status`, `priority_level`, `category`, `deadline`.
+    - `id`, `title`, `notes`, `status`, `priority_level`, `category`, `deadline`.
     - `tags`: Etiquetas asociadas.
     - `workspace`: Información del workspace al que pertenece.
 

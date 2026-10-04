@@ -352,3 +352,10 @@ export const iconMap: Record<string, React.ElementType> = {
   Magic: MagicIcon,
   Tag: TagIcon,
 };
+
+/** The keys that focus the library's search box (see WorkspaceLibraryHeader). */
+export const SEARCH_SHORTCUT =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPhone|iPad/i.test(navigator.userAgent)
+    ? '⌘K'
+    : 'Ctrl K';

@@ -44,7 +44,8 @@ export interface TaskResponse {
   priority_level: number;
   category: string;
   color?: string;
-  deadline: string;
+  /** null when the task has no date. */
+  deadline: string | null;
   status:
     | 'Todo'
     | 'Planning'

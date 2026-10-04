@@ -27,18 +27,27 @@ describe('useTaskFormState (Home / CreateTaskModal variant)', () => {
     expect(Number.isNaN(result.current.currentDate!.getTime())).toBe(false);
   });
 
-  it('FIXED: falls back to a valid "now" currentDate instead of Invalid Date when initialTask.deadline is a garbage string', () => {
-    // getInitialState now guards `new Date(deadline)` with an isNaN check —
-    // this used to flow an Invalid Date straight into form state and,
-    // downstream, into handleSave/handleUpdate's `.toISOString()` calls
-    // (see useTaskMutations.crashBugs.test.ts for the crash that caused).
+  it('treats a garbage deadline as no date instead of an Invalid Date', () => {
+    // getInitialState guards `new Date(deadline)` with an isNaN check — an
+    // Invalid Date used to flow into handleSave/handleUpdate's
+    // `.toISOString()` calls (see useTaskMutations.crashBugs.test.ts).
     const { result } = renderHook(() =>
       useHomeTaskFormState({
         initialTask: baseTask({ deadline: 'not-a-real-date' }),
         initialStart: null,
       }),
     );
-    expect(Number.isNaN(result.current.currentDate!.getTime())).toBe(false);
+    expect(result.current.currentDate).toBeNull();
+  });
+
+  it('opens a task without a date undated instead of giving it today', () => {
+    const { result } = renderHook(() =>
+      useHomeTaskFormState({
+        initialTask: baseTask({ deadline: null }),
+        initialStart: null,
+      }),
+    );
+    expect(result.current.currentDate).toBeNull();
   });
 
   it('validateForm rejects an empty title', () => {
@@ -110,14 +119,14 @@ describe('useTaskFormState (Home / CreateTaskModal variant)', () => {
     expect(result.current.collaborators).toHaveLength(0);
   });
 
-  it('timeSlotDisplay produces a real time range instead of Invalid Date text when the source deadline was garbage', () => {
+  it('timeSlotDisplay is empty, never Invalid Date text, when the source deadline was garbage', () => {
     const { result } = renderHook(() =>
       useHomeTaskFormState({
         initialTask: baseTask({ deadline: 'garbage' }),
         initialStart: null,
       }),
     );
-    expect(result.current.timeSlotDisplay).not.toBe('');
+    expect(result.current.timeSlotDisplay).toBe('');
     expect(result.current.timeSlotDisplay).not.toMatch(/invalid/i);
   });
 });

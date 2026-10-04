@@ -1,5 +1,12 @@
-import React from 'react';
-import { Box, Typography, IconButton, Menu, MenuItem } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  Checkbox,
+} from '@mui/material';
 import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,20 +14,54 @@ import {
   ModernFolderOutlinedIcon,
   isCustomEmoji,
 } from '@/components/ui';
+import { alpha } from '@mui/material/styles';
+import { UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import {
   CardContainer,
   FolderIconWrapper,
   StatusBar,
+  WorkspacePreviewBox,
 } from './ProjectFolderCard.styles';
 import { useProjectFolderCard } from './ProjectFolderCard.hook';
 import type { ProjectFolderCardProps } from './ProjectFolderCard.types';
 
+const BRAND = '#008767';
+/** "Recent" means edited in the last week. */
+const RECENT_MS = 7 * 24 * 60 * 60 * 1000;
+/** Two caption lines: keeps every card's preview the same height. */
+const PREVIEW_LINES_HEIGHT = 34;
+
+type GroupWorkspace = NonNullable<
+  ProjectFolderCardProps['group']['workspaces']
+>[number];
+
+const toDate = (value?: string | null) => {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+/** The document edited last. */
+const latestWorkspace = (workspaces?: GroupWorkspace[]) =>
+  (workspaces ?? []).reduce<GroupWorkspace | null>((best, ws) => {
+    const date = toDate(ws.updatedAt);
+    const bestDate = toDate(best?.updatedAt);
+    return date && (!bestDate || date > bestDate) ? ws : best;
+  }, null);
+
+const latestDate = (...values: (string | null | undefined)[]) =>
+  values
+    .map(toDate)
+    .reduce<Date | null>((a, b) => (b && (!a || b > a) ? b : a), null);
+
 export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
   group,
-  index,
   onSelect,
   onCustomize,
   onDelete,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
 }) => {
   const { t, i18n } = useTranslation();
   const {
@@ -33,68 +74,37 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
   } = useProjectFolderCard({ group, onCustomize, onDelete });
 
   const baseColor = group.color || '#10b981';
-  const noteCount = group.workspaces?.length ?? 0;
+  const noteCount = group.workspaceCount ?? group.workspaces?.length ?? 0;
   const hasCustomEmoji = isCustomEmoji(group.emoji);
-  const statusLabel =
-    noteCount > 0 ? (index % 3 === 0 ? 'RECENT' : 'ACTIVE') : 'BORRADOR';
-  const getRecentSnippet = () => {
-    if (noteCount === 0) {
-      return t(
-        'workspaceLibrary.emptyFolderSnippet',
-        'Esta carpeta está vacía. Crea tu primer workspace para empezar...',
-      );
-    }
-    const nameLower = group.name.toLowerCase();
-    if (nameLower.includes('nutric') || nameLower.includes('salud')) {
-      if (index % 2 === 0) {
-        return t(
-          'workspaceLibrary.snippets.nutrition1',
-          'Proteínas y macronutrientes esenciales para el rendimiento diario. Notas de la sesión del martes...',
-        );
-      }
-      return t(
-        'workspaceLibrary.snippets.nutrition2',
-        'Vitaminas liposolubles e hidrosolubles: diferencias clave y fuentes alimenticias recomendadas...',
-      );
-    }
-    if (
-      nameLower.includes('sql') ||
-      nameLower.includes('base') ||
-      nameLower.includes('datos')
-    ) {
-      return t(
-        'workspaceLibrary.snippets.sql',
-        'JOINs avanzados en SQL: INNER, LEFT, RIGHT y FULL OUTER JOIN con ejemplos prácticos de consultas...',
-      );
-    }
-    return t(
-      'workspaceLibrary.defaultSnippet',
-      'Plan de trabajo y notas clave asociadas a {{name}}. Objetivos y entregables principales...',
-      { name: group.name },
-    );
-  };
-
-  const formattedDate = group.updatedAt
-    ? new Date(group.updatedAt).toLocaleDateString(
-        i18n.language === 'ja'
-          ? 'ja-JP'
-          : i18n.language === 'en'
-            ? 'en-US'
-            : 'es-ES',
-        {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-        },
-      )
-    : i18n.language === 'ja'
-      ? '2026年9月28日'
-      : i18n.language === 'en'
-        ? 'Sep 28, 2026'
-        : '28 sept 2026';
+  // When the card mounted: "recent" doesn't need to tick live.
+  const [now] = useState(Date.now);
+  const recent = latestWorkspace(group.workspaces);
+  const lastActivity = latestDate(group.updatedAt, recent?.updatedAt);
+  const status: 'empty' | 'recent' | null =
+    noteCount === 0
+      ? 'empty'
+      : lastActivity && now - lastActivity.getTime() < RECENT_MS
+        ? 'recent'
+        : null;
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString(i18n.language, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
 
   return (
-    <CardContainer baseColor={baseColor} onClick={() => onSelect(group.id)}>
+    <CardContainer
+      baseColor={baseColor}
+      onClick={() =>
+        selectionMode ? onToggleSelect?.(group) : onSelect(group.id)
+      }
+      sx={
+        selected
+          ? { outline: '2px solid #008767', outlineOffset: '-1px' }
+          : undefined
+      }
+    >
       {/* Top Bar: Icon + Actions Button */}
       <Box
         sx={{
@@ -109,7 +119,11 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
           baseColor={baseColor}
           onClick={(e) => {
             e.stopPropagation();
-            onCustomize?.(group);
+            if (selectionMode) {
+              onToggleSelect?.(group);
+            } else {
+              onCustomize?.(group);
+            }
           }}
         >
           {hasCustomEmoji ? (
@@ -126,13 +140,24 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
           )}
         </FolderIconWrapper>
 
-        <IconButton
-          size="small"
-          onClick={handleOpenMenu}
-          sx={{ color: 'text.secondary', p: 0.5 }}
-        >
-          <MoreHorizIcon sx={{ fontSize: 18 }} />
-        </IconButton>
+        {selectionMode ? (
+          <Checkbox
+            size="small"
+            checked={selected}
+            onClick={(e) => e.stopPropagation()}
+            onChange={() => onToggleSelect?.(group)}
+            sx={{ p: 0.5, '&.Mui-checked': { color: '#008767' } }}
+            inputProps={{ 'aria-label': group.name }}
+          />
+        ) : (
+          <IconButton
+            size="small"
+            onClick={handleOpenMenu}
+            sx={{ color: 'text.secondary', p: 0.5 }}
+          >
+            <MoreHorizIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        )}
       </Box>
 
       {/* Body: Title + Count + Updated date + Preview Box */}
@@ -153,128 +178,152 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
           {group.name}
         </Typography>
 
-        {/* Subtitle row with folder icon + count + update date */}
+        {/* Subtitle: document count + last activity, always one line */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 0.5,
+            gap: 1,
             mb: 1.25,
+            minWidth: 0,
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flexShrink: 0,
+            }}
+          >
             <ModernFolderOutlinedIcon sx={{ fontSize: 13, color: baseColor }} />
             <Typography
               variant="caption"
-              sx={{
-                color: baseColor,
-                fontWeight: 700,
-                fontSize: '12px',
-              }}
+              sx={{ color: baseColor, fontWeight: 700, fontSize: '12px' }}
             >
               {t('workspaceLibrary.notesInside', { count: noteCount })}
             </Typography>
           </Box>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              fontSize: '11.5px',
-              opacity: 0.8,
-              ml: 1,
-            }}
-          >
-            {t('workspaceLibrary.lastUpdated')} {formattedDate}
-          </Typography>
+          {lastActivity && (
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{
+                color: 'text.secondary',
+                fontSize: '11.5px',
+                opacity: 0.8,
+                minWidth: 0,
+              }}
+            >
+              {t('workspaceLibrary.lastUpdated')} {formatDate(lastActivity)}
+            </Typography>
+          )}
         </Box>
 
-        {/* Workspace Reciente Preview Box */}
-        <Box
-          sx={{
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.03)'
-                : '#F8FAFC',
-            border: (theme) =>
-              `1px solid ${
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.06)'
-                  : '#F1F5F9'
-              }`,
-            borderRadius: '10px',
-            p: 1.25,
-            mb: 'auto',
-          }}
-        >
+        {/* The last document edited in the project (fixed height) */}
+        <WorkspacePreviewBox>
           <Typography
             variant="caption"
+            noWrap
             sx={{
               fontWeight: 800,
               fontSize: '9.5px',
               letterSpacing: '0.05em',
-              color: '#9CA3AF',
+              color: 'text.secondary',
               display: 'block',
               textTransform: 'uppercase',
               mb: 0.5,
             }}
           >
-            {t('workspaceLibrary.recentWorkspace', 'WORKSPACE RECIENTE')}
+            {t('workspaceLibrary.recentWorkspace')}
           </Typography>
-          <Typography
-            variant="caption"
+          <Box
             sx={{
-              color: 'text.secondary',
-              fontSize: '11.5px',
-              lineHeight: 1.45,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              minHeight: PREVIEW_LINES_HEIGHT,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
             }}
           >
-            {getRecentSnippet()}
-          </Typography>
-        </Box>
+            {recent ? (
+              <>
+                <Typography
+                  noWrap
+                  sx={{
+                    fontSize: '12.5px',
+                    fontWeight: 650,
+                    lineHeight: 1.4,
+                    color: 'text.primary',
+                  }}
+                >
+                  {recent.title || UNTITLED_WORKSPACE_TITLE}
+                </Typography>
+                {recent.updatedAt && (
+                  <Typography
+                    variant="caption"
+                    noWrap
+                    sx={{
+                      color: 'text.secondary',
+                      fontSize: '11px',
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    {t('workspaceLibrary.editedOn', {
+                      date: formatDate(new Date(recent.updatedAt)),
+                    })}
+                  </Typography>
+                )}
+              </>
+            ) : (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: '11.5px',
+                  lineHeight: 1.45,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {t('workspaceLibrary.emptyFolderSnippet')}
+              </Typography>
+            )}
+          </Box>
+        </WorkspacePreviewBox>
       </Box>
 
       {/* Status Bar bottom */}
       <StatusBar sx={{ px: 2, py: 1.25 }}>
-        <Box
-          sx={{
-            px: 1,
-            py: 0.35,
-            borderRadius: '6px',
-            fontSize: '10px',
-            fontWeight: 800,
-            letterSpacing: '0.04em',
-            bgcolor:
-              statusLabel === 'BORRADOR'
-                ? '#F1F5F9'
-                : statusLabel === 'RECENT'
-                  ? 'rgba(0, 135, 103, 0.12)'
-                  : '#ECFDF5',
-            color:
-              statusLabel === 'BORRADOR'
-                ? '#475569'
-                : statusLabel === 'RECENT'
-                  ? '#008767'
-                  : '#059669',
-          }}
-        >
-          {statusLabel === 'ACTIVE'
-            ? t('workspaceLibrary.status.active', 'ACTIVO')
-            : statusLabel === 'RECENT'
-              ? t('workspaceLibrary.status.recent', 'RECIENTE')
-              : t('workspaceLibrary.status.draft', 'BORRADOR')}
-        </Box>
+        {status ? (
+          <Box
+            sx={{
+              px: 1,
+              py: 0.35,
+              borderRadius: '6px',
+              fontSize: '10px',
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              bgcolor: (theme) =>
+                status === 'recent'
+                  ? alpha(BRAND, 0.12)
+                  : theme.palette.action.hover,
+              color: status === 'recent' ? BRAND : 'text.secondary',
+            }}
+          >
+            {t(`workspaceLibrary.status.${status}`)}
+          </Box>
+        ) : (
+          <span />
+        )}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
             gap: 0.5,
-            color: '#008767',
+            color: BRAND,
             fontWeight: 700,
             fontSize: '12.5px',
             transition: 'gap 0.15s ease',
@@ -284,15 +333,18 @@ export const ProjectFolderCard: React.FC<ProjectFolderCardProps> = ({
           <span>
             {t('tasks.createProjectTaskModal.openWorkspace', 'Abrir')}
           </span>
-          <span>➔</span>
+          <span aria-hidden>➔</span>
         </Box>
       </StatusBar>
 
-      {/* Card Context Menu */}
+      {/* Card Context Menu. Clicks inside the menu portal still bubble through
+          the React tree to CardContainer, which would open the folder and
+          unmount the grid (and its delete dialog), so stop them here. */}
       <Menu
         anchorEl={menuAnchorEl}
         open={isMenuOpen}
         onClose={handleCloseMenu}
+        onClick={(e) => e.stopPropagation()}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         PaperProps={{

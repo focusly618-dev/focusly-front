@@ -89,7 +89,7 @@ export const useTaskFormState = ({
       )
       .trim();
 
-    const parsedDeadline = new Date(deadline);
+    const parsedDeadline = deadline ? new Date(deadline) : null;
 
     return {
       title,
@@ -98,9 +98,11 @@ export const useTaskFormState = ({
       priority: getPriorityFromLevel(priority_level),
       status,
       category,
-      currentDate: isNaN(parsedDeadline.getTime())
-        ? new Date()
-        : parsedDeadline,
+      // An undated task stays undated instead of being given today's date.
+      currentDate:
+        parsedDeadline && !isNaN(parsedDeadline.getTime())
+          ? parsedDeadline
+          : null,
       duration: estimate_timer ? formatDuration(estimate_timer) : '',
       realTime: real_timer ? formatDuration(real_timer) : '',
     };

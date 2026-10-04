@@ -52,6 +52,7 @@ export const useWorkloadDashboard = (
     const totalMinutes = tasksThisWeek.reduce(
       (sum: number, task: TaskResponse) => {
         const mins = task.estimate_minutes || task.estimate_timer || 0;
+        if (!task.deadline) return sum;
 
         const taskDate = new Date(task.deadline);
         const dayIndex = Math.floor(
