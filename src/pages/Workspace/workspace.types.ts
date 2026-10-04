@@ -13,7 +13,7 @@ export interface ProjectGroupTypes {
   emoji?: string;
   folders?: ProjectTypes[];
   generalWorkspaces?: WorkspaceTypes[];
-  workspaces?: { id: string }[];
+  workspaces?: { id: string; title?: string; updatedAt?: string }[];
   workspaceCount?: number;
   folderCount?: number;
   createdAt: string;

@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Box,
-  Typography,
-  IconButton,
   Avatar,
-  Tooltip,
-  useTheme,
-  alpha,
+  Box,
+  Checkbox,
   Collapse,
+  IconButton,
+  Tooltip,
+  Typography,
+  alpha,
+  useTheme,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { ProjectTaskSubtasks } from './ProjectTaskSubtasks';
+import { ProjectStatusMenu } from './ProjectStatusMenu';
 import {
   PriorityBadge,
   getPriorityConfig,
@@ -25,421 +29,438 @@ import {
 } from '@/components/ui';
 import type {
   ProjectTaskItemData,
-  ProjectTaskPriority,
+  ProjectTaskStatusId,
 } from './projectTasks.types';
 
 export interface ProjectTaskItemProps {
   task: ProjectTaskItemData;
+  /** Show which project the task belongs to (the all-projects view). */
+  showProject?: boolean;
   onTaskClick?: (task: ProjectTaskItemData) => void;
   onToggleComplete?: (task: ProjectTaskItemData) => void;
+  onChangeStatus?: (
+    task: ProjectTaskItemData,
+    status: ProjectTaskStatusId,
+  ) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onAddSubtask?: (taskId: string, title: string) => void;
-  initialExpanded?: boolean;
+  /** Selection mode: the row toggles selection instead of opening. */
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (task: ProjectTaskItemData) => void;
 }
 
-export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
-  task,
-  onTaskClick,
-  onToggleComplete,
-  onToggleSubtask,
-  onAddSubtask,
-  initialExpanded = false,
-}) => {
+// Desktop columns, aligned across rows (every width but the title's is
+// fixed): check · title · [project] · due · priority · estimate · actions.
+const columns = (showProject: boolean) =>
+  showProject
+    ? '28px minmax(0, 1fr) 150px 92px 96px 52px 60px'
+    : '28px minmax(0, 1fr) 92px 96px 52px 60px';
+
+const ProjectChip = ({ task }: { task: ProjectTaskItemData }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  const hasSubtasks = Boolean(task.subtasks && task.subtasks.length > 0);
-  const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(
-    initialExpanded || false,
-  );
-
-  const completedSubtasksCount =
-    task.subtasks?.filter((s) => s.completed).length || 0;
-  const totalSubtasksCount = task.subtasks?.length || 0;
-  const isDone = task.completed || task.status.toLowerCase() === 'completed';
-  const projectName = task.project?.name || task.projectName;
-  const projectColor = task.project?.color || task.projectColor || '#7c3aed';
-  const projectEmoji = task.project?.emoji || task.projectEmoji;
-
-  // Priority Styles helper
-  const renderPriorityBadge = (priority?: ProjectTaskPriority) => {
-    if (!priority || priority === 'None') return null;
-    const config = getPriorityConfig(priority);
-
-    return (
+  const name = task.project?.name || task.projectName;
+  if (!name) return null;
+  const color = task.project?.color || task.projectColor || '#7c3aed';
+  const emoji = task.project?.emoji || task.projectEmoji;
+  return (
+    <Tooltip title={`${t('projectTasks.columns.project')}: ${name}`}>
       <Box
         sx={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: '4px',
+          maxWidth: '100%',
           px: '7px',
           py: '2px',
-          borderRadius: '4px',
+          borderRadius: '5px',
           fontSize: '11px',
-          fontWeight: 700,
-          bgcolor: alpha(config.color, 0.12),
-          color: config.color,
-          border: `1px solid ${alpha(config.color, 0.25)}`,
-          flexShrink: 0,
+          fontWeight: 600,
+          color,
+          bgcolor: alpha(color, isDark ? 0.15 : 0.08),
+          border: `1px solid ${alpha(color, isDark ? 0.3 : 0.2)}`,
+          lineHeight: 1.4,
+          minWidth: 0,
         }}
       >
-        <PriorityBadge priority={priority} size={15} />
-        <span>
-          {t(`tasks.priorities.${priority.toLowerCase()}`, {
-            defaultValue: config.label,
-          })}
-        </span>
+        {isCustomEmoji(emoji) ? (
+          <span style={{ fontSize: '11px', lineHeight: 1 }}>{emoji}</span>
+        ) : emoji === 'filled' ? (
+          <ModernFolderFilledIcon sx={{ fontSize: 13, color }} />
+        ) : (
+          <ModernFolderOutlinedIcon sx={{ fontSize: 13, color }} />
+        )}
+        <Box
+          component="span"
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {name}
+        </Box>
       </Box>
-    );
-  };
+    </Tooltip>
+  );
+};
 
-  const getAssigneeColor = (name: string, customColor?: string) => {
-    if (customColor) return customColor;
-    const colors = ['#ea580c', '#0d9488', '#7c3aed', '#2563eb', '#db2777'];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++)
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    return colors[Math.abs(hash) % colors.length];
-  };
+const DueChip = ({ task }: { task: ProjectTaskItemData }) => {
+  const { t } = useTranslation();
+  if (!task.dueDate) return null;
+  const color =
+    task.dueDateHighlight === 'overdue'
+      ? '#ef4444'
+      : task.dueDateHighlight === 'today'
+        ? '#10b981'
+        : undefined;
+  return (
+    <Tooltip
+      title={
+        task.dueDateHighlight === 'overdue' ? t('tasks.dates.overdue') : ''
+      }
+    >
+      <Box
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '3px',
+          fontSize: '11px',
+          fontWeight: 600,
+          px: '7px',
+          py: '2px',
+          borderRadius: '5px',
+          whiteSpace: 'nowrap',
+          bgcolor: color ? alpha(color, 0.14) : 'action.hover',
+          color: color ?? 'text.secondary',
+          border: '1px solid',
+          borderColor: color ? alpha(color, 0.3) : 'divider',
+        }}
+      >
+        <EventOutlinedIcon sx={{ fontSize: 12 }} />
+        {task.dueDate}
+      </Box>
+    </Tooltip>
+  );
+};
+
+/** Icon and name on desktop; just the icon where space is short. */
+const PriorityChip = ({
+  task,
+  compact,
+}: {
+  task: ProjectTaskItemData;
+  compact?: boolean;
+}) => {
+  const { t } = useTranslation();
+  if (!task.priority || task.priority === 'None') return null;
+  const config = getPriorityConfig(task.priority);
+  const label = t(`tasks.priority.${task.priority.toLowerCase()}`, {
+    defaultValue: config.label,
+  });
+  if (compact) {
+    return (
+      <Tooltip title={label}>
+        <Box sx={{ display: 'inline-flex' }} aria-label={label}>
+          <PriorityBadge priority={task.priority} size={16} />
+        </Box>
+      </Tooltip>
+    );
+  }
+  return (
+    <Box
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '4px',
+        px: '6px',
+        py: '2px',
+        borderRadius: '5px',
+        fontSize: '11px',
+        fontWeight: 700,
+        whiteSpace: 'nowrap',
+        bgcolor: alpha(config.color, 0.12),
+        color: config.color,
+        border: `1px solid ${alpha(config.color, 0.25)}`,
+      }}
+    >
+      <PriorityBadge priority={task.priority} size={14} />
+      {label}
+    </Box>
+  );
+};
+
+export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
+  task,
+  showProject = true,
+  onTaskClick,
+  onToggleComplete,
+  onChangeStatus,
+  onToggleSubtask,
+  onAddSubtask,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
+}) => {
+  const { t } = useTranslation();
+  const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
+  const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
+
+  const subtasks = task.subtasks ?? [];
+  const completedSubtasks = subtasks.filter((s) => s.completed).length;
+  const isDone = Boolean(task.completed) || task.status === 'completed';
+
+  const activate = () =>
+    selectionMode ? onToggleSelect?.(task) : onTaskClick?.(task);
+
+  const subtasksToggle = subtasks.length > 0 && (
+    <Box
+      component="button"
+      type="button"
+      onClick={(e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsSubtasksExpanded((v) => !v);
+      }}
+      aria-expanded={isSubtasksExpanded}
+      aria-label={t('projectTasks.toggleSubtasks')}
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '4px',
+        px: '6px',
+        py: '2px',
+        borderRadius: '5px',
+        font: 'inherit',
+        fontSize: '11px',
+        fontWeight: 600,
+        cursor: 'pointer',
+        flexShrink: 0,
+        color: completedSubtasks > 0 ? '#10b981' : 'text.secondary',
+        bgcolor:
+          completedSubtasks > 0 ? alpha('#10b981', 0.12) : 'action.hover',
+        border: '1px solid',
+        borderColor: completedSubtasks > 0 ? alpha('#10b981', 0.25) : 'divider',
+        '&:focus-visible': { outline: '2px solid #008767' },
+      }}
+    >
+      <FormatListBulletedIcon sx={{ fontSize: 12 }} />
+      {t('tasks.subtasksCount', {
+        completed: completedSubtasks,
+        total: subtasks.length,
+        defaultValue: `${completedSubtasks}/${subtasks.length}`,
+      })}
+      <KeyboardArrowDownIcon
+        sx={{
+          fontSize: 14,
+          transition: 'transform 0.15s ease',
+          transform: isSubtasksExpanded ? 'rotate(180deg)' : 'none',
+        }}
+      />
+    </Box>
+  );
+
+  const workspaceChip = task.workspaceTitle && (
+    <Tooltip
+      title={`${t('projectTasks.linkedDocument')}: ${task.workspaceTitle}`}
+    >
+      <Box
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          minWidth: 0,
+          maxWidth: 160,
+          px: '6px',
+          py: '2px',
+          borderRadius: '5px',
+          fontSize: '11px',
+          fontWeight: 600,
+          color: 'info.main',
+          bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
+          flexShrink: 1,
+        }}
+      >
+        <DescriptionOutlinedIcon sx={{ fontSize: 13, flexShrink: 0 }} />
+        <Box
+          component="span"
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {task.workspaceTitle}
+        </Box>
+      </Box>
+    </Tooltip>
+  );
 
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: '8px',
-        bgcolor: isDark ? 'rgba(255, 255, 255, 0.015)' : 'rgba(0, 0, 0, 0.015)',
-        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
-        transition: 'all 0.15s ease',
+        borderRadius: '10px',
+        bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: selected ? '#008767' : 'divider',
+        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
         '&:hover': {
-          bgcolor: isDark
-            ? 'rgba(255, 255, 255, 0.03)'
-            : 'rgba(0, 0, 0, 0.025)',
-          borderColor: isDark
-            ? 'rgba(255, 255, 255, 0.09)'
-            : 'rgba(0, 0, 0, 0.09)',
+          borderColor: selected ? '#008767' : 'action.disabled',
+          boxShadow: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'none'
+              : '0 2px 8px rgba(15, 23, 42, 0.06)',
         },
       }}
     >
-      {/* ── Main Task Row ── */}
       <Box
-        onClick={() => onTaskClick?.(task)}
+        role="button"
+        tabIndex={0}
+        aria-label={task.title}
+        onClick={activate}
+        onKeyDown={(e) => {
+          if (e.target !== e.currentTarget) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            activate();
+          }
+        }}
         sx={{
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '28px minmax(0, 1fr) auto',
+            md: columns(showProject),
+          },
           alignItems: 'center',
-          justifyContent: 'space-between',
-          px: { xs: 1.5, sm: 2 },
-          py: 1.25,
+          columnGap: { xs: 1, sm: 1.5 },
+          px: { xs: 1.25, sm: 2 },
+          py: 1.1,
           cursor: 'pointer',
-          gap: 1.5,
-          minWidth: 0,
+          borderRadius: '10px',
+          '&:focus-visible': {
+            outline: '2px solid #008767',
+            outlineOffset: -2,
+          },
         }}
       >
-        {/* Left Side: Checkbox + Title + Tags */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.25,
-            minWidth: 0,
-            flex: 1,
-          }}
-        >
-          {/* Checkbox */}
+        {/* Complete (or select) */}
+        {selectionMode ? (
+          <Checkbox
+            size="small"
+            checked={selected}
+            onClick={(e) => e.stopPropagation()}
+            onChange={() => onToggleSelect?.(task)}
+            sx={{ p: 0.25, '&.Mui-checked': { color: '#008767' } }}
+            slotProps={{ input: { 'aria-label': task.title } }}
+          />
+        ) : (
           <IconButton
             size="small"
+            aria-label={
+              isDone
+                ? t('projectTasks.markNotDone')
+                : t('projectTasks.markDone')
+            }
             onClick={(e) => {
               e.stopPropagation();
               onToggleComplete?.(task);
             }}
             sx={{
-              p: 0,
-              color: isDone
-                ? '#10b981'
-                : isDark
-                  ? 'rgba(255, 255, 255, 0.4)'
-                  : 'rgba(0, 0, 0, 0.4)',
-              '&:hover': {
-                color: isDone ? '#059669' : '#10b981',
-              },
+              p: 0.25,
+              color: isDone ? '#10b981' : 'text.disabled',
+              '&:hover': { color: '#10b981' },
             }}
           >
             {isDone ? (
-              <CheckCircleIcon sx={{ fontSize: 18 }} />
+              <CheckCircleIcon sx={{ fontSize: 19 }} />
             ) : (
-              <RadioButtonUncheckedIcon sx={{ fontSize: 18 }} />
+              <RadioButtonUncheckedIcon sx={{ fontSize: 19 }} />
             )}
           </IconButton>
+        )}
 
-          {/* Task Title */}
-          <Typography
+        {/* Title, with its details underneath on small screens */}
+        <Box sx={{ minWidth: 0 }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}
+          >
+            <Typography
+              noWrap
+              sx={{
+                fontSize: '13.5px',
+                fontWeight: 550,
+                color: isDone ? 'text.disabled' : 'text.primary',
+                textDecoration: isDone ? 'line-through' : 'none',
+                minWidth: 0,
+                flex: '0 1 auto',
+              }}
+            >
+              {task.title}
+            </Typography>
+            <Box
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                alignItems: 'center',
+                gap: 0.75,
+                minWidth: 0,
+              }}
+            >
+              {subtasksToggle}
+              {workspaceChip}
+            </Box>
+          </Box>
+          <Box
             sx={{
-              fontSize: '13.5px',
-              fontWeight: 500,
-              color: isDone
-                ? isDark
-                  ? 'rgba(255, 255, 255, 0.4)'
-                  : 'rgba(0, 0, 0, 0.4)'
-                : isDark
-                  ? '#f4f4f5'
-                  : '#18181b',
-              textDecoration: isDone ? 'line-through' : 'none',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              maxWidth: { xs: '180px', sm: '280px', md: '360px' },
+              display: { xs: 'flex', md: 'none' },
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 0.75,
+              mt: 0.6,
+              minWidth: 0,
             }}
           >
-            {task.title}
-          </Typography>
-
-          {/* Project Badge */}
-          {projectName && (
-            <Tooltip
-              title={`${t('tasks.createProjectTaskModal.project', { defaultValue: 'Project:' })} ${projectName}`}
-            >
-              <Box
-                sx={{
-                  display: { xs: 'none', md: 'inline-flex' },
-                  alignItems: 'center',
-                  gap: '4px',
-                  px: '7px',
-                  py: '2px',
-                  borderRadius: '5px',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: projectColor,
-                  bgcolor: alpha(projectColor, isDark ? 0.15 : 0.08),
-                  border: `1px solid ${alpha(projectColor, isDark ? 0.3 : 0.2)}`,
-                  flexShrink: 0,
-                  lineHeight: 1.4,
-                  transition: 'all 0.15s ease',
-                  '&:hover': {
-                    bgcolor: alpha(projectColor, isDark ? 0.24 : 0.15),
-                  },
-                }}
-              >
-                {isCustomEmoji(projectEmoji) ? (
-                  <span style={{ fontSize: '11px', lineHeight: 1 }}>
-                    {projectEmoji}
-                  </span>
-                ) : projectEmoji === 'filled' ? (
-                  <ModernFolderFilledIcon
-                    sx={{ fontSize: 13, color: projectColor }}
-                  />
-                ) : (
-                  <ModernFolderOutlinedIcon
-                    sx={{ fontSize: 13, color: projectColor }}
-                  />
-                )}
-                <span
-                  style={{
-                    maxWidth: '120px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {projectName}
-                </span>
-              </Box>
-            </Tooltip>
-          )}
-
-          {/* Linked Spec / Workspace Badge */}
-          {task.workspaceTitle && (
-            <Tooltip
-              title={`${t('tasks.createProjectTaskModal.linked', { defaultValue: 'Linked Spec' })}: ${task.workspaceTitle}`}
-            >
-              <Box
-                sx={{
-                  display: { xs: 'none', lg: 'inline-flex' },
-                  alignItems: 'center',
-                  gap: '4px',
-                  px: '7px',
-                  py: '2px',
-                  borderRadius: '5px',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: isDark ? '#a5b4fc' : '#4f46e5',
-                  bgcolor: isDark
-                    ? 'rgba(99, 102, 241, 0.15)'
-                    : 'rgba(99, 102, 241, 0.08)',
-                  border: `1px solid ${
-                    isDark
-                      ? 'rgba(99, 102, 241, 0.3)'
-                      : 'rgba(99, 102, 241, 0.2)'
-                  }`,
-                  flexShrink: 0,
-                  lineHeight: 1.4,
-                  transition: 'all 0.15s ease',
-                  '&:hover': {
-                    bgcolor: isDark
-                      ? 'rgba(99, 102, 241, 0.24)'
-                      : 'rgba(99, 102, 241, 0.15)',
-                  },
-                }}
-              >
-                <span style={{ fontSize: '11px', lineHeight: 1 }}>📄</span>
-                <span
-                  style={{
-                    maxWidth: '120px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {task.workspaceTitle}
-                </span>
-              </Box>
-            </Tooltip>
-          )}
-
-          {/* Module / Tag Pill */}
-          {task.tag && (
-            <Box
-              sx={{
-                display: { xs: 'none', sm: 'inline-flex' },
-                alignItems: 'center',
-                px: '7px',
-                py: '2px',
-                borderRadius: '4px',
-                fontSize: '11px',
-                fontWeight: 500,
-                color: isDark
-                  ? 'rgba(255, 255, 255, 0.65)'
-                  : 'rgba(0, 0, 0, 0.65)',
-                bgcolor: isDark
-                  ? 'rgba(255, 255, 255, 0.05)'
-                  : 'rgba(0, 0, 0, 0.04)',
-                border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
-                flexShrink: 0,
-              }}
-            >
-              {task.tag}
-            </Box>
-          )}
-
-          {/* Subtasks Progress Badge */}
-          {totalSubtasksCount > 0 && (
-            <Box
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsSubtasksExpanded(!isSubtasksExpanded);
-              }}
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                px: '6px',
-                py: '2px',
-                borderRadius: '4px',
-                fontSize: '11px',
-                fontWeight: 600,
-                color:
-                  completedSubtasksCount > 0
-                    ? '#10b981'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.5)'
-                      : 'rgba(0, 0, 0, 0.5)',
-                bgcolor:
-                  completedSubtasksCount > 0
-                    ? alpha('#10b981', 0.12)
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.05)'
-                      : 'rgba(0, 0, 0, 0.04)',
-                border: `1px solid ${
-                  completedSubtasksCount > 0
-                    ? alpha('#10b981', 0.25)
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : 'rgba(0, 0, 0, 0.08)'
-                }`,
-                cursor: 'pointer',
-                flexShrink: 0,
-                '&:hover': {
-                  filter: 'brightness(1.15)',
-                },
-              }}
-            >
-              <FormatListBulletedIcon sx={{ fontSize: 12 }} />
-              <span>
-                {t('tasks.subtasksCount', {
-                  completed: completedSubtasksCount,
-                  total: totalSubtasksCount,
-                  defaultValue: `${completedSubtasksCount}/${totalSubtasksCount} subtasks`,
-                })}
-              </span>
-            </Box>
-          )}
+            {showProject && <ProjectChip task={task} />}
+            <DueChip task={task} />
+            <PriorityChip task={task} compact />
+            {subtasksToggle}
+            {workspaceChip}
+          </Box>
         </Box>
 
-        {/* Right Side: Priority + Duration + Due Date + Assignee + Expand Caret */}
+        {/* Desktop columns */}
+        {showProject && (
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, minWidth: 0 }}>
+            <ProjectChip task={task} />
+          </Box>
+        )}
+        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <DueChip task={task} />
+        </Box>
+        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <PriorityChip task={task} />
+        </Box>
+        <Typography
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            fontSize: '11.5px',
+            fontWeight: 500,
+            color: 'text.secondary',
+            textAlign: 'right',
+          }}
+        >
+          {task.duration}
+        </Typography>
+
+        {/* Actions */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1.5,
-            flexShrink: 0,
+            justifyContent: 'flex-end',
+            gap: 0.5,
           }}
         >
-          {/* Priority */}
-          {renderPriorityBadge(task.priority)}
-
-          {/* Duration */}
-          {task.duration && (
-            <Typography
-              sx={{
-                display: { xs: 'none', md: 'block' },
-                fontSize: '11.5px',
-                fontWeight: 500,
-                color: isDark
-                  ? 'rgba(255, 255, 255, 0.4)'
-                  : 'rgba(0, 0, 0, 0.4)',
-              }}
-            >
-              {task.duration}
-            </Typography>
-          )}
-
-          {/* Due Date */}
-          {task.dueDate && (
-            <Box
-              sx={{
-                fontSize: '11px',
-                fontWeight: 600,
-                px: '7px',
-                py: '2px',
-                borderRadius: '4px',
-                bgcolor:
-                  task.dueDateHighlight === 'today' ||
-                  task.dueDate.toLowerCase() === 'today'
-                    ? alpha('#10b981', 0.15)
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.05)'
-                      : 'rgba(0, 0, 0, 0.04)',
-                color:
-                  task.dueDateHighlight === 'today' ||
-                  task.dueDate.toLowerCase() === 'today'
-                    ? '#34d399'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.6)'
-                      : 'rgba(0, 0, 0, 0.6)',
-                border: `1px solid ${
-                  task.dueDateHighlight === 'today' ||
-                  task.dueDate.toLowerCase() === 'today'
-                    ? alpha('#10b981', 0.25)
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : 'rgba(0, 0, 0, 0.08)'
-                }`,
-              }}
-            >
-              {task.dueDate}
-            </Box>
-          )}
-
-          {/* Assignee Avatar */}
           {task.assignee && (
             <Tooltip title={task.assignee.name}>
               <Avatar
@@ -449,10 +470,7 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
                   height: 22,
                   fontSize: '10px',
                   fontWeight: 700,
-                  bgcolor: getAssigneeColor(
-                    task.assignee.name,
-                    task.assignee.color,
-                  ),
+                  bgcolor: task.assignee.color || '#0d9488',
                   color: '#ffffff',
                 }}
               >
@@ -460,45 +478,86 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
               </Avatar>
             </Tooltip>
           )}
-
-          {/* Subtask Chevron */}
-          {hasSubtasks && (
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsSubtasksExpanded(!isSubtasksExpanded);
-              }}
-              sx={{
-                p: '2px',
-                color: isDark
-                  ? 'rgba(255, 255, 255, 0.4)'
-                  : 'rgba(0, 0, 0, 0.4)',
-                '&:hover': {
-                  color: isDark ? '#ffffff' : '#000000',
-                },
-              }}
-            >
-              {isSubtasksExpanded ? (
-                <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
-              ) : (
-                <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
-              )}
-            </IconButton>
+          {!selectionMode && onChangeStatus && (
+            <Tooltip title={t('projectTasks.changeStatus')}>
+              <IconButton
+                size="small"
+                aria-label={t('projectTasks.changeStatus')}
+                aria-haspopup="menu"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setStatusAnchor(e.currentTarget);
+                }}
+                sx={{ p: 0.5, color: 'text.secondary' }}
+              >
+                <MoreHorizIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
           )}
         </Box>
       </Box>
 
-      {/* ── Subtasks Container (Collapsible) ── */}
-      {hasSubtasks && (
+      <ProjectStatusMenu
+        anchorEl={statusAnchor}
+        onClose={() => setStatusAnchor(null)}
+        current={task.status}
+        onSelect={(status) => onChangeStatus?.(task, status)}
+      />
+
+      {subtasks.length > 0 && (
         <Collapse in={isSubtasksExpanded} timeout={180} unmountOnExit>
           <ProjectTaskSubtasks
-            subtasks={task.subtasks!}
+            subtasks={subtasks}
             onToggleSubtask={(subId) => onToggleSubtask?.(task.id, subId)}
             onAddSubtask={(title) => onAddSubtask?.(task.id, title)}
           />
         </Collapse>
       )}
+    </Box>
+  );
+};
+
+/** Column titles over the rows, on screens wide enough for columns. */
+export const ProjectTaskColumns: React.FC<{ showProject?: boolean }> = ({
+  showProject = true,
+}) => {
+  const { t } = useTranslation();
+  const label = (text: string, align: 'left' | 'right' = 'left') => (
+    <Typography
+      component="span"
+      sx={{
+        fontSize: '10.5px',
+        fontWeight: 700,
+        letterSpacing: '0.04em',
+        textTransform: 'uppercase',
+        color: 'text.secondary',
+        textAlign: align,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {text}
+    </Typography>
+  );
+  return (
+    <Box
+      aria-hidden
+      sx={{
+        display: { xs: 'none', md: 'grid' },
+        gridTemplateColumns: columns(showProject),
+        columnGap: 1.5,
+        alignItems: 'center',
+        px: 2,
+        border: '1px solid transparent',
+        mb: 0.5,
+      }}
+    >
+      <span />
+      {label(t('projectTasks.columns.task'))}
+      {showProject && label(t('projectTasks.columns.project'))}
+      {label(t('projectTasks.columns.due'))}
+      {label(t('projectTasks.columns.priority'))}
+      {label(t('projectTasks.columns.estimate'), 'right')}
+      <span />
     </Box>
   );
 };

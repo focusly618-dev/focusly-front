@@ -385,7 +385,9 @@ export const TaskDetailModal = ({
                 handleAddTimeLog={handleAddTimeLog}
                 handleRemoveTimeLog={handleRemoveTimeLog}
                 createdAt={effectiveTask?.created_at || initialTask?.created_at}
-                deadline={effectiveTask?.deadline || initialTask?.deadline}
+                deadline={
+                  effectiveTask?.deadline || initialTask?.deadline || undefined
+                }
                 isLoadingDetail={isLoadingDetail}
               />
 

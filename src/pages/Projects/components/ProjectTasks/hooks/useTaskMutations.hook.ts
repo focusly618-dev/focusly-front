@@ -1,4 +1,5 @@
-import { useMutation } from '@apollo/client';
+import { useApolloClient, useMutation } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import {
   CREATE_TASK,
@@ -11,11 +12,13 @@ import { upsertTask, removeTask } from '@/redux/tasks/task.slice';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import { sileo } from '@/utils';
 import { parseDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import type {
-  ProjectTaskItemData,
-  ProjectSubtaskItem,
-  ProjectTaskPriority,
-  ProjectTaskStatusId,
+import { dateInputToISO } from '../projectTaskDates';
+import {
+  DEFAULT_PROJECT_STATUSES,
+  type ProjectTaskItemData,
+  type ProjectSubtaskItem,
+  type ProjectTaskPriority,
+  type ProjectTaskStatusId,
 } from '../projectTasks.types';
 
 export interface CreateProjectTaskInput {
@@ -47,24 +50,33 @@ export interface UpdateProjectTaskInput {
   dueDate?: string;
   description?: string;
   projectId?: string;
-  workspaceId?: string;
+  /** null unlinks the workspace. */
+  workspaceId?: string | null;
   completed?: boolean;
+  tags?: string[];
   subtasks?: Array<{
     id?: string;
     title: string;
     completed?: boolean;
-    estimate_timer?: number;
+    completed_at?: string | null;
+    estimate_timer?: number | null;
   }>;
 }
+
+const generateSubtaskId = () =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `sub-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
 export const mapStatusToBackend = (status?: string): string => {
   if (!status) return 'Todo';
   const s = status.toLowerCase();
-  if (s === 'in_progress' || s === 'pending') return 'Pending';
-  if (s === 'todo') return 'Todo';
-  if (s === 'completed' || s === 'done') return 'Done';
-  if (s === 'in_review' || s === 'review') return 'Review';
-  if (s === 'backlog') return 'Backlog';
+  const known = DEFAULT_PROJECT_STATUSES.find(
+    (config) => config.id === s || config.backend.toLowerCase() === s,
+  );
+  if (known) return known.backend;
+  if (s === 'review') return 'Review';
+  if (s === 'done') return 'Done';
   return 'Todo';
 };
 
@@ -76,7 +88,8 @@ export const mapStatusFromBackend = (status?: string): ProjectTaskStatusId => {
     return 'in_progress';
   if (s === 'review' || s === 'in_review' || s === 'in review')
     return 'in_review';
-  if (s === 'backlog' || s === 'on hold') return 'backlog';
+  if (s === 'on hold' || s === 'on_hold') return 'on_hold';
+  if (s === 'planning' || s === 'scheduled' || s === 'backlog') return s;
   return 'todo';
 };
 
@@ -109,7 +122,15 @@ export const mapPriorityToBackend = (priority?: string): number => {
   return 0;
 };
 
+/** How long the "Undo" button stays after completing a task. */
+const UNDO_MS = 6000;
+
+// What a task was before it was completed, so reopening it puts it back
+// there (it used to always land in "Pending").
+const statusBeforeDone = new Map<string, ProjectTaskStatusId>();
+
 export const useTaskMutations = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
@@ -121,6 +142,9 @@ export const useTaskMutations = () => {
     if (!user?.id) return [];
     return [
       'GetTasksByUserPaginated',
+      // The project tasks view's own query; without it new tasks didn't show
+      // up and deleted ones stayed until the view remounted.
+      'GetProjectTasks',
       {
         query: GET_TASKS,
         variables: { userId: user.id, limit: 100, offset: 0 },
@@ -134,10 +158,7 @@ export const useTaskMutations = () => {
 
   const createProjectTask = async (input: CreateProjectTaskInput) => {
     if (!user?.id) {
-      sileo.error({
-        title: 'Auth Error',
-        description: 'User not authenticated',
-      });
+      sileo.error({ title: t('projectTasks.toast.authError') });
       return null;
     }
 
@@ -146,11 +167,6 @@ export const useTaskMutations = () => {
         typeof input.duration === 'number'
           ? input.duration
           : parseDuration(input.duration) || 0;
-
-      const generateSubtaskId = () =>
-        typeof crypto !== 'undefined' && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `sub-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
       const formattedSubtasks = (input.subtasks || [])
         .filter((s) => s.title && s.title.trim().length > 0)
@@ -169,13 +185,7 @@ export const useTaskMutations = () => {
         ...(input.modules || []),
       ];
 
-      let deadline: string | undefined = undefined;
-      if (input.dueDate && input.dueDate.trim()) {
-        const parsed = new Date(input.dueDate);
-        if (!isNaN(parsed.getTime())) {
-          deadline = parsed.toISOString();
-        }
-      }
+      const deadline = dateInputToISO(input.dueDate);
 
       const createTaskInput: Record<string, unknown> = {
         title: input.title.trim(),
@@ -205,8 +215,8 @@ export const useTaskMutations = () => {
         const mapped = mapResponseToTask(res.data.createTask);
         dispatch(upsertTask(mapped));
         sileo.success({
-          title: 'Task Created',
-          description: `Task "${input.title}" was created successfully.`,
+          title: t('projectTasks.toast.created'),
+          description: input.title,
           duration: 3000,
         });
         return res.data.createTask;
@@ -215,8 +225,7 @@ export const useTaskMutations = () => {
     } catch (err) {
       console.error('Error creating project task:', err);
       sileo.error({
-        title: 'Error',
-        description: 'Failed to create task.',
+        title: t('projectTasks.toast.createFailed'),
         duration: 3000,
       });
       throw err;
@@ -243,12 +252,16 @@ export const useTaskMutations = () => {
             : parseDuration(input.duration);
       }
       if (input.dueDate !== undefined) {
+        // An empty date removes it: the backend treats null as "no date".
         updateTaskInput.deadline = input.dueDate
-          ? new Date(input.dueDate).toISOString()
-          : undefined;
+          ? dateInputToISO(input.dueDate)
+          : null;
       }
       if (input.subtasks !== undefined) {
         updateTaskInput.subtasks = input.subtasks;
+      }
+      if (input.tags !== undefined) {
+        updateTaskInput.tags = input.tags;
       }
       if (input.description !== undefined) {
         updateTaskInput.notes = input.description;
@@ -257,11 +270,19 @@ export const useTaskMutations = () => {
         updateTaskInput.project_id = input.projectId || undefined;
       }
       if (input.workspaceId !== undefined) {
-        updateTaskInput.workspace_id = input.workspaceId || undefined;
+        // An explicit null tells the backend to remove the link.
+        updateTaskInput.workspace_id = input.workspaceId || null;
       }
 
       const res = await updateTaskMutation({
         variables: { updateTaskInput },
+        // updateTask doesn't return the nested project/workspace, so a moved
+        // or unlinked task would keep showing its old chips until the list is
+        // fetched again.
+        refetchQueries:
+          input.projectId !== undefined || input.workspaceId !== undefined
+            ? ['GetProjectTasks']
+            : undefined,
       });
 
       if (res.data?.updateTask) {
@@ -273,23 +294,54 @@ export const useTaskMutations = () => {
     } catch (err) {
       console.error('Error updating project task:', err);
       sileo.error({
-        title: 'Error',
-        description: 'Failed to update task.',
+        title: t('projectTasks.toast.updateFailed'),
         duration: 3000,
       });
       throw err;
     }
   };
 
+  const setProjectTaskStatus = (
+    task: ProjectTaskItemData,
+    status: ProjectTaskStatusId,
+  ) => updateProjectTask({ id: task.id, status });
+
   const toggleProjectTaskComplete = async (task: ProjectTaskItemData) => {
     const isCurrentlyDone =
       task.completed || task.status.toLowerCase() === 'completed';
-    const nextStatus = isCurrentlyDone ? 'in_progress' : 'completed';
+    if (isCurrentlyDone) {
+      const previous = statusBeforeDone.get(task.id) ?? 'todo';
+      statusBeforeDone.delete(task.id);
+      return setProjectTaskStatus(task, previous);
+    }
 
-    return updateProjectTask({
-      id: task.id,
-      status: nextStatus,
+    statusBeforeDone.set(task.id, task.status);
+    const result = await setProjectTaskStatus(task, 'completed');
+    const toastId = sileo.success({
+      title: t('projectTasks.toast.completed'),
+      description: task.title,
+      button: {
+        title: t('projectTasks.toast.undo'),
+        onClick: () => {
+          statusBeforeDone.delete(task.id);
+          void setProjectTaskStatus(task, task.status);
+        },
+      },
     });
+    // Toasts with a button stay until closed; this one is only useful briefly.
+    setTimeout(() => sileo.dismiss(toastId), UNDO_MS);
+    return result;
+  };
+
+  /** Moves several tasks to one status; returns how many failed. */
+  const setProjectTasksStatus = async (
+    tasks: ProjectTaskItemData[],
+    status: ProjectTaskStatusId,
+  ) => {
+    const results = await Promise.allSettled(
+      tasks.map((task) => setProjectTaskStatus(task, status)),
+    );
+    return results.filter((r) => r.status === 'rejected').length;
   };
 
   const toggleProjectSubtask = async (
@@ -299,51 +351,135 @@ export const useTaskMutations = () => {
   ) => {
     if (!currentSubtasks) return;
 
-    const updatedSubtasks = currentSubtasks.map((s) =>
-      s.id === subtaskId ? { ...s, completed: !s.completed } : s,
-    );
+    // The backend replaces the whole list, so every subtask has to go back
+    // with its estimate and completion date or they get erased.
+    return updateProjectTask({
+      id: taskId,
+      subtasks: currentSubtasks.map((s) => {
+        if (s.id !== subtaskId) {
+          return {
+            id: s.id,
+            title: s.title,
+            completed: s.completed,
+            completed_at: s.completedAt ?? null,
+            estimate_timer: s.estimateTimer ?? null,
+          };
+        }
+        const completed = !s.completed;
+        return {
+          id: s.id,
+          title: s.title,
+          completed,
+          completed_at: completed ? new Date().toISOString() : null,
+          estimate_timer: s.estimateTimer ?? null,
+        };
+      }),
+    });
+  };
+
+  const addProjectSubtask = async (
+    taskId: string,
+    title: string,
+    currentSubtasks: ProjectSubtaskItem[] = [],
+  ) => {
+    const trimmed = title.trim();
+    if (!trimmed) return;
 
     return updateProjectTask({
       id: taskId,
-      subtasks: updatedSubtasks.map((s) => ({
-        id: s.id,
-        title: s.title,
-        completed: s.completed,
-      })),
+      subtasks: [
+        ...currentSubtasks.map((s) => ({
+          id: s.id,
+          title: s.title,
+          completed: s.completed,
+          completed_at: s.completedAt ?? null,
+          estimate_timer: s.estimateTimer ?? null,
+        })),
+        {
+          id: generateSubtaskId(),
+          title: trimmed,
+          completed: false,
+          completed_at: null,
+          estimate_timer: null,
+        },
+      ],
+    });
+  };
+
+  const client = useApolloClient();
+
+  const removeTaskById = async (taskId: string) => {
+    await deleteTaskMutation({ variables: { id: taskId } });
+    dispatch(removeTask({ id: taskId }));
+    // Gone from every cached list at once, mounted or not.
+    client.cache.evict({
+      id: client.cache.identify({ __typename: 'Task', id: taskId }),
+    });
+  };
+
+  // One refetch of the lists on screen, however many tasks were deleted.
+  const refetchAfterDelete = async () => {
+    client.cache.gc();
+    await client.refetchQueries({
+      include: [
+        'GetTasksByUserPaginated',
+        'GetProjectTasks',
+        GET_TASKS,
+        GET_TASKS_TITLES,
+      ],
     });
   };
 
   const deleteProjectTask = async (taskId: string) => {
     try {
-      await deleteTaskMutation({
-        variables: { id: taskId },
-        refetchQueries: getRefetchQueries(),
-        awaitRefetchQueries: true,
-      });
-      dispatch(removeTask({ id: taskId }));
+      await removeTaskById(taskId);
+      await refetchAfterDelete();
       sileo.success({
-        title: 'Task deleted',
-        description: 'Task removed successfully.',
+        title: t('projectTasks.toast.deleted', { count: 1 }),
         duration: 2500,
       });
       return true;
     } catch (err) {
       console.error('Error deleting task:', err);
       sileo.error({
-        title: 'Error',
-        description: 'Failed to delete task.',
+        title: t('projectTasks.toast.deleteFailed'),
         duration: 3000,
       });
       throw err;
     }
   };
 
+  /** Deletes several tasks with one refetch and one toast. */
+  const deleteProjectTasks = async (taskIds: string[]) => {
+    const results = await Promise.allSettled(taskIds.map(removeTaskById));
+    await refetchAfterDelete();
+    const failed = results.filter((r) => r.status === 'rejected').length;
+    const deleted = taskIds.length - failed;
+    if (deleted > 0) {
+      sileo.success({
+        title: t('projectTasks.toast.deleted', { count: deleted }),
+        duration: 2500,
+      });
+    }
+    if (failed > 0) {
+      sileo.error({
+        title: t('projectTasks.toast.deleteFailed'),
+        duration: 3000,
+      });
+      throw new Error(`${failed} tasks could not be deleted`);
+    }
+  };
+
   return {
     createProjectTask,
     updateProjectTask,
+    setProjectTaskStatus,
+    setProjectTasksStatus,
     toggleProjectTaskComplete,
     toggleProjectSubtask,
+    addProjectSubtask,
     deleteProjectTask,
+    deleteProjectTasks,
     isMutating: creating || updating || deleting,
   };
 };

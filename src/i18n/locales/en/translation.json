@@ -396,6 +396,209 @@
       "dismiss": "Dismiss"
     }
   },
+  "actionPlan": {
+    "header": {
+      "title": "Lumina's plan",
+      "changesTitle": "Suggested changes",
+      "review": "Review the details and pick what to create.",
+      "running": "Creating {{done}} of {{total}}…",
+      "done": "Done: everything you selected is in Focusly.",
+      "someFailed": "Some items couldn't be created."
+    },
+    "summary": {
+      "projects_one": "{{count}} project",
+      "projects_other": "{{count}} projects",
+      "documents_one": "{{count}} document",
+      "documents_other": "{{count}} documents",
+      "tasks_one": "{{count}} task",
+      "tasks_other": "{{count}} tasks",
+      "subtasks_one": "{{count}} subtask",
+      "subtasks_other": "{{count}} subtasks",
+      "updates_one": "{{count}} change",
+      "updates_other": "{{count}} changes",
+      "deletions_one": "{{count}} deletion",
+      "deletions_other": "{{count}} deletions",
+      "events_one": "{{count}} event",
+      "events_other": "{{count}} events",
+      "guests_one": "{{count}} guest",
+      "guests_other": "{{count}} guests"
+    },
+    "sections": {
+      "otherTasks": "Other tasks",
+      "updates": "Changes to existing items",
+      "deletions": "To be deleted",
+      "events": "Google Calendar events"
+    },
+    "footer": {
+      "selectAll": "All",
+      "selectNone": "None",
+      "errors": "Check the items marked with an error.",
+      "running": "Creating…",
+      "create_one": "Create {{count}} item",
+      "create_other": "Create {{count}} items",
+      "apply_one": "Apply {{count}} change",
+      "apply_other": "Apply {{count}} changes",
+      "retry_one": "Retry {{count}}",
+      "retry_other": "Retry {{count}}",
+      "done_one": "{{count}} item done",
+      "done_other": "{{count}} items done",
+      "delete_one": "Delete {{count}}",
+      "delete_other": "Delete {{count}}"
+    },
+    "status": {
+      "done": "Created",
+      "error": "Couldn't create",
+      "skipped": "Skipped"
+    },
+    "edit": {
+      "edit": "Edit before creating",
+      "save": "Save",
+      "cancel": "Cancel",
+      "title": "Title",
+      "start": "Start",
+      "name": "Name"
+    },
+    "details": {
+      "show": "Show details",
+      "hide": "Hide details"
+    },
+    "priority": {
+      "1": "Low",
+      "2": "Medium",
+      "3": "High",
+      "4": "Urgent"
+    },
+    "untitledTask": "Untitled task",
+    "untitledNote": "Untitled note",
+    "untitledDocument": "Untitled document",
+    "task": {
+      "subtaskCount_one": "{{count}} subtask",
+      "subtaskCount_other": "{{count}} subtasks",
+      "subtasks": "Subtasks",
+      "notes": "Notes"
+    },
+    "open": {
+      "task": "View task",
+      "document": "Open document",
+      "project": "Open project",
+      "calendar": "Open in Google Calendar",
+      "meet": "Join Meet"
+    },
+    "document": {
+      "label": "Document",
+      "note": "Note",
+      "sections_one": "{{count}} section",
+      "sections_other": "{{count}} sections",
+      "words_one": "~{{count}} word",
+      "words_other": "~{{count}} words",
+      "linkedTasks_one": "{{count}} linked task",
+      "linkedTasks_other": "{{count}} linked tasks",
+      "outline": "Document sections",
+      "showContent": "View full document",
+      "hideContent": "Hide document"
+    },
+    "project": {
+      "new": "New project",
+      "existing": "Existing project",
+      "existingFallback": "Existing project",
+      "documents_one": "{{count}} document",
+      "documents_other": "{{count}} documents",
+      "tasks_one": "{{count}} task",
+      "tasks_other": "{{count}} tasks"
+    },
+    "fields": {
+      "title": "Title",
+      "start": "Start",
+      "end": "End",
+      "priority": "Priority",
+      "duration": "Duration",
+      "notes": "Notes",
+      "status": "Status",
+      "document": "Document",
+      "project": "Project",
+      "when": "Date",
+      "location": "Location",
+      "description": "Description",
+      "guests": "Guests",
+      "meet": "Google Meet"
+    },
+    "update": {
+      "changes_one": "{{count}} change",
+      "changes_other": "{{count}} changes",
+      "notesReplaced": "Notes are replaced",
+      "unknownTask": "Existing task",
+      "aDocument": "A document",
+      "aProject": "A project"
+    },
+    "insert": {
+      "title": "Add to the open document",
+      "hint": "Inserted into the document you have open"
+    },
+    "taskStatus": {
+      "todo": "To do",
+      "planning": "Planning",
+      "pending": "Pending",
+      "onHold": "On hold",
+      "review": "In review",
+      "done": "Done",
+      "backlog": "Backlog",
+      "scheduled": "Scheduled",
+      "archived": "Archived"
+    },
+    "subtasks": {
+      "add_one": "+{{count}} new",
+      "add_other": "+{{count}} new",
+      "complete_one": "{{count}} completed",
+      "complete_other": "{{count}} completed",
+      "reopen_one": "{{count}} reopened",
+      "reopen_other": "{{count}} reopened",
+      "remove_one": "{{count}} removed",
+      "remove_other": "{{count}} removed",
+      "missing": "Couldn't find these subtasks: {{titles}}"
+    },
+    "delete": {
+      "permanent": "Deleted for good",
+      "alsoGoogle": "Also from Google Calendar",
+      "confirm_one": "I understand {{count}} task will be permanently deleted.",
+      "confirm_other": "I understand {{count}} tasks will be permanently deleted.",
+      "confirmEvents_one": "I understand {{count}} event will be canceled and its guests will be notified.",
+      "confirmEvents_other": "I understand {{count}} events will be canceled and their guests will be notified.",
+      "confirmMixed_one": "I understand {{count}} item will be permanently deleted.",
+      "confirmMixed_other": "I understand {{count}} items will be permanently deleted."
+    },
+    "event": {
+      "untitled": "Untitled event",
+      "unknown": "Event in your calendar",
+      "allDay": "All day",
+      "meet": "Google Meet",
+      "meetCreated": "A Google Meet link will be created for the meeting.",
+      "meetAdded": "A Meet link is added",
+      "guests_one": "{{count}} guest",
+      "guests_other": "{{count}} guests",
+      "guestsNotice": "Google will email an invitation to each guest.",
+      "updateNotice": "Guests will be notified of the change.",
+      "addGuests_one": "+{{count}} guest",
+      "addGuests_other": "+{{count}} guests",
+      "removeGuests_one": "−{{count}} guest",
+      "removeGuests_other": "−{{count}} guests",
+      "descriptionReplaced": "The description is replaced",
+      "organizedBy": "Organized by {{email}}",
+      "notOrganizerHint": "You don't organize this event: only the organizer can change its time or guests for everyone.",
+      "cancel": "Canceled",
+      "cancelNotice_one": "{{count}} guest will get the cancellation",
+      "cancelNotice_other": "{{count}} guests will get the cancellation",
+      "needsCalendar": "Needs Google Calendar",
+      "connectHint": "Connect Google Calendar so Lumina can create and edit your events.",
+      "connect": "Connect Google Calendar",
+      "you": "You",
+      "response": {
+        "accepted": "Accepted",
+        "declined": "Declined",
+        "tentative": "Maybe",
+        "needsAction": "No reply"
+      }
+    }
+  },
   "insightsHeader": {
     "title": "{{period}} Insights",
     "periods": {
@@ -694,10 +897,112 @@
     "mediumSlate": "Medium Slate",
     "darkSlate": "Dark Slate"
   },
+  "selection": {
+    "select": "Select",
+    "selectAll": "Select all",
+    "selectedCount_one": "{{count}} selected",
+    "selectedCount_other": "{{count}} selected",
+    "deleteCount": "Delete ({{count}})"
+  },
+  "deleteConfirm": {
+    "andMore": "and {{count}} more"
+  },
+  "projectTasks": {
+    "empty": {
+      "title": "No tasks in your projects yet",
+      "description": "Create tasks inside a project to see them here, grouped by status.",
+      "action": "Create task"
+    },
+    "emptySearch": {
+      "title": "No tasks found",
+      "description": "No task matches your search. Try different words."
+    },
+    "error": {
+      "title": "Couldn't load the tasks",
+      "description": "Check your connection and try again.",
+      "retry": "Retry"
+    },
+    "loadMore": "Load more tasks",
+    "loadingMore": "Loading…",
+    "toast": {
+      "authError": "Sign in again to continue",
+      "created": "Task created",
+      "createFailed": "Couldn't create the task",
+      "updateFailed": "Couldn't update the task",
+      "deleted_one": "Task deleted",
+      "deleted_other": "{{count}} tasks deleted",
+      "deleteFailed": "Some tasks couldn't be deleted",
+      "completed": "Task completed",
+      "undo": "Undo"
+    },
+    "moveTo": "Move to",
+    "changeStatus": "Change status",
+    "markDone": "Mark as done",
+    "markNotDone": "Mark as not done",
+    "toggleSubtasks": "Show or hide subtasks",
+    "linkedDocument": "Linked document",
+    "addTo": "Add task to {{status}}",
+    "quickAddPlaceholder": "New task in {{status}} (Enter to save, Esc to cancel)",
+    "allProjects": "All projects",
+    "showEmptyStatuses": "Show empty statuses",
+    "columns": {
+      "task": "Task",
+      "project": "Project",
+      "due": "Due",
+      "priority": "Priority",
+      "estimate": "Est."
+    },
+    "summary": {
+      "completed": "{{done}} of {{total}} done",
+      "progress": "Progress: {{percent}}%",
+      "remaining": "{{time}} left",
+      "overdue_one": "{{count}} overdue",
+      "overdue_other": "{{count}} overdue",
+      "loaded": "Showing {{loaded}} of {{total}}"
+    },
+    "filters": {
+      "overdue": "Overdue",
+      "noDate": "No date",
+      "highPriority": "High priority",
+      "clear": "Clear filters"
+    },
+    "sort": {
+      "dueDate": "By date",
+      "priority": "By priority",
+      "title": "By name",
+      "recent": "Newest first"
+    },
+    "emptyProject": {
+      "title": "This project has no tasks yet",
+      "description": "Create the first one to start organizing the project's work."
+    },
+    "emptyFilters": {
+      "title": "No tasks match the filters",
+      "description": "Remove a filter to see more tasks."
+    },
+    "bulk": {
+      "complete": "Complete",
+      "move": "Move to…"
+    },
+    "bulkDelete": {
+      "title_one": "Delete {{count}} task?",
+      "title_other": "Delete {{count}} tasks?",
+      "description_one": "It will be permanently deleted, with its subtasks.",
+      "description_other": "They will be permanently deleted, with their subtasks."
+    }
+  },
   "workspaceLibrary": {
     "toast": {
       "deleteProjectsTitle": "Remove Projects",
       "deleteProjectsDesc": "Are you sure you want to delete the following projects: {{names}}? Workspaces inside will be unlinked but not deleted.",
+      "projectsDeleted_one": "Project deleted",
+      "projectsDeleted_other": "{{count}} projects deleted",
+      "projectsDeleteFailed_one": "{{count}} project could not be deleted.",
+      "projectsDeleteFailed_other": "{{count}} projects could not be deleted.",
+      "workspacesDeleted_one": "Workspace deleted",
+      "workspacesDeleted_other": "{{count}} workspaces deleted",
+      "workspacesDeleteFailed_one": "{{count}} workspace could not be deleted.",
+      "workspacesDeleteFailed_other": "{{count}} workspaces could not be deleted.",
       "deletedTitle": "Projects deleted"
     },
     "breadcrumb": {
@@ -708,8 +1013,7 @@
     "newWorkspace": "New Workspace",
     "status": {
       "recent": "Recent",
-      "draft": "Draft",
-      "active": "Active"
+      "empty": "Empty"
     },
     "notesInside_one": "{{count}} note inside",
     "notesInside_other": "{{count}} notes inside",
@@ -727,12 +1031,6 @@
     },
     "recentWorkspace": "RECENT WORKSPACE",
     "emptyFolderSnippet": "This folder is empty. Create your first workspace to get started...",
-    "defaultSnippet": "Work plan and key notes associated with {{name}}. Main goals and deliverables...",
-    "snippets": {
-      "nutrition1": "Proteins and essential macronutrients for daily performance. Tuesday session notes...",
-      "nutrition2": "Fat-soluble and water-soluble vitamins: key differences and recommended food sources...",
-      "sql": "Advanced SQL JOINs: INNER, LEFT, RIGHT, and FULL OUTER JOIN with practical query examples..."
-    },
     "filterAndSortNotes": "Filter & Sort Notes",
     "switchViewMode": "Switch View Mode",
     "sortNotes": "Sort Notes",
@@ -744,6 +1042,25 @@
     "viewGrid": "Grid",
     "viewList": "List",
     "deleteWorkspace": "Delete Workspace",
+    "deleteDialog": {
+      "title": "Delete project",
+      "description": "Are you sure you want to delete the project \"{{name}}\"?",
+      "bulkTitle": "Delete {{count}} projects",
+      "bulkDescription": "Are you sure you want to delete the following {{count}} projects?",
+      "workspacesWarning_one": "This project has {{count}} workspace inside. It will be deleted along with the project and cannot be recovered.",
+      "workspacesWarning_other": "This project has {{count}} workspaces inside. They will be deleted along with the project and cannot be recovered.",
+      "bulkWorkspacesWarning_one": "Data will be deleted: these projects contain {{count}} workspace that will also be permanently deleted.",
+      "bulkWorkspacesWarning_other": "Data will be deleted: these projects contain {{count}} workspaces in total that will also be permanently deleted.",
+      "noWorkspacesWarning": "This action cannot be undone."
+    },
+    "deleteWorkspacesDialog": {
+      "title": "Delete workspace",
+      "description": "Are you sure you want to delete \"{{name}}\"?",
+      "bulkTitle": "Delete {{count}} workspaces",
+      "bulkDescription": "Are you sure you want to delete the following {{count}} workspaces?",
+      "warning_one": "Its content will be permanently deleted. This action cannot be undone.",
+      "warning_other": "The content of {{count}} workspaces will be permanently deleted. This action cannot be undone."
+    },
     "renameFolder": "Rename Folder",
     "customizeStyle": "Customize Style",
     "deleteFolder": "Delete Folder",
@@ -759,7 +1076,27 @@
       "title": "Create New Folder"
     },
     "namePlaceholder": "e.g. Sprint Plan, Personal, Marketing",
-    "createFolder": "Create Folder"
+    "createFolder": "Create Folder",
+    "editedOn": "Edited {{date}}",
+    "card": {
+      "created": "Created",
+      "taskStatus": "Task status",
+      "time": "Time est. / actual",
+      "none": "None",
+      "noTask": "No task linked",
+      "more_one": "+{{count}} more",
+      "more_other": "+{{count}} more",
+      "doneCount": "{{done}}/{{total}} done",
+      "linkedTasks_one": "Linked tasks ({{count}})",
+      "linkedTasks_other": "Linked tasks ({{count}})",
+      "noContent": "No content yet",
+      "options": "Document options"
+    },
+    "folderView": {
+      "label": "Project view",
+      "documents": "Documents",
+      "tasks": "Tasks"
+    }
   },
   "allProjectsModal": {
     "title": "All Folders",
@@ -834,7 +1171,6 @@
     "status": {
       "all": "All",
       "todo": "To Do",
-      "inProgress": "In Progress",
       "planning": "Planning",
       "scheduled": "Scheduled",
       "review": "In Review",
@@ -848,7 +1184,8 @@
       "high": "High",
       "medium": "Medium",
       "low": "Low",
-      "none": "No priority"
+      "none": "No priority",
+      "critical": "Urgent"
     },
     "columns": {
       "taskName": "TASK NAME",
@@ -866,16 +1203,12 @@
       "markAsDone": "Mark as Done",
       "deleteTask": "Delete Task"
     },
-    "allClear": "All clear",
-    "addTaskTo": "Add task to",
-    "collapseSection": "Collapse section",
-    "expandSection": "Expand section",
-    "pressEnter": "Press Enter",
     "subtasksCount": "{{completed}}/{{total}} subtasks",
     "dates": {
       "all": "All Tasks",
       "today": "Today",
       "tomorrow": "Tomorrow",
+      "overdue": "Overdue",
       "in3Days": "In 3 days",
       "nextWeek": "Next week",
       "thisWeek": "This Week",
@@ -931,6 +1264,15 @@
       "logTime": "Log time",
       "noTimeLogged": "No time logged yet.",
       "titlePlaceholder": "Complete quarterly performance report"
+    },
+    "projectRequired": {
+      "title": "Choose a project",
+      "description": "Create a project first: tasks in this view always belong to one."
+    },
+    "deleteTaskDialog": {
+      "title": "Delete task",
+      "description": "Are you sure you want to delete the task \"{{title}}\"?",
+      "warning": "It will be deleted along with its subtasks and cannot be undone."
     },
     "createProjectTaskModal": {
       "titlePlaceholder": "Task title...",

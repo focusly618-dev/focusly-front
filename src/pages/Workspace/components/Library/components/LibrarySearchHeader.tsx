@@ -26,6 +26,7 @@ import {
   Wallpaper as WallpaperIcon,
 } from '@mui/icons-material';
 import { StyledTextField } from '../WorkspaceLibrary.styles';
+import { SEARCH_SHORTCUT } from '../constants/library.constants';
 
 export interface LibrarySearchHeaderProps {
   searchTerm: string;
@@ -37,6 +38,9 @@ export interface LibrarySearchHeaderProps {
   onNoteSortChange?: (sort: 'recent' | 'title-asc' | 'title-desc') => void;
   noteFilterType?: 'all' | 'linked-task' | 'has-cover';
   onNoteFilterChange?: (type: 'all' | 'linked-task' | 'has-cover') => void;
+  /** Just the search box (the project's tasks view). */
+  searchOnly?: boolean;
+  placeholder?: string;
 }
 
 export const LibrarySearchHeader = ({
@@ -49,6 +53,8 @@ export const LibrarySearchHeader = ({
   onNoteSortChange,
   noteFilterType = 'all',
   onNoteFilterChange,
+  searchOnly = false,
+  placeholder,
 }: LibrarySearchHeaderProps) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -109,12 +115,15 @@ export const LibrarySearchHeader = ({
     >
       <StyledTextField
         id="joyride-workspace-search"
-        placeholder={t('nav.searchWorkspaces', 'Search workspaces...')}
+        placeholder={
+          placeholder ?? t('nav.searchWorkspaces', 'Search workspaces...')
+        }
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         size="small"
         sx={{
           width: '380px',
+          minWidth: 0,
           flex: { xs: 1, sm: 'none' },
         }}
         InputProps={{
@@ -151,14 +160,14 @@ export const LibrarySearchHeader = ({
                 userSelect: 'none',
               }}
             >
-              ⌘F
+              {SEARCH_SHORTCUT}
             </Box>
           ),
         }}
       />
 
       {/* Filter & Sort Button for Notes */}
-      {onNoteSortChange && onNoteFilterChange && (
+      {!searchOnly && onNoteSortChange && onNoteFilterChange && (
         <Tooltip
           title={t(
             'workspaceLibrary.filterAndSortNotes',
@@ -201,33 +210,37 @@ export const LibrarySearchHeader = ({
       )}
 
       {/* View Mode Selector Button */}
-      <Tooltip title={t('workspaceLibrary.switchViewMode', 'Switch View Mode')}>
-        <IconButton
-          size="small"
-          onClick={handleOpenViewMenu}
-          sx={{
-            border: `1px solid ${
-              isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
-            }`,
-            borderRadius: '8px',
-            p: 0.5,
-            width: '38px',
-            height: '38px',
-            color: 'text.secondary',
-            bgcolor: viewMenuAnchor
-              ? isDark
-                ? 'rgba(255,255,255,0.05)'
-                : 'rgba(0,0,0,0.03)'
-              : 'transparent',
-            transition: 'all 0.2s',
-            '&:hover': {
-              bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-            },
-          }}
+      {!searchOnly && (
+        <Tooltip
+          title={t('workspaceLibrary.switchViewMode', 'Switch View Mode')}
         >
-          {getActiveViewIcon()}
-        </IconButton>
-      </Tooltip>
+          <IconButton
+            size="small"
+            onClick={handleOpenViewMenu}
+            sx={{
+              border: `1px solid ${
+                isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
+              }`,
+              borderRadius: '8px',
+              p: 0.5,
+              width: '38px',
+              height: '38px',
+              color: 'text.secondary',
+              bgcolor: viewMenuAnchor
+                ? isDark
+                  ? 'rgba(255,255,255,0.05)'
+                  : 'rgba(0,0,0,0.03)'
+                : 'transparent',
+              transition: 'all 0.2s',
+              '&:hover': {
+                bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+              },
+            }}
+          >
+            {getActiveViewIcon()}
+          </IconButton>
+        </Tooltip>
+      )}
 
       {/* Filter & Sort Menu for Notes */}
       {onNoteSortChange && onNoteFilterChange && (

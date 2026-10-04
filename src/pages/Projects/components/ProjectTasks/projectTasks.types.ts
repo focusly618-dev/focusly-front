@@ -1,3 +1,5 @@
+import type { DueDateHighlight } from './projectTaskDates';
+
 export type ProjectTaskPriority =
   | 'Critical'
   | 'High'
@@ -5,12 +7,16 @@ export type ProjectTaskPriority =
   | 'Low'
   | 'None';
 
+/** One per backend status (Archived tasks aren't shown in this view). */
 export type ProjectTaskStatusId =
   | 'in_progress'
   | 'todo'
-  | 'completed'
+  | 'planning'
+  | 'scheduled'
   | 'in_review'
+  | 'on_hold'
   | 'backlog'
+  | 'completed'
   | string;
 
 export interface ProjectSubtaskItem {
@@ -19,6 +25,10 @@ export interface ProjectSubtaskItem {
   completed: boolean;
   duration?: string;
   dueBadge?: string;
+  // Raw backend values, sent back untouched so saving the subtask list
+  // never wipes them (the backend replaces the whole list on update).
+  estimateTimer?: number | null;
+  completedAt?: string | null;
 }
 
 export interface ProjectTaskAssignee {
@@ -44,7 +54,7 @@ export interface ProjectTaskItemData {
   tag?: string;
   duration?: string;
   dueDate?: string;
-  dueDateHighlight?: 'today' | 'tomorrow' | 'normal';
+  dueDateHighlight?: DueDateHighlight;
   assignee?: ProjectTaskAssignee;
   subtasks?: ProjectSubtaskItem[];
   completed?: boolean;
@@ -58,58 +68,98 @@ export interface ProjectTaskItemData {
   description?: string;
   rawDeadline?: string;
   modules?: string[];
+  /** Estimate in minutes (for totals). */
+  estimateMinutes?: number;
+  createdAt?: string;
 }
 
 export interface ProjectStatusConfig {
   id: ProjectTaskStatusId;
+  /** The status as the backend stores it. */
+  backend: string;
+  /** Same names as the rest of the app (tasks.status.*). */
+  labelKey: string;
   label: string;
   color: string;
   dotColor: string;
-  bgColor?: string;
-  borderColor?: string;
   isCompleted?: boolean;
+  /** Shown even with no tasks (the others appear when they have some). */
+  alwaysVisible?: boolean;
 }
 
+// Every status keeps its own group: a task shows here under the same name it
+// has everywhere else (it used to merge Planning/Scheduled into To Do and On
+// Hold into Backlog, and call Pending "In Progress").
 export const DEFAULT_PROJECT_STATUSES: ProjectStatusConfig[] = [
   {
     id: 'in_progress',
-    label: 'In Progress',
-    color: '#10b981',
-    dotColor: '#10b981',
-    bgColor: 'rgba(16, 185, 129, 0.12)',
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    backend: 'Pending',
+    labelKey: 'tasks.status.pending',
+    label: 'Pending',
+    color: '#f59e0b',
+    dotColor: '#f59e0b',
+    alwaysVisible: true,
   },
   {
     id: 'todo',
+    backend: 'Todo',
+    labelKey: 'tasks.status.todo',
     label: 'To Do',
-    color: '#94a3b8',
-    dotColor: '#94a3b8',
-    bgColor: 'rgba(148, 163, 184, 0.12)',
-    borderColor: 'rgba(148, 163, 184, 0.25)',
+    color: '#3b82f6',
+    dotColor: '#3b82f6',
+    alwaysVisible: true,
   },
   {
-    id: 'completed',
-    label: 'Completed',
-    color: '#10b981',
-    dotColor: '#10b981',
-    bgColor: 'rgba(16, 185, 129, 0.1)',
-    borderColor: 'rgba(16, 185, 129, 0.2)',
-    isCompleted: true,
+    id: 'planning',
+    backend: 'Planning',
+    labelKey: 'tasks.status.planning',
+    label: 'Planning',
+    color: '#0284c7',
+    dotColor: '#0284c7',
+  },
+  {
+    id: 'scheduled',
+    backend: 'Scheduled',
+    labelKey: 'tasks.status.scheduled',
+    label: 'Scheduled',
+    color: '#8b5cf6',
+    dotColor: '#8b5cf6',
   },
   {
     id: 'in_review',
-    label: 'In Review',
+    backend: 'Review',
+    labelKey: 'tasks.status.review',
+    label: 'Review',
     color: '#06b6d4',
     dotColor: '#06b6d4',
-    bgColor: 'rgba(6, 182, 212, 0.12)',
-    borderColor: 'rgba(6, 182, 212, 0.25)',
+  },
+  {
+    id: 'on_hold',
+    backend: 'On Hold',
+    labelKey: 'tasks.status.onHold',
+    label: 'On Hold',
+    color: '#ec4899',
+    dotColor: '#ec4899',
   },
   {
     id: 'backlog',
+    backend: 'Backlog',
+    labelKey: 'tasks.status.backlog',
     label: 'Backlog',
-    color: '#8b5cf6',
-    dotColor: '#8b5cf6',
-    bgColor: 'rgba(139, 92, 246, 0.12)',
-    borderColor: 'rgba(139, 92, 246, 0.25)',
+    color: '#64748b',
+    dotColor: '#64748b',
+  },
+  {
+    id: 'completed',
+    backend: 'Done',
+    labelKey: 'tasks.status.done',
+    label: 'Done',
+    color: '#10b981',
+    dotColor: '#10b981',
+    isCompleted: true,
+    alwaysVisible: true,
   },
 ];
+
+export const findProjectStatus = (id?: string) =>
+  DEFAULT_PROJECT_STATUSES.find((status) => status.id === id?.toLowerCase());

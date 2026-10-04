@@ -32,7 +32,8 @@ export interface Task {
   /** 1=Low, 4=Critical (FR-06) */
   priority_level: number;
   /** Strict Deadline */
-  deadline: string;
+  /** null when the task has no date. */
+  deadline: string | null;
   status: TaskStatus;
   category: string;
   color?: string;

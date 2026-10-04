@@ -15,6 +15,6 @@ export interface ProjectFoldersGridProps {
     id: string,
     input: { name?: string; color?: string; emoji?: string },
   ) => Promise<unknown> | void;
-  onDeleteFolder: (id: string) => Promise<unknown> | void;
+  onDeleteFolders: (ids: string[]) => Promise<unknown> | void;
   folderSearchTerm?: string;
 }

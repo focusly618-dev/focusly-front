@@ -34,6 +34,7 @@ export const useFocusModeTasks = ({ initialTask }: UseFocusModeTasksProps) => {
     return all
       .filter((t) => {
         if (t.status === 'Done' || t.status === 'Archived') return false;
+        if (!t.deadline) return false;
         const deadline = new Date(t.deadline);
         return deadline >= today && deadline < tomorrow;
       })

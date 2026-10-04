@@ -1,3 +1,13 @@
+export interface GoogleEventAttendee {
+  email?: string;
+  responseStatus?: string;
+  /** The signed-in user. */
+  self?: boolean;
+  organizer?: boolean;
+  displayName?: string;
+  optional?: boolean;
+}
+
 export interface GoogleCalendarEvent {
   id: string;
   google_event_id: string;
@@ -24,6 +34,8 @@ export interface GoogleCalendarEvent {
   links: { title: string; url: string }[];
   estimate_timer?: number;
   collaborators?: { email: string; responseStatus?: string; avatar?: string }[];
+  /** Everyone invited, Meet or not (`collaborators` only lists Meet guests). */
+  attendees?: GoogleEventAttendee[];
   organizer_email?: string;
   location?: string;
   is_all_day: boolean;
@@ -43,12 +55,16 @@ export interface RawGoogleEvent {
   start?: {
     dateTime?: string;
     date?: string;
+    timeZone?: string;
   };
   end?: {
     dateTime?: string;
     date?: string;
+    timeZone?: string;
   };
   hangoutLink?: string;
+  /** The event's page in Google Calendar. */
+  htmlLink?: string;
   conferenceData?: {
     createRequest?: {
       requestId?: string;
@@ -60,10 +76,7 @@ export interface RawGoogleEvent {
       label?: string;
     }[];
   };
-  attendees?: {
-    email?: string;
-    responseStatus?: string;
-  }[];
+  attendees?: GoogleEventAttendee[];
   organizer?: {
     email?: string;
     self?: boolean;

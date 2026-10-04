@@ -7,12 +7,13 @@ import {
   lighten,
   Popover,
   IconButton,
+  Checkbox,
 } from '@mui/material';
 import {
   Link as LinkIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
-import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import {
   WorkspaceCard,
   CardAvatarCircle,
@@ -39,6 +40,9 @@ interface WorkspaceCardItemProps {
   groupName?: string;
   groupColor?: string;
   compact?: boolean;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (workspace: WorkspaceTypes) => void;
 }
 
 const cleanMarkdown = (md: string): string => {
@@ -65,12 +69,13 @@ const cleanMarkdown = (md: string): string => {
   text = text.replace(/<!--.*?-->/gs, '');
 
   // 6. Replace multiple spaces/newlines with a single space
-  return text.replace(/\s+/g, ' ').trim() || 'No content yet';
+  return text.replace(/\s+/g, ' ').trim();
 };
 
 // Safely parse the document content to get a plain text preview snippet
+// ('' when there's nothing to show).
 const getSnippet = (contentStr?: string): string => {
-  if (!contentStr) return 'No content yet';
+  if (!contentStr) return '';
   try {
     const parsed = JSON.parse(contentStr);
     if (Array.isArray(parsed)) {
@@ -90,11 +95,24 @@ const getSnippet = (contentStr?: string): string => {
     }
   } catch {
     if (contentStr.startsWith('[') || contentStr.startsWith('{')) {
-      return 'No content yet';
+      return '';
     }
     return cleanMarkdown(contentStr);
   }
-  return 'No content yet';
+  return '';
+};
+
+// Backend task status → the Tasks board's labels.
+const STATUS_KEYS: Record<string, string> = {
+  todo: 'todo',
+  pending: 'pending',
+  planning: 'planning',
+  scheduled: 'scheduled',
+  review: 'review',
+  'on hold': 'onHold',
+  done: 'done',
+  backlog: 'backlog',
+  archived: 'archived',
 };
 
 export const WorkspaceCardItem = ({
@@ -105,8 +123,16 @@ export const WorkspaceCardItem = ({
   groupName,
   groupColor,
   compact,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
 }: WorkspaceCardItemProps) => {
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
+  const statusLabel = (status?: string) => {
+    const key = STATUS_KEYS[(status ?? '').toLowerCase()];
+    return key ? t(`tasks.status.${key}`) : status || t('tasks.status.backlog');
+  };
 
   const paletteEntry = workspace.background_color
     ? colorPaletteMap[workspace.background_color] ||
@@ -145,7 +171,8 @@ export const WorkspaceCardItem = ({
   const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
   const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
 
-  const snippet = getSnippet(workspace.content);
+  const snippet =
+    getSnippet(workspace.content) || t('workspaceLibrary.card.noContent');
 
   const linkedTasksList = useMemo(() => {
     if (workspace.tasks && workspace.tasks.length > 0) {
@@ -206,9 +233,16 @@ export const WorkspaceCardItem = ({
 
   return (
     <WorkspaceCard
-      onClick={() => onSelect(workspace)}
+      onClick={() =>
+        selectionMode ? onToggleSelect?.(workspace) : onSelect(workspace)
+      }
       gradient={isBackgroundActive ? gradient : undefined}
       compact={compact}
+      sx={
+        selected
+          ? { outline: '2px solid #008767', outlineOffset: '-1px' }
+          : undefined
+      }
     >
       {/* Top Row: Avatar (left), Folder / Color Badge & Menu Options (right) */}
       <Box
@@ -246,7 +280,17 @@ export const WorkspaceCardItem = ({
           )}
         </CardAvatarCircle>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 1,
+            flex: 1,
+            minWidth: 0,
+            ml: 1,
+          }}
+        >
           {folderName && (
             <BadgeChip
               color={visibleColor}
@@ -258,6 +302,7 @@ export const WorkspaceCardItem = ({
                 fontSize: '11px',
                 fontWeight: 600,
                 border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'}`,
+                minWidth: 0,
                 ...(isBackgroundActive && {
                   bgcolor: isLightBg
                     ? 'rgba(0, 0, 0, 0.08)'
@@ -267,7 +312,16 @@ export const WorkspaceCardItem = ({
                 }),
               }}
             >
-              {folderName}
+              <Box
+                component="span"
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {folderName}
+              </Box>
             </BadgeChip>
           )}
 
@@ -276,12 +330,14 @@ export const WorkspaceCardItem = ({
             workspace.background_color !== 'none' && (
               <Box
                 sx={{
-                  display: 'inline-flex',
+                  // Hidden on phones, where the card is narrow.
+                  display: { xs: 'none', sm: 'inline-flex' },
                   alignItems: 'center',
                   gap: 0.6,
                   px: 1,
                   py: 0.3,
                   borderRadius: '12px',
+                  flexShrink: 0,
                   bgcolor: isBackgroundActive
                     ? isLightBg
                       ? 'rgba(0, 0, 0, 0.08)'
@@ -314,6 +370,7 @@ export const WorkspaceCardItem = ({
                   }}
                 />
                 <Typography
+                  noWrap
                   sx={{
                     fontSize: '10.5px',
                     fontWeight: 600,
@@ -329,31 +386,54 @@ export const WorkspaceCardItem = ({
               </Box>
             )}
 
-          {onMenuOpen && (
-            <IconButton
+          {selectionMode ? (
+            <Checkbox
               size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMenuOpen(e, workspace);
-              }}
+              checked={selected}
+              onClick={(e) => e.stopPropagation()}
+              onChange={() => onToggleSelect?.(workspace)}
               sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? '#0f172a'
-                    : '#ffffff'
-                  : 'text.secondary',
                 p: 0.5,
-                '&:hover': {
-                  backgroundColor: isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(0,0,0,0.08)'
-                      : 'rgba(255,255,255,0.15)'
-                    : 'action.hover',
+                flexShrink: 0,
+                color: isBackgroundActive && !isLightBg ? '#ffffff' : undefined,
+                '&.Mui-checked': {
+                  color:
+                    isBackgroundActive && !isLightBg ? '#ffffff' : '#008767',
                 },
               }}
-            >
-              <MoreVertIcon fontSize="small" />
-            </IconButton>
+              inputProps={{
+                'aria-label': workspace.title || UNTITLED_WORKSPACE_TITLE,
+              }}
+            />
+          ) : (
+            onMenuOpen && (
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMenuOpen(e, workspace);
+                }}
+                aria-label={t('workspaceLibrary.card.options')}
+                sx={{
+                  color: isBackgroundActive
+                    ? isLightBg
+                      ? '#0f172a'
+                      : '#ffffff'
+                    : 'text.secondary',
+                  p: 0.5,
+                  flexShrink: 0,
+                  '&:hover': {
+                    backgroundColor: isBackgroundActive
+                      ? isLightBg
+                        ? 'rgba(0,0,0,0.08)'
+                        : 'rgba(255,255,255,0.15)'
+                      : 'action.hover',
+                  },
+                }}
+              >
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
+            )
           )}
         </Box>
       </Box>
@@ -463,7 +543,7 @@ export const WorkspaceCardItem = ({
                 },
               }}
             >
-              Created
+              {t('workspaceLibrary.card.created')}
             </PropertyLabel>
             <PropertyValue
               sx={{
@@ -484,7 +564,11 @@ export const WorkspaceCardItem = ({
                 },
               }}
             >
-              {format(new Date(workspace.createdAt), 'MMM dd, yyyy')}
+              {new Date(workspace.createdAt).toLocaleDateString(i18n.language, {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}
             </PropertyValue>
           </PropertyItem>
 
@@ -510,7 +594,7 @@ export const WorkspaceCardItem = ({
                 },
               }}
             >
-              Task Status
+              {t('workspaceLibrary.card.taskStatus')}
             </PropertyLabel>
             <PropertyValue
               sx={{
@@ -520,12 +604,11 @@ export const WorkspaceCardItem = ({
                     : '#ffffff'
                   : linkedTasksList.length > 0
                     ? linkedTasksList.every(
-                        (t) => t.status?.toUpperCase() === 'DONE',
+                        (task) => task.status?.toUpperCase() === 'DONE',
                       )
                       ? '#10b981'
                       : 'text.primary'
                     : 'text.secondary',
-                textTransform: 'capitalize',
                 fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
@@ -552,19 +635,19 @@ export const WorkspaceCardItem = ({
                       height: 6,
                       borderRadius: '50%',
                       bgcolor: linkedTasksList.every(
-                        (t) => t.status?.toUpperCase() === 'DONE',
+                        (task) => task.status?.toUpperCase() === 'DONE',
                       )
                         ? '#10b981'
                         : '#fbbf24',
                       display: 'inline-block',
                     }}
                   />
-                  {
-                    linkedTasksList.filter(
-                      (t) => t.status?.toUpperCase() === 'DONE',
-                    ).length
-                  }
-                  /{linkedTasksList.length} done
+                  {t('workspaceLibrary.card.doneCount', {
+                    done: linkedTasksList.filter(
+                      (task) => task.status?.toUpperCase() === 'DONE',
+                    ).length,
+                    total: linkedTasksList.length,
+                  })}
                 </>
               ) : linkedTasksList.length === 1 ? (
                 <>
@@ -581,11 +664,10 @@ export const WorkspaceCardItem = ({
                       display: 'inline-block',
                     }}
                   />
-                  {linkedTasksList[0].status?.toLowerCase().replace('_', ' ') ||
-                    'Backlog'}
+                  {statusLabel(linkedTasksList[0].status)}
                 </>
               ) : (
-                'None'
+                t('workspaceLibrary.card.none')
               )}
             </PropertyValue>
           </PropertyItem>
@@ -612,7 +694,7 @@ export const WorkspaceCardItem = ({
                 },
               }}
             >
-              Time Est/Act
+              {t('workspaceLibrary.card.time')}
             </PropertyLabel>
             <PropertyValue
               sx={{
@@ -640,14 +722,14 @@ export const WorkspaceCardItem = ({
                 ? `${
                     formatDuration(
                       linkedTasksList.reduce(
-                        (acc, t) => acc + (t.estimate_timer || 0),
+                        (acc, task) => acc + (task.estimate_timer || 0),
                         0,
                       ),
                     ) || '0m'
                   } / ${
                     formatDuration(
                       linkedTasksList.reduce(
-                        (acc, t) => acc + (t.real_timer || 0),
+                        (acc, task) => acc + (task.real_timer || 0),
                         0,
                       ),
                     ) || '0m'
@@ -784,7 +866,9 @@ export const WorkspaceCardItem = ({
                     },
                   }}
                 >
-                  +{linkedTasksList.length - 1} more
+                  {t('workspaceLibrary.card.more', {
+                    count: linkedTasksList.length - 1,
+                  })}
                 </Box>
               ) : (
                 <Typography
@@ -865,7 +949,7 @@ export const WorkspaceCardItem = ({
                   color: 'inherit',
                 }}
               >
-                No task linked
+                {t('workspaceLibrary.card.noTask')}
               </Typography>
             </Box>
           )}
@@ -930,13 +1014,15 @@ export const WorkspaceCardItem = ({
               color: 'text.secondary',
             }}
           >
-            Tareas vinculadas ({linkedTasksList.length})
+            {t('workspaceLibrary.card.linkedTasks', {
+              count: linkedTasksList.length,
+            })}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-          {linkedTasksList.map((t) => (
+          {linkedTasksList.map((task) => (
             <Box
-              key={t.id}
+              key={task.id}
               sx={{
                 p: '6px 8px',
                 borderRadius: '8px',
@@ -967,7 +1053,7 @@ export const WorkspaceCardItem = ({
                     borderRadius: '50%',
                     flexShrink: 0,
                     bgcolor:
-                      t.status?.toUpperCase() === 'DONE'
+                      task.status?.toUpperCase() === 'DONE'
                         ? '#10b981'
                         : '#fbbf24',
                   }}
@@ -982,7 +1068,7 @@ export const WorkspaceCardItem = ({
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {t.title}
+                  {task.title}
                 </Typography>
               </Box>
             </Box>

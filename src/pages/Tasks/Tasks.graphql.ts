@@ -261,6 +261,7 @@ export const GET_PROJECT_TASKS = gql`
       tasks {
         id
         title
+        notes
         status
         priority_level
         deadline
@@ -269,10 +270,14 @@ export const GET_PROJECT_TASKS = gql`
         category
         color
         created_at
+        tags {
+          name
+        }
         subtasks {
           id
           title
           completed
+          completed_at
           estimate_timer
         }
         collaborators {

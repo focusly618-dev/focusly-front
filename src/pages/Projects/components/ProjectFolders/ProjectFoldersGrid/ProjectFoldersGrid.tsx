@@ -9,6 +9,7 @@ import {
 } from './ProjectFoldersGrid.styles';
 import { useProjectFoldersGrid } from './ProjectFoldersGrid.hook';
 import { ProjectFolderCard } from '../ProjectFolderCard';
+import { SelectionToolbar } from '../../SelectionToolbar';
 import {
   CreateFolderModal,
   CustomizeFolderModal,
@@ -25,48 +26,73 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
   onSelectFolder,
   onCreateFolder,
   onUpdateFolder,
-  onDeleteFolder,
+  onDeleteFolders,
   folderSearchTerm = '',
 }) => {
   const { t } = useTranslation();
   const { state, actions } = useProjectFoldersGrid();
+  const { selection } = state;
+
+  const handleConfirmDelete = async (ids: string[]) => {
+    await onDeleteFolders(ids);
+    actions.selection.stopSelecting();
+  };
 
   return (
     <GridWrapper>
+      {(groups.length > 0 || selection.isSelecting) && (
+        <Box sx={{ mb: 2 }}>
+          <SelectionToolbar
+            isSelecting={selection.isSelecting}
+            selectedCount={selection.selectedCount}
+            allSelected={actions.selection.areAllSelected(groups)}
+            hasItems={groups.length > 0}
+            onStart={actions.selection.startSelecting}
+            onCancel={actions.selection.stopSelecting}
+            onToggleAll={() => actions.selection.toggleAll(groups)}
+            onDelete={() => actions.openDelete(selection.selectedItems)}
+          />
+        </Box>
+      )}
+
       <FoldersGrid>
         {/* Dashed Create Folder Card */}
-        <DashedCard onClick={actions.openCreate}>
-          <AddCircleIconWrapper>
-            <AddIcon sx={{ fontSize: 22 }} />
-          </AddCircleIconWrapper>
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 700,
-              fontSize: '15px',
-              color: 'text.primary',
-              mb: 0.5,
-            }}
-          >
-            {t('projects.newProject', 'Nuevo Proyecto')}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{ color: 'text.secondary', fontSize: '12px' }}
-          >
-            {t('projects.createCleanFolder', 'Crear una carpeta limpia')}
-          </Typography>
-        </DashedCard>
+        {!selection.isSelecting && (
+          <DashedCard onClick={actions.openCreate}>
+            <AddCircleIconWrapper>
+              <AddIcon sx={{ fontSize: 22 }} />
+            </AddCircleIconWrapper>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 700,
+                fontSize: '15px',
+                color: 'text.primary',
+                mb: 0.5,
+              }}
+            >
+              {t('projects.newProject', 'Nuevo Proyecto')}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', fontSize: '12px' }}
+            >
+              {t('projects.createCleanFolder', 'Crear una carpeta limpia')}
+            </Typography>
+          </DashedCard>
+        )}
 
         {/* Folder Cards List */}
-        {groups.map((group, index) => (
+        {groups.map((group) => (
           <ProjectFolderCard
             key={group.id}
             group={group}
-            index={index}
             onSelect={onSelectFolder}
             onCustomize={actions.openCustomize}
             onDelete={actions.openDelete}
+            selectionMode={selection.isSelecting}
+            selected={actions.selection.isSelected(group.id)}
+            onToggleSelect={actions.selection.toggle}
           />
         ))}
       </FoldersGrid>
@@ -143,8 +169,8 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
       <DeleteFolderModal
         open={state.isDeleteOpen}
         onClose={actions.closeDelete}
-        group={state.selectedGroup}
-        onConfirmDelete={onDeleteFolder}
+        groups={state.groupsToDelete}
+        onConfirmDelete={handleConfirmDelete}
       />
     </GridWrapper>
   );

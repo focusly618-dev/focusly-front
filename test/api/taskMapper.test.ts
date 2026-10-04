@@ -166,11 +166,17 @@ describe('mapResponseToTask — adversarial: malformed backend payloads', () => 
     expect(result.status).toBe('Archived');
   });
 
-  it('falls back to empty string instead of preserving invalid string when deadline is invalid', () => {
+  it('treats an invalid deadline as no date (null) instead of preserving the invalid string', () => {
     const malformed = { ...minimalValid, deadline: 'not-a-real-date' };
     const result = mapResponseToTask(malformed);
     expect(result.deadline).not.toBe('not-a-real-date');
-    expect(result.deadline).toBe('');
+    expect(result.deadline).toBeNull();
+  });
+
+  it('keeps a task without a date undated', () => {
+    expect(
+      mapResponseToTask({ ...minimalValid, deadline: null }).deadline,
+    ).toBeNull();
   });
 
   it('recovers created_at/updated_at/completed_at/deleted_at independently from bad input', () => {

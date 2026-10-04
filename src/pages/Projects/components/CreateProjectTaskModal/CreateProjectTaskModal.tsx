@@ -57,6 +57,7 @@ import {
   DURATION_OPTIONS,
 } from './useCreateProjectTaskModal.hook';
 import { surfaceColor } from '@/context';
+import { ConfirmDeleteDialog } from '../../modals/ConfirmDeleteDialog/ConfirmDeleteDialog';
 
 export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
   props,
@@ -150,6 +151,9 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
     handleRemoveTag,
     handleCreateTask,
     handleDeleteTask,
+    confirmDeleteTask,
+    isDeleteConfirmOpen,
+    closeDeleteConfirm,
     handleKeyDown,
     handleRedirectWorkspace,
   } = useCreateProjectTaskModal(props);
@@ -618,7 +622,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 <Typography
                   sx={{ fontSize: '12px', fontWeight: 600, color: headerText }}
                 >
-                  {t(`tasks.status.${currentStatusConfig.id}`, {
+                  {t(currentStatusConfig.labelKey, {
                     defaultValue: currentStatusConfig.label,
                   })}
                 </Typography>
@@ -671,7 +675,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                     }}
                   />
                   <Typography sx={{ fontSize: '13px', flex: 1 }}>
-                    {t(`tasks.status.${opt.id}`, { defaultValue: opt.label })}
+                    {t(opt.labelKey, { defaultValue: opt.label })}
                   </Typography>
                   {currentStatusConfig.id === opt.id && (
                     <CheckCircleIcon sx={{ fontSize: 15, color: '#10b981' }} />
@@ -2388,6 +2392,17 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
           </Button>
         </Stack>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={isDeleteConfirmOpen}
+        onClose={closeDeleteConfirm}
+        title={t('tasks.deleteTaskDialog.title')}
+        description={t('tasks.deleteTaskDialog.description', {
+          title: props.task?.title || '',
+        })}
+        warning={t('tasks.deleteTaskDialog.warning')}
+        onConfirm={confirmDeleteTask}
+      />
     </>
   );
 };

@@ -3,6 +3,7 @@ import {
   Box,
   Typography,
   IconButton,
+  Checkbox,
   useTheme,
   alpha,
   lighten,
@@ -28,6 +29,9 @@ interface WorkspaceListItemProps {
   onUnlinkTask: (workspace: WorkspaceTypes) => void;
   groupName?: string;
   groupColor?: string;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (workspace: WorkspaceTypes) => void;
 }
 
 export const WorkspaceListItem = ({
@@ -37,6 +41,9 @@ export const WorkspaceListItem = ({
   onUnlinkTask,
   groupName,
   groupColor,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
 }: WorkspaceListItemProps) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -47,7 +54,9 @@ export const WorkspaceListItem = ({
 
   return (
     <Box
-      onClick={() => onSelect(workspace)}
+      onClick={() =>
+        selectionMode ? onToggleSelect?.(workspace) : onSelect(workspace)
+      }
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -55,6 +64,10 @@ export const WorkspaceListItem = ({
         p: '10px 16px',
         borderRadius: '8px',
         border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)'}`,
+        ...(selected && {
+          outline: '2px solid #008767',
+          outlineOffset: '-1px',
+        }),
         bgcolor: surfaceColor(
           theme,
           'rgba(26, 31, 43, 0.4)',
@@ -212,16 +225,29 @@ export const WorkspaceListItem = ({
         {format(new Date(workspace.updatedAt), 'MMM dd, yyyy, hh:mm a')}
       </Typography>
 
-      <IconButton
-        size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          onMenuOpen(e, workspace);
-        }}
-        sx={{ color: 'text.secondary', p: 0.5 }}
-      >
-        <MoreVertIcon fontSize="small" />
-      </IconButton>
+      {selectionMode ? (
+        <Checkbox
+          size="small"
+          checked={selected}
+          onClick={(e) => e.stopPropagation()}
+          onChange={() => onToggleSelect?.(workspace)}
+          sx={{ p: 0.5, '&.Mui-checked': { color: '#008767' } }}
+          inputProps={{
+            'aria-label': workspace.title || UNTITLED_WORKSPACE_TITLE,
+          }}
+        />
+      ) : (
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            onMenuOpen(e, workspace);
+          }}
+          sx={{ color: 'text.secondary', p: 0.5 }}
+        >
+          <MoreVertIcon fontSize="small" />
+        </IconButton>
+      )}
     </Box>
   );
 };

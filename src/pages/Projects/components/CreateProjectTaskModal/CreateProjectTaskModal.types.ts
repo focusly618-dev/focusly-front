@@ -20,6 +20,8 @@ export interface CreateProjectTaskModalProps {
   linkedSpecSection?: string;
   linkedWorkspaceId?: string | null;
   defaultStatus?: string;
+  /** Title prefilled when creating (e.g. typed in a quick-add row). */
+  defaultTitle?: string;
   onCreate?: (task: Record<string, unknown>) => void | Promise<unknown>;
   onUpdate?: (
     taskId: string,

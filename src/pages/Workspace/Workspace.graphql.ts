@@ -180,6 +180,8 @@ export const GET_PROJECT_GROUPS_PAGINATED = gql`
         workspaceCount
         workspaces {
           id
+          title
+          updatedAt
         }
       }
     }

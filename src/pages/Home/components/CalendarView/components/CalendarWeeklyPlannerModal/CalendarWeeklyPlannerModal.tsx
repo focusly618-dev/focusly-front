@@ -130,7 +130,8 @@ export const CalendarWeeklyPlannerModal: React.FC<
                 status: targetTask.status || 'Todo',
                 estimate_timer: targetTask.estimate_timer || 0,
                 priority_level: targetTask.priority_level,
-                deadline: targetTask.deadline || new Date().toISOString(),
+                // Omitted when the task has no date, so it isn't given one.
+                deadline: targetTask.deadline || undefined,
                 category: targetTask.category || 'General',
                 tags: targetTask.tags || [],
                 google_event_id: targetTask.google_event_id,

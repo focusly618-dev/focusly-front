@@ -1,6 +1,7 @@
 import { client } from '@/api/apollo';
 import { REMOVE_WORKSPACE, GET_WORKSPACES } from '../Workspace.graphql';
 import { sileo, getFriendlyErrorMessage } from '@/utils';
+import i18n from '@/i18n';
 
 export const useWorkspaceActions = () => {
   const handleOpen = (id: string): void => {
@@ -43,6 +44,59 @@ export const useWorkspaceActions = () => {
     }
   };
 
+  const deleteWorkspaces = async (ids: string[]) => {
+    if (!ids.length) return 0;
+
+    const results = await Promise.allSettled(
+      ids.map((id) =>
+        client.mutate({ mutation: REMOVE_WORKSPACE, variables: { id } }),
+      ),
+    );
+    const deletedIds = ids.filter((_, i) => results[i].status === 'fulfilled');
+    const failed = results.filter(
+      (r): r is PromiseRejectedResult => r.status === 'rejected',
+    );
+    failed.forEach((r) => console.error('Error deleting workspace:', r.reason));
+
+    if (deletedIds.length > 0) {
+      deletedIds.forEach((id) =>
+        client.cache.evict({
+          id: client.cache.identify({ __typename: 'Workspace', id }),
+        }),
+      );
+      client.cache.gc();
+      // Refetch once for the whole batch; project groups carry workspace counts.
+      await client.refetchQueries({
+        include: [
+          'GetWorkspacesPaginated',
+          'GetProjectGroupsPaginated',
+          'GetProjectGroups',
+        ],
+      });
+      sileo.success({
+        title: i18n.t('workspaceLibrary.toast.workspacesDeleted', {
+          count: deletedIds.length,
+        }),
+        fill: 'var(--sileo-delete-bg)',
+      });
+    }
+
+    if (failed.length > 0) {
+      sileo.error({
+        title: getFriendlyErrorMessage(
+          failed[0].reason,
+          i18n.t('workspaceLibrary.toast.workspacesDeleteFailed', {
+            count: failed.length,
+          }),
+        ),
+        fill: 'var(--sileo-error-bg)',
+      });
+      if (deletedIds.length === 0) throw failed[0].reason;
+    }
+
+    return deletedIds.length;
+  };
+
   // ... rest of the hook
   const searchWorkspaces = async (query: string) => {
     try {
@@ -61,6 +115,7 @@ export const useWorkspaceActions = () => {
     handleOpen,
     searchWorkspaces,
     deleteWorkspace,
+    deleteWorkspaces,
     open: false, // Placeholder
     handleClose: () => {}, // Placeholder
     onConfirm: () => {}, // Placeholder

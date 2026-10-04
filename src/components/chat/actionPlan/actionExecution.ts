@@ -1,16 +1,30 @@
-import type { ReactNode } from 'react';
-import type { MutationFunction, OperationVariables } from '@apollo/client';
-import {
-  Folder as FolderIcon,
-  Description as DescriptionIcon,
-  Assignment as AssignmentIcon,
-  EventRepeat as RescheduleIcon,
-} from '@mui/icons-material';
+import type {
+  ApolloClient,
+  MutationFunction,
+  OperationVariables,
+} from '@apollo/client';
 import { format } from 'date-fns';
-import { enUS } from 'date-fns/locale';
-import { GET_TASKS, GET_TASKS_TITLES } from '@/pages/Tasks/Tasks.graphql';
+import {
+  GET_TASK_DETAIL,
+  GET_TASKS,
+  GET_TASKS_TITLES,
+} from '@/pages/Tasks/Tasks.graphql';
+import { applySubtaskOps, toSubtaskRecords } from './subtaskOps';
+import {
+  createGoogleEvent,
+  deleteGoogleEvent,
+  fetchGoogleEvent,
+  updateGoogleEvent,
+} from '@/api/GoogleCalendar/googleCalendarApi';
+import {
+  buildEventCreateBody,
+  buildEventPatchBody,
+  patchNeedsCurrent,
+} from './eventBody';
 import type { ParsedLuminaAction } from '@/utils';
-import type { ActionPreviewData } from './suggestedActionCard.types';
+import { normalizeEstimateTimer, parseDeadline } from './planFormat';
+
+export { normalizeEstimateTimer, parseDeadline };
 
 // Kept in sync with PRIORITY_COLORS in
 // src/pages/Home/components/CalendarEvent/CalendarEvent.styles.ts so the
@@ -27,12 +41,6 @@ export const PRIORITY_COLORS: Record<number, string> = {
   2: '#60A5FA',
   3: '#FBBF24',
   4: '#F87171',
-};
-
-export const normalizeEstimateTimer = (value?: number): number => {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return 1800;
-  if (value > 1000 && value % 60 === 0) return Math.round(value / 60);
-  return value;
 };
 
 export const formatDuration = (minutes: number): string => {
@@ -55,143 +63,6 @@ export const stripMarkdown = (text: string): string =>
 export const truncate = (text: string, max: number): string =>
   text.length > max ? `${text.slice(0, max).trim()}…` : text;
 
-/** Parses the LLM-supplied "deadline" (ISO date, e.g. "2026-09-07"); null if missing/invalid. */
-// The system prompt only ever asks the model for a bare "YYYY-MM-DD" — no
-// time of day — so every deadline anchors here. 9 AM matches the app's own
-// default working hours (see scheduler_service.py's workingHours default)
-// and this user's stated productive window, giving created tasks a sensible
-// visible start time instead of a literal "12:00 AM".
-const DEFAULT_DEADLINE_HOUR = 9;
-
-export const parseDeadline = (value?: string): Date | null => {
-  if (!value) return null;
-  // A bare YYYY-MM-DD date must be read as a *local* calendar date, not UTC
-  // midnight — `new Date('2026-09-07')` parses as UTC, which lands on the
-  // previous day in any timezone behind UTC (e.g. Sep 6 in Mexico/Central
-  // Time instead of the intended Sep 7). It also has no time of day, so we
-  // anchor it to DEFAULT_DEADLINE_HOUR rather than midnight — otherwise a
-  // task's estimated_start_date/estimated_end_date (derived from this) ends
-  // up showing as "12:00 AM - 1:30 AM" on the calendar.
-  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (dateOnlyMatch) {
-    const [, year, month, day] = dateOnlyMatch;
-    const local = new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      DEFAULT_DEADLINE_HOUR,
-    );
-    return Number.isNaN(local.getTime()) ? null : local;
-  }
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-};
-
-export const formatDateLabel = (date: Date): string =>
-  format(date, 'EEE, MMM d', { locale: enUS });
-
-export const getActionTitle = (action: ParsedLuminaAction): string => {
-  if (action.type === 'CREATE_TASK') return 'Create Task';
-  if (action.type === 'UPDATE_TASK') return 'Reschedule Task';
-  if (action.type === 'CREATE_WORKSPACE') return 'Create Workspace';
-  if (action.type === 'CREATE_NOTE') return 'Create Note';
-  if (action.type === 'INSERT_TO_WORKSPACE') return 'Insertar en Workspace';
-  return 'Create Project Group';
-};
-
-export const getActionPreviewData = (
-  action: ParsedLuminaAction,
-): ActionPreviewData => {
-  if (action.type === 'CREATE_TASK') {
-    const priorityLevel = action.payload.priority_level ?? 2;
-    const estimateTimer = normalizeEstimateTimer(
-      Number(action.payload.estimate_timer) || 1800,
-    );
-    const deadline = parseDeadline(action.payload.deadline);
-    let timeRangeLabel: string | undefined;
-    if (deadline) {
-      const end = new Date(deadline.getTime() + estimateTimer * 60000);
-      timeRangeLabel = `${format(deadline, 'h:mm a')} - ${format(end, 'h:mm a')}`;
-    }
-
-    const rawSubtasks = action.payload.subtasks || [];
-    const subtasks = rawSubtasks.map((s) => {
-      const title = typeof s === 'string' ? s : s.title;
-      const timer =
-        typeof s === 'object' && s.estimate_timer
-          ? normalizeEstimateTimer(s.estimate_timer)
-          : undefined;
-      return {
-        title,
-        estimateTimer: timer,
-        durationLabel: timer ? formatDuration(timer) : undefined,
-      };
-    });
-
-    return {
-      title: action.payload.title || 'AI Task',
-      description: action.payload.notes || undefined,
-      dateLabel: deadline ? formatDateLabel(deadline) : undefined,
-      timeRangeLabel,
-      durationLabel: formatDuration(estimateTimer),
-      priorityLabel: PRIORITY_LABELS[priorityLevel] || 'Medium',
-      priorityColor: PRIORITY_COLORS[priorityLevel] || PRIORITY_COLORS[2],
-      subtasks: subtasks.length > 0 ? subtasks : undefined,
-    };
-  }
-  if (action.type === 'UPDATE_TASK') {
-    const start = parseDeadline(
-      action.payload.estimated_start_date || action.payload.deadline,
-    );
-    return {
-      title: action.payload.title || 'Existing task',
-      dateLabel: start ? formatDateLabel(start) : undefined,
-      durationLabel: action.payload.estimate_timer
-        ? formatDuration(normalizeEstimateTimer(action.payload.estimate_timer))
-        : undefined,
-    };
-  }
-  if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE') {
-    const raw =
-      action.payload.content_encrypted || action.payload.content || '';
-    const projectName =
-      action.payload.project_name ||
-      action.payload.new_project_name ||
-      (action.payload.title
-        ? action.payload.title
-            .replace(/^(?:Reporte|Investigación|Proyecto|Documento):\s*/i, '')
-            .trim()
-        : undefined);
-    return {
-      title:
-        action.payload.title ||
-        (action.type === 'CREATE_NOTE' ? 'AI Note' : 'AI Workspace'),
-      description: projectName ? `📁 Proyecto: ${projectName}` : undefined,
-      contentPreview: raw ? truncate(stripMarkdown(raw), 180) : undefined,
-    };
-  }
-  if (action.type === 'INSERT_TO_WORKSPACE') {
-    const raw = action.payload.markdown || '';
-    return {
-      contentPreview: raw ? truncate(stripMarkdown(raw), 220) : undefined,
-    };
-  }
-  return { title: action.payload.name || 'AI Project Group' };
-};
-
-export const getActionIcon = (
-  action: ParsedLuminaAction,
-  color: string,
-): ReactNode => {
-  const sx = { fontSize: 20, color };
-  if (action.type === 'CREATE_TASK') return <AssignmentIcon sx={sx} />;
-  if (action.type === 'UPDATE_TASK') return <RescheduleIcon sx={sx} />;
-  if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE')
-    return <DescriptionIcon sx={sx} />;
-  if (action.type === 'INSERT_TO_WORKSPACE') return <AssignmentIcon sx={sx} />;
-  return <FolderIcon sx={sx} />;
-};
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MutateFunction = MutationFunction<any, OperationVariables>;
 
@@ -201,7 +72,31 @@ export interface ActionExecutionContext {
   updateTask: MutateFunction;
   createWorkspace: MutateFunction;
   createProjectGroup: MutateFunction;
+  deleteTask?: MutateFunction;
+  /** Reads a task fresh before editing its subtasks. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client?: ApolloClient<any>;
+  /** Drops a deleted task from local state right away. */
+  onTaskDeleted?: (id: string) => void;
+  /** Drops a deleted event from the calendar right away. */
+  onEventDeleted?: (id: string) => void;
+  /** Asks the calendar view to refetch after an event changed. */
+  onCalendarChanged?: () => void;
 }
+
+export interface ActionResult {
+  id?: string;
+  projectGroupId?: string;
+  /** Where to open what was created (a Google Calendar event page). */
+  url?: string;
+  /** The event's Google Meet link. */
+  meetUrl?: string;
+}
+
+const taskRefetches = (userId: string) => [
+  { query: GET_TASKS, variables: { userId } },
+  { query: GET_TASKS_TITLES, variables: { userId, limit: 24, offset: 0 } },
+];
 
 /**
  * Executes a single parsed action against the right GraphQL mutation.
@@ -211,7 +106,7 @@ export interface ActionExecutionContext {
 export const executeSingleAction = async (
   action: ParsedLuminaAction,
   ctx: ActionExecutionContext,
-): Promise<{ id?: string }> => {
+): Promise<ActionResult> => {
   if (action.type === 'CREATE_TASK') {
     const priorityLevel = action.payload.priority_level ?? 2;
     const estimateTimer = normalizeEstimateTimer(
@@ -259,6 +154,7 @@ export const executeSingleAction = async (
           use_ai: true,
           subtasks: formattedSubtasks,
           workspace_id: action.payload.workspace_id || undefined,
+          project_id: action.payload.project_group_id || undefined,
           // The user picked this exact day on purpose (a day-by-day plan,
           // including deliberate weekend days) — never let the
           // auto-scheduler move it. skip_scheduling only protects THIS
@@ -295,6 +191,15 @@ export const executeSingleAction = async (
 
     const updateTaskInput: Record<string, unknown> = { id: action.payload.id };
 
+    if (action.payload.status) {
+      updateTaskInput.status = action.payload.status;
+    }
+    if (action.payload.workspace_id) {
+      updateTaskInput.workspace_id = action.payload.workspace_id;
+    }
+    if (action.payload.project_group_id) {
+      updateTaskInput.project_id = action.payload.project_group_id;
+    }
     if (action.payload.title !== undefined) {
       updateTaskInput.title = action.payload.title;
     }
@@ -353,8 +258,86 @@ export const executeSingleAction = async (
       variables: {
         updateTaskInput,
       },
+      refetchQueries: taskRefetches(ctx.userId),
     });
     return { id: res.data?.updateTask?.id };
+  }
+
+  if (action.type === 'UPDATE_SUBTASKS') {
+    if (!action.payload.id) {
+      throw new Error('UPDATE_SUBTASKS is missing the id of the task');
+    }
+    if (!ctx.client) throw new Error('UPDATE_SUBTASKS needs an Apollo client');
+    // The checklist is written whole: build on the task's current subtasks,
+    // read fresh, so none are lost.
+    const { data } = await ctx.client.query({
+      query: GET_TASK_DETAIL,
+      variables: { id: action.payload.id },
+      fetchPolicy: 'network-only',
+    });
+    if (!data?.task) throw new Error('Task not found');
+    const subtasks = applySubtaskOps(
+      toSubtaskRecords(data.task.subtasks),
+      action.payload,
+    );
+    const res = await ctx.updateTask({
+      variables: { updateTaskInput: { id: action.payload.id, subtasks } },
+      refetchQueries: taskRefetches(ctx.userId),
+    });
+    return { id: res.data?.updateTask?.id };
+  }
+
+  if (action.type === 'DELETE_TASK') {
+    if (!action.payload.id) {
+      throw new Error('DELETE_TASK is missing the id of the task');
+    }
+    if (!ctx.deleteTask)
+      throw new Error('DELETE_TASK needs the delete mutation');
+    // The backend also removes the task's Google Calendar event, if synced.
+    await ctx.deleteTask({
+      variables: { id: action.payload.id },
+      refetchQueries: taskRefetches(ctx.userId),
+    });
+    ctx.onTaskDeleted?.(action.payload.id);
+    return { id: action.payload.id };
+  }
+
+  if (action.type === 'CREATE_EVENT') {
+    const created = await createGoogleEvent(
+      buildEventCreateBody(action.payload),
+    );
+    ctx.onCalendarChanged?.();
+    return {
+      id: created.id,
+      url: created.htmlLink,
+      meetUrl: created.hangoutLink,
+    };
+  }
+
+  if (action.type === 'UPDATE_EVENT') {
+    const { id } = action.payload;
+    if (!id) throw new Error('UPDATE_EVENT is missing the event id');
+    // Guests, length and Meet are read from Google right before the edit:
+    // the guest list is written whole, so a stale copy would drop people.
+    const current = patchNeedsCurrent(action.payload)
+      ? await fetchGoogleEvent(id)
+      : null;
+    const updated = await updateGoogleEvent(
+      id,
+      buildEventPatchBody(action.payload, current),
+    );
+    ctx.onCalendarChanged?.();
+    return { id, url: updated.htmlLink, meetUrl: updated.hangoutLink };
+  }
+
+  if (action.type === 'DELETE_EVENT') {
+    const { id } = action.payload;
+    if (!id) throw new Error('DELETE_EVENT is missing the event id');
+    // Guests are notified: the backend deletes with sendUpdates=all.
+    await deleteGoogleEvent(id);
+    ctx.onEventDeleted?.(id);
+    ctx.onCalendarChanged?.();
+    return { id };
   }
 
   if (action.type === 'CREATE_WORKSPACE' || action.type === 'CREATE_NOTE') {
@@ -416,7 +399,10 @@ export const executeSingleAction = async (
         'GetProjectGroupsPaginated',
       ],
     });
-    return { id: res.data?.createWorkspace?.id };
+    return {
+      id: res.data?.createWorkspace?.id,
+      projectGroupId: targetGroupId ?? undefined,
+    };
   }
 
   if (action.type === 'CREATE_PROJECT_GROUP') {

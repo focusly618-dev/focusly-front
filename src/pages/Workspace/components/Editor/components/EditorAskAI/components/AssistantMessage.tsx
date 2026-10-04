@@ -7,7 +7,7 @@ import {
   Replay as RetryIcon,
   EditNoteOutlined as EditIcon,
 } from '@mui/icons-material';
-import { SuggestedActionsPlan } from '@/components/chat/suggestedActionsPlan/SuggestedActionsPlan';
+import { ActionPlan } from '@/components/chat/actionPlan/ActionPlan';
 import {
   linkActionsToWorkspace,
   parseAssistantReply,
@@ -22,7 +22,7 @@ import {
   StatusLine,
   ThinkingDots,
 } from '../EditorAskAI.styles';
-import { ReplyMarkdown } from './ReplyMarkdown';
+import { ReplyMarkdown } from '@/components/chat/ReplyMarkdown';
 
 interface AssistantMessageProps {
   message: EditorChatMessage;
@@ -169,9 +169,7 @@ export const AssistantMessage = ({
 
       {!isStreaming && actions.length > 0 && (
         <Box sx={{ width: '100%', mt: 1 }}>
-          <SuggestedActionsPlan
-            actions={linkActionsToWorkspace(actions, workspaceId)}
-          />
+          <ActionPlan actions={linkActionsToWorkspace(actions, workspaceId)} />
         </Box>
       )}
 
