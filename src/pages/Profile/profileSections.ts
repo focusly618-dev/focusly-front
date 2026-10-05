@@ -6,6 +6,7 @@ import {
   PaletteOutlined,
   ExtensionOutlined,
   ShieldOutlined,
+  CreditCardOutlined,
 } from '@mui/icons-material';
 
 // Sections of the profile page, in sidebar order. The slug is the last URL
@@ -13,6 +14,7 @@ import {
 // profilePage.nav.<key> and profilePage.descriptions.<key>.
 export const PROFILE_SECTIONS = [
   { slug: 'account', key: 'account', icon: PersonOutline },
+  { slug: 'billing', key: 'billing', icon: CreditCardOutlined },
   { slug: 'work-focus', key: 'workFocus', icon: ScheduleOutlined },
   {
     slug: 'notifications',

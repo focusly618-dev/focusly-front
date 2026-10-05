@@ -4002,6 +4002,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stripe/react-stripe-js@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@stripe/react-stripe-js@npm:7.0.0"
+  dependencies:
+    prop-types: "npm:^15.7.2"
+  peerDependencies:
+    "@stripe/stripe-js": ">=10.0.0 <11.0.0"
+    react: ">=16.8.0 <20.0.0"
+    react-dom: ">=16.8.0 <20.0.0"
+  checksum: 10c0/e361a602533778179dcc8473c74d16a046e8c30b33a96614fe011ac68915b0675290595689acf4bac95c3e6f56eacb339ec20d1e58e3f1609676b05d7ea6dd2b
+  languageName: node
+  linkType: hard
+
+"@stripe/stripe-js@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "@stripe/stripe-js@npm:10.0.0"
+  checksum: 10c0/3fa2cd6dafe69aa276441520ae7b0e2f749d04dd5d720034dcab48de6dab6535cfc13cf3c9937e13d2de09da9a327a11220da7be84e2a5c5ab2c417701fd5bb9
+  languageName: node
+  linkType: hard
+
 "@tanstack/store@npm:^0.7.7":
   version: 0.7.7
   resolution: "@tanstack/store@npm:0.7.7"
@@ -6985,6 +7005,8 @@ __metadata:
     "@mui/x-date-pickers": "npm:^8.25.0"
     "@react-oauth/google": "npm:^0.13.4"
     "@reduxjs/toolkit": "npm:^2.11.2"
+    "@stripe/react-stripe-js": "npm:^7.0.0"
+    "@stripe/stripe-js": "npm:^10.0.0"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^7.0.0"
     "@testing-library/react": "npm:^16.3.2"

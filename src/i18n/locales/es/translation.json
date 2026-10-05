@@ -174,6 +174,7 @@
     "logout": "Cerrar sesión",
     "nav": {
       "account": "Perfil",
+      "billing": "Planes y Facturación",
       "workFocus": "Horario y enfoque",
       "notifications": "Notificaciones",
       "appearance": "Apariencia",
@@ -182,6 +183,7 @@
     },
     "descriptions": {
       "account": "Tu foto, tu nombre y la cuenta con la que inicias sesión.",
+      "billing": "Gestiona tu suscripción, métodos de pago y beneficios de Focusly Pro.",
       "workFocus": "Cuándo trabajas y cuánto dura una sesión de enfoque. Focusly usa esto para acomodar tus tareas.",
       "notifications": "Cómo te avisa Focusly cuando una tarea está por empezar.",
       "appearance": "Tema e idioma de Focusly en este dispositivo.",

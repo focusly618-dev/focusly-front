@@ -17,7 +17,7 @@ export interface UpgradePlanCta {
 }
 
 export interface UpgradePlan {
-  id: 'free' | 'pro' | 'elite';
+  id: 'free' | 'pro';
   name: string;
   price: string;
   priceSuffix: string;
@@ -49,7 +49,7 @@ export const UPGRADE_PLANS: UpgradePlan[] = [
   {
     id: 'pro',
     name: 'Focusly Pro',
-    price: '$8',
+    price: '$9.99',
     priceSuffix: '/ mes',
     popular: true,
     featured: true,
@@ -58,14 +58,14 @@ export const UPGRADE_PLANS: UpgradePlan[] = [
       {
         emoji: '📝',
         boldText: 'Editor de workspaces con IA',
-        subText: '(Genera y expande textos)',
+        subText: '(Genera y expande textos en tus notas)',
         highlighted: true,
       },
       { emoji: '🧠', text: 'Contexto avanzado de tareas', highlighted: true },
       {
         emoji: '📅',
-        boldText: 'Hábitos inteligentes',
-        subText: '(Optimización diaria de rutinas)',
+        boldText: 'Calendario y reuniones sincronizadas',
+        subText: '(Google Calendar y enlaces de Meet)',
         highlighted: true,
       },
       {
@@ -78,63 +78,6 @@ export const UPGRADE_PLANS: UpgradePlan[] = [
     cta: {
       label: 'Pagar y Desbloquear',
       variant: 'contained',
-    },
-  },
-  {
-    id: 'elite',
-    name: 'Focusly Elite',
-    price: '$15',
-    priceSuffix: '/ mes',
-    features: [
-      {
-        emoji: '🚀',
-        text: 'Respuestas rápidas prioritarias',
-        highlighted: true,
-      },
-      {
-        emoji: '🪄',
-        boldText: 'IA en Editor ilimitada',
-        subText: '(Fórmulas, traducción y bloques)',
-        highlighted: true,
-      },
-      {
-        emoji: '👥',
-        text: 'Trabajo en equipo colaborativo',
-        highlighted: true,
-      },
-      {
-        emoji: '📈',
-        text: 'Insights profundos de productividad',
-        highlighted: true,
-      },
-      {
-        emoji: '🛡️',
-        boldText: 'Historial de versiones',
-        subText: '(Respaldos automáticos de workspaces)',
-        highlighted: true,
-      },
-      {
-        emoji: '🎙️',
-        boldText: 'Notas por voz con IA',
-        subText: '(Transcripción de audios a tareas)',
-        highlighted: true,
-      },
-      {
-        emoji: '🚀',
-        boldText: 'Modelos de IA premium',
-        subText: '(Acceso a Claude 3 Opus y Gemini Pro)',
-        highlighted: true,
-      },
-      {
-        emoji: '🎨',
-        boldText: 'Personalización completa',
-        subText: '(Temas y branding a tu medida)',
-        highlighted: true,
-      },
-    ],
-    cta: {
-      label: 'Mejorar a Elite',
-      variant: 'outlined',
     },
   },
 ];

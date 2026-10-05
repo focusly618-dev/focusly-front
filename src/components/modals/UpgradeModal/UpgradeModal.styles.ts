@@ -4,7 +4,7 @@ import { surfaceColor } from '@/context';
 export const dialogPaperSx: SxProps<Theme> = {
   borderRadius: '12px',
   p: 3.5,
-  width: '840px',
+  width: '640px',
   maxWidth: 'calc(100vw - 32px)',
   bgcolor: (theme: Theme) =>
     surfaceColor(theme, '#191919', '#222222', '#ffffff'),
@@ -103,8 +103,8 @@ export const introTextSx: SxProps<Theme> = {
 
 export const plansContainerSx: SxProps<Theme> = {
   display: 'grid',
-  gridTemplateColumns: { xs: '1fr', sm: '1fr', md: 'repeat(3, 1fr)' },
-  gap: 3.5,
+  gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+  gap: 3,
 };
 
 export const priceSuffixSx: SxProps<Theme> = {
@@ -122,9 +122,7 @@ export const featuresListSx: SxProps<Theme> = {
   mb: 3,
 };
 
-export const ctaButtonSx = (
-  planId: 'free' | 'pro' | 'elite',
-): SxProps<Theme> => {
+export const ctaButtonSx = (planId: 'free' | 'pro'): SxProps<Theme> => {
   switch (planId) {
     case 'pro':
       return {
@@ -138,19 +136,6 @@ export const ctaButtonSx = (
         '&:hover': {
           bgcolor: 'primary.dark',
           boxShadow: 'none',
-        },
-      };
-    case 'elite':
-      return {
-        textTransform: 'none',
-        fontWeight: 700,
-        borderRadius: '6px',
-        borderColor: 'primary.main',
-        color: 'primary.main',
-        fontSize: '11px',
-        '&:hover': {
-          borderColor: 'primary.dark',
-          bgcolor: 'rgba(0, 135, 103, 0.06)',
         },
       };
     case 'free':
