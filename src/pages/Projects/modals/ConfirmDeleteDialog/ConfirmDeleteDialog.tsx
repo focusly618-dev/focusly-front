@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Typography,
 } from '@mui/material';
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import { useTranslation } from 'react-i18next';
 
 const MAX_LISTED_ITEMS = 5;
@@ -20,7 +19,8 @@ export interface ConfirmDeleteDialogProps {
   title: string;
   description: string;
   itemNames?: string[];
-  warning?: string;
+  warning?: React.ReactNode;
+  warningNote?: React.ReactNode;
   confirmText?: string;
   onConfirm: () => Promise<unknown> | void;
 }
@@ -32,6 +32,7 @@ export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
   description,
   itemNames = [],
   warning,
+  warningNote,
   confirmText,
   onConfirm,
 }) => {
@@ -69,13 +70,28 @@ export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: 800, fontSize: '1.1rem', pb: 1 }}>
+      <DialogTitle
+        sx={{
+          fontWeight: 800,
+          fontSize: '1.1rem',
+          pb: 1,
+          color: 'text.primary',
+        }}
+      >
         {title}
       </DialogTitle>
-      <DialogContent>
-        <DialogContentText sx={{ color: 'text.secondary', fontSize: '14px' }}>
+      <DialogContent sx={{ pb: 1 }}>
+        <Typography
+          sx={{
+            color: (theme) =>
+              theme.palette.mode === 'dark' ? '#E2E8F0' : '#334155',
+            fontSize: '14px',
+            lineHeight: 1.5,
+            fontWeight: 400,
+          }}
+        >
           {description}
-        </DialogContentText>
+        </Typography>
 
         {itemNames.length > 1 && (
           <Box component="ul" sx={{ mt: 1.5, mb: 0, pl: 2.5 }}>
@@ -105,13 +121,72 @@ export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
           </Box>
         )}
 
-        {warning && (
-          <Alert
-            severity="warning"
-            sx={{ mt: 2, borderRadius: '10px', fontSize: '13px' }}
+        {(warning || warningNote) && (
+          <Box
+            sx={{
+              mt: 2,
+              p: 1.5,
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 1.25,
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(239, 68, 68, 0.1)'
+                  : 'rgba(239, 68, 68, 0.05)',
+              border: (theme) =>
+                `1px solid ${
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(239, 68, 68, 0.25)'
+                    : 'rgba(239, 68, 68, 0.18)'
+                }`,
+            }}
           >
-            {warning}
-          </Alert>
+            <ErrorOutlineRoundedIcon
+              sx={{
+                fontSize: 18,
+                color: (theme) =>
+                  theme.palette.mode === 'dark' ? '#F87171' : '#DC2626',
+                mt: '2px',
+                flexShrink: 0,
+              }}
+            />
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 0.5,
+                flex: 1,
+              }}
+            >
+              {warning && (
+                <Typography
+                  sx={{
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    lineHeight: 1.45,
+                    color: (theme) =>
+                      theme.palette.mode === 'dark' ? '#FCA5A5' : '#B91C1C',
+                  }}
+                >
+                  {warning}
+                </Typography>
+              )}
+              {warningNote && (
+                <Typography
+                  sx={{
+                    fontSize: '12px',
+                    fontWeight: 400,
+                    lineHeight: 1.4,
+                    color: (theme) =>
+                      theme.palette.mode === 'dark' ? '#94A3B8' : '#64748B',
+                  }}
+                >
+                  {warningNote}
+                </Typography>
+              )}
+            </Box>
+          </Box>
         )}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>

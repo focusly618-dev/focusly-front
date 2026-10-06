@@ -14,7 +14,8 @@
     "connected": "接続済み",
     "error": "エラー",
     "connect": "接続する",
-    "all": "すべて"
+    "all": "すべて",
+    "create": "作成"
   },
   "errors": {
     "network": "サーバーに接続できませんでした。インターネット接続を確認してもう一度お試しください。",
@@ -1022,8 +1023,8 @@
       "description": "プロジェクト「{{name}}」を削除してもよろしいですか？",
       "bulkTitle": "{{count}} 件のプロジェクトを削除",
       "bulkDescription": "次の {{count}} 件のプロジェクトを削除してもよろしいですか？",
-      "workspacesWarning_other": "このプロジェクトには {{count}} 件のワークスペースがあります。プロジェクトと一緒に削除され、復元できません。",
-      "bulkWorkspacesWarning_other": "データが削除されます：これらのプロジェクトには合計 {{count}} 件のワークスペースがあり、完全に削除されます。",
+      "workspacesWarning_other": "このプロジェクトに含まれる {{count}} 件のワークスペースも完全に削除されます。",
+      "bulkWorkspacesWarning_other": "これらのプロジェクトに含まれる合計 {{count}} 件のワークスペースも完全に削除されます。",
       "noWorkspacesWarning": "この操作は元に戻せません。"
     },
     "deleteWorkspacesDialog": {
@@ -1041,9 +1042,29 @@
     },
     "folderName": "フォルダ名",
     "iconShape": "アイコンの形",
+    "filled": "塗りつぶし",
     "solid": "塗りつぶし",
     "outlined": "アウトライン",
+    "folderColor": "フォルダの色",
     "colorAccent": "アクセントカラー",
+    "colors": {
+      "Red": "赤",
+      "Orange": "オレンジ",
+      "Amber": "アンバー",
+      "Yellow": "黄",
+      "Green": "緑",
+      "Emerald": "エメラルド",
+      "Teal": "ティール",
+      "Cyan": "シアン",
+      "Sky": "スカイブルー",
+      "Blue": "青",
+      "Indigo": "インディゴ",
+      "Purple": "紫",
+      "Fuchsia": "マゼンタ",
+      "Pink": "ピンク",
+      "Rose": "ローズ",
+      "Slate": "スレート"
+    },
     "createDialog": {
       "title": "新しいフォルダを作成"
     },

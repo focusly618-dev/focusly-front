@@ -7,6 +7,7 @@ export interface ConfirmRequest {
   description: string;
   confirmText?: string;
   warning?: string;
+  warningNote?: string;
   /** Runs when confirmed; the dialog waits for it and stays open if it throws. */
   onConfirm: () => Promise<unknown> | unknown;
 }

@@ -14,7 +14,8 @@
     "connected": "Conectado",
     "error": "Error",
     "connect": "Conectar",
-    "all": "Todos"
+    "all": "Todos",
+    "create": "Crear"
   },
   "errors": {
     "network": "No se pudo conectar con el servidor. Revisa tu conexión a internet e intenta de nuevo.",
@@ -1050,10 +1051,10 @@
       "description": "¿Seguro que quieres eliminar el proyecto \"{{name}}\"?",
       "bulkTitle": "Eliminar {{count}} proyectos",
       "bulkDescription": "¿Seguro que quieres eliminar los siguientes {{count}} proyectos?",
-      "workspacesWarning_one": "Este proyecto tiene {{count}} espacio de trabajo dentro. Se eliminará junto con el proyecto y no podrás recuperarlo.",
-      "workspacesWarning_other": "Este proyecto tiene {{count}} espacios de trabajo dentro. Se eliminarán junto con el proyecto y no podrás recuperarlos.",
-      "bulkWorkspacesWarning_one": "Se borrará información: estos proyectos contienen {{count}} espacio de trabajo que también se eliminará de forma permanente.",
-      "bulkWorkspacesWarning_other": "Se borrará información: estos proyectos contienen {{count}} espacios de trabajo en total que también se eliminarán de forma permanente.",
+      "workspacesWarning_one": "Este proyecto contiene {{count}} espacio de trabajo que se eliminará de forma permanente.",
+      "workspacesWarning_other": "Este proyecto contiene {{count}} espacios de trabajo que se eliminarán de forma permanente.",
+      "bulkWorkspacesWarning_one": "Estos proyectos contienen {{count}} espacio de trabajo en total que se eliminará de forma permanente.",
+      "bulkWorkspacesWarning_other": "Estos proyectos contienen {{count}} espacios de trabajo en total que se eliminarán de forma permanente.",
       "noWorkspacesWarning": "Esta acción no se puede deshacer."
     },
     "deleteWorkspacesDialog": {
@@ -1061,8 +1062,8 @@
       "description": "¿Seguro que quieres eliminar \"{{name}}\"?",
       "bulkTitle": "Eliminar {{count}} espacios de trabajo",
       "bulkDescription": "¿Seguro que quieres eliminar los siguientes {{count}} espacios de trabajo?",
-      "warning_one": "Su contenido se borrará de forma permanente. Esta acción no se puede deshacer.",
-      "warning_other": "Se borrará el contenido de {{count}} espacios de trabajo de forma permanente. Esta acción no se puede deshacer."
+      "warning_one": "El contenido de este espacio de trabajo se borrará de forma permanente.",
+      "warning_other": "Se borrará el contenido de {{count}} espacios de trabajo de forma permanente."
     },
     "renameFolder": "Renombrar Carpeta",
     "customizeStyle": "Personalizar Estilo",
@@ -1072,9 +1073,29 @@
     },
     "folderName": "Nombre de la Carpeta",
     "iconShape": "Forma del Ícono",
+    "filled": "Relleno",
     "solid": "Sólido",
     "outlined": "Contorneado",
+    "folderColor": "Color de la Carpeta",
     "colorAccent": "Color de Acento",
+    "colors": {
+      "Red": "Rojo",
+      "Orange": "Naranja",
+      "Amber": "Ámbar",
+      "Yellow": "Amarillo",
+      "Green": "Verde",
+      "Emerald": "Esmeralda",
+      "Teal": "Verde azulado",
+      "Cyan": "Cian",
+      "Sky": "Celeste",
+      "Blue": "Azul",
+      "Indigo": "Índigo",
+      "Purple": "Púrpura",
+      "Fuchsia": "Fucsia",
+      "Pink": "Rosa",
+      "Rose": "Rosado",
+      "Slate": "Pizarra"
+    },
     "createDialog": {
       "title": "Crear Nueva Carpeta"
     },

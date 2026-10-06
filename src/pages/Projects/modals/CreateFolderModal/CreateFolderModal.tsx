@@ -195,7 +195,10 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.2, flexWrap: 'wrap', mb: 1 }}>
           {FOLDER_COLORS.map((c) => (
-            <Tooltip key={c.value} title={c.name}>
+            <Tooltip
+              key={c.value}
+              title={t(`workspaceLibrary.colors.${c.name}`, c.name)}
+            >
               <Box
                 onClick={() => setFolderColor(c.value)}
                 sx={{
