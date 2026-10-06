@@ -1,16 +1,16 @@
 import { loadStripe } from '@stripe/stripe-js';
 
-const publishableKey =
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
-  'pk_test_51UNH6GAJyAA60rb5aX6hfKROSgP9GupGSIZCE22I3crFCqOSH7nPI6rSwRbuW7FbFgpOtsl65ahnBxq3RiZ1fVMd00evYJK83l';
+// Only the publishable key lives in the browser. The price, and who is Pro,
+// are decided by the backend.
+const publishableKey: string | undefined = import.meta.env
+  .VITE_STRIPE_PUBLISHABLE_KEY;
 
-if (!publishableKey) {
+export const isStripeConfigured = Boolean(publishableKey);
+
+if (!isStripeConfigured) {
   console.warn(
-    '[Stripe] VITE_STRIPE_PUBLISHABLE_KEY is not defined in environment variables.',
+    '[Stripe] VITE_STRIPE_PUBLISHABLE_KEY is not set: payments are disabled.',
   );
 }
 
-export const stripePromise = loadStripe(publishableKey);
-
-export const DEFAULT_PRO_PRICE_ID =
-  import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1UNIiQAJyAA60rb54rrTjLev';
+export const stripePromise = publishableKey ? loadStripe(publishableKey) : null;

@@ -178,7 +178,8 @@
       "notifications": "通知",
       "appearance": "外観",
       "integrations": "連携",
-      "privacy": "プライバシーとセキュリティ"
+      "privacy": "プライバシーとセキュリティ",
+      "billing": "プランとお支払い"
     },
     "descriptions": {
       "account": "プロフィール写真、名前、ログインに使うアカウント。",
@@ -186,7 +187,8 @@
       "notifications": "タスクの開始が近づいたときに Focusly がお知らせする方法。",
       "appearance": "このデバイスでの Focusly のテーマと言語。",
       "integrations": "Focusly がカレンダーの同期と Meet リンクの作成に使う外部アカウント。",
-      "privacy": "セッション、法的文書、アカウントの削除。"
+      "privacy": "セッション、法的文書、アカウントの削除。",
+      "billing": "サブスクリプション、お支払い方法、Focusly Pro の特典を管理します。"
     },
     "account": {
       "photoTitle": "プロフィール写真",
@@ -1425,6 +1427,118 @@
       "accept": "同意する",
       "logout": "ログアウト",
       "error": "同意を保存できませんでした。もう一度お試しください。"
+    }
+  },
+  "billing": {
+    "plans": {
+      "free": {
+        "name": "Focusly Free",
+        "tagline": "整理して Lumina を試すために",
+        "price": "無料"
+      },
+      "pro": {
+        "name": "Focusly Pro",
+        "tagline": "Lumina を無制限に、ドキュメントでも"
+      },
+      "recommended": "おすすめ",
+      "current": "現在のプラン",
+      "perInterval": "/ {{interval}}",
+      "interval": {
+        "month": "月",
+        "year": "年",
+        "week": "週",
+        "day": "日"
+      },
+      "priceLater": "料金は次のステップで表示されます"
+    },
+    "features": {
+      "aiTrial_one": "Lumina を試せるメッセージ {{count}} 件",
+      "aiTrial_other": "Lumina を試せるメッセージ {{count}} 件",
+      "core": "タスク、プロジェクト、ドキュメント",
+      "calendar": "カレンダーと Google カレンダー",
+      "editorAi": "ドキュメントエディターの AI",
+      "unlimitedAi": "Lumina と無制限にチャット",
+      "editorAiPro": "エディターの AI：下書き、要約、書き直し",
+      "everythingFree": "Free プランのすべて",
+      "cancelAnytime": "いつでも解約可能",
+      "notIncluded": "含まれません"
+    },
+    "usage": "無料メッセージ {{limit}} 件中 {{used}} 件使用",
+    "usageLeft_one": "無料メッセージ残り {{count}} 件",
+    "usageLeft_other": "無料メッセージ残り {{count}} 件",
+    "usageNone": "無料メッセージを使い切りました",
+    "tryPro": "Pro を試す",
+    "upgrade": {
+      "title": {
+        "manual": "プランをアップグレード",
+        "limit_one": "無料メッセージを使い切りました",
+        "limit_other": "無料メッセージ {{count}} 件を使い切りました",
+        "editor": "エディターの AI は Pro の機能です"
+      },
+      "subtitle": {
+        "manual": "あなたの働き方に合ったプランを選んでください。",
+        "limit": "Pro にすると Lumina と無制限に会話できます。",
+        "editor": "Pro なら、Lumina がドキュメント内で下書き、要約、書き直しを行います。"
+      },
+      "cta": "お支払いへ進む",
+      "alreadyPro": "すでに Focusly Pro をご利用中です",
+      "notConfigured": "お支払いはまだご利用いただけません。後でもう一度お試しください。",
+      "startError": "お支払いを開始できませんでした。もう一度お試しください。",
+      "close": "閉じる"
+    },
+    "checkout": {
+      "title": "サブスクリプションを完了",
+      "back": "プランに戻る",
+      "renews": "{{interval}}ごとに自動更新されます",
+      "pay": "{{price}} で登録",
+      "payNoPrice": "登録する",
+      "secure": "Stripe による安全なお支払い。Focusly がカード情報を見ることはありません。",
+      "cancelNote": "プロフィール → プランとお支払い からいつでも解約できます。",
+      "error": "お支払いを処理できませんでした。入力内容を確認して、もう一度お試しください。",
+      "loading": "お支払いフォームを読み込んでいます…",
+      "applePayDescription": "Focusly Pro のサブスクリプション"
+    },
+    "activating": {
+      "title": "プランを有効化しています…",
+      "body": "Stripe でお支払いを確認しています。"
+    },
+    "done": {
+      "title": "Focusly Pro へようこそ！",
+      "body": "エディターも含め、Lumina を無制限に使えるようになりました。",
+      "cta": "始める"
+    },
+    "pending": {
+      "title": "お支払いを受け付けました",
+      "body": "数分以内に Pro プランが有効になります。このウィンドウは閉じてかまいません。"
+    },
+    "limitBanner": {
+      "title_one": "Lumina の無料メッセージを使い切りました",
+      "title_other": "Lumina の無料メッセージ {{count}} 件を使い切りました",
+      "body": "Focusly Pro にすると、無制限に会話を続けられます。",
+      "cta": "プランを見る"
+    },
+    "limitReply": "無料メッセージの上限に達しました。メッセージは送信されていません。Focusly Pro で再送信できます。",
+    "editorGate": {
+      "title": "エディターの AI は Pro の機能です",
+      "body": "Focusly Pro なら、Lumina がドキュメントの下書き、要約、書き直しを行います。",
+      "cta": "Pro を試す"
+    },
+    "section": {
+      "title": "あなたのプラン",
+      "description": "サブスクリプション、Lumina の利用状況、お支払い情報。",
+      "free": "Free プラン",
+      "pro": "Pro プラン",
+      "renews": "{{date}} に更新されます",
+      "cancels": "Pro プランは {{date}} に終了し、以降は請求されません。",
+      "pastDue": "前回の請求を処理できませんでした。Pro を継続するにはカードを更新してください。",
+      "manage": "お支払いと請求書を管理",
+      "manageHint": "Stripe の安全なポータルで、カードの変更、請求書のダウンロード、解約ができます。",
+      "portalError": "Stripe のポータルを開けませんでした。",
+      "plansTitle": "プラン",
+      "plansDescription": "各プランに含まれるもの。",
+      "returnSuccess": "Focusly Pro のサブスクリプションが有効になりました！",
+      "returnPending": "お支払いを受け付けました。数分以内にプランが有効になります。",
+      "returnFailed": "お支払いは完了しませんでした。もう一度お試しいただけます。"
     }
   }
 }

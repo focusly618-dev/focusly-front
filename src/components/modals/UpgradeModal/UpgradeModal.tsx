@@ -1,229 +1,339 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import confetti from 'canvas-confetti';
 import {
-  Dialog,
+  Alert,
   Box,
-  Typography,
   Button,
-  IconButton,
-  Divider,
   CircularProgress,
+  Dialog,
+  IconButton,
+  Typography,
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
-import { sileo } from '@/utils';
-import { LuminaAnimatedFace } from '@/components/ui';
-import { useAppDispatch } from '@/redux/hooks';
-import { updateUser } from '@/redux/auth/auth.slice';
-import { billingApi } from '@/api/Billing/billingApi';
-import { DEFAULT_PRO_PRICE_ID } from '@/config/stripe';
-import { StripeCheckoutModal } from '@/components/Billing/StripeCheckoutModal';
-import type { UpgradeModalProps } from './UpgradeModal.types';
-import { UPGRADE_PLANS } from './UpgradeModal.utils';
 import {
-  dialogPaperSx,
-  planCardSx,
-  popularBadgeSx,
-  bulletRowSx,
-  bulletEmojiSx,
-  bulletTextSx,
-  bulletSubTextSx,
-  ctaButtonSx,
-  headerRowSx,
-  logoTitleRowSx,
-  closeIconButtonSx,
-  closeIconSx,
-  introBoxSx,
-  introTextSx,
-  plansContainerSx,
-  priceSuffixSx,
-  dividerSx,
-  featuresListSx,
-} from './UpgradeModal.styles';
+  Close as CloseIcon,
+  CheckCircleRounded as DoneIcon,
+  HourglassTopRounded as PendingIcon,
+} from '@mui/icons-material';
+import { LuminaAnimatedFace } from '@/components/ui';
+import { PlanCards } from '@/components/Billing/PlanCards';
+import { StripeCheckout } from '@/components/Billing/StripeCheckout';
+import {
+  billingApi,
+  type SubscriptionResponse,
+} from '@/api/Billing/billingApi';
+import { isStripeConfigured } from '@/config/stripe';
+import { formatPrice } from '@/config/plans';
+import { useBilling } from '@/hooks/useBilling';
+import { sileo } from '@/utils';
+import type { UpgradeModalProps } from './UpgradeModal.types';
 
+const BRAND = '#008767';
+
+type Step =
+  | 'plans'
+  | 'starting'
+  | 'checkout'
+  | 'activating'
+  | 'done'
+  | 'pending';
+
+/**
+ * Free vs Pro, then Stripe's payment form, then the plan's activation — one
+ * dialog for the whole upgrade, opened from wherever the free plan stops
+ * the user (see billingService.openUpgrade).
+ */
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   open,
+  reason = 'manual',
+  startCheckout = false,
   onClose,
-  onUpgradeSuccess,
 }) => {
-  const dispatch = useAppDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const { t, i18n } = useTranslation();
+  const billing = useBilling();
+  const paymentsAvailable = isStripeConfigured && billing.billingEnabled;
+  const firstStep: Step =
+    startCheckout && paymentsAvailable ? 'starting' : 'plans';
+  const [step, setStep] = useState<Step>(open ? firstStep : 'plans');
+  const [starting, setStarting] = useState(false);
+  const [checkout, setCheckout] = useState<SubscriptionResponse | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const handleUpgrade = async () => {
-    setIsLoading(true);
+  // Every opening starts at the plans (or the payment, when asked).
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) {
+      setStep(firstStep);
+      setCheckout(null);
+      setBusy(false);
+    }
+  }
+
+  const price = checkout ?? billing.status?.pro_price ?? null;
+  const priceLabel = formatPrice(price, i18n.language);
+  const interval = price?.interval;
+  const intervalLabel = interval
+    ? t(`billing.plans.interval.${interval}`, { defaultValue: interval })
+    : null;
+
+  const { refresh } = billing;
+
+  /** Creates the subscription and moves to Stripe's form. */
+  const requestCheckout = async () => {
     try {
-      const data = await billingApi.createSubscription(
-        DEFAULT_PRO_PRICE_ID,
-        'pro_monthly',
-      );
-      setClientSecret(data.client_secret);
-      setIsCheckoutOpen(true);
-    } catch (err: unknown) {
-      console.error('Error starting subscription:', err);
+      setCheckout(await billingApi.createSubscription());
+      setStep('checkout');
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+      if (status === 409) {
+        // Already Pro (e.g. paid in another tab).
+        await refresh();
+        setStep('done');
+        return;
+      }
       sileo.error({
-        title: 'Error al iniciar suscripción',
-        description:
-          'No se pudo conectar con la pasarela de pagos. Inténtalo de nuevo.',
+        title:
+          status === 503
+            ? t('billing.upgrade.notConfigured')
+            : t('billing.upgrade.startError'),
       });
-    } finally {
-      setIsLoading(false);
+      setStep('plans');
     }
   };
 
-  const handleSuccess = () => {
-    dispatch(updateUser({ subscriptionStatus: 'pro' }));
-    onClose();
-    sileo.success({
-      title: '¡Plan Actualizado!',
-      description: '¡Gracias por suscribirte a Focusly Pro!',
-      duration: 4500,
-    });
-    onUpgradeSuccess?.('Focusly Pro');
+  const choosePro = async () => {
+    if (!paymentsAvailable) {
+      sileo.error({ title: t('billing.upgrade.notConfigured') });
+      return;
+    }
+    setStarting(true);
+    await requestCheckout();
+    setStarting(false);
   };
 
+  // Opened straight on the payment (from the profile's Pro card). Once per
+  // opening: StrictMode runs effects twice, and each call is a subscription.
+  const requested = useRef(false);
+  useEffect(() => {
+    if (!open || step !== 'starting') {
+      requested.current = false;
+      return;
+    }
+    if (requested.current) return;
+    requested.current = true;
+    void requestCheckout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, step]);
+
+  const handlePaid = async () => {
+    setStep('activating');
+    if (await billing.waitForPro()) {
+      setStep('done');
+      try {
+        confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+      } catch {
+        // No canvas (tests, old browsers): skip the confetti.
+      }
+    } else {
+      setStep('pending');
+    }
+  };
+
+  const canClose = !busy && step !== 'activating';
+  const close = () => {
+    if (canClose) onClose();
+  };
+
+  const title =
+    step === 'checkout' || step === 'starting'
+      ? t('billing.checkout.title')
+      : billing.isPro && step === 'plans'
+        ? t('billing.upgrade.alreadyPro')
+        : reason === 'limit'
+          ? t('billing.upgrade.title.limit', { count: billing.limit })
+          : t(`billing.upgrade.title.${reason}`);
+  const subtitle =
+    step === 'plans' && !billing.isPro
+      ? t(`billing.upgrade.subtitle.${reason}`)
+      : null;
+
+  const statusPanel = (
+    icon: React.ReactNode,
+    heading: string,
+    body: string,
+    action?: React.ReactNode,
+  ) => (
+    <Box
+      role="status"
+      sx={{
+        py: { xs: 4, sm: 5 },
+        px: 2,
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 1,
+      }}
+    >
+      {icon}
+      <Typography component="h3" sx={{ fontWeight: 800, fontSize: '18px' }}>
+        {heading}
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 380 }}>
+        {body}
+      </Typography>
+      {action}
+    </Box>
+  );
+
+  const finishButton = (label: string) => (
+    <Button
+      variant="contained"
+      onClick={onClose}
+      sx={{
+        mt: 1.5,
+        px: 3,
+        borderRadius: '10px',
+        textTransform: 'none',
+        fontWeight: 750,
+        bgcolor: BRAND,
+        boxShadow: 'none',
+        '&:hover': { bgcolor: '#007357', boxShadow: 'none' },
+      }}
+    >
+      {label}
+    </Button>
+  );
+
   return (
-    <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        PaperProps={{
-          sx: dialogPaperSx,
+    <Dialog
+      open={open}
+      onClose={close}
+      fullWidth
+      maxWidth={step === 'plans' ? 'md' : 'sm'}
+      aria-labelledby="upgrade-dialog-title"
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: '18px',
+            m: { xs: 1.5, sm: 4 },
+            width: { xs: 'calc(100% - 24px)', sm: undefined },
+            p: { xs: 2, sm: 3 },
+          },
+        },
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 1.5,
+          mb: 2.5,
         }}
       >
-        {/* Header */}
-        <Box sx={headerRowSx}>
-          <Box sx={logoTitleRowSx}>
-            <LuminaAnimatedFace size={24} />
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0 }}
+        >
+          <LuminaAnimatedFace size={28} />
+          <Box sx={{ minWidth: 0 }}>
             <Typography
-              variant="subtitle1"
-              fontWeight={750}
-              color="text.primary"
+              id="upgrade-dialog-title"
+              component="h2"
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: '17px', sm: '19px' },
+                lineHeight: 1.3,
+              }}
             >
-              Mejorar Plan de Focusly
+              {title}
             </Typography>
+            {subtitle && (
+              <Typography variant="body2" color="text.secondary">
+                {subtitle}
+              </Typography>
+            )}
           </Box>
-          <IconButton size="small" onClick={onClose} sx={closeIconButtonSx}>
-            <CloseIcon sx={closeIconSx} />
-          </IconButton>
         </Box>
+        <IconButton
+          size="small"
+          onClick={close}
+          disabled={!canClose}
+          aria-label={t('billing.upgrade.close')}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Box>
 
-        {/* Main Intro */}
-        <Box sx={introBoxSx}>
-          <Typography variant="body2" color="text.secondary" sx={introTextSx}>
-            Elige el plan que mejor se adapte a tu ritmo de trabajo y desbloquea
-            el poder del asistente de IA.
-          </Typography>
+      {step === 'plans' && (
+        <>
+          {!paymentsAvailable && !billing.isPro && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              {t('billing.upgrade.notConfigured')}
+            </Alert>
+          )}
+          <PlanCards
+            isPro={billing.isPro}
+            used={billing.used}
+            limit={billing.limit}
+            price={billing.status?.pro_price}
+            onChoosePro={choosePro}
+            starting={starting}
+            disabled={!paymentsAvailable}
+          />
+        </>
+      )}
+
+      {step === 'checkout' && checkout && (
+        <StripeCheckout
+          clientSecret={checkout.client_secret}
+          intentType={checkout.intent_type}
+          customerSessionClientSecret={checkout.customer_session_client_secret}
+          amount={checkout.amount}
+          interval={checkout.interval}
+          priceLabel={priceLabel}
+          intervalLabel={intervalLabel}
+          onPaid={handlePaid}
+          onBack={() => setStep('plans')}
+          onBusyChange={setBusy}
+        />
+      )}
+
+      {step === 'starting' && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress
+            size={36}
+            sx={{ color: BRAND }}
+            aria-label={t('billing.checkout.loading')}
+          />
         </Box>
+      )}
 
-        {/* Plans Container */}
-        <Box sx={plansContainerSx}>
-          {UPGRADE_PLANS.map((plan) => (
-            <Box
-              key={plan.id}
-              sx={planCardSx(plan.featured ? 'featured' : 'default')}
-            >
-              <Box>
-                {plan.popular ? (
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mb={0.5}
-                  >
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight={800}
-                      color="primary.main"
-                    >
-                      {plan.name}
-                    </Typography>
-                    <Box sx={popularBadgeSx}>POPULAR</Box>
-                  </Box>
-                ) : (
-                  <Typography
-                    variant="subtitle2"
-                    fontWeight={700}
-                    color="text.primary"
-                    mb={0.5}
-                  >
-                    {plan.name}
-                  </Typography>
-                )}
+      {step === 'activating' &&
+        statusPanel(
+          <CircularProgress size={40} sx={{ color: BRAND, mb: 1 }} />,
+          t('billing.activating.title'),
+          t('billing.activating.body'),
+        )}
 
-                <Box display="flex" alignItems="baseline" mb={1.75}>
-                  <Typography
-                    variant="h5"
-                    fontWeight={850}
-                    color="text.primary"
-                  >
-                    {plan.price}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={priceSuffixSx}
-                  >
-                    {plan.priceSuffix}
-                  </Typography>
-                </Box>
+      {step === 'done' &&
+        statusPanel(
+          <DoneIcon sx={{ fontSize: 56, color: BRAND }} />,
+          t('billing.done.title'),
+          t('billing.done.body'),
+          finishButton(t('billing.done.cta')),
+        )}
 
-                <Divider sx={dividerSx} />
-
-                <Box sx={featuresListSx}>
-                  {plan.features.map((feature, idx) => (
-                    <Box key={idx} sx={bulletRowSx}>
-                      <Typography component="span" sx={bulletEmojiSx}>
-                        {feature.emoji}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={bulletTextSx(feature.highlighted)}
-                      >
-                        {feature.boldText ? (
-                          <>
-                            <strong>{feature.boldText}</strong>
-                            <br />
-                            <Box component="span" sx={bulletSubTextSx}>
-                              {feature.subText}
-                            </Box>
-                          </>
-                        ) : (
-                          feature.text
-                        )}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-
-              <Button
-                fullWidth
-                disabled={plan.cta.disabled || isLoading}
-                variant={plan.cta.variant}
-                onClick={plan.cta.disabled ? undefined : handleUpgrade}
-                sx={ctaButtonSx(plan.id)}
-              >
-                {isLoading && plan.id === 'pro' ? (
-                  <CircularProgress size={16} color="inherit" />
-                ) : (
-                  plan.cta.label
-                )}
-              </Button>
-            </Box>
-          ))}
-        </Box>
-      </Dialog>
-
-      {/* Stripe Payment Element Checkout Modal */}
-      <StripeCheckoutModal
-        open={isCheckoutOpen}
-        clientSecret={clientSecret}
-        onClose={() => setIsCheckoutOpen(false)}
-        onSuccess={handleSuccess}
-        planName="Focusly Pro"
-        amountDisplay="$9.99 USD / mes"
-      />
-    </>
+      {step === 'pending' &&
+        statusPanel(
+          <PendingIcon sx={{ fontSize: 52, color: 'warning.main' }} />,
+          t('billing.pending.title'),
+          t('billing.pending.body'),
+          finishButton(t('billing.upgrade.close')),
+        )}
+    </Dialog>
   );
 };
 

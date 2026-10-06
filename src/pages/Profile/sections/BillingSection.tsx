@@ -1,346 +1,220 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import {
+  Alert,
   Box,
   Button,
   Chip,
   CircularProgress,
-  Grid,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Typography,
 } from '@mui/material';
 import {
-  Check as CheckIcon,
-  Star as StarIcon,
+  AutoAwesome as SparkIcon,
   CreditCard as CreditCardIcon,
   OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { updateUser } from '@/redux/auth/auth.slice';
 import { billingApi } from '@/api/Billing/billingApi';
-import { DEFAULT_PRO_PRICE_ID } from '@/config/stripe';
-import { StripeCheckoutModal } from '@/components/Billing/StripeCheckoutModal';
+import { PlanCards } from '@/components/Billing/PlanCards';
+import { useBilling } from '@/hooks/useBilling';
 import { sileo } from '@/utils';
 import { Card, CardDescription, CardTitle, Divider } from '../Profile.styles';
 
+const BRAND = '#008767';
+
+// Stripe adds these to the return URL when a payment method had to leave
+// the page (3-D Secure, bank redirects…).
+const RETURN_PARAMS = [
+  'payment_intent',
+  'payment_intent_client_secret',
+  'setup_intent',
+  'setup_intent_client_secret',
+  'redirect_status',
+];
+
 export const BillingSection = () => {
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
-  const isPro = user?.subscriptionStatus === 'pro';
+  const { t, i18n } = useTranslation();
+  const billing = useBilling();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [openingPortal, setOpeningPortal] = useState(false);
+  const [returnNotice, setReturnNotice] = useState<
+    'success' | 'pending' | 'failed' | null
+  >(null);
+  const { refresh, waitForPro } = billing;
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  // Read the subscription from Stripe when the page opens (renewal date,
+  // a cancellation done in the portal…).
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Inicia el proceso de suscripción obteniendo el client_secret de Stripe
-  const handleStartUpgrade = async () => {
-    setIsLoading(true);
+  // Back from a payment that needed a redirect: confirm the plan.
+  const redirectStatus = searchParams.get('redirect_status');
+  const handledReturn = useRef(false);
+  useEffect(() => {
+    if (!redirectStatus || handledReturn.current) return;
+    handledReturn.current = true;
+    const next = new URLSearchParams(searchParams);
+    RETURN_PARAMS.forEach((param) => next.delete(param));
+    setSearchParams(next, { replace: true });
+
+    if (redirectStatus === 'failed') {
+      setReturnNotice('failed');
+      return;
+    }
+    void waitForPro().then((active) =>
+      setReturnNotice(active ? 'success' : 'pending'),
+    );
+  }, [redirectStatus, searchParams, setSearchParams, waitForPro]);
+
+  const openPortal = async () => {
+    setOpeningPortal(true);
     try {
-      const data = await billingApi.createSubscription(
-        DEFAULT_PRO_PRICE_ID,
-        'pro_monthly',
-      );
-      setClientSecret(data.client_secret);
-      setIsCheckoutOpen(true);
-    } catch (err: unknown) {
-      console.error('Error al iniciar suscripción:', err);
-      sileo.error({
-        title: 'Error al iniciar pago',
-        description:
-          'No se pudo conectar con la pasarela de Stripe. Inténtalo de nuevo.',
-      });
-    } finally {
-      setIsLoading(false);
+      const { url } = await billingApi.getPortalUrl();
+      window.location.assign(url);
+    } catch (err) {
+      console.error('Could not open the Stripe portal:', err);
+      sileo.error({ title: t('billing.section.portalError') });
+      setOpeningPortal(false);
     }
   };
 
-  // Abre el portal oficial de Stripe para que el usuario gestione su método de pago o facturas
-  const handleOpenPortal = async () => {
-    setIsLoading(true);
-    try {
-      const data = await billingApi.getPortalUrl();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (err: unknown) {
-      console.error('Error al abrir portal:', err);
-      sileo.error({
-        title: 'Error al abrir portal',
-        description:
-          'No se pudo generar la sesión del portal de cliente de Stripe.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handlePaymentSuccess = () => {
-    dispatch(updateUser({ subscriptionStatus: 'pro' }));
-    sileo.success({
-      title: '¡Bienvenido a Focusly Pro!',
-      description: 'Tu suscripción mensual se ha activado exitosamente.',
-    });
-  };
+  const status = billing.status;
+  const periodEnd = status?.current_period_end
+    ? new Date(status.current_period_end * 1000).toLocaleDateString(
+        i18n.language,
+        { day: 'numeric', month: 'long', year: 'numeric' },
+      )
+    : null;
 
   return (
     <>
-      {/* 1. Tarjeta de Estado Actual */}
       <Card>
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             flexWrap: 'wrap',
             gap: 1.5,
           }}
         >
-          <Box>
-            <CardTitle>Plan y Suscripción</CardTitle>
+          <Box sx={{ minWidth: 0 }}>
+            <CardTitle>{t('billing.section.title')}</CardTitle>
             <CardDescription>
-              Administra tu facturación, métodos de pago guardados y beneficios
-              de tu cuenta.
+              {t('billing.section.description')}
             </CardDescription>
           </Box>
           <Chip
-            icon={isPro ? <StarIcon /> : undefined}
-            label={isPro ? 'Plan Pro Activo ✨' : 'Plan Gratuito'}
-            color={isPro ? 'primary' : 'default'}
-            sx={{ fontWeight: 700, px: 1 }}
+            icon={billing.isPro ? <SparkIcon /> : undefined}
+            label={
+              billing.isPro
+                ? t('billing.section.pro')
+                : t('billing.section.free')
+            }
+            sx={{
+              fontWeight: 750,
+              ...(billing.isPro && {
+                bgcolor: BRAND,
+                color: '#fff',
+                '& .MuiChip-icon': { color: '#fff' },
+              }),
+            }}
           />
         </Box>
 
-        <Box sx={{ mt: 3, p: 2.5, bgcolor: 'action.hover', borderRadius: 2 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
-            {isPro
-              ? 'Tienes acceso total a todas las herramientas Pro'
-              : 'Estás utilizando el plan Básico de Focusly'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {isPro
-              ? 'Tu suscripción mensual se renueva automáticamente. Puedes actualizar tus tarjetas o ver tus recibos en el portal.'
-              : 'Actualiza a Focusly Pro para desbloquear workspaces ilimitados, asistentes de IA avanzados y sincronización completa.'}
-          </Typography>
+        {returnNotice && (
+          <Alert
+            severity={
+              returnNotice === 'success'
+                ? 'success'
+                : returnNotice === 'pending'
+                  ? 'info'
+                  : 'warning'
+            }
+            onClose={() => setReturnNotice(null)}
+            sx={{ mt: 2 }}
+          >
+            {t(
+              returnNotice === 'success'
+                ? 'billing.section.returnSuccess'
+                : returnNotice === 'pending'
+                  ? 'billing.section.returnPending'
+                  : 'billing.section.returnFailed',
+            )}
+          </Alert>
+        )}
 
-          {isPro && (
-            <Box sx={{ mt: 2, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+        {billing.isPro ? (
+          <Box
+            sx={{ mt: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}
+          >
+            {status?.subscription_status === 'past_due' && (
+              <Alert severity="warning">{t('billing.section.pastDue')}</Alert>
+            )}
+            {periodEnd && (
+              <Typography variant="body2" color="text.secondary">
+                {status?.cancel_at_period_end
+                  ? t('billing.section.cancels', { date: periodEnd })
+                  : t('billing.section.renews', { date: periodEnd })}
+              </Typography>
+            )}
+            <Box>
               <Button
                 variant="outlined"
                 startIcon={<CreditCardIcon />}
-                endIcon={<OpenInNewIcon sx={{ fontSize: 16 }} />}
-                onClick={handleOpenPortal}
-                disabled={isLoading}
-                sx={{ textTransform: 'none', fontWeight: 600 }}
+                endIcon={
+                  openingPortal ? (
+                    <CircularProgress size={16} />
+                  ) : (
+                    <OpenInNewIcon sx={{ fontSize: 16 }} />
+                  )
+                }
+                onClick={openPortal}
+                disabled={openingPortal}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 650,
+                  borderRadius: '10px',
+                }}
               >
-                {isLoading ? (
-                  <CircularProgress size={20} />
-                ) : (
-                  'Administrar tarjetas y facturas en Stripe'
-                )}
+                {t('billing.section.manage')}
               </Button>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                component="p"
+                sx={{ mt: 0.75 }}
+              >
+                {t('billing.section.manageHint')}
+              </Typography>
             </Box>
-          )}
-        </Box>
+          </Box>
+        ) : (
+          billing.known && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              {t('billing.usage', { used: billing.used, limit: billing.limit })}
+            </Typography>
+          )
+        )}
       </Card>
 
       <Divider />
 
-      {/* 2. Comparativa de Planes */}
       <Card>
-        <CardTitle>Planes disponibles</CardTitle>
-        <CardDescription>
-          Elige el plan que mejor se adapte a tu flujo de trabajo.
+        <CardTitle>{t('billing.section.plansTitle')}</CardTitle>
+        <CardDescription sx={{ mb: 2 }}>
+          {t('billing.section.plansDescription')}
         </CardDescription>
-
-        <Grid container spacing={2.5} sx={{ mt: 1 }}>
-          {/* Plan Free */}
-          <Grid item xs={12} sm={6}>
-            <Box
-              sx={{
-                p: 3,
-                height: '100%',
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: !isPro ? 'primary.main' : 'divider',
-                bgcolor: !isPro ? 'action.selected' : 'background.paper',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Focusly Free
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Para uso personal básico
-              </Typography>
-
-              <Typography variant="h4" sx={{ fontWeight: 800, my: 2 }}>
-                $0{' '}
-                <Typography
-                  component="span"
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  / para siempre
-                </Typography>
-              </Typography>
-
-              <List dense sx={{ flexGrow: 1, mb: 2 }}>
-                {[
-                  'Hasta 3 Workspaces',
-                  'Gestión de tareas y bloques de tiempo',
-                  'Asistente de IA estándar',
-                  'Integración básica de calendario',
-                ].map((feature) => (
-                  <ListItem key={feature} disableGutters sx={{ py: 0.5 }}>
-                    <ListItemIcon
-                      sx={{ minWidth: 28, color: 'text.secondary' }}
-                    >
-                      <CheckIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={feature}
-                      primaryTypographyProps={{ variant: 'body2' }}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-
-              <Button
-                variant="outlined"
-                disabled
-                fullWidth
-                sx={{ textTransform: 'none', fontWeight: 600 }}
-              >
-                {!isPro ? 'Plan actual' : 'Plan Básico'}
-              </Button>
-            </Box>
-          </Grid>
-
-          {/* Plan Pro */}
-          <Grid item xs={12} sm={6}>
-            <Box
-              sx={{
-                p: 3,
-                height: '100%',
-                borderRadius: 3,
-                border: '2px solid',
-                borderColor: 'primary.main',
-                bgcolor: 'background.paper',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                boxShadow: (theme) =>
-                  `0 8px 24px ${theme.palette.primary.main}1A`,
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 700, color: 'primary.main' }}
-                >
-                  Focusly Pro ✨
-                </Typography>
-                <Chip
-                  label="Recomendado"
-                  color="primary"
-                  size="small"
-                  sx={{ fontWeight: 700, fontSize: '0.7rem' }}
-                />
-              </Box>
-
-              <Typography variant="caption" color="text.secondary">
-                Productividad y automatización sin límites
-              </Typography>
-
-              <Typography variant="h4" sx={{ fontWeight: 800, my: 2 }}>
-                $9.99{' '}
-                <Typography
-                  component="span"
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  USD / mes
-                </Typography>
-              </Typography>
-
-              <List dense sx={{ flexGrow: 1, mb: 2 }}>
-                {[
-                  'Workspaces y notas ilimitadas',
-                  'Asistente de IA avanzado (Lumina) en editor',
-                  'Detección automática de TODOs en notas',
-                  'Planificador inteligente de agenda',
-                  'Sincronización bidireccional continua con Google Meet',
-                  'Soporte prioritario 24/7',
-                ].map((feature) => (
-                  <ListItem key={feature} disableGutters sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 28, color: 'primary.main' }}>
-                      <CheckIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={feature}
-                      primaryTypographyProps={{
-                        variant: 'body2',
-                        fontWeight: 500,
-                      }}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-
-              {isPro ? (
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  fullWidth
-                  onClick={handleOpenPortal}
-                  disabled={isLoading}
-                  sx={{ textTransform: 'none', fontWeight: 700 }}
-                >
-                  Gestionar suscripción
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  onClick={handleStartUpgrade}
-                  disabled={isLoading}
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    py: 1,
-                  }}
-                >
-                  {isLoading ? (
-                    <CircularProgress size={22} color="inherit" />
-                  ) : (
-                    'Mejorar a Focusly Pro ✨'
-                  )}
-                </Button>
-              )}
-            </Box>
-          </Grid>
-        </Grid>
+        <PlanCards
+          isPro={billing.isPro}
+          used={billing.used}
+          limit={billing.limit}
+          price={billing.status?.pro_price}
+          onChoosePro={() => billing.openUpgrade('manual', { checkout: true })}
+        />
       </Card>
-
-      {/* 3. Modal de Stripe Elements (Payment Element) */}
-      <StripeCheckoutModal
-        open={isCheckoutOpen}
-        clientSecret={clientSecret}
-        onClose={() => setIsCheckoutOpen(false)}
-        onSuccess={handlePaymentSuccess}
-        planName="Focusly Pro"
-        amountDisplay="$9.99 USD / mes"
-      />
     </>
   );
 };

@@ -39,6 +39,9 @@ vi.mock('@/components/ReleaseModal/ReleaseModal', () => ({
 vi.mock('@/components/TermsAcceptanceModal/TermsAcceptanceModal', () => ({
   TermsAcceptanceModal: () => null,
 }));
+vi.mock('@/components/Billing/UpgradeModalHost', () => ({
+  UpgradeModalHost: () => null,
+}));
 vi.mock('@/pages/Public/Legal/LegalPage', () => ({
   default: ({ document }: { document: string }) => (
     <div>{`LEGAL_PAGE_${document.toUpperCase()}`}</div>
