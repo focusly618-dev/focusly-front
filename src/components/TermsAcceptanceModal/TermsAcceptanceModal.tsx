@@ -12,7 +12,7 @@ import {
   UserGet,
   type UserResponse,
 } from '@/api/User/apiUser';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 
 // The legal pages must stay readable while this modal is pending (its links
 // open them in a new tab), so it never renders on top of them.
@@ -82,9 +82,8 @@ export const TermsAcceptanceModal = () => {
       dispatch(updateUser(termsState(updated)));
       setOpen(false);
     } catch {
-      sileo.error({
+      notify.error({
         title: t('legal.acceptModal.error'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsSaving(false);

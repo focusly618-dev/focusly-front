@@ -83,7 +83,7 @@ import { isPlanLimitMessage } from '@/api/Billing/planLimit';
 import { aiStreamService } from '@/services/aiStreamService';
 import {
   parseLuminaActions,
-  sileo,
+  notify,
   type ParsedLuminaAction,
   extractUserIntent,
 } from '@/utils';
@@ -547,11 +547,11 @@ export const AskAI: React.FC = () => {
   const handleCopyMessage = (text: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
-    sileo.success({ title: 'Copiado al portapapeles' });
+    notify.success({ title: 'Copiado al portapapeles' });
   };
 
   const handleFeedback = () => {
-    sileo.success({ title: '¡Gracias por tu feedback!' });
+    notify.success({ title: '¡Gracias por tu feedback!' });
   };
 
   const filteredConversations = conversations.filter(
@@ -790,18 +790,16 @@ export const AskAI: React.FC = () => {
         handleNewChat();
       }
       getAIConversations().then(setConversations).catch(console.error);
-      sileo.success({
+      notify.success({
         title: 'Chat deleted',
         description: 'The conversation has been removed.',
-        fill: 'var(--sileo-delete-bg)',
         duration: 3000,
       });
       setConversationToDelete(null);
     } catch (err) {
-      sileo.error({
+      notify.error({
         title: 'Error deleting conversation',
         description: 'The conversation could not be removed, try again.',
-        fill: 'var(--sileo-error-bg)',
         duration: 3000,
       });
       console.error('Error deleting conversation:', err);
@@ -913,10 +911,9 @@ export const AskAI: React.FC = () => {
 
       if (extension === 'pdf' && file.size > MAX_PDF_SIZE_BYTES) {
         const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
-        sileo.error({
+        notify.error({
           title: 'Archivo demasiado pesado',
           description: `El límite de tamaño en PDF es de 3MB. "${file.name}" (${fileSizeMB}MB) supera el límite.`,
-          fill: 'var(--sileo-error-bg)',
           duration: 4000,
         });
         continue;
@@ -924,10 +921,9 @@ export const AskAI: React.FC = () => {
 
       if (file.size > MAX_DOC_SIZE_BYTES) {
         const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
-        sileo.error({
+        notify.error({
           title: 'Archivo demasiado pesado',
           description: `El límite de tamaño para documentos es de 3MB. "${file.name}" (${fileSizeMB}MB) supera el límite.`,
-          fill: 'var(--sileo-error-bg)',
           duration: 4000,
         });
         continue;
@@ -952,10 +948,9 @@ export const AskAI: React.FC = () => {
         });
       } catch (err) {
         console.error('Failed to read file:', file.name, err);
-        sileo.error({
+        notify.error({
           title: 'Error al leer el archivo',
           description: `No se pudo procesar ${file.name}`,
-          fill: 'var(--sileo-error-bg)',
           duration: 3500,
         });
       }
@@ -963,7 +958,7 @@ export const AskAI: React.FC = () => {
 
     if (newFiles.length > 0) {
       setAttachedFiles((prev) => [...prev, ...newFiles]);
-      sileo.success({
+      notify.success({
         title:
           newFiles.length === 1
             ? 'Archivo adjuntado'

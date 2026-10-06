@@ -80,6 +80,7 @@
     "recharts": "^3.7.0",
     "remark-gfm": "^4.0.1",
     "socket.io-client": "^4.8.3",
+    "sonner": "^2.0.8",
     "sweetalert2": "^11.26.24",
     "temporal-polyfill": "^0.3.0",
     "turndown": "^7.2.4",

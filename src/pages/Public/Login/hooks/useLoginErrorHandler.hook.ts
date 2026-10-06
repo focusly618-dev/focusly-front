@@ -1,12 +1,11 @@
-import { sileo } from '@/utils/notifications/sileo';
+import { notify } from '@/utils/notifications/notify';
 import { getFriendlyErrorMessage } from '@/utils/errors/interpretError';
 
 export const useLoginErrorHandler = () => {
   const handleError = (error: unknown, context: string) => {
     console.error(context, error);
-    sileo.error({
+    notify.error({
       title: getFriendlyErrorMessage(error),
-      fill: 'var(--sileo-error-bg)',
     });
   };
 

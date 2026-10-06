@@ -30,7 +30,7 @@ vi.mock('@/components/Billing/StripeCheckout', () => ({
 vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 vi.mock('@/components/ui', () => ({ LuminaAnimatedFace: () => null }));
 const toast = vi.hoisted(() => ({ error: vi.fn() }));
-vi.mock('@/utils', () => ({ sileo: toast }));
+vi.mock('@/utils', () => ({ notify: toast }));
 vi.mock('@/redux/hooks', () => ({
   useAppDispatch: () => vi.fn(),
   useAppSelector: (selector: (state: unknown) => unknown) =>

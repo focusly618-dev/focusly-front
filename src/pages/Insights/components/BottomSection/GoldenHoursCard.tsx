@@ -30,7 +30,7 @@ import {
   type TimelineBlock,
 } from '@/api/AI/apiAIInsights';
 import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
 
 export interface GoldenHoursCardProps {
@@ -140,7 +140,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
     navigator.clipboard
       .writeText(textToCopy)
       .then(() => {
-        sileo.success({
+        notify.success({
           title: '¡Copiado con éxito! 🚀',
           description:
             'El texto de tu perfil ha sido copiado al portapapeles. ¡Compártelo en tus redes!',
@@ -149,7 +149,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
       })
       .catch((err) => {
         console.error('Failed to copy text: ', err);
-        sileo.error({
+        notify.error({
           title: 'Error al copiar',
           description: 'No se pudo copiar el texto al portapapeles.',
           duration: 4000,
@@ -196,7 +196,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
             timestamp: Date.now(),
           }),
         );
-        sileo.success({
+        notify.success({
           title: 'Análisis Completo',
           description: 'Lumina ha identificado tus patrones de productividad.',
           duration: 4000,
@@ -206,7 +206,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
       }
     } catch (err) {
       console.error('Error analyzing patterns:', err);
-      sileo.error({
+      notify.error({
         title: 'Error de Análisis',
         description: getFriendlyErrorMessage(
           err,
@@ -247,7 +247,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
         next.add(taskId);
         return next;
       });
-      sileo.success({
+      notify.success({
         title: '¡Cambio Aplicado con éxito! 🚀',
         description:
           'La tarea ha sido agendada en tu calendario durante tus Golden Hours.',
@@ -255,7 +255,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
       });
     } catch (err) {
       console.error('Error applying recommendation action:', err);
-      sileo.error({
+      notify.error({
         title: 'Error al aplicar cambio',
         description: getFriendlyErrorMessage(
           err,

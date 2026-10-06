@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import type {
   EditorHeaderProps,
   ISpeechRecognition,
@@ -133,10 +133,9 @@ export const useEditorHeader = (props: EditorHeaderProps) => {
       (window as unknown as SpeechRecognitionWindow).SpeechRecognition ||
       (window as unknown as SpeechRecognitionWindow).webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
-      sileo.error({
+      notify.error({
         title: 'Speech Recognition Not Supported',
         description: 'Your browser does not support speech recognition.',
-        fill: 'var(--sileo-error-bg)',
       });
       return;
     }
@@ -151,10 +150,9 @@ export const useEditorHeader = (props: EditorHeaderProps) => {
     rec.onstart = () => {
       setIsListening(true);
       interimLengthRef.current = 0;
-      sileo.info({
+      notify.info({
         title: 'Listening...',
         description: `Speak now in ${getSpeechLanguageCode().split('-')[0].toUpperCase()}. Press mic again to stop.`,
-        fill: 'var(--sileo-info-bg)',
         duration: 4000,
       });
     };
@@ -221,10 +219,9 @@ export const useEditorHeader = (props: EditorHeaderProps) => {
           rec.onstart = () => {
             setIsListening(true);
             interimLengthRef.current = 0;
-            sileo.info({
+            notify.info({
               title: 'Listening...',
               description: `Language changed. Speak now in ${lang.toUpperCase()}.`,
-              fill: 'var(--sileo-info-bg)',
               duration: 3000,
             });
           };

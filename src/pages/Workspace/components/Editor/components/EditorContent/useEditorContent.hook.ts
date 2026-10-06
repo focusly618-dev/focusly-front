@@ -9,7 +9,7 @@ import type {
 import {
   colorPalette,
   type HeaderColor,
-  sileo,
+  notify,
   getFriendlyErrorMessage,
 } from '@/utils';
 import { fetchEditResult } from '@/api/AI/apiAI';
@@ -121,10 +121,9 @@ export const useEditorContent = ({
       return;
     }
     if (!selectedText) {
-      sileo.error({
+      notify.error({
         title: 'Error',
         description: 'Please select some text in the editor to create a task.',
-        fill: 'var(--sileo-error-bg)',
         duration: 3000,
       });
       return;
@@ -207,22 +206,19 @@ Text: "${selectedText}"`;
     };
 
     try {
-      const previewData = await sileo.promise(analyzeProcess(), {
+      const previewData = await notify.promise(analyzeProcess(), {
         loading: {
           title: 'AI Task Creator',
           description: 'Creating summary & analyzing task...',
-          fill: 'var(--sileo-info-bg)',
         },
         success: {
           title: 'Task summary ready!',
           description: 'Review task details before scheduling.',
-          fill: 'var(--sileo-success-bg)',
           duration: 3000,
         },
         error: {
           title: 'Error creating task summary',
           description: 'Could not generate task with AI.',
-          fill: 'var(--sileo-error-bg)',
         },
       });
 
@@ -302,10 +298,9 @@ Text: "${selectedText}"`;
             setValue('taskId', createdTask.id, { shouldDirty: true });
           }
         }
-        sileo.success({
+        notify.success({
           title: 'Task created!',
           description: 'New task has been added to your schedule.',
-          fill: 'var(--sileo-success-bg)',
           duration: 3000,
         });
         setIsAITaskPreviewOpen(false);
@@ -313,10 +308,9 @@ Text: "${selectedText}"`;
       }
     } catch (e) {
       console.error('Error creating task:', e);
-      sileo.error({
+      notify.error({
         title: 'Error creating task',
         description: getFriendlyErrorMessage(e, 'Could not save task.'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsCreatingTask(false);
@@ -372,22 +366,19 @@ Text: "${selectedText}"`;
     try {
       const fetchPromise = fetchEditResult(aiPrompt);
 
-      await sileo.promise(fetchPromise, {
+      await notify.promise(fetchPromise, {
         loading: {
           title: 'AI Assistant',
           description: promptDescription,
-          fill: 'var(--sileo-info-bg)',
         },
         success: {
           title: successTitle,
           description: 'The selected text has been updated.',
-          fill: 'var(--sileo-success-bg)',
           duration: 3000,
         },
         error: {
           title: 'AI Processing Error',
           description: 'Could not refine the selected text.',
-          fill: 'var(--sileo-error-bg)',
         },
       });
 

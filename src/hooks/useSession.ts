@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout as logoutThunk, clearAuth } from '@/redux/auth/auth.slice';
 import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 
 /**
  * useSession Hook
@@ -19,11 +19,10 @@ export const useSession = () => {
       try {
         if (isExternal) {
           dispatch(clearAuth());
-          sileo.info({
+          notify.info({
             title: 'Sesión Finalizada',
             description:
               'Tu sesión se ha cerrado en otra pestaña. Inicia Sesión de nuevo para continuar.',
-            fill: 'var(--sileo-update-bg)',
             duration: 5000,
           });
         } else {

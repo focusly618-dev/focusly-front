@@ -1571,5 +1571,30 @@
       "returnPending": "We received your payment; your plan will be active in a few minutes.",
       "returnFailed": "The payment wasn't completed. You can try again."
     }
+  },
+  "toasts": {
+    "region": "Notifications"
+  },
+  "confirmDialogs": {
+    "deleteTask": {
+      "title": "Delete this task?",
+      "description": "It will be permanently deleted, with its subtasks.",
+      "confirm": "Delete task",
+      "done": "Task deleted"
+    },
+    "deleteProject": {
+      "title": "Delete this project?",
+      "description": "Its documents aren't deleted: they're just taken out of the project.",
+      "confirm": "Delete project",
+      "done": "Project deleted",
+      "failed": "Couldn't delete the project"
+    },
+    "deleteDocument": {
+      "title": "Delete this document?",
+      "description": "It will be permanently deleted.",
+      "confirm": "Delete document",
+      "done": "Document deleted",
+      "failed": "Couldn't delete the document"
+    }
   }
 }

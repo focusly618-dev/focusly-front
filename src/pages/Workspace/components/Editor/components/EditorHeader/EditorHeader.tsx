@@ -34,7 +34,7 @@ import {
 
 import { ImportContentModal } from './components/ImportContentModal/ImportContentModal';
 import { convertMarkdownToDocx } from './documentExporters';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import { HeaderLeft, HeaderRight } from '@/pages/Workspace/Workspace.styles';
 import { EditorHeader as StyledEditorHeader } from './EditorHeader.styles';
 import type { EditorHeaderProps } from './EditorHeader.types';
@@ -97,13 +97,12 @@ export const EditorHeader = (props: EditorHeaderProps) => {
       downloadBlob(blob, 'docx');
     } catch (error) {
       console.error('Failed to export document as Word:', error);
-      sileo.error({
+      notify.error({
         title: t('workspaceEditor.exportFailed', 'Export failed'),
         description: t(
           'workspaceEditor.exportFailedDesc',
           'Could not generate the Word document.',
         ),
-        fill: 'var(--sileo-error-bg)',
       });
     }
   };

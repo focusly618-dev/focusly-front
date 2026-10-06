@@ -11,7 +11,7 @@ import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { login } from '@/redux/auth/auth.slice';
 import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 import axios from '@/api/axiosInstance';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import {
   UserUpdate,
   type UserResponse,
@@ -62,16 +62,14 @@ export const IntegrationsSection = () => {
           }),
         );
 
-        sileo.success({
+        notify.success({
           title: t('integrationsSettings.toast.connectedTitle'),
           description: t('integrationsSettings.toast.connectedDesc'),
-          fill: 'var(--sileo-success-bg)',
         });
       } catch (error) {
         console.error('Error connecting Google Calendar:', error);
-        sileo.error({
+        notify.error({
           title: t('integrationsSettings.toast.connectErrorTitle'),
-          fill: 'var(--sileo-error-bg)',
         });
       } finally {
         setIsConnecting(false);
@@ -79,9 +77,8 @@ export const IntegrationsSection = () => {
     },
     onError: (error: unknown) => {
       console.error(error);
-      sileo.error({
+      notify.error({
         title: t('integrationsSettings.toast.connectFailedTitle'),
-        fill: 'var(--sileo-error-bg)',
       });
     },
   });

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { REMOVE_WORKSPACE } from '@/pages/Workspace/Workspace.graphql';
-import { sileo, handleMutationError } from '@/utils';
+import { notify, handleMutationError } from '@/utils';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import {
   deduplicateLinks,
@@ -53,7 +53,7 @@ export const useTaskMutations = ({
         meetLink = res.meetLink;
         createdGoogleEventId = res.googleEventId;
       } else {
-        sileo.warning({
+        notify.warning({
           title: 'Could not generate Meet link',
           description:
             'The task will be saved without it. Make sure you are signed in with Google.',
@@ -110,10 +110,9 @@ export const useTaskMutations = ({
         createInput as unknown as Record<string, unknown>,
       );
       if (data?.createTask) {
-        sileo.success({
+        notify.success({
           title: 'Task created',
           description: 'The task has been created successfully',
-          fill: 'var(--sileo-success-bg)',
           duration: 2000,
         });
         onSave(data.createTask);
@@ -206,9 +205,8 @@ export const useTaskMutations = ({
         id: initialTask.id,
       });
       if (data?.updateTask) {
-        sileo.success({
+        notify.success({
           title: 'Task updated',
-          fill: 'var(--sileo-update-bg)',
         });
         onSave(data.updateTask);
         if (shouldClose) onClose();
@@ -219,11 +217,12 @@ export const useTaskMutations = ({
     setLoadingSave(false);
   };
 
-  const handleDelete = async () => {
-    if (!initialTask?.id) return;
+  /** True once the task is gone (errors are reported here). */
+  const handleDelete = async (): Promise<boolean> => {
+    if (!initialTask?.id) return false;
     if (onDelete) {
-      onDelete(initialTask.id);
-      return;
+      await onDelete(initialTask.id);
+      return true;
     }
 
     try {
@@ -231,8 +230,10 @@ export const useTaskMutations = ({
         googleEventId: initialTask.google_event_id,
       });
       resetForm();
+      return true;
     } catch (e) {
       handleMutationError(e, 'Error al eliminar la tarea');
+      return false;
     }
   };
 

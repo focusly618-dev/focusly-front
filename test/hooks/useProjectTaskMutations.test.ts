@@ -68,7 +68,7 @@ vi.mock('@/redux/hooks', () => ({
 }));
 
 vi.mock('@/utils', () => ({
-  sileo: {
+  notify: {
     success: mocks.success,
     error: mocks.error,
     dismiss: mocks.dismiss,

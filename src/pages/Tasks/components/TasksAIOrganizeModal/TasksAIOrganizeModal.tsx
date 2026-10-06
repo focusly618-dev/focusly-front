@@ -26,7 +26,7 @@ import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { LuminaOrb } from '@/components/ui';
 import { organizeTasksAI, type AIPlanItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
 
 interface TasksAIOrganizeModalProps {
@@ -55,7 +55,7 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
           setPlan(res.plan);
         } catch (e) {
           console.error('Error organizing tasks:', e);
-          sileo.error({
+          notify.error({
             title: 'Error de Planificador',
             description: getFriendlyErrorMessage(
               e,
@@ -111,7 +111,7 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
         });
       }
 
-      sileo.success({
+      notify.success({
         title: 'Planificación Aplicada',
         description:
           'Lumina ha reorganizado y priorizado tus tareas con éxito.',
@@ -120,7 +120,7 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
       onClose();
     } catch (e) {
       console.error('Error applying AI plan:', e);
-      sileo.error({
+      notify.error({
         title: 'Error',
         description: getFriendlyErrorMessage(
           e,

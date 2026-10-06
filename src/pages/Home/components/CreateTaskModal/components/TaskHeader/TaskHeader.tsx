@@ -8,7 +8,7 @@ import {
 import { headerIconSx } from '../../CreateTaskModal.styles';
 import { TASK_COLORS } from '../../CreateTaskModal.utils';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils';
+import { confirmTaskDeletion } from '@/services/confirmTaskDeletion';
 
 interface TaskHeaderProps {
   color: string;
@@ -16,7 +16,8 @@ interface TaskHeaderProps {
   setIsFullScreen: (v: boolean) => void;
   onClose: () => void;
   initialTask?: Task | null;
-  handleDelete: () => Promise<void>;
+  /** Resolves false when the task couldn't be deleted. */
+  handleDelete: () => Promise<boolean | void>;
 }
 
 export const TaskHeader = ({
@@ -71,34 +72,7 @@ export const TaskHeader = ({
         {initialTask && (
           <IconButton
             size="small"
-            onClick={() => {
-              sileo.warning({
-                title: 'Delete Task',
-                description: 'Are you sure you want to delete this task?',
-                fill: 'var(--sileo-warning-bg)',
-                button: {
-                  title: 'Confirm',
-                  onClick: () => {
-                    sileo.promise(() => handleDelete(), {
-                      loading: {
-                        title: 'Deleting...',
-                        fill: 'var(--sileo-update-bg)',
-                      },
-                      success: {
-                        title: 'Task deleted successfully!',
-                        duration: 4000,
-                        fill: 'var(--sileo-delete-bg)',
-                      },
-                      error: {
-                        title: 'Error deleting task',
-                        fill: 'var(--sileo-error-bg)',
-                      },
-                    });
-                    onClose();
-                  },
-                },
-              });
-            }}
+            onClick={() => confirmTaskDeletion(handleDelete, onClose)}
             sx={{
               ...iconSx,
               '&:hover': {

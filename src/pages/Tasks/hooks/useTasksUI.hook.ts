@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 
 export const useTasksUI = () => {
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
@@ -46,10 +46,9 @@ export const useTasksUI = () => {
     const method =
       type === 'warning' ? 'warning' : type === 'error' ? 'error' : 'success';
 
-    sileo[method]({
+    notify[method]({
       title: message,
       description: subMessage,
-      fill: `var(--sileo-${type}-bg)`,
       duration: 4000,
     });
   };

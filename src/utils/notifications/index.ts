@@ -1,3 +1,3 @@
 export * from './notificationSounds';
-export * from './sileo';
+export * from './notify';
 export * from './notifications.types';

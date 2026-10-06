@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@apollo/client';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme, alpha } from '@mui/material';
-import { sileo, UNTITLED_WORKSPACE_TITLE } from '@/utils';
+import { notify, UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import { PRIORITY_OPTIONS, isCustomEmoji } from '@/components/ui';
 import {
   GET_WORKSPACES,
@@ -180,7 +180,7 @@ export function useCreateProjectTaskModal({
       customTitle !== undefined ? customTitle : newWorkspaceTitle
     ).trim();
     if (!titleToUse) {
-      sileo.warning({
+      notify.warning({
         title: t('tasks.createProjectTaskModal.toast.workspaceTitleRequired'),
         description: t(
           'tasks.createProjectTaskModal.toast.workspaceTitleRequiredDesc',
@@ -211,7 +211,7 @@ export function useCreateProjectTaskModal({
         setNewWorkspaceTitle('');
         setWorkspaceMenuAnchor(null);
         await refetchWorkspaces();
-        sileo.success({
+        notify.success({
           title: t('tasks.createProjectTaskModal.toast.workspaceLinked'),
           description: newWs.title || titleToUse,
           duration: 2500,
@@ -220,7 +220,7 @@ export function useCreateProjectTaskModal({
       }
     } catch (err) {
       console.error('Error al crear workspace:', err);
-      sileo.error({
+      notify.error({
         title: t('tasks.createProjectTaskModal.toast.workspaceCreateFailed'),
         duration: 3000,
       });
@@ -447,7 +447,7 @@ export function useCreateProjectTaskModal({
 
   const handleCreateTask = async () => {
     if (!title.trim()) {
-      sileo.warning({
+      notify.warning({
         title: t('tasks.createProjectTaskModal.toast.titleRequired'),
         description: t('tasks.createProjectTaskModal.toast.titleRequiredDesc'),
         duration: 3000,
@@ -468,7 +468,7 @@ export function useCreateProjectTaskModal({
         } else if (onCreate) {
           await onCreate({ ...changes, id: task.id });
         }
-        sileo.success({
+        notify.success({
           title: t('tasks.createProjectTaskModal.toast.taskUpdated'),
           description: title.trim(),
           duration: 2500,

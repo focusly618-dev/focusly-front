@@ -15,7 +15,7 @@ import {
   isCustomEmoji,
 } from '@/components/ui';
 import { useWorkspaceActions } from '../../hooks/useWorkspaceActions.hook';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import type { WorkspaceTypes, ProjectGroupTypes } from '../../workspace.types';
 import {
   LibraryContainer,
@@ -736,7 +736,7 @@ export const WorkspaceLibrary = ({
             projectOptions[0]?.id;
           if (!targetProjectId) {
             // A task without a project never shows up in this view.
-            sileo.warning({
+            notify.warning({
               title: t('tasks.projectRequired.title'),
               description: t('tasks.projectRequired.description'),
               duration: 3000,

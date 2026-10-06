@@ -6,7 +6,7 @@ import {
   type RefObject,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import {
   editorAssistantService as service,
   sessionKey,
@@ -195,12 +195,11 @@ export const useEditorAskAI = ({
   const resolveDiff = (resolution: 'accept' | 'reject') => {
     markdownEditorRef.current?.resolveDiff(resolution);
     service.finishReview(key);
-    sileo.success({
+    notify.success({
       title:
         resolution === 'accept'
           ? t('editorAI.diff.applied')
           : t('editorAI.diff.discarded'),
-      fill: 'var(--sileo-success-bg)',
       duration: 2200,
     });
   };
@@ -224,9 +223,8 @@ export const useEditorAskAI = ({
     } else {
       editor.insertAtCursor(text);
     }
-    sileo.success({
+    notify.success({
       title: t('editorAI.toasts.inserted'),
-      fill: 'var(--sileo-success-bg)',
       duration: 2000,
     });
   };
@@ -234,15 +232,13 @@ export const useEditorAskAI = ({
   const copy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      sileo.success({
+      notify.success({
         title: t('editorAI.toasts.copied'),
-        fill: 'var(--sileo-success-bg)',
         duration: 1600,
       });
     } catch {
-      sileo.error({
+      notify.error({
         title: t('editorAI.errors.copy'),
-        fill: 'var(--sileo-error-bg)',
       });
     }
   };

@@ -26,7 +26,7 @@ import {
 import { isStripeConfigured } from '@/config/stripe';
 import { formatPrice } from '@/config/plans';
 import { useBilling } from '@/hooks/useBilling';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import type { UpgradeModalProps } from './UpgradeModal.types';
 
 const BRAND = '#008767';
@@ -93,7 +93,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
         setStep('done');
         return;
       }
-      sileo.error({
+      notify.error({
         title:
           status === 503
             ? t('billing.upgrade.notConfigured')
@@ -105,7 +105,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
 
   const choosePro = async () => {
     if (!paymentsAvailable) {
-      sileo.error({ title: t('billing.upgrade.notConfigured') });
+      notify.error({ title: t('billing.upgrade.notConfigured') });
       return;
     }
     setStarting(true);

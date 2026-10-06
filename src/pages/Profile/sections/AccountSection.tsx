@@ -17,7 +17,7 @@ import { updateUser } from '@/redux/auth/auth.slice';
 import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 import { UserUpdate } from '@/api/User/apiUser';
 import { useAvatarUpload } from '@/hooks/useAvatarUpload.hook';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import {
   Card,
   CardDescription,
@@ -58,15 +58,13 @@ export const AccountSection = () => {
           name: typeof updated.name === 'string' ? updated.name : trimmedName,
         }),
       );
-      sileo.success({
+      notify.success({
         title: t('accountSettings.toast.title'),
         description: t('accountSettings.toast.desc'),
-        fill: 'var(--sileo-success-bg)',
       });
     } catch {
-      sileo.error({
+      notify.error({
         title: t('profilePage.account.nameError'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsSaving(false);

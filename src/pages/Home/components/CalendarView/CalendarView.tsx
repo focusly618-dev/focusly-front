@@ -58,7 +58,7 @@ import {
   priorityCircleSx,
   PRIORITY_COLORS,
 } from '../CalendarEvent/CalendarEvent.styles';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 
 // Types
 import type { Task } from '@/redux/tasks/task.types';
@@ -355,7 +355,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
   const handleAIPlanningTrigger = async () => {
     if (isAILoading) return;
     setIsAILoading(true);
-    sileo.info({
+    notify.info({
       title: t('calendar.aiPlannerTitle'),
       description: t('calendar.aiPlannerDescription'),
       duration: 3500,
@@ -406,7 +406,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       }
 
       if (pendingTasks.length === 0) {
-        sileo.info({
+        notify.info({
           title: t('calendar.noPendingTasksTitle'),
           description: t('calendar.noPendingTasksDesc'),
           duration: 3000,
@@ -416,7 +416,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       }
 
       if (slots.length === 0) {
-        sileo.warning({
+        notify.warning({
           title: t('calendar.noAvailabilityTitle'),
           description: t('calendar.noAvailabilityDesc'),
           duration: 3000,
@@ -430,7 +430,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       const proposed = res.events || [];
 
       if (proposed.length === 0) {
-        sileo.info({
+        notify.info({
           title: t('calendar.noSuggestionsTitle'),
           description: t('calendar.noSuggestionsDesc'),
           duration: 3000,
@@ -459,14 +459,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       setDraftEvents(mappedDrafts);
       setIsCalendarInDraftMode(true);
 
-      sileo.success({
+      notify.success({
         title: t('calendar.draftGeneratedTitle'),
         description: t('calendar.draftGeneratedDesc'),
         duration: 5000,
       });
     } catch (e) {
       console.error('Error generating AI schedule:', e);
-      sileo.error({
+      notify.error({
         title: t('calendar.planningErrorTitle'),
         description: getFriendlyErrorMessage(
           e,

@@ -26,7 +26,7 @@ vi.mock('@/redux/hooks', () => ({
     selector({ auth: { isLogged: true, user: { id: 'user-1' } } }),
 }));
 
-vi.mock('@/utils', () => ({ sileo: { error: vi.fn() } }));
+vi.mock('@/utils', () => ({ notify: { error: vi.fn() } }));
 
 const { TermsAcceptanceModal } =
   await import('@/components/TermsAcceptanceModal/TermsAcceptanceModal');

@@ -1571,5 +1571,30 @@
       "returnPending": "Recibimos tu pago; tu plan se activará en unos minutos.",
       "returnFailed": "El pago no se completó. Puedes intentarlo de nuevo."
     }
+  },
+  "toasts": {
+    "region": "Notificaciones"
+  },
+  "confirmDialogs": {
+    "deleteTask": {
+      "title": "¿Eliminar esta tarea?",
+      "description": "Se eliminará de forma permanente, con sus subtareas.",
+      "confirm": "Eliminar tarea",
+      "done": "Tarea eliminada"
+    },
+    "deleteProject": {
+      "title": "¿Eliminar este proyecto?",
+      "description": "Sus documentos no se borran: solo quedan fuera del proyecto.",
+      "confirm": "Eliminar proyecto",
+      "done": "Proyecto eliminado",
+      "failed": "No se pudo eliminar el proyecto"
+    },
+    "deleteDocument": {
+      "title": "¿Eliminar este documento?",
+      "description": "Se eliminará de forma permanente.",
+      "confirm": "Eliminar documento",
+      "done": "Documento eliminado",
+      "failed": "No se pudo eliminar el documento"
+    }
   }
 }

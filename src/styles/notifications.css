@@ -1,162 +1,177 @@
-/* Professional Notification Animations - Notion/Motion Style */
+/* Focusly toasts (sonner, see components/Notification/FocuslyToaster).
+   Compact cards with a colored edge per kind, in the app's surfaces. */
 
-@keyframes motionSlideIn {
-  from {
-    opacity: 0;
-    transform: translate3d(100%, 0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes motionSlideOut {
-  from {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    opacity: 0;
-    transform: translate3d(100%, 0, 0);
-  }
-}
-
-.motion-slide-in {
-  animation: motionSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-}
-
-.motion-slide-out {
-  animation: motionSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-}
-
-/* Color Tokens for Theme Adaptation */
 :root {
-  --sileo-bg: rgba(255, 255, 255, 0.85);
-  --sileo-border: rgba(0, 0, 0, 0.08);
-  --sileo-shadow:
-    0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
-  --sileo-title-color: #1c1c1a;
-  --sileo-body-color: rgba(28, 28, 26, 0.7);
-  --sileo-icon-bg: rgba(0, 0, 0, 0.04);
-  --sileo-icon-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
-  --sileo-close-color: rgba(28, 28, 26, 0.45);
-  --sileo-close-hover-color: rgba(28, 28, 26, 0.8);
-  --sileo-btn-bg: rgba(0, 0, 0, 0.06);
-  --sileo-btn-hover-bg: rgba(0, 0, 0, 0.1);
-  --sileo-btn-color: #1c1c1a;
-  --sileo-spinner-color: #137fec;
+  --toast-bg: #ffffff;
+  --toast-border: rgba(15, 23, 42, 0.08);
+  --toast-title: #0f172a;
+  --toast-text: #475569;
+  --toast-shadow:
+    0 12px 28px -10px rgba(15, 23, 42, 0.25),
+    0 2px 6px -2px rgba(15, 23, 42, 0.08);
+  --toast-success: #008767;
+  --toast-error: #dc2626;
+  --toast-warning: #d97706;
+  --toast-info: #2563eb;
+  --toast-action-bg: rgba(0, 135, 103, 0.1);
+  --toast-action-hover-bg: rgba(0, 135, 103, 0.18);
+  --toast-action-text: #00684f;
 }
 
 html.dark {
-  --sileo-bg: rgba(20, 21, 24, 0.95);
-  --sileo-border: rgba(255, 255, 255, 0.08);
-  --sileo-shadow:
-    0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 4px 12px -2px rgba(0, 0, 0, 0.15);
-  --sileo-title-color: #ffffff;
-  --sileo-body-color: rgba(255, 255, 255, 0.7);
-  --sileo-icon-bg: rgba(255, 255, 255, 0.06);
-  --sileo-icon-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-  --sileo-close-color: rgba(255, 255, 255, 0.5);
-  --sileo-close-hover-color: rgba(255, 255, 255, 0.85);
-  --sileo-btn-bg: rgba(255, 255, 255, 0.2);
-  --sileo-btn-hover-bg: rgba(255, 255, 255, 0.3);
-  --sileo-btn-color: #ffffff;
-  --sileo-spinner-color: #ffffff;
+  --toast-bg: #1c1d22;
+  --toast-border: rgba(255, 255, 255, 0.08);
+  --toast-title: #f4f4f5;
+  --toast-text: rgba(255, 255, 255, 0.66);
+  --toast-shadow:
+    0 14px 32px -10px rgba(0, 0, 0, 0.6), 0 2px 6px -2px rgba(0, 0, 0, 0.35);
+  --toast-success: #34d399;
+  --toast-error: #f87171;
+  --toast-warning: #fbbf24;
+  --toast-info: #60a5fa;
+  --toast-action-bg: rgba(52, 211, 153, 0.14);
+  --toast-action-hover-bg: rgba(52, 211, 153, 0.22);
+  --toast-action-text: #6ee7b7;
 }
 
 html.graydark {
-  --sileo-bg: rgba(36, 36, 37, 0.95);
+  --toast-bg: #2a2a2b;
 }
 
-/* Before the app sets a mode class on <html>, follow the OS preference.
-   Once it does (light, dark or graydark), the classes above win. */
+/* Before the app sets a mode class on <html>, follow the OS preference. */
 @media (prefers-color-scheme: dark) {
-  :root:not(.light):not(.dark) {
-    --sileo-bg: rgba(20, 21, 24, 0.95);
-    --sileo-border: rgba(255, 255, 255, 0.08);
-    --sileo-shadow:
-      0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 4px 12px -2px rgba(0, 0, 0, 0.15);
-    --sileo-title-color: #ffffff;
-    --sileo-body-color: rgba(255, 255, 255, 0.7);
-    --sileo-icon-bg: rgba(255, 255, 255, 0.06);
-    --sileo-icon-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-    --sileo-close-color: rgba(255, 255, 255, 0.5);
-    --sileo-close-hover-color: rgba(255, 255, 255, 0.85);
-    --sileo-btn-bg: rgba(255, 255, 255, 0.2);
-    --sileo-btn-hover-bg: rgba(255, 255, 255, 0.3);
-    --sileo-btn-color: #ffffff;
-    --sileo-spinner-color: #ffffff;
+  :root:not(.light):not(.dark):not(.graydark) {
+    --toast-bg: #1c1d22;
+    --toast-border: rgba(255, 255, 255, 0.08);
+    --toast-title: #f4f4f5;
+    --toast-text: rgba(255, 255, 255, 0.66);
+    --toast-success: #34d399;
+    --toast-error: #f87171;
+    --toast-warning: #fbbf24;
+    --toast-info: #60a5fa;
+    --toast-action-bg: rgba(52, 211, 153, 0.14);
+    --toast-action-hover-bg: rgba(52, 211, 153, 0.22);
+    --toast-action-text: #6ee7b7;
   }
 }
 
-/* Premium Notification Styles */
-.motion-notification {
-  border-radius: 14px !important;
-  padding: 16px 20px !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  min-width: 340px !important;
-  max-width: 420px !important;
-  background: var(--sileo-bg) !important;
-  border: 1px solid var(--sileo-border) !important;
-  box-shadow: var(--sileo-shadow) !important;
-  transition:
-    background 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease !important;
+[data-sonner-toaster] {
+  --width: 360px;
+  /* The × in the top right corner (sonner puts it top left). */
+  --toast-close-button-start: unset;
+  --toast-close-button-end: 0;
+  --toast-close-button-transform: translate(35%, -35%);
+  font-family: inherit;
 }
 
-/* Base text styles for the notification */
-.motion-notification-title {
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  color: var(--sileo-title-color) !important;
-  margin-bottom: 3px !important;
-  letter-spacing: -0.01em !important;
-  transition: color 0.3s ease !important;
+[data-sonner-toaster] [data-sonner-toast].focusly-toast {
+  --toast-accent: var(--toast-info);
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px 11px 15px;
+  border-radius: 12px;
+  background: var(--toast-bg);
+  border: 1px solid var(--toast-border);
+  color: var(--toast-title);
+  box-shadow:
+    inset 3px 0 0 var(--toast-accent),
+    var(--toast-shadow);
+  font-family: inherit;
 }
 
-.motion-notification-body {
-  font-size: 13px !important;
-  color: var(--sileo-body-color) !important;
-  line-height: 1.4 !important;
-  font-weight: 400 !important;
-  transition: color 0.3s ease !important;
+[data-sonner-toast].focusly-toast[data-type='success'] {
+  --toast-accent: var(--toast-success);
+}
+[data-sonner-toast].focusly-toast[data-type='error'] {
+  --toast-accent: var(--toast-error);
+}
+[data-sonner-toast].focusly-toast[data-type='warning'] {
+  --toast-accent: var(--toast-warning);
+}
+[data-sonner-toast].focusly-toast[data-type='loading'] {
+  --toast-accent: var(--toast-success);
 }
 
-.motion-notification-icon-wrapper {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 20px !important;
-  flex-shrink: 0 !important;
-  background: var(--sileo-icon-bg) !important;
-  box-shadow: var(--sileo-icon-box-shadow) !important;
-  transition: all 0.3s ease !important;
+[data-sonner-toast] .focusly-toast-icon {
+  color: var(--toast-accent);
+  margin: 1px 0 0;
+  width: 18px;
+  height: 18px;
 }
 
-.motion-notification-close-btn {
-  color: var(--sileo-close-color) !important;
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease !important;
+[data-sonner-toast] .focusly-toast-icon svg {
+  width: 18px;
+  height: 18px;
+  margin: 0;
 }
 
-.motion-notification-close-btn:hover {
-  color: var(--sileo-close-hover-color) !important;
-  background-color: var(--sileo-icon-bg) !important;
+[data-sonner-toast] .focusly-toast-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--toast-title);
 }
 
-.motion-notification-action-btn {
-  background-color: var(--sileo-btn-bg) !important;
-  color: var(--sileo-btn-color) !important;
-  transition: all 0.2s ease !important;
+[data-sonner-toast] .focusly-toast-description {
+  margin-top: 2px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--toast-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.motion-notification-action-btn:hover {
-  background-color: var(--sileo-btn-hover-bg) !important;
+[data-sonner-toast] .focusly-toast-action {
+  align-self: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--toast-action-bg);
+  color: var(--toast-action-text);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+[data-sonner-toast] .focusly-toast-action:hover {
+  background: var(--toast-action-hover-bg);
+}
+
+[data-sonner-toast] .focusly-toast-action:focus-visible,
+[data-sonner-toast] .focusly-toast-close:focus-visible {
+  outline: 2px solid var(--toast-success);
+  outline-offset: 2px;
+}
+
+/* The × only shows when the pointer is on the toast (or it has focus):
+   less clutter; touch screens close by swiping. */
+[data-sonner-toast] .focusly-toast-close {
+  width: 20px;
+  height: 20px;
+  background: var(--toast-bg);
+  border: 1px solid var(--toast-border);
+  color: var(--toast-text);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+[data-sonner-toast] .focusly-toast-close svg {
+  width: 13px;
+  height: 13px;
+}
+
+[data-sonner-toast]:hover .focusly-toast-close,
+[data-sonner-toast] .focusly-toast-close:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  [data-sonner-toast] .focusly-toast-close {
+    opacity: 1;
+  }
 }

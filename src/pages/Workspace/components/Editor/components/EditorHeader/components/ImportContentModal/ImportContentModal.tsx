@@ -10,7 +10,7 @@ import {
 } from '@mui/icons-material';
 import { BaseModal } from '@/components/modals';
 import { Button } from '@/components/ui';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import type { MarkdownEditorRef } from '../../../../codemirror/MarkdownEditor.types';
 import { getConverter } from './documentConverters';
 
@@ -92,12 +92,11 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
       if (f.size > MAX_FILE_SIZE) {
         const isPdf = f.name.toLowerCase().endsWith('.pdf');
         const sizeMB = (f.size / (1024 * 1024)).toFixed(1);
-        sileo.error({
+        notify.error({
           title: 'Archivo demasiado pesado',
           description: isPdf
             ? `El límite de tamaño en PDF es de 3MB. "${f.name}" (${sizeMB}MB) supera el límite.`
             : `El límite de tamaño para documentos es de 3MB. "${f.name}" (${sizeMB}MB) supera el límite.`,
-          fill: 'var(--sileo-error-bg)',
           duration: 4000,
         });
       } else {
@@ -122,11 +121,10 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
 
   const handleSourceClick = (source: ImportSource) => {
     if (!source.supported) {
-      sileo.info({
+      notify.info({
         title: `${source.label} import coming soon`,
         description:
           'This source is not connected yet — Markdown/Text and drag & drop already work.',
-        fill: 'var(--sileo-info-bg)',
       });
       return;
     }
@@ -179,26 +177,23 @@ export const ImportContentModal: React.FC<ImportContentModalProps> = ({
 
     if (combined) {
       markdownEditorRef?.current?.insertAtCursor(combined);
-      sileo.success({
+      notify.success({
         title: 'Content imported',
         description: `${succeeded.length} file${succeeded.length > 1 ? 's' : ''} added to your note.`,
-        fill: 'var(--sileo-success-bg)',
       });
     }
 
     if (failed.length > 0) {
-      sileo.error({
+      notify.error({
         title: 'Some files failed to convert',
         description: `${failed.length} file${failed.length > 1 ? 's' : ''} could not be read — the file may be corrupted or password-protected.`,
-        fill: 'var(--sileo-error-bg)',
       });
     }
 
     if (unsupportedCount > 0) {
-      sileo.info({
+      notify.info({
         title: 'Some files were skipped',
         description: `${unsupportedCount} file${unsupportedCount > 1 ? 's' : ''} in a format we don't convert yet (Excel, legacy .doc, or .zip).`,
-        fill: 'var(--sileo-info-bg)',
       });
     }
 

@@ -22,7 +22,7 @@ import {
   type AIWeeklyPlanDayItem,
 } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import { startOfWeek, addDays, format } from 'date-fns';
 
 interface CalendarWeeklyPlannerModalProps {
@@ -50,7 +50,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
         try {
           const pendingTasks = tasks.filter((t) => t.status !== 'Done');
           if (pendingTasks.length === 0) {
-            sileo.info({
+            notify.info({
               title: t('calendarWeeklyPlanner.toast.noTasksTitle'),
               description: t('calendarWeeklyPlanner.toast.noTasksDesc'),
               duration: 3000,
@@ -67,7 +67,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
           setSummary(res.recommendationSummary || '');
         } catch (e) {
           console.error('Error fetching weekly plan:', e);
-          sileo.error({
+          notify.error({
             title: t('common.error'),
             description: getFriendlyErrorMessage(
               e,
@@ -143,7 +143,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
         }
       }
 
-      sileo.success({
+      notify.success({
         title: t('calendarWeeklyPlanner.toast.appliedTitle'),
         description: t('calendarWeeklyPlanner.toast.appliedDesc'),
         duration: 4000,
@@ -151,7 +151,7 @@ export const CalendarWeeklyPlannerModal: React.FC<
       onClose();
     } catch (e) {
       console.error('Error applying weekly schedule:', e);
-      sileo.error({
+      notify.error({
         title: t('common.error'),
         description: getFriendlyErrorMessage(
           e,

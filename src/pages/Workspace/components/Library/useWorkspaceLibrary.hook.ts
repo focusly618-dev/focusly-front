@@ -7,7 +7,7 @@ import {
   GET_PROJECT_GROUPS_PAGINATED,
 } from '../../Workspace.graphql';
 import type { WorkspaceTypes } from '../../workspace.types';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 
 const LIMIT = 18;
 const GROUP_LIMIT = 18;
@@ -95,10 +95,9 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
           },
         },
       });
-      sileo.success({
+      notify.success({
         title: 'Background updated',
         description: `Workspace background updated successfully.`,
-        fill: 'var(--sileo-update-bg)',
         duration: 3000,
       });
     } catch (err) {
@@ -119,10 +118,9 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
           },
         },
       });
-      sileo.success({
+      notify.success({
         title: 'Background removed',
         description: 'Workspace background has been reset.',
-        fill: 'var(--sileo-delete-bg)',
         duration: 3000,
       });
     } catch (err) {
@@ -141,10 +139,9 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
           },
         },
       });
-      sileo.success({
+      notify.success({
         title: 'Task unlinked',
         description: 'The task association has been removed.',
-        fill: 'var(--sileo-update-bg)',
         duration: 3000,
       });
     } catch (err) {

@@ -24,7 +24,7 @@ vi.mock('@apollo/client', async (importOriginal) => {
 
 const handleMutationError = vi.fn();
 vi.mock('@/utils', () => ({
-  sileo: { success: vi.fn(), error: vi.fn() },
+  notify: { success: vi.fn(), error: vi.fn() },
   handleMutationError,
 }));
 

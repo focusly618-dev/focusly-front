@@ -23,19 +23,17 @@ vi.mock('@apollo/client', async (importOriginal) => {
   return { ...actual, useMutation: () => [vi.fn(), {}] };
 });
 
-const sileo = { success: vi.fn(), error: vi.fn(), warning: vi.fn() };
+const notify = { success: vi.fn(), error: vi.fn(), warning: vi.fn() };
 const handleMutationError = vi.fn();
 vi.mock('@/utils', () => ({
-  sileo,
+  notify,
   handleMutationError,
 }));
 
-const { useTaskMutations: useCreateTaskModalMutations } = await import(
-  '@/pages/Home/components/CreateTaskModal/hooks/useTaskMutations'
-);
-const { useTaskMutations: useTaskDetailModalMutations } = await import(
-  '@/pages/Tasks/components/TaskDetailModal/hooks/useTaskMutations'
-);
+const { useTaskMutations: useCreateTaskModalMutations } =
+  await import('@/pages/Home/components/CreateTaskModal/hooks/useTaskMutations');
+const { useTaskMutations: useTaskDetailModalMutations } =
+  await import('@/pages/Tasks/components/TaskDetailModal/hooks/useTaskMutations');
 
 const createState = (
   overrides: Partial<CreateTaskData & { shouldGenerateMeet?: boolean }> = {},
@@ -77,123 +75,126 @@ describe.each([
     buildState: detailState,
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-])('useTaskMutations.handleSave ($name) — Meet link generation failure', (ctx: any) => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('warns the user (without blocking task creation) when generateMeetLinkNow fails and shouldGenerateMeet is set', async () => {
-    generateMeetLinkNow.mockResolvedValue(null);
-    executeCreateTask.mockResolvedValue({ createTask: { id: 'new-1' } });
-    const onSave = vi.fn();
-    const onClose = vi.fn();
-    const resetForm = vi.fn();
-
-    const { result } = renderHook(() =>
-      ctx.useTaskMutations({
-        onSave,
-        onClose,
-        resetForm,
-        initialTask: undefined,
-      }),
-    );
-
-    await result.current.handleSave(
-      ctx.buildState({ shouldGenerateMeet: true }),
-    );
-
-    expect(generateMeetLinkNow).toHaveBeenCalledTimes(1);
-    expect(sileo.warning).toHaveBeenCalledTimes(1);
-    expect(sileo.warning).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Could not generate Meet link',
-      }),
-    );
-    // The task must still be created successfully — Meet failure degrades
-    // gracefully instead of blocking the save or reporting false success.
-    expect(executeCreateTask).toHaveBeenCalledTimes(1);
-    expect(sileo.success).toHaveBeenCalledTimes(1);
-    expect(onSave).toHaveBeenCalledWith({ id: 'new-1' });
-  });
-
-  it('warns when collaborators are set (even without shouldGenerateMeet) and generateMeetLinkNow fails', async () => {
-    generateMeetLinkNow.mockResolvedValue(null);
-    executeCreateTask.mockResolvedValue({ createTask: { id: 'new-2' } });
-    const onSave = vi.fn();
-    const onClose = vi.fn();
-    const resetForm = vi.fn();
-
-    const { result } = renderHook(() =>
-      ctx.useTaskMutations({
-        onSave,
-        onClose,
-        resetForm,
-        initialTask: undefined,
-      }),
-    );
-
-    await result.current.handleSave(
-      ctx.buildState({ collaborators: [{ name: 'A', email: 'a@b.com' }] }),
-    );
-
-    expect(sileo.warning).toHaveBeenCalledTimes(1);
-    expect(executeCreateTask).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not warn when generateMeetLinkNow succeeds', async () => {
-    generateMeetLinkNow.mockResolvedValue({
-      meetLink: 'https://meet.google.com/abc-defg-hij',
-      googleEventId: 'g-1',
+])(
+  'useTaskMutations.handleSave ($name) — Meet link generation failure',
+  (ctx: any) => {
+    beforeEach(() => {
+      vi.clearAllMocks();
     });
-    executeCreateTask.mockResolvedValue({ createTask: { id: 'new-3' } });
-    const onSave = vi.fn();
-    const onClose = vi.fn();
-    const resetForm = vi.fn();
 
-    const { result } = renderHook(() =>
-      ctx.useTaskMutations({
-        onSave,
-        onClose,
-        resetForm,
-        initialTask: undefined,
-      }),
-    );
+    it('warns the user (without blocking task creation) when generateMeetLinkNow fails and shouldGenerateMeet is set', async () => {
+      generateMeetLinkNow.mockResolvedValue(null);
+      executeCreateTask.mockResolvedValue({ createTask: { id: 'new-1' } });
+      const onSave = vi.fn();
+      const onClose = vi.fn();
+      const resetForm = vi.fn();
 
-    await result.current.handleSave(
-      ctx.buildState({ shouldGenerateMeet: true }),
-    );
-
-    expect(sileo.warning).not.toHaveBeenCalled();
-    expect(executeCreateTask).toHaveBeenCalledTimes(1);
-    const [createInput] = executeCreateTask.mock.calls[0];
-    expect(createInput.links).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          title: 'Google Meet',
-          url: 'https://meet.google.com/abc-defg-hij',
+      const { result } = renderHook(() =>
+        ctx.useTaskMutations({
+          onSave,
+          onClose,
+          resetForm,
+          initialTask: undefined,
         }),
-      ]),
-    );
-  });
+      );
 
-  it('does not attempt Meet generation at all when neither shouldGenerateMeet nor collaborators are set', async () => {
-    executeCreateTask.mockResolvedValue({ createTask: { id: 'new-4' } });
-    const onSave = vi.fn();
-    const onClose = vi.fn();
-    const resetForm = vi.fn();
+      await result.current.handleSave(
+        ctx.buildState({ shouldGenerateMeet: true }),
+      );
 
-    const { result } = renderHook(() =>
-      ctx.useTaskMutations({
-        onSave,
-        onClose,
-        resetForm,
-        initialTask: undefined,
-      }),
-    );
+      expect(generateMeetLinkNow).toHaveBeenCalledTimes(1);
+      expect(notify.warning).toHaveBeenCalledTimes(1);
+      expect(notify.warning).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Could not generate Meet link',
+        }),
+      );
+      // The task must still be created successfully — Meet failure degrades
+      // gracefully instead of blocking the save or reporting false success.
+      expect(executeCreateTask).toHaveBeenCalledTimes(1);
+      expect(notify.success).toHaveBeenCalledTimes(1);
+      expect(onSave).toHaveBeenCalledWith({ id: 'new-1' });
+    });
 
-    await result.current.handleSave(ctx.buildState());
+    it('warns when collaborators are set (even without shouldGenerateMeet) and generateMeetLinkNow fails', async () => {
+      generateMeetLinkNow.mockResolvedValue(null);
+      executeCreateTask.mockResolvedValue({ createTask: { id: 'new-2' } });
+      const onSave = vi.fn();
+      const onClose = vi.fn();
+      const resetForm = vi.fn();
 
-    expect(generateMeetLinkNow).not.toHaveBeenCalled();
-    expect(sileo.warning).not.toHaveBeenCalled();
-  });
-});
+      const { result } = renderHook(() =>
+        ctx.useTaskMutations({
+          onSave,
+          onClose,
+          resetForm,
+          initialTask: undefined,
+        }),
+      );
+
+      await result.current.handleSave(
+        ctx.buildState({ collaborators: [{ name: 'A', email: 'a@b.com' }] }),
+      );
+
+      expect(notify.warning).toHaveBeenCalledTimes(1);
+      expect(executeCreateTask).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not warn when generateMeetLinkNow succeeds', async () => {
+      generateMeetLinkNow.mockResolvedValue({
+        meetLink: 'https://meet.google.com/abc-defg-hij',
+        googleEventId: 'g-1',
+      });
+      executeCreateTask.mockResolvedValue({ createTask: { id: 'new-3' } });
+      const onSave = vi.fn();
+      const onClose = vi.fn();
+      const resetForm = vi.fn();
+
+      const { result } = renderHook(() =>
+        ctx.useTaskMutations({
+          onSave,
+          onClose,
+          resetForm,
+          initialTask: undefined,
+        }),
+      );
+
+      await result.current.handleSave(
+        ctx.buildState({ shouldGenerateMeet: true }),
+      );
+
+      expect(notify.warning).not.toHaveBeenCalled();
+      expect(executeCreateTask).toHaveBeenCalledTimes(1);
+      const [createInput] = executeCreateTask.mock.calls[0];
+      expect(createInput.links).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            title: 'Google Meet',
+            url: 'https://meet.google.com/abc-defg-hij',
+          }),
+        ]),
+      );
+    });
+
+    it('does not attempt Meet generation at all when neither shouldGenerateMeet nor collaborators are set', async () => {
+      executeCreateTask.mockResolvedValue({ createTask: { id: 'new-4' } });
+      const onSave = vi.fn();
+      const onClose = vi.fn();
+      const resetForm = vi.fn();
+
+      const { result } = renderHook(() =>
+        ctx.useTaskMutations({
+          onSave,
+          onClose,
+          resetForm,
+          initialTask: undefined,
+        }),
+      );
+
+      await result.current.handleSave(ctx.buildState());
+
+      expect(generateMeetLinkNow).not.toHaveBeenCalled();
+      expect(notify.warning).not.toHaveBeenCalled();
+    });
+  },
+);

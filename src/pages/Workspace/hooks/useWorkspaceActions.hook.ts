@@ -1,20 +1,16 @@
 import { client } from '@/api/apollo';
 import { REMOVE_WORKSPACE, GET_WORKSPACES } from '../Workspace.graphql';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import i18n from '@/i18n';
+import { confirmAction } from '@/services/confirmService';
 
 export const useWorkspaceActions = () => {
   const handleOpen = (id: string): void => {
-    sileo.warning({
-      title: 'Remove Workspace',
-      description: 'Are you sure you want to remove this workspace?',
-      fill: 'var(--sileo-warning-bg)',
-      button: {
-        title: 'Confirm',
-        onClick: () => {
-          deleteWorkspace(id);
-        },
-      },
+    confirmAction({
+      title: i18n.t('confirmDialogs.deleteDocument.title'),
+      description: i18n.t('confirmDialogs.deleteDocument.description'),
+      confirmText: i18n.t('confirmDialogs.deleteDocument.confirm'),
+      onConfirm: () => deleteWorkspace(id),
     });
   };
 
@@ -31,15 +27,16 @@ export const useWorkspaceActions = () => {
           cache.gc();
         },
       });
-      sileo.success({
-        title: 'Workspace deleted',
-        fill: 'var(--sileo-delete-bg)',
+      notify.success({
+        title: i18n.t('confirmDialogs.deleteDocument.done'),
       });
     } catch (error) {
       console.error('Error deleting workspace:', error);
-      sileo.error({
-        title: getFriendlyErrorMessage(error, 'Error deleting workspace'),
-        fill: 'var(--sileo-error-bg)',
+      notify.error({
+        title: getFriendlyErrorMessage(
+          error,
+          i18n.t('confirmDialogs.deleteDocument.failed'),
+        ),
       });
     }
   };
@@ -73,23 +70,21 @@ export const useWorkspaceActions = () => {
           'GetProjectGroups',
         ],
       });
-      sileo.success({
+      notify.success({
         title: i18n.t('workspaceLibrary.toast.workspacesDeleted', {
           count: deletedIds.length,
         }),
-        fill: 'var(--sileo-delete-bg)',
       });
     }
 
     if (failed.length > 0) {
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(
           failed[0].reason,
           i18n.t('workspaceLibrary.toast.workspacesDeleteFailed', {
             count: failed.length,
           }),
         ),
-        fill: 'var(--sileo-error-bg)',
       });
       if (deletedIds.length === 0) throw failed[0].reason;
     }
