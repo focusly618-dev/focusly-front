@@ -23,7 +23,7 @@ export interface UserResponse {
   email: string;
   passwordHash?: string;
   authProvider: string;
-  subscriptionStatus: 'active' | 'inactive';
+  subscriptionStatus: 'free' | 'pro';
   settings: UserSettings;
   createdAt: Timestamp;
   lastSyncAt: Timestamp;

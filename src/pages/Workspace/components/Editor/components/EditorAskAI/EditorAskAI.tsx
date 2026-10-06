@@ -26,6 +26,8 @@ import { AssistantMessage } from './components/AssistantMessage';
 import { UserMessage } from './components/UserMessage';
 import { QuickActions } from './components/QuickActions';
 import { ConversationList } from './components/ConversationList';
+import { EditorProGate } from './components/EditorProGate';
+import { useBilling } from '@/hooks/useBilling';
 import {
   AvatarFrame,
   ContextChip,
@@ -66,6 +68,7 @@ export const EditorAskAI = ({
   documentTitle,
 }: EditorAskAIProps) => {
   const { t } = useTranslation();
+  const { isPro } = useBilling();
   const ai = useEditorAskAI({
     markdownEditorRef,
     workspaceId,
@@ -249,7 +252,13 @@ export const EditorAskAI = ({
           )}
         </Thread>
 
-        {ai.view === 'chat' && (
+        {ai.view === 'chat' && !isPro && (
+          <Footer>
+            <EditorProGate />
+          </Footer>
+        )}
+
+        {ai.view === 'chat' && isPro && (
           <Footer>
             {ai.hasPendingDiff ? (
               <ReviewBar>

@@ -174,6 +174,7 @@
     "logout": "Cerrar sesión",
     "nav": {
       "account": "Perfil",
+      "billing": "Planes y Facturación",
       "workFocus": "Horario y enfoque",
       "notifications": "Notificaciones",
       "appearance": "Apariencia",
@@ -182,6 +183,7 @@
     },
     "descriptions": {
       "account": "Tu foto, tu nombre y la cuenta con la que inicias sesión.",
+      "billing": "Gestiona tu suscripción, métodos de pago y beneficios de Focusly Pro.",
       "workFocus": "Cuándo trabajas y cuánto dura una sesión de enfoque. Focusly usa esto para acomodar tus tareas.",
       "notifications": "Cómo te avisa Focusly cuando una tarea está por empezar.",
       "appearance": "Tema e idioma de Focusly en este dispositivo.",
@@ -1456,6 +1458,118 @@
       "accept": "Acepto",
       "logout": "Cerrar sesión",
       "error": "No pudimos guardar tu aceptación. Inténtalo de nuevo."
+    }
+  },
+  "billing": {
+    "plans": {
+      "free": {
+        "name": "Focusly Free",
+        "tagline": "Para organizarte y probar a Lumina",
+        "price": "Gratis"
+      },
+      "pro": {
+        "name": "Focusly Pro",
+        "tagline": "Lumina sin límites, también en tus documentos"
+      },
+      "recommended": "Recomendado",
+      "current": "Tu plan actual",
+      "perInterval": "/ {{interval}}",
+      "interval": {
+        "month": "mes",
+        "year": "año",
+        "week": "semana",
+        "day": "día"
+      },
+      "priceLater": "Verás el precio en el siguiente paso"
+    },
+    "features": {
+      "aiTrial_one": "{{count}} mensaje con Lumina para probarla",
+      "aiTrial_other": "{{count}} mensajes con Lumina para probarla",
+      "core": "Tareas, proyectos y documentos",
+      "calendar": "Calendario y Google Calendar",
+      "editorAi": "IA en el editor de documentos",
+      "unlimitedAi": "Chat con Lumina sin límites",
+      "editorAiPro": "IA en el editor: redacta, resume y reescribe",
+      "everythingFree": "Todo lo del plan Free",
+      "cancelAnytime": "Cancela cuando quieras",
+      "notIncluded": "No incluido"
+    },
+    "usage": "{{used}} de {{limit}} mensajes gratis usados",
+    "usageLeft_one": "Te queda {{count}} mensaje gratis",
+    "usageLeft_other": "Te quedan {{count}} mensajes gratis",
+    "usageNone": "Ya usaste tus mensajes gratis",
+    "tryPro": "Prueba Pro",
+    "upgrade": {
+      "title": {
+        "manual": "Mejora tu plan",
+        "limit_one": "Usaste tu mensaje gratis",
+        "limit_other": "Usaste tus {{count}} mensajes gratis",
+        "editor": "La IA del editor es parte de Pro"
+      },
+      "subtitle": {
+        "manual": "Elige el plan que mejor va con tu forma de trabajar.",
+        "limit": "Pásate a Pro para seguir hablando con Lumina sin límites.",
+        "editor": "Con Pro, Lumina redacta, resume y reescribe dentro de tus documentos."
+      },
+      "cta": "Continuar al pago",
+      "alreadyPro": "Ya tienes Focusly Pro",
+      "notConfigured": "Los pagos todavía no están disponibles. Inténtalo más tarde.",
+      "startError": "No pudimos abrir el pago. Inténtalo de nuevo.",
+      "close": "Cerrar"
+    },
+    "checkout": {
+      "title": "Completa tu suscripción",
+      "back": "Volver a los planes",
+      "renews": "Se renueva automáticamente cada {{interval}}",
+      "pay": "Suscribirme por {{price}}",
+      "payNoPrice": "Suscribirme",
+      "secure": "Pago seguro con Stripe. Focusly nunca ve los datos de tu tarjeta.",
+      "cancelNote": "Puedes cancelar cuando quieras desde Perfil → Planes y facturación.",
+      "error": "No se pudo procesar el pago. Revisa los datos e inténtalo de nuevo.",
+      "loading": "Cargando el formulario de pago…",
+      "applePayDescription": "Suscripción a Focusly Pro"
+    },
+    "activating": {
+      "title": "Activando tu plan…",
+      "body": "Estamos confirmando el pago con Stripe."
+    },
+    "done": {
+      "title": "¡Bienvenido a Focusly Pro!",
+      "body": "Ya puedes usar Lumina sin límites, también en el editor.",
+      "cta": "Empezar"
+    },
+    "pending": {
+      "title": "Recibimos tu pago",
+      "body": "Tu plan Pro se activará en unos minutos. Puedes cerrar esta ventana."
+    },
+    "limitBanner": {
+      "title_one": "Usaste tu mensaje gratis con Lumina",
+      "title_other": "Usaste tus {{count}} mensajes gratis con Lumina",
+      "body": "Pásate a Focusly Pro para seguir conversando sin límites.",
+      "cta": "Ver planes"
+    },
+    "limitReply": "Llegaste al límite de mensajes gratis. Tu mensaje no se envió: puedes reenviarlo con Focusly Pro.",
+    "editorGate": {
+      "title": "La IA del editor es parte de Pro",
+      "body": "Con Focusly Pro, Lumina redacta, resume y reescribe tus documentos.",
+      "cta": "Prueba Pro"
+    },
+    "section": {
+      "title": "Tu plan",
+      "description": "Tu suscripción, tu uso de Lumina y tus datos de pago.",
+      "free": "Plan Free",
+      "pro": "Plan Pro",
+      "renews": "Se renueva el {{date}}",
+      "cancels": "Tu plan Pro termina el {{date}} y no se volverá a cobrar.",
+      "pastDue": "No pudimos cobrar tu última factura. Actualiza tu tarjeta para no perder Pro.",
+      "manage": "Gestionar pago y facturas",
+      "manageHint": "Cambia tu tarjeta, descarga facturas o cancela en el portal seguro de Stripe.",
+      "portalError": "No se pudo abrir el portal de Stripe.",
+      "plansTitle": "Planes",
+      "plansDescription": "Lo que incluye cada plan.",
+      "returnSuccess": "¡Tu suscripción a Focusly Pro está activa!",
+      "returnPending": "Recibimos tu pago; tu plan se activará en unos minutos.",
+      "returnFailed": "El pago no se completó. Puedes intentarlo de nuevo."
     }
   }
 }

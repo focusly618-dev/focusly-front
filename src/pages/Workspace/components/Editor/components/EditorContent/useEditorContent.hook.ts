@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, type DocumentNode } from '@apollo/client';
 import { useAppSelector } from '@/redux/hooks';
+import { useBilling } from '@/hooks/useBilling';
 import type {
   UseEditorContentProps,
   UseEditorContentReturn,
@@ -29,6 +30,8 @@ export const useEditorContent = ({
 }: UseEditorContentProps): UseEditorContentReturn => {
   const [createTaskMutation] = useMutation(CREATE_TASK);
   const { user } = useAppSelector((state) => state.auth);
+  // The editor's AI (rewrites, task from selection) is a Pro feature.
+  const { isPro, openUpgrade } = useBilling();
 
   const persistedEmoji = watch?.('emoji');
   const persistedBg = watch?.('background_color');
@@ -113,6 +116,10 @@ export const useEditorContent = ({
 
   const handleCreateTask = async () => {
     handleClose();
+    if (!isPro) {
+      openUpgrade('editor');
+      return;
+    }
     if (!selectedText) {
       sileo.error({
         title: 'Error',
@@ -318,6 +325,10 @@ Text: "${selectedText}"`;
 
   const processTextWithAI = async (action: string) => {
     handleClose();
+    if (!isPro) {
+      openUpgrade('editor');
+      return;
+    }
     if (!selectedText || !markdownEditorRef.current) return;
 
     setIsAIProcessing(true);

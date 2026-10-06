@@ -6,6 +6,7 @@ import { CREATE_WORKSPACE, UPDATE_WORKSPACE } from '../Workspace.graphql';
 import type { WorkspaceFormData } from '../workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
 import { generateWorkspaceTitle } from '@/api/AI/apiAI';
+import { isPlanLimitError } from '@/api/Billing/planLimit';
 import { stripMarkdown } from '@/components/chat/actionPlan/actionExecution';
 
 // Below this many characters of actual (non-markdown) text, there isn't
@@ -226,6 +227,8 @@ export const useWorkspaceForm = () => {
         }
       })
       .catch((err) => {
+        // Free plan: AI titles are part of Pro's editor AI.
+        if (isPlanLimitError(err)) return;
         console.error('Failed to auto-generate workspace title:', err);
       });
   }, [values.id, values.title, values.content, setValue]);

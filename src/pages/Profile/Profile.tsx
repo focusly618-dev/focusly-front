@@ -23,6 +23,7 @@ import {
   UserSummary,
 } from './Profile.styles';
 import { AccountSection } from './sections/AccountSection';
+import { BillingSection } from './sections/BillingSection';
 import { WorkFocusSection } from './sections/WorkFocusSection';
 import { NotificationsSection } from './sections/NotificationsSection';
 import { AppearanceSection } from './sections/AppearanceSection';
@@ -31,6 +32,7 @@ import { PrivacySection } from './sections/PrivacySection';
 
 const SECTION_CONTENT: Record<ProfileSectionSlug, ComponentType> = {
   account: AccountSection,
+  billing: BillingSection,
   'work-focus': WorkFocusSection,
   notifications: NotificationsSection,
   appearance: AppearanceSection,

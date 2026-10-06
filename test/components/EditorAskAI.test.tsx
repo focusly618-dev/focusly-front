@@ -24,6 +24,8 @@ vi.mock('@/components/ui', () => ({
   LuminaAnimatedFace: () => <span data-testid="lumina-face" />,
 }));
 vi.mock('@/i18n', () => ({ default: { t: (key: string) => key } }));
+const billing = vi.hoisted(() => ({ isPro: true, openUpgrade: vi.fn() }));
+vi.mock('@/hooks/useBilling', () => ({ useBilling: () => billing }));
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key, i18n: { language: 'es' } }),
 }));
@@ -57,6 +59,8 @@ const openPanel = async () => {
 
 describe('EditorAskAI', () => {
   beforeEach(() => {
+    billing.isPro = true;
+    billing.openUpgrade.mockClear();
     editorAssistantService.reset();
     api.fetchEditorConversation.mockResolvedValue({
       conversationId: null,
@@ -129,5 +133,20 @@ describe('EditorAskAI', () => {
     );
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('on the free plan, offers Pro instead of the input', async () => {
+    billing.isPro = false;
+    renderAssistant();
+    await openPanel();
+
+    expect(screen.getByText('billing.editorGate.title')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('editorAI.actions.extractTasks.label'),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('billing.editorGate.cta'));
+    expect(billing.openUpgrade).toHaveBeenCalledWith('editor');
   });
 });

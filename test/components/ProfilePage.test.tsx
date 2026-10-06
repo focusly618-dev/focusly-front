@@ -22,6 +22,9 @@ vi.mock('@/pages/Profile/sections/IntegrationsSection', () => ({
 vi.mock('@/pages/Profile/sections/PrivacySection', () => ({
   PrivacySection: () => <div>PRIVACY_SECTION</div>,
 }));
+vi.mock('@/pages/Profile/sections/BillingSection', () => ({
+  BillingSection: () => <div>BILLING_SECTION</div>,
+}));
 
 const dispatch = vi.fn();
 vi.mock('@/redux/hooks', () => ({

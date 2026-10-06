@@ -18,6 +18,8 @@ import {
   type FragmentTarget,
   type PendingReview,
 } from '@/pages/Workspace/components/Editor/components/EditorAskAI/editorAssistant.utils';
+import { isPlanLimitError } from '@/api/Billing/planLimit';
+import { billingService } from '@/services/billingService';
 
 // The workspace editor's assistant, one session per document, kept outside
 // React like aiStreamService: a reply keeps streaming when the user leaves the
@@ -417,6 +419,17 @@ class EditorAssistantService {
       }));
     } catch (e) {
       const stopped = controller.signal.aborted;
+      if (isPlanLimitError(e)) {
+        // Free plan: the editor assistant is Pro. Drop the unanswered turn.
+        this.set(key, (s) => ({
+          isStreaming: false,
+          messages: s.messages.filter(
+            (m) => m.id !== reply.id && m.id !== question.id,
+          ),
+        }));
+        billingService.openUpgrade('editor');
+        return;
+      }
       if (!stopped) console.error('Editor assistant failed:', e);
       this.set(key, (s) => ({
         isStreaming: false,

@@ -3,6 +3,11 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import type { AIMessage, AITaskContext } from './apiAI.types';
 import type { ParsedLuminaAction } from '@/utils/lumina/lumina.types';
+import {
+  remainingFromHeaders,
+  throwIfPlanLimit,
+} from '@/api/Billing/planLimit';
+import { billingService } from '@/services/billingService';
 
 const getAIEndpoint = () => {
   const isDev = import.meta.env.DEV;
@@ -50,6 +55,7 @@ export const fetchEditResult = async (prompt: string): Promise<string> => {
     }
   }
 
+  await throwIfPlanLimit(response);
   if (!response.ok) {
     throw new Error(await response.text());
   }
@@ -137,6 +143,7 @@ export const fetchChatStreamResponse = async (
     }
   }
 
+  await throwIfPlanLimit(response);
   if (!response.ok) {
     throw new Error(await response.text());
   }
@@ -144,6 +151,9 @@ export const fetchChatStreamResponse = async (
   if (!response.body) {
     throw new Error('Response body is null');
   }
+
+  const remaining = remainingFromHeaders(response);
+  if (remaining !== null) billingService.setRemaining(remaining);
 
   return response.body;
 };

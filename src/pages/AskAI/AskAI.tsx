@@ -76,7 +76,10 @@ import {
   ChainOfThoughtStep,
   Shimmer,
 } from '@/components/ai-elements';
-import { UpgradeModal } from '@/components/modals';
+import { TryProButton } from '@/components/Billing/TryProButton';
+import { useBilling } from '@/hooks/useBilling';
+import { billingService } from '@/services/billingService';
+import { isPlanLimitMessage } from '@/api/Billing/planLimit';
 import { aiStreamService } from '@/services/aiStreamService';
 import {
   parseLuminaActions,
@@ -521,61 +524,12 @@ export const AskAI: React.FC = () => {
     title?: string;
   } | null>(null);
   const [isDeletingConversation, setIsDeletingConversation] = useState(false);
-  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
-  // 10 Trial Messages tracking
-  const TRIAL_MESSAGE_LIMIT = 10;
-  const trialStorageKey = `focusly_ask_ai_user_messages_count_${user?.id || 'default'}`;
-  const proStorageKey = `focusly_is_pro_user_${user?.id || 'default'}`;
+  // Free plan: the backend counts the AI messages (and enforces the
+  // limit); this only reflects it.
+  const billing = useBilling();
+  const isTrialLimitReached = !billing.isPro && billing.remaining <= 0;
 
-  const [isProUser, setIsProUser] = useState<boolean>(() => {
-    return localStorage.getItem(proStorageKey) === 'true';
-  });
-
-  const [userMessageCount, setUserMessageCount] = useState<number>(() => {
-    const stored = localStorage.getItem(trialStorageKey);
-    if (stored !== null) {
-      const parsed = parseInt(stored, 10);
-      if (!isNaN(parsed)) return parsed;
-    }
-    return 0;
-  });
-
-  const isTrialLimitReached =
-    !isProUser && userMessageCount >= TRIAL_MESSAGE_LIMIT;
-
-  useEffect(() => {
-    const storedPro = localStorage.getItem(proStorageKey) === 'true';
-    setIsProUser(storedPro);
-    const storedCount = localStorage.getItem(trialStorageKey);
-    if (storedCount !== null) {
-      const parsed = parseInt(storedCount, 10);
-      if (!isNaN(parsed)) setUserMessageCount(parsed);
-    }
-  }, [proStorageKey, trialStorageKey]);
-
-  useEffect(() => {
-    const currentChatUserMsgs = messages.filter(
-      (m) => m.sender === 'user',
-    ).length;
-    if (currentChatUserMsgs > userMessageCount) {
-      setUserMessageCount(currentChatUserMsgs);
-      localStorage.setItem(trialStorageKey, String(currentChatUserMsgs));
-    }
-  }, [messages, trialStorageKey, userMessageCount]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as unknown as { resetAITrial?: () => void }).resetAITrial =
-        () => {
-          localStorage.removeItem(trialStorageKey);
-          localStorage.removeItem(proStorageKey);
-          setUserMessageCount(0);
-          setIsProUser(false);
-          console.log('[DEBUG] Focusly AI trial reset to 0');
-        };
-    }
-  }, [proStorageKey, trialStorageKey]);
   const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
   const [selectedContext, setSelectedContext] =
@@ -771,6 +725,22 @@ export const AskAI: React.FC = () => {
             }
           })
           .catch(console.error);
+      } else if (event.type === 'error' && isPlanLimitMessage(event.error)) {
+        // The backend refused the message (free messages used up): it wasn't
+        // sent, so drop it with the empty reply and put its text back.
+        const list = event.activeMessages ?? [];
+        const at = list.findIndex((msg) => msg.id === event.aiMsgId);
+        const sent = at > 0 ? list[at - 1] : undefined;
+        const sentId = sent?.sender === 'user' ? sent.id : null;
+        setStatus('ready');
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== event.aiMsgId && msg.id !== sentId),
+        );
+        if (sentId && sent?.text) {
+          setInputValue((current) => current || sent.text);
+        }
+        billingService.markLimitReached();
+        billingService.openUpgrade('limit');
       } else if (event.type === 'error') {
         setStatus('error');
         setMessages((prev) =>
@@ -1025,8 +995,8 @@ export const AskAI: React.FC = () => {
 
       if (!trimmedText && currentFiles.length === 0) return;
 
-      if (!isProUser && userMessageCount >= TRIAL_MESSAGE_LIMIT) {
-        setIsUpgradeModalOpen(true);
+      if (isTrialLimitReached) {
+        billingService.openUpgrade('limit');
         return;
       }
 
@@ -1081,12 +1051,6 @@ export const AskAI: React.FC = () => {
       setInputValue('');
       setAttachedFiles([]);
       setStatus('submitted');
-
-      if (!isProUser) {
-        const nextCount = userMessageCount + 1;
-        setUserMessageCount(nextCount);
-        localStorage.setItem(trialStorageKey, String(nextCount));
-      }
 
       const aiMsgId = `ai-${Date.now()}`;
       const aiMsg: Message = {
@@ -1166,10 +1130,7 @@ export const AskAI: React.FC = () => {
       selectedModel,
       selectedContext,
       attachedFiles,
-      isProUser,
-      userMessageCount,
-      trialStorageKey,
-      TRIAL_MESSAGE_LIMIT,
+      isTrialLimitReached,
     ],
   );
 
@@ -1215,7 +1176,14 @@ export const AskAI: React.FC = () => {
       <ChatAreaWrapper>
         {/* ── Chat Header ── */}
         <ChatHeader>
-          <Box display="flex" justifyContent="flex-end" width="100%">
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            alignItems="center"
+            gap={1}
+            width="100%"
+          >
+            <TryProButton reason="manual" />
             <Button
               variant="outlined"
               size="small"
@@ -2261,10 +2229,12 @@ export const AskAI: React.FC = () => {
                           lineHeight: 1.25,
                         }}
                       >
-                        Has alcanzado el límite de tu chat de prueba
+                        {t('billing.limitBanner.title', {
+                          count: billing.limit,
+                        })}
                       </Typography>
                       <Chip
-                        label={`${TRIAL_MESSAGE_LIMIT}/${TRIAL_MESSAGE_LIMIT} mensajes`}
+                        label={`${billing.used}/${billing.limit}`}
                         size="small"
                         sx={{
                           height: 20,
@@ -2294,16 +2264,14 @@ export const AskAI: React.FC = () => {
                         lineHeight: 1.4,
                       }}
                     >
-                      Se agotaron los 10 mensajes de prueba con Lumina.
-                      Actualiza a Focusly Plus para continuar conversando sin
-                      límites y acceder a modelos avanzados.
+                      {t('billing.limitBanner.body')}
                     </Typography>
                   </Box>
                 </Box>
 
                 <Button
                   variant="contained"
-                  onClick={() => setIsUpgradeModalOpen(true)}
+                  onClick={() => billingService.openUpgrade('limit')}
                   endIcon={<AutoAwesomeIcon sx={{ fontSize: 15 }} />}
                   sx={{
                     borderRadius: '10px',
@@ -2326,7 +2294,7 @@ export const AskAI: React.FC = () => {
                     },
                   }}
                 >
-                  Actualizar a Plus
+                  {t('billing.limitBanner.cta')}
                 </Button>
               </TrialUpgradeBanner>
             )}
@@ -2336,7 +2304,7 @@ export const AskAI: React.FC = () => {
               onStop={handleStopStream}
               onSubmit={() => {
                 if (isTrialLimitReached) {
-                  setIsUpgradeModalOpen(true);
+                  billingService.openUpgrade('limit');
                 } else {
                   sendMessage(inputValue);
                 }
@@ -2906,15 +2874,6 @@ export const AskAI: React.FC = () => {
           </Box>
         )}
       </HistorySidebar>
-
-      <UpgradeModal
-        open={isUpgradeModalOpen}
-        onClose={() => setIsUpgradeModalOpen(false)}
-        onUpgradeSuccess={() => {
-          setIsProUser(true);
-          localStorage.setItem(proStorageKey, 'true');
-        }}
-      />
 
       {/* Confirmation Modal to delete AI conversation */}
       <Dialog

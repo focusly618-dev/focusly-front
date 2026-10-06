@@ -14,6 +14,7 @@ import { SessionExpiredBanner } from '@/components/ui/SessionExpiredBanner';
 import { ReleaseModal } from '@/components/ReleaseModal/ReleaseModal';
 import { TermsAcceptanceModal } from '@/components/TermsAcceptanceModal/TermsAcceptanceModal';
 import { EditorAIBackgroundIndicator } from '@/components/AI/EditorAIBackgroundIndicator';
+import { UpgradeModalHost } from '@/components/Billing/UpgradeModalHost';
 
 function App() {
   const { isLogged } = useSession();
@@ -29,6 +30,8 @@ function App() {
       <TermsAcceptanceModal />
       {/* Editor assistant replies keep running when the user leaves the note */}
       {isLogged && <EditorAIBackgroundIndicator />}
+      {/* The Free/Pro plans and the Stripe checkout, opened from anywhere */}
+      {isLogged && <UpgradeModalHost />}
       <Box
         sx={{
           pt: sessionExpiredNotice ? { xs: '92px', sm: '102px' } : 0,
