@@ -2,7 +2,8 @@ import type { Task } from '@/redux/tasks/task.types';
 
 export interface TaskActionsProps {
   initialTask: Task | null | undefined;
-  handleDelete: () => Promise<void>;
+  /** Resolves false when the task couldn't be deleted. */
+  handleDelete: () => Promise<boolean | void>;
   onClose: () => void;
   handleUpdate: () => void;
   handleSave: () => void;

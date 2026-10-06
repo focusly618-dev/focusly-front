@@ -49,7 +49,7 @@ import {
   isCustomEmoji,
   PRIORITY_OPTIONS,
 } from '@/components/ui';
-import { sileo, UNTITLED_WORKSPACE_TITLE } from '@/utils';
+import { notify, UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import type { CreateProjectTaskModalProps } from './CreateProjectTaskModal.types';
 import {
   useCreateProjectTaskModal,
@@ -1672,7 +1672,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                       onClick={() => {
                         setSelectedWorkspaceId(ws.id);
                         setWorkspaceMenuAnchor(null);
-                        sileo.success({
+                        notify.success({
                           title: t('tasks.createProjectTaskModal.linked'),
                           description: ws.title || UNTITLED_WORKSPACE_TITLE,
                           duration: 2500,

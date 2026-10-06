@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLoginForm } from './hooks/useLoginForm.hook';
 import { useLoginAuth } from './hooks/useLoginAuth.hook';
 import { useLoginErrorHandler } from './hooks/useLoginErrorHandler.hook';
-import { sileo } from '@/utils/notifications/sileo';
+import { notify } from '@/utils/notifications/notify';
 
 export const useLogin = () => {
   const { t } = useTranslation();
@@ -20,9 +20,8 @@ export const useLogin = () => {
 
   const onSignIn = async () => {
     if (!form.email) {
-      sileo.warning({
+      notify.warning({
         title: t('login.enterEmailWarning'),
-        fill: 'var(--sileo-warning-bg)',
       });
       return;
     }

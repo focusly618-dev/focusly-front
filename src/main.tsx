@@ -14,16 +14,17 @@ import { store } from '@/redux/store.ts';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@/api/apollo';
 import '@/i18n';
-import { NotificationToaster } from '@/components/Notification/NotificationToaster';
+import { FocuslyToaster } from '@/components/Notification/FocuslyToaster';
 import { BrowserRouter } from 'react-router-dom';
 
 createRoot(document.getElementById('root')!).render(
   <AppThemeProvider>
     <CssBaseline />
-    <NotificationToaster />
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <ApolloProvider client={client}>
         <Provider store={store}>
+          {/* Inside the store: it moves below the session banner */}
+          <FocuslyToaster />
           <RealTimeProvider>
             <BrowserRouter>
               <App />

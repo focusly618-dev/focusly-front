@@ -15,7 +15,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { updateUser } from '@/redux/auth/auth.slice';
 import { UserGet, UserUpdate, type UserSettings } from '@/api/User/apiUser';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import { Card, CardDescription, CardTitle } from '../Profile.styles';
 import {
   FOCUS_MINUTES,
@@ -144,15 +144,13 @@ export const WorkFocusSection = () => {
       const next = formFromSettings(updated.settings);
       setSaved(next);
       setForm(next);
-      sileo.success({
+      notify.success({
         title: t('profilePage.workFocus.savedTitle'),
         description: t('profilePage.workFocus.savedDesc'),
-        fill: 'var(--sileo-success-bg)',
       });
     } catch {
-      sileo.error({
+      notify.error({
         title: t('profilePage.workFocus.saveError'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsSaving(false);

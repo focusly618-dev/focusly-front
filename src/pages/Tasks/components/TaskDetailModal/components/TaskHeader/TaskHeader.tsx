@@ -8,7 +8,7 @@ import {
   PaletteOutlined as PaletteIcon,
 } from '@mui/icons-material';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo } from '@/utils';
+import { confirmTaskDeletion } from '@/services/confirmTaskDeletion';
 import { headerContainerSx, headerIconButtonSx } from './TaskHeader.styles';
 import { isTaskCustomColor, isColorDark } from '../../TaskDetailModal.utils';
 
@@ -19,7 +19,8 @@ interface TaskHeaderProps {
   title: string;
   onClose: () => void;
   initialTask?: Task | null;
-  handleDelete: () => Promise<void>;
+  /** Resolves false when the task couldn't be deleted. */
+  handleDelete: () => Promise<boolean | void>;
   isReadOnly?: boolean;
   onOpenColorPicker?: (el: HTMLElement) => void;
 }
@@ -162,35 +163,7 @@ export const TaskHeader = ({
           <Tooltip title="Eliminar tarea" arrow>
             <IconButton
               size="small"
-              onClick={() => {
-                sileo.warning({
-                  title: 'Eliminar Tarea',
-                  description:
-                    '¿Estás seguro de que deseas eliminar esta tarea?',
-                  fill: 'var(--sileo-warning-bg)',
-                  button: {
-                    title: 'Confirmar',
-                    onClick: () => {
-                      sileo.promise(() => handleDelete(), {
-                        loading: {
-                          title: 'Eliminando...',
-                          fill: 'var(--sileo-update-bg)',
-                        },
-                        success: {
-                          title: '¡Tarea eliminada con éxito!',
-                          duration: 4000,
-                          fill: 'var(--sileo-delete-bg)',
-                        },
-                        error: {
-                          title: 'Error al eliminar tarea',
-                          fill: 'var(--sileo-error-bg)',
-                        },
-                      });
-                      onClose();
-                    },
-                  },
-                });
-              }}
+              onClick={() => confirmTaskDeletion(handleDelete, onClose)}
               sx={{
                 ...iconSx,
                 '&:hover': {

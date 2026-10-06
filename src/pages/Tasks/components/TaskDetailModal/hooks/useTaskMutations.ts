@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { UPDATE_WORKSPACE } from '@/pages/Workspace/Workspace.graphql';
 import { GET_TASKS } from '../../../Tasks.graphql';
-import { sileo, handleMutationError } from '@/utils';
+import { notify, handleMutationError } from '@/utils';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import {
   deduplicateLinks,
@@ -46,7 +46,7 @@ export const useTaskMutations = ({
       return { meetLink: res.meetLink, googleEventId: res.googleEventId };
     }
 
-    sileo.warning({
+    notify.warning({
       title: 'Could not generate Meet link',
       description:
         'The task will be saved without it. Make sure you are signed in with Google.',
@@ -75,9 +75,8 @@ export const useTaskMutations = ({
 
       const data = await executeCreateTask(createInput);
       if (data?.createTask) {
-        sileo.success({
+        notify.success({
           title: 'Task created',
-          fill: 'var(--sileo-success-bg)',
         });
         onSave(data.createTask);
         resetForm();
@@ -273,9 +272,8 @@ export const useTaskMutations = ({
         'GetTasksByUserPaginated',
       ]);
       if (data?.updateTask) {
-        sileo.success({
+        notify.success({
           title: 'Task updated',
-          fill: 'var(--sileo-update-bg)',
         });
         onSave(data.updateTask);
         resetForm();
@@ -287,12 +285,13 @@ export const useTaskMutations = ({
     setLoadingSave(false);
   };
 
-  const handleDelete = async () => {
-    if (!initialTask?.id) return;
+  /** True once the task is gone (errors are reported here). */
+  const handleDelete = async (): Promise<boolean> => {
+    if (!initialTask?.id) return false;
 
     if (onDelete) {
       await onDelete(initialTask.id);
-      return;
+      return true;
     }
 
     try {
@@ -303,12 +302,14 @@ export const useTaskMutations = ({
 
       resetForm();
       onClose();
+      return true;
     } catch (e: unknown) {
       if (e instanceof Error && !e.message.includes('not found')) {
         handleMutationError(e, 'Error al eliminar la tarea');
       } else if (!(e instanceof Error)) {
         handleMutationError(e, 'Error al eliminar la tarea');
       }
+      return false;
     }
   };
 
@@ -325,9 +326,8 @@ export const useTaskMutations = ({
         },
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user?.id } }],
       });
-      sileo.success({
+      notify.success({
         title: 'Workspace unlinked',
-        fill: 'var(--sileo-update-bg)',
       });
     } catch (error) {
       handleMutationError(error, 'Error al desvincular el espacio de trabajo');

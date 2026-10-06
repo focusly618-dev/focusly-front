@@ -10,7 +10,7 @@ import {
 } from '@/pages/Tasks/Tasks.graphql';
 import { upsertTask, removeTask } from '@/redux/tasks/task.slice';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import { parseDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import { dateInputToISO } from '../projectTaskDates';
 import {
@@ -175,7 +175,7 @@ export const useTaskMutations = () => {
 
   const createProjectTask = async (input: CreateProjectTaskInput) => {
     if (!user?.id) {
-      sileo.error({ title: t('projectTasks.toast.authError') });
+      notify.error({ title: t('projectTasks.toast.authError') });
       return null;
     }
 
@@ -231,7 +231,7 @@ export const useTaskMutations = () => {
       if (res.data?.createTask) {
         const mapped = mapResponseToTask(res.data.createTask);
         dispatch(upsertTask(mapped));
-        sileo.success({
+        notify.success({
           title: t('projectTasks.toast.created'),
           description: input.title,
           duration: 3000,
@@ -241,7 +241,7 @@ export const useTaskMutations = () => {
       return null;
     } catch (err) {
       console.error('Error creating project task:', err);
-      sileo.error({
+      notify.error({
         title: t('projectTasks.toast.createFailed'),
         duration: 3000,
       });
@@ -313,7 +313,7 @@ export const useTaskMutations = () => {
       return null;
     } catch (err) {
       console.error('Error updating project task:', err);
-      sileo.error({
+      notify.error({
         title: t('projectTasks.toast.updateFailed'),
         duration: 3000,
       });
@@ -345,7 +345,7 @@ export const useTaskMutations = () => {
 
     statusBeforeDone.set(task.id, task.status);
     const result = await setProjectTaskStatus(task, 'completed');
-    const toastId = sileo.success({
+    const toastId = notify.success({
       title: t('projectTasks.toast.completed'),
       description: task.title,
       button: {
@@ -357,7 +357,7 @@ export const useTaskMutations = () => {
       },
     });
     // Toasts with a button stay until closed; this one is only useful briefly.
-    setTimeout(() => sileo.dismiss(toastId), UNDO_MS);
+    setTimeout(() => notify.dismiss(toastId), UNDO_MS);
     return result;
   };
 
@@ -470,14 +470,14 @@ export const useTaskMutations = () => {
     try {
       await removeTaskById(taskId);
       await refetchAfterDelete();
-      sileo.success({
+      notify.success({
         title: t('projectTasks.toast.deleted', { count: 1 }),
         duration: 2500,
       });
       return true;
     } catch (err) {
       console.error('Error deleting task:', err);
-      sileo.error({
+      notify.error({
         title: t('projectTasks.toast.deleteFailed'),
         duration: 3000,
       });
@@ -492,13 +492,13 @@ export const useTaskMutations = () => {
     const failed = results.filter((r) => r.status === 'rejected').length;
     const deleted = taskIds.length - failed;
     if (deleted > 0) {
-      sileo.success({
+      notify.success({
         title: t('projectTasks.toast.deleted', { count: deleted }),
         duration: 2500,
       });
     }
     if (failed > 0) {
-      sileo.error({
+      notify.error({
         title: t('projectTasks.toast.deleteFailed'),
         duration: 3000,
       });

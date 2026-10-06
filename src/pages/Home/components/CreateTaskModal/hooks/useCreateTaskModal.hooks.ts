@@ -1,4 +1,4 @@
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions } from '../CreateTaskModal.utils';
@@ -222,23 +222,20 @@ export const useCreateTaskModal = ({
       if (meetUrl?.meetLink) {
         handleAddLink('Google Meet', meetUrl.meetLink);
         setShouldGenerateMeet(true);
-        sileo.success({
+        notify.success({
           title: 'Google Meet link generated!',
           description: 'Link added to resources.',
-          fill: 'var(--sileo-success-bg)',
         });
       } else {
-        sileo.error({
+        notify.error({
           title: 'Could not generate Meet link',
           description: 'Make sure you are signed in with Google.',
-          fill: 'var(--sileo-error-bg)',
         });
       }
     } catch (error) {
       console.error('Error generating Meet link:', error);
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(error, 'Error generating Meet link'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsGeneratingMeet(false);

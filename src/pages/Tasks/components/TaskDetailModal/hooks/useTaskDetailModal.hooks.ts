@@ -7,7 +7,7 @@ import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
 import { getTimerSuggestions, formatDuration } from '../TaskDetailModal.utils';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
 import { GET_TASK_DETAIL } from '../../../Tasks.graphql';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
@@ -389,23 +389,20 @@ export const useTaskDetailModal = ({
         if (initialTask?.id && !initialTask.id.startsWith('temp-')) {
           setShouldGenerateMeet(true);
         }
-        sileo.success({
+        notify.success({
           title: 'Google Meet link generated!',
           description: 'Link added to resources.',
-          fill: 'var(--sileo-success-bg)',
         });
       } else {
-        sileo.error({
+        notify.error({
           title: 'Could not generate Meet link',
           description: 'Make sure you are signed in with Google.',
-          fill: 'var(--sileo-error-bg)',
         });
       }
     } catch (error) {
       console.error('Error generating Meet link:', error);
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(error, 'Error generating Meet link'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsGeneratingMeet(false);

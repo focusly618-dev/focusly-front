@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client';
 import { UPDATE_WORKSPACE } from '../../Workspace/Workspace.graphql';
 import type { WorkspaceTypes } from '../../Workspace/workspace.types';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 
 export const useProjectDocActions = () => {
   const [updateWorkspace, { loading: updating }] = useMutation(
@@ -22,15 +22,14 @@ export const useProjectDocActions = () => {
           },
         },
       });
-      sileo.success({
+      notify.success({
         title: 'Background updated',
         description: 'Workspace background updated successfully.',
-        fill: 'var(--sileo-update-bg)',
         duration: 3000,
       });
     } catch (err) {
       console.error('Error setting background:', err);
-      sileo.error({
+      notify.error({
         title: 'Error',
         description: 'Failed to update background color.',
         duration: 3000,
@@ -49,15 +48,14 @@ export const useProjectDocActions = () => {
           },
         },
       });
-      sileo.success({
+      notify.success({
         title: 'Background removed',
         description: 'Workspace background has been reset.',
-        fill: 'var(--sileo-delete-bg)',
         duration: 3000,
       });
     } catch (err) {
       console.error('Error removing background:', err);
-      sileo.error({
+      notify.error({
         title: 'Error',
         description: 'Failed to reset background.',
         duration: 3000,
@@ -75,15 +73,14 @@ export const useProjectDocActions = () => {
           },
         },
       });
-      sileo.success({
+      notify.success({
         title: 'Task unlinked',
         description: 'The task association has been removed.',
-        fill: 'var(--sileo-update-bg)',
         duration: 3000,
       });
     } catch (err) {
       console.error('Error unlinking task:', err);
-      sileo.error({
+      notify.error({
         title: 'Error',
         description: 'Failed to unlink task.',
         duration: 3000,

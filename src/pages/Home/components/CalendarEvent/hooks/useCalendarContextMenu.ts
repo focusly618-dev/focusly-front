@@ -9,7 +9,7 @@ import {
 } from '@/pages/Tasks/Tasks.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import type { Task } from '@/redux/tasks/task.types';
 import { format } from 'date-fns';
 
@@ -86,7 +86,9 @@ export const useCalendarContextMenu = (
 
     // Check if it's a Google event mirrored task - we probably shouldn't duplicate these directly via Focusly API or they lose sync
     if (task.source === 'google') {
-      sileo.error({ title: 'Cannot duplicate Google events via context menu' });
+      notify.error({
+        title: 'Cannot duplicate Google events via context menu',
+      });
       return;
     }
 
@@ -124,17 +126,15 @@ export const useCalendarContextMenu = (
       if (data?.createTask) {
         const newTask = mapResponseToTask(data.createTask);
         dispatch(upsertTask(newTask));
-        sileo.success({
+        notify.success({
           title: 'Task duplicated',
-          fill: 'var(--sileo-success-bg)',
           duration: 3000,
         });
       }
     } catch (error) {
       console.error('Failed to duplicate task:', error);
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(error, 'Failed to duplicate task'),
-        fill: 'var(--sileo-error-bg)',
       });
     }
   };
@@ -158,17 +158,15 @@ export const useCalendarContextMenu = (
       if (data?.updateTask) {
         const updatedTask = mapResponseToTask(data.updateTask);
         dispatch(upsertTask(updatedTask));
-        sileo.success({
+        notify.success({
           title: `Priority updated to ${priorityLevel}`,
-          fill: 'var(--sileo-update-bg)',
           duration: 3000,
         });
       }
     } catch (error) {
       console.error('Failed to update priority:', error);
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(error, 'Failed to update priority'),
-        fill: 'var(--sileo-error-bg)',
       });
     }
   };
@@ -201,26 +199,23 @@ export const useCalendarContextMenu = (
       });
       dispatch(removeTask({ id: taskId }));
       dispatch(removeEvent({ id: taskId }));
-      sileo.success({
+      notify.success({
         title: 'Task deleted',
-        fill: 'var(--sileo-delete-bg)',
         duration: 3000,
       });
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes('not found')) {
         dispatch(removeTask({ id: taskId }));
         dispatch(removeEvent({ id: taskId }));
-        sileo.success({
+        notify.success({
           title: 'Task deleted',
-          fill: 'var(--sileo-delete-bg)',
           duration: 3000,
         });
         return;
       }
       console.error('Failed to delete task:', error);
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(error, 'Failed to delete task'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsDeleting(false);
@@ -242,16 +237,14 @@ export const useCalendarContextMenu = (
       if (googleRes?.google_event_id && googleRes.google_event_id !== eventId) {
         dispatch(removeEvent({ id: googleRes.google_event_id }));
       }
-      sileo.success({
+      notify.success({
         title: 'Event deleted',
-        fill: 'var(--sileo-delete-bg)',
         duration: 3000,
       });
     } catch (error) {
       console.error('Failed to delete Google event:', error);
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(error, 'Failed to delete event'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsDeleting(false);

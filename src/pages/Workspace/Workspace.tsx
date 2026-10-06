@@ -5,7 +5,7 @@ import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import { CREATE_PROJECT_GROUP } from './Workspace.graphql';
 import { CreateProjectModal } from './components/Library/modals/CreateProjectModal';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import type { WorkspaceProps } from './workspace.types';
 
 const WorkspaceEditor = lazy(() =>
@@ -45,10 +45,9 @@ export const Workspace = ({
       newParams.delete('workspaceId');
       setSearchParams(newParams);
 
-      sileo.success({
+      notify.success({
         title: 'Project created',
         description: `Project "${name}" created successfully.`,
-        fill: 'var(--sileo-success-bg)',
         duration: 3000,
       });
     } catch (err) {

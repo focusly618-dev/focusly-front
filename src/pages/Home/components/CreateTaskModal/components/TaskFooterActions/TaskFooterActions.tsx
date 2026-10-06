@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, DialogActions } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { sileo } from '@/utils';
+import { confirmTaskDeletion } from '@/services/confirmTaskDeletion';
 import {
   dialogActionsSx,
   cancelButtonSx,
@@ -14,7 +14,8 @@ interface TaskFooterActionsProps {
   onClose: () => void;
   handleSave: () => void;
   handleUpdate: () => void;
-  handleDelete: () => Promise<void>;
+  /** Resolves false when the task couldn't be deleted. */
+  handleDelete: () => Promise<boolean | void>;
   loadingSave: boolean;
   disabled?: boolean;
 }
@@ -35,34 +36,7 @@ export const TaskFooterActions = ({
       justifyContent="flex-start"
     >
       <Button
-        onClick={() => {
-          sileo.warning({
-            title: 'Delete Task',
-            description: 'Are you sure you want to delete this task?',
-            fill: 'var(--sileo-warning-bg)',
-            button: {
-              title: 'Confirm',
-              onClick: () => {
-                sileo.promise(handleDelete(), {
-                  loading: {
-                    title: 'Deleting...',
-                    fill: 'var(--sileo-update-bg)',
-                  },
-                  success: {
-                    title: 'Task deleted successfully!',
-                    duration: 4000,
-                    fill: 'var(--sileo-delete-bg)',
-                  },
-                  error: {
-                    title: 'Error deleting task',
-                    fill: 'var(--sileo-error-bg)',
-                  },
-                });
-                onClose();
-              },
-            },
-          });
-        }}
+        onClick={() => confirmTaskDeletion(handleDelete, onClose)}
         variant="contained"
         disableElevation
         sx={deleteButtonSx}

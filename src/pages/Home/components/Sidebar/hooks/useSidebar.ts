@@ -14,7 +14,9 @@ import {
   UPDATE_PROJECT_GROUP,
   DELETE_PROJECT_GROUP,
 } from '@/pages/Workspace/Workspace.graphql';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
+import i18n from '@/i18n';
+import { confirmAction } from '@/services/confirmService';
 import type {
   WorkspaceTypes,
   ProjectGroupTypes,
@@ -314,10 +316,9 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
       if (data?.createWorkspace) {
         handleSelectWorkspace(data.createWorkspace);
       }
-      sileo.success({
+      notify.success({
         title: 'Workspace created',
         description: `Workspace "${title}" has been created.`,
-        fill: 'var(--sileo-success-bg)',
         duration: 2000,
       });
     } catch (err) {
@@ -336,10 +337,9 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
       });
       setNewGroupName('');
       setIsCreatingGroupInline(false);
-      sileo.success({
+      notify.success({
         title: 'Project created',
         description: `"${name}" has been created.`,
-        fill: 'var(--sileo-success-bg)',
         duration: 2000,
       });
     } catch (err) {
@@ -348,25 +348,26 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   };
 
   const handleDeleteGroup = async (id: string) => {
-    sileo.warning({
-      title: 'Remove Project',
-      description:
-        'Are you sure? Workspaces inside will be unlinked but not deleted.',
-      fill: 'var(--sileo-warning-bg)',
-      button: {
-        title: 'Delete',
-        onClick: async () => {
-          try {
-            await deleteProjectGroup({ variables: { id } });
-            sileo.success({
-              title: 'Project deleted',
-              fill: 'var(--sileo-delete-bg)',
-              duration: 4000,
-            });
-          } catch (err) {
-            console.error('Error deleting project:', err);
-          }
-        },
+    confirmAction({
+      title: i18n.t('confirmDialogs.deleteProject.title'),
+      description: i18n.t('confirmDialogs.deleteProject.description'),
+      confirmText: i18n.t('confirmDialogs.deleteProject.confirm'),
+      onConfirm: async () => {
+        try {
+          await deleteProjectGroup({ variables: { id } });
+          notify.success({
+            title: i18n.t('confirmDialogs.deleteProject.done'),
+          });
+        } catch (err) {
+          console.error('Error deleting project:', err);
+          notify.error({
+            title: getFriendlyErrorMessage(
+              err,
+              i18n.t('confirmDialogs.deleteProject.failed'),
+            ),
+          });
+          throw err;
+        }
       },
     });
   };
@@ -409,32 +410,31 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
   }, [projectGroupsData?.projectGroups]);
 
   const handleDeleteWorkspace = (id: string) => {
-    sileo.warning({
-      title: 'Remove Workspace',
-      description: 'Are you sure you want to remove this workspace?',
-      fill: 'var(--sileo-warning-bg)',
-      button: {
-        title: 'Confirm',
-        onClick: async () => {
-          try {
-            await deleteWorkspaceMutation({ variables: { id } });
-            sileo.success({
-              title: 'Workspace deleted',
-              fill: 'var(--sileo-delete-bg)',
-            });
-            if (searchParams.get('workspaceId') === id) {
-              const newParams = new URLSearchParams(searchParams);
-              newParams.delete('workspaceId');
-              setSearchParams(newParams);
-            }
-          } catch (error) {
-            console.error('Error deleting workspace:', error);
-            sileo.error({
-              title: getFriendlyErrorMessage(error, 'Error deleting workspace'),
-              fill: 'var(--sileo-error-bg)',
-            });
+    confirmAction({
+      title: i18n.t('confirmDialogs.deleteDocument.title'),
+      description: i18n.t('confirmDialogs.deleteDocument.description'),
+      confirmText: i18n.t('confirmDialogs.deleteDocument.confirm'),
+      onConfirm: async () => {
+        try {
+          await deleteWorkspaceMutation({ variables: { id } });
+          notify.success({
+            title: i18n.t('confirmDialogs.deleteDocument.done'),
+          });
+          if (searchParams.get('workspaceId') === id) {
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('workspaceId');
+            setSearchParams(newParams);
           }
-        },
+        } catch (error) {
+          console.error('Error deleting workspace:', error);
+          notify.error({
+            title: getFriendlyErrorMessage(
+              error,
+              i18n.t('confirmDialogs.deleteDocument.failed'),
+            ),
+          });
+          throw error;
+        }
       },
     });
   };

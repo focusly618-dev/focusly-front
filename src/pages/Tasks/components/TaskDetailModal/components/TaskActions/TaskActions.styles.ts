@@ -1,4 +1,4 @@
-import { 
+import {
   dialogActionsSx as baseDialogActionsSx,
   deleteButtonSx as baseDeleteButtonSx,
   saveButtonSx as baseSaveButtonSx,
@@ -11,5 +11,5 @@ export const saveButtonSx = baseSaveButtonSx;
 export const deleteContainerSx = (hasTask: boolean) => ({
   display: hasTask ? 'flex' : 'none',
   flex: 1,
-  justifyContent: 'flex-start'
+  justifyContent: 'flex-start',
 });

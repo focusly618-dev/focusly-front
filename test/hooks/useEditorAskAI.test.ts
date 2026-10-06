@@ -18,7 +18,7 @@ vi.mock('@/api/AI/apiAI', () => ({
   deleteAIConversation: vi.fn(),
 }));
 vi.mock('@/utils', () => ({
-  sileo: { success: vi.fn(), error: vi.fn() },
+  notify: { success: vi.fn(), error: vi.fn() },
   getFriendlyErrorMessage: (_e: unknown, fallback: string) => fallback,
 }));
 vi.mock('@/i18n', () => ({ default: { t: (key: string) => key } }));

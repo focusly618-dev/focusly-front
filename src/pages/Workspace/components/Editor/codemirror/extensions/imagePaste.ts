@@ -1,6 +1,6 @@
 import { EditorView } from '@codemirror/view';
 import { compressImageToDataUrl } from '@/utils/images/imageCompressor';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 
 // Compression is async, so a placeholder token is inserted synchronously at
 // paste time and later found-and-replaced by exact text match — this stays
@@ -34,10 +34,9 @@ const uploadAndReplace = (view: EditorView, file: File, token: string) => {
           changes: { from: idx, to: idx + token.length, insert: '' },
         });
       }
-      sileo.error({
+      notify.error({
         title: 'Image paste failed',
         description: 'Could not process the pasted image.',
-        fill: 'var(--sileo-error-bg)',
       });
     });
 };

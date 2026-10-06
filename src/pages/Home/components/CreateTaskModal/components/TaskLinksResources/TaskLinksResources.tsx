@@ -111,7 +111,11 @@ export const TaskLinksResources = ({
             <LinkIcon sx={{ fontSize: 16, color: 'primary.main' }} />
             <Typography
               variant="caption"
-              sx={{ color: 'text.secondary', fontSize: '13px', fontWeight: 500 }}
+              sx={{
+                color: 'text.secondary',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
             >
               Links and resources
             </Typography>

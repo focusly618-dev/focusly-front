@@ -24,7 +24,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { planCalendarAI, type AITimeBlockItem } from '@/api/AI/apiAIPlanner';
 import { createTimeBlock } from '@/api/TimeBlocks/timeBlocksApi';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import { format, startOfDay, addDays } from 'date-fns';
 import { useMutation } from '@apollo/client';
 import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
@@ -97,7 +97,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
           const freeSlots = calculateFreeSlots(events, currentDate);
 
           if (pendingTasks.length === 0) {
-            sileo.info({
+            notify.info({
               title: t('calendar.noPendingTasksTitle'),
               description: t('calendar.noPendingTasksDesc'),
               duration: 3000,
@@ -107,7 +107,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
           }
 
           if (freeSlots.length === 0) {
-            sileo.warning({
+            notify.warning({
               title: t('calendar.noAvailabilityTitle'),
               description: t('calendar.noAvailabilityDesc'),
               duration: 3000,
@@ -120,7 +120,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
           setProposedEvents(res.events || []);
         } catch (e) {
           console.error('Error generating AI schedule:', e);
-          sileo.error({
+          notify.error({
             title: t('calendar.planningErrorTitle'),
             description: getFriendlyErrorMessage(
               e,
@@ -186,7 +186,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
         }
       }
 
-      sileo.success({
+      notify.success({
         title: t('calendarAiPlanner.toast.scheduledTitle'),
         description: t('calendarAiPlanner.toast.scheduledDesc'),
         duration: 4000,
@@ -195,7 +195,7 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
       onClose();
     } catch (e) {
       console.error('Error scheduling events:', e);
-      sileo.error({
+      notify.error({
         title: t('common.error'),
         description: getFriendlyErrorMessage(
           e,

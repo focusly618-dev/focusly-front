@@ -12,7 +12,7 @@ import { setProjectTab } from '@/redux/tasks/task.slice';
 import type { ProjectTab } from '@/redux/tasks/task.types';
 import type { ProjectSortOption } from '../../Workspace/components/Library/components/WorkspaceLibraryHeader';
 import type { ProjectGroupTypes } from '../../Workspace/workspace.types';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 
 const GROUP_LIMIT = 8;
 
@@ -92,7 +92,7 @@ export const useProjectFolders = () => {
           },
         },
       });
-      sileo.success({
+      notify.success({
         title: 'Folder created',
         description: `Folder "${name}" was created successfully.`,
         duration: 3000,
@@ -100,7 +100,7 @@ export const useProjectFolders = () => {
       return res.data?.createProjectGroup;
     } catch (err) {
       console.error('Error creating project folder:', err);
-      sileo.error({
+      notify.error({
         title: 'Error',
         description: 'Failed to create folder.',
         duration: 3000,
@@ -119,7 +119,7 @@ export const useProjectFolders = () => {
           input: { id, ...input },
         },
       });
-      sileo.success({
+      notify.success({
         title: 'Folder updated',
         description: 'Folder customized successfully.',
         duration: 3000,
@@ -127,7 +127,7 @@ export const useProjectFolders = () => {
       return res.data?.updateProjectGroup;
     } catch (err) {
       console.error('Error updating project folder:', err);
-      sileo.error({
+      notify.error({
         title: 'Error',
         description: 'Failed to update folder.',
         duration: 3000,
@@ -169,7 +169,7 @@ export const useProjectFolders = () => {
       );
       if (groupPage > remainingPages) setGroupPage(remainingPages);
 
-      sileo.success({
+      notify.success({
         title: t('workspaceLibrary.toast.projectsDeleted', {
           count: deletedCount,
         }),
@@ -178,7 +178,7 @@ export const useProjectFolders = () => {
     }
 
     if (failed.length > 0) {
-      sileo.error({
+      notify.error({
         title: 'Error',
         description: t('workspaceLibrary.toast.projectsDeleteFailed', {
           count: failed.length,

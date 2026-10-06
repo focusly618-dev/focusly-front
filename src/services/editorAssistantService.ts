@@ -1,5 +1,5 @@
 import i18n from '@/i18n';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import type { ParsedLuminaAction } from '@/utils/lumina';
 import {
   deleteAIConversation,
@@ -287,13 +287,12 @@ class EditorAssistantService {
       );
     } catch (e) {
       this.set(key, { historyStatus: 'loaded' });
-      sileo.error({
+      notify.error({
         title: i18n.t('editorAI.history.loadError'),
         description: getFriendlyErrorMessage(
           e,
           i18n.t('editorAI.errors.retry'),
         ),
-        fill: 'var(--sileo-error-bg)',
       });
     }
   }
@@ -313,13 +312,12 @@ class EditorAssistantService {
     try {
       await deleteAIConversation(conversationId);
     } catch (e) {
-      sileo.error({
+      notify.error({
         title: i18n.t('editorAI.history.deleteError'),
         description: getFriendlyErrorMessage(
           e,
           i18n.t('editorAI.errors.retry'),
         ),
-        fill: 'var(--sileo-error-bg)',
       });
       return;
     }
@@ -440,13 +438,12 @@ class EditorAssistantService {
         ),
       }));
       if (!stopped) {
-        sileo.error({
+        notify.error({
           title: i18n.t('editorAI.errors.title'),
           description: getFriendlyErrorMessage(
             e,
             i18n.t('editorAI.errors.retry'),
           ),
-          fill: 'var(--sileo-error-bg)',
         });
       }
     } finally {

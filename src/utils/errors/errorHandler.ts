@@ -1,4 +1,4 @@
-import { sileo } from '../notifications/sileo';
+import { notify } from '../notifications/notify';
 import { getFriendlyErrorMessage } from './interpretError';
 
 export const handleMutationError = (
@@ -6,8 +6,7 @@ export const handleMutationError = (
   fallbackMessage: string,
 ) => {
   console.error(fallbackMessage, error);
-  sileo.error({
+  notify.error({
     title: getFriendlyErrorMessage(error, fallbackMessage),
-    fill: 'var(--sileo-error-bg)',
   });
 };

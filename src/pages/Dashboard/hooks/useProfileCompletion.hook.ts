@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { updateUser as updateReduxUser } from '@/redux/auth/auth.slice';
 import axios from '@/api/axiosInstance';
 import { uploadAvatarFile } from '@/api/User/apiUser';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 
 interface UseProfileCompletionProps {
   onNext: () => void;
@@ -12,7 +12,7 @@ interface UseProfileCompletionProps {
 export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
-  
+
   const [fullName, setFullName] = useState(user?.name || '');
   const [jobTitle, setJobTitle] = useState((user?.jobTitle as string) || '');
   const [bio, setBio] = useState((user?.bio as string) || '');
@@ -30,7 +30,9 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -41,7 +43,7 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
       setPictureToSave(objectKey);
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      sileo.error({
+      notify.error({
         title: 'No se pudo subir la imagen',
         description: getFriendlyErrorMessage(
           error,
@@ -56,22 +58,22 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
 
   const handleContinue = async () => {
     if (!user?.id) return;
-    
+
     setIsLoading(true);
     try {
       const updateData = {
         name: fullName,
         jobTitle,
         bio,
-        picture: pictureToSave
+        picture: pictureToSave,
       };
 
       // Send to backend
       const response = await axios.patch(`/users/${user.id}`, updateData);
-      
+
       // Update Redux with the response from server
       dispatch(updateReduxUser(response.data));
-      
+
       onNext();
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -94,6 +96,6 @@ export const useProfileCompletion = ({ onNext }: UseProfileCompletionProps) => {
     isUploadingImage,
     handleImageClick,
     handleFileChange,
-    handleContinue
+    handleContinue,
   };
 };

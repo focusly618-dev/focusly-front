@@ -25,7 +25,7 @@ vi.mock('@/api/AI/apiAI', () => ({
 }));
 // The real '@/utils' builds an AudioContext, which jsdom doesn't have.
 vi.mock('@/utils', () => ({
-  sileo: { success: vi.fn(), error: vi.fn() },
+  notify: { success: vi.fn(), error: vi.fn() },
   getFriendlyErrorMessage: (_e: unknown, fallback: string) => fallback,
 }));
 vi.mock('@/i18n', () => ({

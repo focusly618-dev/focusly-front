@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { updateUser as updateReduxUser } from '@/redux/auth/auth.slice';
 import { uploadAvatarFile, UserUpdate } from '@/api/User/apiUser';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 
 // Shared by every place in the app that lets the user change their profile
 // picture (onboarding, /profile, Settings > Account) — saves immediately on
@@ -18,7 +18,9 @@ export const useAvatarUpload = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file || !user?.id) return;
 
@@ -27,10 +29,10 @@ export const useAvatarUpload = () => {
       const { objectKey } = await uploadAvatarFile(file);
       const updated = await UserUpdate(user.id, { picture: objectKey });
       dispatch(updateReduxUser(updated));
-      sileo.success({ title: 'Foto de perfil actualizada' });
+      notify.success({ title: 'Foto de perfil actualizada' });
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      sileo.error({
+      notify.error({
         title: 'No se pudo subir la imagen',
         description: getFriendlyErrorMessage(
           error,
@@ -50,10 +52,10 @@ export const useAvatarUpload = () => {
     try {
       const updated = await UserUpdate(user.id, { picture: null });
       dispatch(updateReduxUser(updated));
-      sileo.success({ title: 'Foto de perfil eliminada' });
+      notify.success({ title: 'Foto de perfil eliminada' });
     } catch (error) {
       console.error('Error removing avatar:', error);
-      sileo.error({
+      notify.error({
         title: 'No se pudo eliminar la imagen',
         description: getFriendlyErrorMessage(error, 'Intenta de nuevo.'),
       });

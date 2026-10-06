@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout } from '@/redux/auth/auth.slice';
 import { UserDelete } from '@/api/User/apiUser';
 import { ModalDelete } from '@/components/modals';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import { Card, CardDescription, DangerCard, Divider } from '../Profile.styles';
 import { SettingRow } from '../components/SettingRow';
 
@@ -50,14 +50,12 @@ export const PrivacySection = () => {
       localStorage.removeItem('onboardingCompleted');
       await dispatch(logout());
       navigate('/');
-      sileo.success({
+      notify.success({
         title: t('securitySettings.deleteConfirm.success'),
-        fill: 'var(--sileo-success-bg)',
       });
     } catch {
-      sileo.error({
+      notify.error({
         title: t('securitySettings.deleteConfirm.error'),
-        fill: 'var(--sileo-error-bg)',
       });
     } finally {
       setIsDeleting(false);

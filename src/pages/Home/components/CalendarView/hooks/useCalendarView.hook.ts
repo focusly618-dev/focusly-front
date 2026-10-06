@@ -27,7 +27,7 @@ import type { RootState } from '@/redux/store';
 import type { UserSettings } from '@/api/User/apiUser.types';
 import { removeTask, setTasks, updateTask } from '@/redux/tasks/task.slice';
 import type { Task } from '@/redux/tasks/task.types';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 import { useMutation, useQuery } from '@apollo/client';
 import {
   addDays,
@@ -597,7 +597,7 @@ export const useCalendarView = () => {
       const isReadOnly = initialTask.is_owner === false;
 
       if (isReadOnly) {
-        sileo.error({
+        notify.error({
           title: 'Action not allowed',
           description:
             "You can't delete the task because you are not the owner",
@@ -653,16 +653,14 @@ export const useCalendarView = () => {
 
       handleModalClose();
 
-      sileo.success({
+      notify.success({
         title: 'Task deleted successfully!',
-        fill: 'var(--sileo-delete-bg)',
         duration: 4000,
       });
     } catch (err) {
       console.error('Error deleting task:', err);
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(err, 'Error deleting task'),
-        fill: 'var(--sileo-error-bg)',
         duration: 4000,
       });
     } finally {
@@ -723,7 +721,7 @@ export const useCalendarView = () => {
         }
       }
 
-      sileo.success({
+      notify.success({
         title: 'Calendario Organizado',
         description: 'Tus sugerencias han sido agendadas con éxito.',
         duration: 4000,
@@ -734,7 +732,7 @@ export const useCalendarView = () => {
       refetchTasks();
     } catch (e) {
       console.error('Error confirming draft events:', e);
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(
           e,
           'No se pudieron guardar todas las sugerencias.',
@@ -780,7 +778,7 @@ export const useCalendarView = () => {
       // Google, the same way handleDeleteTask already does for delete.
       const originalEvent = event.resource as GoogleCalendarEvent;
       if (originalEvent?.is_owner === false) {
-        sileo.error({
+        notify.error({
           title: 'Action not allowed',
           description: "You can't move the task because you are not the owner",
           duration: 3000,
@@ -804,7 +802,7 @@ export const useCalendarView = () => {
           end: { dateTime: endDate.toISOString() },
         });
 
-        sileo.success({
+        notify.success({
           title: 'Task rescheduled!',
           description: `New time: ${format(startDate, 'hh:mm a')}`,
           duration: 3000,
@@ -814,7 +812,7 @@ export const useCalendarView = () => {
         if (originalEvent) {
           dispatch(updateEvent(originalEvent));
         }
-        sileo.error({
+        notify.error({
           title: getFriendlyErrorMessage(err, 'Error rescheduling task'),
         });
       }
@@ -828,7 +826,7 @@ export const useCalendarView = () => {
       const isReadOnly = originalTask.is_owner === false;
 
       if (isReadOnly) {
-        sileo.error({
+        notify.error({
           title: 'Action not allowed',
           description: "You can't move the task because you are not the owner",
           duration: 3000,
@@ -861,7 +859,7 @@ export const useCalendarView = () => {
         },
       });
 
-      sileo.success({
+      notify.success({
         title: 'Task rescheduled!',
         description: `New time: ${format(startDate, 'hh:mm a')}`,
         duration: 3000,
@@ -872,7 +870,7 @@ export const useCalendarView = () => {
       if (originalTask) {
         dispatch(updateTask(originalTask));
       }
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(err, 'Error rescheduling task'),
       });
     }
@@ -901,7 +899,7 @@ export const useCalendarView = () => {
       // Google, the same way handleDeleteTask already does for delete.
       const originalEvent = event.resource as GoogleCalendarEvent;
       if (originalEvent?.is_owner === false) {
-        sileo.error({
+        notify.error({
           title: 'Action not allowed',
           description: "You can't move the task because you are not the owner",
           duration: 3000,
@@ -929,7 +927,7 @@ export const useCalendarView = () => {
         if (originalEvent) {
           dispatch(updateEvent(originalEvent));
         }
-        sileo.error({
+        notify.error({
           title: getFriendlyErrorMessage(err, 'Error rescheduling task'),
         });
       }
@@ -943,7 +941,7 @@ export const useCalendarView = () => {
       const isReadOnly = originalTask.is_owner === false;
 
       if (isReadOnly) {
-        sileo.error({
+        notify.error({
           title: 'Action not allowed',
           description: "You can't move the task because you are not the owner",
           duration: 3000,
@@ -981,7 +979,7 @@ export const useCalendarView = () => {
       if (originalTask) {
         dispatch(updateTask(originalTask));
       }
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(err, 'Error rescheduling task'),
       });
     }
@@ -1069,7 +1067,7 @@ export const useCalendarView = () => {
       console.error('Error updating subtask from calendar:', err);
       // Rollback on failure
       dispatch(updateTask(targetTask));
-      sileo.error({
+      notify.error({
         title: getFriendlyErrorMessage(err, 'Error updating subtask'),
       });
     }

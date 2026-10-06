@@ -15,6 +15,7 @@ import { ReleaseModal } from '@/components/ReleaseModal/ReleaseModal';
 import { TermsAcceptanceModal } from '@/components/TermsAcceptanceModal/TermsAcceptanceModal';
 import { EditorAIBackgroundIndicator } from '@/components/AI/EditorAIBackgroundIndicator';
 import { UpgradeModalHost } from '@/components/Billing/UpgradeModalHost';
+import { ConfirmDialogHost } from '@/components/ConfirmDialog/ConfirmDialogHost';
 
 function App() {
   const { isLogged } = useSession();
@@ -32,6 +33,8 @@ function App() {
       {isLogged && <EditorAIBackgroundIndicator />}
       {/* The Free/Pro plans and the Stripe checkout, opened from anywhere */}
       {isLogged && <UpgradeModalHost />}
+      {/* Confirmations for deletions, asked from anywhere */}
+      {isLogged && <ConfirmDialogHost />}
       <Box
         sx={{
           pt: sessionExpiredNotice ? { xs: '92px', sm: '102px' } : 0,

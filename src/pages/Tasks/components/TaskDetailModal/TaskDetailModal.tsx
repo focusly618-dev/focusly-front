@@ -22,7 +22,7 @@ import {
 import { isTaskCustomColor } from './TaskDetailModal.utils';
 import { useTaskDetailModal } from './hooks/useTaskDetailModal.hooks';
 import { improveTaskAI } from '@/api/AI/apiAIPlanner';
-import { sileo, getFriendlyErrorMessage } from '@/utils';
+import { notify, getFriendlyErrorMessage } from '@/utils';
 
 // Sub-components
 import { TaskProperties } from './components/TaskProperties/TaskProperties';
@@ -139,7 +139,7 @@ export const TaskDetailModal = ({
     mode: 'subtasks' | 'estimate' | 'priority' | 'all',
   ) => {
     if (!title.trim()) {
-      sileo.warning({
+      notify.warning({
         title: 'Título requerido',
         description:
           'Por favor escribe un título para la tarea antes de usar la IA.',
@@ -148,7 +148,7 @@ export const TaskDetailModal = ({
       return;
     }
 
-    sileo.info({
+    notify.info({
       title: 'Optimizando Tarea',
       description:
         'Lumina está analizando y mejorando los campos de tu tarea...',
@@ -186,14 +186,14 @@ export const TaskDetailModal = ({
         }
       }
 
-      sileo.success({
+      notify.success({
         title: 'Tarea Optimizada',
         description: 'Lumina ha sugerido mejoras inteligentes para tu tarea.',
         duration: 3000,
       });
     } catch (e) {
       console.error('Error improving task with AI:', e);
-      sileo.error({
+      notify.error({
         title: 'Error de Optimización',
         description: getFriendlyErrorMessage(
           e,

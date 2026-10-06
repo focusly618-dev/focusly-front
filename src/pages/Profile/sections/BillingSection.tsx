@@ -17,7 +17,7 @@ import {
 import { billingApi } from '@/api/Billing/billingApi';
 import { PlanCards } from '@/components/Billing/PlanCards';
 import { useBilling } from '@/hooks/useBilling';
-import { sileo } from '@/utils';
+import { notify } from '@/utils';
 import { Card, CardDescription, CardTitle, Divider } from '../Profile.styles';
 
 const BRAND = '#008767';
@@ -75,7 +75,7 @@ export const BillingSection = () => {
       window.location.assign(url);
     } catch (err) {
       console.error('Could not open the Stripe portal:', err);
-      sileo.error({ title: t('billing.section.portalError') });
+      notify.error({ title: t('billing.section.portalError') });
       setOpeningPortal(false);
     }
   };

@@ -1,8 +1,8 @@
 import type { Theme } from '@mui/material/styles';
 
-export const collaboratorContainerSx = { 
-  px: 4, 
-  mb: 4 
+export const collaboratorContainerSx = {
+  px: 4,
+  mb: 4,
 };
 
 export const collaboratorHeaderSx = (isExpanded: boolean) => ({
@@ -10,7 +10,7 @@ export const collaboratorHeaderSx = (isExpanded: boolean) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   cursor: 'pointer',
-  mb: isExpanded ? 2 : 0 
+  mb: isExpanded ? 2 : 0,
 });
 
 export const collaboratorCountSx = {
@@ -32,11 +32,14 @@ export const addCollaboratorButtonSx = {
   fontSize: '12px',
   fontWeight: 700,
   color: 'primary.main',
-  bgcolor: (theme: Theme) => theme.palette.mode === 'dark' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.1)',
-  '&:hover': { 
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(99, 102, 241, 0.15)'
+      : 'rgba(99, 102, 241, 0.1)',
+  '&:hover': {
     bgcolor: 'primary.main',
-    color: '#fff' 
-  }
+    color: '#fff',
+  },
 };
 
 export const collaboratorsListSx = {
@@ -50,21 +53,30 @@ export const collaboratorsListSx = {
     bgcolor: 'transparent',
   },
   '&::-webkit-scrollbar-thumb': {
-    bgcolor: (theme: Theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+    bgcolor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.1)'
+        : 'rgba(0,0,0,0.1)',
     borderRadius: '10px',
     '&:hover': {
-      bgcolor: (theme: Theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
-    }
-  }
+      bgcolor: (theme: Theme) =>
+        theme.palette.mode === 'dark'
+          ? 'rgba(255,255,255,0.2)'
+          : 'rgba(0,0,0,0.2)',
+    },
+  },
 };
 
-export const addCollaboratorFormSx = { 
-  mb: 1, 
-  p: 2, 
-  borderRadius: '12px', 
-  bgcolor: (theme: Theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+export const addCollaboratorFormSx = {
+  mb: 1,
+  p: 2,
+  borderRadius: '12px',
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,0.05)'
+      : 'rgba(0,0,0,0.03)',
   border: '1px solid',
-  borderColor: 'primary.main'
+  borderColor: 'primary.main',
 };
 
 export const collaboratorItemSx = {
@@ -73,14 +85,23 @@ export const collaboratorItemSx = {
   justifyContent: 'space-between',
   p: 1.5,
   borderRadius: '12px',
-  bgcolor: (theme: Theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+  bgcolor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,0.03)'
+      : 'rgba(0,0,0,0.02)',
   border: '1px solid',
-  borderColor: (theme: Theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+  borderColor: (theme: Theme) =>
+    theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,0.05)'
+      : 'rgba(0,0,0,0.05)',
   transition: 'all 0.2s',
   '&:hover': {
-    bgcolor: (theme: Theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-    borderColor: 'divider'
-  }
+    bgcolor: (theme: Theme) =>
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.05)'
+        : 'rgba(0,0,0,0.04)',
+    borderColor: 'divider',
+  },
 };
 
 export const avatarSx = (hasAvatar: boolean) => ({
@@ -93,6 +114,7 @@ export const avatarSx = (hasAvatar: boolean) => ({
     return theme.palette.mode === 'dark' ? 'primary.main' : 'primary.light';
   },
   color: '#fff',
-  border: (theme: Theme) => hasAvatar ? `1px solid ${theme.palette.divider}` : 'none',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  border: (theme: Theme) =>
+    hasAvatar ? `1px solid ${theme.palette.divider}` : 'none',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
 });

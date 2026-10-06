@@ -21,18 +21,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Sileo Toast Design System Tokens */
-  --sileo-success-bg: #ecfdf5;
-  --sileo-success-text: #065f46;
-  --sileo-update-bg: #eff6ff;
-  --sileo-update-text: #1e40af;
-  --sileo-delete-bg: #fef2f2;
-  --sileo-delete-text: #991b1b;
-  --sileo-warning-bg: #fffbeb;
-  --sileo-warning-text: #92400e;
-  --sileo-error-bg: #fff1f2;
-  --sileo-error-text: #991b1b;
-  --sileo-desc-text: #475569;
 }
 
 html.dark {

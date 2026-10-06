@@ -7,7 +7,7 @@ import { incrementSyncVersion } from '@/redux/calendar/calendar.slice';
 import { API_BASE_URL } from '@/config/env.config';
 import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
-import { sileo, soundPlayer } from '@/utils';
+import { notify, soundPlayer } from '@/utils';
 import { RealTimeContext } from './RealTimeContext';
 
 export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -104,13 +104,13 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
             : `Comienza en ${data.minutesLeft} minutos (${timeFormatted})`;
 
         if (data.type === '1min') {
-          sileo.warning({
+          notify.warning({
             title: `¡Tarea urgente: ${data.title}!`,
             description,
             duration: 6000,
           });
         } else {
-          sileo.info({
+          notify.info({
             title: `Tarea próxima: ${data.title}`,
             description,
             duration: 5000,
@@ -182,7 +182,7 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
           .map((t) => `• ${t.taskTitle}`)
           .join('\n');
 
-        sileo.success({
+        notify.success({
           title: `⚡ ${data.count === 1 ? '1 tarea creada' : `${data.count} tareas creadas`} automáticamente`,
           description: taskNames,
           duration: 6000,
