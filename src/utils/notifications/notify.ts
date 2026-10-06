@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+export { toast };
 
 // Focusly's toasts (rendered by components/Notification/FocuslyToaster).
 // Short and quiet: successes go away fast, errors stay a little longer, and

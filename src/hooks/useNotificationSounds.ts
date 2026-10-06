@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { soundPlayer, playNotificationSound } from '@/utils';
-import Swal from 'sweetalert2';
+import { toast } from 'sonner';
 
 type SoundType =
   | 'taskUpcoming'
@@ -51,7 +51,6 @@ export const useNotificationSounds = (
       setIsPlaying(true);
       playNotificationSound(type, volume);
 
-      // Show test notification with professional Notion/Motion style
       if (showNotification) {
         const message = TEST_MESSAGES[type];
         const iconMap: Record<SoundType, string> = {
@@ -61,38 +60,9 @@ export const useNotificationSounds = (
           sessionEnd: '🏁',
         };
 
-        void Swal.fire({
-          html: `
-          <div style="display: flex; align-items: center; gap: 16px; font-family: inherit;">
-            <div class="motion-notification-icon-wrapper">${iconMap[type]}</div>
-            <div style="flex: 1; min-width: 0; text-align: left;">
-              <div class="motion-notification-title">${message.title}</div>
-              <div class="motion-notification-body">${message.body}</div>
-            </div>
-          </div>
-        `,
-          toast: true,
-          position: 'top-end',
-          timer: 5000,
-          timerProgressBar: false,
-          showConfirmButton: false,
-          showCloseButton: false,
-          showDenyButton: false,
-          background: 'transparent',
-          padding: '0',
-          customClass: {
-            popup: 'motion-notification',
-          },
-          showClass: {
-            popup: 'motion-slide-in',
-          },
-          hideClass: {
-            popup: 'motion-slide-out',
-          },
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer);
-            toast.addEventListener('mouseleave', Swal.resumeTimer);
-          },
+        toast(`${iconMap[type]} ${message.title}`, {
+          description: message.body,
+          duration: 4000,
         });
       }
 
