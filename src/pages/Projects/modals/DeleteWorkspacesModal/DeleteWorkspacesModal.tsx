@@ -43,9 +43,16 @@ export const DeleteWorkspacesModal: React.FC<DeleteWorkspacesModalProps> = ({
       itemNames={workspaces.map(
         (workspace) => workspace.title || UNTITLED_WORKSPACE_TITLE,
       )}
-      warning={t('workspaceLibrary.deleteWorkspacesDialog.warning', {
-        count: workspaces.length,
-      })}
+      warning={
+        isBulk
+          ? t('workspaceLibrary.deleteWorkspacesDialog.warning_other', {
+              count: workspaces.length,
+            })
+          : t('workspaceLibrary.deleteWorkspacesDialog.warning_one', {
+              count: 1,
+            })
+      }
+      warningNote={t('workspaceLibrary.deleteDialog.noWorkspacesWarning')}
       onConfirm={() =>
         onConfirmDelete(workspaces.map((workspace) => workspace.id))
       }

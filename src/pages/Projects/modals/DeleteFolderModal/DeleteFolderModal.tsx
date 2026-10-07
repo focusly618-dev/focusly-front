@@ -29,16 +29,19 @@ export const DeleteFolderModal: React.FC<DeleteFolderModalProps> = ({
   // Deleting a project also deletes every workspace inside it on the backend,
   // so warn about the data that will be lost.
   let warning: string;
+  let warningNote: string | undefined;
+
   if (workspaceCount === 0) {
     warning = t('workspaceLibrary.deleteDialog.noWorkspacesWarning');
-  } else if (isBulk) {
-    warning = t('workspaceLibrary.deleteDialog.bulkWorkspacesWarning', {
-      count: workspaceCount,
-    });
   } else {
-    warning = t('workspaceLibrary.deleteDialog.workspacesWarning', {
-      count: workspaceCount,
-    });
+    warning = isBulk
+      ? t('workspaceLibrary.deleteDialog.bulkWorkspacesWarning', {
+          count: workspaceCount,
+        })
+      : t('workspaceLibrary.deleteDialog.workspacesWarning', {
+          count: workspaceCount,
+        });
+    warningNote = t('workspaceLibrary.deleteDialog.noWorkspacesWarning');
   }
 
   return (
@@ -63,6 +66,7 @@ export const DeleteFolderModal: React.FC<DeleteFolderModalProps> = ({
       }
       itemNames={groups.map((group) => group.name)}
       warning={warning}
+      warningNote={warningNote}
       onConfirm={() => onConfirmDelete(groups.map((group) => group.id))}
     />
   );

@@ -16,6 +16,7 @@ export const ConfirmDialogHost = () => {
       description={request?.description ?? ''}
       confirmText={request?.confirmText}
       warning={request?.warning}
+      warningNote={request?.warningNote}
       onConfirm={async () => {
         await request?.onConfirm();
       }}

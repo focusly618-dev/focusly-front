@@ -14,7 +14,8 @@
     "connected": "Connected",
     "error": "Error",
     "connect": "Connect",
-    "all": "All"
+    "all": "All",
+    "create": "Create"
   },
   "errors": {
     "network": "Couldn't connect to the server. Check your internet connection and try again.",
@@ -1050,10 +1051,10 @@
       "description": "Are you sure you want to delete the project \"{{name}}\"?",
       "bulkTitle": "Delete {{count}} projects",
       "bulkDescription": "Are you sure you want to delete the following {{count}} projects?",
-      "workspacesWarning_one": "This project has {{count}} workspace inside. It will be deleted along with the project and cannot be recovered.",
-      "workspacesWarning_other": "This project has {{count}} workspaces inside. They will be deleted along with the project and cannot be recovered.",
-      "bulkWorkspacesWarning_one": "Data will be deleted: these projects contain {{count}} workspace that will also be permanently deleted.",
-      "bulkWorkspacesWarning_other": "Data will be deleted: these projects contain {{count}} workspaces in total that will also be permanently deleted.",
+      "workspacesWarning_one": "This project contains {{count}} workspace that will be permanently deleted.",
+      "workspacesWarning_other": "This project contains {{count}} workspaces that will be permanently deleted.",
+      "bulkWorkspacesWarning_one": "These projects contain {{count}} workspace in total that will be permanently deleted.",
+      "bulkWorkspacesWarning_other": "These projects contain {{count}} workspaces in total that will be permanently deleted.",
       "noWorkspacesWarning": "This action cannot be undone."
     },
     "deleteWorkspacesDialog": {
@@ -1061,8 +1062,8 @@
       "description": "Are you sure you want to delete \"{{name}}\"?",
       "bulkTitle": "Delete {{count}} workspaces",
       "bulkDescription": "Are you sure you want to delete the following {{count}} workspaces?",
-      "warning_one": "Its content will be permanently deleted. This action cannot be undone.",
-      "warning_other": "The content of {{count}} workspaces will be permanently deleted. This action cannot be undone."
+      "warning_one": "The content of this workspace will be permanently deleted.",
+      "warning_other": "The content of {{count}} workspaces will be permanently deleted."
     },
     "renameFolder": "Rename Folder",
     "customizeStyle": "Customize Style",
@@ -1072,9 +1073,29 @@
     },
     "folderName": "Folder Name",
     "iconShape": "Icon Shape",
+    "filled": "Filled",
     "solid": "Solid",
     "outlined": "Outlined",
+    "folderColor": "Folder Color",
     "colorAccent": "Color Accent",
+    "colors": {
+      "Red": "Red",
+      "Orange": "Orange",
+      "Amber": "Amber",
+      "Yellow": "Yellow",
+      "Green": "Green",
+      "Emerald": "Emerald",
+      "Teal": "Teal",
+      "Cyan": "Cyan",
+      "Sky": "Sky",
+      "Blue": "Blue",
+      "Indigo": "Indigo",
+      "Purple": "Purple",
+      "Fuchsia": "Fuchsia",
+      "Pink": "Pink",
+      "Rose": "Rose",
+      "Slate": "Slate"
+    },
     "createDialog": {
       "title": "Create New Folder"
     },
