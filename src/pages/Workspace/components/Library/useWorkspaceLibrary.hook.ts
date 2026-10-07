@@ -56,9 +56,9 @@ export const useWorkspaceLibrary = (selectedGroupId: string | null = null) => {
 
   // Separate, unpaginated fetch — the "All Folders" modal needs every group
   // to search/browse through, not just the current page shown in the root
-  // grid.
+  // grid. The sidebar loads the same query: read from the cache.
   const { data: allProjectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-first',
   });
 
   // Mutations

@@ -5,19 +5,19 @@ import {
 } from '@/api/GoogleCalendar/googleCalendarApi';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import {
+  refreshQueries,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
+import {
   CREATE_TASK,
   DELETE_TASK,
-  GET_TASKS,
   UPDATE_TASK,
 } from '@/pages/Tasks/Tasks.graphql';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import { addEvent, removeEvent } from '@/redux/calendar/calendar.slice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
-import {
-  useMutation,
-  type InternalRefetchQueriesInclude,
-} from '@apollo/client';
+import { useMutation } from '@apollo/client';
 
 export interface MeetState {
   title?: string;
@@ -104,22 +104,18 @@ export const useTaskOperations = () => {
     }
   };
 
+  // After a change, the task lists on screen are fetched again once (see
+  // refreshQueries): `refresh` names them, by default every task list.
   const executeCreateTask = async (
     createTaskInput: Record<string, unknown>,
-    extraRefetchQueries?: InternalRefetchQueriesInclude,
+    refresh: string[] = TASK_QUERIES,
   ) => {
     if (!user?.id) throw new Error('User not authenticated');
 
-    const defaultRefetchQueries: InternalRefetchQueriesInclude = [
-      { query: GET_TASKS, variables: { userId: user.id } },
-    ];
-
-    const refetchQueries = extraRefetchQueries || defaultRefetchQueries;
-
     const { data } = await createTaskMutation({
       variables: { createTaskInput },
-      refetchQueries,
     });
+    await refreshQueries(refresh);
 
     if (data?.createTask) {
       const mappedTask = mapResponseToTask(data.createTask);
@@ -129,16 +125,18 @@ export const useTaskOperations = () => {
     return data;
   };
 
+  // The updated task changes in every cached list by itself (same id);
+  // `refresh` is for changes that move it between lists.
   const executeUpdateTask = async (
     updateTaskInput: Record<string, unknown>,
-    extraRefetchQueries?: InternalRefetchQueriesInclude,
+    refresh: string[] = [],
   ) => {
     if (!user?.id) throw new Error('User not authenticated');
 
     const { data } = await updateTaskMutation({
       variables: { updateTaskInput },
-      refetchQueries: extraRefetchQueries || [],
     });
+    if (refresh.length) await refreshQueries(refresh);
 
     if (data?.updateTask) {
       const mappedTask = mapResponseToTask(data.updateTask);
@@ -153,7 +151,7 @@ export const useTaskOperations = () => {
     options?: {
       googleEventId?: string;
       isGoogleTask?: boolean;
-      extraRefetchQueries?: InternalRefetchQueriesInclude;
+      refresh?: string[];
     },
   ) => {
     if (!user?.id) throw new Error('User not authenticated');
@@ -193,15 +191,10 @@ export const useTaskOperations = () => {
           }
         }
 
-        const defaultRefetchQueries: InternalRefetchQueriesInclude = [
-          { query: GET_TASKS, variables: { userId: user.id } },
-          { query: GET_WORKSPACES, variables: { search: '' } },
-        ];
-
-        await deleteTaskMutation({
-          variables: { id: taskId },
-          refetchQueries: options?.extraRefetchQueries || defaultRefetchQueries,
-        });
+        await deleteTaskMutation({ variables: { id: taskId } });
+        await refreshQueries(
+          options?.refresh ?? [...TASK_QUERIES, ...WORKSPACE_QUERIES],
+        );
       } else {
         const eventId = options.googleEventId || taskId;
         await deleteGoogleEvent(eventId);

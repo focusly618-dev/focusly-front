@@ -1617,5 +1617,14 @@
       "done": "Documento eliminado",
       "failed": "No se pudo eliminar el documento"
     }
+  },
+  "aiModels": {
+    "auto": "Auto",
+    "autoHint": "Lumina elige según tu mensaje",
+    "fast": "Rápido",
+    "fastHint": "Respuestas y acciones sencillas",
+    "reasoning": "Razonamiento",
+    "reasoningHint": "Planes, análisis y documentos",
+    "select": "Seleccionar modelo"
   }
 }

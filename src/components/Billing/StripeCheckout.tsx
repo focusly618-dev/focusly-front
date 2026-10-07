@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -72,16 +72,28 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
   const elements = useElements();
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [paid, setPaid] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Never two charges: checked and set in the same click, before React
+  // re-renders the disabled button (state alone lets a double click, or
+  // Enter pressed while clicking, confirm twice).
+  const lock = useRef<'idle' | 'confirming' | 'paid'>('idle');
 
   const setBusyState = (value: boolean) => {
     setBusy(value);
     onBusyChange?.(value);
   };
 
+  const unlock = (message: string) => {
+    lock.current = 'idle';
+    setError(message);
+    setBusyState(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements || busy) return;
+    if (!stripe || !elements || lock.current !== 'idle') return;
+    lock.current = 'confirming';
     setBusyState(true);
     setError(null);
 
@@ -104,13 +116,12 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
 
       if (result.error) {
         // Card and form errors come already worded (and translated) by Stripe.
-        setError(
+        unlock(
           result.error.type === 'card_error' ||
             result.error.type === 'validation_error'
             ? (result.error.message ?? t('billing.checkout.error'))
             : t('billing.checkout.error'),
         );
-        setBusyState(false);
         return;
       }
 
@@ -119,15 +130,16 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
           ? result.paymentIntent?.status
           : result.setupIntent?.status;
       if (status === 'succeeded' || status === 'processing') {
+        // Paid (or being paid by the bank): the form stays locked for good.
+        lock.current = 'paid';
+        setPaid(true);
         setBusyState(false);
         onPaid();
         return;
       }
-      setError(t('billing.checkout.error'));
-      setBusyState(false);
+      unlock(t('billing.checkout.error'));
     } catch {
-      setError(t('billing.checkout.error'));
-      setBusyState(false);
+      unlock(t('billing.checkout.error'));
     }
   };
 
@@ -226,7 +238,7 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
       >
         <Button
           onClick={onBack}
-          disabled={busy}
+          disabled={busy || paid}
           color="inherit"
           sx={{ textTransform: 'none', fontWeight: 600 }}
         >
@@ -235,7 +247,7 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
         <Button
           type="submit"
           variant="contained"
-          disabled={!stripe || !elements || !ready || busy}
+          disabled={!stripe || !elements || !ready || busy || paid}
           sx={{
             minWidth: 190,
             py: 1,

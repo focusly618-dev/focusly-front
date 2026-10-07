@@ -46,7 +46,6 @@ import type { UserSettings } from '@/api/User/apiUser.types';
 import {
   LuminaAnimatedFace,
   LuminaOrb,
-  ClaudeIcon,
   GeminiIcon,
   LuminaSpeakingWave,
 } from '@/components/ui';
@@ -116,6 +115,26 @@ import {
   convertDocxToMarkdown,
   readFileAsText,
 } from '@/pages/Workspace/components/Editor/components/EditorHeader/components/ImportContentModal/documentConverters';
+
+// Tiers the backend maps to its current Gemini models.
+type AIModelChoice = 'auto' | 'gemini-flash-lite' | 'gemini-flash';
+const AI_MODEL_OPTIONS: {
+  value: AIModelChoice;
+  labelKey: string;
+  hintKey: string;
+}[] = [
+  { value: 'auto', labelKey: 'aiModels.auto', hintKey: 'aiModels.autoHint' },
+  {
+    value: 'gemini-flash-lite',
+    labelKey: 'aiModels.fast',
+    hintKey: 'aiModels.fastHint',
+  },
+  {
+    value: 'gemini-flash',
+    labelKey: 'aiModels.reasoning',
+    hintKey: 'aiModels.reasoningHint',
+  },
+];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -530,7 +549,8 @@ export const AskAI: React.FC = () => {
   const billing = useBilling();
   const isTrialLimitReached = !billing.isPro && billing.remaining <= 0;
 
-  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
+  // 'auto': the backend picks the light or the strong model per message.
+  const [selectedModel, setSelectedModel] = useState<AIModelChoice>('auto');
   const [modelAnchor, setModelAnchor] = useState<null | HTMLElement>(null);
   const [selectedContext, setSelectedContext] =
     useState<AIContextSelector | null>(null);
@@ -601,7 +621,7 @@ export const AskAI: React.FC = () => {
       skip: !user?.id,
     },
   );
-  const workspacesList = workspacesData?.workspaces || [];
+  const workspacesList = workspacesData?.result?.workspaces || [];
 
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -858,23 +878,6 @@ export const AskAI: React.FC = () => {
     return `Good evening, ${name} 🌙`;
   };
 
-  const getModelLabel = (model: string) => {
-    switch (model) {
-      case 'claude-3-5-sonnet':
-        return 'Claude 3.5 Sonnet';
-      case 'claude-3-5-haiku':
-        return 'Claude 3.5 Haiku';
-      case 'claude-3-opus':
-        return 'Claude 3 Opus';
-      case 'gemini-2.5-flash-lite':
-        return 'Gemini Flash Lite';
-      case 'gemini-2.5-flash':
-        return 'Gemini Flash 2.5';
-      case 'gemini-1.5-flash':
-        return 'Gemini Flash 1.5';
-    }
-  };
-
   const biggestTask = tasks.reduce(
     (prev, curr) =>
       (curr.estimated_end_date &&
@@ -1072,7 +1075,9 @@ export const AskAI: React.FC = () => {
 
       try {
         const streamPromise = fetchChatStreamResponse(
-          history,
+          // A thread the backend already has needs only the new message; a
+          // retry sends its truncated history (the replies after it go).
+          activeConversationId && !customHistory ? history.slice(-1) : history,
           biggestTask
             ? {
                 title: biggestTask.title,
@@ -1085,7 +1090,7 @@ export const AskAI: React.FC = () => {
               }
             : null,
           undefined,
-          selectedModel,
+          selectedModel === 'auto' ? undefined : selectedModel,
           activeConversationId || undefined,
           selectedContext?.type || null,
           selectedContext?.id || null,
@@ -2433,10 +2438,10 @@ export const AskAI: React.FC = () => {
                   <PromptInputButton
                     onClick={(e) => setModelAnchor(e.currentTarget)}
                     disabled={isTrialLimitReached}
-                    title="Seleccionar modelo"
+                    title={t('aiModels.select')}
                   >
-                    {selectedModel.startsWith('claude') ? (
-                      <ClaudeIcon sx={{ fontSize: 14 }} />
+                    {selectedModel === 'auto' ? (
+                      <AutoAwesomeIcon sx={{ fontSize: 14 }} />
                     ) : (
                       <GeminiIcon sx={{ fontSize: 14 }} />
                     )}
@@ -2444,7 +2449,10 @@ export const AskAI: React.FC = () => {
                       component="span"
                       sx={{ display: { xs: 'none', sm: 'inline' } }}
                     >
-                      {getModelLabel(selectedModel)}
+                      {t(
+                        AI_MODEL_OPTIONS.find((o) => o.value === selectedModel)
+                          ?.labelKey ?? 'aiModels.auto',
+                      )}
                     </Box>
                     <ArrowDownIcon sx={{ fontSize: 14 }} />
                   </PromptInputButton>
@@ -2498,75 +2506,43 @@ export const AskAI: React.FC = () => {
                 },
               }}
             >
-              {/* Claude models */}
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('claude-3-5-sonnet');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'claude-3-5-sonnet'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
-                Claude 3.5 Sonnet (Recommended)
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('claude-3-5-haiku');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'claude-3-5-haiku'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
-                Claude 3.5 Haiku (Fast)
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('claude-3-opus');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'claude-3-opus'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <ClaudeIcon sx={{ fontSize: 16, color: '#cc6543', mr: 1.5 }} />
-                Claude 3 Opus (Advanced)
-              </MenuItem>
-              <Divider sx={{ my: 0.5 }} />
-              {/* Gemini models */}
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('gemini-2.5-flash-lite');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'gemini-2.5-flash-lite'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
-                Gemini 2.5 Flash Lite
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('gemini-2.5-flash');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'gemini-2.5-flash'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
-                Gemini 2.5 Flash
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSelectedModel('gemini-1.5-flash');
-                  setModelAnchor(null);
-                }}
-                selected={selectedModel === 'gemini-1.5-flash'}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
-              >
-                <GeminiIcon sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }} />
-                Gemini 1.5 Flash
-              </MenuItem>
+              {AI_MODEL_OPTIONS.map((option) => (
+                <MenuItem
+                  key={option.value}
+                  onClick={() => {
+                    setSelectedModel(option.value);
+                    setModelAnchor(null);
+                  }}
+                  selected={selectedModel === option.value}
+                  sx={{ fontSize: '12px', fontWeight: 600, py: 1 }}
+                >
+                  {option.value === 'auto' ? (
+                    <AutoAwesomeIcon
+                      sx={{ fontSize: 16, color: '#008767', mr: 1.5 }}
+                    />
+                  ) : (
+                    <GeminiIcon
+                      sx={{ fontSize: 16, color: '#137fec', mr: 1.5 }}
+                    />
+                  )}
+                  <Box>
+                    <Box component="span" sx={{ display: 'block' }}>
+                      {t(option.labelKey)}
+                    </Box>
+                    <Box
+                      component="span"
+                      sx={{
+                        display: 'block',
+                        fontSize: '11px',
+                        fontWeight: 400,
+                        color: 'text.secondary',
+                      }}
+                    >
+                      {t(option.hintKey)}
+                    </Box>
+                  </Box>
+                </MenuItem>
+              ))}
             </Menu>
           </Box>
 

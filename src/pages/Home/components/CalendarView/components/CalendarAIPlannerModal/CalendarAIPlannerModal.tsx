@@ -29,6 +29,7 @@ import { format, startOfDay, addDays } from 'date-fns';
 import { useMutation } from '@apollo/client';
 import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
+import { isPlanLimitError } from '@/api/Billing/planLimit';
 
 interface CalendarAIPlannerModalProps {
   open: boolean;
@@ -119,6 +120,11 @@ export const CalendarAIPlannerModal: React.FC<CalendarAIPlannerModalProps> = ({
           const res = await planCalendarAI(pendingTasks, freeSlots);
           setProposedEvents(res.events || []);
         } catch (e) {
+          // The Pro plans are already on screen.
+          if (isPlanLimitError(e)) {
+            onClose();
+            return;
+          }
           console.error('Error generating AI schedule:', e);
           notify.error({
             title: t('calendar.planningErrorTitle'),

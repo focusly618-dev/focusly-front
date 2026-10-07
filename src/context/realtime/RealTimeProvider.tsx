@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useSelector, useDispatch } from 'react-redux';
-import { useApolloClient } from '@apollo/client';
 import type { RootState } from '@/redux/store';
-import { incrementSyncVersion } from '@/redux/calendar/calendar.slice';
 import { API_BASE_URL } from '@/config/env.config';
-import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
+import {
+  refreshQueries,
+  requestCalendarSync,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
 import { notify, soundPlayer } from '@/utils';
 import { RealTimeContext } from './RealTimeContext';
 
@@ -14,7 +16,6 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const dispatch = useDispatch();
-  const apolloClient = useApolloClient();
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id;
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -57,20 +58,14 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
     newSocket.on('schedule_updated', (data) => {
       console.log('[REALTIME] Received schedule_updated event:', data);
 
-      // 1. Refetch current active tasks and workspaces queries
-      apolloClient
-        .refetchQueries({
-          include: [GET_TASKS, GET_WORKSPACES],
-        })
-        .catch((err) => {
-          console.error(
-            '[REALTIME] Failed to refetch queries via Apollo:',
-            err,
-          );
-        });
-
-      // 2. Trigger Google Calendar refetch by incrementing version
-      dispatch(incrementSyncVersion());
+      // The lists on screen and the Google Calendar events. When this tab
+      // made the change, it refreshed them already: skipped then.
+      refreshQueries([...TASK_QUERIES, ...WORKSPACE_QUERIES], {
+        fromServer: true,
+      }).catch((err) => {
+        console.error('[REALTIME] Failed to refetch queries via Apollo:', err);
+      });
+      requestCalendarSync(dispatch, { fromServer: true });
     });
 
     newSocket.on(
@@ -188,8 +183,9 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
           duration: 6000,
         });
 
-        // Refrescar la lista de tareas para que aparezcan las nuevas
-        apolloClient.refetchQueries({ include: [GET_TASKS] }).catch((err) => {
+        // Refrescar la lista de tareas para que aparezcan las nuevas (son
+        // tareas nuevas del servidor, no un eco de un cambio de esta pestaña).
+        refreshQueries(TASK_QUERIES).catch((err) => {
           console.error(
             '[REALTIME] Failed to refetch tasks after automation:',
             err,
@@ -204,7 +200,7 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
       setSocket(null);
       console.log('[REALTIME] Cleaned up socket connection');
     };
-  }, [userId, apolloClient, dispatch, user?.pushEnabled]);
+  }, [userId, dispatch, user?.pushEnabled]);
 
   return (
     <RealTimeContext.Provider value={socket}>

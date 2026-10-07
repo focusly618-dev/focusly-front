@@ -1,4 +1,9 @@
 import {
+  refreshQueries,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
+import {
   deleteGoogleEvent,
   fetchGoogleEvents,
   updateGoogleEvent,
@@ -15,7 +20,6 @@ import {
   GET_TASKS_CALENDAR,
   UPDATE_TASK,
 } from '@/pages/Tasks/Tasks.graphql';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
   incrementSyncVersion,
   removeEvent,
@@ -627,17 +631,8 @@ export const useCalendarView = () => {
 
         await deleteTaskMutation({
           variables: { id: taskId },
-          refetchQueries: [
-            {
-              query: GET_TASKS_CALENDAR,
-              variables: {
-                userId: user?.id,
-                filters: { startDate: dateRange.start, endDate: dateRange.end },
-              },
-            },
-            { query: GET_WORKSPACES, variables: { search: '' } },
-          ],
         });
+        await refreshQueries([...TASK_QUERIES, ...WORKSPACE_QUERIES]);
       } else {
         const googleEventId =
           virtualEvent?.google_event_id || virtualEvent?.id || taskId;

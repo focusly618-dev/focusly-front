@@ -19,11 +19,11 @@ export const useWorkspaceActions = () => {
       await client.mutate({
         mutation: REMOVE_WORKSPACE,
         variables: { id },
-        refetchQueries: ['GetWorkspacesPaginated', 'GetWorkspaces'],
+        // Only the document leaves the cache (lists skip it right away);
+        // evicting the lists too made each one refetch twice.
+        refetchQueries: ['GetWorkspacesPaginated'],
         update(cache) {
           cache.evict({ id: cache.identify({ __typename: 'Workspace', id }) });
-          cache.evict({ fieldName: 'workspacesPaginated' });
-          cache.evict({ fieldName: 'workspaces' });
           cache.gc();
         },
       });

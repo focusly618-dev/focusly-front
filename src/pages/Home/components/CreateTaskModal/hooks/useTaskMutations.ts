@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { GET_TASKS } from '@/pages/Tasks/Tasks.graphql';
+import {
+  refreshQueries,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
 import { REMOVE_WORKSPACE } from '@/pages/Workspace/Workspace.graphql';
 import { notify, handleMutationError } from '@/utils';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
@@ -241,8 +245,8 @@ export const useTaskMutations = ({
     try {
       await removeWorkspaceMutation({
         variables: { id: workspaceId },
-        refetchQueries: [{ query: GET_TASKS, variables: { userId: user?.id } }],
       });
+      await refreshQueries([...TASK_QUERIES, ...WORKSPACE_QUERIES]);
     } catch (error) {
       handleMutationError(
         error,

@@ -118,6 +118,48 @@ describe('UpgradeModal', () => {
     expect(await screen.findByText('billing.done.title')).toBeInTheDocument();
   });
 
+  it('a double click on "Get Pro" starts one checkout', async () => {
+    let resolve!: (value: unknown) => void;
+    api.createSubscription.mockImplementation(
+      () => new Promise((r) => (resolve = r)),
+    );
+    await renderModal();
+    const cta = screen.getByText('billing.upgrade.cta');
+    await act(async () => {
+      fireEvent.click(cta);
+      fireEvent.click(cta);
+      fireEvent.click(cta);
+    });
+    expect(api.createSubscription).toHaveBeenCalledTimes(1);
+    await act(async () =>
+      resolve({
+        subscription_id: 'sub_1',
+        client_secret: 'pi_secret',
+        intent_type: 'payment',
+        status: 'incomplete',
+        amount: 999,
+        currency: 'usd',
+        interval: 'month',
+      }),
+    );
+    expect(screen.getByText('STRIPE_FORM $9.99')).toBeInTheDocument();
+  });
+
+  it('a payment reported twice activates the plan once', async () => {
+    await renderModal();
+    await act(async () => {
+      fireEvent.click(screen.getByText('billing.upgrade.cta'));
+    });
+    api.getStatus.mockResolvedValue(status({ plan: 'pro' }));
+    const payButton = screen.getByText('PAY');
+    await act(async () => {
+      fireEvent.click(payButton);
+      fireEvent.click(payButton);
+    });
+    expect(await screen.findByText('billing.done.title')).toBeInTheDocument();
+    expect(api.createSubscription).toHaveBeenCalledTimes(1);
+  });
+
   it('already Pro elsewhere: no second charge', async () => {
     api.createSubscription.mockRejectedValue({
       isAxiosError: true,

@@ -29,7 +29,7 @@ export const Workspace = ({
     useState(false);
 
   const [createProjectGroup] = useMutation(CREATE_PROJECT_GROUP, {
-    refetchQueries: ['GetProjectGroups', 'GetWorkspaces'],
+    refetchQueries: ['GetProjectGroups', 'GetWorkspacesPaginated'],
   });
 
   const handleCreateProject = async (name: string, color: string) => {

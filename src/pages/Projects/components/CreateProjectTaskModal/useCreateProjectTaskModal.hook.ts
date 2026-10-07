@@ -163,16 +163,9 @@ export function useCreateProjectTaskModal({
 
   const [createWorkspaceMutation, { loading: isCreatingWorkspace }] =
     useMutation(CREATE_WORKSPACE, {
-      refetchQueries: [
-        'GetWorkspacesPaginated',
-        'GetWorkspaces',
-        'GetProjectGroups',
-      ],
-      update(cache) {
-        cache.evict({ fieldName: 'workspacesPaginated' });
-        cache.evict({ fieldName: 'workspaces' });
-        cache.gc();
-      },
+      // refetchQueries alone: evicting the lists as well made each list on
+      // screen refetch itself on top of it (every list fetched twice).
+      refetchQueries: ['GetWorkspacesPaginated', 'GetProjectGroups'],
     });
 
   const handleCreateWorkspace = async (customTitle?: string) => {

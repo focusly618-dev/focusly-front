@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { UPDATE_WORKSPACE } from '@/pages/Workspace/Workspace.graphql';
-import { GET_TASKS } from '../../../Tasks.graphql';
+import {
+  refreshQueries,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
 import { notify, handleMutationError } from '@/utils';
 import { useTaskOperations } from '@/hooks/useTaskOperations';
 import {
@@ -266,11 +270,7 @@ export const useTaskMutations = ({
     }
 
     try {
-      const data = await executeUpdateTask(updateInput, [
-        'GetTasks',
-        'GetTasksTitles',
-        'GetTasksByUserPaginated',
-      ]);
+      const data = await executeUpdateTask(updateInput, TASK_QUERIES);
       if (data?.updateTask) {
         notify.success({
           title: 'Task updated',
@@ -324,8 +324,8 @@ export const useTaskMutations = ({
             taskId: null,
           },
         },
-        refetchQueries: [{ query: GET_TASKS, variables: { userId: user?.id } }],
       });
+      await refreshQueries([...TASK_QUERIES, ...WORKSPACE_QUERIES]);
       notify.success({
         title: 'Workspace unlinked',
       });

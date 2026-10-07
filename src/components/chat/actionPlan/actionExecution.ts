@@ -4,11 +4,7 @@ import type {
   OperationVariables,
 } from '@apollo/client';
 import { format } from 'date-fns';
-import {
-  GET_TASK_DETAIL,
-  GET_TASKS,
-  GET_TASKS_TITLES,
-} from '@/pages/Tasks/Tasks.graphql';
+import { GET_TASK_DETAIL } from '@/pages/Tasks/Tasks.graphql';
 import { applySubtaskOps, toSubtaskRecords } from './subtaskOps';
 import {
   createGoogleEvent,
@@ -93,15 +89,11 @@ export interface ActionResult {
   meetUrl?: string;
 }
 
-const taskRefetches = (userId: string) => [
-  { query: GET_TASKS, variables: { userId } },
-  { query: GET_TASKS_TITLES, variables: { userId, limit: 24, offset: 0 } },
-];
-
 /**
  * Executes a single parsed action against the right GraphQL mutation.
  * Shared by the single-card flow and the multi-task plan modal so a fix
- * here (date handling, payload shape) never has to be made twice.
+ * here (date handling, payload shape) never has to be made twice. It doesn't
+ * refetch the lists: the caller does it once, after the whole plan.
  */
 export const executeSingleAction = async (
   action: ParsedLuminaAction,
@@ -173,13 +165,6 @@ export const executeSingleAction = async (
           skip_scheduling: true,
         },
       },
-      refetchQueries: [
-        { query: GET_TASKS, variables: { userId: ctx.userId } },
-        {
-          query: GET_TASKS_TITLES,
-          variables: { userId: ctx.userId, limit: 24, offset: 0 },
-        },
-      ],
     });
     return { id: res.data?.createTask?.id };
   }
@@ -258,7 +243,6 @@ export const executeSingleAction = async (
       variables: {
         updateTaskInput,
       },
-      refetchQueries: taskRefetches(ctx.userId),
     });
     return { id: res.data?.updateTask?.id };
   }
@@ -282,7 +266,6 @@ export const executeSingleAction = async (
     );
     const res = await ctx.updateTask({
       variables: { updateTaskInput: { id: action.payload.id, subtasks } },
-      refetchQueries: taskRefetches(ctx.userId),
     });
     return { id: res.data?.updateTask?.id };
   }
@@ -296,7 +279,6 @@ export const executeSingleAction = async (
     // The backend also removes the task's Google Calendar event, if synced.
     await ctx.deleteTask({
       variables: { id: action.payload.id },
-      refetchQueries: taskRefetches(ctx.userId),
     });
     ctx.onTaskDeleted?.(action.payload.id);
     return { id: action.payload.id };
@@ -376,7 +358,6 @@ export const executeSingleAction = async (
               emoji: action.payload.emoji || '📁',
             },
           },
-          refetchQueries: ['GetProjectGroups', 'GetProjectGroupsPaginated'],
         });
         targetGroupId = projectRes.data?.createProjectGroup?.id || null;
       } catch (err) {
@@ -393,11 +374,6 @@ export const executeSingleAction = async (
           saveStatus: true,
         },
       },
-      refetchQueries: [
-        'GetWorkspacesPaginated',
-        'GetProjectGroups',
-        'GetProjectGroupsPaginated',
-      ],
     });
     return {
       id: res.data?.createWorkspace?.id,
@@ -417,7 +393,6 @@ export const executeSingleAction = async (
           emoji: action.payload.emoji || '📁',
         },
       },
-      refetchQueries: ['GetProjectGroups', 'GetProjectGroupsPaginated'],
     });
     return { id: res.data?.createProjectGroup?.id };
   }

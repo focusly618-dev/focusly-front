@@ -74,10 +74,9 @@ describe.each([
     useTaskMutations: useTaskDetailModalMutations,
     buildState: detailState,
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ])(
   'useTaskMutations.handleSave ($name) — Meet link generation failure',
-  (ctx: any) => {
+  (ctx) => {
     beforeEach(() => {
       vi.clearAllMocks();
     });

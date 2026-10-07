@@ -60,6 +60,9 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   const [checkout, setCheckout] = useState<SubscriptionResponse | null>(null);
   const [busy, setBusy] = useState(false);
 
+  // A payment is reported once (see handlePaid).
+  const activatingRef = useRef(false);
+
   // Every opening starts at the plans (or the payment, when asked).
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
@@ -68,6 +71,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       setStep(firstStep);
       setCheckout(null);
       setBusy(false);
+      activatingRef.current = false;
     }
   }
 
@@ -103,14 +107,22 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     }
   };
 
+  // Set in the click itself: a double click starts one checkout.
+  const startingRef = useRef(false);
   const choosePro = async () => {
+    if (startingRef.current) return;
     if (!paymentsAvailable) {
       notify.error({ title: t('billing.upgrade.notConfigured') });
       return;
     }
+    startingRef.current = true;
     setStarting(true);
-    await requestCheckout();
-    setStarting(false);
+    try {
+      await requestCheckout();
+    } finally {
+      startingRef.current = false;
+      setStarting(false);
+    }
   };
 
   // Opened straight on the payment (from the profile's Pro card). Once per
@@ -128,6 +140,9 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   }, [open, step]);
 
   const handlePaid = async () => {
+    // Reported once per payment, however many times the form calls it.
+    if (activatingRef.current) return;
+    activatingRef.current = true;
     setStep('activating');
     if (await billing.waitForPro()) {
       setStep('done');

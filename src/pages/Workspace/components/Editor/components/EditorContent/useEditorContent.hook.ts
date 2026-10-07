@@ -1,5 +1,10 @@
+import {
+  refreshQueries,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
 import { useState } from 'react';
-import { useMutation, type DocumentNode } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useAppSelector } from '@/redux/hooks';
 import { useBilling } from '@/hooks/useBilling';
 import type {
@@ -13,13 +18,8 @@ import {
   getFriendlyErrorMessage,
 } from '@/utils';
 import { fetchEditResult } from '@/api/AI/apiAI';
-import {
-  CREATE_TASK,
-  GET_TASKS,
-  GET_TASKS_TITLES,
-} from '@/pages/Tasks/Tasks.graphql';
+import { CREATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
-import { GET_WORKSPACE_BY_ID } from '@/pages/Workspace/Workspace.graphql';
 import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 import type { AITaskPreviewData } from '../AITaskPreviewModal/AITaskPreviewModal';
 
@@ -262,29 +262,15 @@ Text: "${selectedText}"`;
         workspace_id: currentWorkspaceId || undefined,
       };
 
-      const refetchList: (
-        | string
-        | { query: DocumentNode; variables?: Record<string, unknown> }
-      )[] = [
-        { query: GET_TASKS, variables: { userId: user.id || '' } },
-        {
-          query: GET_TASKS_TITLES,
-          variables: { userId: user.id || '', limit: 24, offset: 0 },
-        },
-        'GetWorkspacesPaginated',
-        'GetWorkspaces',
-      ];
-      if (currentWorkspaceId) {
-        refetchList.push({
-          query: GET_WORKSPACE_BY_ID,
-          variables: { id: currentWorkspaceId },
-        });
-      }
-
       const { data } = await createTaskMutation({
         variables: { createTaskInput },
-        refetchQueries: refetchList,
       });
+      // The task lists, the documents and this document, fetched again once.
+      await refreshQueries([
+        ...TASK_QUERIES,
+        ...WORKSPACE_QUERIES,
+        'GetWorkspaceById',
+      ]);
 
       if (data?.createTask) {
         const createdTask = data.createTask as unknown as TaskSearchItems;

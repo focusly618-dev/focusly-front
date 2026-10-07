@@ -1,11 +1,15 @@
+import {
+  PROJECT_QUERIES,
+  refreshQueries,
+  requestCalendarSync,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
 import { useMemo, useRef, useState } from 'react';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { removeTask } from '@/redux/tasks/task.slice';
-import {
-  incrementSyncVersion,
-  removeEvent,
-} from '@/redux/calendar/calendar.slice';
+import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 import type { UserSettings } from '@/api/User/apiUser.types';
 import {
@@ -232,6 +236,7 @@ export const useActionPlan = (actions: ParsedLuminaAction[]) => {
     setIsRunning(true);
 
     const refs = await loadRefs();
+    let calendarChanged = false;
     const nextStatuses = [...statuses];
     const nextIds = [...createdIds];
     const nextLinks = [...links];
@@ -268,8 +273,10 @@ export const useActionPlan = (actions: ParsedLuminaAction[]) => {
             client,
             onTaskDeleted: (id) => dispatch(removeTask({ id })),
             onEventDeleted: (id) => dispatch(removeEvent({ id })),
-            // The calendar view refetches its events.
-            onCalendarChanged: () => dispatch(incrementSyncVersion()),
+            // The calendar reloads once, after the whole plan.
+            onCalendarChanged: () => {
+              calendarChanged = true;
+            },
           });
           recordResult(resolved, result, refs);
           if (result.url || result.meetUrl) {
@@ -291,6 +298,16 @@ export const useActionPlan = (actions: ParsedLuminaAction[]) => {
 
     commit();
     setIsRunning(false);
+    // The lists on screen, fetched again once for the whole plan (each
+    // action used to refetch every list, and the server echoed each one).
+    refreshQueries([
+      ...TASK_QUERIES,
+      ...WORKSPACE_QUERIES,
+      ...PROJECT_QUERIES,
+    ]).catch((err) =>
+      console.warn('Could not refresh the lists after the plan:', err),
+    );
+    if (calendarChanged) requestCalendarSync(dispatch);
     try {
       localStorage.setItem(
         storageKey,

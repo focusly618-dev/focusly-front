@@ -1,9 +1,13 @@
+import {
+  refreshQueries,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { useMutation } from '@apollo/client';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
-import { GET_TASKS, DELETE_TASK } from '@/pages/Tasks/Tasks.graphql';
+import { DELETE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import {
   removeTask,
   upsertTask as upsertTaskRedux,
@@ -27,7 +31,6 @@ export const useHome = () => {
   const dispatch = useAppDispatch();
   const { tasks } = useAppSelector((state) => state.task);
   const { reduxEvents } = useAppSelector((state) => state.calendar);
-  const { user } = useAppSelector((state) => state.auth);
 
   const activeTab = (searchParams.get('tab') as TaskBar) || TaskBar.DailyPlan;
 
@@ -234,11 +237,8 @@ export const useHome = () => {
 
         await deleteTaskMutation({
           variables: { id: targetId },
-          refetchQueries: [
-            { query: GET_TASKS, variables: { userId: user?.id || '' } },
-            { query: GET_WORKSPACES, variables: { search: '' } },
-          ],
         });
+        await refreshQueries([...TASK_QUERIES, ...WORKSPACE_QUERIES]);
       } else {
         // Pure Google Event — Delete only in Google Calendar
         const eventId = targetTask?.google_event_id || targetId;

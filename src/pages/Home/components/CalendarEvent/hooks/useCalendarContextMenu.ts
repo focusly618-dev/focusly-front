@@ -1,11 +1,14 @@
+import {
+  refreshQueries,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
 import { useMutation } from '@apollo/client';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
 import {
   CREATE_TASK,
   UPDATE_TASK,
   DELETE_TASK,
-  GET_TASKS,
 } from '@/pages/Tasks/Tasks.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
@@ -192,11 +195,8 @@ export const useCalendarContextMenu = (
 
       await deleteTask({
         variables: { id: taskId },
-        refetchQueries: [
-          { query: GET_TASKS, variables: { userId: user.id } },
-          { query: GET_WORKSPACES, variables: { search: '' } },
-        ],
       });
+      await refreshQueries([...TASK_QUERIES, ...WORKSPACE_QUERIES]);
       dispatch(removeTask({ id: taskId }));
       dispatch(removeEvent({ id: taskId }));
       notify.success({

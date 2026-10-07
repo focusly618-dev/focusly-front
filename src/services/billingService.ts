@@ -26,6 +26,10 @@ class BillingService {
   private state: BillingState = INITIAL;
   private listeners = new Set<() => void>();
   private inflight: Promise<BillingStatus | null> | null = null;
+  private inflightRefresh = false;
+  /** A plain read waiting to be sent (see load). */
+  private queuedRead: ((status: Promise<BillingStatus | null>) => void) | null =
+    null;
 
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -50,14 +54,49 @@ class BillingService {
   load(userId: string, { refresh = false } = {}) {
     if (this.state.userId !== userId) {
       this.inflight = null;
+      this.dropQueuedRead();
       this.set({ ...INITIAL, userId });
     }
-    if (this.inflight && !refresh) return this.inflight;
+    if (this.inflight && (!refresh || this.inflightRefresh))
+      return this.inflight;
     if (this.state.status && !refresh)
       return Promise.resolve(this.state.status);
 
+    if (!refresh) {
+      // Sent a moment later: when a screen also asks for a refresh as it
+      // opens (the profile's billing section), that one request answers
+      // both instead of a plain read plus a refresh.
+      const queued = new Promise<BillingStatus | null>((resolve) => {
+        this.queuedRead = resolve;
+      });
+      this.inflight = queued;
+      this.inflightRefresh = false;
+      queueMicrotask(() => {
+        const resolve = this.queuedRead;
+        if (!resolve) return;
+        this.queuedRead = null;
+        resolve(this.request(userId, false));
+      });
+      return queued;
+    }
+
+    const request = this.request(userId, true);
+    const queuedRead = this.queuedRead;
+    this.queuedRead = null;
+    queuedRead?.(request);
+    return request;
+  }
+
+  /** Whoever awaits a read that won't be sent gets no status. */
+  private dropQueuedRead() {
+    const resolve = this.queuedRead;
+    this.queuedRead = null;
+    resolve?.(Promise.resolve(null));
+  }
+
+  private request(userId: string, refresh: boolean) {
     this.set({ loading: true });
-    const request = billingApi
+    const request: Promise<BillingStatus | null> = billingApi
       .getStatus(refresh)
       .then((status) => {
         if (this.state.userId === userId) this.set({ status });
@@ -72,6 +111,7 @@ class BillingService {
         if (this.state.userId === userId) this.set({ loading: false });
       });
     this.inflight = request;
+    this.inflightRefresh = refresh;
     return request;
   }
 
@@ -115,6 +155,7 @@ class BillingService {
 
   reset() {
     this.inflight = null;
+    this.dropQueuedRead();
     this.set(INITIAL);
   }
 }
