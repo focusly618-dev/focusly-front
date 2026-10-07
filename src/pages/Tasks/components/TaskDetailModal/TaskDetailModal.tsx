@@ -34,6 +34,7 @@ import { TaskActions } from './components/TaskActions/TaskActions';
 import { TaskWorkspaces } from './components/TaskWorkspaces/TaskWorkspaces';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
+import { isPlanLimitError } from '@/api/Billing/planLimit';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -192,6 +193,8 @@ export const TaskDetailModal = ({
         duration: 3000,
       });
     } catch (e) {
+      // The Pro plans are already on screen.
+      if (isPlanLimitError(e)) return;
       console.error('Error improving task with AI:', e);
       notify.error({
         title: 'Error de Optimización',

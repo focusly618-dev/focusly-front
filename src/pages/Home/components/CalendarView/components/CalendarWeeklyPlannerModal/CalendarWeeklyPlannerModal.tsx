@@ -24,6 +24,7 @@ import {
 import type { Task } from '@/redux/tasks/task.types';
 import { notify, getFriendlyErrorMessage } from '@/utils';
 import { startOfWeek, addDays, format } from 'date-fns';
+import { isPlanLimitError } from '@/api/Billing/planLimit';
 
 interface CalendarWeeklyPlannerModalProps {
   open: boolean;
@@ -66,6 +67,11 @@ export const CalendarWeeklyPlannerModal: React.FC<
           setWeeklyPlan(res.weeklyPlan || []);
           setSummary(res.recommendationSummary || '');
         } catch (e) {
+          // The Pro plans are already on screen.
+          if (isPlanLimitError(e)) {
+            onClose();
+            return;
+          }
           console.error('Error fetching weekly plan:', e);
           notify.error({
             title: t('common.error'),

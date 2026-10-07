@@ -28,6 +28,7 @@ import { organizeTasksAI, type AIPlanItem } from '@/api/AI/apiAIPlanner';
 import type { Task } from '@/redux/tasks/task.types';
 import { notify, getFriendlyErrorMessage } from '@/utils';
 import { useAppSelector } from '@/redux/hooks';
+import { isPlanLimitError } from '@/api/Billing/planLimit';
 
 interface TasksAIOrganizeModalProps {
   open: boolean;
@@ -54,6 +55,11 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
           const res = await organizeTasksAI(tasks);
           setPlan(res.plan);
         } catch (e) {
+          // The Pro plans are already on screen.
+          if (isPlanLimitError(e)) {
+            onClose();
+            return;
+          }
           console.error('Error organizing tasks:', e);
           notify.error({
             title: 'Error de Planificador',

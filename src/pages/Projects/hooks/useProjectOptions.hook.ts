@@ -6,10 +6,11 @@ import type { ProjectOption } from '../components/CreateProjectTaskModal/CreateP
 
 // Every project, most recently updated first, for project pickers. The folder
 // grid's query can't feed one: it's paginated (8 per page), filtered by the
-// grid's search and paused outside the projects tab.
+// grid's search and paused outside the projects tab. The sidebar loads the
+// same query (and keeps it fresh): read from the cache.
 export const useProjectOptions = () => {
   const { data, loading } = useQuery(GET_PROJECT_GROUPS, {
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-first',
   });
 
   const options: ProjectOption[] = useMemo(() => {

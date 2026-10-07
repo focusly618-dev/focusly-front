@@ -34,6 +34,26 @@ describe('billingService', () => {
     expect(api.getStatus).toHaveBeenLastCalledWith(true);
   });
 
+  it('a refresh asked for as the screen opens replaces the plain read', async () => {
+    api.getStatus.mockResolvedValue(status({ plan: 'pro' }));
+    // The profile opens: useBilling loads, the billing section refreshes.
+    const [plain, refreshed] = await Promise.all([
+      billingService.load('u1'),
+      billingService.load('u1', { refresh: true }),
+    ]);
+    expect(api.getStatus).toHaveBeenCalledTimes(1);
+    expect(api.getStatus).toHaveBeenCalledWith(true);
+    expect(plain?.plan).toBe('pro');
+    expect(refreshed?.plan).toBe('pro');
+  });
+
+  it('a read dropped by a logout still settles', async () => {
+    const pending = billingService.load('u1');
+    billingService.reset();
+    await expect(pending).resolves.toBeNull();
+    expect(api.getStatus).not.toHaveBeenCalled();
+  });
+
   it("another user's plan never shows for the next one", async () => {
     api.getStatus.mockResolvedValueOnce(status({ plan: 'pro' }));
     await billingService.load('u1');

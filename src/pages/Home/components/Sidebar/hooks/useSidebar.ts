@@ -175,29 +175,21 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     { query: GET_WORKSPACES, variables: { search: '' } },
     { query: GET_PROJECT_GROUPS },
   ];
+  // Only the document leaves the cache (lists skip it right away):
+  // evicting the lists too made each one refetch twice.
   const [deleteWorkspaceMutation] = useMutation(REMOVE_WORKSPACE, {
-    refetchQueries: [
-      'GetWorkspacesPaginated',
-      'GetWorkspaces',
-      'GetProjectGroups',
-    ],
+    refetchQueries: ['GetWorkspacesPaginated', 'GetProjectGroups'],
     update(cache, _result, { variables }) {
       if (variables?.id) {
         cache.evict({
           id: cache.identify({ __typename: 'Workspace', id: variables.id }),
         });
       }
-      cache.evict({ fieldName: 'workspacesPaginated' });
-      cache.evict({ fieldName: 'workspaces' });
       cache.gc();
     },
   });
   const [createWorkspaceMutation] = useMutation(CREATE_WORKSPACE, {
-    refetchQueries: [
-      'GetWorkspacesPaginated',
-      'GetWorkspaces',
-      'GetProjectGroups',
-    ],
+    refetchQueries: ['GetWorkspacesPaginated', 'GetProjectGroups'],
   });
   const [createProjectGroup] = useMutation(CREATE_PROJECT_GROUP, {
     refetchQueries: refetchAll,

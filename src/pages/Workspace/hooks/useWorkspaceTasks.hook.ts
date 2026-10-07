@@ -1,3 +1,8 @@
+import {
+  refreshQueries,
+  TASK_QUERIES,
+  WORKSPACE_QUERIES,
+} from '@/api/refreshQueries';
 import { useState, useMemo, useEffect } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
@@ -124,14 +129,12 @@ export const useWorkspaceTasks = ({
             ...updates,
           },
         },
-        refetchQueries: [
-          'GetWorkspacesPaginated',
-          'GetWorkspaces',
-          'GetWorkspaceById',
-          'GetTasksTitles',
-          'GetTasks',
-        ],
       });
+      await refreshQueries([
+        ...WORKSPACE_QUERIES,
+        'GetWorkspaceById',
+        ...TASK_QUERIES,
+      ]);
     } catch (error) {
       handleMutationError(error, 'Error al actualizar la tarea');
     }

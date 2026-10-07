@@ -62,6 +62,7 @@ import { notify, getFriendlyErrorMessage } from '@/utils';
 
 // Types
 import type { Task } from '@/redux/tasks/task.types';
+import { isPlanLimitError } from '@/api/Billing/planLimit';
 
 const locales = {
   'en-US': enUS,
@@ -465,6 +466,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         duration: 5000,
       });
     } catch (e) {
+      // The Pro plans are already on screen.
+      if (isPlanLimitError(e)) return;
       console.error('Error generating AI schedule:', e);
       notify.error({
         title: t('calendar.planningErrorTitle'),

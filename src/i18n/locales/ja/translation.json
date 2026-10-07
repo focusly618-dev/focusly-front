@@ -1565,5 +1565,14 @@
       "done": "ドキュメントを削除しました",
       "failed": "ドキュメントを削除できませんでした"
     }
+  },
+  "aiModels": {
+    "auto": "自動",
+    "autoHint": "メッセージに合わせてLuminaが選択",
+    "fast": "高速",
+    "fastHint": "簡単な回答と操作",
+    "reasoning": "推論",
+    "reasoningHint": "計画・分析・ドキュメント",
+    "select": "モデルを選択"
   }
 }

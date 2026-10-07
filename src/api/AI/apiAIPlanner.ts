@@ -1,4 +1,7 @@
+import axios from 'axios';
 import axiosInstance from '../axiosInstance';
+import { PlanLimitError } from '@/api/Billing/planLimit';
+import { billingService } from '@/services/billingService';
 import type { Task } from '@/redux/tasks/task.types';
 import type { WorkHoursConfig } from '@/api/User/apiUser.types';
 import type {
@@ -20,6 +23,35 @@ export type {
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
+// ─── Plan limits ──────────────────────────────────────────────────────────────
+
+/**
+ * Each planner call counts as an AI message on the free plan: the backend
+ * answers 402 once they're used up, and the Pro plans open.
+ */
+const plannerPost = async <T>(url: string, body: unknown): Promise<T> => {
+  try {
+    const response = await axiosInstance.post<T>(url, body);
+    const remaining = Number(response.headers['x-ai-messages-remaining']);
+    if (
+      response.headers['x-ai-messages-remaining'] !== undefined &&
+      Number.isFinite(remaining)
+    ) {
+      billingService.setRemaining(remaining);
+    }
+    return response.data;
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 402) {
+      const detail = (err.response.data as { detail?: { limit?: number } })
+        ?.detail;
+      billingService.markLimitReached(detail?.limit);
+      billingService.openUpgrade('limit');
+      throw new PlanLimitError('free_limit_reached', detail?.limit);
+    }
+    throw err;
+  }
+};
+
 // ─── Client Methods ───────────────────────────────────────────────────────────
 
 /**
@@ -39,13 +71,10 @@ export const organizeTasksAI = async (
     estimatedTime: t.estimate_timer ? `${t.estimate_timer}m` : '',
   }));
 
-  const response = await axiosInstance.post<AIOrganizeResponse>(
-    '/ai/planner/organize',
-    {
-      tasks: mappedTasks,
-    },
-  );
-  return response.data;
+  const data = await plannerPost<AIOrganizeResponse>('/ai/planner/organize', {
+    tasks: mappedTasks,
+  });
+  return data;
 };
 
 /**
@@ -63,14 +92,14 @@ export const planCalendarAI = async (
       t.priority_level === 3 ? 'High' : t.priority_level === 2 ? 'Med' : 'Low',
   }));
 
-  const response = await axiosInstance.post<AICalendarPlannerResponse>(
+  const data = await plannerPost<AICalendarPlannerResponse>(
     '/ai/planner/calendar',
     {
       tasks: mappedTasks,
       free_slots: freeSlots,
     },
   );
-  return response.data;
+  return data;
 };
 
 export interface AIAvailability {
@@ -127,14 +156,11 @@ export const planWeeklyAI = async (
     deadline: t.deadline || '',
   }));
 
-  const response = await axiosInstance.post<AIWeeklyPlanResponse>(
-    '/ai/planner/weekly',
-    {
-      tasks: mappedTasks,
-      availability,
-    },
-  );
-  return response.data;
+  const data = await plannerPost<AIWeeklyPlanResponse>('/ai/planner/weekly', {
+    tasks: mappedTasks,
+    availability,
+  });
+  return data;
 };
 
 /**
@@ -145,13 +171,10 @@ export const improveTaskAI = async (params: {
   description?: string;
   mode: 'subtasks' | 'estimate' | 'priority' | 'all';
 }): Promise<AIImproveTaskResponse> => {
-  const response = await axiosInstance.post<AIImproveTaskResponse>(
-    '/ai/planner/improve',
-    {
-      title: params.title,
-      description: params.description || '',
-      mode: params.mode,
-    },
-  );
-  return response.data;
+  const data = await plannerPost<AIImproveTaskResponse>('/ai/planner/improve', {
+    title: params.title,
+    description: params.description || '',
+    mode: params.mode,
+  });
+  return data;
 };

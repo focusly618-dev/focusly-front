@@ -1596,5 +1596,14 @@
       "done": "Document deleted",
       "failed": "Couldn't delete the document"
     }
+  },
+  "aiModels": {
+    "auto": "Auto",
+    "autoHint": "Lumina picks based on your message",
+    "fast": "Fast",
+    "fastHint": "Quick answers and simple actions",
+    "reasoning": "Reasoning",
+    "reasoningHint": "Plans, analysis and documents",
+    "select": "Choose model"
   }
 }

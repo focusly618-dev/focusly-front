@@ -15,28 +15,13 @@ import { stripMarkdown } from '@/components/chat/actionPlan/actionExecution';
 const MIN_CONTENT_LENGTH_FOR_AUTO_TITLE = 40;
 
 export const useWorkspaceForm = () => {
+  // refetchQueries alone: evicting the lists as well made each list on
+  // screen refetch itself on top of it (every list fetched twice).
   const [createWorkspace] = useMutation(CREATE_WORKSPACE, {
-    refetchQueries: [
-      'GetWorkspacesPaginated',
-      'GetWorkspaces',
-      'GetProjectGroups',
-    ],
-    update(cache) {
-      cache.evict({ fieldName: 'workspacesPaginated' });
-      cache.evict({ fieldName: 'workspaces' });
-      cache.gc();
-    },
+    refetchQueries: ['GetWorkspacesPaginated', 'GetProjectGroups'],
   });
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE, {
-    refetchQueries: [
-      'GetWorkspacesPaginated',
-      'GetWorkspaces',
-      'GetWorkspaceById',
-    ],
-    update(cache) {
-      cache.evict({ fieldName: 'workspacesPaginated' });
-      cache.evict({ fieldName: 'workspaces' });
-    },
+    refetchQueries: ['GetWorkspacesPaginated', 'GetWorkspaceById'],
   });
 
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>(

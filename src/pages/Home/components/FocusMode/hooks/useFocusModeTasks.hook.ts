@@ -25,7 +25,7 @@ export const useFocusModeTasks = ({ initialTask }: UseFocusModeTasksProps) => {
   }, [activeTask]);
 
   const todaysTasks = useMemo(() => {
-    const all: Task[] = tasksData?.tasks || [];
+    const all: Task[] = tasksData?.result?.tasks || [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -39,7 +39,7 @@ export const useFocusModeTasks = ({ initialTask }: UseFocusModeTasksProps) => {
         return deadline >= today && deadline < tomorrow;
       })
       .map((t) => ({ ...t }));
-  }, [tasksData?.tasks]);
+  }, [tasksData?.result?.tasks]);
 
   return {
     activeTask,

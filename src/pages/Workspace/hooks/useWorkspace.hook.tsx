@@ -108,20 +108,20 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     onTaskSelect: (taskId) => setValue('taskId', taskId),
   });
 
-  // 5. GraphQL Queries
+  // 5. GraphQL Queries. The sidebar already loads (and keeps fresh) these
+  // same two: from the cache, so opening the page doesn't fetch them again.
   const { data: workspacesData, loading: workspacesLoadingQuery } = useQuery(
     GET_WORKSPACES,
     {
       variables: { search: '' },
-      fetchPolicy: 'cache-and-network',
-      nextFetchPolicy: 'cache-first',
+      fetchPolicy: 'cache-first',
     },
   );
 
   const { data: projectGroupsData, loading: projectGroupsLoading } = useQuery(
     GET_PROJECT_GROUPS,
     {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'cache-first',
     },
   );
 
