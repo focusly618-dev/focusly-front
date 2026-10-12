@@ -7,6 +7,8 @@ import { logoutUser } from '@/api/Auth/authApi';
 import { AuthProviders } from '@/pages/Public/Login/types/Login.types';
 import { resetTask } from '@/redux/tasks/task.slice';
 import { resetCalendar } from '@/redux/calendar/calendar.slice';
+import { safeSetItem } from '@/utils/storage/localData';
+import { calendarPlanService } from '@/services/calendarPlanService';
 
 interface User {
   id: string;
@@ -74,6 +76,8 @@ export const logout = createAsyncThunk<void, LogoutReason | undefined>(
       dispatch(clearAuth());
       dispatch(resetTask());
       dispatch(resetCalendar());
+      // Lumina's calendar proposal (and a run in progress) is this user's.
+      calendarPlanService.reset();
       // Prevent the next login (possibly a different account) from
       // momentarily rendering this session's cached queries/entities.
       // Dynamic import: apollo.ts imports the store itself (to read auth
@@ -108,16 +112,21 @@ export const authSlice = createSlice({
       state.authProvider = action.payload.provider;
       state.sessionExpiredNotice = false;
 
-      localStorage.setItem('authProvider', action.payload.provider);
-      localStorage.setItem('user', JSON.stringify(action.payload.user));
+      // Never throws: a full localStorage mustn't stop a login.
+      safeSetItem('authProvider', action.payload.provider);
+      safeSetItem('user', JSON.stringify(action.payload.user));
     },
     clearAuth: (state) => {
       state.isLogged = false;
       state.user = null;
       state.authProvider = null;
 
-      localStorage.removeItem('user');
-      localStorage.removeItem('authProvider');
+      try {
+        localStorage.removeItem('user');
+        localStorage.removeItem('authProvider');
+      } catch {
+        // Blocked storage: nothing was saved there.
+      }
     },
     setSessionExpiredNotice: (state, action: PayloadAction<boolean>) => {
       state.sessionExpiredNotice = action.payload;
@@ -127,12 +136,12 @@ export const authSlice = createSlice({
     },
     completeOnboarding: (state) => {
       state.onboardingCompleted = true;
-      localStorage.setItem('onboardingCompleted', 'true');
+      safeSetItem('onboardingCompleted', 'true');
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
-        localStorage.setItem('user', JSON.stringify(state.user));
+        safeSetItem('user', JSON.stringify(state.user));
       }
     },
   },

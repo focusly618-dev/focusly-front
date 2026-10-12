@@ -23,6 +23,11 @@ import {
   GET_PROJECT_GROUPS,
 } from '@/pages/Workspace/Workspace.graphql';
 import type { LuminaActionPayload, ParsedLuminaAction } from '@/utils';
+import {
+  planRunKey,
+  readPlanRun,
+  writePlanRun,
+} from '@/utils/storage/localData';
 import { executeSingleAction, type ActionResult } from './actionExecution';
 import {
   createPlanRefs,
@@ -65,12 +70,15 @@ interface SavedRun {
   links?: (ItemLinks | null)[];
 }
 
-const STORAGE_PREFIX = 'focusly_plan_completed_';
+/** Plans run before per-item tracking only recorded that they ran. */
+interface LegacyRun {
+  allDone: true;
+}
 
 // Compact fingerprint: type + title/name for each action, not the full
-// payload (notes/content can be hundreds of KB).
+// payload (notes/content can be hundreds of KB). It's hashed into the key
+// (see planRunKey): nothing of the plan is readable in localStorage.
 const fingerprint = (actions: ParsedLuminaAction[]) =>
-  STORAGE_PREFIX +
   actions
     .map(
       (a) =>
@@ -79,21 +87,15 @@ const fingerprint = (actions: ParsedLuminaAction[]) =>
     .join('|');
 
 const readSavedRun = (key: string, count: number): SavedRun | null => {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    // Plans run before per-item tracking only stored "true".
-    if (raw === 'true') {
-      return {
-        statuses: Array(count).fill('done'),
-        createdIds: Array(count).fill(null),
-      };
-    }
-    const saved = JSON.parse(raw) as SavedRun;
-    return saved.statuses?.length === count ? saved : null;
-  } catch {
-    return null;
+  const saved = readPlanRun<SavedRun | LegacyRun>(key);
+  if (!saved) return null;
+  if ('allDone' in saved) {
+    return {
+      statuses: Array(count).fill('done'),
+      createdIds: Array(count).fill(null),
+    };
   }
+  return saved.statuses?.length === count ? saved : null;
 };
 
 export const useActionPlan = (actions: ParsedLuminaAction[]) => {
@@ -116,7 +118,10 @@ export const useActionPlan = (actions: ParsedLuminaAction[]) => {
     [projectsData],
   );
 
-  const storageKey = useMemo(() => fingerprint(actions), [actions]);
+  const storageKey = useMemo(
+    () => planRunKey(user?.id ?? 'anonymous', fingerprint(actions)),
+    [actions, user?.id],
+  );
   const [saved] = useState(() => readSavedRun(storageKey, actions.length));
 
   const [statuses, setStatuses] = useState<PlanItemStatus[]>(
@@ -308,18 +313,12 @@ export const useActionPlan = (actions: ParsedLuminaAction[]) => {
       console.warn('Could not refresh the lists after the plan:', err),
     );
     if (calendarChanged) requestCalendarSync(dispatch);
-    try {
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          statuses: nextStatuses,
-          createdIds: nextIds,
-          links: nextLinks,
-        }),
-      );
-    } catch {
-      // Storage full or blocked: the plan just won't remember on reload.
-    }
+    // Storage full or blocked: the plan just won't remember on reload.
+    writePlanRun<SavedRun>(storageKey, {
+      statuses: nextStatuses,
+      createdIds: nextIds,
+      links: nextLinks,
+    });
     if (nextStatuses.some((s) => s === 'error')) {
       setErrorMessage('error');
     }

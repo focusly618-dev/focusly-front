@@ -29,9 +29,13 @@ export type {
  * Each planner call counts as an AI message on the free plan: the backend
  * answers 402 once they're used up, and the Pro plans open.
  */
-const plannerPost = async <T>(url: string, body: unknown): Promise<T> => {
+const plannerPost = async <T>(
+  url: string,
+  body: unknown,
+  config?: { signal?: AbortSignal },
+): Promise<T> => {
   try {
-    const response = await axiosInstance.post<T>(url, body);
+    const response = await axiosInstance.post<T>(url, body, config);
     const remaining = Number(response.headers['x-ai-messages-remaining']);
     if (
       response.headers['x-ai-messages-remaining'] !== undefined &&
@@ -83,6 +87,7 @@ export const organizeTasksAI = async (
 export const planCalendarAI = async (
   tasks: Task[],
   freeSlots: { start: string; end: string }[],
+  options?: { signal?: AbortSignal },
 ): Promise<AICalendarPlannerResponse> => {
   const mappedTasks = tasks.map((t) => ({
     id: t.id,
@@ -90,6 +95,8 @@ export const planCalendarAI = async (
     duration: t.estimate_timer ? `${t.estimate_timer}m` : '30m',
     priority:
       t.priority_level === 3 ? 'High' : t.priority_level === 2 ? 'Med' : 'Low',
+    // So it's placed before it's due.
+    deadline: t.deadline || null,
   }));
 
   const data = await plannerPost<AICalendarPlannerResponse>(
@@ -98,6 +105,7 @@ export const planCalendarAI = async (
       tasks: mappedTasks,
       free_slots: freeSlots,
     },
+    options,
   );
   return data;
 };

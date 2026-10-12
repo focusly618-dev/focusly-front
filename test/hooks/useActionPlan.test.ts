@@ -228,6 +228,20 @@ describe('useActionPlan', () => {
     expect(workspaceInput(0).groupId).toBe('proj-1');
   });
 
+  it('keeps no task content in localStorage, only a hashed key', async () => {
+    const { result } = render(nutrition);
+    await act(async () => result.current.run());
+    const keys = Array.from({ length: localStorage.length }, (_, i) =>
+      localStorage.key(i),
+    ) as string[];
+    expect(keys).toHaveLength(1);
+    expect(keys[0]).toMatch(/^focusly_plan_run_u-1_[a-z0-9]+$/);
+    const stored = localStorage.getItem(keys[0]) as string;
+    expect(stored).not.toContain('Lista de compras');
+    expect(stored).not.toContain('Nutrición');
+    expect(JSON.parse(stored).savedAt).toEqual(expect.any(Number));
+  });
+
   it('remembers what was created after a reload', async () => {
     const first = render(nutrition);
     await act(async () => first.result.current.run());
@@ -441,7 +455,9 @@ describe('useActionPlan — calendar events', () => {
     const saved = JSON.parse(
       localStorage.getItem(localStorage.key(0) as string) as string,
     );
-    expect(saved.links[0].meetUrl).toBe('https://meet.google.com/abc-defg-hij');
+    expect(saved.run.links[0].meetUrl).toBe(
+      'https://meet.google.com/abc-defg-hij',
+    );
   });
 
   it('adds a guest on top of the guests the event has right now', async () => {

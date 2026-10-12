@@ -202,6 +202,52 @@ export const SubNavItem = styled(ListItemButton, {
   },
 }));
 
+export const TreeSubNavItem = styled(ListItemButton, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
+  position: 'relative',
+  borderRadius: 6,
+  marginBottom: 2,
+  padding: '4px 8px 4px 34px',
+  minHeight: 28,
+  backgroundColor: active
+    ? theme.palette.mode === 'dark'
+      ? '#102d29'
+      : 'rgba(0, 0, 0, 0.05)'
+    : 'transparent',
+  color: active
+    ? theme.palette.mode === 'dark'
+      ? '#2dd4bf'
+      : theme.palette.text.primary
+    : theme.palette.mode === 'dark'
+      ? '#8a8f98'
+      : theme.palette.text.secondary,
+  transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+  '&:hover': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.04)'
+        : 'rgba(0, 0, 0, 0.03)',
+    color: theme.palette.text.primary,
+    '& .tree-connector-elbow': {
+      borderColor:
+        theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.35)'
+          : 'rgba(0, 0, 0, 0.3)',
+    },
+  },
+  '& .MuiListItemIcon-root': {
+    color: 'inherit',
+    minWidth: 20,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '& .MuiSvgIcon-root': {
+      fontSize: 14,
+    },
+  },
+}));
+
 export const NavCountBadge = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'active',
 })<{ active?: boolean }>(({ theme, active }) => ({

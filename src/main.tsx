@@ -16,6 +16,10 @@ import { client } from '@/api/apollo';
 import '@/i18n';
 import { FocuslyToaster } from '@/components/Notification/FocuslyToaster';
 import { BrowserRouter } from 'react-router-dom';
+import { tidyLocalStorage } from '@/utils/storage/localData';
+
+// Old records with task content, and expired ones (see localData).
+tidyLocalStorage();
 
 createRoot(document.getElementById('root')!).render(
   <AppThemeProvider>

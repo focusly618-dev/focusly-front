@@ -1,3 +1,5 @@
+import { calendarPlanService } from '@/services/calendarPlanService';
+import { useTranslation } from 'react-i18next';
 import {
   refreshQueries,
   TASK_QUERIES,
@@ -42,13 +44,23 @@ import {
   startOfWeek,
   subDays,
 } from 'date-fns';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { Views, type View } from 'react-big-calendar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import type { ICalendarEvent } from '../../CalendarEvent';
 
+const NO_DRAFTS: ICalendarEvent[] = [];
+
 export const useCalendarView = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const reduxEvents =
@@ -80,8 +92,29 @@ export const useCalendarView = () => {
 
   const [scrollToTime] = useState<Date | undefined>(undefined);
   const [flashingDate, setFlashingDate] = useState<Date | null>(null);
-  const [draftEvents, setDraftEvents] = useState<ICalendarEvent[]>([]);
-  const [isCalendarInDraftMode, setIsCalendarInDraftMode] = useState(false);
+  // Lumina's proposal lives in calendarPlanService: it survives leaving the
+  // calendar (another tab of the app) and coming back.
+  const planState = useSyncExternalStore(
+    calendarPlanService.subscribe,
+    calendarPlanService.getSnapshot,
+  );
+  const draftOwnerId = useSelector((state: RootState) => state.auth.user?.id);
+  const ownsPlan = planState.userId === draftOwnerId;
+  // The blocks to show and schedule: the ones the user kept checked.
+  const draftEvents = useMemo(
+    () =>
+      ownsPlan
+        ? planState.drafts.filter((d) => !planState.excluded.includes(d.id))
+        : NO_DRAFTS,
+    [ownsPlan, planState.drafts, planState.excluded],
+  );
+  const isCalendarInDraftMode = ownsPlan && planState.drafts.length > 0;
+  const setDraftEvents = (
+    update: ICalendarEvent[] | ((drafts: ICalendarEvent[]) => ICalendarEvent[]),
+  ) =>
+    calendarPlanService.setDrafts(
+      typeof update === 'function' ? update : () => update,
+    );
 
   // Trigger temporary column highlight (flash) when the selected date (d URL param) changes
   useEffect(() => {
@@ -680,68 +713,77 @@ export const useCalendarView = () => {
 
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
   const [confirmingDraft, setConfirmingDraft] = useState(false);
+  // Set in the click itself: confirming twice would book everything twice.
+  const confirmingRef = useRef(false);
+  // Drafts whose time block already exists: a retry doesn't create another.
+  const savedBlocks = useRef(new Set<string>());
 
   const confirmDraftEvents = async () => {
-    if (!user?.id || draftEvents.length === 0) return;
+    if (!user?.id || draftEvents.length === 0 || confirmingRef.current) return;
+    confirmingRef.current = true;
     setConfirmingDraft(true);
+    const failed: ICalendarEvent[] = [];
     try {
       const { createTimeBlock } =
         await import('@/api/TimeBlocks/timeBlocksApi');
       for (const item of draftEvents) {
-        // 1. Create TimeBlock in DB
-        await createTimeBlock({
-          userId: user.id,
-          taskId:
-            item.resource && 'id' in item.resource
-              ? item.resource.id
-              : undefined,
-          startTime: item.start.toISOString(),
-          endTime: item.end.toISOString(),
-          blockType: 'Focus_Block',
-          source: 'App',
-          title: item.title,
-        });
-
-        // 2. Reschedule corresponding task
-        if (item.resource && 'id' in item.resource) {
-          await updateTaskMutation({
-            variables: {
-              updateTaskInput: {
-                id: item.resource.id,
-                estimated_start_date: item.start.toISOString(),
-                estimated_end_date: item.end.toISOString(),
+        const taskId =
+          item.resource && 'id' in item.resource ? item.resource.id : undefined;
+        try {
+          if (!savedBlocks.current.has(item.id)) {
+            await createTimeBlock({
+              userId: user.id,
+              taskId,
+              startTime: item.start.toISOString(),
+              endTime: item.end.toISOString(),
+              blockType: 'Focus_Block',
+              source: 'App',
+              title: item.title,
+            });
+            savedBlocks.current.add(item.id);
+          }
+          // The task moves to its block.
+          if (taskId) {
+            await updateTaskMutation({
+              variables: {
+                updateTaskInput: {
+                  id: taskId,
+                  estimated_start_date: item.start.toISOString(),
+                  estimated_end_date: item.end.toISOString(),
+                },
               },
-            },
-          });
+            });
+          }
+        } catch (e) {
+          console.error('Error confirming draft event:', e);
+          failed.push(item);
         }
       }
 
-      notify.success({
-        title: 'Calendario Organizado',
-        description: 'Tus sugerencias han sido agendadas con éxito.',
-        duration: 4000,
-      });
-
-      setDraftEvents([]);
-      setIsCalendarInDraftMode(false);
+      if (failed.length > 0) {
+        // Only what failed stays proposed, so confirming again finishes it.
+        setDraftEvents(failed);
+        notify.error({
+          title: t('calendar.scheduleSaveError', { count: failed.length }),
+        });
+      } else {
+        savedBlocks.current.clear();
+        calendarPlanService.clearDrafts();
+        notify.success({
+          title: t('calendar.scheduleSavedTitle'),
+          description: t('calendar.scheduleSavedDesc'),
+        });
+      }
       refetchTasks();
-    } catch (e) {
-      console.error('Error confirming draft events:', e);
-      notify.error({
-        title: getFriendlyErrorMessage(
-          e,
-          'No se pudieron guardar todas las sugerencias.',
-        ),
-        duration: 4000,
-      });
     } finally {
+      confirmingRef.current = false;
       setConfirmingDraft(false);
     }
   };
 
   const clearDraftEvents = () => {
-    setDraftEvents([]);
-    setIsCalendarInDraftMode(false);
+    savedBlocks.current.clear();
+    calendarPlanService.clearDrafts();
   };
 
   const handleDeleteDraft = (id: string) => {
@@ -1108,9 +1150,7 @@ export const useCalendarView = () => {
     workHoursConfig,
     handleAddTaskClick,
     draftEvents,
-    setDraftEvents,
     isCalendarInDraftMode,
-    setIsCalendarInDraftMode,
     handleDeleteDraft,
     confirmDraftEvents,
     clearDraftEvents,

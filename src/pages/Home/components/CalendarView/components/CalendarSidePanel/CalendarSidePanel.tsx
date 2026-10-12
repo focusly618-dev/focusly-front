@@ -2,7 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { View } from 'react-big-calendar';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
-import { Box, Button, Typography, styled, Stack } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Typography,
+  styled,
+  Stack,
+} from '@mui/material';
 import {
   Add as AddIcon,
   ChevronRight,
@@ -150,11 +157,17 @@ interface CalendarSidePanelProps {
   events: ICalendarEvent[];
   onEventSelect: (event: ICalendarEvent) => void;
   onAIPlannerClick?: () => void;
+  /** Lumina is building the proposal. */
+  isAIPlanning?: boolean;
+  /** Under the button, for the free plan ("1 of your free messages"). */
+  aiPlannerHint?: string;
   onWeeklyPlannerClick?: () => void;
   hoveredEventId?: string | null;
   onHoverEvent?: (eventId: string | null) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onViewAllClick?: () => void;
+  /** Lumina at work, or its proposal: takes the panel's place meanwhile. */
+  planPanel?: React.ReactNode;
 }
 
 export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
@@ -166,11 +179,14 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   events,
   onEventSelect,
   onAIPlannerClick,
+  isAIPlanning = false,
+  aiPlannerHint,
   onWeeklyPlannerClick,
   hoveredEventId,
   onHoverEvent,
   onToggleSubtask,
   onViewAllClick,
+  planPanel,
 }) => {
   const { t } = useTranslation();
   const [expandedTaskIds, setExpandedTaskIds] = useState<
@@ -224,743 +240,799 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
           height: '100%',
         }}
       >
-        {/* Header Today & Date */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'baseline',
-          }}
-        >
-          <Typography
-            sx={{ fontWeight: 800, fontSize: '1.1rem', color: 'text.primary' }}
-          >
-            {isSameDay(currentDate, new Date())
-              ? t('calendar.today')
-              : format(currentDate, 'eeee')}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 600,
-              color: 'text.secondary',
-              fontSize: '11.5px',
-            }}
-          >
-            {format(currentDate, 'd MMMM')}
-          </Typography>
-        </Box>
-
-        {/* View Toggle */}
-        <ViewToggleContainer>
-          {(['day', 'week', 'month'] as const).map((v) => (
-            <ToggleButton
-              key={v}
-              className={currentView === v ? 'active' : ''}
-              onClick={() => onViewChange(v as View)}
+        {planPanel ?? (
+          <>
+            {/* Header Today & Date */}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+              }}
             >
-              {v === 'day'
-                ? t('calendar.day')
-                : v === 'week'
-                  ? t('calendar.week')
-                  : t('calendar.month')}
-            </ToggleButton>
-          ))}
-        </ViewToggleContainer>
-
-        {/* Add Task */}
-        <AddTaskButton
-          onClick={onAddTaskClick}
-          startIcon={<AddIcon sx={{ fontSize: 16 }} />}
-        >
-          {t('calendar.addTask')}
-        </AddTaskButton>
-
-        {/* Mini Calendar (Week vs Month) */}
-        {String(currentView).toLowerCase() === 'month' ? (
-          <Box
-            sx={{
-              p: 1.25,
-              borderRadius: 1,
-              border: '1px solid',
-              borderColor: 'divider',
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.01)'
-                  : '#ffffff',
-            }}
-          >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {/* Weekday letters */}
-              <Box
+              <Typography
                 sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(7, 1fr)',
-                  textAlign: 'center',
+                  fontWeight: 800,
+                  fontSize: '1.1rem',
+                  color: 'text.primary',
                 }}
               >
-                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => (
-                  <Typography
-                    key={idx}
-                    variant="caption"
+                {isSameDay(currentDate, new Date())
+                  ? t('calendar.today')
+                  : format(currentDate, 'eeee')}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600,
+                  color: 'text.secondary',
+                  fontSize: '11.5px',
+                }}
+              >
+                {format(currentDate, 'd MMMM')}
+              </Typography>
+            </Box>
+
+            {/* View Toggle */}
+            <ViewToggleContainer>
+              {(['day', 'week', 'month'] as const).map((v) => (
+                <ToggleButton
+                  key={v}
+                  className={currentView === v ? 'active' : ''}
+                  onClick={() => onViewChange(v as View)}
+                >
+                  {v === 'day'
+                    ? t('calendar.day')
+                    : v === 'week'
+                      ? t('calendar.week')
+                      : t('calendar.month')}
+                </ToggleButton>
+              ))}
+            </ViewToggleContainer>
+
+            {/* Add Task */}
+            <AddTaskButton
+              onClick={onAddTaskClick}
+              startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            >
+              {t('calendar.addTask')}
+            </AddTaskButton>
+
+            {/* Mini Calendar (Week vs Month) */}
+            {String(currentView).toLowerCase() === 'month' ? (
+              <Box
+                sx={{
+                  p: 1.25,
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.01)'
+                      : '#ffffff',
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {/* Weekday letters */}
+                  <Box
                     sx={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      color:
-                        idx === selectedDayColIndex
-                          ? 'primary.main'
-                          : 'text.disabled',
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(7, 1fr)',
+                      textAlign: 'center',
                     }}
                   >
-                    {letter}
-                  </Typography>
-                ))}
-              </Box>
-              {/* All days of the month grid */}
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(7, 1fr)',
-                  rowGap: 0.5,
-                  textAlign: 'center',
-                }}
-              >
-                {miniMonthDays.map((dayDate, idx) => {
-                  const isSelected = isSameDay(dayDate, currentDate);
-                  const isToday = isSameDay(dayDate, new Date());
-                  const isCurrentMonth = isSameMonth(dayDate, currentDate);
-                  return (
-                    <Box
-                      key={idx}
-                      onClick={() => onDateChange(dayDate)}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: 24,
-                        width: 24,
-                        mx: 'auto',
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        fontSize: '11px',
-                        fontWeight: isSelected || isToday ? 700 : 500,
-                        bgcolor: isSelected ? 'primary.main' : 'transparent',
-                        color: isSelected
-                          ? '#ffffff'
-                          : isToday
-                            ? 'primary.main'
-                            : isCurrentMonth
-                              ? 'text.primary'
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => (
+                      <Typography
+                        key={idx}
+                        variant="caption"
+                        sx={{
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          color:
+                            idx === selectedDayColIndex
+                              ? 'primary.main'
                               : 'text.disabled',
-                        opacity: isCurrentMonth ? 1 : 0.4,
-                        border: isToday && !isSelected ? '1px solid' : 'none',
-                        borderColor: 'primary.main',
-                        transition: 'all 0.15s ease-in-out',
-                        '&:hover': {
-                          bgcolor: isSelected ? 'primary.main' : 'action.hover',
-                        },
-                      }}
-                    >
-                      {format(dayDate, 'd')}
-                    </Box>
-                  );
-                })}
-              </Box>
-            </Box>
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              p: 1.25,
-              borderRadius: 1,
-              border: '1px solid',
-              borderColor: 'divider',
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.01)'
-                  : '#ffffff',
-            }}
-          >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {/* Weekday letters */}
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(7, 1fr)',
-                  textAlign: 'center',
-                }}
-              >
-                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => {
-                  const dayDate = miniWeekDays[idx];
-                  const isSelected = isSameDay(dayDate, currentDate);
-                  return (
-                    <Typography
-                      key={idx}
-                      variant="caption"
-                      sx={{
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        color: isSelected ? 'primary.main' : 'text.disabled',
-                      }}
-                    >
-                      {letter}
-                    </Typography>
-                  );
-                })}
-              </Box>
-              {/* Weekday day numbers */}
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(7, 1fr)',
-                  textAlign: 'center',
-                }}
-              >
-                {miniWeekDays.map((dayDate, idx) => {
-                  const isSelected = isSameDay(dayDate, currentDate);
-                  const isToday = isSameDay(dayDate, new Date());
-                  return (
-                    <Box
-                      key={idx}
-                      onClick={() => onDateChange(dayDate)}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: 24,
-                        width: 24,
-                        mx: 'auto',
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        bgcolor: isSelected ? 'primary.main' : 'transparent',
-                        color: isSelected
-                          ? '#ffffff'
-                          : isToday
-                            ? 'primary.main'
-                            : 'text.primary',
-                        border: isToday && !isSelected ? '1px solid' : 'none',
-                        borderColor: 'primary.main',
-                        transition: 'all 0.15s ease-in-out',
-                        '&:hover': {
-                          bgcolor: isSelected ? 'primary.main' : 'action.hover',
-                        },
-                      }}
-                    >
-                      {format(dayDate, 'd')}
-                    </Box>
-                  );
-                })}
-              </Box>
-            </Box>
-          </Box>
-        )}
-        {/* Awaited Tasks Section */}
-        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mb: 1.25,
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: 700,
-                color: 'text.secondary',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                fontSize: '10px',
-              }}
-            >
-              {t('calendar.awaitedTasks')}
-            </Typography>
-            <Button
-              variant="text"
-              size="small"
-              onClick={onViewAllClick}
-              sx={{
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: '11px',
-                color: 'primary.main',
-                p: 0,
-                minWidth: 0,
-                '&:hover': {
-                  bgcolor: 'transparent',
-                  textDecoration: 'underline',
-                },
-              }}
-            >
-              {t('calendar.viewAll')}
-            </Button>
-          </Box>
-
-          <Stack
-            spacing={1}
-            sx={{
-              overflowY: 'auto',
-              maxHeight: '480px',
-              pr: 0.5,
-            }}
-          >
-            {awaitedTasks.length === 0 ? (
-              <Box
-                sx={{
-                  py: 3,
-                  px: 1.5,
-                  textAlign: 'center',
-                  border: '1px dashed',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: 'text.secondary',
-                    fontWeight: 600,
-                    fontSize: '12px',
-                  }}
-                >
-                  {t('calendar.noAwaitedTasks')}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'text.disabled', fontSize: '10.5px' }}
-                >
-                  {t('calendar.freeTimeDesc')}
-                </Typography>
+                        }}
+                      >
+                        {letter}
+                      </Typography>
+                    ))}
+                  </Box>
+                  {/* All days of the month grid */}
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(7, 1fr)',
+                      rowGap: 0.5,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {miniMonthDays.map((dayDate, idx) => {
+                      const isSelected = isSameDay(dayDate, currentDate);
+                      const isToday = isSameDay(dayDate, new Date());
+                      const isCurrentMonth = isSameMonth(dayDate, currentDate);
+                      return (
+                        <Box
+                          key={idx}
+                          onClick={() => onDateChange(dayDate)}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            height: 24,
+                            width: 24,
+                            mx: 'auto',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            fontWeight: isSelected || isToday ? 700 : 500,
+                            bgcolor: isSelected
+                              ? 'primary.main'
+                              : 'transparent',
+                            color: isSelected
+                              ? '#ffffff'
+                              : isToday
+                                ? 'primary.main'
+                                : isCurrentMonth
+                                  ? 'text.primary'
+                                  : 'text.disabled',
+                            opacity: isCurrentMonth ? 1 : 0.4,
+                            border:
+                              isToday && !isSelected ? '1px solid' : 'none',
+                            borderColor: 'primary.main',
+                            transition: 'all 0.15s ease-in-out',
+                            '&:hover': {
+                              bgcolor: isSelected
+                                ? 'primary.main'
+                                : 'action.hover',
+                            },
+                          }}
+                        >
+                          {format(dayDate, 'd')}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
               </Box>
             ) : (
-              awaitedTasks.map((event) => {
-                const isTask = event.type === 'task';
-                const task = isTask
-                  ? (event.resource as {
-                      id?: string;
-                      google_event_id?: string;
-                      category?: string;
-                      status?: string;
-                      color?: string;
-                      notes?: string;
-                      subtasks?: Array<{
-                        id: string;
-                        title: string;
-                        completed: boolean;
-                        estimate_timer?: number;
-                      }>;
-                    })
-                  : null;
-                const subtasks = task?.subtasks || [];
-                const hasSubtasks = isTask && subtasks.length > 0;
-                const completedSubtasksCount = subtasks.filter(
-                  (s) => s.completed,
-                ).length;
-                const totalSubtasksCount = subtasks.length;
-                const isSubtasksExpanded = Boolean(expandedTaskIds[event.id]);
-
-                const category = task ? task.category || 'General' : 'Meeting';
-                const taskCustomColor =
-                  task?.color && task.color !== '#1e293b'
-                    ? task.color
-                    : (() => {
-                        const match = task?.notes?.match(/\[COLOR:(.*?)\]/);
-                        return match && match[1] && match[1] !== '#1e293b'
-                          ? match[1]
-                          : undefined;
-                      })();
-                const categoryColor =
-                  taskCustomColor || getCategoryColor(category);
-
-                const formatTime = (date: Date) =>
-                  format(new Date(date), 'hh:mm a');
-                const timeString = `${formatTime(event.start)} - ${formatTime(event.end)}`;
-
-                const isHovered =
-                  hoveredEventId !== null &&
-                  (event.id === hoveredEventId ||
-                    task?.id === hoveredEventId ||
-                    task?.google_event_id === hoveredEventId);
-
-                return (
+              <Box
+                sx={{
+                  p: 1.25,
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.01)'
+                      : '#ffffff',
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {/* Weekday letters */}
                   <Box
-                    key={event.id}
-                    onClick={() => onEventSelect(event)}
-                    onMouseEnter={() => onHoverEvent?.(event.id)}
-                    onMouseLeave={() => onHoverEvent?.(null)}
                     sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      p: 1,
-                      borderRadius: 1,
-                      bgcolor: isHovered
-                        ? (theme) => {
-                            const isDark = theme.palette.mode === 'dark';
-                            const isGray =
-                              (theme as { appMode?: string }).appMode ===
-                              'graydark';
-                            return isDark
-                              ? isGray
-                                ? '#28282b'
-                                : '#222225'
-                              : '#f1f5f9';
-                          }
-                        : (theme) => {
-                            const isDark = theme.palette.mode === 'dark';
-                            const isGray =
-                              (theme as { appMode?: string }).appMode ===
-                              'graydark';
-                            return isDark
-                              ? isGray
-                                ? '#202022'
-                                : '#171719'
-                              : '#ffffff';
-                          },
-                      border: '1px solid',
-                      borderColor: isHovered
-                        ? (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? '#94a3b8'
-                              : '#64748b'
-                        : 'divider',
-                      cursor: 'pointer',
-                      transition:
-                        'background-color 0.15s ease, border-color 0.15s ease',
-                      '&:hover': {
-                        borderColor: (theme) =>
-                          theme.palette.mode === 'dark' ? '#94a3b8' : '#64748b',
-                        bgcolor: (theme) => {
-                          const isDark = theme.palette.mode === 'dark';
-                          const isGray =
-                            (theme as { appMode?: string }).appMode ===
-                            'graydark';
-                          return isDark
-                            ? isGray
-                              ? '#28282b'
-                              : '#222225'
-                            : '#f1f5f9';
-                        },
-                      },
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(7, 1fr)',
+                      textAlign: 'center',
                     }}
                   >
-                    <Box
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => {
+                      const dayDate = miniWeekDays[idx];
+                      const isSelected = isSameDay(dayDate, currentDate);
+                      return (
+                        <Typography
+                          key={idx}
+                          variant="caption"
+                          sx={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            color: isSelected
+                              ? 'primary.main'
+                              : 'text.disabled',
+                          }}
+                        >
+                          {letter}
+                        </Typography>
+                      );
+                    })}
+                  </Box>
+                  {/* Weekday day numbers */}
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(7, 1fr)',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {miniWeekDays.map((dayDate, idx) => {
+                      const isSelected = isSameDay(dayDate, currentDate);
+                      const isToday = isSameDay(dayDate, new Date());
+                      return (
+                        <Box
+                          key={idx}
+                          onClick={() => onDateChange(dayDate)}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            height: 24,
+                            width: 24,
+                            mx: 'auto',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            bgcolor: isSelected
+                              ? 'primary.main'
+                              : 'transparent',
+                            color: isSelected
+                              ? '#ffffff'
+                              : isToday
+                                ? 'primary.main'
+                                : 'text.primary',
+                            border:
+                              isToday && !isSelected ? '1px solid' : 'none',
+                            borderColor: 'primary.main',
+                            transition: 'all 0.15s ease-in-out',
+                            '&:hover': {
+                              bgcolor: isSelected
+                                ? 'primary.main'
+                                : 'action.hover',
+                            },
+                          }}
+                        >
+                          {format(dayDate, 'd')}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
+              </Box>
+            )}
+            {/* Awaited Tasks Section */}
+            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 1.25,
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 700,
+                    color: 'text.secondary',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    fontSize: '10px',
+                  }}
+                >
+                  {t('calendar.awaitedTasks')}
+                </Typography>
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={onViewAllClick}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: '11px',
+                    color: 'primary.main',
+                    p: 0,
+                    minWidth: 0,
+                    '&:hover': {
+                      bgcolor: 'transparent',
+                      textDecoration: 'underline',
+                    },
+                  }}
+                >
+                  {t('calendar.viewAll')}
+                </Button>
+              </Box>
+
+              <Stack
+                spacing={1}
+                sx={{
+                  overflowY: 'auto',
+                  maxHeight: '480px',
+                  pr: 0.5,
+                }}
+              >
+                {awaitedTasks.length === 0 ? (
+                  <Box
+                    sx={{
+                      py: 3,
+                      px: 1.5,
+                      textAlign: 'center',
+                      border: '1px dashed',
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
                       sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '100%',
+                        color: 'text.secondary',
+                        fontWeight: 600,
+                        fontSize: '12px',
                       }}
                     >
+                      {t('calendar.noAwaitedTasks')}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'text.disabled', fontSize: '10.5px' }}
+                    >
+                      {t('calendar.freeTimeDesc')}
+                    </Typography>
+                  </Box>
+                ) : (
+                  awaitedTasks.map((event) => {
+                    const isTask = event.type === 'task';
+                    const task = isTask
+                      ? (event.resource as {
+                          id?: string;
+                          google_event_id?: string;
+                          category?: string;
+                          status?: string;
+                          color?: string;
+                          notes?: string;
+                          subtasks?: Array<{
+                            id: string;
+                            title: string;
+                            completed: boolean;
+                            estimate_timer?: number;
+                          }>;
+                        })
+                      : null;
+                    const subtasks = task?.subtasks || [];
+                    const hasSubtasks = isTask && subtasks.length > 0;
+                    const completedSubtasksCount = subtasks.filter(
+                      (s) => s.completed,
+                    ).length;
+                    const totalSubtasksCount = subtasks.length;
+                    const isSubtasksExpanded = Boolean(
+                      expandedTaskIds[event.id],
+                    );
+
+                    const category = task
+                      ? task.category || 'General'
+                      : 'Meeting';
+                    const taskCustomColor =
+                      task?.color && task.color !== '#1e293b'
+                        ? task.color
+                        : (() => {
+                            const match = task?.notes?.match(/\[COLOR:(.*?)\]/);
+                            return match && match[1] && match[1] !== '#1e293b'
+                              ? match[1]
+                              : undefined;
+                          })();
+                    const categoryColor =
+                      taskCustomColor || getCategoryColor(category);
+
+                    const formatTime = (date: Date) =>
+                      format(new Date(date), 'hh:mm a');
+                    const timeString = `${formatTime(event.start)} - ${formatTime(event.end)}`;
+
+                    const isHovered =
+                      hoveredEventId !== null &&
+                      (event.id === hoveredEventId ||
+                        task?.id === hoveredEventId ||
+                        task?.google_event_id === hoveredEventId);
+
+                    return (
                       <Box
+                        key={event.id}
+                        onClick={() => onEventSelect(event)}
+                        onMouseEnter={() => onHoverEvent?.(event.id)}
+                        onMouseLeave={() => onHoverEvent?.(null)}
                         sx={{
                           display: 'flex',
-                          alignItems: 'center',
-                          gap: 1,
-                          minWidth: 0,
-                          flex: 1,
+                          flexDirection: 'column',
+                          p: 1,
+                          borderRadius: 1,
+                          bgcolor: isHovered
+                            ? (theme) => {
+                                const isDark = theme.palette.mode === 'dark';
+                                const isGray =
+                                  (theme as { appMode?: string }).appMode ===
+                                  'graydark';
+                                return isDark
+                                  ? isGray
+                                    ? '#28282b'
+                                    : '#222225'
+                                  : '#f1f5f9';
+                              }
+                            : (theme) => {
+                                const isDark = theme.palette.mode === 'dark';
+                                const isGray =
+                                  (theme as { appMode?: string }).appMode ===
+                                  'graydark';
+                                return isDark
+                                  ? isGray
+                                    ? '#202022'
+                                    : '#171719'
+                                  : '#ffffff';
+                              },
+                          border: '1px solid',
+                          borderColor: isHovered
+                            ? (theme) =>
+                                theme.palette.mode === 'dark'
+                                  ? '#94a3b8'
+                                  : '#64748b'
+                            : 'divider',
+                          cursor: 'pointer',
+                          transition:
+                            'background-color 0.15s ease, border-color 0.15s ease',
+                          '&:hover': {
+                            borderColor: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? '#94a3b8'
+                                : '#64748b',
+                            bgcolor: (theme) => {
+                              const isDark = theme.palette.mode === 'dark';
+                              const isGray =
+                                (theme as { appMode?: string }).appMode ===
+                                'graydark';
+                              return isDark
+                                ? isGray
+                                  ? '#28282b'
+                                  : '#222225'
+                                : '#f1f5f9';
+                            },
+                          },
                         }}
                       >
                         <Box
                           sx={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: '50%',
-                            bgcolor: categoryColor,
-                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: '100%',
                           }}
-                        />
-                        <Box sx={{ minWidth: 0, flex: 1, pr: 0.5 }}>
-                          <Typography
-                            variant="body2"
-                            noWrap
-                            sx={{
-                              fontWeight: 600,
-                              color: (theme) =>
-                                (theme as { appMode?: string }).appMode ===
-                                'graydark'
-                                  ? '#f8fafc'
-                                  : 'text.primary',
-                              fontSize: '12px',
-                              lineHeight: 1.2,
-                              mb: 0.2,
-                            }}
-                          >
-                            {event.title}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: (theme) =>
-                                (theme as { appMode?: string }).appMode ===
-                                'graydark'
-                                  ? '#cbd5e1'
-                                  : 'text.secondary',
-                              fontSize: '10.5px',
-                              lineHeight: 1.1,
-                            }}
-                          >
-                            {timeString}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {hasSubtasks && (
+                        >
                           <Box
-                            component="button"
-                            type="button"
-                            onClick={(e) =>
-                              handleToggleCardSubtasks(e, event.id)
-                            }
                             sx={{
-                              display: 'inline-flex',
+                              display: 'flex',
                               alignItems: 'center',
-                              gap: 0.3,
-                              px: 0.6,
-                              py: 0.2,
-                              borderRadius: '4px',
-                              fontSize: '10px',
-                              fontWeight: 600,
-                              cursor: 'pointer',
-                              border: '1px solid',
-                              borderColor: (theme) =>
-                                isSubtasksExpanded
-                                  ? theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.2)'
-                                    : 'rgba(0, 0, 0, 0.15)'
-                                  : 'divider',
-                              bgcolor: (theme) =>
-                                isSubtasksExpanded
-                                  ? theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.1)'
-                                    : 'rgba(0, 0, 0, 0.06)'
-                                  : 'transparent',
-                              color: 'text.secondary',
-                              outline: 'none',
-                              transition: 'all 0.15s ease',
-                              '&:hover': {
-                                bgcolor: (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.15)'
-                                    : 'rgba(0, 0, 0, 0.08)',
-                                color: 'text.primary',
-                              },
+                              gap: 1,
+                              minWidth: 0,
+                              flex: 1,
                             }}
                           >
-                            <span>
-                              {completedSubtasksCount}/{totalSubtasksCount}
-                            </span>
-                            <ArrowDownIcon
+                            <Box
                               sx={{
-                                fontSize: 13,
-                                transition: 'transform 0.2s ease',
-                                transform: isSubtasksExpanded
-                                  ? 'rotate(180deg)'
-                                  : 'rotate(0deg)',
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
+                                bgcolor: categoryColor,
+                                flexShrink: 0,
+                              }}
+                            />
+                            <Box sx={{ minWidth: 0, flex: 1, pr: 0.5 }}>
+                              <Typography
+                                variant="body2"
+                                noWrap
+                                sx={{
+                                  fontWeight: 600,
+                                  color: (theme) =>
+                                    (theme as { appMode?: string }).appMode ===
+                                    'graydark'
+                                      ? '#f8fafc'
+                                      : 'text.primary',
+                                  fontSize: '12px',
+                                  lineHeight: 1.2,
+                                  mb: 0.2,
+                                }}
+                              >
+                                {event.title}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: (theme) =>
+                                    (theme as { appMode?: string }).appMode ===
+                                    'graydark'
+                                      ? '#cbd5e1'
+                                      : 'text.secondary',
+                                  fontSize: '10.5px',
+                                  lineHeight: 1.1,
+                                }}
+                              >
+                                {timeString}
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              flexShrink: 0,
+                            }}
+                          >
+                            {hasSubtasks && (
+                              <Box
+                                component="button"
+                                type="button"
+                                onClick={(e) =>
+                                  handleToggleCardSubtasks(e, event.id)
+                                }
+                                sx={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 0.3,
+                                  px: 0.6,
+                                  py: 0.2,
+                                  borderRadius: '4px',
+                                  fontSize: '10px',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  border: '1px solid',
+                                  borderColor: (theme) =>
+                                    isSubtasksExpanded
+                                      ? theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.2)'
+                                        : 'rgba(0, 0, 0, 0.15)'
+                                      : 'divider',
+                                  bgcolor: (theme) =>
+                                    isSubtasksExpanded
+                                      ? theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.1)'
+                                        : 'rgba(0, 0, 0, 0.06)'
+                                      : 'transparent',
+                                  color: 'text.secondary',
+                                  outline: 'none',
+                                  transition: 'all 0.15s ease',
+                                  '&:hover': {
+                                    bgcolor: (theme) =>
+                                      theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.15)'
+                                        : 'rgba(0, 0, 0, 0.08)',
+                                    color: 'text.primary',
+                                  },
+                                }}
+                              >
+                                <span>
+                                  {completedSubtasksCount}/{totalSubtasksCount}
+                                </span>
+                                <ArrowDownIcon
+                                  sx={{
+                                    fontSize: 13,
+                                    transition: 'transform 0.2s ease',
+                                    transform: isSubtasksExpanded
+                                      ? 'rotate(180deg)'
+                                      : 'rotate(0deg)',
+                                  }}
+                                />
+                              </Box>
+                            )}
+                            <ChevronRight
+                              sx={{
+                                fontSize: 16,
+                                color: 'text.disabled',
                               }}
                             />
                           </Box>
-                        )}
-                        <ChevronRight
-                          sx={{
-                            fontSize: 16,
-                            color: 'text.disabled',
-                          }}
-                        />
-                      </Box>
-                    </Box>
+                        </Box>
 
-                    {/* Expandable Subtasks Accordion */}
-                    {hasSubtasks && (
-                      <Box
-                        onClick={(e: React.MouseEvent) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                        sx={{
-                          display: 'grid',
-                          gridTemplateRows: isSubtasksExpanded ? '1fr' : '0fr',
-                          opacity: isSubtasksExpanded ? 1 : 0,
-                          transition:
-                            'grid-template-rows 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease',
-                          width: '100%',
-                        }}
-                      >
-                        <Box sx={{ minHeight: 0, overflow: 'hidden' }}>
+                        {/* Expandable Subtasks Accordion */}
+                        {hasSubtasks && (
                           <Box
+                            onClick={(e: React.MouseEvent) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
                             sx={{
-                              pt: 0.75,
-                              mt: 0.5,
-                              borderTop: '1px solid',
-                              borderColor: (theme) =>
-                                theme.palette.mode === 'dark'
-                                  ? 'rgba(255, 255, 255, 0.08)'
-                                  : 'rgba(0, 0, 0, 0.06)',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '2px',
+                              display: 'grid',
+                              gridTemplateRows: isSubtasksExpanded
+                                ? '1fr'
+                                : '0fr',
+                              opacity: isSubtasksExpanded ? 1 : 0,
+                              transition:
+                                'grid-template-rows 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease',
+                              width: '100%',
                             }}
                           >
-                            {subtasks.map((subtask) => (
+                            <Box sx={{ minHeight: 0, overflow: 'hidden' }}>
                               <Box
-                                key={subtask.id}
-                                onClick={(e: React.MouseEvent) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  if (task?.id && onToggleSubtask) {
-                                    onToggleSubtask(task.id, subtask.id);
-                                  }
-                                }}
                                 sx={{
+                                  pt: 0.75,
+                                  mt: 0.5,
+                                  borderTop: '1px solid',
+                                  borderColor: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255, 255, 255, 0.08)'
+                                      : 'rgba(0, 0, 0, 0.06)',
                                   display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 0.6,
-                                  p: '2.5px 4px',
-                                  borderRadius: '4px',
-                                  cursor: onToggleSubtask
-                                    ? 'pointer'
-                                    : 'default',
-                                  transition: 'background-color 0.15s ease',
-                                  '&:hover': onToggleSubtask
-                                    ? {
-                                        bgcolor: (theme) =>
-                                          theme.palette.mode === 'dark'
-                                            ? 'rgba(255, 255, 255, 0.06)'
-                                            : 'rgba(0, 0, 0, 0.04)',
-                                      }
-                                    : undefined,
+                                  flexDirection: 'column',
+                                  gap: '2px',
                                 }}
                               >
-                                {subtask.completed ? (
-                                  <CheckedIcon
-                                    sx={{
-                                      fontSize: 13,
-                                      color: '#10b981',
-                                      flexShrink: 0,
+                                {subtasks.map((subtask) => (
+                                  <Box
+                                    key={subtask.id}
+                                    onClick={(e: React.MouseEvent) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      if (task?.id && onToggleSubtask) {
+                                        onToggleSubtask(task.id, subtask.id);
+                                      }
                                     }}
-                                  />
-                                ) : (
-                                  <UncheckedIcon
                                     sx={{
-                                      fontSize: 13,
-                                      color: 'text.disabled',
-                                      flexShrink: 0,
-                                    }}
-                                  />
-                                )}
-                                <Typography
-                                  variant="caption"
-                                  noWrap
-                                  sx={{
-                                    fontSize: '11px',
-                                    fontWeight: 500,
-                                    color: subtask.completed
-                                      ? 'text.disabled'
-                                      : 'text.primary',
-                                    textDecoration: subtask.completed
-                                      ? 'line-through'
-                                      : 'none',
-                                    flex: 1,
-                                    minWidth: 0,
-                                  }}
-                                >
-                                  {subtask.title}
-                                </Typography>
-                                {Boolean(subtask.estimate_timer) && (
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      fontSize: '9px',
-                                      fontWeight: 600,
-                                      color: 'text.secondary',
-                                      bgcolor: (theme) =>
-                                        theme.palette.mode === 'dark'
-                                          ? 'rgba(255, 255, 255, 0.08)'
-                                          : 'rgba(0, 0, 0, 0.05)',
-                                      px: 0.4,
-                                      py: 0.1,
-                                      borderRadius: '3px',
-                                      flexShrink: 0,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 0.6,
+                                      p: '2.5px 4px',
+                                      borderRadius: '4px',
+                                      cursor: onToggleSubtask
+                                        ? 'pointer'
+                                        : 'default',
+                                      transition: 'background-color 0.15s ease',
+                                      '&:hover': onToggleSubtask
+                                        ? {
+                                            bgcolor: (theme) =>
+                                              theme.palette.mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.06)'
+                                                : 'rgba(0, 0, 0, 0.04)',
+                                          }
+                                        : undefined,
                                     }}
                                   >
-                                    {subtask.estimate_timer}m
-                                  </Typography>
-                                )}
+                                    {subtask.completed ? (
+                                      <CheckedIcon
+                                        sx={{
+                                          fontSize: 13,
+                                          color: '#10b981',
+                                          flexShrink: 0,
+                                        }}
+                                      />
+                                    ) : (
+                                      <UncheckedIcon
+                                        sx={{
+                                          fontSize: 13,
+                                          color: 'text.disabled',
+                                          flexShrink: 0,
+                                        }}
+                                      />
+                                    )}
+                                    <Typography
+                                      variant="caption"
+                                      noWrap
+                                      sx={{
+                                        fontSize: '11px',
+                                        fontWeight: 500,
+                                        color: subtask.completed
+                                          ? 'text.disabled'
+                                          : 'text.primary',
+                                        textDecoration: subtask.completed
+                                          ? 'line-through'
+                                          : 'none',
+                                        flex: 1,
+                                        minWidth: 0,
+                                      }}
+                                    >
+                                      {subtask.title}
+                                    </Typography>
+                                    {Boolean(subtask.estimate_timer) && (
+                                      <Typography
+                                        variant="caption"
+                                        sx={{
+                                          fontSize: '9px',
+                                          fontWeight: 600,
+                                          color: 'text.secondary',
+                                          bgcolor: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                              ? 'rgba(255, 255, 255, 0.08)'
+                                              : 'rgba(0, 0, 0, 0.05)',
+                                          px: 0.4,
+                                          py: 0.1,
+                                          borderRadius: '3px',
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        {subtask.estimate_timer}m
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                ))}
                               </Box>
-                            ))}
+                            </Box>
                           </Box>
-                        </Box>
+                        )}
                       </Box>
-                    )}
-                  </Box>
-                );
-              })
-            )}
-          </Stack>
-        </Box>
+                    );
+                  })
+                )}
+              </Stack>
+            </Box>
 
-        {/* Optimize Schedule / Weekly Planner Buttons */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 0.75,
-            mt: 'auto',
-          }}
-        >
-          <Button
-            variant="contained"
-            onClick={onAIPlannerClick}
-            startIcon={<AutoAwesomeIcon sx={{ fontSize: 14 }} />}
-            sx={{
-              textTransform: 'none',
-              borderRadius: '8px',
-              py: 0.9,
-              fontWeight: 700,
-              fontSize: '12.5px',
-              bgcolor: '#4f46e5',
-              color: '#ffffff',
-              boxShadow: '0 2px 8px rgba(79, 70, 229, 0.25)',
-              '&:hover': {
-                bgcolor: '#4338ca',
-                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
-              },
-            }}
-          >
-            {t('calendar.optimizeSchedule')}
-          </Button>
-
-          {onWeeklyPlannerClick && (
-            <Button
-              variant="text"
-              onClick={onWeeklyPlannerClick}
+            {/* Optimize Schedule / Weekly Planner Buttons */}
+            <Box
               sx={{
-                textTransform: 'none',
-                borderRadius: '8px',
-                py: 0.5,
-                fontWeight: 600,
-                fontSize: '11.5px',
-                color: 'text.secondary',
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                  color: 'text.primary',
-                },
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 0.75,
+                mt: 'auto',
               }}
             >
-              {t('calendar.openWeeklyPlanner')}
-            </Button>
-          )}
-        </Box>
+              <Button
+                variant="contained"
+                onClick={onAIPlannerClick}
+                disabled={isAIPlanning}
+                aria-busy={isAIPlanning}
+                startIcon={
+                  isAIPlanning ? (
+                    <CircularProgress size={14} color="inherit" />
+                  ) : (
+                    <AutoAwesomeIcon sx={{ fontSize: 14 }} />
+                  )
+                }
+                sx={{
+                  textTransform: 'none',
+                  borderRadius: '8px',
+                  py: 0.9,
+                  fontWeight: 700,
+                  fontSize: '12.5px',
+                  bgcolor: 'primary.main',
+                  color: '#ffffff',
+                  boxShadow: '0 2px 8px rgba(0, 135, 103, 0.25)',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                    boxShadow: '0 4px 12px rgba(0, 135, 103, 0.35)',
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'primary.main',
+                    color: '#ffffff',
+                    opacity: 0.75,
+                  },
+                }}
+              >
+                {isAIPlanning
+                  ? t('calendar.optimizing')
+                  : t('calendar.optimizeSchedule')}
+              </Button>
+              {aiPlannerHint && !isAIPlanning && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    textAlign: 'center',
+                    color: 'text.secondary',
+                    fontSize: '11px',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {aiPlannerHint}
+                </Typography>
+              )}
+
+              {onWeeklyPlannerClick && (
+                <Button
+                  variant="text"
+                  onClick={onWeeklyPlannerClick}
+                  sx={{
+                    textTransform: 'none',
+                    borderRadius: '8px',
+                    py: 0.5,
+                    fontWeight: 600,
+                    fontSize: '11.5px',
+                    color: 'text.secondary',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'text.primary',
+                    },
+                  }}
+                >
+                  {t('calendar.openWeeklyPlanner')}
+                </Button>
+              )}
+            </Box>
+          </>
+        )}
       </PerfectScrollbar>
     </PanelContainer>
   );

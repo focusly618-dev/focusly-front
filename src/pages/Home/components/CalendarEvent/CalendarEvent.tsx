@@ -481,6 +481,8 @@ export const CalendarEvent = (props: CalendarEventProps) => {
         semanticTheme={semanticTheme}
         isMeeting={isMeeting}
         isDraft={isDraft}
+        // Why Lumina put it here, on hover.
+        title={isDraft ? event.draftReason : undefined}
         onContextMenu={
           isDraft || isDeleting
             ? (e) => {
@@ -1103,7 +1105,9 @@ export const CalendarEvent = (props: CalendarEventProps) => {
                       fontSize: '10px',
                       fontWeight: 600,
                       color: (theme) =>
-                        theme.palette.mode === 'dark' ? '#94a3b8' : '#475569',
+                        theme.palette.mode === 'dark'
+                          ? '#e2e2e2ff'
+                          : '#ffffffff',
                       bgcolor: (theme) =>
                         theme.palette.mode === 'dark'
                           ? 'rgba(255, 255, 255, 0.05)'

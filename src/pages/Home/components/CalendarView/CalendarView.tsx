@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { calendarPlanService } from '@/services/calendarPlanService';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import {
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  startOfDay,
-  addDays,
-  isToday,
-} from 'date-fns';
+import { format, parse, startOfWeek, getDay, addDays, isToday } from 'date-fns';
 import { enUS, es } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -24,11 +22,10 @@ import {
 } from '../CalendarEvent';
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
+import { AIPlanPanel } from './components/AIPlanPanel/AIPlanPanel';
 import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
 import { AwaitedTasksModal } from './components/AwaitedTasksModal';
-import type { AITimeBlockItem } from '@/api/AI/apiAIPlanner';
 import { surfaceColor } from '@/context';
-import { LuminaOrb } from '@/components/ui';
 
 // Material UI
 import {
@@ -37,7 +34,6 @@ import {
   Stack,
   Typography,
   Drawer,
-  Backdrop,
   Button,
   IconButton,
 } from '@mui/material';
@@ -47,22 +43,17 @@ import {
 } from '@mui/icons-material';
 
 // Styles & Hooks
-import {
-  CalendarContainer,
-  DraftActionBar,
-  CalendarTopBar,
-} from './CalendarView.styles';
+import { CalendarContainer, CalendarTopBar } from './CalendarView.styles';
 import { useCalendarView } from './hooks/useCalendarView.hook';
+import { useAIScheduler } from './hooks/useAIScheduler.hook';
 import {
   contextMenuSx,
   priorityCircleSx,
   PRIORITY_COLORS,
 } from '../CalendarEvent/CalendarEvent.styles';
-import { notify, getFriendlyErrorMessage } from '@/utils';
 
 // Types
 import type { Task } from '@/redux/tasks/task.types';
-import { isPlanLimitError } from '@/api/Billing/planLimit';
 
 const locales = {
   'en-US': enUS,
@@ -220,10 +211,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     workHoursConfig,
     handleAddTaskClick,
     tasks,
-    draftEvents,
-    setDraftEvents,
     isCalendarInDraftMode,
-    setIsCalendarInDraftMode,
     handleDeleteDraft,
     handleToggleSubtask,
     confirmDraftEvents,
@@ -351,136 +339,42 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     };
   }, [currentView, currentDate]);
 
-  const [isAILoading, setIsAILoading] = useState(false);
-
-  const handleAIPlanningTrigger = async () => {
-    if (isAILoading) return;
-    setIsAILoading(true);
-    notify.info({
-      title: t('calendar.aiPlannerTitle'),
-      description: t('calendar.aiPlannerDescription'),
-      duration: 3500,
-    });
-
-    try {
-      const pendingTasks = tasks.filter((t) => t.status !== 'Done');
-      const slots: { start: string; end: string }[] = [];
-      const startDay = startOfDay(currentDate);
-
-      const dayShortNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const [startHour] = (workHoursConfig?.startTime ?? '09:00')
-        .split(':')
-        .map(Number);
-      const [endHour] = (workHoursConfig?.endTime ?? '18:00')
-        .split(':')
-        .map(Number);
-      const workDays = workHoursConfig?.selectedDays;
-
-      for (let d = 0; d < 3; d++) {
-        const day = addDays(startDay, d);
-        if (
-          workDays?.length &&
-          !workDays.includes(dayShortNames[day.getDay()])
-        ) {
-          continue;
-        }
-        for (let hour = startHour; hour < endHour; hour++) {
-          const slotStart = new Date(day);
-          slotStart.setHours(hour, 0, 0, 0);
-          const slotEnd = new Date(day);
-          slotEnd.setHours(hour + 1, 0, 0, 0);
-
-          // Check overlap with existing events
-          const isOverlap = events.some((e) => {
-            const eStart = new Date(e.start);
-            const eEnd = new Date(e.end);
-            return slotStart < eEnd && slotEnd > eStart;
-          });
-
-          if (!isOverlap) {
-            slots.push({
-              start: slotStart.toISOString(),
-              end: slotEnd.toISOString(),
-            });
-          }
-        }
-      }
-
-      if (pendingTasks.length === 0) {
-        notify.info({
-          title: t('calendar.noPendingTasksTitle'),
-          description: t('calendar.noPendingTasksDesc'),
-          duration: 3000,
+  const aiScheduler = useAIScheduler({
+    events,
+    currentDate,
+    workHours: workHoursConfig,
+  });
+  // Tells Lumina's background run whether the user is looking (see
+  // calendarPlanService.isCalendarOpen).
+  useEffect(() => calendarPlanService.attachCalendar(), []);
+  const planState = useSyncExternalStore(
+    calendarPlanService.subscribe,
+    calendarPlanService.getSnapshot,
+  );
+  const showPlan = aiScheduler.isPlanning || isCalendarInDraftMode;
+  const renderPlan = (variant: 'panel' | 'floating') => (
+    <AIPlanPanel
+      variant={variant}
+      plan={planState}
+      confirming={confirmingDraft}
+      onCancel={aiScheduler.cancel}
+      onConfirm={confirmDraftEvents}
+      onDiscard={clearDraftEvents}
+      onToggle={(id) => calendarPlanService.toggleExcluded(id)}
+      onFocus={(draft) => {
+        handleOnNavigate(draft.start);
+        setHoveredEventId(draft.id);
+      }}
+      onHover={setHoveredEventId}
+    />
+  );
+  const aiPlannerHint = aiScheduler.isPro
+    ? undefined
+    : aiScheduler.freeMessagesLeft === 0
+      ? t('calendar.optimizeProOnly')
+      : t('calendar.optimizeFreeHint', {
+          count: aiScheduler.freeMessagesLeft ?? 0,
         });
-        setIsAILoading(false);
-        return;
-      }
-
-      if (slots.length === 0) {
-        notify.warning({
-          title: t('calendar.noAvailabilityTitle'),
-          description: t('calendar.noAvailabilityDesc'),
-          duration: 3000,
-        });
-        setIsAILoading(false);
-        return;
-      }
-
-      const { planCalendarAI } = await import('@/api/AI/apiAIPlanner');
-      const res = await planCalendarAI(pendingTasks, slots);
-      const proposed = res.events || [];
-
-      if (proposed.length === 0) {
-        notify.info({
-          title: t('calendar.noSuggestionsTitle'),
-          description: t('calendar.noSuggestionsDesc'),
-          duration: 3000,
-        });
-        setIsAILoading(false);
-        return;
-      }
-
-      const mappedDrafts = proposed.map(
-        (item: AITimeBlockItem, idx: number) => {
-          return {
-            id: `draft-${item.taskId || idx}-${Date.now()}`,
-            title: item.title,
-            start: new Date(item.startTime),
-            end: new Date(item.endTime),
-            allDay: false,
-            resource: item.taskId
-              ? tasks.find((t) => t.id === item.taskId)
-              : undefined,
-            type: 'task' as const,
-            isDraft: true,
-          };
-        },
-      );
-
-      setDraftEvents(mappedDrafts);
-      setIsCalendarInDraftMode(true);
-
-      notify.success({
-        title: t('calendar.draftGeneratedTitle'),
-        description: t('calendar.draftGeneratedDesc'),
-        duration: 5000,
-      });
-    } catch (e) {
-      // The Pro plans are already on screen.
-      if (isPlanLimitError(e)) return;
-      console.error('Error generating AI schedule:', e);
-      notify.error({
-        title: t('calendar.planningErrorTitle'),
-        description: getFriendlyErrorMessage(
-          e,
-          t('calendar.planningErrorDesc'),
-        ),
-        duration: 4000,
-      });
-    } finally {
-      setIsAILoading(false);
-    }
-  };
 
   const handleCreateTaskAtSlot = (priority?: number) => {
     if (slotContextMenu) {
@@ -518,86 +412,22 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         position: 'relative',
       }}
     >
-      <Backdrop
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 2,
-          color: '#fff',
-          backgroundColor: 'rgba(0, 0, 0, 0.45)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 2.5,
-        }}
-        open={isAILoading}
-      >
-        <LuminaOrb size={80} state="thinking" />
-        <Typography variant="body2" fontWeight={500}>
-          {t('calendar.organizingBackdrop')}
-        </Typography>
-      </Backdrop>
-
-      {isCalendarInDraftMode && (
-        <DraftActionBar>
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 600,
-              color: 'text.primary',
-              fontSize: '13px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-            }}
-          >
-            {t('calendar.draftProposed', { count: draftEvents.length })}
-          </Typography>
-          <Stack direction="row" spacing={1}>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={clearDraftEvents}
-              disabled={confirmingDraft}
-              sx={{
-                textTransform: 'none',
-                borderRadius: '20px',
-                fontWeight: 600,
-                fontSize: '0.75rem',
-                color: 'text.secondary',
-                borderColor: 'divider',
-                '&:hover': {
-                  borderColor: 'error.light',
-                  bgcolor: 'rgba(239, 68, 68, 0.06)',
-                  color: 'error.main',
-                },
-              }}
-            >
-              {t('calendar.discard')}
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              onClick={confirmDraftEvents}
-              disabled={confirmingDraft}
-              sx={{
-                textTransform: 'none',
-                borderRadius: '20px',
-                fontWeight: 700,
-                fontSize: '0.75rem',
-                bgcolor: 'primary.main',
-                boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)',
-                '&:hover': {
-                  bgcolor: 'primary.dark',
-                  boxShadow: '0 4px 12px rgba(124, 58, 237, 0.35)',
-                },
-              }}
-            >
-              {confirmingDraft
-                ? t('calendar.scheduling')
-                : t('calendar.confirmSchedule')}
-            </Button>
-          </Stack>
-        </DraftActionBar>
+      {/* Lumina working: a bar over the calendar, which stays usable. */}
+      {/* Small screens: Lumina's progress or proposal as a card over the
+          calendar (the side panel shows it on larger ones). */}
+      {showPlan && (
+        <Box
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            position: 'absolute',
+            left: 12,
+            right: 12,
+            bottom: 12,
+            zIndex: 1100,
+          }}
+        >
+          {renderPlan('floating')}
+        </Box>
       )}
       <CalendarContainer
         isDayView={currentView === Views.DAY}
@@ -842,7 +672,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           onAddTaskClick={handleAddTaskClick}
           events={events}
           onEventSelect={handleSelectEvent}
-          onAIPlannerClick={handleAIPlanningTrigger}
+          onAIPlannerClick={aiScheduler.plan}
+          isAIPlanning={aiScheduler.isPlanning}
+          aiPlannerHint={aiPlannerHint}
+          planPanel={showPlan ? renderPlan('panel') : undefined}
           onWeeklyPlannerClick={() => setIsWeeklyPlannerOpen(true)}
           hoveredEventId={hoveredEventId}
           onHoverEvent={setHoveredEventId}
@@ -887,9 +720,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             setIsSidePanelOpen(false);
           }}
           onAIPlannerClick={() => {
-            handleAIPlanningTrigger();
+            void aiScheduler.plan();
             setIsSidePanelOpen(false);
           }}
+          isAIPlanning={aiScheduler.isPlanning}
+          aiPlannerHint={aiPlannerHint}
+          planPanel={showPlan ? renderPlan('panel') : undefined}
           onWeeklyPlannerClick={() => {
             setIsWeeklyPlannerOpen(true);
             setIsSidePanelOpen(false);

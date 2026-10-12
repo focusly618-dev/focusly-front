@@ -12,6 +12,8 @@ export interface ICalendarEvent {
   overlapIndex?: number;
   provider?: string;
   isDraft?: boolean;
+  /** Why Lumina proposed this block (drafts only). */
+  draftReason?: string;
 }
 
 export interface CalendarEventProps {

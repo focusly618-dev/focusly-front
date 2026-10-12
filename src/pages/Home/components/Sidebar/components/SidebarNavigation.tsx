@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import {
   List,
   ListItem,
@@ -9,10 +9,12 @@ import {
   Collapse,
 } from '@mui/material';
 import { aiStreamService } from '@/services/aiStreamService';
+import { calendarPlanService } from '@/services/calendarPlanService';
 import { useTranslation } from 'react-i18next';
 import {
   NavItem,
   SubNavItem,
+  TreeSubNavItem,
   NavCountBadge,
   CategoryHeader,
 } from '../Sidebar.styles';
@@ -32,8 +34,77 @@ import {
   BarChartRounded as InsightsIcon,
   GridViewOutlined as ProjectIcon,
   ExpandMore as ExpandMoreIcon,
+  ArrowForwardRounded as ArrowForwardIcon,
 } from '@mui/icons-material';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
+
+interface TreeConnectorProps {
+  isLast: boolean;
+  isActive?: boolean;
+}
+
+const TreeConnector = ({ isLast, isActive }: TreeConnectorProps) => (
+  <Box
+    sx={{
+      position: 'absolute',
+      left: '19px',
+      top: 0,
+      bottom: 0,
+      width: '14px',
+      pointerEvents: 'none',
+      zIndex: 1,
+    }}
+  >
+    <Box
+      className="tree-connector-elbow"
+      sx={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        width: '11px',
+        height: '14px',
+        borderLeft: (theme) =>
+          `1.5px solid ${
+            isActive
+              ? theme.palette.mode === 'dark'
+                ? '#2dd4bf'
+                : '#008767'
+              : theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.14)'
+                : 'rgba(0, 0, 0, 0.12)'
+          }`,
+        borderBottom: (theme) =>
+          `1.5px solid ${
+            isActive
+              ? theme.palette.mode === 'dark'
+                ? '#2dd4bf'
+                : '#008767'
+              : theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.14)'
+                : 'rgba(0, 0, 0, 0.12)'
+          }`,
+        borderBottomLeftRadius: '5px',
+        transition: 'border-color 0.2s ease',
+      }}
+    />
+    {!isLast && (
+      <Box
+        sx={{
+          position: 'absolute',
+          left: 0,
+          top: '14px',
+          bottom: 0,
+          borderLeft: (theme) =>
+            `1.5px solid ${
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.14)'
+                : 'rgba(0, 0, 0, 0.12)'
+            }`,
+        }}
+      />
+    )}
+  </Box>
+);
 
 interface SidebarNavigationProps {
   sidebar: UseSidebarReturn;
@@ -62,6 +133,18 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
   const currentDateRange = sidebar.searchParams.get('dateRange');
 
   const isDailyPlanActive = currentTab === TaskBar.DailyPlan;
+  // "Optimizar agenda" running, or its proposal waiting, from another tab.
+  const calendarPlan = useSyncExternalStore(
+    calendarPlanService.subscribe,
+    calendarPlanService.getSnapshot,
+  );
+  const calendarPlanStatus = isDailyPlanActive
+    ? null
+    : calendarPlan.isPlanning
+      ? 'planning'
+      : calendarPlan.drafts.length > 0
+        ? 'ready'
+        : null;
   const isTasksActive =
     currentTab === TaskBar.Tasks && !currentFilter && !currentDateRange;
   const isInboxActive =
@@ -91,6 +174,10 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
     currentTab === TaskBar.Workspace &&
     !sidebar.searchParams.get('modal') &&
     !sidebar.searchParams.get('groupId');
+
+  const MAX_RECENT_PROJECTS = 8;
+  const recentProjects = projectGroups.slice(0, MAX_RECENT_PROJECTS);
+  const hasMoreProjects = projectGroups.length > MAX_RECENT_PROJECTS;
 
   const handleProjectsTabClick = () => {
     if (isCollapsed) {
@@ -138,8 +225,35 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           active={isDailyPlanActive}
           onClick={() => changeStatusTab(TaskBar.DailyPlan)}
         >
-          <ListItemIcon>
+          <ListItemIcon sx={{ position: 'relative' }}>
             <DailyPlanIcon />
+            {calendarPlanStatus && (
+              <Box
+                role="status"
+                aria-label={t(
+                  calendarPlanStatus === 'planning'
+                    ? 'calendar.organizingBackdrop'
+                    : 'calendar.draftReadyTitle',
+                )}
+                sx={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 2,
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  bgcolor: 'primary.main',
+                  boxShadow: (theme) => `0 0 8px ${theme.palette.primary.main}`,
+                  ...(calendarPlanStatus === 'planning' && {
+                    animation: 'calendarPlanPulse 1.5s infinite ease-in-out',
+                    '@keyframes calendarPlanPulse': {
+                      '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                      '50%': { transform: 'scale(1.4)', opacity: 0.6 },
+                    },
+                  }),
+                }}
+              />
+            )}
           </ListItemIcon>
           <ListItemText
             primary={t('nav.dailyPlan')}
@@ -508,7 +622,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           )}
         </NavItem>
 
-        {/* Sub-items: Projects List */}
+        {/* Sub-items: Projects Tree List */}
         {!isCollapsed && (
           <Collapse
             in={isProjectsExpanded}
@@ -525,91 +639,240 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                 flexDirection: 'column',
                 mt: '1px',
                 mb: '2px',
+                position: 'relative',
               }}
             >
-              {projectGroups.map((group) => {
-                const isGroupActive =
-                  currentTab === TaskBar.Workspace &&
-                  sidebar.searchParams.get('groupId') === group.id;
-                const noteCount =
-                  group.workspaces?.length ??
-                  group.generalWorkspaces?.length ??
-                  0;
-
-                return (
-                  <SubNavItem
-                    key={group.id}
-                    active={isGroupActive}
-                    onClick={() => {
-                      const newParams = new URLSearchParams();
-                      newParams.set('tab', TaskBar.Workspace);
-                      newParams.set('groupId', group.id);
-                      sidebar.setSearchParams(newParams);
-                      changeStatusTab(TaskBar.Workspace, newParams);
+              {projectGroups.length === 0 ? (
+                <Box
+                  sx={{
+                    position: 'relative',
+                    pl: '34px',
+                    pr: '10px',
+                    py: '6px',
+                  }}
+                >
+                  <TreeConnector isLast={true} />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontSize: '11px',
+                      color: 'text.disabled',
+                      fontStyle: 'italic',
                     }}
                   >
-                    <ListItemIcon
+                    {t('nav.noProjectsYet', 'Sin proyectos aún')}
+                  </Typography>
+                </Box>
+              ) : (
+                <>
+                  {/* Tree Header / Indicator */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      position: 'relative',
+                      pl: '34px',
+                      pr: '10px',
+                      pt: '4px',
+                      pb: '3px',
+                    }}
+                  >
+                    <Box
                       sx={{
-                        minWidth: 20,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        position: 'absolute',
+                        left: '19px',
+                        top: 0,
+                        bottom: 0,
+                        borderLeft: (theme) =>
+                          `1.5px solid ${
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.14)'
+                              : 'rgba(0, 0, 0, 0.12)'
+                          }`,
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontSize: '9.5px',
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        color:
+                          theme.palette.mode === 'dark' ? '#717684' : '#9CA3AF',
+                        lineHeight: 1,
                       }}
                     >
-                      {isCustomEmoji(group.emoji) ? (
-                        <Box
-                          component="span"
+                      {t('nav.recentProjects', 'Recientes')}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontSize: '9.5px',
+                        fontWeight: 600,
+                        color:
+                          theme.palette.mode === 'dark' ? '#525866' : '#9CA3AF',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {recentProjects.length}
+                      {hasMoreProjects ? ` / ${projectGroups.length}` : ''}
+                    </Typography>
+                  </Box>
+
+                  {/* 8 Most Recent Projects */}
+                  {recentProjects.map((group, index) => {
+                    const isGroupActive =
+                      currentTab === TaskBar.Workspace &&
+                      sidebar.searchParams.get('groupId') === group.id;
+                    const noteCount =
+                      group.workspaces?.length ??
+                      group.generalWorkspaces?.length ??
+                      0;
+                    const isLast =
+                      !hasMoreProjects && index === recentProjects.length - 1;
+
+                    return (
+                      <TreeSubNavItem
+                        key={group.id}
+                        active={isGroupActive}
+                        onClick={() => {
+                          const newParams = new URLSearchParams();
+                          newParams.set('tab', TaskBar.Workspace);
+                          newParams.set('groupId', group.id);
+                          sidebar.setSearchParams(newParams);
+                          changeStatusTab(TaskBar.Workspace, newParams);
+                        }}
+                      >
+                        <TreeConnector
+                          isLast={isLast}
+                          isActive={isGroupActive}
+                        />
+                        <ListItemIcon
                           sx={{
-                            fontSize: '13px',
-                            lineHeight: 1,
+                            minWidth: 20,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                           }}
                         >
-                          {group.emoji}
-                        </Box>
-                      ) : group.emoji === 'outlined' ? (
-                        <ModernFolderOutlinedIcon
-                          sx={{
-                            fontSize: 14,
-                            color:
-                              group.color ||
-                              (theme.palette.mode === 'dark'
-                                ? '#a78bfa'
-                                : '#7c3aed'),
+                          {isCustomEmoji(group.emoji) ? (
+                            <Box
+                              component="span"
+                              sx={{
+                                fontSize: '13px',
+                                lineHeight: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              {group.emoji}
+                            </Box>
+                          ) : group.emoji === 'outlined' ? (
+                            <ModernFolderOutlinedIcon
+                              sx={{
+                                fontSize: 14,
+                                color:
+                                  group.color ||
+                                  (theme.palette.mode === 'dark'
+                                    ? '#a78bfa'
+                                    : '#7c3aed'),
+                              }}
+                            />
+                          ) : (
+                            <ModernFolderFilledIcon
+                              sx={{
+                                fontSize: 14,
+                                color:
+                                  group.color ||
+                                  (theme.palette.mode === 'dark'
+                                    ? '#a78bfa'
+                                    : '#7c3aed'),
+                              }}
+                            />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={group.name}
+                          primaryTypographyProps={{
+                            fontSize: '11.5px',
+                            fontWeight: isGroupActive ? 600 : 500,
+                            noWrap: true,
+                            textOverflow: 'ellipsis',
                           }}
                         />
-                      ) : (
-                        <ModernFolderFilledIcon
-                          sx={{
-                            fontSize: 14,
-                            color:
-                              group.color ||
-                              (theme.palette.mode === 'dark'
-                                ? '#a78bfa'
-                                : '#7c3aed'),
-                          }}
-                        />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={group.name}
-                      primaryTypographyProps={{
-                        fontSize: '11.5px',
-                        fontWeight: isGroupActive ? 600 : 500,
-                        noWrap: true,
-                        textOverflow: 'ellipsis',
+                        {noteCount > 0 && (
+                          <NavCountBadge active={isGroupActive}>
+                            {noteCount}
+                          </NavCountBadge>
+                        )}
+                      </TreeSubNavItem>
+                    );
+                  })}
+
+                  {/* Terminal Node: View all projects if > 8 */}
+                  {hasMoreProjects && (
+                    <TreeSubNavItem
+                      key="view-all-projects"
+                      active={
+                        currentTab === TaskBar.Workspace &&
+                        !sidebar.searchParams.get('groupId') &&
+                        !sidebar.searchParams.get('modal')
+                      }
+                      onClick={() => {
+                        const newParams = new URLSearchParams();
+                        newParams.set('tab', TaskBar.Workspace);
+                        sidebar.setSearchParams(newParams);
+                        changeStatusTab(TaskBar.Workspace, newParams);
                       }}
-                    />
-                    {noteCount > 0 && (
-                      <NavCountBadge active={isGroupActive}>
-                        {noteCount}
-                      </NavCountBadge>
-                    )}
-                  </SubNavItem>
-                );
-              })}
+                      sx={{
+                        opacity: 0.85,
+                        '&:hover': {
+                          opacity: 1,
+                        },
+                      }}
+                    >
+                      <TreeConnector isLast={true} />
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 20,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <ArrowForwardIcon
+                          sx={{
+                            fontSize: 13,
+                            color:
+                              theme.palette.mode === 'dark'
+                                ? '#a78bfa'
+                                : '#7c3aed',
+                          }}
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t(
+                          'nav.viewAllProjects',
+                          'Ver todos ({{count}})',
+                          { count: projectGroups.length },
+                        )}
+                        primaryTypographyProps={{
+                          fontSize: '11px',
+                          fontWeight: 500,
+                          color:
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.7)'
+                              : 'text.secondary',
+                          noWrap: true,
+                        }}
+                      />
+                    </TreeSubNavItem>
+                  )}
+                </>
+              )}
             </Box>
           </Collapse>
         )}
