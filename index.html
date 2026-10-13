@@ -9,12 +9,19 @@
       // Apply the saved theme before first paint (no light flash on dark
       // themes). Mirrors applyModeToDocument in src/context/theme.
       (function () {
-        var mode = 'dark';
+        // 'system' (or nothing saved) follows the OS, as resolveThemeMode does.
+        var saved = null;
         try {
-          var saved = localStorage.getItem('themeMode');
-          if (saved === 'light' || saved === 'dark' || saved === 'graydark')
-            mode = saved;
+          saved = localStorage.getItem('themeMode');
         } catch (e) {}
+        var mode;
+        if (saved === 'light' || saved === 'dark' || saved === 'graydark') {
+          mode = saved;
+        } else {
+          var mq =
+            window.matchMedia && matchMedia('(prefers-color-scheme: dark)');
+          mode = mq && !mq.matches ? 'light' : 'dark';
+        }
         var root = document.documentElement;
         root.classList.toggle('light', mode === 'light');
         root.classList.toggle('dark', mode !== 'light');
