@@ -1,4 +1,10 @@
 {
+  "taskReminder": {
+    "upcomingTitle": "Coming up: {{title}}",
+    "urgentTitle": "Starting now: {{title}}!",
+    "startsIn_one": "Starts in {{count}} minute ({{time}})",
+    "startsIn_other": "Starts in {{count}} minutes ({{time}})"
+  },
   "common": {
     "loadingConversations": "Loading conversations…",
     "save": "Save",

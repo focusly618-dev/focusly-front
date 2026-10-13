@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/redux/store';
@@ -9,8 +9,9 @@ import {
   TASK_QUERIES,
   WORKSPACE_QUERIES,
 } from '@/api/refreshQueries';
-import { notify, soundPlayer } from '@/utils';
+import { notify } from '@/utils';
 import { RealTimeContext } from './RealTimeContext';
+import { showTaskReminder, type TaskUpcomingEvent } from './taskReminder';
 
 export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -19,6 +20,12 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id;
   const [socket, setSocket] = useState<Socket | null>(null);
+  // Read when a reminder arrives, so switching it in Settings doesn't
+  // reconnect the socket.
+  const remindersOnRef = useRef(user?.pushEnabled !== false);
+  useEffect(() => {
+    remindersOnRef.current = user?.pushEnabled !== false;
+  }, [user?.pushEnabled]);
 
   useEffect(() => {
     if (!userId) {
@@ -68,95 +75,14 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
       requestCalendarSync(dispatch, { fromServer: true });
     });
 
-    newSocket.on(
-      'task_upcoming',
-      (data: {
-        taskId: string;
-        title: string;
-        deadline: string;
-        minutesLeft: number;
-        type: '5min' | '1min';
-      }) => {
-        console.log('[REALTIME] Received task_upcoming event:', data);
-
-        const pushEnabled = user?.pushEnabled !== false;
-        if (!pushEnabled) {
-          console.log('[REALTIME] Notification ignored due to user settings');
-          return;
-        }
-
-        soundPlayer.playTaskUpcoming();
-
-        const date = new Date(data.deadline);
-        const timeFormatted = date.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-
-        const description =
-          data.type === '1min'
-            ? `Comienza en 1 minuto (${timeFormatted})`
-            : `Comienza en ${data.minutesLeft} minutos (${timeFormatted})`;
-
-        if (data.type === '1min') {
-          notify.warning({
-            title: `¡Tarea urgente: ${data.title}!`,
-            description,
-            duration: 6000,
-          });
-        } else {
-          notify.info({
-            title: `Tarea próxima: ${data.title}`,
-            description,
-            duration: 5000,
-          });
-        }
-
-        if (typeof Notification !== 'undefined') {
-          if (Notification.permission === 'granted') {
-            try {
-              new Notification(data.title, {
-                body: description,
-                icon: '/Focusly.png',
-                tag: data.taskId,
-              });
-            } catch (err) {
-              console.warn(
-                '[REALTIME] Standard Notification failed, trying Service Worker:',
-                err,
-              );
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.ready
-                  .then((registration) => {
-                    void registration.showNotification(data.title, {
-                      body: description,
-                      icon: '/Focusly.png',
-                      tag: data.taskId,
-                      renotify: true,
-                    } as NotificationOptions);
-                  })
-                  .catch((swErr) => {
-                    console.error(
-                      '[REALTIME] Service Worker notification error:',
-                      swErr,
-                    );
-                  });
-              }
-            }
-          } else if (Notification.permission !== 'denied') {
-            void Notification.requestPermission().then((permission) => {
-              if (permission === 'granted') {
-                new Notification(data.title, {
-                  body: description,
-                  icon: '/Focusly.png',
-                  tag: data.taskId,
-                });
-              }
-            });
-          }
-        }
-      },
-    );
+    newSocket.on('task_upcoming', (data: TaskUpcomingEvent) => {
+      console.log('[REALTIME] Received task_upcoming event:', data);
+      if (!remindersOnRef.current) {
+        console.log('[REALTIME] Notification ignored due to user settings');
+        return;
+      }
+      showTaskReminder(data);
+    });
 
     // ── Workflow: Automatización TODO ─────────────────────────────────────────
     // Se dispara cuando el backend detecta un "TODO:" en el workspace guardado
@@ -200,7 +126,7 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
       setSocket(null);
       console.log('[REALTIME] Cleaned up socket connection');
     };
-  }, [userId, dispatch, user?.pushEnabled]);
+  }, [userId, dispatch]);
 
   return (
     <RealTimeContext.Provider value={socket}>

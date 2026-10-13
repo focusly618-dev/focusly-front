@@ -1,4 +1,9 @@
 {
+  "taskReminder": {
+    "upcomingTitle": "まもなく開始: {{title}}",
+    "urgentTitle": "まもなく開始します: {{title}}",
+    "startsIn_other": "あと{{count}}分で開始（{{time}}）"
+  },
   "common": {
     "loadingConversations": "会話を読み込み中…",
     "save": "保存",
