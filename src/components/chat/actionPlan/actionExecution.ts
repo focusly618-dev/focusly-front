@@ -1,3 +1,4 @@
+import { isEmptyDocument } from '@/utils/documentContent';
 import type {
   ApolloClient,
   MutationFunction,
@@ -331,7 +332,7 @@ export const executeSingleAction = async (
       action.payload.markdown ||
       '';
 
-    if (!rawContent || rawContent === '[]') {
+    if (isEmptyDocument(rawContent)) {
       rawContent = isNote
         ? `# ${title}\n\nNota creada por Lumina.\n`
         : `# ${title}\n\n## Resumen / Objetivos\nDocumento de trabajo generado por Lumina.\n\n## Secciones de Investigación\n- [ ] Recopilar fuentes y antecedentes\n- [ ] Desarrollo de conceptos clave\n- [ ] Conclusiones y referencias\n`;

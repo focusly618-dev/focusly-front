@@ -8,7 +8,11 @@ import {
   AddCircleIconWrapper,
 } from './ProjectFoldersGrid.styles';
 import { useProjectFoldersGrid } from './ProjectFoldersGrid.hook';
-import { ProjectFolderCard } from '../ProjectFolderCard';
+import {
+  ProjectFolderCard,
+  ProjectFolderCardSkeleton,
+} from '../ProjectFolderCard';
+import { LoadingRegion } from '@/components/ui';
 import { SelectionToolbar } from '../../SelectionToolbar';
 import {
   CreateFolderModal,
@@ -28,9 +32,13 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
   onUpdateFolder,
   onDeleteFolders,
   folderSearchTerm = '',
+  loading = false,
   selection: { state: selection, actions: selectionActions },
 }) => {
   const { t } = useTranslation();
+  // Placeholders only before the first projects arrive: a refetch keeps
+  // showing the ones already there.
+  const showSkeletons = loading && groups.length === 0;
   const { state, actions } = useProjectFoldersGrid();
 
   const handleConfirmDelete = async (ids: string[]) => {
@@ -81,6 +89,17 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
           </DashedCard>
         )}
 
+        {showSkeletons && (
+          <LoadingRegion
+            label={t('projects.loading')}
+            sx={{ display: 'contents' }}
+          >
+            {Array.from({ length: 5 }, (_, i) => (
+              <ProjectFolderCardSkeleton key={i} index={i} />
+            ))}
+          </LoadingRegion>
+        )}
+
         {/* Folder Cards List */}
         {groups.map((group) => (
           <ProjectFolderCard
@@ -97,59 +116,61 @@ export const ProjectFoldersGrid: React.FC<ProjectFoldersGridProps> = ({
       </FoldersGrid>
 
       {/* Pagination Footer */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          pt: 4,
-          pb: 2,
-          flexWrap: 'wrap',
-          gap: 2,
-        }}
-      >
-        <Typography
-          variant="body2"
-          sx={{ color: 'text.secondary', fontSize: '13px' }}
-        >
-          {folderSearchTerm
-            ? t(
-                'projects.showingResultsFor',
-                `Mostrando ${groups.length} resultados para "${folderSearchTerm}"`,
-                { count: groups.length, term: folderSearchTerm },
-              )
-            : t(
-                'projects.showingCountOfTotal',
-                `Mostrando ${groups.length} de ${groups.length} proyectos`,
-                { current: groups.length, total: groups.length },
-              )}
-        </Typography>
-
-        <Pagination
-          count={Math.max(totalGroupPages, 1)}
-          page={groupPage}
-          onChange={(_event, value) => onPageChange?.(value)}
-          shape="rounded"
+      {!showSkeletons && (
+        <Box
           sx={{
-            '& .MuiPaginationItem-root': {
-              borderRadius: '6px',
-              fontSize: '13px',
-              minWidth: '32px',
-              height: '32px',
-              fontWeight: 500,
-              color: 'text.secondary',
-              '&.Mui-selected': {
-                bgcolor: '#008767 !important',
-                color: '#ffffff',
-                fontWeight: 700,
-              },
-              '&:hover': {
-                bgcolor: 'action.hover',
-              },
-            },
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            pt: 4,
+            pb: 2,
+            flexWrap: 'wrap',
+            gap: 2,
           }}
-        />
-      </Box>
+        >
+          <Typography
+            variant="body2"
+            sx={{ color: 'text.secondary', fontSize: '13px' }}
+          >
+            {folderSearchTerm
+              ? t(
+                  'projects.showingResultsFor',
+                  `Mostrando ${groups.length} resultados para "${folderSearchTerm}"`,
+                  { count: groups.length, term: folderSearchTerm },
+                )
+              : t(
+                  'projects.showingCountOfTotal',
+                  `Mostrando ${groups.length} de ${groups.length} proyectos`,
+                  { current: groups.length, total: groups.length },
+                )}
+          </Typography>
+
+          <Pagination
+            count={Math.max(totalGroupPages, 1)}
+            page={groupPage}
+            onChange={(_event, value) => onPageChange?.(value)}
+            shape="rounded"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                borderRadius: '6px',
+                fontSize: '13px',
+                minWidth: '32px',
+                height: '32px',
+                fontWeight: 500,
+                color: 'text.secondary',
+                '&.Mui-selected': {
+                  bgcolor: '#008767 !important',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                },
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
+              },
+            }}
+          />
+        </Box>
+      )}
 
       {/* Modals */}
       <CreateFolderModal

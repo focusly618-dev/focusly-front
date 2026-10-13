@@ -89,7 +89,7 @@ export const scheduleBoxSx = {
   borderColor: (theme: Theme) =>
     surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),
   bgcolor: (theme: Theme) =>
-    surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
+    surfaceColor(theme, '#18191e', '#242425', '#ffffff'),
   cursor: 'pointer',
   transition: 'border-color 0.15s ease',
   '&:hover': {
@@ -141,10 +141,18 @@ export const colorPopoverPaperSx = {
   boxShadow: '0 10px 30px rgba(0,0,0,0.2), 0 0 0 1px rgba(128,128,128,0.15)',
 };
 
+// As many swatches per row as fit (9 at the popover's full width).
 export const colorGridSx = {
   p: 0.5,
   display: 'grid',
-  gridTemplateColumns: 'repeat(5, 1fr)',
-  gap: 1.25,
+  gridTemplateColumns: 'repeat(auto-fill, minmax(34px, 1fr))',
+  gap: 1,
   justifyItems: 'center',
+};
+
+/** The background-color popover: wide enough for the palette at a glance. */
+export const colorPopoverSizeSx = {
+  p: 2,
+  width: { xs: 'calc(100vw - 32px)', sm: 384 },
+  maxWidth: 'calc(100vw - 32px)',
 };

@@ -1,3 +1,4 @@
+import { ListRowSkeleton, TextSkeleton } from '@/components/ui';
 import { useQuery, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -11,7 +12,6 @@ import {
   Fade,
   Slide,
   Chip,
-  CircularProgress,
 } from '@mui/material';
 import {
   NotificationsNone as NotificationsNoneIcon,
@@ -115,17 +115,23 @@ export const Notifications = () => {
     deleteAllNotifs();
   };
 
-  if (loading) {
+  // Only the first load: the sidebar polls this same query every few
+  // seconds, and the list on screen stays meanwhile.
+  if (loading && !data) {
     return (
       <Box
         sx={{
+          flex: 1,
           height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          overflow: 'auto',
+          p: { xs: 2, md: 4 },
         }}
       >
-        <CircularProgress />
+        <Box sx={{ display: 'grid', gap: 1, mb: 4 }}>
+          <TextSkeleton width={200} height={26} />
+          <TextSkeleton width={140} height={12} />
+        </Box>
+        <ListRowSkeleton rows={6} label={t('notificationsPage.loading')} />
       </Box>
     );
   }

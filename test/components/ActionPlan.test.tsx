@@ -237,6 +237,45 @@ describe('ActionPlan', () => {
     );
   });
 
+  it('once done, straight to the project, its tasks and the calendar', async () => {
+    renderPlan(nutrition);
+    await act(async () => {
+      fireEvent.click(screen.getByText('actionPlan.footer.create:3'));
+    });
+    const goTo = screen.getByRole('group', { name: 'actionPlan.open.goTo' });
+    const location = () => screen.getByTestId('location').textContent;
+
+    fireEvent.click(within(goTo).getByText('actionPlan.open.viewProject'));
+    expect(location()).toBe('?tab=Projects&groupId=proj-1');
+
+    fireEvent.click(within(goTo).getByText('actionPlan.open.tasks:1'));
+    expect(location()).toBe('?tab=Projects&groupId=proj-1&view=tasks');
+
+    fireEvent.click(within(goTo).getByText('actionPlan.open.inCalendar'));
+    expect(location()).toBe('?tab=DailyPlan&v=day&d=2026-10-05');
+  });
+
+  it('before running there is nowhere to go yet', () => {
+    renderPlan(nutrition);
+    expect(
+      screen.queryByRole('group', { name: 'actionPlan.open.goTo' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('each created item has its own button (a task opens over the chat)', async () => {
+    renderPlan(nutrition);
+    await act(async () => {
+      fireEvent.click(screen.getByText('actionPlan.footer.create:3'));
+    });
+    fireEvent.click(
+      screen.getByRole('button', { name: /actionPlan\.open\.task$/ }),
+    );
+    // The chat stays: the task opens on top of it.
+    expect(screen.getByTestId('location').textContent).toBe(
+      '?tab=AskAI&taskId=task-1',
+    );
+  });
+
   it("a status change shows the task's current and new status", () => {
     renderPlan([
       { type: 'UPDATE_TASK', payload: { id: 't-9', status: 'Done' } },
@@ -352,6 +391,12 @@ describe('ActionPlan — calendar events', () => {
     );
     expect(screen.getByText('actionPlan.open.calendar')).toBeInTheDocument();
     open.mockRestore();
+
+    // And to the day in Focusly's own calendar.
+    fireEvent.click(screen.getAllByText('actionPlan.open.inCalendar')[0]);
+    expect(screen.getByTestId('location').textContent).toBe(
+      '?tab=DailyPlan&v=day&d=2026-10-05',
+    );
   });
 
   it("an edit shows the event's real name, before → after and guest changes", () => {

@@ -1,3 +1,4 @@
+import { EMPTY_DOCUMENT } from '@/utils/documentContent';
 import { useState, useMemo, useContext } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTheme } from '@mui/material';
@@ -166,9 +167,12 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
   });
-  const { data: projectGroupsData } = useQuery(GET_PROJECT_GROUPS, {
-    fetchPolicy: 'cache-and-network',
-  });
+  const { data: projectGroupsData, loading: projectGroupsLoading } = useQuery(
+    GET_PROJECT_GROUPS,
+    {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
 
   // Workspaces Mutations
   const refetchAll = [
@@ -297,7 +301,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
         variables: {
           createWorkspaceInput: {
             title,
-            content: '[]',
+            content: EMPTY_DOCUMENT,
             groupId: creatingWorkspaceInGroupId,
             saveStatus: true,
           },
@@ -546,6 +550,8 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     workspacesData,
     projectGroupsData,
     projectGroups,
+    // Before the first answer: "no projects yet" would be a guess.
+    projectGroupsLoading: projectGroupsLoading && !projectGroupsData,
     selectedWorkspaceId,
     selectedGroupId,
     isWorkspaceTab,

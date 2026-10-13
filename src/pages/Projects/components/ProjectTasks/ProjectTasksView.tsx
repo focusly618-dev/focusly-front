@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, CircularProgress } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import {
   ErrorOutline as ErrorOutlineIcon,
   FilterAltOff as FilterOffIcon,
@@ -14,6 +14,7 @@ import { SelectButton, SelectionToolbar } from '../SelectionToolbar';
 import { ConfirmDeleteDialog } from '../../modals/ConfirmDeleteDialog/ConfirmDeleteDialog';
 import type { ProjectOption } from '../CreateProjectTaskModal/CreateProjectTaskModal.types';
 import { ProjectTasksByStatus } from './ProjectTasksByStatus';
+import { ProjectTasksSkeleton } from './ProjectTasksSkeleton';
 import { ProjectTasksToolbar } from './ProjectTasksToolbar';
 import { ProjectStatusMenu } from './ProjectStatusMenu';
 import type { useProjectTasks } from './hooks/useProjectTasks.hook';
@@ -115,11 +116,7 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
   }
 
   if (projectTasks.loading && !tasks.length) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-        <CircularProgress size={28} sx={{ color: '#008767' }} />
-      </Box>
-    );
+    return <ProjectTasksSkeleton />;
   }
 
   const toolbar = (

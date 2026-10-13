@@ -406,7 +406,7 @@ export const TableWrapper = styled(Box)(({ theme }) => ({
   border:
     theme.palette.mode === 'dark' ? '1px solid #25272e' : '1px solid #e2e8f0',
   borderRadius: '16px',
-  backgroundColor: surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
+  backgroundColor: surfaceColor(theme, '#18191e', '#242425', '#ffffff'),
   overflowX: 'auto',
   overflowY: 'hidden',
   WebkitOverflowScrolling: 'touch',

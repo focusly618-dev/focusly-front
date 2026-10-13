@@ -1,3 +1,12 @@
+import {
+  dateLocale,
+  formatWeekRange,
+  stepDate,
+  weekdayInitials,
+} from '../../utils/calendarNavigation';
+
+const capitalizeFirst = (text: string) =>
+  text.charAt(0).toLocaleUpperCase() + text.slice(1);
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { View } from 'react-big-calendar';
@@ -6,6 +15,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Typography,
   styled,
   Stack,
@@ -13,6 +23,8 @@ import {
 import {
   Add as AddIcon,
   ChevronRight,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
   AutoAwesome as AutoAwesomeIcon,
   KeyboardArrowDownRounded as ArrowDownIcon,
   CheckCircleRounded as CheckedIcon,
@@ -35,6 +47,7 @@ import {
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import { surfaceColor } from '@/context';
+import { ListRowSkeleton } from '@/components/ui';
 
 // Styled Components
 const PanelContainer = styled(Box)(({ theme }) => ({
@@ -168,6 +181,8 @@ interface CalendarSidePanelProps {
   onViewAllClick?: () => void;
   /** Lumina at work, or its proposal: takes the panel's place meanwhile. */
   planPanel?: React.ReactNode;
+  /** The calendar's first load: the task list shows placeholders. */
+  isLoading?: boolean;
 }
 
 export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
@@ -187,8 +202,51 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
   onToggleSubtask,
   onViewAllClick,
   planPanel,
+  isLoading = false,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = dateLocale(i18n.language);
+  const weekdays = useMemo(() => weekdayInitials(locale), [locale]);
+  const isMonthMini = String(currentView).toLowerCase() === 'month';
+  // The mini calendar moves by its own unit: a month, or the week it shows.
+  const miniStep = isMonthMini ? 'month' : 'week';
+  const miniNavigation = (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        mb: 0.25,
+      }}
+    >
+      <IconButton
+        size="small"
+        onClick={() => onDateChange(stepDate(miniStep, currentDate, -1))}
+        aria-label={t(`calendar.nav.previous.${miniStep}`)}
+        title={t(`calendar.nav.previous.${miniStep}`)}
+        sx={{ p: 0.25, color: 'text.secondary' }}
+      >
+        <ChevronLeftIcon sx={{ fontSize: 16 }} />
+      </IconButton>
+      <Typography
+        aria-live="polite"
+        sx={{ fontSize: '11.5px', fontWeight: 700, color: 'text.primary' }}
+      >
+        {isMonthMini
+          ? capitalizeFirst(format(currentDate, 'LLLL yyyy', { locale }))
+          : formatWeekRange(currentDate, locale)}
+      </Typography>
+      <IconButton
+        size="small"
+        onClick={() => onDateChange(stepDate(miniStep, currentDate, 1))}
+        aria-label={t(`calendar.nav.next.${miniStep}`)}
+        title={t(`calendar.nav.next.${miniStep}`)}
+        sx={{ p: 0.25, color: 'text.secondary' }}
+      >
+        <ChevronRightIcon sx={{ fontSize: 16 }} />
+      </IconButton>
+    </Box>
+  );
   const [expandedTaskIds, setExpandedTaskIds] = useState<
     Record<string, boolean>
   >({});
@@ -259,7 +317,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
               >
                 {isSameDay(currentDate, new Date())
                   ? t('calendar.today')
-                  : format(currentDate, 'eeee')}
+                  : capitalizeFirst(format(currentDate, 'eeee', { locale }))}
               </Typography>
               <Typography
                 variant="caption"
@@ -269,7 +327,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                   fontSize: '11.5px',
                 }}
               >
-                {format(currentDate, 'd MMMM')}
+                {format(currentDate, 'd MMMM', { locale })}
               </Typography>
             </Box>
 
@@ -313,6 +371,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 }}
               >
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {miniNavigation}
                   {/* Weekday letters */}
                   <Box
                     sx={{
@@ -321,7 +380,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       textAlign: 'center',
                     }}
                   >
-                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => (
+                    {weekdays.map((letter, idx) => (
                       <Typography
                         key={idx}
                         variant="caption"
@@ -409,6 +468,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                 }}
               >
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {miniNavigation}
                   {/* Weekday letters */}
                   <Box
                     sx={{
@@ -417,7 +477,7 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                       textAlign: 'center',
                     }}
                   >
-                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, idx) => {
+                    {weekdays.map((letter, idx) => {
                       const dayDate = miniWeekDays[idx];
                       const isSelected = isSameDay(dayDate, currentDate);
                       return (
@@ -541,7 +601,13 @@ export const CalendarSidePanel: React.FC<CalendarSidePanelProps> = ({
                   pr: 0.5,
                 }}
               >
-                {awaitedTasks.length === 0 ? (
+                {isLoading && awaitedTasks.length === 0 ? (
+                  <ListRowSkeleton
+                    rows={3}
+                    leading="dot"
+                    label={t('calendar.loadingEvents')}
+                  />
+                ) : awaitedTasks.length === 0 ? (
                   <Box
                     sx={{
                       py: 3,

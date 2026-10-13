@@ -68,7 +68,7 @@ export const subtaskInputFormSx = {
   py: 0.8,
   borderRadius: '10px',
   bgcolor: (theme: Theme) =>
-    surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
+    surfaceColor(theme, '#18191e', '#242425', '#ffffff'),
   border: '1px solid',
   borderColor: (theme: Theme) =>
     surfaceColor(theme, '#25272e', '#333333', '#e2e8f0'),

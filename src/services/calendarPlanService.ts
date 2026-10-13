@@ -25,6 +25,8 @@ export interface CalendarPlanState {
   excluded: string[];
   /** Tasks Lumina had no room for. */
   unplaced: UnplacedTask[];
+  /** The review dialog is open (closed: the proposal waits on the calendar). */
+  reviewOpen: boolean;
 }
 
 const INITIAL: CalendarPlanState = {
@@ -35,6 +37,7 @@ const INITIAL: CalendarPlanState = {
   drafts: [],
   excluded: [],
   unplaced: [],
+  reviewOpen: false,
 };
 
 export interface PlanResult {
@@ -105,6 +108,7 @@ class CalendarPlanService {
           drafts: result.drafts,
           unplaced: result.unplaced,
           excluded: [],
+          reviewOpen: result.drafts.length > 0,
         });
       }
     } finally {
@@ -135,7 +139,17 @@ class CalendarPlanService {
   }
 
   clearDrafts() {
-    this.set({ drafts: [], excluded: [], unplaced: [] });
+    this.set({ drafts: [], excluded: [], unplaced: [], reviewOpen: false });
+  }
+
+  /** Back to the review (from the bar over the calendar, or the toast). */
+  openReview() {
+    if (this.state.drafts.length > 0) this.set({ reviewOpen: true });
+  }
+
+  /** Looks at the calendar for a while: the blocks stay proposed. */
+  closeReview() {
+    this.set({ reviewOpen: false });
   }
 
   /** Logout or another user: nothing of the previous one stays. */

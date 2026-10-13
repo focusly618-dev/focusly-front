@@ -141,4 +141,31 @@ describe('calendarPlanService', () => {
       unplaced: [],
     });
   });
+
+  it('a proposal opens its review; closing it keeps the blocks', async () => {
+    await calendarPlanService.run('u1', async () => ({
+      drafts: [draft('a')],
+      unplaced: [],
+    }));
+    expect(calendarPlanService.getSnapshot().reviewOpen).toBe(true);
+    calendarPlanService.closeReview();
+    expect(calendarPlanService.getSnapshot()).toMatchObject({
+      reviewOpen: false,
+      drafts: [expect.objectContaining({ id: 'a' })],
+    });
+    calendarPlanService.openReview();
+    expect(calendarPlanService.getSnapshot().reviewOpen).toBe(true);
+    calendarPlanService.clearDrafts();
+    expect(calendarPlanService.getSnapshot().reviewOpen).toBe(false);
+  });
+
+  it('no proposal, no review to open', async () => {
+    await calendarPlanService.run('u1', async () => ({
+      drafts: [],
+      unplaced: [],
+    }));
+    expect(calendarPlanService.getSnapshot().reviewOpen).toBe(false);
+    calendarPlanService.openReview();
+    expect(calendarPlanService.getSnapshot().reviewOpen).toBe(false);
+  });
 });

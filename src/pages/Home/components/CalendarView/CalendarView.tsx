@@ -6,11 +6,16 @@ import React, {
   useSyncExternalStore,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
+import {
+  Calendar,
+  dateFnsLocalizer,
+  Views,
+  type View,
+} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { format, parse, startOfWeek, getDay, addDays, isToday } from 'date-fns';
-import { enUS, es } from 'date-fns/locale';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { enUS, es, ja } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Components
@@ -23,6 +28,8 @@ import {
 import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
 import { AIPlanPanel } from './components/AIPlanPanel/AIPlanPanel';
+import { AIPlanReviewDialog } from './components/AIPlanReview/AIPlanReviewDialog';
+import { AIPlanPill } from './components/AIPlanReview/AIPlanPill';
 import { CalendarWeeklyPlannerModal } from './components/CalendarWeeklyPlannerModal/CalendarWeeklyPlannerModal';
 import { AwaitedTasksModal } from './components/AwaitedTasksModal';
 import { surfaceColor } from '@/context';
@@ -36,16 +43,27 @@ import {
   Drawer,
   Button,
   IconButton,
+  LinearProgress,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
+  EventNote as EventNoteIcon,
 } from '@mui/icons-material';
 
 // Styles & Hooks
 import { CalendarContainer, CalendarTopBar } from './CalendarView.styles';
 import { useCalendarView } from './hooks/useCalendarView.hook';
 import { useAIScheduler } from './hooks/useAIScheduler.hook';
+import {
+  dateLocale,
+  isCurrentPeriod,
+  periodShortLabel,
+  periodTitle,
+  type CalendarViewName,
+} from './utils/calendarNavigation';
 import {
   contextMenuSx,
   priorityCircleSx,
@@ -57,7 +75,17 @@ import type { Task } from '@/redux/tasks/task.types';
 
 const locales = {
   'en-US': enUS,
+  es,
+  ja,
 };
+
+/** The calendar's culture (its own labels and formats) for the app language. */
+const cultureFor = (language?: string) =>
+  language?.startsWith('es')
+    ? 'es'
+    : language?.startsWith('ja')
+      ? 'ja'
+      : 'en-US';
 
 // Setup the localizer with Monday as first day of week
 const localizer = dateFnsLocalizer({
@@ -193,10 +221,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     events,
     skeletonEvents,
     isCalendarLoading,
+    isCalendarSyncing,
     currentView,
     currentDate,
     handleOnChangeView,
     handleOnNavigate,
+    handleStep,
+    handleDrillDown,
     handleSelectSlot,
     handleSelectEvent,
     handleEventDrop,
@@ -212,6 +243,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     handleAddTaskClick,
     tasks,
     isCalendarInDraftMode,
+    draftEvents,
     handleDeleteDraft,
     handleToggleSubtask,
     confirmDraftEvents,
@@ -260,24 +292,46 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     [],
   );
 
-  const isCurrentDateToday = isToday(currentDate);
+  const viewName = currentView as CalendarViewName;
+  const locale = dateLocale(i18n.language);
+  const formattedDateTitle = periodTitle(viewName, currentDate, locale);
+  const shortPeriodLabel = periodShortLabel(
+    viewName,
+    currentDate,
+    locale,
+    t('calendar.today', 'Hoy'),
+  );
+  const onCurrentPeriod = isCurrentPeriod(viewName, currentDate);
 
-  const formattedDateTitle = useMemo(() => {
-    try {
-      const isSpanish = !i18n.language || i18n.language.startsWith('es');
-      if (isSpanish) {
-        const dayOfWeek = format(currentDate, 'EEEE', { locale: es });
-        const dayOfMonth = format(currentDate, 'd');
-        const month = format(currentDate, 'MMMM', { locale: es });
-        const capDay = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
-        const capMonth = month.charAt(0).toUpperCase() + month.slice(1);
-        return `${capDay}, ${dayOfMonth} de ${capMonth}`;
+  // Keyboard: ← → move a period, T goes to today, D / W / M change the view.
+  // Not while typing, with a modifier held or with a dialog open.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (
+        target?.closest(
+          'input, textarea, select, [contenteditable="true"], [role="textbox"]',
+        ) ||
+        document.querySelector(
+          '[role="dialog"], [role="presentation"].MuiModal-root',
+        )
+      ) {
+        return;
       }
-      return format(currentDate, 'EEEE, MMMM d', { locale: enUS });
-    } catch {
-      return format(currentDate, 'EEEE, d MMMM');
-    }
-  }, [currentDate, i18n.language]);
+      const key = e.key.toLowerCase();
+      if (e.key === 'ArrowLeft') handleStep(-1);
+      else if (e.key === 'ArrowRight') handleStep(1);
+      else if (key === 't') handleOnNavigate(new Date());
+      else if (key === 'd') handleOnChangeView(Views.DAY);
+      else if (key === 'w' || key === 's') handleOnChangeView(Views.WEEK);
+      else if (key === 'm') handleOnChangeView(Views.MONTH);
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
 
   useEffect(() => {
     const BADGE_ID = 'rbc-time-badge-live';
@@ -351,23 +405,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     calendarPlanService.subscribe,
     calendarPlanService.getSnapshot,
   );
-  const showPlan = aiScheduler.isPlanning || isCalendarInDraftMode;
+  // Lumina working: its steps in the side panel. Its proposal: reviewed in
+  // the center (AIPlanReviewDialog); closed, a bar over the calendar.
+  const showPlan = aiScheduler.isPlanning;
+  const showReview = isCalendarInDraftMode && planState.reviewOpen;
   const renderPlan = (variant: 'panel' | 'floating') => (
     <AIPlanPanel
       variant={variant}
       plan={planState}
-      confirming={confirmingDraft}
       onCancel={aiScheduler.cancel}
-      onConfirm={confirmDraftEvents}
-      onDiscard={clearDraftEvents}
-      onToggle={(id) => calendarPlanService.toggleExcluded(id)}
-      onFocus={(draft) => {
-        handleOnNavigate(draft.start);
-        setHoveredEventId(draft.id);
-      }}
-      onHover={setHoveredEventId}
     />
   );
+  // The calendar's own events (not the proposal), around it in the preview.
+  const busyEvents = useMemo(() => events.filter((e) => !e.isDraft), [events]);
   const aiPlannerHint = aiScheduler.isPro
     ? undefined
     : aiScheduler.freeMessagesLeft === 0
@@ -413,8 +463,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
       }}
     >
       {/* Lumina working: a bar over the calendar, which stays usable. */}
-      {/* Small screens: Lumina's progress or proposal as a card over the
-          calendar (the side panel shows it on larger ones). */}
+      {/* Small screens: Lumina's progress as a card over the calendar (the
+          side panel shows it on larger ones). */}
       {showPlan && (
         <Box
           sx={{
@@ -429,6 +479,27 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           {renderPlan('floating')}
         </Box>
       )}
+
+      {isCalendarInDraftMode && !planState.reviewOpen && (
+        <AIPlanPill
+          count={draftEvents.length}
+          onReview={() => calendarPlanService.openReview()}
+          onDiscard={clearDraftEvents}
+        />
+      )}
+
+      <AIPlanReviewDialog
+        open={showReview}
+        drafts={planState.drafts}
+        excluded={planState.excluded}
+        unplaced={planState.unplaced}
+        busyEvents={busyEvents}
+        confirming={confirmingDraft}
+        onClose={() => calendarPlanService.closeReview()}
+        onConfirm={confirmDraftEvents}
+        onDiscard={clearDraftEvents}
+        onToggle={(id) => calendarPlanService.toggleExcluded(id)}
+      />
       <CalendarContainer
         isDayView={currentView === Views.DAY}
         sx={{
@@ -463,6 +534,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                 variant="outlined"
                 size="small"
                 onClick={() => handleOnNavigate(new Date())}
+                aria-current={onCurrentPeriod ? 'date' : undefined}
+                title={t('calendar.nav.todayShortcut')}
                 sx={{
                   borderRadius: '8px',
                   textTransform: 'none',
@@ -508,7 +581,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               >
                 <IconButton
                   size="small"
-                  onClick={() => handleOnNavigate(addDays(currentDate, -1))}
+                  onClick={() => handleStep(-1)}
+                  aria-label={t(`calendar.nav.previous.${viewName}`)}
+                  title={t(`calendar.nav.previous.${viewName}`)}
                   sx={{ p: 0.5, color: 'text.secondary' }}
                 >
                   <ChevronLeftIcon sx={{ fontSize: 18 }} />
@@ -523,13 +598,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
                     userSelect: 'none',
                   }}
                 >
-                  {isCurrentDateToday
-                    ? t('calendar.today', 'Hoy')
-                    : format(currentDate, 'd MMM')}
+                  {shortPeriodLabel}
                 </Typography>
                 <IconButton
                   size="small"
-                  onClick={() => handleOnNavigate(addDays(currentDate, 1))}
+                  onClick={() => handleStep(1)}
+                  aria-label={t(`calendar.nav.next.${viewName}`)}
+                  title={t(`calendar.nav.next.${viewName}`)}
                   sx={{ p: 0.5, color: 'text.secondary' }}
                 >
                   <ChevronRightIcon sx={{ fontSize: 18 }} />
@@ -537,7 +612,77 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               </Box>
             </Stack>
           </Stack>
+
+          {/* Small screens: the side panel (with the view switch and mini
+              calendar) is a drawer, so the views and a way to open it live
+              here. */}
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ display: { xs: 'flex', md: 'none' } }}
+          >
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              value={viewName}
+              onChange={(_e, next: View | null) => {
+                if (next) handleOnChangeView(next);
+              }}
+              aria-label={t('calendar.nav.views')}
+              sx={{
+                height: 30,
+                '& .MuiToggleButton-root': {
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '12px',
+                  px: 1.25,
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.main',
+                    color: '#fff',
+                    '&:hover': { bgcolor: 'primary.dark' },
+                  },
+                },
+              }}
+            >
+              <ToggleButton value={Views.DAY}>{t('calendar.day')}</ToggleButton>
+              <ToggleButton value={Views.WEEK}>
+                {t('calendar.week')}
+              </ToggleButton>
+              <ToggleButton value={Views.MONTH}>
+                {t('calendar.month')}
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <IconButton
+              size="small"
+              onClick={() => setIsSidePanelOpen(true)}
+              aria-label={t('calendar.nav.openPanel')}
+              title={t('calendar.nav.openPanel')}
+              sx={{
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: '8px',
+              }}
+            >
+              <EventNoteIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Stack>
         </CalendarTopBar>
+
+        {/* Loading tasks or events: a thin bar under the header (the space
+            is always reserved, so nothing moves when it appears). */}
+        <Box sx={{ height: 2, flexShrink: 0 }}>
+          {isCalendarSyncing && (
+            <LinearProgress
+              aria-label={t('calendar.loadingEvents')}
+              sx={{
+                height: 2,
+                bgcolor: 'transparent',
+                '& .MuiLinearProgress-bar': { bgcolor: 'primary.main' },
+              }}
+            />
+          )}
+        </Box>
         <Box
           sx={{
             flexGrow: 1,
@@ -565,7 +710,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               localizer={localizer}
               toolbar={false}
               events={
-                isCalendarLoading ? [...events, ...skeletonEvents] : events
+                // Placeholders only on an empty calendar: never mixed with
+                // what's already there (the bar shows the rest is coming).
+                isCalendarLoading && events.length === 0
+                  ? skeletonEvents
+                  : events
               }
               startAccessor="start"
               endAccessor="end"
@@ -573,6 +722,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               onView={handleOnChangeView}
               date={currentDate}
               onNavigate={(newDate) => handleOnNavigate(newDate as Date)}
+              onDrillDown={handleDrillDown}
+              culture={cultureFor(i18n.language)}
               onSelectSlot={handleSelectSlot}
               onSelectEvent={handleSelectEvent}
               onEventDrop={handleEventDrop}
@@ -676,6 +827,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           isAIPlanning={aiScheduler.isPlanning}
           aiPlannerHint={aiPlannerHint}
           planPanel={showPlan ? renderPlan('panel') : undefined}
+          isLoading={isCalendarLoading}
           onWeeklyPlannerClick={() => setIsWeeklyPlannerOpen(true)}
           hoveredEventId={hoveredEventId}
           onHoverEvent={setHoveredEventId}
@@ -726,6 +878,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           isAIPlanning={aiScheduler.isPlanning}
           aiPlannerHint={aiPlannerHint}
           planPanel={showPlan ? renderPlan('panel') : undefined}
+          isLoading={isCalendarLoading}
           onWeeklyPlannerClick={() => {
             setIsWeeklyPlannerOpen(true);
             setIsSidePanelOpen(false);

@@ -1,3 +1,4 @@
+import { PlanDestinations } from './components/PlanDestinations';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -247,19 +248,23 @@ export const ActionPlan = ({ actions: proposed }: ActionPlanProps) => {
 
       <PlanFooter>
         {plan.isCompleted ? (
-          <Typography
-            variant="body2"
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.75,
-              color: BRAND,
-              fontWeight: 650,
-            }}
-          >
-            <DoneIcon sx={{ fontSize: 18 }} />
-            {t('actionPlan.footer.done', { count: doneCount })}
-          </Typography>
+          <>
+            <Typography
+              variant="body2"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.75,
+                color: BRAND,
+                fontWeight: 650,
+                mr: 'auto',
+              }}
+            >
+              <DoneIcon sx={{ fontSize: 18 }} />
+              {t('actionPlan.footer.done', { count: doneCount })}
+            </Typography>
+            <PlanDestinations plan={plan} />
+          </>
         ) : (
           <>
             {actions.length > 1 && !plan.isRunning && (

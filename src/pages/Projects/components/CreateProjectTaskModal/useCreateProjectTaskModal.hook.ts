@@ -1,3 +1,4 @@
+import { EMPTY_DOCUMENT } from '@/utils/documentContent';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -188,7 +189,7 @@ export function useCreateProjectTaskModal({
         variables: {
           createWorkspaceInput: {
             title: titleToUse,
-            content: '[]',
+            content: EMPTY_DOCUMENT,
             groupId: selectedProject?.id || undefined,
             taskId: task?.id || undefined,
             saveStatus: true,

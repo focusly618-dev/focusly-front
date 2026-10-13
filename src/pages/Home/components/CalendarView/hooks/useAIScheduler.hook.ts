@@ -227,17 +227,19 @@ export const useAIScheduler = ({
       left > 0
         ? t('calendar.draftGeneratedPartial', { count: blocks.length, left })
         : t('calendar.draftGeneratedDesc');
-    if (calendarPlanService.isCalendarOpen() && !document.hidden) {
-      notify.success({ title: t('calendar.draftGeneratedTitle'), description });
-    } else {
-      // Done while the user was elsewhere: it waits for them, with a way back.
+    // On the calendar, the review opens by itself. Elsewhere, the proposal
+    // waits for the user, with a way back to it.
+    if (!calendarPlanService.isCalendarOpen() || document.hidden) {
       notify.success({
         title: t('calendar.draftReadyTitle'),
         description,
         duration: Infinity,
         button: {
           title: t('calendar.viewProposal'),
-          onClick: () => navigate(`/tasks?tab=${TaskBar.DailyPlan}`),
+          onClick: () => {
+            navigate(`/tasks?tab=${TaskBar.DailyPlan}`);
+            calendarPlanService.openReview();
+          },
         },
       });
     }

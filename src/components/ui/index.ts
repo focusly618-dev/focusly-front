@@ -11,3 +11,4 @@ export * from './LanguageSelector';
 export * from './PriorityBadge';
 export * from './LuminaSpeakingWave';
 export * from './sonner';
+export * from './Skeletons';

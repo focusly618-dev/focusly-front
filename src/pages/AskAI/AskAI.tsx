@@ -48,6 +48,8 @@ import {
   LuminaOrb,
   GeminiIcon,
   LuminaSpeakingWave,
+  ChatSkeleton,
+  ListRowSkeleton,
 } from '@/components/ui';
 import { useQuery } from '@apollo/client';
 import { GET_WORKSPACES } from '@/pages/Workspace/Workspace.graphql';
@@ -630,6 +632,17 @@ export const AskAI: React.FC = () => {
   const [showScrollBottom, setShowScrollBottom] = useState(false);
 
   const hasMessages = messages.length > 0;
+  // The history list's first load, and the conversation being opened.
+  const [conversationsLoaded, setConversationsLoaded] = useState(false);
+  const [openingConversationId, setOpeningConversationId] = useState<
+    string | null
+  >(null);
+  // The last conversation asked for: an older answer arriving late must not
+  // replace the one on screen.
+  const latestOpenRequest = useRef<string | null>(null);
+  const isOpeningConversation =
+    openingConversationId !== null &&
+    openingConversationId === activeConversationId;
 
   useEffect(() => {
     let active = true;
@@ -641,6 +654,9 @@ export const AskAI: React.FC = () => {
       })
       .catch((err) => {
         console.error('Error loading conversations:', err);
+      })
+      .finally(() => {
+        if (active) setConversationsLoaded(true);
       });
     return () => {
       active = false;
@@ -649,8 +665,11 @@ export const AskAI: React.FC = () => {
 
   const handleSelectConversation = async (conversationId: string) => {
     setActiveConversationId(conversationId);
+    latestOpenRequest.current = conversationId;
+    setOpeningConversationId(conversationId);
     try {
       const msgs = await getAIConversationMessages(conversationId);
+      if (latestOpenRequest.current !== conversationId) return;
       setMessages(
         msgs.map((m) => {
           const isUser = m.role === 'user';
@@ -674,10 +693,16 @@ export const AskAI: React.FC = () => {
       );
     } catch (err) {
       console.error('Error loading conversation messages:', err);
+    } finally {
+      if (latestOpenRequest.current === conversationId) {
+        setOpeningConversationId(null);
+      }
     }
   };
 
   const handleNewChat = () => {
+    latestOpenRequest.current = null;
+    setOpeningConversationId(null);
     setActiveConversationId(null);
     setMessages([]);
   };
@@ -1213,8 +1238,11 @@ export const AskAI: React.FC = () => {
         {/* ── Scrollable chat area ── */}
         <ChatScrollArea ref={chatScrollAreaRef} onScroll={handleChatScroll}>
           <CenteredColumn>
+            {/* ── A conversation being opened ── */}
+            {isOpeningConversation && <ChatSkeleton />}
+
             {/* ── Welcome screen (shown when no messages) ── */}
-            {!hasMessages && (
+            {!hasMessages && !isOpeningConversation && (
               <WelcomeSection>
                 <MascotWrapper>
                   <LuminaAnimatedFace size={60} primaryColor={primaryColor} />
@@ -1303,7 +1331,7 @@ export const AskAI: React.FC = () => {
             )}
 
             {/* ── Message history ── */}
-            {hasMessages && (
+            {hasMessages && !isOpeningConversation && (
               <Box display="flex" flexDirection="column" gap={2} py={2}>
                 <DateSeparator>
                   <span className="date-pill">{formatTodayDate()}</span>
@@ -2642,7 +2670,15 @@ export const AskAI: React.FC = () => {
         </Box>
 
         <Box sx={{ flex: 1, overflowY: 'auto', px: 2, pb: 2 }}>
-          {filteredConversations.length === 0 ? (
+          {!conversationsLoaded ? (
+            <ListRowSkeleton
+              rows={6}
+              leading={false}
+              dense
+              label={t('common.loadingConversations')}
+              sx={{ pt: 1 }}
+            />
+          ) : filteredConversations.length === 0 ? (
             <Typography
               variant="caption"
               color="text.secondary"

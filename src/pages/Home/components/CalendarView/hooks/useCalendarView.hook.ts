@@ -1,3 +1,4 @@
+import { stepDate, type CalendarViewName } from '../utils/calendarNavigation';
 import { calendarPlanService } from '@/services/calendarPlanService';
 import { useTranslation } from 'react-i18next';
 import {
@@ -59,6 +60,18 @@ import type { ICalendarEvent } from '../../CalendarEvent';
 
 const NO_DRAFTS: ICalendarEvent[] = [];
 
+/** One hour before now once the work day started, else just before it. */
+export const initialScrollHour = (now: Date, workStart?: string) => {
+  const parsed = Number.parseInt((workStart ?? '').split(':')[0], 10);
+  // 0 is a real start (a night shift): only a missing value falls back.
+  const startHour = Number.isNaN(parsed) ? 9 : parsed;
+  const hour = now.getHours();
+  return Math.max(
+    0,
+    Math.min(22, hour >= startHour ? hour - 1 : startHour - 1),
+  );
+};
+
 export const useCalendarView = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -90,7 +103,22 @@ export const useCalendarView = () => {
     return new Date();
   }, [searchParams]);
 
-  const [scrollToTime] = useState<Date | undefined>(undefined);
+  // Where the day and week views open: the working day, or the hour before
+  // now once it has started. (Before, they opened at 00:00, with the
+  // morning, and the loading placeholders, out of sight.)
+  const workStartTime = useSelector(
+    (state: RootState) =>
+      (state.auth.user?.settings as UserSettings | undefined)?.workHoursConfig
+        ?.startTime,
+  );
+  const [scrollAnchorHour] = useState(() =>
+    initialScrollHour(new Date(), workStartTime),
+  );
+  const [scrollToTime] = useState(() => {
+    const at = new Date();
+    at.setHours(scrollAnchorHour, 0, 0, 0);
+    return at;
+  });
   const [flashingDate, setFlashingDate] = useState<Date | null>(null);
   // Lumina's proposal lives in calendarPlanService: it survives leaving the
   // calendar (another tab of the app) and coming back.
@@ -307,6 +335,12 @@ export const useCalendarView = () => {
   const hasRenderableTasks =
     tasks.length > 0 || (tasksData?.result?.tasks?.length ?? 0) > 0;
   const hasRenderableGoogleEvents = reduxEvents.length > 0;
+
+  // Anything being fetched (a month navigated to, Google's first load): a
+  // thin bar, the calendar stays usable.
+  const isCalendarSyncing =
+    isTasksQueryLoading ||
+    (isGoogleEventsLoading && !hasRenderableGoogleEvents);
 
   const isCalendarLoading =
     !isDeleting &&
@@ -537,18 +571,20 @@ export const useCalendarView = () => {
 
     let slots: { start: Date; end: Date }[];
 
+    // Right below where the view opens, so they're seen while loading.
+    const h = Math.min(scrollAnchorHour + 1, 19);
     if (currentView === Views.DAY) {
       slots = [
-        makeSlot(currentDate, 9, 0, 10, 0),
-        makeSlot(currentDate, 11, 30, 12, 30),
-        makeSlot(currentDate, 14, 0, 15, 30),
+        makeSlot(currentDate, h, 0, h + 1, 0),
+        makeSlot(currentDate, h + 2, 0, h + 3, 0),
+        makeSlot(currentDate, h + 3, 30, h + 4, 30),
       ];
     } else if (currentView === Views.WEEK) {
       const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
       slots = [
-        makeSlot(addDays(weekStart, 0), 9, 0, 10, 0),
-        makeSlot(addDays(weekStart, 2), 11, 0, 12, 30),
-        makeSlot(addDays(weekStart, 4), 14, 0, 15, 0),
+        makeSlot(addDays(weekStart, 0), h, 0, h + 1, 0),
+        makeSlot(addDays(weekStart, 2), h + 1, 30, h + 3, 0),
+        makeSlot(addDays(weekStart, 4), h + 3, 0, h + 4, 0),
       ];
     } else {
       const monthStart = startOfMonth(currentDate);
@@ -567,7 +603,7 @@ export const useCalendarView = () => {
       allDay: false,
       type: 'skeleton' as const,
     }));
-  }, [currentView, currentDate]);
+  }, [currentView, currentDate, scrollAnchorHour]);
 
   const handleOnChangeView = (selectedView: View) => {
     updateUrlParams(selectedView, currentDate);
@@ -575,6 +611,22 @@ export const useCalendarView = () => {
 
   const handleOnNavigate = (newDate: Date) => {
     updateUrlParams(currentView, newDate);
+  };
+
+  /** The header's arrows: a day, a week or a month, by view. */
+  const handleStep = (direction: -1 | 1) => {
+    updateUrlParams(
+      currentView,
+      stepDate(currentView as CalendarViewName, currentDate, direction),
+    );
+  };
+
+  // Clicking a day in the month (or week) view opens that day. The calendar
+  // reports it as two calls (view, then date), each rewriting the URL from
+  // the same old one, so the date's call put the old view back: the day was
+  // never opened. One update with both.
+  const handleDrillDown = (date: Date, view: View) => {
+    updateUrlParams(view, date);
   };
 
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
@@ -1124,11 +1176,14 @@ export const useCalendarView = () => {
   return {
     events,
     skeletonEvents,
+    isCalendarSyncing,
     currentView,
     currentDate,
     isCalendarLoading,
     handleOnChangeView,
     handleOnNavigate,
+    handleStep,
+    handleDrillDown,
     handleSelectSlot,
     handleSelectEvent,
     handleEventDrop,

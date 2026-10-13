@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEditorContent } from './useEditorContent.hook';
 import {
   Box,
@@ -10,6 +11,7 @@ import {
   ListItemText,
   Tooltip,
   alpha,
+  ButtonBase,
 } from '@mui/material';
 import EmojiPicker, { Theme as EmojiPickerTheme } from 'emoji-picker-react';
 import {
@@ -139,6 +141,8 @@ export const EditorContent = ({
     markdownEditorRef,
   });
 
+  const { t } = useTranslation();
+
   // Use derived values directly - no need for useEffect sync
   // (persistedBg and persistedEmoji from watch() are already reactive)
 
@@ -178,47 +182,102 @@ export const EditorContent = ({
     processTextWithAI('summarize');
   };
   const isCoverDark = isColorDark(currentBgGradient || headerColor);
-  // Ghost button styles reused for both cover actions
+  // The icon / cover / view actions over the document: always readable
+  // (on a cover, solid enough to read on any color).
   const ghostBtnSx = (onCover: boolean) => ({
-    display: 'flex',
+    display: 'inline-flex',
     alignItems: 'center',
     gap: 0.75,
-    px: 1.5,
-    py: 0.75,
+    px: 1.25,
+    py: 0.6,
     borderRadius: '8px',
     border: '1px solid',
-    fontSize: '12px',
+    fontFamily: 'inherit',
+    fontSize: '12.5px',
     fontWeight: 600,
-    letterSpacing: '0.3px',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
+    lineHeight: 1.2,
+    whiteSpace: 'nowrap',
+    transition:
+      'background-color .15s, border-color .15s, color .15s, transform .15s',
+    '& svg': { fontSize: 16 },
+    '&.Mui-focusVisible': {
+      outline: '2px solid',
+      outlineColor: 'primary.main',
+      outlineOffset: 2,
+    },
     ...(onCover
       ? {
           color: isCoverDark ? '#ffffff' : '#0f172a',
           borderColor: isCoverDark
-            ? 'rgba(255,255,255,0.28)'
-            : 'rgba(0,0,0,0.15)',
-          bgcolor: isCoverDark ? 'rgba(0,0,0,0.32)' : 'rgba(255,255,255,0.65)',
+            ? 'rgba(255,255,255,0.35)'
+            : 'rgba(15,23,42,0.18)',
+          bgcolor: isCoverDark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.9)',
           backdropFilter: 'blur(12px)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
           '&:hover': {
-            bgcolor: isCoverDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.9)',
+            bgcolor: isCoverDark ? 'rgba(0,0,0,0.7)' : '#ffffff',
             borderColor: isCoverDark
-              ? 'rgba(255,255,255,0.45)'
-              : 'rgba(0,0,0,0.25)',
+              ? 'rgba(255,255,255,0.55)'
+              : 'rgba(15,23,42,0.3)',
             transform: 'translateY(-1px)',
           },
         }
       : {
-          color: 'text.disabled',
+          color: 'text.secondary',
           borderColor: 'divider',
-          bgcolor: 'transparent',
+          bgcolor: 'background.paper',
           '&:hover': {
-            color: 'text.secondary',
+            color: 'text.primary',
             borderColor: 'text.secondary',
             bgcolor: 'action.hover',
           },
         }),
   });
+
+  /** The three actions: icon, cover, and the focused (centered) view. */
+  const headerActions = (onCover: boolean) => {
+    const actions = [
+      {
+        key: 'icon',
+        onClick: handleIconClick,
+        icon: <EmojiPickerIcon />,
+        label: headerIcon
+          ? t('workspaceEditor.header.changeIcon')
+          : t('workspaceEditor.header.addIcon'),
+      },
+      {
+        key: 'cover',
+        onClick: handleColorClick,
+        icon: <CoverIcon />,
+        label: onCover
+          ? t('workspaceEditor.header.changeCover')
+          : t('workspaceEditor.header.addCover'),
+      },
+      {
+        key: 'view',
+        onClick: toggleCentered,
+        icon: isCentered ? <DefaultModeIcon /> : <FocusModeIcon />,
+        label: isCentered
+          ? t('workspaceEditor.header.defaultView')
+          : t('workspaceEditor.header.focusView'),
+      },
+    ];
+    return actions.map((action) => (
+      <ButtonBase
+        key={action.key}
+        onClick={action.onClick}
+        aria-label={action.label}
+        title={action.label}
+        sx={ghostBtnSx(onCover)}
+      >
+        {action.icon}
+        {/* Small screens: icons only (the label is the button's name). */}
+        <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+          {action.label}
+        </Box>
+      </ButtonBase>
+    ));
+  };
 
   return (
     <StyledEditorContent>
@@ -318,49 +377,7 @@ export const EditorContent = ({
                 pb: headerIcon ? 1.5 : 1.4,
               }}
             >
-              <Box onClick={handleIconClick} sx={ghostBtnSx(true)}>
-                <EmojiPickerIcon sx={{ fontSize: 14 }} />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'inherit',
-                    fontWeight: 600,
-                    display: { xs: 'none', sm: 'inline-block' },
-                  }}
-                >
-                  {headerIcon ? 'Change icon' : 'Add icon'}
-                </Typography>
-              </Box>
-              <Box onClick={handleColorClick} sx={ghostBtnSx(true)}>
-                <CoverIcon sx={{ fontSize: 14 }} />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'inherit',
-                    fontWeight: 600,
-                    display: { xs: 'none', sm: 'inline-block' },
-                  }}
-                >
-                  Change cover
-                </Typography>
-              </Box>
-              <Box onClick={toggleCentered} sx={ghostBtnSx(true)}>
-                {isCentered ? (
-                  <DefaultModeIcon sx={{ fontSize: 14 }} />
-                ) : (
-                  <FocusModeIcon sx={{ fontSize: 14 }} />
-                )}
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'inherit',
-                    fontWeight: 600,
-                    display: { xs: 'none', sm: 'inline-block' },
-                  }}
-                >
-                  {isCentered ? 'Default view' : 'Focus view'}
-                </Typography>
-              </Box>
+              {headerActions(true)}
             </Box>
           </Box>
         </Box>
@@ -378,49 +395,7 @@ export const EditorContent = ({
             width: '100%',
           }}
         >
-          <Box onClick={handleIconClick} sx={ghostBtnSx(false)}>
-            <EmojiPickerIcon sx={{ fontSize: 14 }} />
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'inherit',
-                fontWeight: 600,
-                display: { xs: 'none', sm: 'inline-block' },
-              }}
-            >
-              {headerIcon ? 'Change icon' : 'Add icon'}
-            </Typography>
-          </Box>
-          <Box onClick={handleColorClick} sx={ghostBtnSx(false)}>
-            <CoverIcon sx={{ fontSize: 14 }} />
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'inherit',
-                fontWeight: 600,
-                display: { xs: 'none', sm: 'inline-block' },
-              }}
-            >
-              Add cover
-            </Typography>
-          </Box>
-          <Box onClick={toggleCentered} sx={ghostBtnSx(false)}>
-            {isCentered ? (
-              <DefaultModeIcon sx={{ fontSize: 14 }} />
-            ) : (
-              <FocusModeIcon sx={{ fontSize: 14 }} />
-            )}
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'inherit',
-                fontWeight: 600,
-                display: { xs: 'none', sm: 'inline-block' },
-              }}
-            >
-              {isCentered ? 'Default view' : 'Focus view'}
-            </Typography>
-          </Box>
+          {headerActions(false)}
         </Box>
       )}
 

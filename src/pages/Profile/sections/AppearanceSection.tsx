@@ -5,6 +5,7 @@ import {
   LightModeOutlined as LightIcon,
   DarkModeOutlined as DarkIcon,
   TonalityOutlined as GrayDarkIcon,
+  SettingsBrightnessOutlined as SystemIcon,
 } from '@mui/icons-material';
 import { ColorModeContext } from '@/context';
 import {
@@ -23,9 +24,10 @@ import {
 
 export const AppearanceSection = () => {
   const { t, i18n } = useTranslation();
-  const { mode, setMode } = useContext(ColorModeContext);
+  const { preference, setMode } = useContext(ColorModeContext);
 
   const themeOptions = [
+    { id: 'system', label: t('settings.theme.system'), icon: <SystemIcon /> },
     { id: 'light', label: t('settings.theme.light'), icon: <LightIcon /> },
     { id: 'dark', label: t('settings.theme.dark'), icon: <DarkIcon /> },
     {
@@ -42,7 +44,7 @@ export const AppearanceSection = () => {
         <CardDescription>{t('settings.theme.subtitle')}</CardDescription>
         <OptionGrid role="radiogroup">
           {themeOptions.map((option) => {
-            const isActive = mode === option.id;
+            const isActive = preference === option.id;
             return (
               <OptionCard
                 key={option.id}

@@ -23,8 +23,8 @@ import {
   Details,
   ItemIcon,
   ItemRow,
+  GoButton,
   ItemTitle,
-  LinkButton,
   MetaChip,
   MetaRow,
   RowMain,
@@ -197,10 +197,10 @@ export const PlanItem = ({
                   )}
                 </MetaRow>
                 {status === 'done' && onOpen && (
-                  <LinkButton onClick={onOpen} sx={{ mt: 0.5, ml: -0.75 }}>
+                  <GoButton onClick={onOpen} sx={{ mt: 0.75 }}>
                     <OpenIcon />
                     {openLabel}
-                  </LinkButton>
+                  </GoButton>
                 )}
                 {footer}
               </>

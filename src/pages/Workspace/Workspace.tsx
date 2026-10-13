@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { useMutation } from '@apollo/client';
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
+import { WorkspaceLibrarySkeleton } from './components/Library/WorkspaceLibrarySkeleton';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import { CREATE_PROJECT_GROUP } from './Workspace.graphql';
 import { CreateProjectModal } from './components/Library/modals/CreateProjectModal';
@@ -85,9 +86,11 @@ export const Workspace = ({
     setValue('taskId', null);
   };
 
+  // Until the first answer, whether there are projects is unknown: the
+  // page's shape while it loads, not a blank page nor the empty state.
   const isInitialLoading =
     workspacesLoading && !workspacesData && !isEditorOpen;
-  if (isInitialLoading) return null;
+  if (isInitialLoading) return <WorkspaceLibrarySkeleton />;
 
   return (
     <Box

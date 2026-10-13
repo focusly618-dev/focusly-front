@@ -8,60 +8,61 @@ import {
 import { ThemeProvider } from '@mui/material/styles';
 import { getDesignTokens } from './theme';
 
-import { ColorModeContext, type ThemeMode } from './ColorModeContext';
+import { ColorModeContext, type ThemePreference } from './ColorModeContext';
 import { applyModeToDocument } from './documentMode';
-
-const VALID_MODES: ThemeMode[] = ['light', 'dark', 'graydark'];
+import {
+  readSavedPreference,
+  resolveThemeMode,
+  saveThemePreference,
+} from './themePreference';
+import { useSystemDark } from './useSystemDark';
 
 export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [mode, setMode] = useState<ThemeMode>(() => {
-    const savedMode = localStorage.getItem('themeMode');
-    return VALID_MODES.includes(savedMode as ThemeMode)
-      ? (savedMode as ThemeMode)
-      : 'dark';
-  });
+  const [preference, setPreference] =
+    useState<ThemePreference>(readSavedPreference);
+  const systemDark = useSystemDark();
+  // On 'system' this follows the OS live, without the transition below.
+  const mode = resolveThemeMode(preference, systemDark);
 
   useEffect(() => {
-    localStorage.setItem('themeMode', mode);
+    saveThemePreference(preference);
+  }, [preference]);
+
+  useEffect(() => {
     applyModeToDocument(mode);
   }, [mode]);
 
-  const applyModeChange = useCallback(
-    (updater: (prevMode: ThemeMode) => ThemeMode) => {
-      const commit = () => {
-        document.body.classList.add('theme-transitioning');
-        setMode(updater);
-        setTimeout(() => {
-          document.body.classList.remove('theme-transitioning');
-        }, 450);
-      };
+  const applyPreferenceChange = useCallback((next: ThemePreference) => {
+    const commit = () => {
+      document.body.classList.add('theme-transitioning');
+      setPreference(next);
+      setTimeout(() => {
+        document.body.classList.remove('theme-transitioning');
+      }, 450);
+    };
 
-      // Modern browsers with View Transition API
-      if (document.startViewTransition) {
-        document.startViewTransition(() => {
-          commit();
-        });
-      } else {
-        // Fallback for non-supporting browsers
+    // Modern browsers with View Transition API
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
         commit();
-      }
-    },
-    [],
-  );
+      });
+    } else {
+      // Fallback for non-supporting browsers
+      commit();
+    }
+  }, []);
 
   const colorMode = useMemo(
     () => ({
+      // From what is on screen to the opposite, as an explicit choice.
       toggleColorMode: () => {
-        applyModeChange((prevMode) =>
-          prevMode === 'light' ? 'dark' : 'light',
-        );
+        applyPreferenceChange(mode === 'light' ? 'dark' : 'light');
       },
-      setMode: (nextMode: ThemeMode) => {
-        applyModeChange(() => nextMode);
-      },
+      setMode: applyPreferenceChange,
       mode,
+      preference,
     }),
-    [mode, applyModeChange],
+    [mode, preference, applyPreferenceChange],
   );
 
   const theme = useMemo(() => getDesignTokens(mode), [mode]);

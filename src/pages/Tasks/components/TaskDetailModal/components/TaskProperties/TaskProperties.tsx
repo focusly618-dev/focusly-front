@@ -75,6 +75,7 @@ import {
   timeLogPopoverPaperSx,
   colorPopoverPaperSx,
   colorGridSx,
+  colorPopoverSizeSx,
 } from './TaskProperties.styles';
 import {
   triggerDurationError,
@@ -1079,9 +1080,7 @@ export const TaskProperties = ({
         PaperProps={{
           sx: {
             ...colorPopoverPaperSx,
-            p: 1.75,
-            minWidth: 260,
-            maxWidth: 290,
+            ...colorPopoverSizeSx,
           },
         }}
       >
@@ -1168,19 +1167,20 @@ export const TaskProperties = ({
             {
               id: 'all' as const,
               label: 'Todos',
-              count: 45,
+              count: PASTEL_COLORS.length,
               dot: 'linear-gradient(135deg, #BAE6FD, #FBCFE8, #A7F3D0)',
             },
             {
               id: 'pastel' as const,
               label: 'Pasteles',
-              count: 25,
+              count: PASTEL_COLORS.filter((c) => c.category === 'pastel')
+                .length,
               dot: '#BAE6FD',
             },
             {
               id: 'solid' as const,
               label: 'Sólidos',
-              count: 20,
+              count: PASTEL_COLORS.filter((c) => c.category === 'solid').length,
               dot: '#1D4ED8',
             },
           ].map((cat) => {
@@ -1239,7 +1239,7 @@ export const TaskProperties = ({
 
         <Box
           sx={{
-            maxHeight: 330,
+            maxHeight: 'min(440px, 60vh)',
             overflowY: 'auto',
             pr: 0.5,
             '&::-webkit-scrollbar': { width: '4px' },
@@ -1287,8 +1287,8 @@ export const TaskProperties = ({
                           onMouseEnter={() => setHoveredColor(item)}
                           onMouseLeave={() => setHoveredColor(null)}
                           sx={{
-                            width: 32,
-                            height: 32,
+                            width: 34,
+                            height: 34,
                             borderRadius: '50%',
                             bgcolor: item.value,
                             cursor: 'pointer',
@@ -1370,8 +1370,8 @@ export const TaskProperties = ({
                           onMouseEnter={() => setHoveredColor(item)}
                           onMouseLeave={() => setHoveredColor(null)}
                           sx={{
-                            width: 32,
-                            height: 32,
+                            width: 34,
+                            height: 34,
                             borderRadius: '50%',
                             bgcolor: item.value,
                             cursor: 'pointer',

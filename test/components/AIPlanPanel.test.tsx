@@ -15,8 +15,16 @@ vi.mock('react-i18next', () => ({
 }));
 
 import { AIPlanPanel } from '@/pages/Home/components/CalendarView/components/AIPlanPanel/AIPlanPanel';
+import { AIPlanReviewDialog } from '@/pages/Home/components/CalendarView/components/AIPlanReview/AIPlanReviewDialog';
+import { AIPlanPill } from '@/pages/Home/components/CalendarView/components/AIPlanReview/AIPlanPill';
+import {
+  busyOn,
+  focusTime,
+  groupByDay,
+  hourRange,
+  placeInColumn,
+} from '@/pages/Home/components/CalendarView/components/AIPlanReview/planReviewModel';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
-import type { CalendarPlanState } from '@/services/calendarPlanService';
 
 const today = new Date();
 const at = (dayOffset: number, h: number, m = 0) => {
@@ -43,36 +51,59 @@ const draft = (
   resource: { id, title: `Task ${id}`, priority_level: 2, ...task } as never,
 });
 
-const plan = (over: Partial<CalendarPlanState> = {}) => ({
-  isPlanning: false,
-  phase: null,
-  startedAt: null,
-  drafts: [],
-  excluded: [],
-  unplaced: [],
+const event = (
+  id: string,
+  start: Date,
+  end: Date,
+  over = {},
+): ICalendarEvent => ({
+  id,
+  title: `Event ${id}`,
+  start,
+  end,
+  type: 'event',
   ...over,
 });
 
-const handlers = () => ({
-  onCancel: vi.fn(),
-  onConfirm: vi.fn(),
-  onDiscard: vi.fn(),
-  onToggle: vi.fn(),
-  onFocus: vi.fn(),
-  onHover: vi.fn(),
-});
+const drafts = [
+  draft('b', at(1, 9), at(1, 10), {}, 'Mañana con energía'),
+  draft('a', at(0, 15), at(0, 16, 30), {
+    priority_level: 3,
+    deadline: at(0, 18).toISOString(),
+  }),
+  draft('c', at(0, 17), at(0, 17, 30), {
+    priority_level: 1,
+    deadline: at(0, 12).toISOString(),
+    estimated_start_date: at(-1, 9).toISOString(),
+  }),
+];
 
-describe('AIPlanPanel while Lumina works', () => {
+const dialog = (
+  over: Partial<React.ComponentProps<typeof AIPlanReviewDialog>> = {},
+) => {
+  const props = {
+    open: true,
+    drafts,
+    excluded: [],
+    unplaced: [],
+    busyEvents: [event('meet', at(0, 14), at(0, 15))],
+    confirming: false,
+    onClose: vi.fn(),
+    onConfirm: vi.fn(),
+    onDiscard: vi.fn(),
+    onToggle: vi.fn(),
+    ...over,
+  };
+  render(<AIPlanReviewDialog {...props} />);
+  return props;
+};
+
+describe('AIPlanPanel: Lumina at work (side panel)', () => {
   it('shows the steps: done, current and still to come', () => {
     render(
       <AIPlanPanel
-        {...handlers()}
-        confirming={false}
-        plan={plan({
-          isPlanning: true,
-          phase: 'thinking',
-          startedAt: Date.now(),
-        })}
+        onCancel={vi.fn()}
+        plan={{ phase: 'thinking', startedAt: Date.now() }}
       />,
     );
     const steps = screen.getAllByRole('listitem');
@@ -83,73 +114,89 @@ describe('AIPlanPanel while Lumina works', () => {
       'calendar.plan.steps.checking',
     ]);
     expect(steps[2]).toHaveAttribute('aria-current', 'step');
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'calendar.plan.backgroundHint',
-    );
   });
 
   it('counts the seconds and can be cancelled', () => {
-    vi.useFakeTimers();
-    const h = handlers();
+    const onCancel = vi.fn();
     render(
       <AIPlanPanel
-        {...h}
-        confirming={false}
-        plan={plan({ isPlanning: true, phase: 'tasks', startedAt: Date.now() })}
+        onCancel={onCancel}
+        plan={{ phase: 'tasks', startedAt: Date.now() }}
       />,
     );
     expect(screen.getByText('calendar.plan.elapsed:0')).toBeInTheDocument();
-    vi.useRealTimers();
     fireEvent.click(screen.getByText('calendar.cancelPlanning'));
-    expect(h.onCancel).toHaveBeenCalled();
+    expect(onCancel).toHaveBeenCalled();
   });
 });
 
-describe('AIPlanPanel with a proposal', () => {
-  const drafts = [
-    draft('b', at(1, 9), at(1, 10), {}, 'Mañana con energía'),
-    draft('a', at(0, 15), at(0, 16, 30), {
-      priority_level: 3,
-      deadline: at(0, 18).toISOString(),
-    }),
-    draft('c', at(0, 17), at(0, 17, 30), {
-      priority_level: 1,
-      deadline: at(0, 12).toISOString(),
-      estimated_start_date: at(-1, 9).toISOString(),
-    }),
-  ];
-
-  it('groups the blocks by day, in order, with the focus time', () => {
-    render(
-      <AIPlanPanel
-        {...handlers()}
-        confirming={false}
-        plan={plan({ drafts })}
-      />,
-    );
-    const headings = screen
-      .getAllByText(/calendar\.plan\.(today|tomorrow)/)
-      .map((e) => e.textContent);
-    expect(headings).toEqual(['calendar.plan.today', 'calendar.plan.tomorrow']);
-    const titles = screen
-      .getAllByText(/^Task [abc]$/)
-      .map((e) => e.textContent);
-    expect(titles).toEqual(['Task a', 'Task c', 'Task b']);
-    // 90 + 30 + 60 minutes.
+describe('AIPlanReviewDialog: the proposal in the center', () => {
+  it('a dialog with the summary: blocks and focus time', () => {
+    dialog();
+    const box = screen.getByRole('dialog', {
+      name: 'calendar.plan.reviewTitle',
+    });
     expect(
-      screen.getByText(/calendar\.plan\.reviewSummary:3/),
+      within(box).getByText(/calendar\.plan\.reviewSummary:3/),
     ).toHaveTextContent('calendar.plan.focusTime');
-    expect(screen.getByText('calendar.plan.confirm:3')).toBeInTheDocument();
+    expect(
+      within(box).getByText('calendar.plan.confirm:3'),
+    ).toBeInTheDocument();
   });
 
-  it('says whether each block lands before its deadline, and what was moved', () => {
-    render(
-      <AIPlanPanel
-        {...handlers()}
-        confirming={false}
-        plan={plan({ drafts })}
-      />,
+  it('previews the blocks as on the calendar, with the events already there', () => {
+    dialog();
+    const preview = screen.getByRole('group', {
+      name: 'calendar.plan.previewLabel',
+    });
+    // One column per day, today first.
+    expect(
+      within(preview).getByText('calendar.plan.today'),
+    ).toBeInTheDocument();
+    expect(
+      within(preview).getByText('calendar.plan.tomorrow'),
+    ).toBeInTheDocument();
+    expect(within(preview).getByTestId('preview-draft-a')).toHaveTextContent(
+      'Task a',
     );
+    // The meeting at 14:00 is shown next to them.
+    expect(within(preview).getByText('Event meet')).toBeInTheDocument();
+  });
+
+  it('hovering a block in the list highlights it in the preview', () => {
+    dialog();
+    const item = screen
+      .getByRole('checkbox', { name: /Task b/ })
+      .closest('label')!;
+    fireEvent.mouseEnter(item);
+    expect(screen.getByTestId('preview-draft-b')).toHaveAttribute(
+      'data-highlighted',
+      'true',
+    );
+    fireEvent.mouseLeave(item);
+    expect(screen.getByTestId('preview-draft-b')).not.toHaveAttribute(
+      'data-highlighted',
+    );
+  });
+
+  it('a block can be left out from the list or from the preview', () => {
+    const props = dialog({ excluded: ['draft-a'] });
+    expect(screen.getByText('calendar.plan.confirm:2')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /Task a/ })).not.toBeChecked();
+    fireEvent.click(screen.getByRole('checkbox', { name: /Task a/ }));
+    fireEvent.click(screen.getByTestId('preview-draft-c'));
+    expect(props.onToggle.mock.calls).toEqual([['draft-a'], ['draft-c']]);
+  });
+
+  it('nothing checked: nothing to schedule', () => {
+    dialog({ excluded: drafts.map((d) => d.id) });
+    expect(
+      screen.getByRole('button', { name: 'calendar.plan.confirm:0' }),
+    ).toBeDisabled();
+  });
+
+  it('deadlines, priority, what was moved and why', () => {
+    dialog();
     expect(
       screen.getByText('calendar.plan.beforeDeadline'),
     ).toBeInTheDocument();
@@ -159,84 +206,101 @@ describe('AIPlanPanel with a proposal', () => {
     expect(screen.getByText('Mañana con energía')).toBeInTheDocument();
   });
 
-  it('unchecking a block leaves it out of the count', () => {
-    const h = handlers();
-    render(
-      <AIPlanPanel
-        {...h}
-        confirming={false}
-        plan={plan({ drafts, excluded: ['draft-a'] })}
-      />,
-    );
-    expect(screen.getByText('calendar.plan.confirm:2')).toBeInTheDocument();
-    const box = screen.getByRole('checkbox', { name: /Task a/ });
-    expect(box).not.toBeChecked();
-    fireEvent.click(box);
-    expect(h.onToggle).toHaveBeenCalledWith('draft-a');
-  });
-
-  it('nothing checked: nothing to schedule', () => {
-    render(
-      <AIPlanPanel
-        {...handlers()}
-        confirming={false}
-        plan={plan({ drafts, excluded: drafts.map((d) => d.id) })}
-      />,
-    );
-    expect(
-      screen.getByRole('button', { name: 'calendar.plan.confirm:0' }),
-    ).toBeDisabled();
-  });
-
-  it('a block can be shown on the calendar (click or keyboard) and highlighted on hover', () => {
-    const h = handlers();
-    render(<AIPlanPanel {...h} confirming={false} plan={plan({ drafts })} />);
-    const item = screen.getByText('Task b').closest('[role="button"]')!;
-    fireEvent.click(item);
-    fireEvent.keyDown(item, { key: 'Enter' });
-    expect(h.onFocus).toHaveBeenCalledTimes(2);
-    expect(h.onFocus.mock.calls[0][0].id).toBe('draft-b');
-    fireEvent.mouseEnter(item.parentElement!);
-    expect(h.onHover).toHaveBeenCalledWith('draft-b');
-    fireEvent.mouseLeave(item.parentElement!);
-    expect(h.onHover).toHaveBeenLastCalledWith(null);
-  });
-
   it('lists what did not fit, on demand', () => {
-    render(
-      <AIPlanPanel
-        {...handlers()}
-        confirming={false}
-        plan={plan({ drafts, unplaced: [{ id: 'x', title: 'Leer libro' }] })}
-      />,
-    );
+    dialog({ unplaced: [{ id: 'x', title: 'Leer libro' }] });
     const toggle = screen.getByRole('button', {
       name: 'calendar.plan.unplaced:1',
     });
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(
-      within(toggle.parentElement!).getByText('Leer libro'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Leer libro')).toBeInTheDocument();
   });
 
-  it('while scheduling, nothing can be changed', () => {
-    const h = handlers();
-    render(<AIPlanPanel {...h} confirming plan={plan({ drafts })} />);
+  it('closing keeps the proposal; confirm and discard decide', () => {
+    const props = dialog();
+    fireEvent.click(
+      screen.getByRole('button', { name: 'calendar.plan.closeReview' }),
+    );
+    fireEvent.click(screen.getByText('calendar.plan.confirm:3'));
+    fireEvent.click(screen.getByText('calendar.discard'));
+    expect(props.onClose).toHaveBeenCalled();
+    expect(props.onConfirm).toHaveBeenCalled();
+    expect(props.onDiscard).toHaveBeenCalled();
+  });
+
+  it('while scheduling, nothing can be changed nor closed', () => {
+    const props = dialog({ confirming: true });
     expect(screen.getByText('calendar.scheduling')).toBeInTheDocument();
     expect(screen.getByText('calendar.discard')).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'calendar.plan.closeReview' }),
+    ).toBeDisabled();
     screen
       .getAllByRole('checkbox')
       .forEach((box) => expect(box).toBeDisabled());
+    fireEvent.click(screen.getByTestId('preview-draft-a'));
+    expect(props.onToggle).not.toHaveBeenCalled();
+  });
+});
+
+describe('AIPlanPill: the proposal while looking at the calendar', () => {
+  it('reopens the review or discards', () => {
+    const onReview = vi.fn();
+    const onDiscard = vi.fn();
+    render(<AIPlanPill count={9} onReview={onReview} onDiscard={onDiscard} />);
+    expect(screen.getByRole('region')).toHaveTextContent(
+      'calendar.plan.reviewSummary:9',
+    );
+    fireEvent.click(screen.getByText('calendar.plan.review'));
+    fireEvent.click(screen.getByText('calendar.discard'));
+    expect(onReview).toHaveBeenCalled();
+    expect(onDiscard).toHaveBeenCalled();
+  });
+});
+
+describe('the preview layout', () => {
+  const day = at(0, 0);
+
+  it('shows the proposal hours with an hour around them', () => {
+    expect(hourRange(drafts)).toEqual({ from: 8, to: 19 });
+    expect(hourRange([])).toEqual({ from: 9, to: 18 });
   });
 
-  it('confirm and discard', () => {
-    const h = handlers();
-    render(<AIPlanPanel {...h} confirming={false} plan={plan({ drafts })} />);
-    fireEvent.click(screen.getByText('calendar.plan.confirm:3'));
-    fireEvent.click(screen.getByText('calendar.discard'));
-    expect(h.onConfirm).toHaveBeenCalled();
-    expect(h.onDiscard).toHaveBeenCalled();
+  it('a block ending at midnight belongs to the end of its day', () => {
+    const late = draft('late', at(0, 22), at(1, 0));
+    expect(hourRange([late])).toEqual({ from: 21, to: 24 });
+  });
+
+  it('places a block in its column, as a share of the hours shown', () => {
+    const placed = placeInColumn(drafts[1], day, 14, 18)!;
+    // 15:00–16:30 in a 14–18 window: a quarter down, 37.5% tall.
+    expect(placed.top).toBeCloseTo(25);
+    expect(placed.height).toBeCloseTo(37.5);
+  });
+
+  it('clips what starts before the window, drops what is outside', () => {
+    const early = event('e', at(0, 6), at(0, 9));
+    expect(placeInColumn(early, day, 8, 18)).toMatchObject({ top: 0 });
+    expect(
+      placeInColumn(event('x', at(0, 20), at(0, 21)), day, 8, 18),
+    ).toBeNull();
+  });
+
+  it('busy time leaves out the drafts, all-day events and other days', () => {
+    const list = [
+      event('meet', at(0, 10), at(0, 11)),
+      event('bday', at(0, 0), at(1, 0), { allDay: true }),
+      event('tomorrow', at(1, 10), at(1, 11)),
+      drafts[1],
+    ];
+    expect(busyOn(list, day).map((e) => e.id)).toEqual(['meet']);
+  });
+
+  it('groups by day in time order, and adds up the focus time', () => {
+    expect(groupByDay(drafts).map((g) => g.items.map((d) => d.id))).toEqual([
+      ['draft-a', 'draft-c'],
+      ['draft-b'],
+    ]);
+    expect(focusTime(drafts)).toEqual({ total: 180, hours: 3, minutes: 0 });
   });
 });

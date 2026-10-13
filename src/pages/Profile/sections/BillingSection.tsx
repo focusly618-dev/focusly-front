@@ -17,6 +17,7 @@ import {
 import { billingApi } from '@/api/Billing/billingApi';
 import { PlanCards } from '@/components/Billing/PlanCards';
 import { useBilling } from '@/hooks/useBilling';
+import { LoadingRegion, TextSkeleton } from '@/components/ui';
 import { notify } from '@/utils';
 import { Card, CardDescription, CardTitle, Divider } from '../Profile.styles';
 
@@ -191,12 +192,14 @@ export const BillingSection = () => {
               </Typography>
             </Box>
           </Box>
+        ) : billing.known ? (
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            {t('billing.usage', { used: billing.used, limit: billing.limit })}
+          </Typography>
         ) : (
-          billing.known && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              {t('billing.usage', { used: billing.used, limit: billing.limit })}
-            </Typography>
-          )
+          <LoadingRegion sx={{ mt: 2 }}>
+            <TextSkeleton width={220} height={14} />
+          </LoadingRegion>
         )}
       </Card>
 

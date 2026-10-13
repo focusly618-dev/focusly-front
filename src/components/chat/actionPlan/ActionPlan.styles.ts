@@ -199,6 +199,28 @@ export const LinkButton = styled(ButtonBase)(({ theme }) => ({
   },
 }));
 
+/** "Go to" what the plan made: a small, clearly clickable button. */
+export const GoButton = styled(ButtonBase)(({ theme }) => ({
+  alignSelf: 'flex-start',
+  gap: 6,
+  padding: theme.spacing(0.5, 1.25),
+  borderRadius: 8,
+  border: `1px solid ${alpha(BRAND, 0.35)}`,
+  backgroundColor: alpha(BRAND, 0.06),
+  fontFamily: 'inherit',
+  fontSize: '0.78rem',
+  fontWeight: 650,
+  color: BRAND,
+  whiteSpace: 'nowrap',
+  transition: 'background-color .15s, border-color .15s',
+  '& svg': { fontSize: 15 },
+  '&:hover': { backgroundColor: alpha(BRAND, 0.12), borderColor: BRAND },
+  '&.Mui-focusVisible': {
+    outline: `2px solid ${BRAND}`,
+    outlineOffset: 1,
+  },
+}));
+
 export const ChangeRow = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: 'minmax(80px, auto) 1fr',

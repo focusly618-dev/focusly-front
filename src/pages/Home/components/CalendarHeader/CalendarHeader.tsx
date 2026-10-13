@@ -3,10 +3,16 @@ import { format, isToday, isSameDay } from 'date-fns';
 import { Typography } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { dateLocale } from '../CalendarView/utils/calendarNavigation';
 
 export const CalendarHeader = (props: HeaderProps) => {
   const { date } = props;
-  const dayName = format(date, 'EEE').toUpperCase();
+  const { i18n } = useTranslation();
+  // The week day in the app's language ("LUN", "MON", "月").
+  const dayName = format(date, 'EEE', { locale: dateLocale(i18n.language) })
+    .replace('.', '')
+    .toLocaleUpperCase();
   const dayNumber = format(date, 'd');
   const active = isToday(date);
   const [searchParams, setSearchParams] = useSearchParams();

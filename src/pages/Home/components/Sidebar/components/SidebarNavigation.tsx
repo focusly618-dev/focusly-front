@@ -1,3 +1,4 @@
+import { ListRowSkeleton } from '@/components/ui';
 import { useState, useEffect, useSyncExternalStore } from 'react';
 import {
   List,
@@ -7,6 +8,7 @@ import {
   Box,
   Avatar,
   Collapse,
+  Typography,
 } from '@mui/material';
 import { aiStreamService } from '@/services/aiStreamService';
 import { calendarPlanService } from '@/services/calendarPlanService';
@@ -126,6 +128,7 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
     toggleProjectsExpanded,
     setIsProjectsExpanded,
     projectGroups,
+    projectGroupsLoading,
   } = sidebar;
 
   const currentTab = activeTab;
@@ -642,7 +645,17 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
                 position: 'relative',
               }}
             >
-              {projectGroups.length === 0 ? (
+              {projectGroupsLoading ? (
+                <Box sx={{ pl: '34px', pr: '10px' }}>
+                  <ListRowSkeleton
+                    rows={3}
+                    leading="square"
+                    lines={1}
+                    dense
+                    label={t('projects.loading')}
+                  />
+                </Box>
+              ) : projectGroups.length === 0 ? (
                 <Box
                   sx={{
                     position: 'relative',

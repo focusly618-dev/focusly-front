@@ -1,3 +1,5 @@
+import { actionDate } from '../planDestinations';
+import { usePlanNavigation } from '../usePlanNavigation.hook';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
@@ -30,6 +32,7 @@ import {
 import { formatMinutes, toDateTimeInput } from '../planFormat';
 import {
   DetailLabel,
+  GoButton,
   LinkButton,
   MarkdownBox,
   MetaChip,
@@ -167,23 +170,38 @@ const ConnectCalendar = () => {
   );
 };
 
-/** "Open in Google Calendar" / "Join Meet" once the event exists. */
+/** Once the event exists: the day in Focusly's calendar, and Google's own
+ * links ("Open in Google Calendar", "Join Meet"). */
 const EventLinks = ({ plan, index }: EventNodeProps) => {
   const { t } = useTranslation();
+  const nav = usePlanNavigation();
+  if (plan.statuses[index] !== 'done') return null;
   const links = plan.links[index];
-  if (plan.statuses[index] !== 'done' || !links) return null;
+  const date = actionDate(plan.effectiveAction(index));
   const open = (url: string) => window.open(url, '_blank', 'noopener');
   return (
     <Box
-      sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5, ml: -0.75 }}
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 0.5,
+        mt: 0.75,
+      }}
     >
-      {links.url && (
+      {date && (
+        <GoButton onClick={() => nav.openCalendar(date)}>
+          <CalendarIcon />
+          {t('actionPlan.open.inCalendar')}
+        </GoButton>
+      )}
+      {links?.url && (
         <LinkButton onClick={() => open(links.url!)}>
           <OpenIcon />
           {t('actionPlan.open.calendar')}
         </LinkButton>
       )}
-      {links.meetUrl && (
+      {links?.meetUrl && (
         <LinkButton onClick={() => open(links.meetUrl!)}>
           <MeetIcon />
           {t('actionPlan.open.meet')}

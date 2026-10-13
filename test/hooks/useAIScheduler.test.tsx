@@ -295,12 +295,9 @@ describe('useAIScheduler', () => {
       expect(calendarPlanService.getSnapshot().unplaced).toEqual([
         { id: 'b', title: 'Task b' },
       ]);
-      // Says that some tasks didn't fit.
-      expect(mocks.notify.success).toHaveBeenCalledWith(
-        expect.objectContaining({
-          description: 'calendar.draftGeneratedPartial',
-        }),
-      );
+      // On the calendar the review opens by itself (it lists what didn't fit).
+      expect(calendarPlanService.getSnapshot().reviewOpen).toBe(true);
+      expect(mocks.notify.success).not.toHaveBeenCalled();
     });
 
     it('nothing usable: no drafts, a clear message', async () => {
@@ -471,16 +468,29 @@ describe('useAIScheduler', () => {
       expect(mocks.navigate).toHaveBeenCalledWith('/tasks?tab=DailyPlan');
     });
 
-    it('on the calendar, a normal toast without a button', async () => {
+    it('on the calendar, the review opens by itself (no toast)', async () => {
       givenTasks(apiTask('a'));
       mocks.planCalendarAI.mockResolvedValue({
         events: [proposal('a', at(7, 10), at(7, 11))],
       });
       const { result } = setup();
       await act(() => result.current.plan());
-      const toast = mocks.notify.success.mock.calls[0][0];
-      expect(toast.title).toBe('calendar.draftGeneratedTitle');
-      expect(toast.button).toBeUndefined();
+      expect(calendarPlanService.getSnapshot().reviewOpen).toBe(true);
+      expect(mocks.notify.success).not.toHaveBeenCalled();
+    });
+
+    it("the toast's button brings the user back to the review", async () => {
+      givenTasks(apiTask('a'));
+      mocks.planCalendarAI.mockResolvedValue({
+        events: [proposal('a', at(7, 10), at(7, 11))],
+      });
+      calendarOpen(false);
+      const { result } = setup();
+      await act(() => result.current.plan());
+      calendarPlanService.closeReview();
+      mocks.notify.success.mock.calls[0][0].button.onClick();
+      expect(mocks.navigate).toHaveBeenCalledWith('/tasks?tab=DailyPlan');
+      expect(calendarPlanService.getSnapshot().reviewOpen).toBe(true);
     });
 
     it('a calendar opened again while Lumina works shows it, and cannot start a second run', async () => {

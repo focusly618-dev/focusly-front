@@ -1,3 +1,4 @@
+import { isEmptyDocument } from '@/utils/documentContent';
 import { useCallback, useMemo, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm, useWatch } from 'react-hook-form';
@@ -74,7 +75,8 @@ export const useWorkspaceForm = () => {
             },
           });
         } else {
-          if (!data.title?.trim() && data.content === '[]') {
+          // Nothing typed yet: no document is created.
+          if (!data.title?.trim() && isEmptyDocument(data.content)) {
             safeSetSaveState('idle');
             return;
           }

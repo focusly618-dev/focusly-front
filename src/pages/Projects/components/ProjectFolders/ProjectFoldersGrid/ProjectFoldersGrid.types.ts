@@ -18,6 +18,8 @@ export interface ProjectFoldersGridProps {
   ) => Promise<unknown> | void;
   onDeleteFolders: (ids: string[]) => Promise<unknown> | void;
   folderSearchTerm?: string;
+  /** The projects are loading (and none are on screen yet). */
+  loading?: boolean;
   /** Owned by the page, whose filters row has the "Select" button. */
   selection: MultiSelect<ProjectGroupTypes>;
 }

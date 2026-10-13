@@ -1,3 +1,4 @@
+import { EMPTY_DOCUMENT } from '../documentContent';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 
@@ -18,7 +19,7 @@ export const UNTITLED_WORKSPACE_TITLE = 'Untitled Strategic Plan';
 
 export const DEFAULT_WORKSPACE_DATA = {
   title: '',
-  content: '[]',
+  content: EMPTY_DOCUMENT,
   saveStatus: true,
   groupId: undefined as string | undefined,
   taskId: null as string | null,

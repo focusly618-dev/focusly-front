@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { Box, Typography, Pagination, Tab, useTheme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Pagination,
+  Skeleton,
+  Tab,
+  useTheme,
+} from '@mui/material';
 import {
   PushPin as PushPinIcon,
   Add as AddIcon,
@@ -13,6 +20,9 @@ import {
   ModernFolderFilledIcon,
   ModernFolderOutlinedIcon,
   isCustomEmoji,
+  LoadingRegion,
+  TextSkeleton,
+  skeletonWidth,
 } from '@/components/ui';
 import { useWorkspaceActions } from '../../hooks/useWorkspaceActions.hook';
 import { notify } from '@/utils';
@@ -313,7 +323,15 @@ export const WorkspaceLibrary = ({
                 }}
               >
                 {activeGroup?.name ||
-                  t('workspaceLibrary.breadcrumb.folderFallback')}
+                  (folders.state.loading ? (
+                    <TextSkeleton
+                      width={96}
+                      height={12}
+                      sx={{ display: 'inline-block', verticalAlign: 'middle' }}
+                    />
+                  ) : (
+                    t('workspaceLibrary.breadcrumb.folderFallback')
+                  ))}
               </Typography>
             </Box>
           </>
@@ -394,6 +412,7 @@ export const WorkspaceLibrary = ({
             onUpdateFolder={folders.actions.updateFolder}
             onDeleteFolders={folders.actions.deleteFolders}
             folderSearchTerm={folders.state.folderSearchTerm}
+            loading={folders.state.loading}
             selection={folderSelection}
           />
         )
@@ -454,9 +473,12 @@ export const WorkspaceLibrary = ({
                 <GridContainer viewMode={viewMode}>
                   {/* Skeletons while loading */}
                   {notes.state.loading && !notes.data.notes.length ? (
-                    [1, 2, 3, 4, 5].map((i) => {
-                      if (viewMode === 'list') {
-                        return (
+                    <LoadingRegion
+                      label={t('workspaceLibrary.loadingDocuments')}
+                      sx={{ display: 'contents' }}
+                    >
+                      {[0, 1, 2, 3, 4].map((i) =>
+                        viewMode === 'list' ? (
                           <Box
                             key={i}
                             sx={{
@@ -469,61 +491,52 @@ export const WorkspaceLibrary = ({
                               mb: 1,
                             }}
                           >
-                            <Box
-                              sx={{
-                                width: 12,
-                                height: 12,
-                                borderRadius: '50%',
-                                bgcolor: 'action.disabledBackground',
-                              }}
+                            <Skeleton
+                              animation="wave"
+                              variant="circular"
+                              width={12}
+                              height={12}
                             />
-                            <Box
-                              sx={{
-                                height: 16,
-                                bgcolor: 'action.hover',
-                                borderRadius: 1,
-                                flex: 1,
-                              }}
+                            <TextSkeleton
+                              width={skeletonWidth(i)}
+                              height={14}
+                            />
+                            <TextSkeleton
+                              width={72}
+                              height={10}
+                              sx={{ ml: 'auto', flexShrink: 0 }}
                             />
                           </Box>
-                        );
-                      }
-                      return (
-                        <WorkspaceCard key={i} compact={viewMode === 'grid'}>
-                          <Box
-                            sx={{
-                              width: '80%',
-                              height: 24,
-                              bgcolor: 'action.hover',
-                              mb: 1.5,
-                              borderRadius: 1,
-                            }}
-                          />
-                          {viewMode !== 'grid' && (
-                            <>
-                              <Box
-                                sx={{
-                                  width: '100%',
-                                  height: 16,
-                                  bgcolor: 'action.hover',
-                                  mb: 0.5,
-                                  borderRadius: 1,
-                                }}
-                              />
-                              <Box
-                                sx={{
-                                  width: '90%',
-                                  height: 16,
-                                  bgcolor: 'action.hover',
-                                  mb: 0.5,
-                                  borderRadius: 1,
-                                }}
-                              />
-                            </>
-                          )}
-                        </WorkspaceCard>
-                      );
-                    })
+                        ) : (
+                          <WorkspaceCard
+                            key={i}
+                            compact={viewMode === 'grid'}
+                            sx={{ pointerEvents: 'none' }}
+                          >
+                            <TextSkeleton
+                              width={skeletonWidth(i)}
+                              height={18}
+                              sx={{ mb: 1.5 }}
+                            />
+                            {viewMode !== 'grid' && (
+                              <Box sx={{ display: 'grid', gap: 0.75, mb: 2 }}>
+                                <TextSkeleton width="100%" height={10} />
+                                <TextSkeleton width="92%" height={10} />
+                                <TextSkeleton
+                                  width={skeletonWidth(i, 2)}
+                                  height={10}
+                                />
+                              </Box>
+                            )}
+                            <TextSkeleton
+                              width="40%"
+                              height={10}
+                              sx={{ mt: 'auto' }}
+                            />
+                          </WorkspaceCard>
+                        ),
+                      )}
+                    </LoadingRegion>
                   ) : (
                     <>
                       {!notes.state.searchTerm &&

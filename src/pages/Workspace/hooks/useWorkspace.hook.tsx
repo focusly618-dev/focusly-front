@@ -1,3 +1,4 @@
+import { EMPTY_DOCUMENT } from '@/utils/documentContent';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router-dom';
@@ -283,7 +284,7 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     reset({
       title: initialTitle || '',
       taskId: undefined,
-      content: initialContent || '[]',
+      content: initialContent || EMPTY_DOCUMENT,
       id: undefined,
       projectId: undefined,
       groupId: targetGroupId || selectedGroupId || undefined,

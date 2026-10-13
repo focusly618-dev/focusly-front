@@ -180,7 +180,7 @@ export const headerIconSx = {
   },
 };
 
-export const dialogContentSx = { p: 3, paddingTop: '12px !important' };
+export const dialogContentSx = { p: 0, paddingTop: '0px !important' };
 
 export const propertyListSx = {
   mt: 2,
@@ -349,7 +349,7 @@ export const saveButtonSx = {
 
 export const descriptionInputSx = {
   backgroundColor: (theme: Theme) =>
-    surfaceColor(theme, '#18191e', '#18191e', '#ffffff'),
+    surfaceColor(theme, '#18191e', '#242425', '#ffffff'),
   borderRadius: '10px',
   mt: 0.5,
   '& .MuiOutlinedInput-root': {

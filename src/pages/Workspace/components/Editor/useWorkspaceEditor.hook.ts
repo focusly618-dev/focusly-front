@@ -3,6 +3,7 @@ import type { UseFormWatch } from 'react-hook-form';
 import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
 import type { TaskSearchItems, WorkspaceFormData } from '../../workspace.types';
 import type { MarkdownEditorRef } from './codemirror/MarkdownEditor.types';
+import { isEmptyDocument } from '@/utils/documentContent';
 
 export interface UseWorkspaceEditorProps {
   watch: UseFormWatch<WorkspaceFormData>;
@@ -77,7 +78,8 @@ export const useWorkspaceEditor = ({
   // MarkdownEditor treats this as its uncontrolled `initialValue`, it does
   // not get synced back in on every keystroke.
   const initialMarkdown = useMemo(() => {
-    if (!currentContent) return '';
+    // Empty, also an empty old-editor document ("[]", shown as text before).
+    if (isEmptyDocument(currentContent)) return '';
     return convertLegacyBlocksToMarkdown(currentContent) ?? currentContent;
   }, [currentContent]);
 

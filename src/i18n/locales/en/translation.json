@@ -1,5 +1,6 @@
 {
   "common": {
+    "loadingConversations": "Loading conversations…",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -59,6 +60,7 @@
     "theme": {
       "title": "Theme",
       "subtitle": "Choose how Focusly looks on this device.",
+      "system": "Automatic",
       "light": "Light",
       "dark": "Dark",
       "graydark": "Gray Dark"
@@ -71,6 +73,22 @@
     }
   },
   "calendar": {
+    "nav": {
+      "previous": {
+        "day": "Previous day (←)",
+        "week": "Previous week (←)",
+        "month": "Previous month (←)"
+      },
+      "next": {
+        "day": "Next day (→)",
+        "week": "Next week (→)",
+        "month": "Next month (→)"
+      },
+      "views": "Calendar view",
+      "openPanel": "Open calendar panel",
+      "todayShortcut": "Go to today (T)"
+    },
+    "loadingEvents": "Loading your schedule…",
     "title": "Calendar",
     "subtitle": "Organized clarity for your deep work sessions.",
     "aiPlannerTitle": "AI Planner",
@@ -103,6 +121,9 @@
     "freeTimeDesc": "Enjoy your free time!",
     "optimizeSchedule": "Optimize Schedule",
     "plan": {
+      "review": "Review",
+      "closeReview": "Close and see the calendar",
+      "previewLabel": "Preview of the proposal on the calendar",
       "workingTitle": "Lumina is organizing your schedule",
       "elapsed_one": "{{count}} second",
       "elapsed_other": "{{count}} seconds",
@@ -531,6 +552,11 @@
       "notes": "Notes"
     },
     "open": {
+      "goTo": "Go to what was created",
+      "inCalendar": "View in calendar",
+      "tasks_other": "View {{count}} tasks",
+      "tasks_one": "View task",
+      "viewProject": "View project",
       "task": "View task",
       "document": "Open document",
       "project": "Open project",
@@ -667,6 +693,7 @@
     "nextMonth": "Next month"
   },
   "notificationsPage": {
+    "loading": "Loading notifications…",
     "title": "Notifications",
     "subtitle": "Stay up to date with your latest activity",
     "newBadge": "{{count}} NEW",
@@ -838,32 +865,77 @@
     "features": {
       "heading": "The OS for productivity.",
       "subheading": "Powerful downloads for high-performance teams. Simplify your workflow without actual linking of subject.",
-      "workspaces": { "title": "Workspaces", "description": "Seamlessly separate personal, startup, and side projects with dedicated workspaces." },
-      "tasks": { "title": "Tasks", "description": "Create lists, prioritize, add labels, tags, assignees, and due dates." },
-      "calendar": { "title": "Calendar", "description": "Sync and unify all your tasks and focus slots directly from Google Calendar." },
-      "notes": { "title": "Notes", "description": "Markdown documentation for project specs, plans, and guidelines." },
-      "aiAssistant": { "title": "AI Assistant", "description": "Intelligent helper schedules focus blocks, updates statuses, and summaries files." },
-      "analytics": { "title": "Analytics", "description": "Detailed metrics show focus trends and behavioral insights." },
-      "notifications": { "title": "Notifications", "description": "Smart updates only notify you when it actually matters." }
+      "workspaces": {
+        "title": "Workspaces",
+        "description": "Seamlessly separate personal, startup, and side projects with dedicated workspaces."
+      },
+      "tasks": {
+        "title": "Tasks",
+        "description": "Create lists, prioritize, add labels, tags, assignees, and due dates."
+      },
+      "calendar": {
+        "title": "Calendar",
+        "description": "Sync and unify all your tasks and focus slots directly from Google Calendar."
+      },
+      "notes": {
+        "title": "Notes",
+        "description": "Markdown documentation for project specs, plans, and guidelines."
+      },
+      "aiAssistant": {
+        "title": "AI Assistant",
+        "description": "Intelligent helper schedules focus blocks, updates statuses, and summaries files."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Detailed metrics show focus trends and behavioral insights."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Smart updates only notify you when it actually matters."
+      }
     },
     "ai": {
       "heading": "Meet your AI productivity partner.",
       "subheading": "Focusly AI acts as a smart, co-pilot engine that understands your projects, analyzes your energy, and schedules your day.",
       "tryButton": "Try Focusly AI",
       "bullets": {
-        "createTasks": { "title": "Create tasks from thin air", "desc": "Describe a goal, and we will structure the task list, priorities, and deadlines." },
-        "summarize": { "title": "Summarize everything", "desc": "Sync transcripts or documents, and get key action items." },
-        "automate": { "title": "Automate workflows", "desc": "Trigger routines based on calendar updates or tasks." },
-        "instantAnswers": { "title": "Instant answers", "desc": "Query your entire workspace context instantly." }
+        "createTasks": {
+          "title": "Create tasks from thin air",
+          "desc": "Describe a goal, and we will structure the task list, priorities, and deadlines."
+        },
+        "summarize": {
+          "title": "Summarize everything",
+          "desc": "Sync transcripts or documents, and get key action items."
+        },
+        "automate": {
+          "title": "Automate workflows",
+          "desc": "Trigger routines based on calendar updates or tasks."
+        },
+        "instantAnswers": {
+          "title": "Instant answers",
+          "desc": "Query your entire workspace context instantly."
+        }
       }
     },
     "howItWorks": {
       "heading": "Streamlined for success.",
       "subheading": "Go from chaos to focus in four simple steps.",
-      "step1": { "title": "Create Workspaces 🗂", "desc": "Set up nice, private labs for separate projects, startups, or goals." },
-      "step2": { "title": "Create Tasks 📝", "desc": "Break down your goals into structured checklists, assign priorities, and link items directly to workspaces." },
-      "step3": { "title": "Focus Time ⚡", "desc": "Start high-focus sprints with custom timers and beautiful visual progress cards to stay in the zone." },
-      "step4": { "title": "Create Projects 📁", "desc": "Milestone boards track all of the fundamental elements." },
+      "step1": {
+        "title": "Create Workspaces 🗂",
+        "desc": "Set up nice, private labs for separate projects, startups, or goals."
+      },
+      "step2": {
+        "title": "Create Tasks 📝",
+        "desc": "Break down your goals into structured checklists, assign priorities, and link items directly to workspaces."
+      },
+      "step3": {
+        "title": "Focus Time ⚡",
+        "desc": "Start high-focus sprints with custom timers and beautiful visual progress cards to stay in the zone."
+      },
+      "step4": {
+        "title": "Create Projects 📁",
+        "desc": "Milestone boards track all of the fundamental elements."
+      },
       "plusMore": "Plus much more: Focus status 🟢, Smart Analytics 📈, Reminders 🔔"
     },
     "pricing": {
@@ -881,29 +953,59 @@
         "name": "Pro",
         "tagline": "For power users and professionals.",
         "cta": "Go Pro",
-        "features": ["Unlimited Workspaces", "AI Assistant (500 runs)", "Advanced Analytics", "Google Calendar Integration"]
+        "features": [
+          "Unlimited Workspaces",
+          "AI Assistant (500 runs)",
+          "Advanced Analytics",
+          "Google Calendar Integration"
+        ]
       },
       "enterprise": {
         "name": "Enterprise",
         "tagline": "For ultimate productivity.",
         "cta": "Go Enterprise",
-        "features": ["Unlimited Lumina AI Runs", "Priority AI Queue Processing", "Advanced Insights & Audits", "Export Workspaces (PDF/Markdown)", "Priority Support & Beta Access", "SLA & Security Protocols"]
+        "features": [
+          "Unlimited Lumina AI Runs",
+          "Priority AI Queue Processing",
+          "Advanced Insights & Audits",
+          "Export Workspaces (PDF/Markdown)",
+          "Priority Support & Beta Access",
+          "SLA & Security Protocols"
+        ]
       }
     },
     "testimonials": {
       "heading": "Trusted by the best.",
       "items": [
-        { "role": "Product Lead, Stripe", "quote": "Focusly changed how our design team works. The timing blocks reduce project delays by almost 40%." },
-        { "role": "CTO, Linear", "quote": "The calendar sync is flawless. The AI integration works like magic for organizing my daily schedule." },
-        { "role": "Founder & CEO, Raycast", "quote": "The workspace separation is exactly what I needed. Minimalist, premium, and extremely fast." }
+        {
+          "role": "Product Lead, Stripe",
+          "quote": "Focusly changed how our design team works. The timing blocks reduce project delays by almost 40%."
+        },
+        {
+          "role": "CTO, Linear",
+          "quote": "The calendar sync is flawless. The AI integration works like magic for organizing my daily schedule."
+        },
+        {
+          "role": "Founder & CEO, Raycast",
+          "quote": "The workspace separation is exactly what I needed. Minimalist, premium, and extremely fast."
+        }
       ]
     },
     "faq": {
       "heading": "Common Questions",
       "items": [
-        { "q": "How does the Google Calendar integration work?", "a": "Focusly integrates with Google Calendar to sync all of your meetings and blocks instantly, preventing any double booking." },
-        { "q": "Is my data secure?", "a": "Yes. Your data travels encrypted over HTTPS, is only used to provide the service, and is never sold. See our Privacy Notice for details." },
-        { "q": "Can I use Focusly for free?", "a": "Absolutely, our Free plan includes all core task management and calendar utilities." }
+        {
+          "q": "How does the Google Calendar integration work?",
+          "a": "Focusly integrates with Google Calendar to sync all of your meetings and blocks instantly, preventing any double booking."
+        },
+        {
+          "q": "Is my data secure?",
+          "a": "Yes. Your data travels encrypted over HTTPS, is only used to provide the service, and is never sold. See our Privacy Notice for details."
+        },
+        {
+          "q": "Can I use Focusly for free?",
+          "a": "Absolutely, our Free plan includes all core task management and calendar utilities."
+        }
       ]
     },
     "footer": {
@@ -961,6 +1063,7 @@
     "andMore": "and {{count}} more"
   },
   "projectTasks": {
+    "loading": "Loading tasks…",
     "attendees": "Invited: {{names}}",
     "empty": {
       "title": "No tasks in your projects yet",
@@ -1046,6 +1149,7 @@
     }
   },
   "workspaceLibrary": {
+    "loadingDocuments": "Loading documents…",
     "toast": {
       "deleteProjectsTitle": "Remove Projects",
       "deleteProjectsDesc": "Are you sure you want to delete the following projects: {{names}}? Workspaces inside will be unlinked but not deleted.",
@@ -1399,6 +1503,7 @@
     }
   },
   "projects": {
+    "loading": "Loading projects…",
     "newProject": "New Project",
     "createCleanFolder": "Create a clean folder",
     "showingResultsFor": "Showing {{count}} results for \"{{term}}\"",
@@ -1427,6 +1532,14 @@
     }
   },
   "workspaceEditor": {
+    "header": {
+      "addIcon": "Add icon",
+      "changeIcon": "Change icon",
+      "addCover": "Add cover",
+      "changeCover": "Change cover",
+      "focusView": "Focus view",
+      "defaultView": "Default view"
+    },
     "untitledNote": "Untitled Note",
     "saving": "saving",
     "saved": "saved",

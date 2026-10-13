@@ -187,9 +187,10 @@ export const TaskPopovers = ({
           sx: {
             ...popoverPaperSx,
             borderRadius: '16px',
-            p: 1.75,
-            minWidth: 260,
-            maxWidth: 290,
+            // Wide enough for the palette at a glance (9 per row).
+            p: 2,
+            width: { xs: 'calc(100vw - 32px)', sm: 384 },
+            maxWidth: 'calc(100vw - 32px)',
           },
         }}
       >
@@ -250,19 +251,20 @@ export const TaskPopovers = ({
             {
               id: 'all' as const,
               label: 'Todos',
-              count: 45,
+              count: PASTEL_COLORS.length,
               dot: 'linear-gradient(135deg, #BAE6FD, #FBCFE8, #A7F3D0)',
             },
             {
               id: 'pastel' as const,
               label: 'Pasteles',
-              count: 25,
+              count: PASTEL_COLORS.filter((c) => c.category === 'pastel')
+                .length,
               dot: '#BAE6FD',
             },
             {
               id: 'solid' as const,
               label: 'Sólidos',
-              count: 20,
+              count: PASTEL_COLORS.filter((c) => c.category === 'solid').length,
               dot: '#1D4ED8',
             },
           ].map((cat) => {
@@ -321,7 +323,7 @@ export const TaskPopovers = ({
 
         <Box
           sx={{
-            maxHeight: 340,
+            maxHeight: 'min(440px, 60vh)',
             overflowY: 'auto',
             pr: 0.5,
             '&::-webkit-scrollbar': {
@@ -352,8 +354,8 @@ export const TaskPopovers = ({
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(5, 1fr)',
-                  gap: 1.2,
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(34px, 1fr))',
+                  gap: 1,
                   justifyItems: 'center',
                   mb: 2,
                 }}
@@ -375,8 +377,8 @@ export const TaskPopovers = ({
                             setColorAnchor(null);
                           }}
                           sx={{
-                            width: 32,
-                            height: 32,
+                            width: 34,
+                            height: 34,
                             borderRadius: '50%',
                             bgcolor: item.value,
                             cursor: 'pointer',
@@ -441,8 +443,8 @@ export const TaskPopovers = ({
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(5, 1fr)',
-                  gap: 1.2,
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(34px, 1fr))',
+                  gap: 1,
                   justifyItems: 'center',
                   pb: 0.5,
                 }}
@@ -464,8 +466,8 @@ export const TaskPopovers = ({
                             setColorAnchor(null);
                           }}
                           sx={{
-                            width: 32,
-                            height: 32,
+                            width: 34,
+                            height: 34,
                             borderRadius: '50%',
                             bgcolor: item.value,
                             cursor: 'pointer',
