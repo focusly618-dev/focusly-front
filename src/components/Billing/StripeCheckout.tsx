@@ -4,11 +4,17 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   CircularProgress,
+  Divider,
+  TextField,
   Typography,
   useTheme,
 } from '@mui/material';
-import { LockOutlined as LockIcon } from '@mui/icons-material';
+import {
+  LockOutlined as LockIcon,
+  LocalOfferOutlined as TagIcon,
+} from '@mui/icons-material';
 import {
   Elements,
   PaymentElement,
@@ -17,7 +23,13 @@ import {
 } from '@stripe/react-stripe-js';
 import type { StripeElementLocale } from '@stripe/stripe-js';
 import { stripePromise } from '@/config/stripe';
-import { CHECKOUT_RETURN_PATH } from '@/config/plans';
+import type { Discount } from '@/api/Billing/billingApi';
+import {
+  CHECKOUT_RETURN_PATH,
+  discountValue,
+  formatDate,
+  formatPrice,
+} from '@/config/plans';
 import { useAppSelector } from '@/redux/hooks';
 import { buildPaymentElementOptions } from './paymentElementOptions';
 
@@ -40,6 +52,14 @@ export interface StripeCheckoutProps {
   /** Price in cents and Stripe interval, for Apple Pay's subscription sheet. */
   amount?: number | null;
   interval?: string | null;
+  currency?: string | null;
+  /** Charged today (the first payment less the discount; 0 in a trial). */
+  amountDue?: number | null;
+  /** Unix seconds: when the free trial ends (none: charged today). */
+  trialEnd?: number | null;
+  discount?: Discount | null;
+  /** The promotion code field; without it there's none. */
+  promo?: PromoControls;
   /** The payment went through (or is being processed by the bank). */
   onPaid: () => void;
   onBack: () => void;
@@ -47,17 +67,136 @@ export interface StripeCheckoutProps {
   onBusyChange?: (busy: boolean) => void;
 }
 
+export interface PromoControls {
+  /** Applies a code: resolves with an error to show, or null if applied. */
+  apply: (code: string) => Promise<string | null>;
+  remove: () => Promise<void>;
+  /** A code is being applied or removed (the form is being replaced). */
+  busy: boolean;
+}
+
+/** "¿Tienes un código?" → the field → the code applied, removable. */
+const PromoCodeField: React.FC<{
+  promo: PromoControls;
+  applied: string | null;
+  disabled: boolean;
+}> = ({ promo, applied, disabled }) => {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  if (applied) {
+    return (
+      <Chip
+        icon={<TagIcon sx={{ fontSize: 16 }} />}
+        label={applied}
+        onDelete={
+          disabled || promo.busy ? undefined : () => void promo.remove()
+        }
+        aria-label={t('billing.checkout.promo.applied', { code: applied })}
+        sx={{ fontWeight: 700, alignSelf: 'flex-start' }}
+      />
+    );
+  }
+  if (!open) {
+    return (
+      <Button
+        size="small"
+        startIcon={<TagIcon sx={{ fontSize: 16 }} />}
+        onClick={() => setOpen(true)}
+        disabled={disabled}
+        sx={{
+          alignSelf: 'flex-start',
+          textTransform: 'none',
+          fontWeight: 650,
+          color: BRAND,
+          px: 0.5,
+        }}
+      >
+        {t('billing.checkout.promo.toggle')}
+      </Button>
+    );
+  }
+  const submit = async () => {
+    const value = code.trim();
+    if (!value) return;
+    setError(await promo.apply(value));
+  };
+  return (
+    <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+      <TextField
+        size="small"
+        autoFocus
+        value={code}
+        onChange={(e) => {
+          setCode(e.target.value.toUpperCase());
+          setError(null);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            void submit();
+          }
+        }}
+        placeholder={t('billing.checkout.promo.placeholder')}
+        error={Boolean(error)}
+        helperText={error ?? undefined}
+        disabled={disabled || promo.busy}
+        slotProps={{
+          htmlInput: {
+            'aria-label': t('billing.checkout.promo.label'),
+            maxLength: 64,
+            autoCapitalize: 'characters',
+          },
+        }}
+        sx={{ flex: 1 }}
+      />
+      <Button
+        variant="outlined"
+        onClick={() => void submit()}
+        disabled={disabled || promo.busy || !code.trim()}
+        sx={{ textTransform: 'none', fontWeight: 650, minWidth: 92 }}
+      >
+        {promo.busy ? (
+          <CircularProgress size={18} />
+        ) : (
+          t('billing.checkout.promo.apply')
+        )}
+      </Button>
+    </Box>
+  );
+};
+
 const CheckoutForm: React.FC<StripeCheckoutProps> = ({
   intentType,
   priceLabel,
   intervalLabel,
   amount,
   interval,
+  currency,
+  amountDue,
+  trialEnd,
+  discount,
+  promo,
   onPaid,
   onBack,
   onBusyChange,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language;
+  const trial = Boolean(trialEnd);
+  const due = amountDue ?? amount;
+  const dueLabel =
+    due != null && currency
+      ? formatPrice({ amount: due, currency }, locale)
+      : priceLabel;
+  const discountOff =
+    discount && amount != null && amountDue != null && !trial
+      ? amount - amountDue
+      : null;
+  const pricePerInterval =
+    priceLabel && intervalLabel ? `${priceLabel}/${intervalLabel}` : priceLabel;
   const user = useAppSelector((state) => state.auth.user);
   const paymentElementOptions = buildPaymentElementOptions({
     name: user?.name,
@@ -146,31 +285,111 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
   return (
     <Box component="form" onSubmit={handleSubmit} noValidate>
       <Box
+        component="section"
+        aria-label={t('billing.checkout.summary')}
         sx={{
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 2,
+          flexDirection: 'column',
+          gap: 1,
           p: 2,
           mb: 2,
           borderRadius: '12px',
           bgcolor: 'action.hover',
         }}
       >
-        <Box sx={{ minWidth: 0 }}>
-          <Typography sx={{ fontWeight: 750, fontSize: '14px' }}>
-            {t('billing.plans.pro.name')}
-          </Typography>
-          {intervalLabel && (
-            <Typography variant="caption" color="text.secondary">
-              {t('billing.checkout.renews', { interval: intervalLabel })}
+        <SummaryRow
+          label={
+            <>
+              <Typography
+                component="span"
+                sx={{ fontWeight: 750, fontSize: '14px' }}
+              >
+                {t('billing.plans.pro.name')}
+              </Typography>
+              {interval && (
+                <Typography
+                  component="span"
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  {' · '}
+                  {t(`billing.checkout.plan.${interval}`, {
+                    defaultValue: intervalLabel ?? interval,
+                  })}
+                </Typography>
+              )}
+            </>
+          }
+          value={pricePerInterval}
+        />
+        {discount && (
+          <SummaryRow
+            label={t(
+              discount.duration === 'repeating'
+                ? 'billing.checkout.discountMonths'
+                : discount.duration === 'forever'
+                  ? 'billing.checkout.discountForever'
+                  : 'billing.checkout.discountOnce',
+              {
+                code: discount.code ?? '',
+                value: discountValue(discount, locale),
+                count: discount.duration_in_months ?? 0,
+              },
+            )}
+            value={
+              discountOff != null && currency
+                ? `−${formatPrice({ amount: discountOff, currency }, locale)}`
+                : null
+            }
+            accent
+          />
+        )}
+        {trial && trialEnd && (
+          <SummaryRow
+            label={t('billing.checkout.trialRow', {
+              date: formatDate(trialEnd, locale),
+            })}
+            value={t('billing.checkout.free')}
+            accent
+          />
+        )}
+        <Divider sx={{ my: 0.5 }} />
+        <SummaryRow
+          label={
+            <Typography
+              component="span"
+              sx={{ fontWeight: 800, fontSize: '14px' }}
+            >
+              {t('billing.checkout.dueToday')}
             </Typography>
-          )}
-        </Box>
-        {priceLabel && (
-          <Typography sx={{ fontWeight: 850, fontSize: '18px', color: BRAND }}>
-            {priceLabel}
-          </Typography>
+          }
+          value={
+            <Typography
+              component="span"
+              sx={{ fontWeight: 850, fontSize: '18px', color: BRAND }}
+            >
+              {trial && currency
+                ? formatPrice({ amount: 0, currency }, locale)
+                : dueLabel}
+            </Typography>
+          }
+        />
+        <Typography variant="caption" color="text.secondary">
+          {trial && trialEnd
+            ? t('billing.checkout.afterTrial', {
+                date: formatDate(trialEnd, locale),
+                price: pricePerInterval,
+              })
+            : intervalLabel
+              ? t('billing.checkout.renews', { interval: intervalLabel })
+              : null}
+        </Typography>
+        {promo && (
+          <PromoCodeField
+            promo={promo}
+            applied={discount?.code ?? null}
+            disabled={busy || paid}
+          />
         )}
       </Box>
 
@@ -225,6 +444,10 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
         component="p"
         sx={{ mb: 2.5 }}
       >
+        {pricePerInterval &&
+          t('billing.checkout.disclosure', {
+            price: pricePerInterval,
+          })}{' '}
         {t('billing.checkout.cancelNote')}
       </Typography>
 
@@ -247,7 +470,9 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
         <Button
           type="submit"
           variant="contained"
-          disabled={!stripe || !elements || !ready || busy || paid}
+          disabled={
+            !stripe || !elements || !ready || busy || paid || promo?.busy
+          }
           sx={{
             minWidth: 190,
             py: 1,
@@ -262,8 +487,10 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
         >
           {busy ? (
             <CircularProgress size={20} color="inherit" />
-          ) : priceLabel ? (
-            t('billing.checkout.pay', { price: priceLabel })
+          ) : trial ? (
+            t('billing.checkout.startTrial')
+          ) : dueLabel ? (
+            t('billing.checkout.pay', { price: dueLabel })
           ) : (
             t('billing.checkout.payNoPrice')
           )}
@@ -272,6 +499,44 @@ const CheckoutForm: React.FC<StripeCheckoutProps> = ({
     </Box>
   );
 };
+
+const SummaryRow: React.FC<{
+  label: React.ReactNode;
+  value: React.ReactNode;
+  /** Something taken off (a discount, the trial). */
+  accent?: boolean;
+}> = ({ label, value, accent }) => (
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      gap: 2,
+    }}
+  >
+    <Typography
+      component="div"
+      variant="body2"
+      sx={{ minWidth: 0, color: accent ? BRAND : 'text.primary' }}
+    >
+      {label}
+    </Typography>
+    {value != null && (
+      <Typography
+        component="div"
+        variant="body2"
+        sx={{
+          flexShrink: 0,
+          fontWeight: 650,
+          fontVariantNumeric: 'tabular-nums',
+          color: accent ? BRAND : 'text.primary',
+        }}
+      >
+        {value}
+      </Typography>
+    )}
+  </Box>
+);
 
 /** Stripe's Payment Element (cards, wallets…) for the first Pro payment. */
 export const StripeCheckout: React.FC<StripeCheckoutProps> = (props) => {

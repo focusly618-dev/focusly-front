@@ -12,21 +12,45 @@ vi.mock('@/config/stripe', () => ({
   isStripeConfigured: true,
   stripePromise: null,
 }));
-// Stripe's form is tested on its own; here it just reports a payment.
-vi.mock('@/components/Billing/StripeCheckout', () => ({
-  StripeCheckout: ({
-    priceLabel,
-    onPaid,
-  }: {
-    priceLabel: string;
-    onPaid: () => void;
-  }) => (
-    <div>
-      <span>STRIPE_FORM {priceLabel}</span>
-      <button onClick={onPaid}>PAY</button>
-    </div>
-  ),
-}));
+// Stripe's form is tested on its own; here it reports a payment and offers
+// the promotion code field.
+vi.mock('@/components/Billing/StripeCheckout', async () => {
+  const { useState } = await import('react');
+  return {
+    StripeCheckout: ({
+      priceLabel,
+      clientSecret,
+      amountDue,
+      promo,
+      onPaid,
+    }: {
+      priceLabel: string;
+      clientSecret: string;
+      amountDue?: number;
+      promo?: { apply: (code: string) => Promise<string | null> };
+      onPaid: () => void;
+    }) => {
+      const [promoError, setPromoError] = useState<string | null>(null);
+      return (
+        <div>
+          <span>STRIPE_FORM {priceLabel}</span>
+          <span>
+            CHECKOUT {clientSecret} DUE {amountDue}
+          </span>
+          <button onClick={onPaid}>PAY</button>
+          <button
+            onClick={async () =>
+              setPromoError(await promo!.apply('BIENVENIDA20'))
+            }
+          >
+            APPLY_PROMO
+          </button>
+          {promoError && <span>PROMO_ERROR {promoError}</span>}
+        </div>
+      );
+    },
+  };
+});
 vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 vi.mock('@/components/ui', () => ({ LuminaAnimatedFace: () => null }));
 const toast = vi.hoisted(() => ({ error: vi.fn() }));
@@ -40,7 +64,11 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
-      opts && 'count' in opts ? `${key}:${opts.count}` : key,
+      opts && 'count' in opts
+        ? `${key}:${opts.count}`
+        : opts && 'date' in opts
+          ? `${key}:${opts.date}`
+          : key,
     i18n: { language: 'en' },
   }),
 }));
@@ -107,7 +135,7 @@ describe('UpgradeModal', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('billing.upgrade.cta'));
     });
-    expect(api.createSubscription).toHaveBeenCalledWith();
+    expect(api.createSubscription).toHaveBeenCalledWith({ interval: 'month' });
     expect(screen.getByText('STRIPE_FORM $9.99')).toBeInTheDocument();
 
     api.getStatus.mockResolvedValue(status({ plan: 'pro' }));
@@ -227,5 +255,118 @@ describe('UpgradeModal', () => {
     expect(
       screen.getByRole('button', { name: /billing\.upgrade\.cta/ }),
     ).toBeEnabled();
+  });
+
+  describe('monthly or yearly, a trial, a promotion code', () => {
+    const prices = [
+      { amount: 999, currency: 'usd', interval: 'month' },
+      { amount: 9990, currency: 'usd', interval: 'year' },
+    ];
+
+    it('yearly: its price, what it saves, and the yearly checkout', async () => {
+      api.getStatus.mockResolvedValue(status({ pro_prices: prices }));
+      await renderModal();
+      expect(
+        screen.getByText('billing.plans.monthsFree:2'),
+      ).toBeInTheDocument();
+      fireEvent.click(
+        screen.getByRole('button', { name: 'billing.plans.yearly' }),
+      );
+      expect(screen.getByText('$99.90')).toBeInTheDocument();
+      await act(async () => {
+        fireEvent.click(screen.getByText('billing.upgrade.cta'));
+      });
+      expect(api.createSubscription).toHaveBeenCalledWith({ interval: 'year' });
+    });
+
+    it('a new customer is offered the free trial', async () => {
+      api.getStatus.mockResolvedValue(status({ trial_days: 7 }));
+      await renderModal();
+      expect(
+        screen.getByText('billing.plans.trialBadge:7'),
+      ).toBeInTheDocument();
+      expect(screen.getByText('billing.plans.trialNote')).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /billing\.upgrade\.ctaTrial:7/ }),
+      ).toBeInTheDocument();
+    });
+
+    it('the trial started: the welcome says until when it is free', async () => {
+      api.createSubscription.mockResolvedValue({
+        subscription_id: 'sub_1',
+        client_secret: 'seti_secret',
+        intent_type: 'setup',
+        status: 'trialing',
+        amount: 999,
+        currency: 'usd',
+        interval: 'month',
+        amount_due: 0,
+        trial_end: 1_800_000_000,
+      });
+      await renderModal();
+      await act(async () => {
+        fireEvent.click(screen.getByText('billing.upgrade.cta'));
+      });
+      api.getStatus.mockResolvedValue(
+        status({ plan: 'pro', trial_end: 1_800_000_000 }),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByText('PAY'));
+      });
+      expect(
+        await screen.findByText('billing.done.trialTitle'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/^billing\.done\.trialBody:/),
+      ).toBeInTheDocument();
+    });
+
+    it('a code replaces the checkout with one at the new price', async () => {
+      await renderModal();
+      await act(async () => {
+        fireEvent.click(screen.getByText('billing.upgrade.cta'));
+      });
+      api.createSubscription.mockResolvedValue({
+        subscription_id: 'sub_2',
+        client_secret: 'pi_discounted',
+        intent_type: 'payment',
+        status: 'incomplete',
+        amount: 999,
+        currency: 'usd',
+        interval: 'month',
+        amount_due: 799,
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByText('APPLY_PROMO'));
+      });
+      expect(api.createSubscription).toHaveBeenLastCalledWith({
+        interval: 'month',
+        promotionCode: 'BIENVENIDA20',
+      });
+      expect(
+        screen.getByText('CHECKOUT pi_discounted DUE 799'),
+      ).toBeInTheDocument();
+    });
+
+    it('a code the server refuses keeps the checkout and says why', async () => {
+      await renderModal();
+      await act(async () => {
+        fireEvent.click(screen.getByText('billing.upgrade.cta'));
+      });
+      api.createSubscription.mockRejectedValue({
+        isAxiosError: true,
+        response: {
+          status: 400,
+          data: { detail: 'Ese código no es válido o ya venció.' },
+        },
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByText('APPLY_PROMO'));
+      });
+      expect(
+        screen.getByText('PROMO_ERROR Ese código no es válido o ya venció.'),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/CHECKOUT pi_secret/)).toBeInTheDocument();
+    });
   });
 });

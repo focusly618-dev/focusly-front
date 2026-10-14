@@ -1642,7 +1642,16 @@
         "week": "週",
         "day": "日"
       },
-      "priceLater": "料金は次のステップで表示されます"
+      "priceLater": "料金は次のステップで表示されます",
+      "intervalLabel": "お支払い",
+      "monthly": "月払い",
+      "yearly": "年払い",
+      "monthsFree_other": "{{count}}か月分無料",
+      "save": "{{percent}}%お得",
+      "perMonthEquivalent": "月あたり{{price}}（年1回のお支払い）",
+      "trialBadge_other": "{{count}}日間無料",
+      "trialNote": "本日のお支払いはありません。トライアル終了前に解約すれば料金はかかりません。",
+      "cancelAnytime": "いつでも解約できます。"
     },
     "features": {
       "aiTrial_one": "Lumina を試せるメッセージ {{count}} 件",
@@ -1677,7 +1686,8 @@
       "alreadyPro": "すでに Focusly Pro をご利用中です",
       "notConfigured": "お支払いはまだご利用いただけません。後でもう一度お試しください。",
       "startError": "お支払いを開始できませんでした。もう一度お試しください。",
-      "close": "閉じる"
+      "close": "閉じる",
+      "ctaTrial_other": "{{count}}日間の無料トライアルを始める"
     },
     "checkout": {
       "title": "サブスクリプションを完了",
@@ -1689,7 +1699,30 @@
       "cancelNote": "プロフィール → プランとお支払い からいつでも解約できます。",
       "error": "お支払いを処理できませんでした。入力内容を確認して、もう一度お試しください。",
       "loading": "お支払いフォームを読み込んでいます…",
-      "applePayDescription": "Focusly Pro のサブスクリプション"
+      "applePayDescription": "Focusly Pro のサブスクリプション",
+      "summary": "ご注文内容",
+      "plan": {
+        "month": "月払い",
+        "year": "年払い"
+      },
+      "discountOnce": "コード {{code}}（初回 {{value}} オフ）",
+      "discountMonths_other": "コード {{code}}（{{count}}か月間 {{value}} オフ）",
+      "discountForever": "コード {{code}}（常に {{value}} オフ）",
+      "trialRow": "{{date}}まで無料トライアル",
+      "free": "無料",
+      "dueToday": "本日のお支払い",
+      "afterTrial": "{{date}}に{{price}}が請求され、自動更新されます。",
+      "disclosure": "登録すると、解約するまでFocuslyが{{price}}を定期的に請求することに同意したものとみなされます。",
+      "startTrial": "無料トライアルを始める",
+      "promo": {
+        "toggle": "プロモーションコードをお持ちですか？",
+        "placeholder": "コード",
+        "label": "プロモーションコード",
+        "apply": "適用",
+        "applied": "コード {{code}} を適用しました",
+        "invalid": "このコードは無効か、有効期限が切れています。",
+        "error": "コードを適用できませんでした。もう一度お試しください。"
+      }
     },
     "activating": {
       "title": "プランを有効化しています…",
@@ -1698,7 +1731,10 @@
     "done": {
       "title": "Focusly Pro へようこそ！",
       "body": "エディターも含め、Lumina を無制限に使えるようになりました。",
-      "cta": "始める"
+      "cta": "始める",
+      "trialTitle": "Focusly Proの無料トライアルが始まりました！",
+      "trialBody": "{{date}}までLuminaを無制限に無料でご利用いただけます。それまでに解約すれば料金はかかりません。",
+      "nextCharge": "次回の請求日は{{date}}です。"
     },
     "pending": {
       "title": "お支払いを受け付けました",
@@ -1731,7 +1767,40 @@
       "plansDescription": "各プランに含まれるもの。",
       "returnSuccess": "Focusly Pro のサブスクリプションが有効になりました！",
       "returnPending": "お支払いを受け付けました。数分以内にプランが有効になります。",
-      "returnFailed": "お支払いは完了しませんでした。もう一度お試しいただけます。"
+      "returnFailed": "お支払いは完了しませんでした。もう一度お試しいただけます。",
+      "plan": {
+        "month": "Focusly Pro 月払い",
+        "year": "Focusly Pro 年払い"
+      },
+      "trialEnds": "{{date}}まで無料トライアル中です。その後{{price}}が請求されます。",
+      "trialCancels": "無料トライアルは{{date}}に終了し、請求はありません。",
+      "discount": "コード {{code}}：{{value}} オフ",
+      "discountUntil": "コード {{code}}：{{date}}まで {{value}} オフ"
+    },
+    "history": {
+      "title": "お支払い履歴",
+      "description": "Focuslyへのお支払いと、その領収書・PDF請求書。",
+      "loading": "お支払い履歴を読み込み中…",
+      "empty": "まだお支払いはありません。",
+      "error": "お支払い履歴を読み込めませんでした。",
+      "retry": "再試行",
+      "plan": {
+        "month": "Focusly Pro・月払い",
+        "year": "Focusly Pro・年払い"
+      },
+      "discount": "{{amount}} 割引",
+      "status": {
+        "paid": "支払い済み",
+        "trial": "無料トライアル",
+        "open": "未払い",
+        "uncollectible": "回収不能",
+        "refunded": "返金済み",
+        "partially_refunded": "一部返金"
+      },
+      "receipt": "領収書を見る",
+      "receiptFor": "領収書 {{number}} を見る",
+      "pdf": "PDFをダウンロード",
+      "pdfFor": "請求書 {{number}} をPDFでダウンロード"
     }
   },
   "toasts": {

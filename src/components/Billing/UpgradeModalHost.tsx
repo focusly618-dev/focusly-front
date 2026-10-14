@@ -9,6 +9,7 @@ export const UpgradeModalHost = () => {
       open={upgrade.open}
       reason={upgrade.reason}
       startCheckout={upgrade.checkout}
+      interval={upgrade.interval}
       onClose={closeUpgrade}
     />
   );

@@ -1,4 +1,8 @@
-import { billingApi, type BillingStatus } from '@/api/Billing/billingApi';
+import {
+  billingApi,
+  type BillingInterval,
+  type BillingStatus,
+} from '@/api/Billing/billingApi';
 
 // The user's plan and free AI usage, shared by every screen (chat, editor,
 // profile), plus the one "Pro plans" dialog any of them can open. The
@@ -10,14 +14,25 @@ export interface BillingState {
   userId: string | null;
   status: BillingStatus | null;
   loading: boolean;
-  upgrade: { open: boolean; reason: UpgradeReason; checkout: boolean };
+  upgrade: {
+    open: boolean;
+    reason: UpgradeReason;
+    checkout: boolean;
+    /** The plan picked before opening (e.g. on the profile's cards). */
+    interval: BillingInterval;
+  };
 }
 
 const INITIAL: BillingState = {
   userId: null,
   status: null,
   loading: false,
-  upgrade: { open: false, reason: 'manual', checkout: false },
+  upgrade: {
+    open: false,
+    reason: 'manual',
+    checkout: false,
+    interval: 'month',
+  },
 };
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -144,9 +159,16 @@ class BillingService {
     }
   }
 
-  /** checkout: skip the plans and go straight to the payment form. */
-  openUpgrade(reason: UpgradeReason = 'manual', { checkout = false } = {}) {
-    this.set({ upgrade: { open: true, reason, checkout } });
+  /** checkout: skip the plans and go straight to the payment form, for the
+   * given plan. */
+  openUpgrade(
+    reason: UpgradeReason = 'manual',
+    {
+      checkout = false,
+      interval = 'month',
+    }: { checkout?: boolean; interval?: BillingInterval } = {},
+  ) {
+    this.set({ upgrade: { open: true, reason, checkout, interval } });
   }
 
   closeUpgrade() {

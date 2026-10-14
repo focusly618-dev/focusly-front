@@ -100,9 +100,13 @@ describe('billingService', () => {
       open: true,
       reason: 'limit',
       checkout: false,
+      interval: 'month',
     });
     billingService.openUpgrade('manual', { checkout: true });
     expect(billingService.getSnapshot().upgrade.checkout).toBe(true);
+    // The plan picked on the profile's cards goes to the dialog.
+    billingService.openUpgrade('manual', { checkout: true, interval: 'year' });
+    expect(billingService.getSnapshot().upgrade.interval).toBe('year');
     billingService.closeUpgrade();
     expect(billingService.getSnapshot().upgrade.open).toBe(false);
   });

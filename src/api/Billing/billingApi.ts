@@ -1,6 +1,7 @@
 import axiosInstance from '../axiosInstance';
 
 export type PlanId = 'free' | 'pro';
+export type BillingInterval = 'month' | 'year';
 
 export interface BillingStatus {
   plan: PlanId;
@@ -12,8 +13,30 @@ export interface BillingStatus {
   ai_messages_used: number;
   ai_messages_limit: number;
   billing_enabled: boolean;
-  /** The Pro price as Stripe has it (null when unknown). */
+  /** The monthly Pro price as Stripe has it (null when unknown). */
   pro_price: ProPrice | null;
+  /** Every Pro price on sale: monthly, and yearly when offered. */
+  pro_prices?: ProPrice[];
+  /** The current subscription's billing interval (when read from Stripe). */
+  interval?: string | null;
+  /** Unix seconds: when the free trial ends, while in one. */
+  trial_end?: number | null;
+  /** The promotion code applied to the subscription, if any. */
+  discount?: Discount | null;
+  /** Days of free trial this user would get (0: none). */
+  trial_days?: number;
+}
+
+export interface Discount {
+  code: string | null;
+  percent_off: number | null;
+  /** In the smallest currency unit. */
+  amount_off: number | null;
+  currency: string | null;
+  duration: 'once' | 'repeating' | 'forever' | null;
+  duration_in_months: number | null;
+  /** Unix seconds, when it stops applying (null: never / unknown). */
+  end?: number | null;
 }
 
 export interface ProPrice {
@@ -35,6 +58,46 @@ export interface SubscriptionResponse {
   amount: number | null;
   currency: string | null;
   interval: string | null;
+  /** Charged today: the first payment less the discount, 0 in a trial. */
+  amount_due?: number | null;
+  /** Unix seconds: when the free trial ends (null: no trial). */
+  trial_end?: number | null;
+  discount?: Discount | null;
+}
+
+export type InvoiceStatus =
+  | 'paid'
+  | 'open'
+  | 'uncollectible'
+  | 'refunded'
+  | 'partially_refunded';
+
+export interface Invoice {
+  id: string;
+  number: string | null;
+  /** Unix seconds. */
+  created: number;
+  paid_at: number | null;
+  status: InvoiceStatus;
+  /** The first invoice of a free trial (nothing charged). */
+  trial: boolean;
+  subtotal: number | null;
+  /** Taken off by a promotion code. */
+  discount: number;
+  total: number | null;
+  amount_paid: number;
+  amount_refunded: number;
+  currency: string;
+  period_start: number | null;
+  period_end: number | null;
+  interval: BillingInterval;
+  hosted_invoice_url: string | null;
+  invoice_pdf: string | null;
+}
+
+export interface CheckoutOptions {
+  interval?: BillingInterval;
+  promotionCode?: string;
 }
 
 export interface PortalResponse {
@@ -58,11 +121,27 @@ export const billingApi = {
     return response.data;
   },
 
-  /** The price is the server's; nothing about it is sent from here. */
-  createSubscription: async (): Promise<SubscriptionResponse> => {
+  /** Only the plan (monthly or yearly) and a promotion code go from here:
+   * the prices are the server's. */
+  createSubscription: async ({
+    interval = 'month',
+    promotionCode,
+  }: CheckoutOptions = {}): Promise<SubscriptionResponse> => {
     const response = await axiosInstance.post<SubscriptionResponse>(
       '/api/billing/subscribe',
-      undefined,
+      {
+        interval,
+        ...(promotionCode ? { promotion_code: promotionCode } : {}),
+      },
+      { timeout: STRIPE_TIMEOUT_MS },
+    );
+    return response.data;
+  },
+
+  /** The user's payment history, newest first. */
+  getInvoices: async (): Promise<Invoice[]> => {
+    const response = await axiosInstance.get<Invoice[]>(
+      '/api/billing/invoices',
       { timeout: STRIPE_TIMEOUT_MS },
     );
     return response.data;

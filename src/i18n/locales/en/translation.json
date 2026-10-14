@@ -1670,7 +1670,18 @@
         "week": "week",
         "day": "day"
       },
-      "priceLater": "You'll see the price in the next step"
+      "priceLater": "You'll see the price in the next step",
+      "intervalLabel": "Billing",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "monthsFree_one": "{{count}} month free",
+      "monthsFree_other": "{{count}} months free",
+      "save": "Save {{percent}}%",
+      "perMonthEquivalent": "That's {{price}}/month, billed once a year",
+      "trialBadge_one": "{{count}}-day free trial",
+      "trialBadge_other": "{{count}}-day free trial",
+      "trialNote": "Nothing is charged today. Cancel before the trial ends and you pay nothing.",
+      "cancelAnytime": "No commitment: cancel anytime."
     },
     "features": {
       "aiTrial_one": "{{count}} message with Lumina to try it",
@@ -1705,7 +1716,9 @@
       "alreadyPro": "You already have Focusly Pro",
       "notConfigured": "Payments aren't available yet. Please try again later.",
       "startError": "We couldn't open the payment. Please try again.",
-      "close": "Close"
+      "close": "Close",
+      "ctaTrial_one": "Start {{count}}-day free trial",
+      "ctaTrial_other": "Start {{count}}-day free trial"
     },
     "checkout": {
       "title": "Complete your subscription",
@@ -1717,7 +1730,31 @@
       "cancelNote": "You can cancel anytime from Profile → Plans & billing.",
       "error": "The payment couldn't be processed. Check your details and try again.",
       "loading": "Loading the payment form…",
-      "applePayDescription": "Focusly Pro subscription"
+      "applePayDescription": "Focusly Pro subscription",
+      "summary": "Order summary",
+      "plan": {
+        "month": "Monthly",
+        "year": "Yearly"
+      },
+      "discountOnce": "Code {{code}} ({{value}} off the first payment)",
+      "discountMonths_one": "Code {{code}} ({{value}} off for {{count}} month)",
+      "discountMonths_other": "Code {{code}} ({{value}} off for {{count}} months)",
+      "discountForever": "Code {{code}} ({{value}} off, always)",
+      "trialRow": "Free trial until {{date}}",
+      "free": "Free",
+      "dueToday": "Due today",
+      "afterTrial": "On {{date}} you'll be charged {{price}}, renewing automatically.",
+      "disclosure": "By subscribing you authorize Focusly to charge {{price}} on a recurring basis until you cancel.",
+      "startTrial": "Start free trial",
+      "promo": {
+        "toggle": "Have a promo code?",
+        "placeholder": "CODE",
+        "label": "Promo code",
+        "apply": "Apply",
+        "applied": "Code {{code}} applied",
+        "invalid": "That code isn't valid or has expired.",
+        "error": "Couldn't apply the code. Please try again."
+      }
     },
     "activating": {
       "title": "Activating your plan…",
@@ -1726,7 +1763,10 @@
     "done": {
       "title": "Welcome to Focusly Pro!",
       "body": "You can now use Lumina without limits, in the editor too.",
-      "cta": "Get started"
+      "cta": "Get started",
+      "trialTitle": "Your Focusly Pro trial has started!",
+      "trialBody": "Unlimited Lumina, free until {{date}}. Cancel before then and you pay nothing.",
+      "nextCharge": "Your next charge is on {{date}}."
     },
     "pending": {
       "title": "We received your payment",
@@ -1759,7 +1799,40 @@
       "plansDescription": "What each plan includes.",
       "returnSuccess": "Your Focusly Pro subscription is active!",
       "returnPending": "We received your payment; your plan will be active in a few minutes.",
-      "returnFailed": "The payment wasn't completed. You can try again."
+      "returnFailed": "The payment wasn't completed. You can try again.",
+      "plan": {
+        "month": "Focusly Pro monthly",
+        "year": "Focusly Pro yearly"
+      },
+      "trialEnds": "You're on your free trial until {{date}}. After that, {{price}} will be charged.",
+      "trialCancels": "Your free trial ends on {{date}} and you won't be charged.",
+      "discount": "Code {{code}}: {{value}} off.",
+      "discountUntil": "Code {{code}}: {{value}} off until {{date}}."
+    },
+    "history": {
+      "title": "Payment history",
+      "description": "Your payments to Focusly, with their receipt and PDF invoice.",
+      "loading": "Loading your payments…",
+      "empty": "No payments yet.",
+      "error": "Couldn't load your payment history.",
+      "retry": "Retry",
+      "plan": {
+        "month": "Focusly Pro · monthly",
+        "year": "Focusly Pro · yearly"
+      },
+      "discount": "{{amount}} discount",
+      "status": {
+        "paid": "Paid",
+        "trial": "Free trial",
+        "open": "Due",
+        "uncollectible": "Uncollected",
+        "refunded": "Refunded",
+        "partially_refunded": "Partly refunded"
+      },
+      "receipt": "View receipt",
+      "receiptFor": "View receipt {{number}}",
+      "pdf": "Download PDF",
+      "pdfFor": "Download invoice {{number}} as PDF"
     }
   },
   "toasts": {

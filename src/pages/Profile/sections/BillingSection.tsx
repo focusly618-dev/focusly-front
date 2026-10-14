@@ -15,7 +15,14 @@ import {
   OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
 import { billingApi } from '@/api/Billing/billingApi';
+import { PaymentHistory } from '@/components/Billing/PaymentHistory';
 import { PlanCards } from '@/components/Billing/PlanCards';
+import {
+  discountValue,
+  formatDate,
+  formatPrice,
+  priceFor,
+} from '@/config/plans';
 import { useBilling } from '@/hooks/useBilling';
 import { LoadingRegion, TextSkeleton } from '@/components/ui';
 import { notify } from '@/utils';
@@ -82,12 +89,19 @@ export const BillingSection = () => {
   };
 
   const status = billing.status;
+  const locale = i18n.language;
   const periodEnd = status?.current_period_end
-    ? new Date(status.current_period_end * 1000).toLocaleDateString(
-        i18n.language,
-        { day: 'numeric', month: 'long', year: 'numeric' },
-      )
+    ? formatDate(status.current_period_end, locale)
     : null;
+  const trialEnd = status?.trial_end
+    ? formatDate(status.trial_end, locale)
+    : null;
+  const plan = status?.interval === 'year' ? 'year' : 'month';
+  const planPrice = formatPrice(
+    priceFor(status?.pro_prices, plan) ?? status?.pro_price,
+    locale,
+  );
+  const discount = status?.discount;
 
   return (
     <>
@@ -154,11 +168,43 @@ export const BillingSection = () => {
             {status?.subscription_status === 'past_due' && (
               <Alert severity="warning">{t('billing.section.pastDue')}</Alert>
             )}
-            {periodEnd && (
-              <Typography variant="body2" color="text.secondary">
+            {status?.interval && (
+              <Typography variant="body2" sx={{ fontWeight: 650 }}>
+                {t(`billing.section.plan.${plan}`)}
+                {planPrice &&
+                  ` · ${planPrice}/${t(`billing.plans.interval.${plan}`)}`}
+              </Typography>
+            )}
+            {trialEnd ? (
+              <Alert severity="info" icon={<SparkIcon fontSize="small" />}>
                 {status?.cancel_at_period_end
-                  ? t('billing.section.cancels', { date: periodEnd })
-                  : t('billing.section.renews', { date: periodEnd })}
+                  ? t('billing.section.trialCancels', { date: trialEnd })
+                  : t('billing.section.trialEnds', {
+                      date: trialEnd,
+                      price: planPrice ?? '',
+                    })}
+              </Alert>
+            ) : (
+              periodEnd && (
+                <Typography variant="body2" color="text.secondary">
+                  {status?.cancel_at_period_end
+                    ? t('billing.section.cancels', { date: periodEnd })
+                    : t('billing.section.renews', { date: periodEnd })}
+                </Typography>
+              )
+            )}
+            {discount && (
+              <Typography variant="body2" sx={{ color: BRAND }}>
+                {discount.end
+                  ? t('billing.section.discountUntil', {
+                      code: discount.code ?? '',
+                      value: discountValue(discount, locale),
+                      date: formatDate(discount.end, locale),
+                    })
+                  : t('billing.section.discount', {
+                      code: discount.code ?? '',
+                      value: discountValue(discount, locale),
+                    })}
               </Typography>
             )}
             <Box>
@@ -215,8 +261,22 @@ export const BillingSection = () => {
           used={billing.used}
           limit={billing.limit}
           price={billing.status?.pro_price}
-          onChoosePro={() => billing.openUpgrade('manual', { checkout: true })}
+          prices={billing.status?.pro_prices}
+          trialDays={billing.status?.trial_days ?? 0}
+          onChoosePro={(interval) =>
+            billing.openUpgrade('manual', { checkout: true, interval })
+          }
         />
+      </Card>
+
+      <Divider />
+
+      <Card>
+        <CardTitle>{t('billing.history.title')}</CardTitle>
+        <CardDescription sx={{ mb: 2 }}>
+          {t('billing.history.description')}
+        </CardDescription>
+        <PaymentHistory />
       </Card>
     </>
   );

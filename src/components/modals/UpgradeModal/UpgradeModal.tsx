@@ -21,10 +21,11 @@ import { PlanCards } from '@/components/Billing/PlanCards';
 import { StripeCheckout } from '@/components/Billing/StripeCheckout';
 import {
   billingApi,
+  type BillingInterval,
   type SubscriptionResponse,
 } from '@/api/Billing/billingApi';
 import { isStripeConfigured } from '@/config/stripe';
-import { formatPrice } from '@/config/plans';
+import { formatDate, formatPrice } from '@/config/plans';
 import { useBilling } from '@/hooks/useBilling';
 import { notify } from '@/utils';
 import type { UpgradeModalProps } from './UpgradeModal.types';
@@ -48,6 +49,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   open,
   reason = 'manual',
   startCheckout = false,
+  interval: startInterval = 'month',
   onClose,
 }) => {
   const { t, i18n } = useTranslation();
@@ -59,6 +61,9 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   const [starting, setStarting] = useState(false);
   const [checkout, setCheckout] = useState<SubscriptionResponse | null>(null);
   const [busy, setBusy] = useState(false);
+  // The plan being bought, and a promotion code being applied or removed.
+  const [interval, setInterval] = useState<BillingInterval>(startInterval);
+  const [promoBusy, setPromoBusy] = useState(false);
 
   // A payment is reported once (see handlePaid).
   const activatingRef = useRef(false);
@@ -71,23 +76,26 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       setStep(firstStep);
       setCheckout(null);
       setBusy(false);
+      setInterval(startInterval);
       activatingRef.current = false;
     }
   }
 
   const price = checkout ?? billing.status?.pro_price ?? null;
   const priceLabel = formatPrice(price, i18n.language);
-  const interval = price?.interval;
-  const intervalLabel = interval
-    ? t(`billing.plans.interval.${interval}`, { defaultValue: interval })
+  const priceInterval = price?.interval;
+  const intervalLabel = priceInterval
+    ? t(`billing.plans.interval.${priceInterval}`, {
+        defaultValue: priceInterval,
+      })
     : null;
 
   const { refresh } = billing;
 
   /** Creates the subscription and moves to Stripe's form. */
-  const requestCheckout = async () => {
+  const requestCheckout = async (plan: BillingInterval = interval) => {
     try {
-      setCheckout(await billingApi.createSubscription());
+      setCheckout(await billingApi.createSubscription({ interval: plan }));
       setStep('checkout');
     } catch (err) {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined;
@@ -109,7 +117,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
 
   // Set in the click itself: a double click starts one checkout.
   const startingRef = useRef(false);
-  const choosePro = async () => {
+  const choosePro = async (plan: BillingInterval = 'month') => {
     if (startingRef.current) return;
     if (!paymentsAvailable) {
       notify.error({ title: t('billing.upgrade.notConfigured') });
@@ -117,8 +125,9 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     }
     startingRef.current = true;
     setStarting(true);
+    setInterval(plan);
     try {
-      await requestCheckout();
+      await requestCheckout(plan);
     } finally {
       startingRef.current = false;
       setStarting(false);
@@ -139,6 +148,36 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, step]);
 
+  /** A promotion code replaces the checkout with one at the new price (the
+   * old one is cancelled by the server, so it can't be paid as well). */
+  const changePromo = async (code: string | null): Promise<string | null> => {
+    setPromoBusy(true);
+    try {
+      setCheckout(
+        await billingApi.createSubscription({
+          interval,
+          ...(code ? { promotionCode: code } : {}),
+        }),
+      );
+      return null;
+    } catch (err) {
+      const response = axios.isAxiosError(err) ? err.response : undefined;
+      if (response?.status === 400) {
+        return typeof response.data?.detail === 'string'
+          ? response.data.detail
+          : t('billing.checkout.promo.invalid');
+      }
+      if (response?.status === 409) {
+        await refresh();
+        setStep('done');
+        return null;
+      }
+      return t('billing.checkout.promo.error');
+    } finally {
+      setPromoBusy(false);
+    }
+  };
+
   const handlePaid = async () => {
     // Reported once per payment, however many times the form calls it.
     if (activatingRef.current) return;
@@ -156,7 +195,11 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     }
   };
 
-  const canClose = !busy && step !== 'activating';
+  // What the welcome says: the trial's end, or the next charge.
+  const trialEnd = billing.status?.trial_end ?? checkout?.trial_end ?? null;
+  const nextCharge = billing.status?.current_period_end ?? null;
+
+  const canClose = !busy && !promoBusy && step !== 'activating';
   const close = () => {
     if (canClose) onClose();
   };
@@ -294,7 +337,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
             used={billing.used}
             limit={billing.limit}
             price={billing.status?.pro_price}
-            onChoosePro={choosePro}
+            prices={billing.status?.pro_prices}
+            trialDays={billing.status?.trial_days ?? 0}
+            initialInterval={interval}
+            onChoosePro={(plan) => void choosePro(plan)}
             starting={starting}
             disabled={!paymentsAvailable}
           />
@@ -303,11 +349,24 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
 
       {step === 'checkout' && checkout && (
         <StripeCheckout
+          // A new checkout (another code) is a new Stripe form.
+          key={checkout.client_secret}
           clientSecret={checkout.client_secret}
           intentType={checkout.intent_type}
           customerSessionClientSecret={checkout.customer_session_client_secret}
           amount={checkout.amount}
           interval={checkout.interval}
+          currency={checkout.currency}
+          amountDue={checkout.amount_due}
+          trialEnd={checkout.trial_end}
+          discount={checkout.discount}
+          promo={{
+            apply: (code) => changePromo(code),
+            remove: async () => {
+              await changePromo(null);
+            },
+            busy: promoBusy,
+          }}
           priceLabel={priceLabel}
           intervalLabel={intervalLabel}
           onPaid={handlePaid}
@@ -336,8 +395,16 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       {step === 'done' &&
         statusPanel(
           <DoneIcon sx={{ fontSize: 56, color: BRAND }} />,
-          t('billing.done.title'),
-          t('billing.done.body'),
+          trialEnd ? t('billing.done.trialTitle') : t('billing.done.title'),
+          trialEnd
+            ? t('billing.done.trialBody', {
+                date: formatDate(trialEnd, i18n.language),
+              })
+            : nextCharge
+              ? `${t('billing.done.body')} ${t('billing.done.nextCharge', {
+                  date: formatDate(nextCharge, i18n.language),
+                })}`
+              : t('billing.done.body'),
           finishButton(t('billing.done.cta')),
         )}
 

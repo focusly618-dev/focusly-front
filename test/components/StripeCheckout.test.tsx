@@ -271,3 +271,140 @@ describe('StripeCheckout', () => {
     });
   });
 });
+
+describe('StripeCheckout: the order summary', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const summary = () =>
+    screen.getByRole('region', { name: 'billing.checkout.summary' });
+
+  it('a promotion code: what it takes off and what is paid today', () => {
+    render(
+      <StripeCheckout
+        {...props}
+        currency="usd"
+        amount={999}
+        amountDue={799}
+        discount={{
+          code: 'BIENVENIDA20',
+          percent_off: 20,
+          amount_off: null,
+          currency: null,
+          duration: 'repeating',
+          duration_in_months: 3,
+        }}
+      />,
+    );
+    expect(summary()).toHaveTextContent('billing.checkout.discountMonths');
+    expect(summary()).toHaveTextContent('−$2');
+    expect(summary()).toHaveTextContent('billing.checkout.dueToday');
+    expect(summary()).toHaveTextContent('$7.99');
+    // The button charges what's due today, not the list price.
+    expect(
+      screen.getByRole('button', { name: 'billing.checkout.pay:$7.99' }),
+    ).toBeInTheDocument();
+  });
+
+  it('a free trial: nothing today, and when the first charge comes', () => {
+    render(
+      <StripeCheckout
+        {...props}
+        intentType="setup"
+        currency="usd"
+        amount={999}
+        amountDue={0}
+        trialEnd={1_800_000_000}
+      />,
+    );
+    expect(summary()).toHaveTextContent('billing.checkout.trialRow');
+    expect(summary()).toHaveTextContent(/dueToday\$0(?!\.)/);
+    expect(summary()).toHaveTextContent('billing.checkout.afterTrial');
+    expect(
+      screen.getByRole('button', { name: 'billing.checkout.startTrial' }),
+    ).toBeInTheDocument();
+  });
+
+  it('says it renews and how to cancel, next to the button', () => {
+    render(<StripeCheckout {...props} />);
+    expect(
+      screen.getByText(/billing\.checkout\.disclosure:\$9\.99\/month/),
+    ).toHaveTextContent('billing.checkout.cancelNote');
+  });
+
+  describe('the promotion code', () => {
+    const promo = (over = {}) => ({
+      apply: vi.fn().mockResolvedValue(null),
+      remove: vi.fn().mockResolvedValue(undefined),
+      busy: false,
+      ...over,
+    });
+
+    it('typed in any case, applied in capitals', async () => {
+      const controls = promo();
+      render(<StripeCheckout {...props} promo={controls} />);
+      fireEvent.click(screen.getByText('billing.checkout.promo.toggle'));
+      fireEvent.change(
+        screen.getByRole('textbox', { name: 'billing.checkout.promo.label' }),
+        { target: { value: 'bienvenida20' } },
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByText('billing.checkout.promo.apply'));
+      });
+      expect(controls.apply).toHaveBeenCalledWith('BIENVENIDA20');
+    });
+
+    it("a code that doesn't work says why, under the field", async () => {
+      const controls = promo({
+        apply: vi
+          .fn()
+          .mockResolvedValue('Ese código no es válido o ya venció.'),
+      });
+      render(<StripeCheckout {...props} promo={controls} />);
+      fireEvent.click(screen.getByText('billing.checkout.promo.toggle'));
+      const field = screen.getByRole('textbox', {
+        name: 'billing.checkout.promo.label',
+      });
+      fireEvent.change(field, { target: { value: 'NOPE' } });
+      await act(async () => {
+        fireEvent.keyDown(field, { key: 'Enter' });
+      });
+      expect(
+        screen.getByText('Ese código no es válido o ya venció.'),
+      ).toBeInTheDocument();
+      expect(field).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('an applied code shows and can be removed', async () => {
+      const controls = promo();
+      render(
+        <StripeCheckout
+          {...props}
+          promo={controls}
+          discount={{
+            code: 'LANZAMIENTO50',
+            percent_off: 50,
+            amount_off: null,
+            currency: null,
+            duration: 'once',
+            duration_in_months: null,
+          }}
+        />,
+      );
+      expect(screen.getByText('LANZAMIENTO50')).toBeInTheDocument();
+      expect(
+        screen.queryByText('billing.checkout.promo.toggle'),
+      ).not.toBeInTheDocument();
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('CancelIcon'));
+      });
+      expect(controls.remove).toHaveBeenCalled();
+    });
+
+    it("while a code is applied the old form can't be paid", () => {
+      render(<StripeCheckout {...props} promo={promo({ busy: true })} />);
+      expect(
+        screen.getByRole('button', { name: 'billing.checkout.pay:$9.99' }),
+      ).toBeDisabled();
+    });
+  });
+});
