@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterEach } from 'vitest';
+
+// findBy*/waitFor give up after 1 s by default: enough alone, but not when the
+// whole suite renders MUI at once on a busy machine or a CI runner.
+configure({ asyncUtilTimeout: 5000 });
 
 // Node's built-in --experimental-webstorage localStorage shadows jsdom's
 // implementation without a backing file, leaving `window.localStorage` undefined.

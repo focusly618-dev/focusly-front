@@ -14,5 +14,8 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./test/setup.ts'],
     css: false,
+    // The heavier component suites (ActionPlan, EditorAskAI) pass in 1–3 s
+    // alone but go past the 5 s default on a loaded machine or CI runner.
+    testTimeout: 20_000,
   },
 });

@@ -229,7 +229,10 @@ describe('useAIScheduler', () => {
       expect(new Date(slots[0].start)).toEqual(at(7, 10));
       expect(new Date(slots[0].end)).toEqual(at(7, 11));
       expect(new Date(slots[1].start)).toEqual(at(7, 12));
-      expect(slots[0].start).not.toMatch(/Z$/);
+      // Sent as local wall-clock time with its offset (in UTC that offset is "Z")
+      expect(slots[0].start).toMatch(
+        /^2026-10-07T10:00:00(Z|[+-]\d{2}:\d{2})$/,
+      );
       expect(options.signal).toBeInstanceOf(AbortSignal);
     });
 
