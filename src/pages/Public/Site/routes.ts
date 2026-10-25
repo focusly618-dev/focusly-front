@@ -38,6 +38,10 @@ export interface PageMeta {
   media?: string;
   /** Placeholders for each content block's media, in block order. */
   blockMedia?: string[];
+  /** Loop video (see LoopVideo and VITE_MEDIA_BASE_URL) replacing the hero placeholder. */
+  video?: string;
+  /** Loop videos replacing the block placeholders, in block order. */
+  blockVideos?: string[];
 }
 
 const img = (what: string) =>
@@ -57,6 +61,8 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · tarea con prioridad y etiquetas',
       'captura · subtareas + temporizador',
     ],
+    video: 'tasks-hero',
+    blockVideos: ['tasks-views', 'tasks-priority', 'tasks-subtasks'],
   },
   calendar: {
     path: '/product/calendar',
@@ -69,6 +75,8 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · semana con bloques de enfoque',
       'captura · confirmar bloques',
     ],
+    video: 'calendar-hero',
+    blockVideos: ['calendar-sync', 'calendar-layers', 'calendar-confirm'],
   },
   planner: {
     path: '/product/planner',
@@ -81,6 +89,8 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · plan propuesto por Lumina',
       'captura · plan en Google Calendar',
     ],
+    video: 'planner-hero',
+    blockVideos: ['planner-hours', 'planner-review', 'planner-gcal'],
   },
   focus: {
     path: '/product/focus',
@@ -93,6 +103,8 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · descanso',
       'captura · resumen de sesión',
     ],
+    video: 'focus-hero',
+    blockVideos: ['focus-timer', 'focus-breaks', 'focus-insights'],
   },
   timeBlocks: {
     path: '/product/time-blocks',
@@ -104,6 +116,12 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · propuesta de bloques',
       'captura · confirmar',
       'captura · bloque en Google Calendar',
+    ],
+    video: 'timeblocks-hero',
+    blockVideos: [
+      'timeblocks-suggest',
+      'timeblocks-confirm',
+      'timeblocks-gcal',
     ],
   },
   workspaces: {
@@ -117,6 +135,8 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · árbol de proyectos',
       'captura · mención @ en el chat',
     ],
+    video: 'workspaces-hero',
+    blockVideos: ['workspaces-syntax', 'workspaces-projects', 'workspaces-ask'],
   },
   projects: {
     path: '/product/projects',
@@ -129,6 +149,8 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · nuevo proyecto desde plantilla',
       'captura · chat con contexto',
     ],
+    video: 'projects-hero',
+    blockVideos: ['projects-space', 'projects-templates', 'projects-context'],
   },
   insights: {
     path: '/product/insights',
@@ -141,6 +163,13 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · energía',
       'captura · ventana dorada',
       'captura · mapa de calor',
+    ],
+    video: 'insights-hero',
+    blockVideos: [
+      'insights-hours',
+      'insights-energy',
+      'insights-golden',
+      'insights-heatmap',
     ],
   },
   lumina: {
@@ -156,6 +185,14 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'captura · adjunto en el chat',
       'captura · preferencias',
       'diagrama · qué datos usa Lumina',
+    ],
+    video: 'lumina-hero',
+    blockVideos: [
+      'lumina-plan',
+      'lumina-blocks',
+      'lumina-context',
+      'lumina-memory',
+      'lumina-privacy',
     ],
   },
   templates: {
@@ -173,9 +210,11 @@ export const PAGES: Record<PageSlug, PageMeta> = {
     media: img('semana de exámenes'),
     blockMedia: [
       'captura · plan de estudio',
-      'captura · apuntes por asignatura',
+      'captura · temario en PDF convertido en plan',
       'captura · modo enfoque',
     ],
+    video: 'students-hero',
+    blockVideos: ['students-study-plan', 'students-syllabus', 'students-focus'],
   },
   freelancers: {
     path: '/for/freelancers',
@@ -186,7 +225,13 @@ export const PAGES: Record<PageSlug, PageMeta> = {
     blockMedia: [
       'captura · proyectos por cliente',
       'captura · registro de tiempo',
-      'captura · plan semanal',
+      'captura · tarea con enlace de Meet',
+    ],
+    video: 'freelancers-hero',
+    blockVideos: [
+      'freelancers-clients',
+      'freelancers-time',
+      'freelancers-meetings',
     ],
   },
   developers: {
@@ -197,9 +242,11 @@ export const PAGES: Record<PageSlug, PageMeta> = {
     media: img('semana con bloques de enfoque'),
     blockMedia: [
       'captura · bloques entre reuniones',
-      'captura · documento técnico',
+      'captura · tablero Kanban del sprint',
       'captura · ventana dorada',
     ],
+    video: 'developers-hero',
+    blockVideos: ['developers-gaps', 'developers-board', 'developers-golden'],
   },
   creators: {
     path: '/for/creators',
@@ -209,8 +256,14 @@ export const PAGES: Record<PageSlug, PageMeta> = {
     media: img('calendario de contenido'),
     blockMedia: [
       'captura · tarea con subtareas',
-      'captura · guion',
+      'captura · Lumina reescribiendo el guion',
       'captura · calendario de publicación',
+    ],
+    video: 'creators-hero',
+    blockVideos: [
+      'creators-subtasks',
+      'creators-ai-script',
+      'creators-publish',
     ],
   },
   pricing: {

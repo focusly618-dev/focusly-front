@@ -253,8 +253,8 @@ export const es: SiteContent = {
           'Dile a Lumina la fecha y la materia; ella reparte el repaso en tu semana.',
         ],
         [
-          'Apuntes en Markdown',
-          'Un workspace por asignatura, con tus apuntes junto a tus tareas.',
+          'Del temario a tareas',
+          'Adjunta el temario en PDF y Lumina lo convierte en un proyecto con apuntes y tareas de repaso.',
         ],
         [
           'Sesiones de estudio',
@@ -276,8 +276,8 @@ export const es: SiteContent = {
           'Sabe cuánto dedicas a cada tarea y cada cliente.',
         ],
         [
-          'Una semana equilibrada',
-          'Lumina reparte el trabajo en tu horario laboral.',
+          'Llamadas con clientes',
+          'Crea la reunión desde la tarea, con enlace de Google Meet e invitación para tu cliente.',
         ],
       ],
     },
@@ -291,8 +291,8 @@ export const es: SiteContent = {
           'Reserva tiempo en tu calendario antes de que se llene de reuniones.',
         ],
         [
-          'Documentación en Markdown',
-          'Especificaciones y notas técnicas con vista previa en vivo.',
+          'Tu sprint en un tablero',
+          'Pasa de lista a Kanban y mueve cada tarea de Por hacer a Hecho.',
         ],
         [
           'Lo difícil, en tu ventana dorada',
@@ -310,8 +310,8 @@ export const es: SiteContent = {
           'Cada pieza como una tarea con subtareas: guion, grabación, edición y publicación.',
         ],
         [
-          'Guiones en workspaces',
-          'Escribe tus guiones en Markdown junto a tus tareas.',
+          'Lumina escribe contigo',
+          'Pídele que redacte, resuma o reescriba tu guion sin salir del editor.',
         ],
         [
           'Tu calendario de publicación',
@@ -439,6 +439,8 @@ export const es: SiteContent = {
           'Sincronización bidireccional con Google Calendar.',
           'Planificador semanal: Lumina reparte tus tareas en tu horario laboral.',
         ],
+        mediaAlt:
+          'Focusly: Lumina reparte las tareas de la bandeja en tu semana laboral y las sincroniza con Google Calendar',
       },
       {
         icon: 'timer',
@@ -580,6 +582,7 @@ export const es: SiteContent = {
     recommended: 'Recomendado',
     perMonth: '/mes',
     perMonthAnnual: '/mes · facturado anualmente',
+    managePlan: 'Gestionar mi plan',
     compareAll: 'Comparar todo',
     compareTitle: 'Compara los planes',
     feature: 'Función',

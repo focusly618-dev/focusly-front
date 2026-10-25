@@ -91,6 +91,8 @@ export interface SiteContent {
       label: string;
       title: string;
       bullets: [string, string, string];
+      /** Describes the tab's demo video, when it has one. */
+      mediaAlt?: string;
     }[];
   };
 
@@ -151,6 +153,8 @@ export interface SiteContent {
     recommended: string;
     perMonth: string;
     perMonthAnnual: string;
+    /** Pro card's button when the visitor already has Pro. */
+    managePlan: string;
     compareAll: string;
     compareTitle: string;
     feature: string;

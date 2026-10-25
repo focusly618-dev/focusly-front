@@ -1,8 +1,13 @@
 import { Box, ButtonBase } from '@mui/material';
+import type { BillingInterval } from '@/api/Billing/billingApi';
+import { useBilling as useAccountBilling } from '@/hooks/useBilling';
+import { profilePath } from '@/pages/Profile/profileSections';
+import { billingService } from '@/services/billingService';
 import { useSiteContent } from '../content';
 import { FONT_HEADING, useSiteTokens } from '../tokens';
 import { SiteIcon } from '../icons';
 import { PRICING, SIGNUP_PATH, type PlanKey } from '../routes';
+import { useStartCta } from './navModel';
 import { Reveal, SiteLink } from './ui';
 
 const PLAN_ORDER: PlanKey[] = ['free', 'pro', 'business'];
@@ -99,6 +104,34 @@ export const PlanCards = ({
   const t = useSiteTokens();
   const { c } = useSiteContent();
   const p = c.pricing;
+  const start = useStartCta();
+  const { isPro } = useAccountBilling();
+  const interval: BillingInterval = annual ? 'year' : 'month';
+
+  /** Where a plan's button leads: sign up, or the next step when logged in. */
+  const planAction = (
+    key: PlanKey,
+  ): { label: string; to: string } | { label: string; onClick: () => void } => {
+    const label = p.plans[key].cta;
+    if (!start.isLogged) {
+      if (key === 'free') return { label, to: SIGNUP_PATH };
+      // Read by the login page, which opens the Pro checkout after sign-up
+      const extra = key === 'pro' && annual ? '&interval=year' : '';
+      return { label, to: `${SIGNUP_PATH}&plan=${key}${extra}` };
+    }
+    if (key === 'free') return { label: start.label, to: start.to };
+    if (key === 'pro' && !isPro) {
+      return {
+        label,
+        onClick: () =>
+          billingService.openUpgrade('manual', { checkout: true, interval }),
+      };
+    }
+    return {
+      label: key === 'pro' ? p.managePlan : label,
+      to: profilePath('billing'),
+    };
+  };
 
   return (
     <Box
@@ -112,6 +145,24 @@ export const PlanCards = ({
       {PLAN_ORDER.map((key, i) => {
         const plan = p.plans[key];
         const rec = key === RECOMMENDED;
+        const action = planAction(key);
+        const ctaSx = {
+          height: 46,
+          borderRadius: '10px',
+          display: 'grid',
+          placeItems: 'center',
+          fontWeight: 600,
+          fontSize: 15.5,
+          textDecoration: 'none',
+          bgcolor: rec ? t.brand : 'transparent',
+          color: rec ? t.onBrand : t.text,
+          border: `1px solid ${rec ? t.brand : t.border}`,
+          transition: 'filter 200ms ease-out',
+          '&:hover': {
+            filter: 'brightness(1.06)',
+            color: rec ? t.onBrand : t.text,
+          },
+        };
         return (
           <Reveal
             key={key}
@@ -204,28 +255,18 @@ export const PlanCards = ({
                 {annual ? p.perMonthAnnual : p.perMonth}
               </Box>
             </Box>
-            <SiteLink
-              to={key === 'free' ? SIGNUP_PATH : `${SIGNUP_PATH}&plan=${key}`}
-              sx={{
-                height: 46,
-                borderRadius: '10px',
-                display: 'grid',
-                placeItems: 'center',
-                fontWeight: 600,
-                fontSize: 15.5,
-                textDecoration: 'none',
-                bgcolor: rec ? t.brand : 'transparent',
-                color: rec ? t.onBrand : t.text,
-                border: `1px solid ${rec ? t.brand : t.border}`,
-                transition: 'filter 200ms ease-out',
-                '&:hover': {
-                  filter: 'brightness(1.06)',
-                  color: rec ? t.onBrand : t.text,
-                },
-              }}
-            >
-              {plan.cta}
-            </SiteLink>
+            {'onClick' in action ? (
+              <ButtonBase
+                onClick={action.onClick}
+                sx={{ ...ctaSx, fontFamily: 'inherit', width: '100%' }}
+              >
+                {action.label}
+              </ButtonBase>
+            ) : (
+              <SiteLink to={action.to} sx={ctaSx}>
+                {action.label}
+              </SiteLink>
+            )}
             {showFeatures && (
               <Box
                 component="ul"

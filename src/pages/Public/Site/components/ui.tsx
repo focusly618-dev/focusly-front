@@ -1,11 +1,12 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { Box, type SxProps, type Theme } from '@mui/material';
+import { Box, useTheme, type SxProps, type Theme } from '@mui/material';
 import { mergeSx } from '@/styles/mui';
+import { MEDIA_BASE_URL } from '@/config/env.config';
 import { FONT_MONO, stripes, useSiteTokens } from '../tokens';
 import { h2Sx } from '../styles';
 import { SiteIcon, type IconName } from '../icons';
-import { scrollToSection } from '../hooks';
+import { scrollToSection, useReducedMotion } from '../hooks';
 
 const REVEAL_EASE = 'cubic-bezier(.16,1,.3,1)';
 
@@ -241,6 +242,105 @@ export const MediaPlaceholder = ({
       >
         {label}
       </Box>
+    </Box>
+  );
+};
+
+/**
+ * Muted looping video from MEDIA_BASE_URL/videos, in the variant matching the
+ * theme: `<name>-light` or `<name>-dark` (.webm, .mp4 and -poster.webp).
+ * It plays only while `active` and on screen, and shows just the poster with
+ * reduced motion.
+ */
+export const LoopVideo = ({
+  name,
+  alt,
+  active = true,
+  aspect = '16/10',
+  sx,
+}: {
+  name: string;
+  alt: string;
+  active?: boolean;
+  aspect?: string;
+  sx?: SxProps<Theme>;
+}) => {
+  const t = useSiteTokens();
+  const theme = useTheme();
+  const reduced = useReducedMotion();
+  const ref = useRef<HTMLVideoElement>(null);
+  // graydark has no video of its own: the dark one sits fine in its frame
+  const variant =
+    (theme.appMode ?? theme.palette.mode) === 'light' ? 'light' : 'dark';
+  const src = `${MEDIA_BASE_URL}/videos/${name}-${variant}`;
+  // The backend answers with a signed link that expires. If a long-open tab
+  // reloads the file with a stale one, ask again past the cached redirect.
+  const [retry, setRetry] = useState(0);
+  const query = retry ? `?r=${retry}` : '';
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    if (!active) {
+      video.pause();
+      return;
+    }
+    // play() rejects when the browser blocks autoplay (the poster stays up),
+    // and returns nothing where media isn't implemented (jsdom)
+    const play = () => video.play()?.catch(() => {});
+    if (typeof IntersectionObserver === 'undefined') {
+      play();
+      return;
+    }
+    // A page can hold several of these: only the ones on screen play
+    const observer = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? play() : video.pause()),
+      { threshold: 0.25 },
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [active, src, reduced]);
+
+  const frame = mergeSx(
+    {
+      aspectRatio: aspect,
+      width: '100%',
+      display: 'block',
+      objectFit: 'cover',
+      borderRadius: '14px',
+      border: `1px solid ${t.border}`,
+      bgcolor: t.surface,
+      boxShadow: t.shadow,
+    },
+    sx,
+  );
+
+  if (reduced) {
+    return (
+      <Box component="img" src={`${src}-poster.webp`} alt={alt} sx={frame} />
+    );
+  }
+  return (
+    // Keyed by source: a <video> doesn't reload when its <source> children change
+    <Box
+      key={src + query}
+      component="video"
+      ref={ref}
+      muted
+      loop
+      playsInline
+      preload="none"
+      poster={`${src}-poster.webp`}
+      aria-label={alt}
+      sx={frame}
+    >
+      <source src={`${src}.webm${query}`} type="video/webm" />
+      {/* The last source's error means none of them loaded */}
+      <source
+        src={`${src}.mp4${query}`}
+        type="video/mp4"
+        onError={() => setRetry((r) => (r < 2 ? r + 1 : r))}
+      />
     </Box>
   );
 };

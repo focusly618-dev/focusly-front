@@ -4,7 +4,7 @@ import { visuallyHiddenSx } from '@/styles/mui';
 import { fill, useSiteContent } from './content';
 import { FONT_HEADING, FONT_MONO, stripes, useSiteTokens } from './tokens';
 import { SiteIcon } from './icons';
-import { PAGES, SIGNUP_PATH, SUPPORT_EMAIL, type PageSlug } from './routes';
+import { PAGES, SUPPORT_EMAIL, type PageSlug } from './routes';
 import { SiteLayout } from './components/SiteLayout';
 import {
   BillingToggle,
@@ -12,9 +12,16 @@ import {
   PlanCards,
 } from './components/Pricing';
 import { useBilling } from './hooks';
-import { IconBadge, MediaPlaceholder, Reveal, SiteLink } from './components/ui';
+import {
+  IconBadge,
+  LoopVideo,
+  MediaPlaceholder,
+  Reveal,
+  SiteLink,
+} from './components/ui';
 import { headingSx, useButtonSx, useCardSx } from './styles';
 import { FinalCta } from './HomePage';
+import { useStartCta } from './components/navModel';
 
 const sectionX = { px: 2.5 } as const;
 const sectionBottom = 'clamp(64px,9cqi,104px)';
@@ -28,6 +35,7 @@ const SitePage: React.FC<{ slug: PageSlug }> = ({ slug }) => {
   const meta = PAGES[slug];
   const text = c.pages[slug];
   const billing = useBilling();
+  const start = useStartCta();
   const [helpQuery, setHelpQuery] = useState('');
   const [templateCat, setTemplateCat] = useState(0);
 
@@ -135,8 +143,8 @@ const SitePage: React.FC<{ slug: PageSlug }> = ({ slug }) => {
                     mt: 4,
                   }}
                 >
-                  <SiteLink to={SIGNUP_PATH} sx={buttons.primary}>
-                    {c.nav.start}
+                  <SiteLink to={start.to} sx={buttons.primary}>
+                    {start.label}
                   </SiteLink>
                   <SiteLink to={PAGES[cta2Slug].path} sx={buttons.secondary}>
                     {cta2Label}
@@ -180,11 +188,20 @@ const SitePage: React.FC<{ slug: PageSlug }> = ({ slug }) => {
                         />
                       ))}
                     </Box>
-                    <MediaPlaceholder
-                      label={meta.media}
-                      aspect="16/9"
-                      sx={{ border: 0, borderRadius: 0, boxShadow: 'none' }}
-                    />
+                    {meta.video ? (
+                      <LoopVideo
+                        name={meta.video}
+                        alt={`${text.title}: ${text.sub}`}
+                        aspect="16/9"
+                        sx={{ border: 0, borderRadius: 0, boxShadow: 'none' }}
+                      />
+                    ) : (
+                      <MediaPlaceholder
+                        label={meta.media}
+                        aspect="16/9"
+                        sx={{ border: 0, borderRadius: 0, boxShadow: 'none' }}
+                      />
+                    )}
                   </Box>
                 )}
               </>
@@ -258,10 +275,18 @@ const SitePage: React.FC<{ slug: PageSlug }> = ({ slug }) => {
                       {desc}
                     </Box>
                   </Box>
-                  <MediaPlaceholder
-                    label={meta.blockMedia?.[i] ?? ''}
-                    sx={{ flex: '1.3 1 400px' }}
-                  />
+                  {meta.blockVideos?.[i] ? (
+                    <LoopVideo
+                      name={meta.blockVideos[i]}
+                      alt={`${title}: ${desc}`}
+                      sx={{ flex: '1.3 1 400px', minWidth: 0 }}
+                    />
+                  ) : (
+                    <MediaPlaceholder
+                      label={meta.blockMedia?.[i] ?? ''}
+                      sx={{ flex: '1.3 1 400px' }}
+                    />
+                  )}
                 </Reveal>
               ))}
             </Box>
@@ -669,7 +694,9 @@ const SitePage: React.FC<{ slug: PageSlug }> = ({ slug }) => {
                         {tpl.desc}
                       </Box>
                       <SiteLink
-                        to={SIGNUP_PATH}
+                        to={
+                          start.isLogged ? '/dashboard?tab=Projects' : start.to
+                        }
                         sx={{
                           mt: 0.75,
                           fontWeight: 600,

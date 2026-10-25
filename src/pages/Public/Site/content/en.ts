@@ -241,8 +241,8 @@ export const en: SiteContent = {
           'Tell Lumina the date and the subject; she spreads the review across your week.',
         ],
         [
-          'Notes in Markdown',
-          'One workspace per subject, with your notes next to your tasks.',
+          'From syllabus to tasks',
+          'Attach the syllabus as a PDF and Lumina turns it into a project with notes and review tasks.',
         ],
         [
           'Study sessions',
@@ -264,8 +264,8 @@ export const en: SiteContent = {
           'Know how much you spend on each task and each client.',
         ],
         [
-          'A balanced week',
-          'Lumina spreads the work across your working hours.',
+          'Client calls',
+          'Create the meeting from the task, with a Google Meet link and an invite for your client.',
         ],
       ],
     },
@@ -278,7 +278,10 @@ export const en: SiteContent = {
           'Deep work blocks',
           'Reserve time on your calendar before it fills up with meetings.',
         ],
-        ['Docs in Markdown', 'Specs and technical notes with live preview.'],
+        [
+          'Your sprint on a board',
+          'Switch from list to Kanban and move each task from To do to Done.',
+        ],
         [
           'Hard work in your golden window',
           'Schedule complex tasks in the hours when you focus best.',
@@ -295,8 +298,8 @@ export const en: SiteContent = {
           'Each piece as a task with subtasks: script, recording, editing and publishing.',
         ],
         [
-          'Scripts in workspaces',
-          'Write your scripts in Markdown next to your tasks.',
+          'Lumina writes with you',
+          'Ask her to draft, summarize or rewrite your script without leaving the editor.',
         ],
         ['Your publishing calendar', 'Dates synced with Google Calendar.'],
       ],
@@ -416,6 +419,8 @@ export const en: SiteContent = {
           'Two-way sync with Google Calendar.',
           'Weekly planner: Lumina fits your tasks into your working hours.',
         ],
+        mediaAlt:
+          'Focusly: Lumina fits your inbox tasks into your work week and syncs them with Google Calendar',
       },
       {
         icon: 'timer',
@@ -557,6 +562,7 @@ export const en: SiteContent = {
     recommended: 'Recommended',
     perMonth: '/month',
     perMonthAnnual: '/month · billed yearly',
+    managePlan: 'Manage my plan',
     compareAll: 'Compare everything',
     compareTitle: 'Compare plans',
     feature: 'Feature',

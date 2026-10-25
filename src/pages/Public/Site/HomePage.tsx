@@ -14,11 +14,13 @@ import { InsightsPreview } from './components/InsightsPreview';
 import { BillingToggle, PlanCards } from './components/Pricing';
 import { Faq } from './components/Faq';
 import { DemoModal } from './components/DemoModal';
+import { useStartCta } from './components/navModel';
 import {
   Container,
   Eyebrow,
   IconBadge,
   Lead,
+  LoopVideo,
   MediaPlaceholder,
   Reveal,
   SectionHeader,
@@ -26,9 +28,9 @@ import {
 } from './components/ui';
 import { h2Sx, headingSx, sectionPad, useButtonSx, useCardSx } from './styles';
 
-/** Placeholder media for each pillar tab, in tab order. */
-const PILLAR_MEDIA = [
-  'video en bucle · planificador semanal\nMP4/WebM < 2 MB · póster · claro/oscuro',
+/** Media for each pillar tab, in tab order: a loop video, or a placeholder label. */
+const PILLAR_MEDIA: (string | { video: string })[] = [
+  { video: 'weekly-planner' },
   'video en bucle · modo enfoque\nMP4/WebM < 2 MB · póster · claro/oscuro',
   'captura · workspace con Markdown\nWebP/AVIF + srcset · claro/oscuro',
   'captura · panel de Insights\nWebP/AVIF + srcset · claro/oscuro',
@@ -396,6 +398,7 @@ const HomePage: React.FC = () => {
             <Box sx={{ display: 'grid', mt: 5 }}>
               {c.pillars.tabs.map((tb, i) => {
                 const on = tab === i;
+                const media = PILLAR_MEDIA[i];
                 return (
                   <Box
                     key={tb.label}
@@ -468,10 +471,19 @@ const HomePage: React.FC = () => {
                         ))}
                       </Box>
                     </Box>
-                    <MediaPlaceholder
-                      label={PILLAR_MEDIA[i]}
-                      sx={{ flex: '1.5 1 420px' }}
-                    />
+                    {typeof media === 'string' ? (
+                      <MediaPlaceholder
+                        label={media}
+                        sx={{ flex: '1.5 1 420px' }}
+                      />
+                    ) : (
+                      <LoopVideo
+                        name={media.video}
+                        alt={tb.mediaAlt ?? tb.title}
+                        active={on}
+                        sx={{ flex: '1.5 1 420px', minWidth: 0 }}
+                      />
+                    )}
                   </Box>
                 );
               })}
@@ -1018,6 +1030,7 @@ export const FinalCta = ({
 }) => {
   const t = useSiteTokens();
   const buttons = useButtonSx();
+  const start = useStartCta();
   return (
     <Reveal
       sx={{
@@ -1056,14 +1069,17 @@ export const FinalCta = ({
         </Box>
       )}
       <SiteLink
-        to={SIGNUP_PATH}
+        to={start.to}
         sx={{ ...buttons.primary, mt: compact ? 1 : 1.5, px: 3.25 }}
       >
-        {cta}
+        {start.isLogged ? start.label : cta}
       </SiteLink>
-      <Box component="span" sx={{ fontSize: 14, color: t.muted }}>
-        {micro}
-      </Box>
+      {/* The micro copy is about signing up ("no card needed") */}
+      {!start.isLogged && (
+        <Box component="span" sx={{ fontSize: 14, color: t.muted }}>
+          {micro}
+        </Box>
+      )}
     </Reveal>
   );
 };

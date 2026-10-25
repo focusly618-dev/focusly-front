@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Site loop videos: served by the backend's /media route from its bucket
+public/videos/

@@ -8,11 +8,21 @@ import {
   PAGE_SLUGS,
   PRODUCT_COLUMNS,
   RESOURCE_SLUGS,
+  SIGNUP_PATH,
   SPY_SECTIONS,
   WHO_SLUGS,
   type NavKey,
   type PageSlug,
 } from '../routes';
+
+/** The site's main call to action: sign up, or back to the app when logged in. */
+export const useStartCta = () => {
+  const { c } = useSiteContent();
+  const isLogged = useAppSelector((state) => state.auth.isLogged);
+  return isLogged
+    ? { to: '/dashboard', label: c.nav.openApp, isLogged }
+    : { to: SIGNUP_PATH, label: c.nav.start, isLogged };
+};
 
 export interface NavEntry {
   slug: PageSlug;
