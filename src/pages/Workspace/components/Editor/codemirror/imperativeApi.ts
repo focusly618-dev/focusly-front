@@ -1,3 +1,4 @@
+import type { Text } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { MarkdownEditorRef } from './MarkdownEditor.types';
 import {
@@ -6,6 +7,20 @@ import {
   setPendingDiff,
 } from './extensions/diffReview';
 import { setTargetHighlight } from './extensions/targetHighlight';
+
+/** The paragraph (run of non-blank lines) holding `pos`; null on a blank line. */
+export const paragraphAt = (
+  doc: Text,
+  pos: number,
+): { from: number; to: number } | null => {
+  const isBlank = (n: number) => doc.line(n).text.trim() === '';
+  let first = doc.lineAt(pos).number;
+  if (isBlank(first)) return null;
+  let last = first;
+  while (first > 1 && !isBlank(first - 1)) first--;
+  while (last < doc.lines && !isBlank(last + 1)) last++;
+  return { from: doc.line(first).from, to: doc.line(last).to };
+};
 
 // All BlockNote call sites (AI text-actions menu, the Lumina chat
 // insert-content event) used to reach into `editor.document`/`insertBlocks`
@@ -20,6 +35,24 @@ export const createImperativeApi = (
     if (!view) return { text: '', from: 0, to: 0 };
     const { from, to } = view.state.selection.main;
     return { text: view.state.sliceDoc(from, to), from, to };
+  },
+  selectParagraphAt: (x, y) => {
+    const view = getView();
+    if (!view) return null;
+    const pos = view.posAtCoords({ x, y });
+    if (pos === null) return null;
+    // posAtCoords snaps to the nearest line: a click in the empty space below
+    // the text would otherwise pick the last paragraph.
+    const block = view.lineBlockAt(pos);
+    const top = view.documentTop + block.top;
+    if (y < top || y > top + block.height) return null;
+    const range = paragraphAt(view.state.doc, pos);
+    if (!range) return null;
+    view.dispatch({ selection: { anchor: range.from, head: range.to } });
+    return {
+      text: view.state.doc.sliceString(range.from, range.to),
+      ...range,
+    };
   },
   replaceRange: (from, to, text) => {
     const view = getView();

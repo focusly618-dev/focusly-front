@@ -68,11 +68,12 @@ import {
   MarkdownEditorSurface,
 } from './EditorContent.styles';
 import { colorPalette, isColorDark } from '@/utils';
-import { CuteRobotIcon } from '@/components/ui';
+import { CuteRobotIcon, AutoflowIcon } from '@/components/ui';
 import { MarkdownEditor } from '../../codemirror/MarkdownEditor';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 import { EditorAskAI } from '../EditorAskAI/EditorAskAI';
 import { surfaceColor } from '@/context';
+import { EditorCanvas } from './EditorCanvas';
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
@@ -126,6 +127,7 @@ export const EditorContent = ({
     handleIconSelect,
     handleContextMenu,
     handleClose,
+    selectedText,
     getLanguageLabel,
     handleCreateTask,
     processTextWithAI,
@@ -135,11 +137,20 @@ export const EditorContent = ({
     setIsAITaskPreviewOpen,
     handleConfirmAITask,
     isCreatingTask,
+    handleGenerateCanvasPage,
+    isCanvasActive,
+    setIsCanvasActive,
+    canvasTitle,
+    setCanvasTitle,
+    canvasId,
+    setCanvasId,
   } = useEditorContent({
     setValue,
     watch,
     markdownEditorRef,
   });
+  // The right-click menu's actions need a selection or a paragraph to act on
+  const hasMenuTarget = selectedText.trim().length > 0;
 
   const { t } = useTranslation();
 
@@ -279,293 +290,324 @@ export const EditorContent = ({
     ));
   };
 
+  const handleEditorSurfaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const canvasLinkEl = target.closest(
+      '.cm-live-canvas-link',
+    ) as HTMLElement | null;
+    if (canvasLinkEl) {
+      const rawText = canvasLinkEl.textContent || '';
+      const cleanTitle = rawText.replace(/^[\s]+/, '').trim() || 'Canvas';
+      const id = canvasLinkEl.dataset.canvasId || null;
+      setCanvasTitle(cleanTitle);
+      setCanvasId(id);
+      setIsCanvasActive(true);
+    }
+  };
+
   return (
     <StyledEditorContent>
-      {hasCover ? (
-        <Box
-          sx={{
-            ml: { xs: '-8px', md: '-60px' },
-            mr: { xs: '-8px', md: '-60px' },
-            mt: { xs: '-16px', md: '-40px' },
-            position: 'relative',
-            mb: headerIcon ? '36px' : '16px',
-          }}
-        >
-          {/* Gradient banner */}
+      {!isCanvasActive &&
+        (hasCover ? (
           <Box
             sx={{
-              height: '180px',
-              background: currentBgGradient,
-              transition: 'background 0.5s ease',
+              ml: { xs: '-8px', md: '-60px' },
+              mr: { xs: '-8px', md: '-60px' },
+              mt: { xs: '-16px', md: '-40px' },
               position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor:
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(0, 0, 0, 0.1)'
-                    : 'rgba(255, 255, 255, 0.05)',
-              },
-            }}
-          />
-
-          {/* Bottom row: icon (floating) + action buttons */}
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: headerIcon ? '-36px' : 0,
-              left: isCentered ? '50%' : { xs: '20px', md: '60px' },
-              right: isCentered ? 'auto' : { xs: '20px', md: '60px' },
-              width: isCentered ? '100%' : 'auto',
-              maxWidth: isCentered ? '800px' : 'none',
-              transform: isCentered ? 'translateX(-50%)' : 'none',
-              display: 'flex',
-              alignItems: 'flex-end',
-              justifyContent: 'space-between',
-              px: isCentered ? { xs: 2, md: 0 } : 0,
-              pb: headerIcon ? 0 : 1.5,
-              transition: 'all 0.3s ease',
+              mb: headerIcon ? '36px' : '16px',
             }}
           >
-            {/* Large icon card — sits on top of the cover edge */}
-            {headerIcon ? (
+            {/* Gradient banner */}
+            <Box
+              sx={{
+                height: '180px',
+                background: currentBgGradient,
+                transition: 'background 0.5s ease',
+                position: 'relative',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(0, 0, 0, 0.1)'
+                      : 'rgba(255, 255, 255, 0.05)',
+                },
+              }}
+            />
+
+            {/* Bottom row: icon (floating) + action buttons */}
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: headerIcon ? '-36px' : 0,
+                left: isCentered ? '50%' : { xs: '20px', md: '60px' },
+                right: isCentered ? 'auto' : { xs: '20px', md: '60px' },
+                width: isCentered ? '100%' : 'auto',
+                maxWidth: isCentered ? '800px' : 'none',
+                transform: isCentered ? 'translateX(-50%)' : 'none',
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'space-between',
+                px: isCentered ? { xs: 2, md: 0 } : 0,
+                pb: headerIcon ? 0 : 1.5,
+                transition: 'all 0.3s ease',
+              }}
+            >
+              {/* Large icon card — sits on top of the cover edge */}
+              {headerIcon ? (
+                <Tooltip title="Change icon">
+                  <Box
+                    onClick={handleIconClick}
+                    sx={{
+                      display: 'inline-flex',
+                      width: 60,
+                      height: 60,
+                      borderRadius: '14px',
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 4px 24px rgba(0,0,0,0.22)',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 2,
+                      position: 'relative',
+                      transition: 'transform 0.18s',
+                      '&:hover': { transform: 'scale(1.06)' },
+                    }}
+                  >
+                    {iconMap[headerIcon] ? (
+                      React.createElement(iconMap[headerIcon], {
+                        sx: { fontSize: 30, color: 'text.primary' },
+                      })
+                    ) : (
+                      <span style={{ fontSize: '30px', lineHeight: 1 }}>
+                        {headerIcon}
+                      </span>
+                    )}
+                  </Box>
+                </Tooltip>
+              ) : (
+                <Box />
+              )}
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  alignItems: 'center',
+                  pb: headerIcon ? 1.5 : 1.4,
+                }}
+              >
+                {headerActions(true)}
+              </Box>
+            </Box>
+          </Box>
+        ) : (
+          /* ── NO COVER: ghost toolbar row, always visible ── */
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: headerIcon ? 1 : 1.5,
+              transition: 'all 0.3s ease',
+              maxWidth: isCentered ? '800px' : '100%',
+              margin: isCentered ? '0 auto' : '0',
+              width: '100%',
+            }}
+          >
+            {headerActions(false)}
+          </Box>
+        ))}
+
+      {/* ── Center Content Wrapper ── */}
+      <Box
+        sx={{
+          maxWidth: isCanvasActive ? '100%' : isCentered ? '800px' : '100%',
+          margin: isCanvasActive ? '0' : isCentered ? '0 auto' : '0',
+          width: '100%',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        {isCanvasActive ? (
+          <EditorCanvas
+            title={canvasTitle}
+            onTitleChange={setCanvasTitle}
+            onClose={() => setIsCanvasActive(false)}
+            initialText={selectedText}
+            projectId={workspaceId}
+            canvasId={canvasId}
+            canvasName={canvasTitle}
+          />
+        ) : (
+          <>
+            {/* ── LARGE ICON when no cover ── */}
+            {!hasCover && headerIcon && (
               <Tooltip title="Change icon">
                 <Box
                   onClick={handleIconClick}
                   sx={{
                     display: 'inline-flex',
-                    width: 60,
-                    height: 60,
-                    borderRadius: '14px',
+                    mb: 2,
+                    width: 56,
+                    height: 56,
+                    borderRadius: '16px',
                     bgcolor: 'background.paper',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.22)',
                     border: '1px solid',
                     borderColor: 'divider',
+                    boxShadow: isThemeDark
+                      ? '0 4px 20px rgba(0,0,0,0.4)'
+                      : '0 4px 12px rgba(0,0,0,0.06)',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    zIndex: 2,
-                    position: 'relative',
-                    transition: 'transform 0.18s',
-                    '&:hover': { transform: 'scale(1.06)' },
+                    transition: 'transform 0.18s, box-shadow 0.18s',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: isThemeDark
+                        ? '0 8px 30px rgba(0,0,0,0.6)'
+                        : '0 8px 16px rgba(0,0,0,0.12)',
+                    },
                   }}
                 >
                   {iconMap[headerIcon] ? (
                     React.createElement(iconMap[headerIcon], {
-                      sx: { fontSize: 30, color: 'text.primary' },
+                      sx: { fontSize: 32, color: 'text.primary' },
                     })
                   ) : (
-                    <span style={{ fontSize: '30px', lineHeight: 1 }}>
+                    <span style={{ fontSize: '32px', lineHeight: 1 }}>
                       {headerIcon}
                     </span>
                   )}
                 </Box>
               </Tooltip>
-            ) : (
-              <Box />
             )}
 
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 1,
-                alignItems: 'center',
-                pb: headerIcon ? 1.5 : 1.4,
-              }}
-            >
-              {headerActions(true)}
-            </Box>
-          </Box>
-        </Box>
-      ) : (
-        /* ── NO COVER: ghost toolbar row, always visible ── */
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            mb: headerIcon ? 1 : 1.5,
-            transition: 'all 0.3s ease',
-            maxWidth: isCentered ? '800px' : '100%',
-            margin: isCentered ? '0 auto' : '0',
-            width: '100%',
-          }}
-        >
-          {headerActions(false)}
-        </Box>
-      )}
-
-      {/* ── Center Content Wrapper ── */}
-      <Box
-        sx={{
-          maxWidth: isCentered ? '800px' : '100%',
-          margin: isCentered ? '0 auto' : '0',
-          width: '100%',
-          transition: 'all 0.3s ease',
-        }}
-      >
-        {/* ── LARGE ICON when no cover ── */}
-        {!hasCover && headerIcon && (
-          <Tooltip title="Change icon">
-            <Box
-              onClick={handleIconClick}
-              sx={{
-                display: 'inline-flex',
-                mb: 2,
-                width: 56,
-                height: 56,
-                borderRadius: '16px',
-                bgcolor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: isThemeDark
-                  ? '0 4px 20px rgba(0,0,0,0.4)'
-                  : '0 4px 12px rgba(0,0,0,0.06)',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'transform 0.18s, box-shadow 0.18s',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: isThemeDark
-                    ? '0 8px 30px rgba(0,0,0,0.6)'
-                    : '0 8px 16px rgba(0,0,0,0.12)',
-                },
-              }}
-            >
-              {iconMap[headerIcon] ? (
-                React.createElement(iconMap[headerIcon], {
-                  sx: { fontSize: 32, color: 'text.primary' },
-                })
-              ) : (
-                <span style={{ fontSize: '32px', lineHeight: 1 }}>
-                  {headerIcon}
-                </span>
-              )}
-            </Box>
-          </Tooltip>
-        )}
-
-        {/* ── FOLDER BADGE ── */}
-        {currentFolder && (
-          <FolderBadge bgColor={currentFolder.color}>
-            <FolderIcon sx={{ fontSize: 12 }} />
-            <Typography
-              variant="caption"
-              fontWeight={700}
-              sx={{ textTransform: 'uppercase' }}
-            >
-              {currentFolder.name}
-            </Typography>
-          </FolderBadge>
-        )}
-
-        <TitleInput
-          placeholder="Untitled Document"
-          value={currentTitle}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <MarkdownEditorSurface
-          id="joyride-editor-area"
-          ref={editorSurfaceRef}
-          onContextMenu={handleContextMenu}
-          // Reserve room below the last line so it can scroll clear of the
-          // fixed "Ask Lumina" button instead of ending up hidden behind it
-          // — that button sits on top of the viewport, not in document flow.
-          style={{ position: 'relative', paddingBottom: '96px' }}
-        >
-          <MarkdownEditor
-            ref={markdownEditorRef}
-            initialValue={initialMarkdown}
-            onChange={onChange}
-            placeholder="Start writing..."
-            onSelectionChange={setLiveSelectedText}
-          />
-
-          {isAIProcessing && (
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                bgcolor: surfaceColor(
-                  theme,
-                  'rgba(15, 23, 42, 0.45)',
-                  'rgba(36, 36, 36, 0.45)',
-                  'rgba(255, 255, 255, 0.45)',
-                ),
-                backdropFilter: 'blur(4px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 10,
-                borderRadius: '12px',
-                animation: 'fadeIn 0.25s ease-out',
-                '@keyframes fadeIn': {
-                  from: { opacity: 0 },
-                  to: { opacity: 1 },
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  px: 3,
-                  py: 1.5,
-                  borderRadius: '99px',
-                  bgcolor:
-                    theme.palette.mode === 'dark' ? '#1e1b4b' : '#e0f2fe',
-                  border: `1px solid ${theme.palette.primary.main}30`,
-                  boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
-                  animation: 'pulseGlow 2s infinite ease-in-out',
-                  '@keyframes pulseGlow': {
-                    '0%, 100%': {
-                      transform: 'scale(1)',
-                      boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
-                    },
-                    '50%': {
-                      transform: 'scale(1.02)',
-                      boxShadow: `0 8px 32px rgba(15, 23, 76, 0.35), 0 0 24px ${theme.palette.primary.main}30`,
-                    },
-                  },
-                }}
-              >
-                <CuteRobotIcon
-                  size={22}
-                  variant="mini"
-                  primaryColor="#137fec"
-                  eyeColor="#22d3ee"
-                />
+            {/* ── FOLDER BADGE ── */}
+            {currentFolder && (
+              <FolderBadge bgColor={currentFolder.color}>
+                <FolderIcon sx={{ fontSize: 12 }} />
                 <Typography
-                  variant="body2"
-                  fontWeight={750}
-                  color="text.primary"
-                  sx={{ letterSpacing: '0.2px' }}
+                  variant="caption"
+                  fontWeight={700}
+                  sx={{ textTransform: 'uppercase' }}
                 >
-                  Lumina AI is writing...
+                  {currentFolder.name}
                 </Typography>
-              </Box>
-            </Box>
-          )}
+              </FolderBadge>
+            )}
 
-          {/* Keyed by document so switching notes starts on that note's thread */}
-          <EditorAskAI
-            key={workspaceId ?? 'unsaved'}
-            markdownEditorRef={markdownEditorRef}
-            selectedText={liveSelectedText}
-            workspaceId={workspaceId}
-            documentTitle={currentTitle}
-          />
-        </MarkdownEditorSurface>
+            <TitleInput
+              placeholder="Untitled Document"
+              value={currentTitle}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+
+            <MarkdownEditorSurface
+              id="joyride-editor-area"
+              ref={editorSurfaceRef}
+              onContextMenu={handleContextMenu}
+              onClick={handleEditorSurfaceClick}
+              // Reserve room below the last line so it can scroll clear of the
+              // fixed "Ask Lumina" button instead of ending up hidden behind it
+              // — that button sits on top of the viewport, not in document flow.
+              style={{ position: 'relative', paddingBottom: '96px' }}
+            >
+              <MarkdownEditor
+                ref={markdownEditorRef}
+                initialValue={initialMarkdown}
+                onChange={onChange}
+                placeholder="Start writing..."
+                onSelectionChange={setLiveSelectedText}
+              />
+
+              {isAIProcessing && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    bgcolor: surfaceColor(
+                      theme,
+                      'rgba(15, 23, 42, 0.45)',
+                      'rgba(36, 36, 36, 0.45)',
+                      'rgba(255, 255, 255, 0.45)',
+                    ),
+                    backdropFilter: 'blur(4px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10,
+                    borderRadius: '12px',
+                    animation: 'fadeIn 0.25s ease-out',
+                    '@keyframes fadeIn': {
+                      from: { opacity: 0 },
+                      to: { opacity: 1 },
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      px: 3,
+                      py: 1.5,
+                      borderRadius: '99px',
+                      bgcolor:
+                        theme.palette.mode === 'dark' ? '#1e1b4b' : '#e0f2fe',
+                      border: `1px solid ${theme.palette.primary.main}30`,
+                      boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
+                      animation: 'pulseGlow 2s infinite ease-in-out',
+                      '@keyframes pulseGlow': {
+                        '0%, 100%': {
+                          transform: 'scale(1)',
+                          boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
+                        },
+                        '50%': {
+                          transform: 'scale(1.02)',
+                          boxShadow: `0 8px 32px rgba(15, 23, 76, 0.35), 0 0 24px ${theme.palette.primary.main}30`,
+                        },
+                      },
+                    }}
+                  >
+                    <CuteRobotIcon
+                      size={22}
+                      variant="mini"
+                      primaryColor="#137fec"
+                      eyeColor="#22d3ee"
+                    />
+                    <Typography
+                      variant="body2"
+                      fontWeight={750}
+                      color="text.primary"
+                      sx={{ letterSpacing: '0.2px' }}
+                    >
+                      Lumina AI is writing...
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Keyed by document so switching notes starts on that note's thread */}
+              <EditorAskAI
+                key={workspaceId ?? 'unsaved'}
+                markdownEditorRef={markdownEditorRef}
+                selectedText={liveSelectedText}
+                workspaceId={workspaceId}
+                documentTitle={currentTitle}
+              />
+            </MarkdownEditorSurface>
+          </>
+        )}
       </Box>
 
       <Menu
@@ -587,7 +629,20 @@ export const EditorContent = ({
           },
         }}
       >
-        <MenuItem onClick={handleCreateTask} sx={{ py: 1.2 }}>
+        {!hasMenuTarget && (
+          <Typography
+            variant="caption"
+            component="div"
+            sx={{ px: 2, pt: 0.5, pb: 1, color: 'text.secondary' }}
+          >
+            Select text, or right-click a paragraph
+          </Typography>
+        )}
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={handleCreateTask}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#7c3aed' }}>
             <AutoAwesomeIcon fontSize="small" />
           </ListItemIcon>
@@ -597,7 +652,11 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem onClick={handleCreateResume} sx={{ py: 1.2 }}>
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={handleCreateResume}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#137fec' }}>
             <DescriptionIcon fontSize="small" />
           </ListItemIcon>
@@ -607,7 +666,11 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem onClick={() => processTextWithAI('grammar')} sx={{ py: 1.2 }}>
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={() => processTextWithAI('grammar')}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#ec4899' }}>
             <SpellcheckIcon fontSize="small" />
           </ListItemIcon>
@@ -617,7 +680,11 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem onClick={() => processTextWithAI('expand')} sx={{ py: 1.2 }}>
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={() => processTextWithAI('expand')}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#10b981' }}>
             <ExpandIcon fontSize="small" />
           </ListItemIcon>
@@ -627,7 +694,11 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem onClick={() => processTextWithAI('shorten')} sx={{ py: 1.2 }}>
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={() => processTextWithAI('shorten')}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#f59e0b' }}>
             <ShortenIcon fontSize="small" />
           </ListItemIcon>
@@ -638,6 +709,7 @@ export const EditorContent = ({
         </MenuItem>
 
         <MenuItem
+          disabled={!hasMenuTarget}
           onClick={() => processTextWithAI('tone_professional')}
           sx={{ py: 1.2 }}
         >
@@ -651,6 +723,7 @@ export const EditorContent = ({
         </MenuItem>
 
         <MenuItem
+          disabled={!hasMenuTarget}
           onClick={() => processTextWithAI('tone_casual')}
           sx={{ py: 1.2 }}
         >
@@ -664,6 +737,7 @@ export const EditorContent = ({
         </MenuItem>
 
         <MenuItem
+          disabled={!hasMenuTarget}
           onClick={() =>
             processTextWithAI(`translate_${targetLanguage || 'en'}`)
           }
@@ -674,6 +748,20 @@ export const EditorContent = ({
           </ListItemIcon>
           <ListItemText
             primary={`Translate to ${getLanguageLabel(targetLanguage || 'en')}`}
+            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+          />
+        </MenuItem>
+
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={handleGenerateCanvasPage}
+          sx={{ py: 1.2 }}
+        >
+          <ListItemIcon sx={{ color: '#0ea5e9' }}>
+            <AutoflowIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary={'Create Canvas Page'}
             primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
           />
         </MenuItem>

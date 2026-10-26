@@ -5,9 +5,28 @@ import { overlaps, type Handler } from './utils';
 // clicking only ever places the cursor — there is nothing to navigate).
 // Hides the opening "[" and collapses "](url)" into nothing unless the
 // cursor is anywhere inside the link.
-export const handleLink: Handler = (node, _view, sel, push) => {
+export const handleLink: Handler = (node, view, sel, push) => {
+  const linkText = view.state.sliceDoc(node.from, node.to);
+  const isCanvas =
+    linkText.includes('(canvas:') || linkText.includes('(#canvas');
+
+  let canvasId: string | undefined;
+  if (isCanvas) {
+    const match = linkText.match(/\((?:canvas:|#canvas-?)([^\s)]*)\)/);
+    if (match && match[1]) {
+      canvasId = match[1];
+    }
+  }
+
   const revealed = overlaps(sel, node.from, node.to);
-  push(node.from, node.to, Decoration.mark({ class: 'cm-live-link' }));
+  push(
+    node.from,
+    node.to,
+    Decoration.mark({
+      class: isCanvas ? 'cm-live-link cm-live-canvas-link' : 'cm-live-link',
+      attributes: canvasId ? { 'data-canvas-id': canvasId } : undefined,
+    }),
+  );
   if (revealed) return;
 
   const marks: { from: number; to: number }[] = [];

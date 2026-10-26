@@ -32,6 +32,13 @@ export interface UseEditorContentReturn {
   handleClose: () => void;
   getLanguageLabel: (code: string) => string;
   handleCreateTask: () => void;
+  handleGenerateCanvasPage: () => void;
+  isCanvasActive: boolean;
+  setIsCanvasActive: (active: boolean) => void;
+  canvasTitle: string;
+  setCanvasTitle: (title: string) => void;
+  canvasId: string | null;
+  setCanvasId: (id: string | null) => void;
   processTextWithAI: (action: string) => Promise<void>;
   isAIProcessing: boolean;
   aiTaskPreviewData: AITaskPreviewData | null;

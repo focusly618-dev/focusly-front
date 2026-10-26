@@ -6,6 +6,10 @@ export interface MarkdownSelection {
 
 export interface MarkdownEditorRef {
   getSelection: () => MarkdownSelection;
+  // Selects the paragraph (run of non-blank lines) under a screen point, as
+  // the right-click menu's target when nothing is selected. Null on a blank
+  // line or outside the text.
+  selectParagraphAt: (x: number, y: number) => MarkdownSelection | null;
   replaceRange: (from: number, to: number, text: string) => void;
   insertAtCursor: (text: string) => void;
   insertAtEnd: (text: string) => void;

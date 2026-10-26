@@ -70,6 +70,8 @@ export const useEditorContent = ({
     setIconAnchor(event.currentTarget);
   };
 
+  const [isCanvasActive, setIsCanvasActive] = useState(false);
+  const [canvasTitle, setCanvasTitle] = useState('');
   const handleColorSelect = (color: HeaderColor) => {
     setValue?.('background_color', color === 'none' ? undefined : color, {
       shouldDirty: true,
@@ -87,16 +89,23 @@ export const useEditorContent = ({
   };
 
   const handleContextMenu = (event: React.MouseEvent) => {
-    const selection = markdownEditorRef.current?.getSelection();
-    if (selection && selection.text.trim().length > 0) {
-      event.preventDefault();
-      setSelectedText(selection.text);
-      setSelectedRange({ from: selection.from, to: selection.to });
-      setMenuAnchor({
-        mouseX: event.clientX - 2,
-        mouseY: event.clientY - 4,
-      });
+    const editor = markdownEditorRef.current;
+    if (!editor) return;
+    event.preventDefault();
+    // Without a selection, the actions apply to the paragraph right-clicked,
+    // which gets selected so it's clear what will change. On a blank line the
+    // menu still opens, with its actions disabled.
+    let target: { text: string; from: number; to: number } | null =
+      editor.getSelection();
+    if (!target.text.trim()) {
+      target = editor.selectParagraphAt(event.clientX, event.clientY);
     }
+    setSelectedText(target?.text ?? '');
+    setSelectedRange(target ? { from: target.from, to: target.to } : null);
+    setMenuAnchor({
+      mouseX: event.clientX - 2,
+      mouseY: event.clientY - 4,
+    });
   };
 
   const handleClose = () => {
@@ -132,15 +141,15 @@ export const useEditorContent = ({
     setIsAIProcessing(true);
 
     const aiPrompt = `You are a helpful productivity assistant. Analyze the selected text and turn it into a clear, actionable task.
-Respond with a single raw JSON object and no extra commentary, matching this schema exactly:
-{
-  "title": "Short, action-oriented task title (max 60 chars)",
-  "description": "A well-structured task description in rich Markdown. Use ## for sections, **bold** for key terms, - for bullet points, and \`code\` or \`\`\`lang\\n...\`\`\` for code snippets. Make it informative and scannable.",
-  "priority": "High" | "Medium" | "Low",
-  "duration": "15m" | "30m" | "1h" | "2h"
-}
+    Respond with a single raw JSON object and no extra commentary, matching this schema exactly:
+    {
+      "title": "Short, action-oriented task title (max 60 chars)",
+      "description": "A well-structured task description in rich Markdown. Use ## for sections, **bold** for key terms, - for bullet points, and \`code\` or \`\`\`lang\\n...\`\`\` for code snippets. Make it informative and scannable.",
+      "priority": "High" | "Medium" | "Low",
+      "duration": "15m" | "30m" | "1h" | "2h"
+    }
 
-Text: "${selectedText}"`;
+    Text: "${selectedText}"`;
 
     const analyzeProcess = async () => {
       if (!user) throw new Error('User not logged in');
@@ -233,6 +242,30 @@ Text: "${selectedText}"`;
     }
   };
 
+  const handleGenerateCanvasPage = () => {
+    handleClose(); // Cierra el menú contextual
+    const initialName = selectedText.trim() || 'Canvas sin título';
+    const slug =
+      initialName
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'canvas';
+
+    // Formato normalizado y legible: [🎨 Nombre](#canvas-slug)
+    const canvasMarkdown = `[🎨 ${initialName}](#canvas-${slug})\n`;
+
+    if (selectedRange && markdownEditorRef.current) {
+      markdownEditorRef.current.replaceRange(
+        selectedRange.from,
+        selectedRange.to,
+        canvasMarkdown,
+      );
+    } else if (markdownEditorRef.current) {
+      markdownEditorRef.current.insertAtCursor(canvasMarkdown);
+    }
+  };
   const handleConfirmAITask = async (finalData: AITaskPreviewData) => {
     if (!user) return;
     setIsCreatingTask(true);
@@ -409,6 +442,14 @@ Text: "${selectedText}"`;
     handleClose,
     getLanguageLabel,
     handleCreateTask,
+    handleGenerateCanvasPage,
+    isCanvasActive,
+    setIsCanvasActive,
+    canvasTitle,
+    setCanvasTitle,
+    canvasId,
+    setCanvasId,
+
     processTextWithAI,
     isAIProcessing,
     aiTaskPreviewData,

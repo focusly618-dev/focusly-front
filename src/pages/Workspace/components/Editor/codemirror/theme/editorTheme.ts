@@ -147,6 +147,32 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         textDecorationColor: alpha(theme.palette.primary.main, 0.4),
         cursor: 'text',
       },
+      '.cm-live-canvas-link': {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '2px 8px 3px 6px',
+        margin: '2px 0',
+        borderRadius: '6px',
+        fontWeight: 600,
+        color: `${theme.palette.text.primary} !important`,
+        textDecoration: 'underline',
+        textDecorationColor: `${alpha(theme.palette.text.primary, 0.3)} !important`,
+        backgroundColor: isDark
+          ? 'rgba(255, 255, 255, 0.06)'
+          : 'rgba(0, 0, 0, 0.04)',
+        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
+        transition: 'background-color 0.15s ease, border-color 0.15s ease',
+        cursor: 'pointer',
+        '&:hover': {
+          backgroundColor: isDark
+            ? 'rgba(255, 255, 255, 0.12)'
+            : 'rgba(0, 0, 0, 0.08)',
+          borderColor: isDark
+            ? 'rgba(255, 255, 255, 0.22)'
+            : 'rgba(0, 0, 0, 0.15)',
+        },
+      },
       '.cm-live-inlinecode': {
         fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
         fontSize: '0.88em',
