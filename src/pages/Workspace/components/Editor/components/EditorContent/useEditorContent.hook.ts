@@ -21,7 +21,6 @@ import {
 import { fetchEditResult } from '@/api/AI/apiAI';
 import { CREATE_CANVAS } from '@/pages/Workspace/Canvas.graphql';
 import type { Canvas } from '@/pages/Workspace/canvas.types';
-import { buildInitialCanvasData } from './canvasScene.utils';
 import { canvasLink, canvasNameFrom } from './canvasLinks.utils';
 import { CREATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
@@ -294,6 +293,8 @@ export const useEditorContent = ({
     let canvas: Canvas | undefined;
     setIsCreatingCanvas(true);
     try {
+      // Fetched now, not with the editor: it pulls in Excalidraw
+      const { buildInitialCanvasData } = await import('./canvasScene.utils');
       const { data } = await createCanvasMutation({
         variables: {
           input: {

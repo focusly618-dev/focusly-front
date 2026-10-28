@@ -57,3 +57,23 @@ export const REMOVE_CANVAS = gql`
     removeCanvas(id: $id)
   }
 `;
+
+// Where the browser uploads an image pasted into a canvas
+export const CREATE_CANVAS_FILE_UPLOAD = gql`
+  mutation CreateCanvasFileUpload($input: CreateCanvasFileUploadInput!) {
+    createCanvasFileUpload(input: $input) {
+      uploadUrl
+    }
+  }
+`;
+
+// Links to read the images a canvas uses, when it opens
+export const GET_CANVAS_FILES = gql`
+  query GetCanvasFiles($canvasId: ID!) {
+    canvasFiles(canvasId: $canvasId) {
+      id
+      mimeType
+      url
+    }
+  }
+`;

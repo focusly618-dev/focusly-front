@@ -1,21 +1,24 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import {
-  Box,
-  useTheme,
-  CircularProgress,
-  Typography,
-  Button,
-} from '@mui/material';
+import { useTheme, CircularProgress, Typography, Button } from '@mui/material';
 import { Excalidraw, hashElementsVersion } from '@excalidraw/excalidraw';
 import '@excalidraw/excalidraw/index.css';
-import type { AppState } from '@excalidraw/excalidraw/types';
+import type {
+  AppState,
+  BinaryFiles,
+  ExcalidrawImperativeAPI,
+} from '@excalidraw/excalidraw/types';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 import { notify, getFriendlyErrorMessage } from '@/utils';
-import { surfaceColor } from '@/context';
 import { GET_CANVAS, UPDATE_CANVAS } from '@/pages/Workspace/Canvas.graphql';
-import type { Canvas, UpdateCanvasInput } from '@/pages/Workspace/canvas.types';
+import type {
+  Canvas,
+  CanvasData,
+  UpdateCanvasInput,
+} from '@/pages/Workspace/canvas.types';
 import { toSavedAppState } from './canvasScene.utils';
+import { CanvasCentered, CanvasFrame } from './CanvasLoading';
+import { useCanvasFiles } from './useCanvasFiles.hook';
 
 // Excalidraw reports every pointer move; saves wait for this much quiet.
 const SAVE_DEBOUNCE_MS = 1500;
@@ -86,6 +89,26 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     [canvasId, flush],
   );
 
+  // ── Images: stored in the bucket as they're pasted; the scene saves which
+  // ones it uses, so a finished upload saves the scene again.
+  const lastScene = useRef<Pick<CanvasData, 'elements' | 'appState'>>({
+    elements: [],
+    appState: {},
+  });
+  const onImageStored = useRef(() => {});
+  const images = useCanvasFiles({
+    canvasId,
+    onStored: useCallback(() => onImageStored.current(), []),
+  });
+  const saveScene = useCallback(() => {
+    scheduleSave({
+      data: { ...lastScene.current, files: images.storedFiles() },
+    });
+  }, [scheduleSave, images]);
+  useEffect(() => {
+    onImageStored.current = saveScene;
+  }, [saveScene]);
+
   useEffect(() => {
     window.addEventListener('beforeunload', flush);
     return () => {
@@ -118,38 +141,56 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       lastSceneVersion.current = hashElementsVersion(
         canvas.data?.elements ?? [],
       );
+      lastScene.current = {
+        elements: canvas.data?.elements ?? [],
+        appState: canvas.data?.appState ?? {},
+      };
+      images.resetStored(canvas.data?.files);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canvas?.id]);
 
+  // Once both the scene and Excalidraw are ready, its stored images come in
+  const [excalidraw, setExcalidraw] = useState<ExcalidrawImperativeAPI | null>(
+    null,
+  );
+  useEffect(() => {
+    if (excalidraw && canvas) void images.loadStoredImages(excalidraw);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [excalidraw, canvas?.id]);
+
   const handleChange = useCallback(
-    (elements: readonly ExcalidrawElement[], appState: AppState) => {
+    (
+      elements: readonly ExcalidrawElement[],
+      appState: AppState,
+      files: BinaryFiles,
+    ) => {
+      images.storeNewImages(elements, files);
       // Scrolling, zooming and selecting don't change the version; only
       // edits to the drawing are worth a save.
       const version = hashElementsVersion(elements);
       if (version === lastSceneVersion.current) return;
       lastSceneVersion.current = version;
-      scheduleSave({
-        data: {
-          elements: elements.filter((el) => !el.isDeleted),
-          appState: toSavedAppState(appState),
-        },
-      });
+      lastScene.current = {
+        elements: elements.filter((el) => !el.isDeleted),
+        appState: toSavedAppState(appState),
+      };
+      saveScene();
     },
-    [scheduleSave],
+    [images, saveScene],
   );
 
   const renderBody = () => {
     if (loading) {
       return (
-        <Box sx={centeredSx}>
+        <CanvasCentered>
           <CircularProgress size={28} />
-        </Box>
+        </CanvasCentered>
       );
     }
     if (!canvasId || error || !canvas) {
       return (
-        <Box sx={centeredSx}>
+        <CanvasCentered>
           <Typography variant="body1" fontWeight={600}>
             No se encontró este canvas
           </Typography>
@@ -160,7 +201,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           <Button variant="outlined" onClick={onClose} sx={{ mt: 1 }}>
             Volver al documento
           </Button>
-        </Box>
+        </CanvasCentered>
       );
     }
     return (
@@ -168,6 +209,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         key={canvas.id}
         theme={isDark ? 'dark' : 'light'}
         onChange={handleChange}
+        excalidrawAPI={setExcalidraw}
         initialData={{
           elements: canvas.data?.elements ?? [],
           appState: {
@@ -180,37 +222,5 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     );
   };
 
-  return (
-    <Box
-      sx={{
-        flex: 1,
-        minHeight: 480,
-        width: '100%',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        border: '1px solid',
-        borderColor: 'divider',
-        position: 'relative',
-        bgcolor: surfaceColor(theme, '#121212', '#1F1F20', '#ffffff'),
-        animation: 'fadeIn 0.25s ease-out',
-        '@keyframes fadeIn': {
-          from: { opacity: 0 },
-          to: { opacity: 1 },
-        },
-      }}
-    >
-      {renderBody()}
-    </Box>
-  );
+  return <CanvasFrame>{renderBody()}</CanvasFrame>;
 };
-
-const centeredSx = {
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 1,
-  px: 3,
-  textAlign: 'center',
-} as const;

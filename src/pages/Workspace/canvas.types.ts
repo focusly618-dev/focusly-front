@@ -1,10 +1,24 @@
 import type { AppState } from '@excalidraw/excalidraw/types';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 
-/** The saved Excalidraw scene. Images (`files`) aren't stored yet. */
+/** A stored image of a canvas: its bytes live in the bucket, not here. */
+export interface CanvasFileMeta {
+  mimeType: string;
+  created: number;
+}
+
+/** The saved Excalidraw scene, with the images it uses (by id). */
 export interface CanvasData {
   elements: readonly ExcalidrawElement[];
   appState: Partial<AppState>;
+  files?: Record<string, CanvasFileMeta>;
+}
+
+/** A signed link to read one stored image. */
+export interface CanvasFileLink {
+  id: string;
+  mimeType: string;
+  url: string;
 }
 
 export interface Canvas {

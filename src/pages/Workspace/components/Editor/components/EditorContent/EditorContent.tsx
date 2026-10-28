@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { Suspense, lazy, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEditorContent } from './useEditorContent.hook';
 import {
@@ -73,11 +73,17 @@ import { MarkdownEditor } from '../../codemirror/MarkdownEditor';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 import { EditorAskAI } from '../EditorAskAI/EditorAskAI';
 import { surfaceColor } from '@/context';
-import { EditorCanvas } from './EditorCanvas';
+import { CanvasLoading } from './CanvasLoading';
 import type { CanvasView } from '../../useCanvasView.hook';
 import { splitCanvasLabel } from './canvasLinks.utils';
 import { CreateCanvasPopover } from '../CanvasIdentity/CreateCanvasPopover';
 import { editorFontVars, type EditorFontStyle } from '../../editorFonts';
+
+// Excalidraw is heavy and only a canvas needs it: it's split into its own
+// chunk, fetched when a canvas is opened rather than with every note.
+const EditorCanvas = lazy(() =>
+  import('./EditorCanvas').then((m) => ({ default: m.EditorCanvas })),
+);
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
@@ -451,13 +457,16 @@ export const EditorContent = ({
         }}
       >
         {isCanvasActive && (
-          <EditorCanvas
-            title={canvasView.title}
-            icon={canvasView.icon}
-            onLoaded={canvasView.applySaved}
-            onClose={canvasView.close}
-            canvasId={canvasView.id}
-          />
+          // The drawing tool downloads the first time a canvas opens
+          <Suspense fallback={<CanvasLoading />}>
+            <EditorCanvas
+              title={canvasView.title}
+              icon={canvasView.icon}
+              onLoaded={canvasView.applySaved}
+              onClose={canvasView.close}
+              canvasId={canvasView.id}
+            />
+          </Suspense>
         )}
         {/* Hidden, not unmounted, while a canvas is open: unmounting would drop
             edits still inside the editor's change debounce (such as the link
