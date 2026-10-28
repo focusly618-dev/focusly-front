@@ -2,8 +2,6 @@ import { EMPTY_DOCUMENT } from '@/utils/documentContent';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router-dom';
-import type { Step } from 'react-joyride';
-import { Box, Typography } from '@mui/material';
 
 import { useAppSelector } from '@/redux/hooks';
 import {
@@ -38,41 +36,6 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
     setPrevGroupId(selectedGroupId);
     setIsCreatingNew(false);
   }
-
-  // 1. Onboarding On-demand state
-  const [runOnboarding, setRunOnboarding] = useState((): boolean => {
-    return localStorage.getItem('onboarding_workspace_completed') !== 'true';
-  });
-
-  const onboardingSteps: Step[] = [
-    {
-      target: 'body',
-      placement: 'center',
-      content: (
-        <Box>
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Welcome to Your Workspace! 🧠
-          </Typography>
-          <Typography variant="body2">
-            This is where you plan your strategy and organize your thoughts.
-          </Typography>
-        </Box>
-      ),
-    },
-    {
-      target: '#joyride-workspace-search',
-      content: 'Quickly find your notes or projects using the search bar.',
-    },
-    {
-      target: '#joyride-workspace-create-note',
-      content: 'Start a new strategic note to capture your next big idea.',
-    },
-  ];
-
-  const handleFinishOnboarding = (): void => {
-    setRunOnboarding(false);
-    localStorage.setItem('onboarding_workspace_completed', 'true');
-  };
 
   // 2. Actions Hook (Delete, Search)
   const {
@@ -299,11 +262,6 @@ export const useWorkspace = (props?: UseWorkspaceProps) => {
   };
 
   return {
-    // Onboarding
-    runOnboarding,
-    handleFinishOnboarding,
-    onboardingSteps,
-
     // Form
     register,
     setValue,

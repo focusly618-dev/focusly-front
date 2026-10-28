@@ -19,6 +19,7 @@ import {
   Typography,
   styled,
   Stack,
+  alpha,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -67,24 +68,27 @@ const PanelContainer = styled(Box)(({ theme }) => ({
   flexShrink: 0,
 }));
 
-const AddTaskButton = styled(Button)({
+// A secondary action: outlined, so the AI planner below stays the panel's one
+// filled, primary button
+const AddTaskButton = styled(Button)(({ theme }) => ({
   width: '100%',
-  backgroundColor: '#008767',
-  color: '#ffffff',
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
+  border: `1px solid ${theme.palette.divider}`,
   textTransform: 'none',
   fontWeight: 600,
   fontSize: '12.5px',
-  padding: '7px 12px',
+  padding: '6px 12px',
   borderRadius: 8,
-  boxShadow: '0 2px 8px rgba(0, 135, 103, 0.25)',
-  transition: 'all 0.2s ease-in-out',
+  boxShadow: 'none',
+  transition: 'background-color 0.15s ease, border-color 0.15s ease',
   gap: 6,
+  '& .MuiButton-startIcon': { color: theme.palette.primary.main },
   '&:hover': {
-    backgroundColor: '#007357',
-    transform: 'translateY(-1px)',
-    boxShadow: '0 4px 12px rgba(0, 135, 103, 0.35)',
+    backgroundColor: theme.palette.action.hover,
+    borderColor: alpha(theme.palette.text.primary, 0.25),
   },
-});
+}));
 
 const ViewToggleContainer = styled(Box)(({ theme }) => ({
   backgroundColor: surfaceColor(

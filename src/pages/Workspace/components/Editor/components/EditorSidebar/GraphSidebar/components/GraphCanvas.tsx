@@ -1,58 +1,65 @@
 import React from 'react';
-import { useTheme } from '@mui/material';
+import { alpha, useTheme } from '@mui/material';
 import type {
   GraphEdge,
   GraphNode,
   GraphSettings,
-  PanState,
 } from '../NoteGraphView.types';
+import type { GraphView } from '../NoteGraphView.hooks';
+import type { GraphLayout } from '../utils/graphLayout.utils';
 import { GraphEdgeItem } from './GraphEdgeItem';
 import { GraphNodeItem } from './GraphNodeItem';
-import { surfaceColor } from '@/context';
 
 interface GraphCanvasProps {
   svgRef: React.RefObject<SVGSVGElement | null>;
+  contentRef: React.RefObject<SVGGElement | null>;
   canvasWidth: number;
   canvasHeight: number;
-  canvasSize?: number;
-  zoom: number;
-  zoomOrigin: string;
-  pan: PanState;
+  view: GraphView;
   isPanning: boolean;
   nodes: GraphNode[];
   edges: GraphEdge[];
   nodeById: Map<string, GraphNode>;
-  neighborIds: Set<string> | null;
+  /** Nodes in focus (hovered and its neighbors, or search matches); null
+   * when nothing is, so all are drawn alike. */
+  focusIds: Set<string> | null;
   hoveredId: string | null;
   selectedNodeId: string | null;
+  draggingId: string | null;
   settings: GraphSettings;
+  layout: GraphLayout;
   onCanvasPointerDown: (e: React.PointerEvent<SVGSVGElement>) => void;
   onNodePointerDown: (node: GraphNode) => (e: React.PointerEvent) => void;
-  onNodeClick: (node: GraphNode) => () => void;
+  onNodeClick: (node: GraphNode) => void;
+  onNodeDoubleClick: (node: GraphNode) => void;
   setHoveredId: (id: string | null) => void;
 }
 
 export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   svgRef,
+  contentRef,
   canvasWidth,
   canvasHeight,
-  zoom,
-  pan,
+  view,
   isPanning,
   nodes,
   edges,
   nodeById,
-  neighborIds,
+  focusIds,
   hoveredId,
   selectedNodeId,
+  draggingId,
   settings,
+  layout,
   onCanvasPointerDown,
   onNodePointerDown,
   onNodeClick,
+  onNodeDoubleClick,
   setHoveredId,
 }) => {
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
+  const cx = canvasWidth / 2;
+  const cy = canvasHeight / 2;
 
   return (
     <svg
@@ -67,37 +74,27 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         touchAction: 'none',
         userSelect: 'none',
         cursor: isPanning ? 'grabbing' : 'grab',
-        width: '100%',
-        height: '100%',
         display: 'block',
       }}
     >
       <defs>
         <pattern
           id="note-graph-dots"
-          x="0"
-          y="0"
-          width="28"
-          height="28"
+          width="24"
+          height="24"
           patternUnits="userSpaceOnUse"
         >
           <circle
-            cx="2"
-            cy="2"
-            r="1.6"
-            fill={isDark ? 'rgba(255, 255, 255, 0.18)' : '#94a3b8'}
+            cx="1.5"
+            cy="1.5"
+            r="1"
+            fill={alpha(theme.palette.text.primary, 0.08)}
           />
         </pattern>
       </defs>
 
-      {/* Background with dotted grid */}
-      <rect
-        x={-canvasWidth * 2}
-        y={-canvasHeight * 2}
-        width={canvasWidth * 5}
-        height={canvasHeight * 5}
-        fill={surfaceColor(theme, '#090d16', '#161616', '#f8fafc')}
-      />
+      {/* A faint dotted ground, larger than the canvas so panning never
+          reaches its edge */}
       <rect
         x={-canvasWidth * 2}
         y={-canvasHeight * 2}
@@ -106,46 +103,37 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         fill="url(#note-graph-dots)"
       />
 
-      {/* Transformed content container for smooth pan and zoom */}
       <g
-        transform={`translate(${canvasWidth / 2 + pan.x}, ${canvasHeight / 2 + pan.y}) scale(${zoom}) translate(${-canvasWidth / 2}, ${-canvasHeight / 2})`}
-        style={{
-          transition: isPanning ? 'none' : 'transform 0.05s linear',
-        }}
+        ref={contentRef}
+        transform={`translate(${cx + view.x}, ${cy + view.y}) scale(${view.zoom}) translate(${-cx}, ${-cy})`}
       >
-        {/* Render edges */}
         {edges.map((edge) => (
           <GraphEdgeItem
             key={`${edge.from}-${edge.to}`}
             edge={edge}
             nodeById={nodeById}
-            selectedNodeId={selectedNodeId}
-            neighborIds={neighborIds}
+            highlightedId={hoveredId ?? selectedNodeId}
+            focusIds={focusIds}
             settings={settings}
+            layout={layout}
           />
         ))}
 
-        {/* Render nodes */}
-        {nodes.map((node) => {
-          const active = !neighborIds || neighborIds.has(node.id);
-          const isHovered = node.id === hoveredId;
-          const isSelected = node.id === selectedNodeId;
-
-          return (
-            <GraphNodeItem
-              key={node.id}
-              node={node}
-              isHovered={isHovered}
-              isSelected={isSelected}
-              active={active}
-              settings={settings}
-              onPointerDown={onNodePointerDown(node)}
-              onClick={onNodeClick(node)}
-              onMouseEnter={() => setHoveredId(node.id)}
-              onMouseLeave={() => setHoveredId(null)}
-            />
-          );
-        })}
+        {nodes.map((node) => (
+          <GraphNodeItem
+            key={node.id}
+            node={node}
+            isHovered={node.id === hoveredId}
+            isSelected={node.id === selectedNodeId}
+            isDragging={node.id === draggingId}
+            dimmed={Boolean(focusIds) && !focusIds?.has(node.id)}
+            onPointerDown={onNodePointerDown(node)}
+            onClick={() => onNodeClick(node)}
+            onDoubleClick={() => onNodeDoubleClick(node)}
+            onMouseEnter={() => setHoveredId(node.id)}
+            onMouseLeave={() => setHoveredId(null)}
+          />
+        ))}
       </g>
     </svg>
   );

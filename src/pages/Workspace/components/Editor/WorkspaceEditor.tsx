@@ -11,8 +11,9 @@ import { EditorContent } from './components/EditorContent/EditorContent';
 import { EditorSidebar } from './components/EditorSidebar/EditorSidebar';
 import { SearchPalette } from './components/SearchPalette/SearchPalette';
 
-import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import { useWorkspaceEditor } from './useWorkspaceEditor.hook';
+import { useCanvasView } from './useCanvasView.hook';
+import { useEditorFontStyle } from './editorFonts';
 
 export const WorkspaceEditor = ({
   onBack,
@@ -60,14 +61,13 @@ export const WorkspaceEditor = ({
 
     initialMarkdown,
     markdownEditorRef,
-
-    onboardingSteps,
-    runOnboarding,
-    handleOnboardingComplete,
   } = useWorkspaceEditor({
     watch,
     tasksData,
   });
+
+  const canvasView = useCanvasView(markdownEditorRef);
+  const { fontStyle, setFontStyle } = useEditorFontStyle();
 
   const [prevContent, setPrevContent] = useState(currentContent);
   const [liveContent, setLiveContent] = useState<string>(currentContent || '');
@@ -244,6 +244,9 @@ export const WorkspaceEditor = ({
             onToggleCentered={toggleCentered}
             onToggleSidebar={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
             onStartFocus={onStartFocus}
+            canvasView={canvasView}
+            fontStyle={fontStyle}
+            onFontStyleChange={setFontStyle}
           />
 
           <EditorContent
@@ -258,6 +261,8 @@ export const WorkspaceEditor = ({
             targetLanguage={targetLanguage}
             isCentered={isCentered}
             toggleCentered={toggleCentered}
+            canvasView={canvasView}
+            fontStyle={fontStyle}
           />
         </MainEditorArea>
 
@@ -308,12 +313,6 @@ export const WorkspaceEditor = ({
           />
         </Box>
       )}
-
-      <OnboardingWrapper
-        steps={onboardingSteps}
-        run={runOnboarding}
-        onFinish={handleOnboardingComplete}
-      />
     </>
   );
 };

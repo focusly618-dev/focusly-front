@@ -26,7 +26,7 @@ export const FocusFooter: React.FC<FocusFooterProps> = ({
   handleCompleteTask,
 }) => {
   return (
-    <FooterContainer sx={{ mt: 8 }}>
+    <FooterContainer sx={{ mt: 'clamp(8px, 2.5vh, 64px)', flexShrink: 0 }}>
       <AddTimeButton startIcon={<HistoryIcon />} onClick={onAddTime}>
         +5m
       </AddTimeButton>

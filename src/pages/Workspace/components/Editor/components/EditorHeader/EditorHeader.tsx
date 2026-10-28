@@ -39,6 +39,8 @@ import { HeaderLeft, HeaderRight } from '@/pages/Workspace/Workspace.styles';
 import { EditorHeader as StyledEditorHeader } from './EditorHeader.styles';
 import type { EditorHeaderProps } from './EditorHeader.types';
 import { useEditorHeader } from './useEditorHeader.hook';
+import { CanvasBreadcrumb } from './components/CanvasBreadcrumb/CanvasBreadcrumb';
+import { FontStylePicker } from './components/FontStylePicker/FontStylePicker';
 
 export const EditorHeader = (props: EditorHeaderProps) => {
   const { t } = useTranslation();
@@ -56,7 +58,15 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     currentTitle,
     onStartFocus,
     markdownEditorRef,
+    canvasView,
+    fontStyle,
+    onFontStyleChange,
   } = props;
+  const isCanvasOpen = Boolean(canvasView?.isActive);
+  // With a canvas open, "back" leaves the canvas, not the editor.
+  const handleBack = isCanvasOpen && canvasView ? canvasView.close : onBack;
+  const documentTitle =
+    currentTitle?.trim() || t('workspaceEditor.untitledNote', 'Untitled Note');
 
   const {
     isListening,
@@ -119,7 +129,12 @@ export const EditorHeader = (props: EditorHeaderProps) => {
         }}
       >
         <IconButton
-          onClick={onBack}
+          onClick={handleBack}
+          aria-label={
+            isCanvasOpen
+              ? t('workspaceEditor.backToDocument', 'Volver al documento')
+              : t('common.back', 'Volver')
+          }
           sx={{
             width: '32px',
             height: '32px',
@@ -136,25 +151,31 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           <ArrowBackIcon sx={{ fontSize: 18 }} />
         </IconButton>
 
-        <Typography
-          variant="subtitle1"
-          noWrap
-          sx={{
-            fontWeight: 700,
-            fontSize: '14px',
-            color: 'text.primary',
-            letterSpacing: '-0.01em',
-            maxWidth: { xs: '200px', sm: '320px', md: '460px' },
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {currentTitle?.trim() ||
-            t('workspaceEditor.untitledNote', 'Untitled Note')}
-        </Typography>
+        {isCanvasOpen && canvasView ? (
+          <CanvasBreadcrumb
+            documentTitle={documentTitle}
+            canvasView={canvasView}
+          />
+        ) : (
+          <Typography
+            variant="subtitle1"
+            noWrap
+            sx={{
+              fontWeight: 700,
+              fontSize: '14px',
+              color: 'text.primary',
+              letterSpacing: '-0.01em',
+              maxWidth: { xs: '200px', sm: '320px', md: '460px' },
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {documentTitle}
+          </Typography>
+        )}
 
-        {currentFolder?.name && (
+        {!isCanvasOpen && currentFolder?.name && (
           <Box
             sx={{
               display: 'inline-flex',
@@ -271,6 +292,54 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             ) : null}
           </Box>
         </Fade>
+
+        {/* Focus Mode: the timed session, on the note's linked task if any */}
+        {onStartFocus && (
+          <Tooltip
+            // Describes the button; its name stays the visible "Focus".
+            describeChild
+            title={
+              selectTask?.title
+                ? t('workspaceEditor.startFocusOn', {
+                    title: selectTask.title,
+                    defaultValue: 'Focus on "{{title}}"',
+                  })
+                : t('workspaceEditor.startFocus', 'Start a focus session')
+            }
+          >
+            <Button
+              onClick={() => onStartFocus(selectTask)}
+              startIcon={<FlashOnIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                height: '34px',
+                px: 1.5,
+                borderRadius: '8px',
+                border: '1px solid',
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.12)'
+                    : '#e2e8f0',
+                color: 'text.primary',
+                fontSize: '12px',
+                fontWeight: 600,
+                textTransform: 'none',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.03)'
+                    : '#ffffff',
+                '& .MuiButton-startIcon': { color: 'primary.main', mr: 0.75 },
+                '&:hover': {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.08)'
+                      : '#f8fafc',
+                },
+              }}
+            >
+              {t('workspaceEditor.focusButton', 'Focus')}
+            </Button>
+          </Tooltip>
+        )}
 
         {/* Target Language Button */}
         <Button
@@ -413,13 +482,22 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             sx: {
               borderRadius: '10px',
               mt: 0.5,
-              minWidth: '190px',
+              minWidth: '220px',
               boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
               border: '1px solid',
               borderColor: 'divider',
             },
           }}
         >
+          {/* Stays open on a pick, like Notion, so styles can be compared. */}
+          {onFontStyleChange && (
+            <FontStylePicker
+              value={fontStyle ?? 'default'}
+              onChange={onFontStyleChange}
+            />
+          )}
+          {onFontStyleChange && <Divider sx={{ my: 0.5 }} />}
+
           <MenuItem
             onClick={() => {
               setToolsAnchor(null);
@@ -460,25 +538,6 @@ export const EditorHeader = (props: EditorHeaderProps) => {
               primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
             />
           </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setToolsAnchor(null);
-              if (onStartFocus) {
-                onStartFocus(selectTask);
-              } else if (onToggleCentered) {
-                onToggleCentered();
-              }
-            }}
-          >
-            <ListItemIcon>
-              <FlashOnIcon sx={{ fontSize: 18 }} />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('workspaceEditor.focusMode', 'Focus Mode')}
-              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
-            />
-          </MenuItem>
-
           <Divider sx={{ my: 0.5 }} />
 
           <MenuItem
@@ -679,7 +738,7 @@ export const EditorHeader = (props: EditorHeaderProps) => {
       >
         {/* Left: Volver Back Button */}
         <Button
-          onClick={onBack}
+          onClick={handleBack}
           startIcon={<ArrowBackIcon sx={{ fontSize: 18 }} />}
           sx={{
             color: 'text.primary',
@@ -722,8 +781,8 @@ export const EditorHeader = (props: EditorHeaderProps) => {
           }}
         >
           {isCentered
-            ? t('workspaceEditor.normalView', 'VISTA NORMAL')
-            : t('workspaceEditor.focusMode', 'MODO ENFOQUE')}
+            ? t('workspaceEditor.header.defaultView', 'Vista normal')
+            : t('workspaceEditor.header.focusView', 'Vista centrada')}
         </Button>
 
         {/* Right: Info Circle Button */}

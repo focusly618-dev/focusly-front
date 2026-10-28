@@ -1,5 +1,5 @@
 import type { Text } from '@codemirror/state';
-import type { EditorView } from '@codemirror/view';
+import { EditorView } from '@codemirror/view';
 import type { MarkdownEditorRef } from './MarkdownEditor.types';
 import {
   buildDiff,
@@ -7,6 +7,10 @@ import {
   setPendingDiff,
 } from './extensions/diffReview';
 import { setTargetHighlight } from './extensions/targetHighlight';
+import {
+  normalizeInsertedMarkdown,
+  prepareMarkdownInsert,
+} from './markdownInsert';
 
 /** The paragraph (run of non-blank lines) holding `pos`; null on a blank line. */
 export const paragraphAt = (
@@ -57,20 +61,50 @@ export const createImperativeApi = (
   replaceRange: (from, to, text) => {
     const view = getView();
     if (!view) return;
+    const insert = prepareMarkdownInsert(
+      view.state.doc.toString(),
+      from,
+      to,
+      text,
+    );
     view.dispatch({
-      changes: { from, to, insert: text },
-      selection: { anchor: from + text.length },
+      changes: { from, to, insert },
+      selection: { anchor: from + insert.trimEnd().length },
       scrollIntoView: true,
     });
     view.focus();
+  },
+  applyChanges: (changes) => {
+    const view = getView();
+    if (!view || changes.length === 0) return;
+    view.dispatch({ changes });
+  },
+  coordsAtPos: (pos, side = 1) => {
+    const view = getView();
+    if (!view) return null;
+    const rect = view.coordsAtPos(pos, side);
+    return rect
+      ? {
+          left: rect.left,
+          right: rect.right,
+          top: rect.top,
+          bottom: rect.bottom,
+        }
+      : null;
   },
   insertAtCursor: (text) => {
     const view = getView();
     if (!view) return;
     const { from, to } = view.state.selection.main;
+    const insert = prepareMarkdownInsert(
+      view.state.doc.toString(),
+      from,
+      to,
+      text,
+    );
     view.dispatch({
-      changes: { from, to, insert: text },
-      selection: { anchor: from + text.length },
+      changes: { from, to, insert },
+      selection: { anchor: from + insert.trimEnd().length },
       scrollIntoView: true,
     });
     view.focus();
@@ -79,9 +113,10 @@ export const createImperativeApi = (
     const view = getView();
     if (!view) return;
     const end = view.state.doc.length;
+    const body = normalizeInsertedMarkdown(text);
     const needsSeparator =
       end > 0 && view.state.sliceDoc(end - 1, end) !== '\n';
-    const insert = (needsSeparator ? '\n\n' : '') + text;
+    const insert = (needsSeparator ? '\n\n' : '') + body;
     view.dispatch({
       changes: { from: end, insert },
       selection: { anchor: end + insert.length },
@@ -160,21 +195,21 @@ export const createImperativeApi = (
       }
     }
 
-    // 4. Scroll smoothly into view, set selection on the heading, and fire pulsing highlight
+    // 4. Bring the heading to the middle of the screen and tint it briefly.
+    // The selection is left alone: selecting the line would reveal its "##"
+    // and move the caret away from where the user was writing.
     const line = view.state.doc.lineAt(targetFrom);
     view.dispatch({
-      selection: { anchor: line.from, head: line.to },
-      scrollIntoView: true,
-      effects: [setTargetHighlight.of({ from: line.from, to: line.to })],
+      effects: [
+        EditorView.scrollIntoView(line.from, { y: 'center' }),
+        setTargetHighlight.of({ from: line.from, to: line.to }),
+      ],
     });
-    view.focus();
 
-    // Auto-clear highlight effect after 3.8s
+    // The tint has faded by then; drop its decoration
     setTimeout(() => {
-      view.dispatch({
-        effects: [setTargetHighlight.of(null)],
-      });
-    }, 3800);
+      view.dispatch({ effects: [setTargetHighlight.of(null)] });
+    }, 1800);
 
     return true;
   },

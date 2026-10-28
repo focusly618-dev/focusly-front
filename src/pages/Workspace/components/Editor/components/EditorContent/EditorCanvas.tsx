@@ -1,254 +1,216 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { Box, useTheme, InputBase, Chip, alpha, Tooltip } from '@mui/material';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
 import {
-  Excalidraw,
-  convertToExcalidrawElements,
-} from '@excalidraw/excalidraw';
+  Box,
+  useTheme,
+  CircularProgress,
+  Typography,
+  Button,
+} from '@mui/material';
+import { Excalidraw, hashElementsVersion } from '@excalidraw/excalidraw';
 import '@excalidraw/excalidraw/index.css';
-import { AutoflowIcon } from '@/components/ui';
-import type { AppState, BinaryFiles } from '@excalidraw/excalidraw/types';
+import type { AppState } from '@excalidraw/excalidraw/types';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
+import { notify, getFriendlyErrorMessage } from '@/utils';
+import { surfaceColor } from '@/context';
+import { GET_CANVAS, UPDATE_CANVAS } from '@/pages/Workspace/Canvas.graphql';
+import type { Canvas, UpdateCanvasInput } from '@/pages/Workspace/canvas.types';
+import { toSavedAppState } from './canvasScene.utils';
+
+// Excalidraw reports every pointer move; saves wait for this much quiet.
+const SAVE_DEBOUNCE_MS = 1500;
 
 interface EditorCanvasProps {
+  /** Name and icon are shown and edited in the editor's header; saved here. */
   title: string;
-  onTitleChange: (newTitle: string) => void;
+  icon: string | null;
+  /** Hands over the saved name and icon once the canvas loads. */
+  onLoaded: (name: string, icon: string | null) => void;
   onClose: () => void;
-  initialText?: string;
-  projectId?: string | null;
-  canvasId?: string | null;
-  canvasName?: string;
-}
-
-export interface Canvas {
-  id: string;
-  projectId: string;
-  name: string;
-  data: CanvasData;
-  createdAt: string;
-  updatedAt: string;
-}
-export interface CanvasData {
-  elements: readonly ExcalidrawElement[];
-  appState: Partial<AppState>;
-  files: BinaryFiles;
-}
-
-export interface CreateCanvasRequest {
-  projectId: string | null;
-  name: string;
-  data: CanvasData;
-}
-
-export interface UpdateCanvasRequest {
-  name?: string;
-  data?: CanvasData;
+  canvasId: string | null;
 }
 
 export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   title,
-  onTitleChange,
-  initialText,
-  projectId,
+  icon,
+  onLoaded,
+  onClose,
   canvasId,
-  canvasName,
 }) => {
   const theme = useTheme();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const isDark = theme.palette.mode === 'dark';
+
+  // Always from the network: autosaves don't return the scene, so a cached
+  // copy would be the one from when the canvas was last opened.
+  const { data, loading, error } = useQuery<{ canvas: Canvas }>(GET_CANVAS, {
+    variables: { id: canvasId },
+    skip: !canvasId,
+    fetchPolicy: 'network-only',
+  });
+  const canvas = data?.canvas;
+
+  const [updateCanvasMutation] = useMutation(UPDATE_CANVAS, {
+    fetchPolicy: 'no-cache',
+  });
+
+  // ── Autosave: changes pile up in `pending` and go out after a pause, or
+  // right away when the canvas closes.
+  const pending = useRef<UpdateCanvasInput | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const lastSceneVersion = useRef<number | null>(null);
+
+  const flush = useCallback(() => {
+    clearTimeout(saveTimer.current);
+    const input = pending.current;
+    if (!input) return;
+    pending.current = null;
+    updateCanvasMutation({ variables: { input } }).catch((e) => {
+      notify.error({
+        title: 'No se pudo guardar el canvas',
+        description: getFriendlyErrorMessage(e, 'Se reintentará al editar.'),
+      });
+      // Back in line, under any newer change, so the next save carries it.
+      pending.current = { ...input, ...pending.current };
+    });
+  }, [updateCanvasMutation]);
+
+  const scheduleSave = useCallback(
+    (changes: Omit<UpdateCanvasInput, 'id'>) => {
+      if (!canvasId) return;
+      pending.current = { ...pending.current, ...changes, id: canvasId };
+      clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(flush, SAVE_DEBOUNCE_MS);
+    },
+    [canvasId, flush],
+  );
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', flush);
+    return () => {
+      window.removeEventListener('beforeunload', flush);
+      flush();
+    };
+  }, [flush]);
+
+  // A rename or new icon from the header goes out with the next save.
+  // Declared before the effect below on purpose: on the render the canvas
+  // arrives, this one runs first, while `saved` is still unset, so the link's
+  // (maybe stale) text shown until then is never saved over the real values.
+  const saved = useRef<{ name: string; icon: string | null } | null>(null);
+  useEffect(() => {
+    if (!saved.current) return;
+    const changes: Omit<UpdateCanvasInput, 'id'> = {};
+    const name = title.trim();
+    if (name && name !== saved.current.name) changes.name = name;
+    if (icon && icon !== saved.current.icon) changes.icon = icon;
+    if (!changes.name && !changes.icon) return;
+    saved.current = { ...saved.current, ...changes };
+    scheduleSave(changes);
+  }, [title, icon, scheduleSave]);
+
+  // The saved name and icon win over the link's text, which may be outdated.
+  useEffect(() => {
+    if (canvas) {
+      saved.current = { name: canvas.name, icon: canvas.icon };
+      onLoaded(canvas.name, canvas.icon);
+      lastSceneVersion.current = hashElementsVersion(
+        canvas.data?.elements ?? [],
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvas?.id]);
 
   const handleChange = useCallback(
-    async (
-      elements: readonly ExcalidrawElement[],
-      appState: AppState,
-      files: BinaryFiles,
-    ) => {
-      const payload = {
-        projectId,
-        name: canvasName,
+    (elements: readonly ExcalidrawElement[], appState: AppState) => {
+      // Scrolling, zooming and selecting don't change the version; only
+      // edits to the drawing are worth a save.
+      const version = hashElementsVersion(elements);
+      if (version === lastSceneVersion.current) return;
+      lastSceneVersion.current = version;
+      scheduleSave({
         data: {
-          elements,
-          appState: {
-            theme: appState.theme,
-            viewBackgroundColor: appState.viewBackgroundColor,
-            gridModeEnabled: appState.gridModeEnabled,
-            scrollX: appState.scrollX,
-            scrollY: appState.scrollY,
-            zoom: appState.zoom,
-          },
-          files,
+          elements: elements.filter((el) => !el.isDeleted),
+          appState: toSavedAppState(appState),
         },
-      };
-
-      // Sustituir por tu función de guardado con debounce.
-      console.log('Canvas ID:', canvasId);
-      console.log('Payload:', payload);
+      });
     },
-    [canvasId, canvasName, projectId],
+    [scheduleSave],
   );
-  // Convert initialText into a sleek starting card element on the canvas
-  const initialElements = useMemo(() => {
-    if (!initialText || initialText.trim().length === 0) return [];
-    try {
-      const isDark = theme.palette.mode === 'dark';
-      const truncatedText =
-        initialText.length > 240
-          ? `${initialText.slice(0, 240)}...`
-          : initialText;
 
-      return convertToExcalidrawElements([
-        {
-          type: 'rectangle',
-          x: 120,
-          y: 100,
-          width: 340,
-          height: 180,
-          backgroundColor: isDark ? '#1e293b' : '#f0f9ff',
-          strokeColor: '#0ea5e9',
-          fillStyle: 'solid',
-          roundness: { type: 3 },
-        },
-        {
-          type: 'text',
-          x: 140,
-          y: 120,
-          text: truncatedText,
-          fontSize: 16,
-          strokeColor: isDark ? '#f8fafc' : '#0f172a',
-        },
-      ]);
-    } catch {
-      return [];
+  const renderBody = () => {
+    if (loading) {
+      return (
+        <Box sx={centeredSx}>
+          <CircularProgress size={28} />
+        </Box>
+      );
     }
-  }, [initialText, theme.palette.mode]);
+    if (!canvasId || error || !canvas) {
+      return (
+        <Box sx={centeredSx}>
+          <Typography variant="body1" fontWeight={600}>
+            No se encontró este canvas
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Puede que se haya borrado, o que el link sea de antes de que los
+            canvas se guardaran.
+          </Typography>
+          <Button variant="outlined" onClick={onClose} sx={{ mt: 1 }}>
+            Volver al documento
+          </Button>
+        </Box>
+      );
+    }
+    return (
+      <Excalidraw
+        key={canvas.id}
+        theme={isDark ? 'dark' : 'light'}
+        onChange={handleChange}
+        initialData={{
+          elements: canvas.data?.elements ?? [],
+          appState: {
+            viewBackgroundColor: 'transparent',
+            ...canvas.data?.appState,
+            theme: isDark ? 'dark' : 'light',
+          },
+        }}
+      />
+    );
+  };
 
   return (
     <Box
       sx={{
+        flex: 1,
+        minHeight: 480,
         width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
+        borderRadius: '12px',
+        overflow: 'hidden',
+        border: '1px solid',
+        borderColor: 'divider',
+        position: 'relative',
+        bgcolor: surfaceColor(theme, '#121212', '#1F1F20', '#ffffff'),
         animation: 'fadeIn 0.25s ease-out',
         '@keyframes fadeIn': {
-          from: { opacity: 0, transform: 'translateY(4px)' },
-          to: { opacity: 1, transform: 'translateY(0)' },
+          from: { opacity: 0 },
+          to: { opacity: 1 },
         },
       }}
     >
-      {/* ── Top Bar: Title & Controls ── */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 1.5,
-          py: 0.5,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          pb: 1.5,
-        }}
-      >
-        {/* Title & Icon Badge */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
-            flex: 1,
-            minWidth: 260,
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 38,
-              height: 38,
-              borderRadius: '10px',
-              bgcolor: alpha('#0ea5e9', 0.12),
-              color: '#0ea5e9',
-              flexShrink: 0,
-            }}
-          >
-            <AutoflowIcon sx={{ fontSize: 22 }} />
-          </Box>
-
-          <Tooltip
-            title="Click para editar el nombre del Canvas"
-            placement="top"
-          >
-            <InputBase
-              inputRef={inputRef}
-              value={title}
-              onChange={(e) => onTitleChange(e.target.value)}
-              placeholder="Nombre del Canvas..."
-              autoFocus
-              sx={{
-                fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                fontWeight: 700,
-                color: 'text.primary',
-                flex: 1,
-                borderRadius: '8px',
-                px: 1,
-                py: 0.25,
-                transition: 'background-color 0.15s, box-shadow 0.15s',
-                '&:hover': {
-                  bgcolor: alpha(theme.palette.text.primary, 0.04),
-                },
-                '&.Mui-focused': {
-                  bgcolor: alpha(theme.palette.text.primary, 0.06),
-                  boxShadow: `0 0 0 2px ${alpha('#0ea5e9', 0.35)}`,
-                },
-              }}
-            />
-          </Tooltip>
-
-          <Chip
-            size="small"
-            label="Canvas View"
-            sx={{
-              display: { xs: 'none', sm: 'inline-flex' },
-              fontWeight: 600,
-              fontSize: '11px',
-              bgcolor: alpha('#0ea5e9', 0.12),
-              color: '#0ea5e9',
-              border: `1px solid ${alpha('#0ea5e9', 0.2)}`,
-            }}
-          />
-        </Box>
-      </Box>
-
-      {/* ── Excalidraw Canvas Area ── */}
-      <Box
-        sx={{
-          width: '100%',
-          height: { xs: 'calc(100vh - 220px)', md: 'calc(100vh - 200px)' },
-          minHeight: '620px',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          border: '1px solid',
-          borderColor: 'divider',
-          boxShadow:
-            theme.palette.mode === 'dark'
-              ? '0 10px 40px rgba(0, 0, 0, 0.5)'
-              : '0 8px 30px rgba(0, 0, 0, 0.06)',
-          position: 'relative',
-          bgcolor: theme.palette.mode === 'dark' ? '#121212' : '#ffffff',
-        }}
-      >
-        <Excalidraw
-          theme={theme.palette.mode === 'dark' ? 'dark' : 'light'}
-          onChange={handleChange}
-          initialData={{
-            elements: initialElements,
-            appState: {
-              theme: theme.palette.mode === 'dark' ? 'dark' : 'light',
-              viewBackgroundColor: 'transparent',
-            },
-          }}
-        />
-      </Box>
+      {renderBody()}
     </Box>
   );
 };
+
+const centeredSx = {
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 1,
+  px: 3,
+  textAlign: 'center',
+} as const;

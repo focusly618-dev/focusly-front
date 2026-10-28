@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { addDays, addMinutes } from 'date-fns';
-import { Typography, Box, LinearProgress, Button } from '@mui/material';
+import { Box, LinearProgress, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -13,8 +13,6 @@ import { TasksContainer, MainContent } from './Tasks.styles';
 import { TasksHeader } from './components/TasksHeader/TasksHeader';
 import { TasksControlsBar } from './components/TasksControlsBar/TasksControlsBar';
 import { TasksContentView } from './components/TasksContentView/TasksContentView';
-import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
-import type { Step } from 'react-joyride';
 import type { Task } from '@/redux/tasks/task.types';
 
 interface TasksProps {
@@ -56,14 +54,12 @@ export const Tasks = ({
     updateTask,
     viewMode,
     setViewMode,
-    runOnboarding,
     handleTaskClick,
     handleFilterClick,
     handleFilterClose,
     handleApplyFilters,
     handleSortClose,
     handleApplySort,
-    handleFinishOnboarding,
     deleteTasks,
     refetchTasks,
     setPriorityFilter,
@@ -131,40 +127,6 @@ export const Tasks = ({
       showAIOrganize: true,
     };
   }, [urlFilter, dateRange, t]);
-
-  const onboardingSteps: Step[] = [
-    {
-      target: 'body',
-      placement: 'center',
-      content: (
-        <Box>
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Welcome to Your Tasks! 🚀
-          </Typography>
-          <Typography variant="body2">
-            This is where you manage and prioritize your work. Let's take a
-            quick tour!
-          </Typography>
-        </Box>
-      ),
-      disableBeacon: true,
-    },
-    {
-      target: '#joyride-tasks-view-toggle',
-      content:
-        'Switch between List and Kanban views to find what works best for you.',
-    },
-    {
-      target: '#joyride-tasks-search',
-      content:
-        'Quickly find any task by searching for its title, tags, or projects.',
-    },
-    {
-      target: '#joyride-tasks-filters',
-      content:
-        'Use filters and sorting to stay focused on what matters most right now.',
-    },
-  ];
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -292,11 +254,6 @@ export const Tasks = ({
           </Box>
         </MainContent>
 
-        <OnboardingWrapper
-          steps={onboardingSteps}
-          run={runOnboarding}
-          onFinish={handleFinishOnboarding}
-        />
         <TasksAIOrganizeModal
           open={isAIPlannerOpen}
           onClose={() => setIsAIPlannerOpen(false)}

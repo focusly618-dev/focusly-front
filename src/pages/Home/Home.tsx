@@ -11,7 +11,7 @@ import { useHome } from './hooks/useHome.hook';
 import { Navigate } from 'react-router-dom';
 import { profilePath } from '@/pages/Profile/profileSections';
 import type { Task } from '@/redux/tasks/task.types';
-import { OnboardingTour } from '@/components/Onboarding';
+import { GuideHost, type GuideSection } from '@/components/Guide';
 import { AskAI } from '../AskAI/AskAI';
 import { AIGeneratingIndicator } from '@/components/AI/AIGeneratingIndicator';
 
@@ -32,6 +32,27 @@ const MainContent = styled(Box)(({ theme }) => ({
     paddingBottom: '80px',
   },
 }));
+
+/** The guide for what's on screen: an open note has the editor's own. */
+const guideSectionFor = (
+  tab: TaskBar,
+  isEditorOpen: boolean,
+): GuideSection | null => {
+  switch (tab) {
+    case TaskBar.DailyPlan:
+      return 'calendar';
+    case TaskBar.Tasks:
+      return 'tasks';
+    case TaskBar.Workspace:
+      return isEditorOpen ? 'editor' : 'workspaces';
+    case TaskBar.Insights:
+      return 'insights';
+    case TaskBar.AskAI:
+      return 'askAi';
+    default:
+      return null;
+  }
+};
 
 export const Home = () => {
   const {
@@ -128,7 +149,8 @@ export const Home = () => {
         />
       )}
 
-      <OnboardingTour activeTab={activeTab} onTabChange={changeStatusTab} />
+      {/* Each section explains itself the first time it's opened */}
+      <GuideHost section={guideSectionFor(activeTab, isWorkspaceEditorOpen)} />
     </>
   );
 };

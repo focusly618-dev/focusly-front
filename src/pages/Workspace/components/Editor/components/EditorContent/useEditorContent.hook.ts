@@ -5,6 +5,7 @@ import {
 } from '@/api/refreshQueries';
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
+import { useTheme } from '@mui/material';
 import { useAppSelector } from '@/redux/hooks';
 import { useBilling } from '@/hooks/useBilling';
 import type {
@@ -18,6 +19,10 @@ import {
   getFriendlyErrorMessage,
 } from '@/utils';
 import { fetchEditResult } from '@/api/AI/apiAI';
+import { CREATE_CANVAS } from '@/pages/Workspace/Canvas.graphql';
+import type { Canvas } from '@/pages/Workspace/canvas.types';
+import { buildInitialCanvasData } from './canvasScene.utils';
+import { canvasLink, canvasNameFrom } from './canvasLinks.utils';
 import { CREATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
 import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
@@ -27,8 +32,13 @@ export const useEditorContent = ({
   setValue,
   watch,
   markdownEditorRef,
+  canvasView,
 }: UseEditorContentProps): UseEditorContentReturn => {
   const [createTaskMutation] = useMutation(CREATE_TASK);
+  const [createCanvasMutation] = useMutation<{ createCanvas: Canvas }>(
+    CREATE_CANVAS,
+  );
+  const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
   // The editor's AI (rewrites, task from selection) is a Pro feature.
   const { isPro, openUpgrade } = useBilling();
@@ -70,8 +80,6 @@ export const useEditorContent = ({
     setIconAnchor(event.currentTarget);
   };
 
-  const [isCanvasActive, setIsCanvasActive] = useState(false);
-  const [canvasTitle, setCanvasTitle] = useState('');
   const handleColorSelect = (color: HeaderColor) => {
     setValue?.('background_color', color === 'none' ? undefined : color, {
       shouldDirty: true,
@@ -242,30 +250,84 @@ export const useEditorContent = ({
     }
   };
 
+  // "Create Canvas Page" first asks for a name and icon, in a popover right
+  // under the text it was opened on. That text (and where it sits) is kept
+  // for when the canvas is created.
+  const [canvasDraft, setCanvasDraft] = useState<{
+    sourceText: string;
+    range: { from: number; to: number } | null;
+    name: string;
+    anchor: { top: number; left: number };
+  } | null>(null);
+  const [isCreatingCanvas, setIsCreatingCanvas] = useState(false);
+
   const handleGenerateCanvasPage = () => {
-    handleClose(); // Cierra el menú contextual
-    const initialName = selectedText.trim() || 'Canvas sin título';
-    const slug =
-      initialName
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '') || 'canvas';
+    // Below the selection's last line, lined up with where it starts; failing
+    // that (the text scrolled out of view), where the menu was opened.
+    const editor = markdownEditorRef.current;
+    const start = selectedRange && editor?.coordsAtPos(selectedRange.from, 1);
+    const end = selectedRange && editor?.coordsAtPos(selectedRange.to, -1);
+    const anchor =
+      start && end
+        ? { top: end.bottom + 6, left: start.left }
+        : { top: menuAnchor?.mouseY ?? 0, left: menuAnchor?.mouseX ?? 0 };
 
-    // Formato normalizado y legible: [🎨 Nombre](#canvas-slug)
-    const canvasMarkdown = `[🎨 ${initialName}](#canvas-${slug})\n`;
-
-    if (selectedRange && markdownEditorRef.current) {
-      markdownEditorRef.current.replaceRange(
-        selectedRange.from,
-        selectedRange.to,
-        canvasMarkdown,
-      );
-    } else if (markdownEditorRef.current) {
-      markdownEditorRef.current.insertAtCursor(canvasMarkdown);
-    }
+    handleClose();
+    setCanvasDraft({
+      sourceText: selectedText,
+      range: selectedRange,
+      name: canvasNameFrom(selectedText),
+      anchor,
+    });
   };
+
+  const handleCancelCanvasDraft = () => {
+    if (!isCreatingCanvas) setCanvasDraft(null);
+  };
+
+  // The canvas is created first so its link carries the id the backend gave
+  // it: [🎨 Name](#canvas-<id>). The selected text becomes its first card.
+  const handleCreateCanvas = async (name: string, icon: string) => {
+    if (!canvasDraft) return;
+    const { sourceText, range } = canvasDraft;
+
+    let canvas: Canvas | undefined;
+    setIsCreatingCanvas(true);
+    try {
+      const { data } = await createCanvasMutation({
+        variables: {
+          input: {
+            name,
+            icon,
+            workspaceId: (watch?.('id') as string | undefined) || null,
+            data: buildInitialCanvasData(sourceText, theme),
+          },
+        },
+      });
+      canvas = data?.createCanvas;
+    } catch (e) {
+      notify.error({
+        title: 'Error creating canvas',
+        description: getFriendlyErrorMessage(e, 'Could not create the canvas.'),
+      });
+      return;
+    } finally {
+      setIsCreatingCanvas(false);
+    }
+    if (!canvas) return;
+    setCanvasDraft(null);
+
+    const canvasMarkdown = `${canvasLink(canvas.id, canvas.name, canvas.icon)}\n`;
+    const editor = markdownEditorRef.current;
+    if (range && editor) {
+      editor.replaceRange(range.from, range.to, canvasMarkdown);
+    } else if (editor) {
+      editor.insertAtCursor(canvasMarkdown);
+    }
+
+    canvasView.open(canvas.id, canvas.name, canvas.icon);
+  };
+
   const handleConfirmAITask = async (finalData: AITaskPreviewData) => {
     if (!user) return;
     setIsCreatingTask(true);
@@ -443,12 +505,12 @@ export const useEditorContent = ({
     getLanguageLabel,
     handleCreateTask,
     handleGenerateCanvasPage,
-    isCanvasActive,
-    setIsCanvasActive,
-    canvasTitle,
-    setCanvasTitle,
-    canvasId,
-    setCanvasId,
+    canvasDraft: canvasDraft
+      ? { name: canvasDraft.name, anchor: canvasDraft.anchor }
+      : null,
+    isCreatingCanvas,
+    handleCancelCanvasDraft,
+    handleCreateCanvas,
 
     processTextWithAI,
     isAIProcessing,

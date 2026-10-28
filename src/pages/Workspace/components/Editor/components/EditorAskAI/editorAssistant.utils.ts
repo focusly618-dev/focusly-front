@@ -7,6 +7,11 @@ import {
   SELECTION_FENCE,
 } from '@/api/AI/editorAssistant';
 import { parseLuminaActions, type ParsedLuminaAction } from '@/utils/lumina';
+import {
+  isBlockMarkdown,
+  normalizeInsertedMarkdown,
+  prepareMarkdownInsert,
+} from '../../codemirror/markdownInsert';
 
 export type QuickActionId =
   | 'improve'
@@ -183,6 +188,10 @@ export const applyFragment = (
   replacement: string,
 ): string => {
   const { doc, from, to } = target;
+  // A block (a table, a code block, a formula…) gets lines of its own
+  if (isBlockMarkdown(normalizeInsertedMarkdown(replacement))) {
+    return `${doc.slice(0, from)}${prepareMarkdownInsert(doc, from, to, replacement)}${doc.slice(to)}`;
+  }
   let text = replacement;
   // Continuing mid-line: keep the new text from gluing onto the last word.
   if (

@@ -1,46 +1,50 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  IconButton,
-  Typography,
-  Divider,
   Button,
+  Divider,
+  IconButton,
   InputBase,
+  Tooltip,
+  Typography,
+  alpha,
   useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Remove as RemoveIcon,
-  CenterFocusStrong as CenterFocusStrongIcon,
+  CenterFocusStrong as FitIcon,
   OpenInFull as FullscreenIcon,
   CloseFullscreen as CloseFullscreenIcon,
   Search as SearchIcon,
-  Undo as UndoIcon,
-  Redo as RedoIcon,
-  ArrowBack as ArrowBackIcon,
-  KeyboardArrowDown as CollapseIcon,
-  KeyboardArrowUp as ExpandIcon,
-  Refresh as RefreshIcon,
-  ChevronRight as ChevronRightIcon,
-  InfoOutlined as InfoIcon,
+  Close as CloseIcon,
   Check as CheckIcon,
+  SubdirectoryArrowLeft as JumpIcon,
 } from '@mui/icons-material';
-import type {
-  GraphFilterCategory,
-  GraphNode,
-  NoteGraphViewProps,
-} from './NoteGraphView.types';
-import { getHeadingPath } from './markdownHeadings';
-import { buildGraph } from './utils/graphLayout.utils';
+import type { GraphNode, NoteGraphViewProps } from './NoteGraphView.types';
+import {
+  buildGraph,
+  nodeText,
+  type GraphLayout,
+} from './utils/graphLayout.utils';
 import {
   useGraphNodeDrag,
   useGraphPanZoom,
   useGraphSettings,
 } from './NoteGraphView.hooks';
 import { GraphCanvas } from './components/GraphCanvas';
-import { surfaceColor } from '@/context';
 
+/**
+ * The note's headings as a graph you can move around: the canvas is the
+ * whole view, with a few quiet controls floating over it.
+ */
 export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
   rootLabel,
   headings,
@@ -50,37 +54,42 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
 
   const svgRef = useRef<SVGSVGElement>(null);
+  const contentRef = useRef<SVGGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<GraphFilterCategory>('all');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isInspectorCollapsed, setIsInspectorCollapsed] = useState(false);
+  const [jumped, setJumped] = useState(false);
 
-  const { settings, resetSettings } = useGraphSettings();
+  const { settings } = useGraphSettings();
 
-  const {
-    zoom,
-    zoomOrigin,
-    pan,
-    isPanning,
-    handleCanvasPointerDown,
-    resetPanZoom,
-    zoomIn,
-    zoomOut,
-  } = useGraphPanZoom(containerRef);
+  // A wide view gets the left-to-right map; a narrow one (the sidebar) the
+  // indented outline, which stays legible at its width.
+  const [layout, setLayout] = useState<GraphLayout>('outline');
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const measure = () => {
+      const { width, height } = container.getBoundingClientRect();
+      if (width > 0 && height > 0) {
+        setLayout(width >= height * 1.1 ? 'tree' : 'outline');
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
   const {
     nodes: baseNodes,
-    edges: baseEdges,
+    edges,
     canvasWidth,
     canvasHeight,
-    canvasSize,
   } = useMemo(
     () =>
       buildGraph(
@@ -89,985 +98,342 @@ export const NoteGraphView: React.FC<NoteGraphViewProps> = ({
         settings.spacing,
         markdownContent,
         rootIcon,
+        layout,
       ),
-    [rootLabel, headings, settings.spacing, markdownContent, rootIcon],
+    [rootLabel, headings, settings.spacing, markdownContent, rootIcon, layout],
   );
 
-  // Default selected node: first section node or document root
-  const defaultSelectedId = useMemo(() => {
-    const firstSection = baseNodes.find((n) => n.type === 'section');
-    return firstSection?.id || baseNodes[0]?.id || null;
-  }, [baseNodes]);
+  const center = useMemo(
+    () => ({ x: canvasWidth / 2, y: canvasHeight / 2 }),
+    [canvasWidth, canvasHeight],
+  );
+  const {
+    view,
+    isPanning,
+    handleCanvasPointerDown,
+    resetPanZoom,
+    zoomIn,
+    zoomOut,
+  } = useGraphPanZoom(svgRef, containerRef, center);
 
-  const effectiveSelectedNodeId = selectedNodeId || defaultSelectedId;
+  const {
+    overrides,
+    draggingId,
+    handleNodePointerDown,
+    wasDragged,
+    resetOverrides,
+  } = useGraphNodeDrag(contentRef);
 
-  const { overrides, handleNodePointerDown, handleNodeClick, resetOverrides } =
-    useGraphNodeDrag(svgRef, canvasWidth, () => {
-      // Drag overrides position without triggering jump
-    });
-
-  // Apply drag overrides
-  const allNodes = useMemo(
+  const nodes = useMemo(
     () =>
       baseNodes.map((node) =>
         overrides[node.id] ? { ...node, ...overrides[node.id] } : node,
       ),
     [baseNodes, overrides],
   );
-
-  // Filter nodes based on heading level
-  const filteredNodes = useMemo(() => {
-    return allNodes.filter((node) => {
-      if (activeFilter === 'h1') {
-        return node.type === 'document' || node.level === 0 || node.level === 1;
-      }
-      if (activeFilter === 'h2') {
-        return node.type === 'document' || node.level === 0 || node.level === 2;
-      }
-      if (activeFilter === 'h3') {
-        return node.type === 'document' || node.level === 0 || node.level >= 3;
-      }
-      return true;
-    });
-  }, [allNodes, activeFilter]);
-
-  // Highlight or filter based on search
-  const visibleNodes = useMemo(() => {
-    if (!searchQuery.trim()) return filteredNodes;
-    const q = searchQuery.toLowerCase();
-    return filteredNodes.filter((node) =>
-      (node.label || '').toLowerCase().includes(q),
-    );
-  }, [filteredNodes, searchQuery]);
-
   const nodeById = useMemo(
-    () => new Map(allNodes.map((node) => [node.id, node])),
-    [allNodes],
+    () => new Map(nodes.map((node) => [node.id, node])),
+    [nodes],
   );
+  const selectedNode = selectedId ? (nodeById.get(selectedId) ?? null) : null;
 
-  // Selected node object
-  const selectedNode = useMemo(() => {
-    return nodeById.get(effectiveSelectedNodeId || '') || allNodes[0] || null;
-  }, [nodeById, effectiveSelectedNodeId, allNodes]);
-
-  // Edges filtered
-  const visibleEdges = useMemo(() => {
-    const visibleIds = new Set(visibleNodes.map((n) => n.id));
-    return baseEdges.filter(
-      (edge) => visibleIds.has(edge.from) && visibleIds.has(edge.to),
-    );
-  }, [baseEdges, visibleNodes]);
-
-  const neighborIds = useMemo(() => {
-    // Only apply neighbor focus dimming when actively hovering a node!
-    if (!hoveredId) return null;
-    const set = new Set([hoveredId]);
-    baseEdges.forEach((edge) => {
-      if (edge.from === hoveredId) set.add(edge.to);
-      if (edge.to === hoveredId) set.add(edge.from);
-    });
-    return set;
-  }, [hoveredId, baseEdges]);
-
-  const handleSelectNode = (node: GraphNode) => {
-    setSelectedNodeId(node.id);
-  };
-
-  const [jumpFeedback, setJumpFeedback] = useState<string | null>(null);
-
-  const handleJumpToSelected = () => {
-    if (!selectedNode) return;
-    setJumpFeedback(selectedNode.label);
-    onJump(selectedNode.pos ?? 0, selectedNode.label);
-    setTimeout(() => {
-      setJumpFeedback(null);
-    }, 2800);
-  };
-
-  const [isOrganizing, setIsOrganizing] = useState(false);
-
-  const handleOrganizeLayout = () => {
-    setIsOrganizing(true);
-    resetOverrides();
-    resetPanZoom();
-    setTimeout(() => {
-      setIsOrganizing(false);
-    }, 550);
-  };
-
-  const handleResetAll = () => {
-    resetOverrides();
-    resetSettings();
-    resetPanZoom();
-  };
-
-  // Node type label for inspector
-  const getNodeTypeLabel = (node: GraphNode | null) => {
-    if (!node || node.type === 'document' || node.level === 0)
-      return t('workspaceEditor.graph.rootDoc', 'Documento Raíz');
-    if (node.level === 1)
-      return t('workspaceEditor.graph.mainHeadingH1', 'Título Principal (H1)');
-    if (node.level === 2)
-      return t('workspaceEditor.graph.sectionH2', 'Sección (H2)');
-    return t(
-      'workspaceEditor.graph.subSection',
-      `Subsección (H${node.level})`,
-      { level: node.level },
-    );
-  };
-
-  // Outgoing connections description
-  const getOutgoingLabel = (node: GraphNode | null) => {
-    if (!node) return t('workspaceEditor.graph.noConnections', '0 conexiones');
-    const outgoing = baseEdges.filter((e) => e.from === node.id);
-    if (outgoing.length === 0)
-      return t('workspaceEditor.graph.terminalSection', 'Sección terminal');
-    return t(
-      'workspaceEditor.graph.connectionCount',
-      `${outgoing.length} ${outgoing.length === 1 ? 'conexión' : 'conexiones'}`,
-      { count: outgoing.length },
-    );
-  };
-
-  // Hierarchical location path for selected node
-  const nodeBreadcrumbs = useMemo(() => {
-    const docLabel =
-      rootLabel || t('workspaceEditor.graph.document', 'Documento');
-    if (!selectedNode) return [];
-    if (
-      selectedNode.type === 'document' ||
-      selectedNode.level === 0 ||
-      selectedNode.pos == null
-    ) {
-      return [{ text: docLabel, level: 0, pos: 0 }];
+  // In focus: the hovered node and its neighbors, else the search matches
+  const focusIds = useMemo(() => {
+    if (hoveredId && !draggingId) {
+      const ids = new Set([hoveredId]);
+      edges.forEach((edge) => {
+        if (edge.from === hoveredId) ids.add(edge.to);
+        if (edge.to === hoveredId) ids.add(edge.from);
+      });
+      return ids;
     }
-    const path = getHeadingPath(headings, selectedNode.pos);
-    return [{ text: docLabel, level: 0, pos: 0 }, ...path];
-  }, [selectedNode, rootLabel, headings, t]);
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return null;
+    return new Set(
+      nodes
+        .filter((node) => node.label.toLowerCase().includes(query))
+        .map((node) => node.id),
+    );
+  }, [hoveredId, draggingId, edges, searchQuery, nodes]);
+
+  const jumpTo = (node: GraphNode) => {
+    onJump(node.pos ?? 0, node.label);
+    setJumped(true);
+    setTimeout(() => setJumped(false), 1600);
+  };
+
+  const handleNodeClick = (node: GraphNode) => {
+    if (wasDragged(node)) return;
+    setSelectedId((current) => (current === node.id ? null : node.id));
+  };
+
+  // Back to the computed layout, every node in view
+  const organize = () => {
+    resetOverrides();
+    resetPanZoom();
+  };
+
+  // Moved nodes and the view belong to the layout they were made in
+  useEffect(() => {
+    resetOverrides();
+    resetPanZoom();
+  }, [layout, resetOverrides, resetPanZoom]);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullscreen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isFullscreen]);
+
+  // The floating controls: small, solid, with a hairline border
+  const floatingSx = {
+    bgcolor: 'background.paper',
+    border: '1px solid',
+    borderColor: 'divider',
+    borderRadius: '10px',
+    boxShadow: `0 1px 3px ${alpha('#000', 0.06)}`,
+  } as const;
+  const controlSx = {
+    width: 28,
+    height: 28,
+    borderRadius: '7px',
+    color: 'text.secondary',
+    '& svg': { fontSize: 16 },
+    '&:hover': { color: 'text.primary', bgcolor: 'action.hover' },
+  } as const;
+
+  const controls = [
+    {
+      key: 'out',
+      label: t('workspaceEditor.graph.zoomOut', 'Alejar'),
+      icon: <RemoveIcon />,
+      onClick: zoomOut,
+    },
+    {
+      key: 'in',
+      label: t('workspaceEditor.graph.zoomIn', 'Acercar'),
+      icon: <AddIcon />,
+      onClick: zoomIn,
+    },
+    {
+      key: 'fit',
+      label: t('workspaceEditor.graph.organize', 'Organizar y ver todo'),
+      icon: <FitIcon />,
+      onClick: organize,
+    },
+    {
+      key: 'full',
+      label: isFullscreen
+        ? t(
+            'workspaceEditor.graph.exitFullscreen',
+            'Salir de pantalla completa',
+          )
+        : t('workspaceEditor.graph.fullscreen', 'Pantalla completa'),
+      icon: isFullscreen ? <CloseFullscreenIcon /> : <FullscreenIcon />,
+      onClick: () => setIsFullscreen((prev) => !prev),
+    },
+  ];
 
   return (
     <Box
+      ref={containerRef}
+      onDoubleClick={resetPanZoom}
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
+        position: isFullscreen ? 'fixed' : 'relative',
+        inset: isFullscreen ? 0 : 'auto',
+        zIndex: isFullscreen ? 1400 : 1,
         height: '100%',
         width: '100%',
-        position: isFullscreen ? 'fixed' : 'relative',
-        top: isFullscreen ? 0 : 'auto',
-        left: isFullscreen ? 0 : 'auto',
-        right: isFullscreen ? 0 : 'auto',
-        bottom: isFullscreen ? 0 : 'auto',
-        zIndex: isFullscreen ? 1400 : 1,
-        bgcolor: surfaceColor(theme, '#090d16', '#161616', '#ffffff'),
+        overflow: 'hidden',
+        bgcolor: 'background.default',
       }}
     >
-      {/* Top Bar: Controls & Filters */}
+      {/* The canvas starts under the floating toolbar, so the graph's top
+          is never hidden behind it */}
+      <Box sx={{ position: 'absolute', top: 52, left: 0, right: 0, bottom: 0 }}>
+        <GraphCanvas
+          svgRef={svgRef}
+          contentRef={contentRef}
+          canvasWidth={canvasWidth}
+          canvasHeight={canvasHeight}
+          view={view}
+          isPanning={isPanning}
+          nodes={nodes}
+          edges={edges}
+          nodeById={nodeById}
+          focusIds={focusIds}
+          hoveredId={hoveredId}
+          selectedNodeId={selectedId}
+          draggingId={draggingId}
+          settings={settings}
+          layout={layout}
+          onCanvasPointerDown={handleCanvasPointerDown}
+          onNodePointerDown={handleNodePointerDown}
+          onNodeClick={handleNodeClick}
+          onNodeDoubleClick={jumpTo}
+          setHoveredId={setHoveredId}
+        />
+      </Box>
+
+      {/* Top: search on the left, view controls on the right */}
       <Box
+        onDoubleClick={(e) => e.stopPropagation()}
         sx={{
-          px: 2,
-          pt: 1.75,
-          pb: 1.25,
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          right: 12,
           display: 'flex',
-          flexDirection: 'column',
-          gap: 1.5,
-          bgcolor: surfaceColor(
-            theme,
-            'rgba(15, 23, 42, 0.4)',
-            'rgba(36, 36, 36, 0.4)',
-            '#ffffff',
-          ),
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          flexShrink: 0,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 1,
+          pointerEvents: 'none',
+          '& > *': { pointerEvents: 'auto' },
         }}
       >
-        {/* Row 1: Left Pill Toolbar & Right Category Pills */}
         <Box
           sx={{
+            ...floatingSx,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 1,
-            flexWrap: 'wrap',
+            gap: 0.75,
+            height: 32,
+            px: 1,
+            minWidth: 0,
+            width: 200,
           }}
         >
-          {/* Left Pill Toolbar: Zoom in, Zoom out, Fit, Fullscreen */}
-          <Box
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              borderRadius: '10px',
-              border: '1px solid',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#e2e8f0',
-              bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#ffffff',
-              p: '2px 4px',
-              gap: 0.25,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-            }}
-          >
-            <IconButton
-              size="small"
-              onClick={zoomIn}
-              sx={{ p: 0.5, color: 'text.secondary' }}
-            >
-              <AddIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={zoomOut}
-              sx={{ p: 0.5, color: 'text.secondary' }}
-            >
-              <RemoveIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={{ mx: 0.25, my: 0.75, height: 14 }}
-            />
-
-            <IconButton
-              size="small"
-              onClick={resetPanZoom}
-              title="Centrar vista"
-              sx={{ p: 0.5, color: 'text.secondary' }}
-            >
-              <CenterFocusStrongIcon sx={{ fontSize: 15 }} />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={handleOrganizeLayout}
-              title="Reorganizar distribución"
-              sx={{
-                p: 0.5,
-                color: isOrganizing ? 'primary.main' : 'text.secondary',
-                transition: 'color 0.2s ease',
-              }}
-            >
-              <RefreshIcon
-                sx={{
-                  fontSize: 15,
-                  transform: isOrganizing ? 'rotate(180deg)' : 'none',
-                  transition: 'transform 0.4s ease',
-                }}
-              />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={() => setIsFullscreen((prev) => !prev)}
-              sx={{ p: 0.5, color: 'text.secondary' }}
-            >
-              {isFullscreen ? (
-                <CloseFullscreenIcon sx={{ fontSize: 15 }} />
-              ) : (
-                <FullscreenIcon sx={{ fontSize: 15 }} />
-              )}
-            </IconButton>
-          </Box>
-
-          {/* Right Level Filter Pills */}
-          <Box
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.75,
-              overflowX: 'auto',
-            }}
-          >
-            {[
-              {
-                value: 'all',
-                label: `${t('common.all', 'Todos')} (${allNodes.length})`,
-              },
-              {
-                value: 'h1',
-                label: t('workspaceEditor.graph.tabH1', 'Títulos (H1)'),
-              },
-              {
-                value: 'h2',
-                label: t('workspaceEditor.graph.tabH2', 'Secciones (H2)'),
-              },
-              {
-                value: 'h3',
-                label: t('workspaceEditor.graph.tabH3', 'Subsecciones (H3+)'),
-              },
-            ].map((tab) => {
-              const isActive = activeFilter === tab.value;
-              return (
-                <Button
-                  key={tab.value}
-                  onClick={() =>
-                    setActiveFilter(tab.value as GraphFilterCategory)
-                  }
-                  size="small"
-                  sx={{
-                    px: 1.25,
-                    py: 0.35,
-                    borderRadius: '9999px',
-                    fontSize: '11px',
-                    fontWeight: isActive ? 700 : 600,
-                    textTransform: 'none',
-                    minWidth: 0,
-                    bgcolor: isActive
-                      ? 'primary.main'
-                      : isDark
-                        ? 'rgba(255, 255, 255, 0.06)'
-                        : '#f1f5f9',
-                    color: isActive ? '#ffffff' : 'text.secondary',
-                    '&:hover': {
-                      bgcolor: isActive ? 'primary.dark' : 'action.hover',
-                    },
-                  }}
-                >
-                  {tab.label}
-                </Button>
-              );
-            })}
-          </Box>
-        </Box>
-
-        {/* Row 2: Search Input */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#f8fafc',
-            border: '1px solid',
-            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0',
-            borderRadius: '10px',
-            px: 1.25,
-            py: 0.4,
-            gap: 1,
-          }}
-        >
-          <SearchIcon
-            sx={{
-              fontSize: 18,
-              color: 'text.secondary',
-              flexShrink: 0,
-            }}
-          />
+          <SearchIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
           <InputBase
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t(
-              'workspaceEditor.graph.filterNodesPlaceholder',
-              'Filtrar nodos...',
-            )}
-            fullWidth
-            sx={{
-              fontSize: '13px',
-              color: 'text.primary',
-              '& input': { p: 0 },
+            placeholder={t('workspaceEditor.graph.search', 'Buscar sección')}
+            inputProps={{
+              'aria-label': t('workspaceEditor.graph.search', 'Buscar sección'),
             }}
+            sx={{ flex: 1, minWidth: 0, fontSize: '12.5px' }}
           />
-        </Box>
-      </Box>
-
-      {/* Main Graph Canvas Area */}
-      <Box
-        ref={containerRef}
-        onDoubleClick={resetPanZoom}
-        sx={{
-          flex: 1,
-          position: 'relative',
-          overflow: 'hidden',
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        {/* Floating "Reorganizar" button in Canvas */}
-        <Button
-          id="btn-organize-graph"
-          variant="outlined"
-          size="small"
-          onClick={handleOrganizeLayout}
-          startIcon={
-            <RefreshIcon
-              sx={{
-                fontSize: 15,
-                transform: isOrganizing ? 'rotate(180deg)' : 'none',
-                transition: 'transform 0.4s ease',
-              }}
-            />
-          }
-          sx={{
-            position: 'absolute',
-            top: 14,
-            left: 14,
-            zIndex: 15,
-            borderRadius: '10px',
-            px: 1.5,
-            py: 0.4,
-            bgcolor: surfaceColor(
-              theme,
-              'rgba(15, 23, 42, 0.88)',
-              'rgba(36, 36, 36, 0.88)',
-              'rgba(255, 255, 255, 0.92)',
-            ),
-            backdropFilter: 'blur(8px)',
-            borderColor: 'divider',
-            color: 'text.primary',
-            fontWeight: 600,
-            fontSize: '11.5px',
-            textTransform: 'none',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            '&:hover': {
-              bgcolor: surfaceColor(
-                theme,
-                'rgba(15, 23, 42, 0.98)',
-                'rgba(36, 36, 36, 0.98)',
-                '#ffffff',
-              ),
-              borderColor: 'primary.main',
-            },
-            transition: 'all 0.15s ease',
-          }}
-        >
-          {t('workspaceEditor.graph.reorganize', 'Reorganizar')}
-        </Button>
-
-        <GraphCanvas
-          svgRef={svgRef}
-          canvasWidth={canvasWidth}
-          canvasHeight={canvasHeight}
-          canvasSize={canvasSize}
-          zoom={zoom}
-          zoomOrigin={zoomOrigin}
-          pan={pan}
-          isPanning={isPanning}
-          nodes={visibleNodes}
-          edges={visibleEdges}
-          nodeById={nodeById}
-          neighborIds={neighborIds}
-          hoveredId={hoveredId}
-          selectedNodeId={effectiveSelectedNodeId}
-          settings={settings}
-          onCanvasPointerDown={handleCanvasPointerDown}
-          onNodePointerDown={handleNodePointerDown}
-          onNodeClick={(node) => () => {
-            handleSelectNode(node);
-            handleNodeClick(node)();
-          }}
-          setHoveredId={setHoveredId}
-        />
-
-        {/* Helpful guide hint when note has no headings yet */}
-        {headings.length === 0 && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 18,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              bgcolor: surfaceColor(
-                theme,
-                'rgba(15, 23, 42, 0.88)',
-                'rgba(36, 36, 36, 0.88)',
-                'rgba(255, 255, 255, 0.95)',
-              ),
-              backdropFilter: 'blur(10px)',
-              border: '1px solid',
-              borderColor: isDark
-                ? 'rgba(255, 255, 255, 0.12)'
-                : 'rgba(0, 0, 0, 0.08)',
-              borderRadius: '12px',
-              px: 2,
-              py: 0.9,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-              pointerEvents: 'none',
-              zIndex: 8,
-              maxWidth: '85%',
-            }}
-          >
-            <InfoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-            <Typography
-              sx={{
-                fontSize: '12px',
-                fontWeight: 600,
-                color: 'text.secondary',
-                whiteSpace: 'nowrap',
-              }}
+          {searchQuery && (
+            <IconButton
+              size="small"
+              onClick={() => setSearchQuery('')}
+              aria-label={t('common.clear', 'Limpiar')}
+              sx={{ p: 0.25, color: 'text.secondary' }}
             >
-              {t(
-                'workspaceEditor.graph.emptyGuideHint',
-                'Escribe encabezados (# Sección) en tu nota para ramificar el grafo en vivo',
-              )}
-            </Typography>
-          </Box>
-        )}
+              <CloseIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          )}
+        </Box>
 
-        {/* Floating Action Pill on Bottom Right: Undo / Redo */}
         <Box
           sx={{
-            position: 'absolute',
-            bottom: isInspectorCollapsed ? '64px' : '174px',
-            right: 18,
+            ...floatingSx,
             display: 'flex',
             alignItems: 'center',
-            borderRadius: '9999px',
-            bgcolor: surfaceColor(
-              theme,
-              'rgba(30, 41, 59, 0.9)',
-              'rgba(55, 55, 55, 0.9)',
-              'rgba(51, 65, 85, 0.9)',
-            ),
-            backdropFilter: 'blur(8px)',
-            p: '3px 6px',
             gap: 0.25,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-            zIndex: 10,
-            transition: 'bottom 0.25s ease',
+            p: '1px',
+            flexShrink: 0,
           }}
         >
-          <IconButton
-            size="small"
-            onClick={handleResetAll}
-            title={t(
-              'workspaceEditor.graph.resetPositionsAndZoom',
-              'Restaurar posiciones y zoom',
-            )}
-            sx={{ color: '#ffffff', p: 0.6 }}
+          {controls.map((control, i) => (
+            <React.Fragment key={control.key}>
+              {i === 2 && (
+                <Divider orientation="vertical" flexItem sx={{ my: 0.75 }} />
+              )}
+              <Tooltip title={control.label}>
+                <IconButton
+                  onClick={control.onClick}
+                  aria-label={control.label}
+                  sx={controlSx}
+                >
+                  {control.icon}
+                </IconButton>
+              </Tooltip>
+            </React.Fragment>
+          ))}
+        </Box>
+      </Box>
+
+      {/* Bottom: the selected node and a way to it in the note */}
+      {selectedNode && (
+        <Box
+          onDoubleClick={(e) => e.stopPropagation()}
+          sx={{
+            ...floatingSx,
+            position: 'absolute',
+            bottom: 12,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            maxWidth: 'calc(100% - 24px)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            pl: 1.5,
+            pr: 0.5,
+            height: 36,
+          }}
+        >
+          <Typography
+            noWrap
+            sx={{ fontSize: '12.5px', fontWeight: 600, minWidth: 0 }}
           >
-            <UndoIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-          <IconButton
+            {selectedNode.icon ? `${selectedNode.icon} ` : ''}
+            {nodeText(selectedNode)}
+          </Typography>
+          <Button
             size="small"
-            onClick={resetPanZoom}
-            title={t('workspaceEditor.graph.centerView', 'Centrar vista')}
-            sx={{ color: '#ffffff', p: 0.6 }}
+            onClick={() => jumpTo(selectedNode)}
+            startIcon={jumped ? <CheckIcon /> : <JumpIcon />}
+            sx={{
+              flexShrink: 0,
+              height: 26,
+              px: 1,
+              borderRadius: '7px',
+              textTransform: 'none',
+              fontSize: '12px',
+              fontWeight: 600,
+              color: jumped ? 'success.main' : 'primary.main',
+              '& .MuiButton-startIcon': { mr: 0.5 },
+              '& svg': { fontSize: '15px !important' },
+            }}
           >
-            <RedoIcon sx={{ fontSize: 16 }} />
+            {jumped
+              ? t('workspaceEditor.graph.jumpDone', 'Listo')
+              : t('workspaceEditor.graph.goToSection', 'Ir a la sección')}
+          </Button>
+          <IconButton
+            onClick={() => setSelectedId(null)}
+            aria-label={t('common.close', 'Cerrar')}
+            sx={{ ...controlSx, width: 26, height: 26 }}
+          >
+            <CloseIcon />
           </IconButton>
         </Box>
+      )}
 
-        {/* Bottom Node Inspector Card */}
-        {isInspectorCollapsed ? (
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: 12,
-              left: 14,
-              right: 14,
-              bgcolor: surfaceColor(
-                theme,
-                'rgba(15, 23, 42, 0.94)',
-                'rgba(36, 36, 36, 0.94)',
-                'rgba(255, 255, 255, 0.95)',
-              ),
-              borderRadius: '9999px',
-              border: '1px solid',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#e2e8f0',
-              boxShadow: isDark
-                ? '0 8px 24px rgba(0,0,0,0.5)'
-                : '0 8px 20px rgba(15, 23, 42, 0.12)',
-              px: 1.5,
-              py: 0.6,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 1.5,
-              zIndex: 20,
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                minWidth: 0,
-                cursor: 'pointer',
-              }}
-              onClick={() => setIsInspectorCollapsed(false)}
-            >
-              <Box
-                sx={{
-                  width: 26,
-                  height: 26,
-                  borderRadius: '7px',
-                  bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '14px',
-                  flexShrink: 0,
-                }}
-              >
-                {selectedNode?.icon || '📚'}
-              </Box>
-              <Typography
-                noWrap
-                sx={{
-                  fontWeight: 800,
-                  fontSize: '12.5px',
-                  color: 'text.primary',
-                }}
-              >
-                {selectedNode?.label}
-              </Typography>
-              <Box
-                sx={{
-                  px: 0.9,
-                  py: 0.2,
-                  borderRadius: '9999px',
-                  bgcolor: isDark ? 'rgba(99, 102, 241, 0.2)' : '#eef2ff',
-                  color: '#4f46e5',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  flexShrink: 0,
-                }}
-              >
-                {selectedNode?.outgoingCount || 3}{' '}
-                {t('workspaceEditor.graph.connectionsShort', 'conex.')}
-              </Box>
-            </Box>
-
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                flexShrink: 0,
-              }}
-            >
-              <Button
-                size="small"
-                onClick={handleJumpToSelected}
-                endIcon={
-                  jumpFeedback ? (
-                    <CheckIcon sx={{ fontSize: 13 }} />
-                  ) : (
-                    <ArrowBackIcon sx={{ fontSize: 13 }} />
-                  )
-                }
-                sx={{
-                  height: '28px',
-                  px: 1.25,
-                  borderRadius: '9999px',
-                  bgcolor: jumpFeedback ? '#10b981' : '#4f46e5',
-                  color: '#ffffff',
-                  fontWeight: 700,
-                  fontSize: '11px',
-                  textTransform: 'none',
-                  boxShadow: jumpFeedback
-                    ? '0 2px 10px rgba(16, 185, 129, 0.4)'
-                    : 'none',
-                  '&:hover': {
-                    bgcolor: jumpFeedback ? '#059669' : '#4338ca',
-                  },
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {jumpFeedback
-                  ? t('workspaceEditor.graph.jumpDone', '¡Listo!')
-                  : t('workspaceEditor.graph.jump', 'Saltar')}
-              </Button>
-              <IconButton
-                size="small"
-                onClick={() => setIsInspectorCollapsed(false)}
-                title={t(
-                  'workspaceEditor.graph.expandDetails',
-                  'Expandir detalles',
-                )}
-                sx={{ color: 'text.secondary', p: 0.4 }}
-              >
-                <ExpandIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            </Box>
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: 12,
-              left: 12,
-              right: 12,
-              bgcolor: surfaceColor(
-                theme,
-                'rgba(15, 23, 42, 0.95)',
-                'rgba(36, 36, 36, 0.95)',
-                '#ffffff',
-              ),
-              borderRadius: '16px',
-              border: '1px solid',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#e2e8f0',
-              boxShadow: isDark
-                ? '0 12px 30px rgba(0,0,0,0.6)'
-                : '0 12px 28px rgba(15, 23, 42, 0.12)',
-              p: 1.5,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1.25,
-              zIndex: 20,
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            {/* Card Header: Avatar Icon, Title, Breadcrumbs, Level Badge & Minimize Button */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 1,
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.25,
-                  minWidth: 0,
-                  flex: 1,
-                }}
-              >
-                {/* Squircle Avatar */}
-                <Box
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: '9px',
-                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px',
-                    flexShrink: 0,
-                  }}
-                >
-                  {selectedNode?.icon || '📑'}
-                </Box>
-
-                {/* Title & Hierarchical Breadcrumbs */}
-                <Box sx={{ minWidth: 0, flex: 1 }}>
-                  <Typography
-                    noWrap
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: '13.5px',
-                      color: 'text.primary',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {selectedNode?.label || rootLabel}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'nowrap',
-                      gap: 0.5,
-                      mt: 0.25,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {nodeBreadcrumbs.map((crumb, idx) => (
-                      <Box
-                        key={`${crumb.pos}-${idx}`}
-                        sx={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          flexShrink:
-                            idx === nodeBreadcrumbs.length - 1 ? 0 : 1,
-                          minWidth: 0,
-                        }}
-                      >
-                        {idx > 0 && (
-                          <ChevronRightIcon
-                            sx={{
-                              fontSize: 12,
-                              color: 'text.disabled',
-                              flexShrink: 0,
-                            }}
-                          />
-                        )}
-                        <Typography
-                          noWrap
-                          sx={{
-                            fontSize: '11px',
-                            fontWeight:
-                              idx === nodeBreadcrumbs.length - 1 ? 700 : 500,
-                            color:
-                              idx === nodeBreadcrumbs.length - 1
-                                ? 'primary.main'
-                                : 'text.secondary',
-                          }}
-                        >
-                          {crumb.text}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  flexShrink: 0,
-                }}
-              >
-                {/* Level Chip */}
-                <Box
-                  sx={{
-                    px: 1,
-                    py: 0.25,
-                    borderRadius: '9999px',
-                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
-                    color: 'text.secondary',
-                    fontSize: '10.5px',
-                    fontWeight: 700,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                  }}
-                >
-                  {getNodeTypeLabel(selectedNode)}
-                </Box>
-
-                <IconButton
-                  size="small"
-                  onClick={() => setIsInspectorCollapsed(true)}
-                  title={t(
-                    'workspaceEditor.graph.minimizePanel',
-                    'Minimizar panel',
-                  )}
-                  sx={{ color: 'text.secondary', p: 0.5 }}
-                >
-                  <CollapseIcon sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Box>
-            </Box>
-
-            {/* 2-Box Info Grid */}
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 1,
-              }}
-            >
-              {/* Box 1: Tipo de nodo */}
-              <Box
-                sx={{
-                  bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',
-                  border: '1px solid',
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
-                  borderRadius: '9px',
-                  p: '6px 10px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 0.2,
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontSize: '9.5px',
-                    fontWeight: 600,
-                    color: 'text.secondary',
-                  }}
-                >
-                  {t('workspaceEditor.graph.hierarchy', 'Jerarquía:')}
-                </Typography>
-                <Typography
-                  noWrap
-                  sx={{
-                    fontSize: '11.5px',
-                    fontWeight: 750,
-                    color: 'text.primary',
-                  }}
-                >
-                  {selectedNode?.type === 'document'
-                    ? t('workspaceEditor.graph.root', 'Raíz')
-                    : t(
-                        'workspaceEditor.graph.level',
-                        `Nivel ${selectedNode?.level ?? 1}`,
-                        { level: selectedNode?.level ?? 1 },
-                      )}
-                </Typography>
-              </Box>
-
-              {/* Box 2: Enlaces salientes */}
-              <Box
-                sx={{
-                  bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',
-                  border: '1px solid',
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
-                  borderRadius: '9px',
-                  p: '6px 10px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 0.2,
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontSize: '9.5px',
-                    fontWeight: 600,
-                    color: 'text.secondary',
-                  }}
-                >
-                  {t('workspaceEditor.graph.connections', 'Conexiones:')}
-                </Typography>
-                <Typography
-                  noWrap
-                  sx={{
-                    fontSize: '11.5px',
-                    fontWeight: 750,
-                    color: 'primary.main',
-                  }}
-                >
-                  {getOutgoingLabel(selectedNode)}
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Action Button: Ir a la sección en el editor */}
-            <Button
-              fullWidth
-              onClick={handleJumpToSelected}
-              endIcon={
-                jumpFeedback ? (
-                  <CheckIcon sx={{ fontSize: 16 }} />
-                ) : (
-                  <ArrowBackIcon sx={{ fontSize: 15 }} />
-                )
-              }
-              sx={{
-                height: '38px',
-                borderRadius: '10px',
-                bgcolor: jumpFeedback ? '#10b981' : 'primary.main',
-                color: '#ffffff',
-                fontWeight: 700,
-                fontSize: '12px',
-                textTransform: 'none',
-                boxShadow: 'none',
-                '&:hover': {
-                  bgcolor: jumpFeedback ? '#059669' : 'primary.dark',
-                },
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {jumpFeedback
-                ? t(
-                    'workspaceEditor.graph.sectionLocated',
-                    '¡Sección localizada en el editor!',
-                  )
-                : t(
-                    'workspaceEditor.graph.goToSectionInEditor',
-                    'Ir a sección en el editor',
-                  )}
-            </Button>
-          </Box>
-        )}
-      </Box>
+      {headings.length === 0 && (
+        <Typography
+          sx={{
+            position: 'absolute',
+            bottom: 16,
+            left: 0,
+            right: 0,
+            px: 2,
+            textAlign: 'center',
+            fontSize: '12px',
+            color: alpha(theme.palette.text.secondary, 0.9),
+            pointerEvents: 'none',
+          }}
+        >
+          {t(
+            'workspaceEditor.graph.emptyHint',
+            'Agrega títulos (# Sección) a la nota para ver su estructura',
+          )}
+        </Typography>
+      )}
     </Box>
   );
 };

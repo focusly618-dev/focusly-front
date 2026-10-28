@@ -1543,8 +1543,8 @@
       "changeIcon": "Change icon",
       "addCover": "Add cover",
       "changeCover": "Change cover",
-      "focusView": "Focus view",
-      "defaultView": "Default view"
+      "focusView": "Centered view",
+      "defaultView": "Normal view"
     },
     "untitledNote": "Untitled Note",
     "saving": "saving",
@@ -1629,7 +1629,10 @@
       "linkTask": "Link task",
       "noLinkedTasks": "No linked tasks",
       "unlinkTask": "Unlink task"
-    }
+    },
+    "focusButton": "Focus",
+    "startFocus": "Start a focus session",
+    "startFocusOn": "Focus on \"{{title}}\""
   },
   "legal": {
     "termsTitle": "Terms and Conditions",
@@ -1868,5 +1871,177 @@
     "reasoning": "Reasoning",
     "reasoningHint": "Plans, analysis and documents",
     "select": "Choose model"
+  },
+  "guide": {
+    "ui": {
+      "next": "Next",
+      "back": "Back",
+      "done": "Got it",
+      "close": "Close guide",
+      "pages": "Pages",
+      "page": "Page {{current}} of {{total}}",
+      "openGuide": "Guide to this section"
+    },
+    "frames": {
+      "markdownSample": "## Plan\n- [ ] Review\n- [x] Design\n**Key**",
+      "confirm": "Confirm"
+    },
+    "keys": {
+      "period": "Previous / next period",
+      "today": "Back to today",
+      "views": "Day, week or month view",
+      "lumina": "Open Lumina, the assistant",
+      "linkTask": "Find and link a task",
+      "undo": "Undo",
+      "redo": "Redo",
+      "moveLine": "Move the line up or down",
+      "copyLine": "Duplicate the line"
+    },
+    "calendar": {
+      "label": "Daily Plan",
+      "steps": {
+        "overview": {
+          "title": "Your time at a glance",
+          "body": "The calendar brings together your focus blocks, scheduled tasks and events. Switch between day, week or month depending on how much you want to see."
+        },
+        "blocks": {
+          "title": "Create and adjust blocks",
+          "body": "Click a free slot to create a quick task. Drag a block to move it to another time or day, and stretch its edge to change how long it lasts."
+        },
+        "awaited": {
+          "title": "Awaited tasks",
+          "body": "The side panel gathers the pending tasks that don’t have a time yet, so none of them gets forgotten."
+        },
+        "ai": {
+          "title": "Plan with AI",
+          "body": "With “Optimize Schedule”, Lumina finds your free slots and proposes when to do each task. Review the draft and confirm or discard it: nothing is scheduled without your go-ahead."
+        },
+        "keys": {
+          "title": "Move around with the keyboard",
+          "body": "Change the period with the arrow keys, go back to today with T, and switch views with D, W and M."
+        }
+      }
+    },
+    "tasks": {
+      "label": "Tasks",
+      "steps": {
+        "lists": {
+          "title": "Inbox, Today and Upcoming",
+          "body": "Your tasks live in three lists: the Inbox for what you haven’t organized yet, Today for your plan of the day, and Upcoming for what’s next."
+        },
+        "create": {
+          "title": "Create a task",
+          "body": "Give it a title and, if you like, a priority, duration and date. The more detail it has, the better Lumina can plan it."
+        },
+        "board": {
+          "title": "List or board",
+          "body": "Switch between the list and board views. On the board, drag a task to another column to change its status."
+        },
+        "find": {
+          "title": "Find what you need",
+          "body": "Search by name or tag and filter by priority or assignee to keep only what matters."
+        },
+        "ai": {
+          "title": "Organize with AI",
+          "body": "“AI Organize” sorts your pending tasks by priority and date. From any task you can also start a Focus session."
+        }
+      }
+    },
+    "workspaces": {
+      "label": "Workspaces",
+      "steps": {
+        "docs": {
+          "title": "Your documents",
+          "body": "Workspaces are markdown notes to plan, document and research. Each card shows its icon, cover and when it was last edited."
+        },
+        "projects": {
+          "title": "Organize into projects",
+          "body": "Group your documents into projects with their own color and icon, so each initiative lives in one place."
+        },
+        "create": {
+          "title": "Create a document",
+          "body": "“New workspace” starts a blank document, or begin from a template so you don’t start from scratch."
+        },
+        "link": {
+          "title": "Link tasks",
+          "body": "A document can have linked tasks: open it and connect them from its side panel to see progress next to the text."
+        },
+        "find": {
+          "title": "Search and switch views",
+          "body": "Find any document with {{mod}} K and choose to see them as a gallery, grid or list, with filters and sorting."
+        }
+      }
+    },
+    "editor": {
+      "label": "Editor",
+      "steps": {
+        "markdown": {
+          "title": "Write in markdown",
+          "body": "Headings, lists, checkboxes and bold text take shape as you type. Put the cursor on an element to see and edit its markdown."
+        },
+        "blocks": {
+          "title": "Special blocks",
+          "body": "Beyond text, the editor shows highlighted code, tables, Mermaid diagrams, formulas, GeoJSON maps and collapsible sections."
+        },
+        "ai": {
+          "title": "AI on your text",
+          "body": "Select text and right-click to create a task, summarize, fix, translate or change the tone. {{mod}} J opens Lumina, which proposes changes for you to review before they apply."
+        },
+        "canvas": {
+          "title": "Canvas",
+          "body": "From the right-click menu, create a canvas page: a board to draw diagrams on, linked in the document as a card."
+        },
+        "sidebar": {
+          "title": "Side panel",
+          "body": "See the note’s outline, heading graph and stats, and manage its linked tasks. The Focus button in the header starts a session on its task."
+        },
+        "keys": {
+          "title": "Keyboard shortcuts",
+          "body": "The shortcuts you’ll use most while writing."
+        }
+      }
+    },
+    "insights": {
+      "label": "Insights",
+      "steps": {
+        "stats": {
+          "title": "Your productivity in numbers",
+          "body": "Total focus time, completed tasks, average energy and your deep work ratio, by day, week, month or year."
+        },
+        "trends": {
+          "title": "Trends",
+          "body": "See how your productivity changes over time and where your time goes."
+        },
+        "activity": {
+          "title": "Activity and golden hours",
+          "body": "The activity map shows your most consistent days, and the golden hours show when you perform best, so you can schedule the hardest work there."
+        },
+        "report": {
+          "title": "Export and share",
+          "body": "Export your data or create a report summarizing the period."
+        }
+      }
+    },
+    "askAi": {
+      "label": "Ask AI",
+      "steps": {
+        "chat": {
+          "title": "Talk to Lumina",
+          "body": "Lumina knows your tasks and your calendar. Ask what to do today, ask for ideas, or have it sum up your week."
+        },
+        "suggestions": {
+          "title": "Start with a suggestion",
+          "body": "Not sure where to begin? Pick a suggestion: a focus strategy, an analysis of your productivity and more."
+        },
+        "plan": {
+          "title": "Action plans",
+          "body": "Lumina can propose tasks and events ready to create. Review and confirm them: nothing is created without your approval."
+        },
+        "history": {
+          "title": "Your conversations",
+          "body": "Every chat is saved so you can pick it up later, or delete it when you no longer need it."
+        }
+      }
+    }
   }
 }

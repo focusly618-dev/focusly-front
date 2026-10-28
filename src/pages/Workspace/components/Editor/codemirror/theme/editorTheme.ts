@@ -40,6 +40,9 @@ const calloutTypeColors = (theme: Theme): Record<string, string> => ({
   important: theme.palette.secondary.main,
 });
 
+// The canvas color, as in the create popover and the header.
+const CANVAS_ACCENT = '#0ea5e9';
+
 export const buildEditorTheme = (theme: Theme): Extension => {
   const isDark = theme.palette.mode === 'dark';
   const calloutColors = calloutTypeColors(theme);
@@ -68,7 +71,9 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         height: '100%',
         color: theme.palette.text.primary,
         backgroundColor: 'transparent',
-        fontSize: '15px',
+        // The note's typeface (Default/Serif/Mono) comes in as CSS variables
+        // set on its wrapper — see editorFonts.ts.
+        fontSize: 'var(--editor-font-size, 15px)',
       },
       // CM6's base theme falls back to a dotted outline on focus, meant to
       // be overridden — Obsidian's editor has no visible border/outline at
@@ -77,7 +82,7 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         outline: 'none',
       },
       '.cm-scroller': {
-        fontFamily: theme.typography.fontFamily ?? 'inherit',
+        fontFamily: `var(--editor-font-family, ${theme.typography.fontFamily ?? 'inherit'})`,
         lineHeight: '1.7',
         overflow: 'auto',
       },
@@ -147,31 +152,102 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         textDecorationColor: alpha(theme.palette.primary.main, 0.4),
         cursor: 'text',
       },
+      // Canvas links inside a sentence, styled after Notion's page links: the
+      // icon on its own, the title underlined by a faint line, a soft wash on
+      // hover. (One with a line to itself is a card, further down.)
       '.cm-live-canvas-link': {
+        color: `${theme.palette.text.primary} !important`,
+        fontWeight: 500,
+        textDecoration: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        transition: 'background-color 0.12s ease',
+      },
+      '.cm-live-canvas-link:hover': {
+        backgroundColor: alpha(theme.palette.text.primary, 0.06),
+      },
+      '.cm-canvas-icon': {
+        fontSize: '1.15em',
+        marginRight: '2px',
+      },
+      '.cm-canvas-title': {
+        textDecoration: 'underline',
+        textDecorationThickness: '1px',
+        textUnderlineOffset: '3px',
+        textDecorationColor: alpha(theme.palette.text.primary, 0.25),
+      },
+      // A canvas link with a line to itself: a full-width card with its
+      // icon, name and an "open" button. Always in the app's font, whatever
+      // typeface the note is in.
+      '.cm-canvas-card': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        width: '100%',
+        boxSizing: 'border-box',
+        margin: '6px 0',
+        padding: '12px 14px',
+        borderRadius: '12px',
+        border: `1px solid ${theme.palette.divider}`,
+        backgroundColor: alpha(
+          theme.palette.text.primary,
+          isDark ? 0.02 : 0.015,
+        ),
+        fontFamily: theme.typography.fontFamily ?? 'inherit',
+        lineHeight: 1.35,
+        cursor: 'pointer',
+        userSelect: 'none',
+        transition: 'border-color 0.15s ease, background-color 0.15s ease',
+        '&:hover': {
+          borderColor: alpha(theme.palette.text.primary, 0.18),
+          backgroundColor: alpha(theme.palette.text.primary, 0.035),
+        },
+      },
+      '.cm-canvas-card-icon': {
+        flexShrink: 0,
+        width: '40px',
+        height: '40px',
+        borderRadius: '10px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '20px',
+        backgroundColor: alpha(CANVAS_ACCENT, isDark ? 0.14 : 0.1),
+      },
+      '.cm-canvas-card-text': {
+        flex: 1,
+        minWidth: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2px',
+      },
+      '.cm-canvas-card-title': {
+        fontSize: '14px',
+        fontWeight: 600,
+        color: theme.palette.text.primary,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      },
+      '.cm-canvas-card-sub': {
+        fontSize: '12px',
+        color: theme.palette.text.secondary,
+      },
+      '.cm-canvas-card-action': {
+        flexShrink: 0,
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '6px',
-        padding: '2px 8px 3px 6px',
-        margin: '2px 0',
-        borderRadius: '6px',
+        gap: '4px',
+        padding: '6px 10px 6px 12px',
+        borderRadius: '8px',
+        fontSize: '12px',
         fontWeight: 600,
-        color: `${theme.palette.text.primary} !important`,
-        textDecoration: 'underline',
-        textDecorationColor: `${alpha(theme.palette.text.primary, 0.3)} !important`,
-        backgroundColor: isDark
-          ? 'rgba(255, 255, 255, 0.06)'
-          : 'rgba(0, 0, 0, 0.04)',
-        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
-        transition: 'background-color 0.15s ease, border-color 0.15s ease',
-        cursor: 'pointer',
-        '&:hover': {
-          backgroundColor: isDark
-            ? 'rgba(255, 255, 255, 0.12)'
-            : 'rgba(0, 0, 0, 0.08)',
-          borderColor: isDark
-            ? 'rgba(255, 255, 255, 0.22)'
-            : 'rgba(0, 0, 0, 0.15)',
-        },
+        color: CANVAS_ACCENT,
+        backgroundColor: alpha(CANVAS_ACCENT, isDark ? 0.14 : 0.1),
+        transition: 'background-color 0.15s ease',
+      },
+      '.cm-canvas-card:hover .cm-canvas-card-action': {
+        backgroundColor: alpha(CANVAS_ACCENT, isDark ? 0.24 : 0.18),
       },
       '.cm-live-inlinecode': {
         fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
@@ -381,66 +457,117 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         textAlign: 'center',
       },
       '.cm-live-math-inline': { display: 'inline-block' },
+
+      // Mermaid diagrams: centered, scrolling sideways when wider than the note
+      '.cm-live-mermaid': {
+        display: 'flex',
+        justifyContent: 'center',
+        overflowX: 'auto',
+        margin: '10px 0',
+        color: theme.palette.text.secondary,
+        fontSize: '0.85em',
+      },
+      '.cm-live-mermaid svg': { maxWidth: '100%', height: 'auto' },
+      '.cm-live-mermaid-error, .cm-live-geojson-error': {
+        display: 'block',
+        color: theme.palette.error.main,
+        fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+        fontSize: '0.85em',
+        padding: '8px 12px',
+        borderRadius: '8px',
+        border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`,
+      },
+
+      // GeoJSON: a small map of its shapes on a quiet card
+      '.cm-live-geojson': {
+        margin: '10px 0',
+        borderRadius: '10px',
+        border: `1px solid ${theme.palette.divider}`,
+        backgroundColor: alpha(
+          theme.palette.text.primary,
+          isDark ? 0.03 : 0.02,
+        ),
+        overflow: 'hidden',
+      },
+      '.cm-live-geojson svg': {
+        display: 'block',
+        width: '100%',
+        height: 'auto',
+        backgroundImage: `radial-gradient(${alpha(theme.palette.text.primary, 0.08)} 1px, transparent 1px)`,
+        backgroundSize: '18px 18px',
+      },
+      '.cm-live-geojson .area': {
+        fill: alpha(theme.palette.primary.main, 0.16),
+        stroke: theme.palette.primary.main,
+        strokeWidth: 1.5,
+        strokeLinejoin: 'round',
+      },
+      '.cm-live-geojson .line': {
+        fill: 'none',
+        stroke: theme.palette.primary.main,
+        strokeWidth: 2,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+      },
+      '.cm-live-geojson .point': {
+        fill: theme.palette.primary.main,
+        stroke: theme.palette.background.paper,
+        strokeWidth: 2,
+      },
+      '.cm-live-geojson-caption': {
+        padding: '6px 12px',
+        fontSize: '0.75em',
+        color: theme.palette.text.secondary,
+        borderTop: `1px solid ${theme.palette.divider}`,
+      },
+
+      // <details> sections: a quiet toggle row, the open body set in by a hairline
+      '.cm-live-details-header': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '2px 4px',
+        margin: '2px 0',
+        borderRadius: '6px',
+        fontWeight: 600,
+        cursor: 'pointer',
+        userSelect: 'none',
+        '&:hover': { backgroundColor: alpha(theme.palette.text.primary, 0.04) },
+      },
+      '.cm-live-details-chevron': {
+        display: 'inline-block',
+        width: '1em',
+        color: theme.palette.text.secondary,
+        fontSize: '0.85em',
+        transition: 'transform 0.15s ease',
+      },
+      '.cm-live-details-chevron-open': { transform: 'rotate(90deg)' },
+      '.cm-live-details-body': {
+        borderLeft: `2px solid ${theme.palette.divider}`,
+        paddingLeft: '18px !important',
+        marginLeft: '10px',
+      },
       '.cm-live-math-error': {
         color: theme.palette.error.main,
         fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
         fontSize: '0.85em',
       },
 
-      // Target paragraph highlight from Graph Jump
-      '.cm-target-line-glow': {
-        position: 'relative',
-        borderRadius: '8px',
-        backgroundColor: alpha(
-          theme.palette.primary.main,
-          isDark ? 0.25 : 0.16,
-        ),
-        borderLeft: `5px solid ${theme.palette.primary.main} !important`,
-        boxShadow: isDark
-          ? `0 0 28px ${alpha(theme.palette.primary.main, 0.45)}, inset 0 0 16px ${alpha(theme.palette.primary.main, 0.2)}`
-          : `0 0 22px ${alpha(theme.palette.primary.main, 0.3)}, inset 0 0 10px ${alpha(theme.palette.primary.main, 0.15)}`,
-        animation:
-          'cmTargetPulse 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important',
-        transition: 'all 0.3s ease',
-      },
-      '.cm-target-text-glow': {
-        backgroundColor: alpha(
-          theme.palette.primary.main,
-          isDark ? 0.35 : 0.25,
-        ),
+      // The heading jumped to (from the graph or the outline): a soft tint
+      // behind its line that holds for a moment, then fades away.
+      '.cm-target-line': {
         borderRadius: '4px',
-        padding: '2px 6px',
-        fontWeight: 700,
-        boxShadow: `0 0 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+        animation: 'cmTargetFade 1.6s ease-out forwards',
       },
-      '@keyframes cmTargetPulse': {
-        '0%': {
+      '@keyframes cmTargetFade': {
+        '0%, 40%': {
           backgroundColor: alpha(
             theme.palette.primary.main,
-            isDark ? 0.45 : 0.35,
+            isDark ? 0.14 : 0.09,
           ),
-          boxShadow: `0 0 35px ${alpha(theme.palette.primary.main, 0.75)}, inset 0 0 20px ${alpha(theme.palette.primary.main, 0.3)}`,
-          transform: 'scale(1.008)',
-        },
-        '30%': {
-          backgroundColor: alpha(
-            theme.palette.primary.main,
-            isDark ? 0.32 : 0.24,
-          ),
-          boxShadow: `0 0 26px ${alpha(theme.palette.primary.main, 0.5)}`,
-        },
-        '70%': {
-          backgroundColor: alpha(
-            theme.palette.primary.main,
-            isDark ? 0.16 : 0.1,
-          ),
-          boxShadow: `0 0 14px ${alpha(theme.palette.primary.main, 0.25)}`,
         },
         '100%': {
-          backgroundColor: 'transparent',
-          boxShadow: 'none',
-          borderLeft: '5px solid transparent',
-          transform: 'scale(1)',
+          backgroundColor: alpha(theme.palette.primary.main, 0),
         },
       },
     },

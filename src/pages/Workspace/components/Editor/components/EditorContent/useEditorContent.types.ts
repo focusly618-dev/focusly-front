@@ -4,11 +4,13 @@ import type { WorkspaceFormData } from '@/pages/Workspace/workspace.types';
 import type { HeaderColor } from '@/utils';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 import type { AITaskPreviewData } from '../AITaskPreviewModal/AITaskPreviewModal';
+import type { CanvasView } from '../../useCanvasView.hook';
 
 export interface UseEditorContentProps {
   setValue?: UseFormSetValue<WorkspaceFormData>;
   watch?: UseFormWatch<WorkspaceFormData>;
   markdownEditorRef: RefObject<MarkdownEditorRef | null>;
+  canvasView: CanvasView;
 }
 
 export interface UseEditorContentReturn {
@@ -33,12 +35,12 @@ export interface UseEditorContentReturn {
   getLanguageLabel: (code: string) => string;
   handleCreateTask: () => void;
   handleGenerateCanvasPage: () => void;
-  isCanvasActive: boolean;
-  setIsCanvasActive: (active: boolean) => void;
-  canvasTitle: string;
-  setCanvasTitle: (title: string) => void;
-  canvasId: string | null;
-  setCanvasId: (id: string | null) => void;
+  /** The create-canvas popover's starting name and where it opens (under the
+   * selected text); null while it's closed. */
+  canvasDraft: { name: string; anchor: { top: number; left: number } } | null;
+  isCreatingCanvas: boolean;
+  handleCancelCanvasDraft: () => void;
+  handleCreateCanvas: (name: string, icon: string) => Promise<void>;
   processTextWithAI: (action: string) => Promise<void>;
   isAIProcessing: boolean;
   aiTaskPreviewData: AITaskPreviewData | null;

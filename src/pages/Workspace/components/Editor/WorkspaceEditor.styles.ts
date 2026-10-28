@@ -352,7 +352,8 @@ export const TitleInput = styled('input')(({ theme }) => ({
   width: '100%',
   marginBottom: '24px',
   outline: 'none',
-  fontFamily: '"Inter", sans-serif',
+  // Follows the note's typeface (editorFonts.ts), like the text under it.
+  fontFamily: 'var(--editor-font-family, "Inter", sans-serif)',
   '&::placeholder': {
     color: theme.palette.text.secondary,
   },

@@ -1,6 +1,8 @@
 import type { RefObject } from 'react';
 import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
+import type { CanvasView } from '../../useCanvasView.hook';
+import type { EditorFontStyle } from '../../editorFonts';
 
 export interface SpeechRecognitionEvent {
   resultIndex: number;
@@ -46,6 +48,12 @@ export interface EditorHeaderProps {
   isRightSidebarOpen?: boolean;
   currentFolder?: { name?: string; color?: string; emoji?: string } | null;
   currentTitle?: string;
+  /** While a canvas is open, the header names it (editable) after the
+   * document's title, and going back returns to the document. */
+  canvasView?: CanvasView;
+  /** The editor's typeface, picked in the "…" menu. */
+  fontStyle?: EditorFontStyle;
+  onFontStyleChange?: (style: EditorFontStyle) => void;
   // Optional legacy props
   showPalette?: boolean;
   setShowPalette?: (b: boolean | ((prev: boolean) => boolean)) => void;

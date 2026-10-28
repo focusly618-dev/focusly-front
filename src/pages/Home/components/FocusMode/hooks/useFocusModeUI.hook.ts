@@ -1,6 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ViewMode } from '../FocusMode.types';
 
+/** The floating mini timer's footprint, to keep it on screen. */
+export const MINI_MODE_SIZE = { width: 280, height: 44 };
+const SCREEN_MARGIN = 12;
+
+/** A mini timer position moved back inside the window, if it left it. */
+const clampToWindow = (x: number, y: number) => ({
+  x: Math.max(
+    SCREEN_MARGIN,
+    Math.min(x, window.innerWidth - MINI_MODE_SIZE.width - SCREEN_MARGIN),
+  ),
+  y: Math.max(
+    SCREEN_MARGIN,
+    Math.min(y, window.innerHeight - MINI_MODE_SIZE.height - SCREEN_MARGIN),
+  ),
+});
+
 export const useFocusModeUI = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -14,16 +30,18 @@ export const useFocusModeUI = () => {
   const [isSessionCompleted, setIsSessionCompleted] = useState(false);
 
   /* Drag Logic */
-  // Initial position: Bottom Right
-  const [position, setPosition] = useState<{ x: number; y: number }>(() => ({
-    x: window.innerWidth - 420, // Approx width of mini mode
-    y: window.innerHeight - 150, // Approx height of mini mode
-  }));
+  // Initial position: bottom right, clear of the edges
+  const [position, setPosition] = useState<{ x: number; y: number }>(() =>
+    clampToWindow(Infinity, window.innerHeight - MINI_MODE_SIZE.height - 24),
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
+      // Its buttons are for clicking, not for grabbing it.
+      if ((e.target as HTMLElement).closest('button')) return;
+      e.preventDefault();
       setIsDragging(true);
       // Use the current translate position to calculate offset correctly
       setDragOffset({
@@ -41,9 +59,9 @@ export const useFocusModeUI = () => {
       if (!isDragging) return;
 
       const updatePosition = () => {
-        const newX = e.clientX - dragOffset.x;
-        const newY = e.clientY - dragOffset.y;
-        setPosition({ x: newX, y: newY });
+        setPosition(
+          clampToWindow(e.clientX - dragOffset.x, e.clientY - dragOffset.y),
+        );
       };
 
       // Throttle updates with requestAnimationFrame
@@ -71,10 +89,7 @@ export const useFocusModeUI = () => {
   // Handle window resize to keep mini mode visible
   useEffect(() => {
     const handleResize = () => {
-      setPosition((prev) => ({
-        x: Math.min(prev.x, window.innerWidth - 400),
-        y: Math.min(prev.y, window.innerHeight - 100),
-      }));
+      setPosition((prev) => clampToWindow(prev.x, prev.y));
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);

@@ -3,6 +3,16 @@ import { Decoration } from '@codemirror/view';
 import type { SyntaxNode } from '@lezer/common';
 import { overlaps, type BlockHandler, type Handler } from './utils';
 import { MermaidWidget } from './mermaidWidget';
+import { MathWidget } from './mathWidget';
+import { GeoJsonWidget } from './geojsonWidget';
+
+// Fences drawn as what they describe (a diagram, a formula, a map) while the
+// cursor is elsewhere, instead of as code.
+const RENDERED_FENCES = new Set(['mermaid', 'math', 'geojson']);
+
+/** A fence's language: the first word of its info string, lowercased. */
+const fenceLanguage = (info: string) =>
+  info.trim().split(/\s+/)[0]?.toLowerCase() ?? '';
 
 const extractFenceInfo = (
   node: SyntaxNode,
@@ -64,9 +74,11 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
     }
   }
 
-  // If mermaid and cursor outside, MermaidWidget in blockDecorations.ts handles replacement
+  // A drawn fence (mermaid, math, geojson) with the cursor outside is
+  // replaced by its widget in blockDecorations.ts
   if (
-    codeInfo?.text.toLowerCase() === 'mermaid' &&
+    codeInfo &&
+    RENDERED_FENCES.has(fenceLanguage(codeInfo.text)) &&
     !overlaps(sel, node.from, node.to)
   ) {
     return false;
@@ -108,21 +120,25 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
   return false;
 };
 
-// Renders a ```mermaid fence as an actual diagram. A BlockHandler (state-based,
-// full-document walk) since it needs `block: true` — see blockDecorations.ts.
-// The framing lines from handleFencedCode above still get computed for this
-// same range, but stay inert underneath the widget until the cursor enters it.
-export const handleMermaidBlock: BlockHandler = (node, state, sel, push) => {
+// Renders ```mermaid as a diagram, ```math as a formula (GitHub's other math
+// syntax) and ```geojson as a map. A BlockHandler (state-based, full-document
+// walk) since it needs `block: true` — see blockDecorations.ts.
+export const handleRenderedFence: BlockHandler = (node, state, sel, push) => {
   if (overlaps(sel, node.from, node.to)) return;
 
   const { info, code } = extractFenceInfo(node.node, state);
-  if (info.toLowerCase() !== 'mermaid') return;
+  const language = fenceLanguage(info);
+  const widget =
+    language === 'mermaid'
+      ? new MermaidWidget(code)
+      : language === 'math'
+        ? new MathWidget(code, true)
+        : language === 'geojson'
+          ? new GeoJsonWidget(code)
+          : null;
+  if (!widget) return;
 
   const startLine = state.doc.lineAt(node.from);
   const endLine = state.doc.lineAt(node.to);
-  push(
-    startLine.from,
-    endLine.to,
-    Decoration.replace({ widget: new MermaidWidget(code), block: true }),
-  );
+  push(startLine.from, endLine.to, Decoration.replace({ widget, block: true }));
 };
