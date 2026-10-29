@@ -15,7 +15,7 @@ import {
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
-import { enUS, es, ja } from 'date-fns/locale';
+import { DATE_LOCALES, dateLanguage } from '@/i18n/dateLocales';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Components
@@ -73,19 +73,9 @@ import {
 // Types
 import type { Task } from '@/redux/tasks/task.types';
 
-const locales = {
-  'en-US': enUS,
-  es,
-  ja,
-};
-
-/** The calendar's culture (its own labels and formats) for the app language. */
-const cultureFor = (language?: string) =>
-  language?.startsWith('es')
-    ? 'es'
-    : language?.startsWith('ja')
-      ? 'ja'
-      : 'en-US';
+/** The calendar's culture (its own labels and formats) for the app language:
+ * a key of the localizer's locales. */
+const cultureFor = (language?: string) => dateLanguage(language);
 
 // Setup the localizer with Monday as first day of week
 const localizer = dateFnsLocalizer({
@@ -93,7 +83,7 @@ const localizer = dateFnsLocalizer({
   parse,
   startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
   getDay,
-  locales,
+  locales: DATE_LOCALES,
 });
 
 const DnDCalendar = withDragAndDrop<ICalendarEvent, object>(Calendar);

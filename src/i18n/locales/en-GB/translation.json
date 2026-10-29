@@ -1,0 +1,214 @@
+{
+  "calendar": {
+    "subtitle": "Organised clarity for your deep work sessions.",
+    "organizingBackdrop": "Lumina AI is organising your tasks on the calendar...",
+    "optimizeSchedule": "Optimise Schedule",
+    "plan": {
+      "workingTitle": "Lumina is organising your schedule"
+    },
+    "draftReadyTitle": "Your optimised schedule is ready ✨",
+    "optimizing": "Optimising…"
+  },
+  "tasksHeader": {
+    "eyebrow": "Manage and prioritise your work"
+  },
+  "profilePage": {
+    "notifications": {
+      "systemDesc": "Also shows each reminder as an operating system notification, so you see it even when Focusly is in another tab or minimised. Requires the browser's permission."
+    }
+  },
+  "editorAI": {
+    "header": {
+      "minimize": "Minimise"
+    },
+    "actions": {
+      "summarize": {
+        "label": "Summarise",
+        "hint": "Summarise the whole document"
+      }
+    },
+    "prompts": {
+      "summarize": "Summarise this document clearly and concisely."
+    }
+  },
+  "actionPlan": {
+    "delete": {
+      "confirmEvents_one": "I understand {{count}} event will be cancelled and its guests will be notified.",
+      "confirmEvents_other": "I understand {{count}} events will be cancelled and their guests will be notified."
+    },
+    "event": {
+      "organizedBy": "Organised by {{email}}",
+      "notOrganizerHint": "You don't organise this event: only the organiser can change its time or guests for everyone.",
+      "cancel": "Cancelled"
+    }
+  },
+  "login": {
+    "helpCenter": "Help Centre"
+  },
+  "calendarAiPlanner": {
+    "loading": "Lumina AI is organising your tasks on the calendar...",
+    "toast": {
+      "scheduledTitle": "Calendar Organised"
+    }
+  },
+  "calendarWeeklyPlanner": {
+    "loading": "Lumina AI is organising your weekly schedule..."
+  },
+  "onboarding": {
+    "focusBlocks": {
+      "heading": "Customise Focus Blocks"
+    },
+    "finalSetup": {
+      "steps": {
+        "analyzing": "Analysing energy peaks & habits",
+        "finalizing": "Finalising weekly schedule"
+      },
+      "subheading": "We are analysing your habits to create the perfect schedule.",
+      "optimizing": "Optimising focus blocks..."
+    }
+  },
+  "landing": {
+    "heroSubtitle": "Organise projects, tasks, calendars, notes and workspaces in one beautiful productivity platform.",
+    "features": {
+      "tasks": {
+        "description": "Create lists, prioritise, add labels, tags, assignees, and due dates."
+      }
+    },
+    "ai": {
+      "subheading": "Focusly AI acts as a smart, co-pilot engine that understands your projects, analyses your energy, and schedules your day.",
+      "bullets": {
+        "summarize": {
+          "title": "Summarise everything"
+        }
+      }
+    },
+    "testimonials": {
+      "items": [
+        {
+          "role": "Product Lead, Stripe",
+          "quote": "Focusly changed how our design team works. The timing blocks reduce project delays by almost 40%."
+        },
+        {
+          "role": "CTO, Linear",
+          "quote": "The calendar sync is flawless. The AI integration works like magic for organising my daily schedule."
+        },
+        {
+          "role": "Founder & CEO, Raycast",
+          "quote": "The workspace separation is exactly what I needed. Minimalist, premium, and extremely fast."
+        }
+      ]
+    }
+  },
+  "projectTasks": {
+    "emptyProject": {
+      "description": "Create the first one to start organising the project's work."
+    }
+  },
+  "workspaceLibrary": {
+    "emptyFolder": {
+      "desc": "Lightweight notes to organise your strategic planning. Create your first workspace to get started."
+    },
+    "customizeStyle": "Customise Style",
+    "customizeDialog": {
+      "title": "Customise Folder"
+    },
+    "folderColor": "Folder Colour",
+    "colorAccent": "Colour Accent"
+  },
+  "createProjectModal": {
+    "subtitle": "Choose a name and colour to keep your workspaces organised and beautiful.",
+    "projectColor": "Project Colour"
+  },
+  "updateProjectModal": {
+    "subtitle": "Modify the folder name and colour to better organise your workspaces.",
+    "folderColor": "Folder Colour"
+  },
+  "tasks": {
+    "header": {
+      "aiOrganize": "AI Organise"
+    },
+    "properties": {
+      "backgroundColor": "Background colour",
+      "removeBackgroundColor": "Remove background colour"
+    }
+  },
+  "projects": {
+    "sort": {
+      "filterByColor": "Filter by Colour",
+      "allColors": "All Colours"
+    }
+  },
+  "workspaceEditor": {
+    "header": {
+      "focusView": "Centred view"
+    },
+    "graph": {
+      "reorganize": "Reorganise",
+      "centerView": "Centre view",
+      "minimizePanel": "Minimise panel"
+    }
+  },
+  "billing": {
+    "plans": {
+      "free": {
+        "tagline": "To get organised and try Lumina"
+      }
+    },
+    "features": {
+      "editorAiPro": "AI in the editor: drafts, summarises and rewrites"
+    },
+    "upgrade": {
+      "subtitle": {
+        "editor": "With Pro, Lumina drafts, summarises and rewrites inside your documents."
+      }
+    },
+    "checkout": {
+      "disclosure": "By subscribing you authorise Focusly to charge {{price}} on a recurring basis until you cancel."
+    },
+    "editorGate": {
+      "body": "With Focusly Pro, Lumina drafts, summarises and rewrites your documents."
+    }
+  },
+  "guide": {
+    "calendar": {
+      "steps": {
+        "ai": {
+          "body": "With “Optimise Schedule”, Lumina finds your free slots and proposes when to do each task. Review the draft and confirm or discard it: nothing is scheduled without your go-ahead."
+        }
+      }
+    },
+    "tasks": {
+      "steps": {
+        "lists": {
+          "body": "Your tasks live in three lists: the Inbox for what you haven’t organised yet, Today for your plan of the day, and Upcoming for what’s next."
+        },
+        "ai": {
+          "title": "Organise with AI",
+          "body": "“AI Organise” sorts your pending tasks by priority and date. From any task you can also start a Focus session."
+        }
+      }
+    },
+    "workspaces": {
+      "steps": {
+        "projects": {
+          "title": "Organise into projects",
+          "body": "Group your documents into projects with their own colour and icon, so each initiative lives in one place."
+        }
+      }
+    },
+    "editor": {
+      "steps": {
+        "ai": {
+          "body": "Select text and right-click to create a task, summarise, fix, translate or change the tone. {{mod}} J opens Lumina, which proposes changes for you to review before they apply."
+        }
+      }
+    },
+    "insights": {
+      "steps": {
+        "report": {
+          "body": "Export your data or create a report summarising the period."
+        }
+      }
+    }
+  }
+}

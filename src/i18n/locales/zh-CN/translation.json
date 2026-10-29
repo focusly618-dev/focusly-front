@@ -1,0 +1,2089 @@
+{
+  "taskReminder": {
+    "upcomingTitle": "即将开始：{{title}}",
+    "urgentTitle": "现在开始：{{title}}！",
+    "startsIn_one": "{{count}} 分钟后开始（{{time}}）",
+    "startsIn_other": "{{count}} 分钟后开始（{{time}}）"
+  },
+  "common": {
+    "loadingConversations": "正在加载对话…",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "search": "搜索",
+    "loading": "加载中...",
+    "actions": "操作",
+    "close": "关闭",
+    "back": "返回",
+    "add": "添加",
+    "active": "活跃",
+    "connected": "已连接",
+    "error": "错误",
+    "connect": "连接",
+    "all": "全部",
+    "create": "创建"
+  },
+  "errors": {
+    "network": "无法连接到服务器。请检查网络连接后重试。",
+    "timeout": "请求响应时间过长。请重试。",
+    "sessionExpired": "你的会话已过期。请重新登录。",
+    "notFound": "找不到所请求的内容，它可能已不存在。",
+    "magicLinkExpired": "此登录链接已过期。请申请新的链接。",
+    "magicLinkInvalid": "此登录链接无效。",
+    "googleAuthFailed": "连接你的 Google 账号时出现问题。请重新登录。",
+    "googleCalendarSync": "无法与 Google 日历同步。请稍后重试。",
+    "aiUnavailable": "AI 助手暂时不可用。请稍后重试。",
+    "emptyMessage": "发送前请先输入消息。",
+    "generic": "出了点问题。请稍后重试。"
+  },
+  "nav": {
+    "agenda": "日程",
+    "dailyPlan": "每日计划",
+    "tasks": "任务",
+    "inbox": "收件箱",
+    "today": "今天",
+    "upcoming": "即将到来",
+    "intelligence": "智能",
+    "askAi": "询问 AI",
+    "insights": "洞察",
+    "workspace": "工作区",
+    "collections": "合集",
+    "projects": "项目",
+    "recentProjects": "最近",
+    "viewAllProjects": "查看全部（{{count}}）",
+    "noProjectsYet": "还没有项目",
+    "templates": "模板",
+    "features": "功能",
+    "howItWorks": "使用方式",
+    "pricing": "价格",
+    "logIn": "登录",
+    "getStarted": "开始使用",
+    "viewProfile": "查看个人资料",
+    "searchWorkspaces": "搜索工作区..."
+  },
+  "settings": {
+    "theme": {
+      "title": "主题",
+      "subtitle": "选择 Focusly 在此设备上的外观。",
+      "system": "自动",
+      "light": "浅色",
+      "dark": "深色",
+      "graydark": "深灰色"
+    },
+    "language": {
+      "title": "语言",
+      "spanish": "Español",
+      "english": "English",
+      "japanese": "日本語"
+    }
+  },
+  "calendar": {
+    "nav": {
+      "previous": {
+        "day": "前一天（←）",
+        "week": "上一周（←）",
+        "month": "上个月（←）"
+      },
+      "next": {
+        "day": "后一天（→）",
+        "week": "下一周（→）",
+        "month": "下个月（→）"
+      },
+      "views": "日历视图",
+      "openPanel": "打开日历面板",
+      "todayShortcut": "跳到今天（T）"
+    },
+    "loadingEvents": "正在加载你的日程…",
+    "title": "日历",
+    "subtitle": "为你的深度工作时段带来有序的清晰。",
+    "aiPlannerTitle": "AI 规划器",
+    "aiPlannerDescription": "Lumina 正在为你的任务寻找最佳专注时段...",
+    "noPendingTasksTitle": "规划器",
+    "noPendingTasksDesc": "你没有需要安排的待办任务。",
+    "noAvailabilityTitle": "没有空闲时间",
+    "noAvailabilityDesc": "日历中没有可安排的空闲时段。",
+    "noSuggestionsTitle": "规划器",
+    "noSuggestionsDesc": "没有找到最佳的时间块建议。",
+    "draftGeneratedTitle": "已生成草稿",
+    "draftGeneratedDesc": "Lumina 已分配好你的任务。请查看、调整或确认你的日程。",
+    "planningErrorTitle": "规划出错",
+    "planningErrorDesc": "无法生成时间块方案。",
+    "organizingBackdrop": "Lumina AI 正在日历上整理你的任务...",
+    "draftProposed": "✨ Lumina 建议了 {{count}} 个专注块",
+    "discard": "放弃",
+    "confirmSchedule": "确认日程 🚀",
+    "scheduling": "正在安排...",
+    "quickCreateTask": "快速创建任务",
+    "showMore": "还有 {{count}} 个",
+    "addTask": "添加任务",
+    "month": "月",
+    "week": "周",
+    "day": "日",
+    "today": "今天",
+    "awaitedTasks": "待处理任务",
+    "viewAll": "查看全部",
+    "noAwaitedTasks": "没有待处理的任务",
+    "freeTimeDesc": "享受你的空闲时间吧！",
+    "optimizeSchedule": "优化日程",
+    "plan": {
+      "review": "查看",
+      "closeReview": "关闭并查看日历",
+      "previewLabel": "在日历中预览方案",
+      "workingTitle": "Lumina 正在整理你的日程",
+      "elapsed_one": "{{count}} 秒",
+      "elapsed_other": "{{count}} 秒",
+      "steps": {
+        "tasks": "正在读取你的未完成任务",
+        "slots": "正在寻找你的空闲时间",
+        "thinking": "正在安排专注块",
+        "checking": "正在检查方案"
+      },
+      "backgroundHint": "继续使用 Focusly 吧：准备好后我们会通知你。",
+      "reviewTitle": "Lumina 的方案",
+      "reviewSummary_one": "{{count}} 个块",
+      "reviewSummary_other": "{{count}} 个块",
+      "focusTime": "专注 {{hours}} 小时 {{minutes}} 分钟",
+      "today": "今天",
+      "tomorrow": "明天",
+      "duration_one": "{{count}} 分钟",
+      "duration_other": "{{count}} 分钟",
+      "include": "包含“{{title}}”",
+      "priority": {
+        "high": "高",
+        "medium": "中",
+        "low": "低"
+      },
+      "beforeDeadline": "截止日期前",
+      "afterDeadline": "截止日期后",
+      "rescheduled": "已重新安排",
+      "unplaced_one": "{{count}} 个任务没能安排进去",
+      "unplaced_other": "{{count}} 个任务没能安排进去",
+      "unplacedHint": "腾出一些时间，或在个人资料中延长你的工作时间。",
+      "dragHint": "你可以在日历上拖动这些块来调整。",
+      "confirm_one": "安排 {{count}} 个块",
+      "confirm_other": "安排 {{count}} 个块"
+    },
+    "draftReadyTitle": "你的优化日程已准备好 ✨",
+    "viewProposal": "查看方案",
+    "optimizing": "正在优化…",
+    "cancelPlanning": "取消",
+    "optimizeFreeHint_one": "使用你最后一条 Lumina 免费消息",
+    "optimizeFreeHint_other": "使用你 {{count}} 条 Lumina 免费消息中的 1 条",
+    "optimizeProOnly": "你已用完本月的免费消息：升级 Pro 即可使用",
+    "draftGeneratedPartial_one": "Lumina 建议了 {{count}} 个块；{{left}} 个任务没能放进你的空闲时间。",
+    "draftGeneratedPartial_other": "Lumina 建议了 {{count}} 个块；{{left}} 个任务没能放进你的空闲时间。",
+    "scheduleSavedTitle": "日程已确认",
+    "scheduleSavedDesc": "你的专注块已安排好。",
+    "scheduleSaveError": "有 {{count}} 个块无法保存。你可以再次确认。",
+    "openWeeklyPlanner": "打开每周规划器",
+    "notifications": {
+      "title": "通知",
+      "new": "{{count}} 条新通知",
+      "empty": "还没有通知",
+      "emptyDesc": "全部看完了！有关任务和专注时段的通知会显示在这里。",
+      "markAllRead": "全部标为已读"
+    }
+  },
+  "notificationSettings": {
+    "sound": {
+      "title": "通知声音",
+      "classicChime": "经典钟声",
+      "digitalTone": "数字音",
+      "softBell": "柔和铃声",
+      "successArpeggio": "成功琶音"
+    }
+  },
+  "accountSettings": {
+    "emailAddress": "电子邮件地址",
+    "emailManagedBy": "由你的登录服务商管理，无法在此更改。",
+    "toast": {
+      "title": "个人资料已更新",
+      "desc": "你的显示名称已保存。"
+    }
+  },
+  "integrationsSettings": {
+    "googleCalendar": "Google 日历和 Meet",
+    "connectedAs": "已以 {{email}} 身份连接",
+    "notConnected": "未连接",
+    "connect": "连接",
+    "refreshPermissions": "刷新权限",
+    "toast": {
+      "connectedTitle": "已连接 Google 日历",
+      "connectedDesc": "你的日历和 Meet 访问权限已刷新。",
+      "connectErrorTitle": "无法连接 Google 日历",
+      "connectFailedTitle": "Google 连接失败"
+    }
+  },
+  "securitySettings": {
+    "activeSession": "当前会话",
+    "signInMethod": "登录方式",
+    "google": "Google",
+    "magicLink": "魔法链接",
+    "googleDesc": "你使用 Google 账号登录，无需单独管理 Focusly 密码。",
+    "magicLinkDesc": "你使用发送到邮箱的免密码魔法链接登录。",
+    "deleteAccount": "删除账号",
+    "deleteConfirm": {
+      "title": "删除你的账号？",
+      "subtitle": "此操作无法撤销",
+      "desc": "你的账号、任务、文档、项目、AI 对话和头像将被永久删除。如果你连接了 Google 日历，我们会撤销 Focusly 的访问权限；你的日历活动不会被删除。",
+      "confirm": "删除账号",
+      "cancel": "取消",
+      "success": "你的账号已删除",
+      "error": "无法删除你的账号。请重试。"
+    }
+  },
+  "tasksHeader": {
+    "eyebrow": "管理并安排你的工作优先级",
+    "title": "我的任务"
+  },
+  "endSessionModal": {
+    "title": "结束专注时段？",
+    "confirmText": "确定要提前结束这个时段吗？",
+    "warningText": "目前记录的时间将保存到任务中。",
+    "endSession": "结束时段"
+  },
+  "focusTimer": {
+    "timeUp": "时间到！完成任务，或再加 5 分钟继续。"
+  },
+  "profilePage": {
+    "title": "设置",
+    "back": "返回",
+    "logout": "退出登录",
+    "nav": {
+      "account": "个人资料",
+      "billing": "套餐与账单",
+      "workFocus": "日程与专注",
+      "notifications": "通知",
+      "appearance": "外观",
+      "integrations": "集成",
+      "privacy": "隐私与安全"
+    },
+    "descriptions": {
+      "account": "你的照片、名字和登录所用的账号。",
+      "billing": "管理你的订阅、已保存的付款方式和 Focusly Pro 权益。",
+      "workFocus": "你的工作时间和每次专注时段的时长。Focusly 会据此安排你的任务。",
+      "notifications": "任务即将开始时 Focusly 如何提醒你。",
+      "appearance": "Focusly 在此设备上的主题和语言。",
+      "integrations": "Focusly 用来同步日历和创建 Meet 链接的外部账号。",
+      "privacy": "你的会话、法律文件以及删除账号。"
+    },
+    "account": {
+      "photoTitle": "头像",
+      "photoDesc": "显示在 Focusly 的侧边菜单中。JPG、PNG 或 WebP。",
+      "upload": "上传照片",
+      "remove": "移除照片",
+      "nameTitle": "名字",
+      "nameDesc": "你在 Focusly 中显示的名字。",
+      "nameError": "无法保存你的名字。请重试。"
+    },
+    "workFocus": {
+      "daysTitle": "工作日",
+      "daysDesc": "勾选你工作的日子。自动排程和 Lumina 的每周计划只会把任务放在这些日子。",
+      "hoursTitle": "工作时间",
+      "hoursDesc": "任务和专注块会安排在你勾选的日子的这段时间内。",
+      "start": "开始",
+      "end": "结束",
+      "focusTitle": "专注时段时长",
+      "focusDesc": "当任务没有预估时间时，专注模式计时器运行的时长。",
+      "minutes": "{{count}} 分钟",
+      "save": "保存更改",
+      "discard": "放弃",
+      "savedTitle": "偏好已保存",
+      "savedDesc": "Focusly 会用这些时间来安排你的任务。",
+      "saveError": "无法保存你的偏好。请重试。",
+      "errors": {
+        "noDays": "请至少选择一天。",
+        "hours": "结束时间必须晚于开始时间。"
+      }
+    },
+    "notifications": {
+      "remindersTitle": "任务提醒",
+      "remindersDesc": "在定时任务开始前 5 分钟和 1 分钟提醒你：在 Focusly 中显示提示，并播放你在下方选择的声音。关闭后，你在此设备上将不会收到提醒。",
+      "systemTitle": "系统通知",
+      "systemDesc": "同时以操作系统通知的形式显示每条提醒，即使 Focusly 在其他标签页或已最小化，你也能看到。需要浏览器授权。",
+      "allow": "允许",
+      "permission": {
+        "granted": "已在此浏览器中允许。",
+        "default": "你还没有在此浏览器中授权。",
+        "denied": "已被浏览器阻止。请在网站设置（地址左侧的图标）中开启。",
+        "unsupported": "此浏览器不支持系统通知。"
+      },
+      "soundDesc": "每条提醒播放的声音。点按一个选项即可试听并选择；它会保存在此设备上。"
+    },
+    "appearance": {
+      "languageDesc": "此设备上的界面语言。"
+    },
+    "integrations": {
+      "googleDesc": "允许 Focusly 读取并在你的 Google 日历中创建活动，以显示你的日程、安排任务并生成 Meet 链接。你可以在 Google 账号中撤销访问权限。"
+    },
+    "privacy": {
+      "sessionDesc": "在此浏览器中退出登录。你的数据会保留，你可以用平常的方式重新登录。",
+      "termsAccepted": "你于 {{date}} 接受了 {{version}} 版本。",
+      "termsAcceptedNoVersion": "你于 {{date}} 接受了条款。",
+      "deleteDesc": "永久删除你的账号、任务、文档、项目以及与 Lumina 的对话。此操作无法撤销。"
+    }
+  },
+  "editorAI": {
+    "launcher": "询问 Lumina",
+    "conversationTitle": "📝 {{title}}",
+    "untitled": "未命名文档",
+    "header": {
+      "title": "Lumina",
+      "subtitle": "关于“{{title}}”",
+      "newChat": "新对话",
+      "minimize": "最小化"
+    },
+    "empty": {
+      "title": "关于这份文档，我能帮你做什么？",
+      "description": "可以询问关于这篇笔记的任何问题，或使用快捷操作。选中文本即可查看针对该段落的操作。",
+      "withSelection": "你已选中文本：选择一个操作，或告诉我该怎么处理。"
+    },
+    "actions": {
+      "label": "快捷操作",
+      "improve": {
+        "label": "改进写作",
+        "hint": "把选中内容改写得更清晰流畅"
+      },
+      "fix": {
+        "label": "修正",
+        "hint": "修正选中内容的拼写和语法"
+      },
+      "shorter": {
+        "label": "更简短",
+        "hint": "精简选中内容"
+      },
+      "longer": {
+        "label": "更详细",
+        "hint": "扩展选中内容"
+      },
+      "translate": {
+        "label": "翻译",
+        "hint": "把选中内容翻译成其他语言"
+      },
+      "explain": {
+        "label": "解释",
+        "hint": "在不修改的情况下解释选中内容"
+      },
+      "matchStyle": {
+        "label": "匹配风格",
+        "hint": "让选中内容与文档风格一致"
+      },
+      "summarize": {
+        "label": "总结",
+        "hint": "总结整篇文档"
+      },
+      "continue": {
+        "label": "继续写作",
+        "hint": "从光标处接着写"
+      },
+      "extractTasks": {
+        "label": "提取任务",
+        "hint": "根据文档建议任务"
+      },
+      "proofread": {
+        "label": "校对",
+        "hint": "修正整篇文档的拼写"
+      }
+    },
+    "prompts": {
+      "improve": "改进所选文本的写作：更清晰流畅，保持原意和语言不变。",
+      "fix": "修正所选文本的拼写和语法，不要改变其风格。",
+      "shorter": "缩短所选文本，保留核心观点。",
+      "longer": "用有用的细节和背景扩展所选文本，保持相同风格。",
+      "translate": "把所选文本翻译成{{language}}。",
+      "explain": "用简单的话解释所选文本。",
+      "matchStyle": "让所选文本与文档其余部分的写作风格（语气、用词和句式结构）保持一致，不要改变原意。",
+      "summarize": "清晰简洁地总结这份文档。",
+      "continue": "从我的光标位置继续写下去，遵循文档的语气和结构。",
+      "extractTasks": "从这份文档中提取可执行的任务，并作为 Focusly 任务提出建议。",
+      "proofread": "校对整篇文档的拼写和语法，在不改变风格的前提下修正错误。"
+    },
+    "quote": {
+      "selection": "选中内容",
+      "cursor": "光标之前"
+    },
+    "status": {
+      "thinking": "思考中…",
+      "preparingEdit": "正在准备对文档的修改…",
+      "preparingTasks": "正在准备任务…",
+      "editProposed": "对文档的修改建议",
+      "stopped": "已停止回复。",
+      "error": "无法完成回复。"
+    },
+    "fragment": {
+      "docChanged": "Lumina 写作期间文档发生了变化。请把文本插入到你想要的位置：",
+      "editChanged": "自你提问后文档已发生变化。请对照当前版本查看修改："
+    },
+    "message": {
+      "copy": "复制",
+      "insertAtCursor": "插入到光标处",
+      "replaceSelection": "替换选中内容",
+      "retry": "重试",
+      "stop": "停止",
+      "reviewEdit": "查看修改"
+    },
+    "diff": {
+      "review": "查看文档中的修改：带删除线的文本将被删除，带下划线的文本将被添加。",
+      "accept": "接受",
+      "discard": "放弃",
+      "applied": "已将修改应用到你的文档",
+      "discarded": "已放弃修改"
+    },
+    "selection": {
+      "attached": "选中内容：“{{text}}”",
+      "detached": "不会发送选中内容",
+      "detach": "不发送选中内容",
+      "attach": "使用"
+    },
+    "input": {
+      "placeholder": "向 Lumina 询问这份文档…",
+      "placeholderSelection": "要如何处理选中的文本？",
+      "send": "发送"
+    },
+    "disclaimer": "Lumina 可能会出错。接受修改前请先检查。",
+    "toasts": {
+      "inserted": "已添加到你的文档",
+      "copied": "已复制"
+    },
+    "errors": {
+      "title": "Lumina 无法回复",
+      "retry": "请稍后重试。",
+      "copy": "无法复制"
+    },
+    "launcherWriting": "Lumina 正在写作…",
+    "launcherReady": "回复已就绪",
+    "backgroundHint": "你可以离开编辑器：Lumina 会在后台继续工作。",
+    "history": {
+      "title": "此文档中的对话",
+      "open": "查看对话",
+      "back": "返回对话",
+      "empty": "此文档中还没有对话。",
+      "untitled": "未命名对话",
+      "active": "已打开",
+      "delete": "删除对话",
+      "confirmDelete": "删除？",
+      "yes": "是",
+      "no": "否",
+      "loadError": "无法加载对话。",
+      "deleteError": "无法删除对话。"
+    },
+    "background": {
+      "writing": "Lumina 正在写作",
+      "done": "Lumina 已完成",
+      "in": "在“{{title}}”中",
+      "open": "打开“{{title}}”",
+      "dismiss": "关闭"
+    }
+  },
+  "actionPlan": {
+    "header": {
+      "title": "Lumina 的计划",
+      "changesTitle": "建议的修改",
+      "review": "查看详情并选择要创建的内容。",
+      "running": "正在创建第 {{done}} 个，共 {{total}} 个…",
+      "done": "完成：你选择的所有内容都已在 Focusly 中。",
+      "someFailed": "有些项目无法创建。"
+    },
+    "summary": {
+      "projects_one": "{{count}} 个项目",
+      "projects_other": "{{count}} 个项目",
+      "documents_one": "{{count}} 份文档",
+      "documents_other": "{{count}} 份文档",
+      "tasks_one": "{{count}} 个任务",
+      "tasks_other": "{{count}} 个任务",
+      "subtasks_one": "{{count}} 个子任务",
+      "subtasks_other": "{{count}} 个子任务",
+      "updates_one": "{{count}} 处修改",
+      "updates_other": "{{count}} 处修改",
+      "deletions_one": "{{count}} 项删除",
+      "deletions_other": "{{count}} 项删除",
+      "events_one": "{{count}} 个活动",
+      "events_other": "{{count}} 个活动",
+      "guests_one": "{{count}} 位嘉宾",
+      "guests_other": "{{count}} 位嘉宾"
+    },
+    "sections": {
+      "otherTasks": "其他任务",
+      "updates": "对现有项目的修改",
+      "deletions": "将被删除",
+      "events": "Google 日历活动"
+    },
+    "footer": {
+      "selectAll": "全部",
+      "selectNone": "无",
+      "errors": "请检查标记为出错的项目。",
+      "running": "正在创建…",
+      "create_one": "创建 {{count}} 项",
+      "create_other": "创建 {{count}} 项",
+      "apply_one": "应用 {{count}} 处修改",
+      "apply_other": "应用 {{count}} 处修改",
+      "retry_one": "重试 {{count}} 项",
+      "retry_other": "重试 {{count}} 项",
+      "done_one": "已完成 {{count}} 项",
+      "done_other": "已完成 {{count}} 项",
+      "delete_one": "删除 {{count}} 项",
+      "delete_other": "删除 {{count}} 项"
+    },
+    "status": {
+      "done": "已创建",
+      "error": "无法创建",
+      "skipped": "已跳过"
+    },
+    "edit": {
+      "edit": "创建前编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "title": "标题",
+      "start": "开始",
+      "name": "名称"
+    },
+    "details": {
+      "show": "显示详情",
+      "hide": "隐藏详情"
+    },
+    "priority": {
+      "1": "低",
+      "2": "中",
+      "3": "高",
+      "4": "紧急"
+    },
+    "untitledTask": "未命名任务",
+    "untitledNote": "未命名笔记",
+    "untitledDocument": "未命名文档",
+    "task": {
+      "subtaskCount_one": "{{count}} 个子任务",
+      "subtaskCount_other": "{{count}} 个子任务",
+      "subtasks": "子任务",
+      "notes": "备注"
+    },
+    "open": {
+      "goTo": "前往已创建的内容",
+      "inCalendar": "在日历中查看",
+      "tasks_other": "查看 {{count}} 个任务",
+      "tasks_one": "查看任务",
+      "viewProject": "查看项目",
+      "task": "查看任务",
+      "document": "打开文档",
+      "project": "打开项目",
+      "calendar": "在 Google 日历中打开",
+      "meet": "加入 Meet"
+    },
+    "document": {
+      "label": "文档",
+      "note": "笔记",
+      "sections_one": "{{count}} 个章节",
+      "sections_other": "{{count}} 个章节",
+      "words_one": "约 {{count}} 字",
+      "words_other": "约 {{count}} 字",
+      "linkedTasks_one": "{{count}} 个关联任务",
+      "linkedTasks_other": "{{count}} 个关联任务",
+      "outline": "文档章节",
+      "showContent": "查看完整文档",
+      "hideContent": "隐藏文档"
+    },
+    "project": {
+      "new": "新项目",
+      "existing": "现有项目",
+      "existingFallback": "现有项目",
+      "documents_one": "{{count}} 份文档",
+      "documents_other": "{{count}} 份文档",
+      "tasks_one": "{{count}} 个任务",
+      "tasks_other": "{{count}} 个任务"
+    },
+    "fields": {
+      "title": "标题",
+      "start": "开始",
+      "end": "结束",
+      "priority": "优先级",
+      "duration": "时长",
+      "notes": "备注",
+      "status": "状态",
+      "document": "文档",
+      "project": "项目",
+      "when": "日期",
+      "location": "地点",
+      "description": "描述",
+      "guests": "嘉宾",
+      "meet": "Google Meet"
+    },
+    "update": {
+      "changes_one": "{{count}} 处修改",
+      "changes_other": "{{count}} 处修改",
+      "notesReplaced": "备注将被替换",
+      "unknownTask": "现有任务",
+      "aDocument": "一份文档",
+      "aProject": "一个项目"
+    },
+    "insert": {
+      "title": "添加到打开的文档",
+      "hint": "已插入到你打开的文档中"
+    },
+    "taskStatus": {
+      "todo": "待办",
+      "planning": "规划中",
+      "pending": "待处理",
+      "onHold": "暂停",
+      "review": "审核中",
+      "done": "已完成",
+      "backlog": "待办池",
+      "scheduled": "已安排",
+      "archived": "已归档"
+    },
+    "subtasks": {
+      "add_one": "新增 {{count}} 个",
+      "add_other": "新增 {{count}} 个",
+      "complete_one": "已完成 {{count}} 个",
+      "complete_other": "已完成 {{count}} 个",
+      "reopen_one": "重新打开 {{count}} 个",
+      "reopen_other": "重新打开 {{count}} 个",
+      "remove_one": "已移除 {{count}} 个",
+      "remove_other": "已移除 {{count}} 个",
+      "missing": "找不到这些子任务：{{titles}}"
+    },
+    "delete": {
+      "permanent": "永久删除",
+      "alsoGoogle": "同时从 Google 日历中删除",
+      "confirm_one": "我了解 {{count}} 个任务将被永久删除。",
+      "confirm_other": "我了解 {{count}} 个任务将被永久删除。",
+      "confirmEvents_one": "我了解 {{count}} 个活动将被取消，并会通知其嘉宾。",
+      "confirmEvents_other": "我了解 {{count}} 个活动将被取消，并会通知其嘉宾。",
+      "confirmMixed_one": "我了解 {{count}} 个项目将被永久删除。",
+      "confirmMixed_other": "我了解 {{count}} 个项目将被永久删除。"
+    },
+    "event": {
+      "untitled": "未命名活动",
+      "unknown": "你日历中的活动",
+      "allDay": "全天",
+      "meet": "Google Meet",
+      "meetCreated": "将为会议创建一个 Google Meet 链接。",
+      "meetAdded": "已添加 Meet 链接",
+      "guests_one": "{{count}} 位嘉宾",
+      "guests_other": "{{count}} 位嘉宾",
+      "guestsNotice": "Google 会通过电子邮件向每位嘉宾发送邀请。",
+      "updateNotice": "嘉宾会收到修改通知。",
+      "addGuests_one": "+{{count}} 位嘉宾",
+      "addGuests_other": "+{{count}} 位嘉宾",
+      "removeGuests_one": "−{{count}} 位嘉宾",
+      "removeGuests_other": "−{{count}} 位嘉宾",
+      "descriptionReplaced": "描述将被替换",
+      "organizedBy": "由 {{email}} 组织",
+      "notOrganizerHint": "你不是此活动的组织者：只有组织者可以为所有人更改时间或嘉宾。",
+      "cancel": "已取消",
+      "cancelNotice_one": "{{count}} 位嘉宾将收到取消通知",
+      "cancelNotice_other": "{{count}} 位嘉宾将收到取消通知",
+      "needsCalendar": "需要 Google 日历",
+      "connectHint": "连接 Google 日历，让 Lumina 可以创建和编辑你的活动。",
+      "connect": "连接 Google 日历",
+      "you": "你",
+      "response": {
+        "accepted": "已接受",
+        "declined": "已拒绝",
+        "tentative": "待定",
+        "needsAction": "未回复"
+      }
+    }
+  },
+  "insightsHeader": {
+    "title": "{{period}}洞察",
+    "periods": {
+      "daily": "每日",
+      "weekly": "每周",
+      "monthly": "每月",
+      "yearly": "每年"
+    },
+    "subtitle": "效率总结与分析",
+    "export": "导出",
+    "createReport": "创建报告",
+    "previousMonth": "上个月",
+    "nextMonth": "下个月"
+  },
+  "notificationsPage": {
+    "loading": "正在加载通知…",
+    "title": "通知",
+    "subtitle": "随时了解你的最新动态",
+    "newBadge": "{{count}} 条新通知",
+    "markAllRead": "全部标为已读",
+    "deleteAll": "全部删除",
+    "error": "加载通知时出错",
+    "emptyTitle": "还没有通知",
+    "emptyDesc": "当你收到有关任务、专注时段或 AI 建议的通知时，它们会显示在这里。",
+    "timeToday": "今天 {{time}}",
+    "timeYesterday": "昨天 {{time}}",
+    "timeOther": "{{date}} {{time}}"
+  },
+  "login": {
+    "toggleTheme": "切换主题",
+    "checkEmail": {
+      "title": "查看你的邮箱",
+      "desc": "我们已将登录链接发送至",
+      "instructions": "点击链接即可立即登录。",
+      "back": "返回登录"
+    },
+    "signUpTitle": "创建账号",
+    "signInTitle": "欢迎回来",
+    "subtitle": "输入你的信息以进入你的工作区。",
+    "tabs": {
+      "signIn": "登录",
+      "signUp": "注册"
+    },
+    "continueWithGoogle": "使用 Google 继续",
+    "orWithEmail": "或使用邮箱",
+    "fullName": "全名",
+    "fullNamePlaceholder": "例如：张伟",
+    "email": "电子邮件地址",
+    "emailPlaceholder": "name@company.com",
+    "createAccount": "创建账号",
+    "signIn": "登录",
+    "noAccount": "还没有账号？",
+    "hasAccount": "已经有账号了？",
+    "signUpHere": "免费注册",
+    "signInHere": "在此登录",
+    "termsOfService": "服务条款",
+    "privacyPolicy": "隐私政策",
+    "helpCenter": "帮助中心",
+    "copyright": "© 2026 Focusly",
+    "enterEmailWarning": "请输入你的邮箱"
+  },
+  "rightPanel": {
+    "quickInsights": "快速洞察",
+    "productivityScore": "效率得分",
+    "moreProductive": "今天早上你比平时更高效。",
+    "habitTracker": "习惯追踪",
+    "focusTime": "专注时间"
+  },
+  "calendarAiPlanner": {
+    "title": "AI 时间块规划器",
+    "loading": "Lumina AI 正在日历上整理你的任务...",
+    "intro": "Lumina 找到了你日历中的空闲时段，并为你的待办任务建议以下专注块：",
+    "confirm": "接受并安排",
+    "creating": "正在创建活动...",
+    "toast": {
+      "scheduledTitle": "日历已整理好",
+      "scheduledDesc": "你的任务已成功转换为时间块。",
+      "errorDesc": "无法保存时间块。"
+    }
+  },
+  "calendarWeeklyPlanner": {
+    "title": "Focusly AI 每周规划器",
+    "loading": "Lumina AI 正在整理你的每周日程...",
+    "recommendation": "🎯 Lumina 的建议：",
+    "noTasksAssigned": "没有分配任务。",
+    "confirm": "确认每周计划",
+    "applying": "正在分配任务...",
+    "toast": {
+      "noTasksTitle": "每周规划器",
+      "noTasksDesc": "本周没有需要规划的待办任务。",
+      "fetchErrorDesc": "无法获取 Lumina 的每周计划。",
+      "appliedTitle": "已应用每周计划",
+      "appliedDesc": "已为你的任务设置预计工作日期。",
+      "applyErrorDesc": "保存规划日期时出现问题。"
+    }
+  },
+  "onboarding": {
+    "progress": {
+      "step": "第 {{current}} 步，共 {{total}} 步",
+      "percentCompleted": "已完成 {{percent}}%"
+    },
+    "next": "下一步",
+    "saveAndContinue": "保存并继续",
+    "workHours": {
+      "heading": "设置你的工作时间",
+      "subheading": "设定你的日常作息，我们会在你效率最高的时段安排任务，而不占用你的个人时间。",
+      "workDays": "工作日",
+      "monToFri": "周一至周五",
+      "dailySchedule": "每日时间安排",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "setLater": "我稍后再设置",
+      "privacyNote": "只有你能看到自己的时间安排。我们用它来规划你的任务。",
+      "days": {
+        "mon": "一",
+        "tue": "二",
+        "wed": "三",
+        "thu": "四",
+        "fri": "五",
+        "sat": "六",
+        "sun": "日"
+      }
+    },
+    "profileCompletion": {
+      "heading": "完善你的个人资料",
+      "subheading": "设定你在 Focusly 中的形象。",
+      "profilePhoto": "头像",
+      "fullName": "全名",
+      "fullNamePlaceholder": "例如：Alex Rivera",
+      "jobTitle": "职位 / 角色",
+      "jobTitlePlaceholder": "例如：首席系统架构师",
+      "focusPhilosophy": "专注理念",
+      "charCounter": "{{count}} / 最多 160 字",
+      "bioPlaceholder": "简要描述你如何进行深度工作...",
+      "continueToDashboard": "进入仪表盘",
+      "completeLater": "稍后完善"
+    },
+    "calendarConnection": {
+      "chooseProvider": "选择服务商",
+      "selectService": "选择你的日历服务以继续",
+      "googleCalendar": "Google 日历",
+      "syncDesc": "同步 Google 中的活动",
+      "skipForNow": "暂时跳过",
+      "connectedHeading": "日历已连接！",
+      "connectedDesc": "我们已从你的日历中获取了 {{count}} 个活动。",
+      "continue": "继续",
+      "privacyNote": "我们只读取和更新你主日历中的活动，以便与任务同步。你可以随时断开连接。"
+    },
+    "focusBlocks": {
+      "heading": "自定义专注块",
+      "subheading": "设置深度工作时段和休息的理想时长。我们会根据你的节奏安排你的智能日历。",
+      "focusSession": "专注时段",
+      "deepWorkDuration": "深度工作时长",
+      "length": "时长",
+      "minutes": "{{count}} 分钟",
+      "recoveryBreaks": "恢复休息",
+      "restRecharge": "休息充电",
+      "shortBreak": "短休息",
+      "shortBreakNote": "每个专注时段后进行。",
+      "longBreak": "长休息",
+      "longBreakNote": "连续 4 个时段后进行。",
+      "infoLabel": "这对你的一天有什么影响：",
+      "infoDesc": "我们会在你的日历中寻找空闲时段并填入这些专注块，确保你不会不休息地过度工作。",
+      "useDefaults": "使用番茄钟默认值（25 分钟 / 5 分钟）"
+    },
+    "finalSetup": {
+      "steps": {
+        "importing": "正在从集成导入任务",
+        "analyzing": "正在分析精力高峰和习惯",
+        "finalizing": "正在完成每周日程"
+      },
+      "headingPart1": "正在优化你的",
+      "headingGradient": "智能日历...",
+      "subheading": "我们正在分析你的习惯，以打造完美的日程。",
+      "optimizing": "正在优化专注块..."
+    }
+  },
+  "landing": {
+    "newBadge": "✨ 新功能：工作区 2.0 现已推出 →",
+    "heroTitle": "保持专注所需的一切。",
+    "heroSubtitle": "在一个精美的效率平台中整理项目、任务、日历、笔记和工作区。",
+    "getStarted": "开始使用 🚀",
+    "watchDemo": "观看演示",
+    "trustedBy": "超过 10,000 名创作者的选择",
+    "features": {
+      "heading": "效率的操作系统。",
+      "subheading": "为高效团队打造的强大工具。简化你的工作流程。",
+      "workspaces": {
+        "title": "工作区",
+        "description": "通过专属工作区，轻松区分个人项目、创业项目和副业项目。"
+      },
+      "tasks": {
+        "title": "任务",
+        "description": "创建清单、设置优先级，并添加标签、负责人和截止日期。"
+      },
+      "calendar": {
+        "title": "日历",
+        "description": "直接从 Google 日历同步并统一管理你的所有任务和专注时段。"
+      },
+      "notes": {
+        "title": "笔记",
+        "description": "用于项目规格、计划和规范的 Markdown 文档。"
+      },
+      "aiAssistant": {
+        "title": "AI 助手",
+        "description": "智能助手会安排专注块、更新状态并总结文件。"
+      },
+      "analytics": {
+        "title": "分析",
+        "description": "详细的指标呈现你的专注趋势和行为洞察。"
+      },
+      "notifications": {
+        "title": "通知",
+        "description": "智能更新只在真正重要时才通知你。"
+      }
+    },
+    "ai": {
+      "heading": "认识你的 AI 效率伙伴。",
+      "subheading": "Focusly AI 就像一个智能副驾驶，理解你的项目、分析你的精力并安排你的一天。",
+      "tryButton": "试用 Focusly AI",
+      "bullets": {
+        "createTasks": {
+          "title": "凭空创建任务",
+          "desc": "描述一个目标，我们就会整理出任务清单、优先级和截止日期。"
+        },
+        "summarize": {
+          "title": "总结一切",
+          "desc": "同步记录稿或文档，获取关键行动项。"
+        },
+        "automate": {
+          "title": "自动化工作流程",
+          "desc": "根据日历或任务的更新触发日常流程。"
+        },
+        "instantAnswers": {
+          "title": "即时解答",
+          "desc": "即时查询你整个工作区的上下文。"
+        }
+      }
+    },
+    "howItWorks": {
+      "heading": "为成功而简化。",
+      "subheading": "简单四步，从混乱到专注。",
+      "step1": {
+        "title": "创建工作区 🗂",
+        "desc": "为不同的项目、创业公司或目标搭建私人空间。"
+      },
+      "step2": {
+        "title": "创建任务 📝",
+        "desc": "把目标拆分成结构化的清单，设置优先级，并把条目直接关联到工作区。"
+      },
+      "step3": {
+        "title": "专注时间 ⚡",
+        "desc": "用自定义计时器和精美的进度卡片开启高度专注的冲刺，保持状态。"
+      },
+      "step4": {
+        "title": "创建项目 📁",
+        "desc": "里程碑看板追踪所有关键要素。"
+      },
+      "plusMore": "还有更多：专注状态 🟢、智能分析 📈、提醒 🔔"
+    },
+    "pricing": {
+      "heading": "适合各种规模的套餐。",
+      "subheading": "免费开始，随成长升级。",
+      "perMonth": " / 月",
+      "free": {
+        "name": "免费版",
+        "tagline": "非常适合个人使用。",
+        "cta": "开始使用",
+        "features": [
+          "1 个用户工作区",
+          "无限任务",
+          "基础日历"
+        ]
+      },
+      "pro": {
+        "badge": "开始免费试用",
+        "name": "Pro",
+        "tagline": "适合高阶用户和专业人士。",
+        "cta": "升级到 Pro",
+        "features": [
+          "无限工作区",
+          "AI 助手（500 次运行）",
+          "高级分析",
+          "Google 日历集成"
+        ]
+      },
+      "enterprise": {
+        "name": "企业版",
+        "tagline": "追求极致效率。",
+        "cta": "升级到企业版",
+        "features": [
+          "无限次 Lumina AI 运行",
+          "AI 队列优先处理",
+          "高级洞察与审计",
+          "导出工作区（PDF/Markdown）",
+          "优先支持与测试版访问",
+          "SLA 与安全协议"
+        ]
+      }
+    },
+    "testimonials": {
+      "heading": "深受顶尖团队信赖。",
+      "items": [
+        {
+          "role": "产品负责人，Stripe",
+          "quote": "Focusly 改变了我们设计团队的工作方式。时间块让项目延期减少了近 40%。"
+        },
+        {
+          "role": "CTO，Linear",
+          "quote": "日历同步无懈可击。AI 集成在安排我的每日日程时就像魔法一样。"
+        },
+        {
+          "role": "创始人兼 CEO，Raycast",
+          "quote": "工作区的划分正是我需要的。极简、高级而且速度极快。"
+        }
+      ]
+    },
+    "faq": {
+      "heading": "常见问题",
+      "items": [
+        {
+          "q": "Google 日历集成是如何工作的？",
+          "a": "Focusly 与 Google 日历集成，即时同步你的所有会议和时间块，避免重复预订。"
+        },
+        {
+          "q": "我的数据安全吗？",
+          "a": "安全。你的数据通过 HTTPS 加密传输，仅用于提供服务，绝不出售。详情请查看我们的隐私声明。"
+        },
+        {
+          "q": "我可以免费使用 Focusly 吗？",
+          "a": "当然可以，我们的免费版包含所有核心的任务管理和日历功能。"
+        }
+      ]
+    },
+    "footer": {
+      "tagline": "为高效团队打造的开放操作系统。",
+      "product": "产品",
+      "company": "公司",
+      "legal": "法律",
+      "features": "功能",
+      "pricing": "价格",
+      "blog": "博客",
+      "resources": "资源",
+      "aboutUs": "关于我们",
+      "careers": "加入我们",
+      "terms": "条款",
+      "privacy": "隐私",
+      "copyright": "© {{year}} Focusly Tech. 为帮助你专注而设计。"
+    }
+  },
+  "colorNames": {
+    "black": "黑色",
+    "slate": "石板灰",
+    "zinc": "锌灰",
+    "darkGreen": "深绿色",
+    "red": "红色",
+    "orange": "橙色",
+    "amber": "琥珀色",
+    "yellow": "黄色",
+    "lime": "青柠色",
+    "green": "绿色",
+    "emerald": "翡翠绿",
+    "teal": "蓝绿色",
+    "seafoam": "海沫绿",
+    "cyan": "青色",
+    "sky": "天空色",
+    "skyBlue": "天蓝色",
+    "blue": "蓝色",
+    "indigo": "靛蓝色",
+    "purple": "紫色",
+    "violet": "紫罗兰色",
+    "fuchsia": "紫红色",
+    "pink": "粉色",
+    "rose": "玫瑰色",
+    "lightSlate": "浅石板灰",
+    "mediumSlate": "中石板灰",
+    "darkSlate": "深石板灰"
+  },
+  "selection": {
+    "select": "选择",
+    "selectAll": "全选",
+    "selectedCount_one": "已选择 {{count}} 项",
+    "selectedCount_other": "已选择 {{count}} 项",
+    "deleteCount": "删除（{{count}}）"
+  },
+  "deleteConfirm": {
+    "andMore": "还有 {{count}} 项"
+  },
+  "projectTasks": {
+    "loading": "正在加载任务…",
+    "attendees": "已邀请：{{names}}",
+    "empty": {
+      "title": "你的项目中还没有任务",
+      "description": "在项目中创建任务，它们会按状态分组显示在这里。",
+      "action": "创建任务"
+    },
+    "emptySearch": {
+      "title": "未找到任务",
+      "description": "没有与搜索匹配的任务。试试其他关键词。"
+    },
+    "error": {
+      "title": "无法加载任务",
+      "description": "请检查网络连接后重试。",
+      "retry": "重试"
+    },
+    "loadMore": "加载更多任务",
+    "loadingMore": "加载中…",
+    "toast": {
+      "authError": "请重新登录以继续",
+      "created": "任务已创建",
+      "createFailed": "无法创建任务",
+      "updateFailed": "无法更新任务",
+      "deleted_one": "任务已删除",
+      "deleted_other": "已删除 {{count}} 个任务",
+      "deleteFailed": "部分任务无法删除",
+      "completed": "任务已完成",
+      "undo": "撤销"
+    },
+    "moveTo": "移动到",
+    "changeStatus": "更改状态",
+    "markDone": "标为已完成",
+    "markNotDone": "标为未完成",
+    "toggleSubtasks": "显示或隐藏子任务",
+    "linkedDocument": "关联的文档",
+    "addTo": "添加任务到{{status}}",
+    "quickAddPlaceholder": "{{status}}中的新任务（按 Enter 继续添加，按 Esc 关闭）",
+    "allProjects": "所有项目",
+    "showEmptyStatuses": "显示空状态",
+    "columns": {
+      "task": "任务",
+      "project": "项目",
+      "due": "截止",
+      "priority": "优先级",
+      "estimate": "预估"
+    },
+    "summary": {
+      "completed": "已完成 {{done}}/{{total}}",
+      "progress": "进度：{{percent}}%",
+      "remaining": "剩余 {{time}}",
+      "overdue_one": "{{count}} 个已逾期",
+      "overdue_other": "{{count}} 个已逾期",
+      "loaded": "显示 {{loaded}}/{{total}}"
+    },
+    "filters": {
+      "overdue": "已逾期",
+      "noDate": "无日期",
+      "highPriority": "高优先级",
+      "clear": "清除筛选"
+    },
+    "sort": {
+      "dueDate": "按日期",
+      "priority": "按优先级",
+      "title": "按名称",
+      "recent": "最新优先"
+    },
+    "emptyProject": {
+      "title": "此项目还没有任务",
+      "description": "创建第一个任务，开始组织项目的工作。"
+    },
+    "emptyFilters": {
+      "title": "没有符合筛选条件的任务",
+      "description": "移除一个筛选条件以查看更多任务。"
+    },
+    "bulk": {
+      "complete": "完成",
+      "move": "移动到…"
+    },
+    "bulkDelete": {
+      "title_one": "删除 {{count}} 个任务？",
+      "title_other": "删除 {{count}} 个任务？",
+      "description_one": "它将连同子任务被永久删除。",
+      "description_other": "它们将连同子任务被永久删除。"
+    }
+  },
+  "workspaceLibrary": {
+    "loadingDocuments": "正在加载文档…",
+    "toast": {
+      "deleteProjectsTitle": "删除项目",
+      "deleteProjectsDesc": "确定要删除以下项目吗：{{names}}？其中的工作区会被解除关联，但不会被删除。",
+      "projectsDeleted_one": "项目已删除",
+      "projectsDeleted_other": "已删除 {{count}} 个项目",
+      "projectsDeleteFailed_one": "有 {{count}} 个项目无法删除。",
+      "projectsDeleteFailed_other": "有 {{count}} 个项目无法删除。",
+      "workspacesDeleted_one": "工作区已删除",
+      "workspacesDeleted_other": "已删除 {{count}} 个工作区",
+      "workspacesDeleteFailed_one": "有 {{count}} 个工作区无法删除。",
+      "workspacesDeleteFailed_other": "有 {{count}} 个工作区无法删除。",
+      "deletedTitle": "项目已删除"
+    },
+    "breadcrumb": {
+      "home": "首页",
+      "folderFallback": "文件夹"
+    },
+    "newFolder": "新建文件夹",
+    "newWorkspace": "新建工作区",
+    "status": {
+      "recent": "最近",
+      "empty": "空"
+    },
+    "notesInside_one": "内含 {{count}} 篇笔记",
+    "notesInside_other": "内含 {{count}} 篇笔记",
+    "lastUpdated": "最后更新：",
+    "error": "加载工作区时出错。请重试。",
+    "emptySearch": {
+      "title": "未找到结果",
+      "desc": "没有与搜索词或筛选条件匹配的工作区。请调整筛选或搜索。"
+    },
+    "emptyFolder": {
+      "title": "还没有工作区",
+      "desc": "用轻量笔记整理你的战略规划。创建你的第一个工作区开始吧。",
+      "action": "创建工作区",
+      "subAction": "创建笔记或文档"
+    },
+    "recentWorkspace": "最近的工作区",
+    "emptyFolderSnippet": "此文件夹为空。创建你的第一个工作区开始吧...",
+    "filterAndSortNotes": "筛选和排序笔记",
+    "switchViewMode": "切换视图模式",
+    "sortNotes": "排序笔记",
+    "filterNotes": "筛选笔记",
+    "allNotes": "所有笔记",
+    "linkedToTask": "已关联任务",
+    "withBackgroundCover": "带背景封面",
+    "viewGallery": "画廊",
+    "viewGrid": "网格",
+    "viewList": "列表",
+    "deleteWorkspace": "删除工作区",
+    "deleteDialog": {
+      "title": "删除项目",
+      "description": "确定要删除项目“{{name}}”吗？",
+      "bulkTitle": "删除 {{count}} 个项目",
+      "bulkDescription": "确定要删除以下 {{count}} 个项目吗？",
+      "workspacesWarning_one": "此项目包含 {{count}} 个将被永久删除的工作区。",
+      "workspacesWarning_other": "此项目包含 {{count}} 个将被永久删除的工作区。",
+      "bulkWorkspacesWarning_one": "这些项目总共包含 {{count}} 个将被永久删除的工作区。",
+      "bulkWorkspacesWarning_other": "这些项目总共包含 {{count}} 个将被永久删除的工作区。",
+      "noWorkspacesWarning": "此操作无法撤销。"
+    },
+    "deleteWorkspacesDialog": {
+      "title": "删除工作区",
+      "description": "确定要删除“{{name}}”吗？",
+      "bulkTitle": "删除 {{count}} 个工作区",
+      "bulkDescription": "确定要删除以下 {{count}} 个工作区吗？",
+      "warning_one": "此工作区的内容将被永久删除。",
+      "warning_other": "{{count}} 个工作区的内容将被永久删除。"
+    },
+    "renameFolder": "重命名文件夹",
+    "customizeStyle": "自定义样式",
+    "deleteFolder": "删除文件夹",
+    "customizeDialog": {
+      "title": "自定义文件夹"
+    },
+    "folderName": "文件夹名称",
+    "iconShape": "图标形状",
+    "filled": "填充",
+    "solid": "实心",
+    "outlined": "描边",
+    "folderColor": "文件夹颜色",
+    "colorAccent": "强调色",
+    "colors": {
+      "Red": "红色",
+      "Orange": "橙色",
+      "Amber": "琥珀色",
+      "Yellow": "黄色",
+      "Green": "绿色",
+      "Emerald": "翡翠绿",
+      "Teal": "蓝绿色",
+      "Cyan": "青色",
+      "Sky": "天空色",
+      "Blue": "蓝色",
+      "Indigo": "靛蓝色",
+      "Purple": "紫色",
+      "Fuchsia": "紫红色",
+      "Pink": "粉色",
+      "Rose": "玫瑰色",
+      "Slate": "石板灰"
+    },
+    "createDialog": {
+      "title": "新建文件夹"
+    },
+    "namePlaceholder": "例如：冲刺计划、个人、市场营销",
+    "createFolder": "创建文件夹",
+    "editedOn": "编辑于 {{date}}",
+    "card": {
+      "created": "创建时间",
+      "taskStatus": "任务状态",
+      "time": "预估 / 实际时间",
+      "none": "无",
+      "noTask": "未关联任务",
+      "more_one": "还有 {{count}} 个",
+      "more_other": "还有 {{count}} 个",
+      "doneCount": "已完成 {{done}}/{{total}}",
+      "linkedTasks_one": "关联任务（{{count}}）",
+      "linkedTasks_other": "关联任务（{{count}}）",
+      "noContent": "还没有内容",
+      "options": "文档选项"
+    },
+    "folderView": {
+      "label": "项目视图",
+      "documents": "文档",
+      "tasks": "任务"
+    }
+  },
+  "allProjectsModal": {
+    "title": "所有文件夹",
+    "subtitle": "浏览并选择要在资料库视图中显示的文件夹。",
+    "searchPlaceholder": "在 {{count}} 个文件夹中搜索...",
+    "emptyNoFolders": "还没有添加文件夹",
+    "emptyNoMatch": "没有匹配的文件夹",
+    "emptyNoFoldersDesc": "在资料库或侧边栏中创建自定义文件夹，开始分组你的计划。",
+    "emptyNoMatchDesc": "试试调整搜索词。",
+    "items": "{{count}} 项",
+    "visible": "可见",
+    "select": "选择",
+    "deleteSelected": "删除（{{count}}）",
+    "applyChanges": "应用更改"
+  },
+  "createProjectModal": {
+    "title": "创建新项目",
+    "subtitle": "选择名称和颜色，让你的工作区井然有序又美观。",
+    "projectName": "项目名称",
+    "namePlaceholder": "例如：营销策略、第一季度计划...",
+    "projectColor": "项目颜色",
+    "create": "创建项目"
+  },
+  "updateProjectModal": {
+    "title": "编辑文件夹",
+    "subtitle": "修改文件夹名称和颜色，更好地整理你的工作区。",
+    "folderColor": "文件夹颜色",
+    "update": "更新文件夹"
+  },
+  "templatesModal": {
+    "title": "专业模板浏览器",
+    "subtitle": "选择一个模板并分配到目标项目文件夹",
+    "searchPlaceholder": "搜索模板...",
+    "previewing": "正在预览",
+    "liveRenderedPreview": "实时渲染预览",
+    "generalUnassigned": "通用 / 未分配",
+    "useTemplate": "使用此模板",
+    "proTip": "Pro 小贴士",
+    "categories": {
+      "all": "全部",
+      "productStrategy": "产品与策略",
+      "engineering": "工程",
+      "productivity": "效率",
+      "systems": "系统"
+    }
+  },
+  "tasks": {
+    "createTask": "新建任务",
+    "changeStatus": "更改状态",
+    "changePriority": "更改优先级",
+    "header": {
+      "inboxTitle": "收件箱",
+      "inboxEyebrow": "收件箱",
+      "todayTitle": "今日计划",
+      "todayEyebrow": "今日计划",
+      "upcomingTitle": "即将到来的任务",
+      "upcomingEyebrow": "即将到来的任务",
+      "addToInbox": "添加到收件箱",
+      "newTaskToday": "新建今日任务",
+      "newUpcomingTask": "新建待办任务",
+      "aiOrganize": "AI 整理",
+      "pending": "待完成",
+      "completed": "已完成"
+    },
+    "controls": {
+      "searchPlaceholder": "搜索任务、标签...",
+      "priority": "优先级",
+      "assignees": "负责人",
+      "allAssignees": "所有负责人",
+      "all": "全部"
+    },
+    "status": {
+      "all": "全部",
+      "todo": "待办",
+      "planning": "规划中",
+      "scheduled": "已排期",
+      "review": "审核中",
+      "pending": "待处理",
+      "onHold": "已搁置",
+      "done": "已完成",
+      "backlog": "待办池",
+      "archived": "已归档"
+    },
+    "priority": {
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "none": "无优先级",
+      "critical": "紧急"
+    },
+    "columns": {
+      "taskName": "任务名称",
+      "subtasks": "子任务",
+      "priority": "优先级",
+      "deadline": "截止日期",
+      "estimated": "预估",
+      "real": "实际",
+      "actions": "操作"
+    },
+    "actions": {
+      "startFocus": "开始专注",
+      "editTask": "编辑任务",
+      "markAsTodo": "标为待办",
+      "markAsDone": "标为已完成",
+      "deleteTask": "删除任务"
+    },
+    "subtasksCount": "子任务 {{completed}}/{{total}}",
+    "dates": {
+      "all": "所有任务",
+      "today": "今天",
+      "tomorrow": "明天",
+      "overdue": "已逾期",
+      "in3Days": "3 天内",
+      "nextWeek": "下周",
+      "thisWeek": "本周",
+      "thisMonth": "本月",
+      "noDate": "无日期",
+      "noDateInbox": "无日期（收件箱）"
+    },
+    "empty": {
+      "noTasksTitle": "还没有任务",
+      "noTasksDesc": "规划你的一天，提升效率。创建第一个任务，它会显示在这里。",
+      "noMatchTitle": "没有与搜索匹配的任务",
+      "noMatchDesc": "试试其他关键词或筛选条件，或在上方创建新任务。",
+      "clearFilters": "清除所有筛选",
+      "noTasksInTab": "{{tab}}中没有任务",
+      "noTasksInTabDesc": "将任务移到这里，或切换标签页查看任务。"
+    },
+    "pagination": {
+      "showing": "显示 {{count}} 个，共 {{total}} 个即将到来的任务"
+    },
+    "bulk": {
+      "selected_one": "已选择 {{count}} 个任务",
+      "selected_other": "已选择 {{count}} 个任务",
+      "cancel": "取消",
+      "deleteSelected": "删除所选",
+      "confirmTitle": "确认删除",
+      "confirmDesc_one": "确定要删除所选的 {{count}} 个任务吗？此操作无法撤销。",
+      "confirmDesc_other": "确定要删除所选的 {{count}} 个任务吗？此操作无法撤销。",
+      "deleteButton": "删除"
+    },
+    "properties": {
+      "status": "状态",
+      "priority": "优先级",
+      "category": "类别",
+      "tags": "标签",
+      "addTag": "添加",
+      "tagPlaceholder": "#标签",
+      "scheduleAndTimes": "日程与时间",
+      "plannedDate": "计划日期",
+      "estimatedDuration": "预估时长",
+      "durationPlaceholder": "4 小时（或 2h 30m）",
+      "startTime": "开始时间",
+      "trackedDuration": "已记录时长",
+      "plannedWindow": "计划时间段",
+      "createdOn": "创建于",
+      "createdAt": "创建日期",
+      "dueOn": "截止",
+      "workspacesProjects": "工作区 / 项目",
+      "backgroundColor": "背景颜色",
+      "removeBackground": "移除背景",
+      "removeBackgroundColor": "移除背景颜色",
+      "noBackground": "无背景",
+      "custom": "自定义",
+      "logTime": "记录时间",
+      "noTimeLogged": "还没有记录时间。",
+      "titlePlaceholder": "完成季度绩效报告"
+    },
+    "projectRequired": {
+      "title": "选择一个项目",
+      "description": "请先创建项目：此视图中的任务始终属于某个项目。"
+    },
+    "deleteTaskDialog": {
+      "title": "删除任务",
+      "description": "确定要删除任务“{{title}}”吗？",
+      "warning": "它将连同子任务一起被删除，且无法撤销。"
+    },
+    "createProjectTaskModal": {
+      "noEstimate": "无预估",
+      "selectProject": "选择项目",
+      "toast": {
+        "titleRequired": "需要标题",
+        "titleRequiredDesc": "请输入任务标题。",
+        "taskUpdated": "任务已更新",
+        "workspaceTitleRequired": "需要标题",
+        "workspaceTitleRequiredDesc": "请输入工作区标题。",
+        "workspaceLinked": "工作区已创建并关联",
+        "workspaceCreateFailed": "无法创建工作区。请重试。"
+      },
+      "titlePlaceholder": "任务标题...",
+      "status": "状态",
+      "priority": "优先级",
+      "tagsModules": "标签 / 模块",
+      "tagPlaceholder": "标签名称...",
+      "scheduleExecution": "日程与执行",
+      "autoSynced": "已自动同步到每日计划",
+      "dueDate": "截止日期",
+      "duration": "时长",
+      "setDuration": "设置时长",
+      "linkedSpec": "关联的规格与 PRD",
+      "createWorkspace": "创建工作区",
+      "changeWorkspace": "更换工作区",
+      "linkWorkspace": "关联工作区",
+      "noWorkspaceLinked": "未关联工作区",
+      "clickToLink": "点击将此任务关联到规格文档或笔记",
+      "unlinkWorkspace": "取消关联工作区",
+      "openWorkspace": "打开",
+      "linked": "已关联",
+      "descAndContext": "描述与背景",
+      "descPlaceholder": "添加更详细的描述...",
+      "subtasks": "子任务",
+      "subtaskPlaceholder": "添加子任务...（按 Enter）",
+      "add": "添加",
+      "aiBreakdown": "Lumina AI 拆解",
+      "deleteTask": "删除任务",
+      "createMore": "继续创建",
+      "cancel": "取消",
+      "createTask": "创建任务",
+      "saveChanges": "保存更改",
+      "createWorkspaceDialogDesc": "用任意标题创建一个新工作区，它会自动关联到此任务。",
+      "project": "项目：",
+      "workspaceTitle": "工作区标题",
+      "workspaceTitlePlaceholder": "例如：技术规格、需求、PRD...",
+      "createAndLink": "创建并关联",
+      "searchWorkspacePlaceholder": "搜索工作区或笔记..."
+    }
+  },
+  "projects": {
+    "loading": "正在加载项目…",
+    "newProject": "新建项目",
+    "createCleanFolder": "创建空白文件夹",
+    "showingResultsFor": "“{{term}}”的 {{count}} 个结果",
+    "showingCountOfTotal": "显示 {{current}}/{{total}} 个项目",
+    "searchProjects": "搜索项目...",
+    "searchTasks": "搜索任务...",
+    "filterAndSort": "筛选和排序",
+    "noProjects": "没有可用的项目",
+    "filterBy": "筛选：",
+    "statusFilter": "状态：",
+    "modifiedDate": "最后修改",
+    "tags": "标签",
+    "tabs": {
+      "viewProjects": "查看项目",
+      "viewTasks": "查看项目任务"
+    },
+    "sort": {
+      "title": "排序项目",
+      "recent": "最近更新",
+      "nameAsc": "名称（A 到 Z）",
+      "notesCount": "笔记数量",
+      "mostNotes": "笔记最多",
+      "filterByColor": "按颜色筛选",
+      "allColors": "所有颜色",
+      "resetFilters": "重置筛选"
+    }
+  },
+  "workspaceEditor": {
+    "header": {
+      "addIcon": "添加图标",
+      "changeIcon": "更换图标",
+      "addCover": "添加封面",
+      "changeCover": "更换封面",
+      "focusView": "居中视图",
+      "defaultView": "普通视图"
+    },
+    "untitledNote": "无标题笔记",
+    "saving": "保存中",
+    "saved": "已保存",
+    "savingChanges": "正在保存更改...",
+    "allChangesSaved": "所有更改已保存",
+    "openSidebar": "打开辅助面板",
+    "closeSidebar": "关闭面板",
+    "detectLanguage": "检测语言",
+    "startDictation": "开始听写",
+    "stopDictation": "停止听写",
+    "focusMode": "专注模式",
+    "normalView": "普通视图",
+    "importDocument": "导入文档",
+    "exportDocument": "导出文档",
+    "exportFailed": "导出失败",
+    "exportFailedDesc": "无法生成 Word 文档。",
+    "markdown": "Markdown (.md)",
+    "word": "Word (.docx)",
+    "searchTasksToLink": "搜索要关联的任务...",
+    "palette": {
+      "availableTasks": "可用任务",
+      "linkedCount": "已关联 {{count}} 个",
+      "noTasksFound": "未找到任务",
+      "pressKey": "按",
+      "toLinkOrUnlink": "关联或取消关联任务"
+    },
+    "outline": {
+      "noHeadings": "此笔记中没有标题",
+      "addHeadingsHint": "使用 markdown 语法（# 标题 或 ## 章节）添加标题，即可生成导航大纲。",
+      "searchPlaceholder": "在大纲中搜索...",
+      "locationInDoc": "在文档中的位置",
+      "jumpTooltip": "在编辑器中跳转到此章节",
+      "goToSection": "前往章节",
+      "noSectionsFound": "未找到与“{{query}}”匹配的章节"
+    },
+    "graph": {
+      "rootDoc": "根文档",
+      "mainHeadingH1": "主标题（H1）",
+      "sectionH2": "章节（H2）",
+      "subSection": "子章节（H{{level}}）",
+      "noConnections": "0 个连接",
+      "terminalSection": "末端章节",
+      "connectionCount": "{{count}} 个连接",
+      "document": "文档",
+      "tabH1": "标题（H1）",
+      "tabH2": "章节（H2）",
+      "tabH3": "子章节（H3+）",
+      "filterNodesPlaceholder": "筛选节点...",
+      "reorganize": "重新排列",
+      "emptyGuideHint": "在笔记中输入标题（# 章节），图谱会实时生长",
+      "resetPositionsAndZoom": "重置位置和缩放",
+      "centerView": "居中视图",
+      "expandDetails": "展开详情",
+      "minimizePanel": "最小化面板",
+      "connectionsShort": "连接",
+      "jumpDone": "完成！",
+      "jump": "跳转",
+      "hierarchy": "层级：",
+      "root": "根",
+      "level": "第 {{level}} 级",
+      "connections": "连接：",
+      "sectionLocated": "已在编辑器中定位到章节！",
+      "goToSectionInEditor": "在编辑器中前往章节"
+    },
+    "sidebar": {
+      "outline": "大纲",
+      "graph": "图谱",
+      "details": "详情",
+      "words": "字数",
+      "characters": "字符",
+      "readingTime": "阅读",
+      "headings": "标题",
+      "document": "文档",
+      "structure": "结构",
+      "mainHeadings": "主标题",
+      "sections": "章节",
+      "subsections": "子章节",
+      "paragraphs": "段落",
+      "linkedTasks": "关联任务",
+      "link": "关联",
+      "linkTask": "关联任务",
+      "noLinkedTasks": "没有关联任务",
+      "unlinkTask": "取消关联任务"
+    },
+    "canvases": {
+      "button": "文档画布",
+      "title": "此文档中的画布",
+      "open": "打开画布",
+      "inDocument": "在文档中",
+      "notInDocument": "不在文档中",
+      "insert": "插入到文档",
+      "delete": "删除",
+      "deleteTitle": "删除“{{name}}”？",
+      "deleteHint": "其绘图、图片以及文档中的链接都会被删除。",
+      "dragHint": "将画布拖入文档，放到任意位置。",
+      "deleteFailed": "无法删除画布",
+      "deleteFailedDesc": "请稍后重试。",
+      "limitReached": "你的套餐包含 {{count}} 个画布",
+      "limitReachedDesc": "删除一个，或升级到 Pro 以创建更多。",
+      "tooLarge": "此画布已达到套餐的大小上限",
+      "tooLargeDesc": "超过 {{size}} 时，最新更改不会被保存。请删除一些元素或升级到 Pro。",
+      "imageTooLarge": "此图片不会被保存",
+      "imageTooLargeDesc": "在你的套餐中，图片最大为 {{size}}。",
+      "imageLimit": "此画布已包含套餐允许的全部图片",
+      "imageLimitDesc": "在你的套餐中，每个画布最多可包含 {{count}} 张图片。",
+      "readOnlyPhone": "手机上仅可查看",
+      "readOnlyPhoneDesc": "请在电脑上打开以进行编辑。"
+    },
+    "focusButton": "专注",
+    "startFocus": "开始专注时段",
+    "startFocusOn": "专注于“{{title}}”"
+  },
+  "legal": {
+    "termsTitle": "服务条款",
+    "privacyTitle": "隐私声明",
+    "backHome": "返回首页",
+    "onlySpanish": "此文档目前仅提供西班牙语版本。",
+    "loginNotice": "继续即表示你同意 Focusly 的<terms>服务条款</terms>和<privacy>隐私声明</privacy>。",
+    "aiNotice": "AI 可能会出错。你的消息和任务上下文由第三方 AI 提供商处理。<privacy>了解更多</privacy>",
+    "settingsTitle": "法律信息",
+    "settingsDesc": "规范你使用 Focusly 以及你的数据如何处理的文件。",
+    "acceptModal": {
+      "title": "条款与隐私",
+      "subtitle": "我们需要你的同意才能继续",
+      "newBody": "要使用 Focusly，请阅读并接受我们的<terms>服务条款</terms>和<privacy>隐私声明</privacy>。",
+      "updatedBody": "我们更新了<terms>服务条款</terms>和<privacy>隐私声明</privacy>。请阅读并接受，以继续使用 Focusly。",
+      "accept": "我同意",
+      "logout": "退出登录",
+      "error": "无法保存你的同意。请重试。"
+    }
+  },
+  "billing": {
+    "plans": {
+      "free": {
+        "name": "Focusly Free",
+        "tagline": "整理一切，体验 Lumina",
+        "price": "免费"
+      },
+      "pro": {
+        "name": "Focusly Pro",
+        "tagline": "无限使用 Lumina，在文档中也一样"
+      },
+      "recommended": "推荐",
+      "current": "你当前的套餐",
+      "perInterval": "/ {{interval}}",
+      "interval": {
+        "month": "月",
+        "year": "年",
+        "week": "周",
+        "day": "天"
+      },
+      "priceLater": "下一步会显示价格",
+      "intervalLabel": "计费周期",
+      "monthly": "按月",
+      "yearly": "按年",
+      "monthsFree_one": "免费 {{count}} 个月",
+      "monthsFree_other": "免费 {{count}} 个月",
+      "save": "节省 {{percent}}%",
+      "perMonthEquivalent": "相当于 {{price}}/月，每年扣费一次",
+      "trialBadge_one": "{{count}} 天免费试用",
+      "trialBadge_other": "{{count}} 天免费试用",
+      "trialNote": "今天不会扣费。在试用结束前取消，无需支付任何费用。",
+      "cancelAnytime": "无需承诺：随时取消。"
+    },
+    "features": {
+      "aiTrial_one": "每月 {{count}} 条 Lumina 消息",
+      "aiTrial_other": "每月 {{count}} 条 Lumina 消息",
+      "core": "任务、项目和文档",
+      "calendar": "日历和 Google 日历",
+      "editorAi": "文档编辑器中的 AI",
+      "unlimitedAi": "与 Lumina 无限畅聊（合理使用）",
+      "editorAiPro": "编辑器 AI：起草、总结和改写",
+      "everythingFree": "包含 Free 的全部功能",
+      "cancelAnytime": "随时取消",
+      "notIncluded": "不包含"
+    },
+    "usage": "本月已使用 {{used}}/{{limit}} 条免费消息",
+    "renewsOn": "将于 {{date}} 恢复",
+    "usageLeft_one": "本月还剩 {{count}} 条免费消息",
+    "usageLeft_other": "本月还剩 {{count}} 条免费消息",
+    "usageNone": "本月免费消息已用完 · {{date}} 恢复",
+    "tryPro": "试用 Pro",
+    "dailyLimit": {
+      "title": "你已达到今天的 Lumina 使用上限",
+      "body_one": "Pro 每天最多包含 {{count}} 次 AI 使用。将于 {{date}} 恢复。",
+      "body_other": "为了让每个人都能顺畅使用 Lumina，Pro 每天最多包含 {{count}} 次 AI 使用（合理使用）。将于 {{date}} 恢复。"
+    },
+    "dailyLow": {
+      "title_one": "今天还剩 {{count}} 次 Lumina 使用",
+      "title_other": "今天还剩 {{count}} 次 Lumina 使用",
+      "body_one": "根据合理使用原则，Pro 每天最多 {{count}} 次。将于 {{date}} 恢复。",
+      "body_other": "根据合理使用原则，Pro 每天最多 {{count}} 次。将于 {{date}} 恢复。"
+    },
+    "upgrade": {
+      "title": {
+        "manual": "升级你的套餐",
+        "limit_one": "你已用完本月的免费消息",
+        "limit_other": "你已用完本月的 {{count}} 条免费消息",
+        "editor": "编辑器 AI 是 Pro 的一部分",
+        "canvas": "Pro 提供更多画布"
+      },
+      "subtitle": {
+        "manual": "选择适合你工作方式的套餐。",
+        "limit": "将于 {{date}} 恢复。升级 Pro，现在就能继续与 Lumina 对话。",
+        "editor": "使用 Pro，Lumina 可以直接在你的文档中起草、总结和改写。",
+        "canvas": "使用 Pro，你可以创建不限数量、更大的画布，图片最大 10 MB。"
+      },
+      "cta": "继续付款",
+      "alreadyPro": "你已拥有 Focusly Pro",
+      "notConfigured": "暂时无法付款。请稍后重试。",
+      "startError": "无法打开付款页面。请重试。",
+      "close": "关闭",
+      "ctaTrial_one": "开始 {{count}} 天免费试用",
+      "ctaTrial_other": "开始 {{count}} 天免费试用"
+    },
+    "checkout": {
+      "title": "完成订阅",
+      "back": "返回套餐",
+      "renews": "每{{interval}}自动续订",
+      "pay": "以 {{price}} 订阅",
+      "payNoPrice": "订阅",
+      "secure": "通过 Stripe 安全付款。Focusly 永远不会看到你的银行卡信息。",
+      "cancelNote": "你可以随时在 个人资料 → 套餐与账单 中取消。",
+      "error": "付款未能处理。请检查信息后重试。",
+      "loading": "正在加载付款表单…",
+      "applePayDescription": "Focusly Pro 订阅",
+      "summary": "订单摘要",
+      "plan": {
+        "month": "按月",
+        "year": "按年"
+      },
+      "discountOnce": "优惠码 {{code}}（首次付款减 {{value}}）",
+      "discountMonths_one": "优惠码 {{code}}（{{count}} 个月内减 {{value}}）",
+      "discountMonths_other": "优惠码 {{code}}（{{count}} 个月内减 {{value}}）",
+      "discountForever": "优惠码 {{code}}（永久减 {{value}}）",
+      "trialRow": "免费试用至 {{date}}",
+      "free": "免费",
+      "dueToday": "今日应付",
+      "afterTrial": "{{date}} 将扣费 {{price}}，并自动续订。",
+      "disclosure": "订阅即表示你授权 Focusly 定期收取 {{price}}，直到你取消为止。",
+      "startTrial": "开始免费试用",
+      "promo": {
+        "toggle": "有优惠码？",
+        "placeholder": "优惠码",
+        "label": "优惠码",
+        "apply": "使用",
+        "applied": "已使用优惠码 {{code}}",
+        "invalid": "该优惠码无效或已过期。",
+        "error": "无法使用该优惠码。请重试。"
+      }
+    },
+    "activating": {
+      "title": "正在激活你的套餐…",
+      "body": "我们正在与 Stripe 确认付款。"
+    },
+    "done": {
+      "title": "欢迎使用 Focusly Pro！",
+      "body": "现在你可以无限使用 Lumina，在编辑器中也一样。",
+      "cta": "开始使用",
+      "trialTitle": "你的 Focusly Pro 试用已开始！",
+      "trialBody": "无限使用 Lumina，免费至 {{date}}。在此之前取消，无需支付任何费用。",
+      "nextCharge": "下次扣费日期为 {{date}}。"
+    },
+    "pending": {
+      "title": "我们已收到你的付款",
+      "body": "你的 Pro 套餐将在几分钟内生效。你可以关闭此窗口。"
+    },
+    "limitBanner": {
+      "title_one": "你已用完本月的免费消息",
+      "title_other": "你已用完本月的 {{count}} 条免费消息",
+      "body": "将于 {{date}} 恢复。升级到 Focusly Pro，现在就能继续聊天。",
+      "cta": "查看套餐"
+    },
+    "limitReply": "你已达到本月的免费消息上限。你的消息未发送：你可以升级 Focusly Pro 后重新发送，或在每月 1 日额度恢复后再发送。",
+    "editorGate": {
+      "title": "编辑器 AI 是 Pro 的一部分",
+      "body": "使用 Focusly Pro，Lumina 可以为你的文档起草、总结和改写。",
+      "cta": "试用 Pro"
+    },
+    "section": {
+      "title": "你的套餐",
+      "description": "你的订阅、Lumina 用量和付款信息。",
+      "free": "免费套餐",
+      "pro": "Pro 套餐",
+      "renews": "将于 {{date}} 续订",
+      "cancels": "你的 Pro 套餐将于 {{date}} 结束，之后不会再扣费。",
+      "pastDue": "我们无法收取你最近一张账单的费用。请更新银行卡以保留 Pro。",
+      "manage": "管理付款和发票",
+      "manageHint": "在 Stripe 的安全门户中更换银行卡、下载发票或取消订阅。",
+      "portalError": "无法打开 Stripe 门户。",
+      "plansTitle": "套餐",
+      "plansDescription": "每个套餐包含的内容。",
+      "returnSuccess": "你的 Focusly Pro 订阅已生效！",
+      "returnPending": "我们已收到你的付款，套餐将在几分钟内生效。",
+      "returnFailed": "付款未完成。你可以重试。",
+      "plan": {
+        "month": "Focusly Pro 月付",
+        "year": "Focusly Pro 年付"
+      },
+      "trialEnds": "你的免费试用持续到 {{date}}。之后将收取 {{price}}。",
+      "trialCancels": "你的免费试用将于 {{date}} 结束，不会扣费。",
+      "discount": "优惠码 {{code}}：减 {{value}}。",
+      "discountUntil": "优惠码 {{code}}：{{date}} 前减 {{value}}。"
+    },
+    "history": {
+      "title": "付款记录",
+      "description": "你向 Focusly 支付的款项，附收据和 PDF 发票。",
+      "loading": "正在加载你的付款记录…",
+      "empty": "还没有付款记录。",
+      "error": "无法加载你的付款记录。",
+      "retry": "重试",
+      "plan": {
+        "month": "Focusly Pro · 月付",
+        "year": "Focusly Pro · 年付"
+      },
+      "discount": "优惠 {{amount}}",
+      "status": {
+        "paid": "已支付",
+        "trial": "免费试用",
+        "open": "待支付",
+        "uncollectible": "未收款",
+        "refunded": "已退款",
+        "partially_refunded": "部分退款"
+      },
+      "receipt": "查看收据",
+      "receiptFor": "查看收据 {{number}}",
+      "pdf": "下载 PDF",
+      "pdfFor": "下载发票 {{number}} 的 PDF"
+    }
+  },
+  "toasts": {
+    "region": "通知"
+  },
+  "confirmDialogs": {
+    "deleteTask": {
+      "title": "删除此任务？",
+      "description": "它将连同子任务被永久删除。",
+      "confirm": "删除任务",
+      "done": "任务已删除"
+    },
+    "deleteProject": {
+      "title": "删除此项目？",
+      "description": "其中的文档不会被删除，只会被移出项目。",
+      "confirm": "删除项目",
+      "done": "项目已删除",
+      "failed": "无法删除项目"
+    },
+    "deleteDocument": {
+      "title": "删除此文档？",
+      "description": "它将被永久删除。",
+      "confirm": "删除文档",
+      "done": "文档已删除",
+      "failed": "无法删除文档"
+    }
+  },
+  "aiModels": {
+    "auto": "自动",
+    "autoHint": "Lumina 根据你的消息自动选择",
+    "fast": "快速",
+    "fastHint": "快速回答和简单操作",
+    "reasoning": "推理",
+    "reasoningHint": "计划、分析和文档",
+    "select": "选择模型"
+  },
+  "guide": {
+    "ui": {
+      "next": "下一步",
+      "back": "上一步",
+      "done": "知道了",
+      "close": "关闭指南",
+      "pages": "页面",
+      "page": "第 {{current}}/{{total}} 页",
+      "openGuide": "本部分指南"
+    },
+    "frames": {
+      "markdownSample": "## 计划\n- [ ] 复查\n- [x] 设计\n**重点**",
+      "confirm": "确认"
+    },
+    "keys": {
+      "period": "上一个 / 下一个时段",
+      "today": "回到今天",
+      "views": "日、周或月视图",
+      "lumina": "打开助手 Lumina",
+      "linkTask": "查找并关联任务",
+      "undo": "撤销",
+      "redo": "重做",
+      "moveLine": "上移或下移该行",
+      "copyLine": "复制该行"
+    },
+    "calendar": {
+      "label": "每日计划",
+      "steps": {
+        "overview": {
+          "title": "一眼看清你的时间",
+          "body": "日历汇集了你的专注块、已排期任务和活动。根据想看的范围，在日、周、月视图之间切换。"
+        },
+        "blocks": {
+          "title": "创建和调整时间块",
+          "body": "点击空闲时段即可快速创建任务。拖动时间块可移到其他时间或日期，拉伸边缘可调整时长。"
+        },
+        "awaited": {
+          "title": "待安排任务",
+          "body": "侧边面板汇集了还没有安排时间的待办任务，确保一个也不会被遗忘。"
+        },
+        "ai": {
+          "title": "用 AI 规划",
+          "body": "点击“优化日程”，Lumina 会找出你的空闲时段并建议每个任务的安排时间。查看草稿后确认或放弃：未经你同意，不会安排任何事项。"
+        },
+        "keys": {
+          "title": "用键盘快速切换",
+          "body": "用方向键切换时段，按 T 回到今天，按 D、W、M 切换视图。"
+        }
+      }
+    },
+    "tasks": {
+      "label": "任务",
+      "steps": {
+        "lists": {
+          "title": "收件箱、今天和即将到来",
+          "body": "你的任务分布在三个列表中：收件箱存放尚未整理的事项，今天是当天的计划，即将到来是接下来的安排。"
+        },
+        "create": {
+          "title": "创建任务",
+          "body": "为任务添加标题，也可以设置优先级、时长和日期。信息越详细，Lumina 规划得越好。"
+        },
+        "board": {
+          "title": "列表或看板",
+          "body": "在列表和看板视图之间切换。在看板中，把任务拖到另一列即可更改状态。"
+        },
+        "find": {
+          "title": "找到所需内容",
+          "body": "按名称或标签搜索，并按优先级或负责人筛选，只保留重要的内容。"
+        },
+        "ai": {
+          "title": "用 AI 整理",
+          "body": "“AI 整理”会按优先级和日期排列你的待完成任务。你也可以从任意任务开始专注时段。"
+        }
+      }
+    },
+    "workspaces": {
+      "label": "工作区",
+      "steps": {
+        "docs": {
+          "title": "你的文档",
+          "body": "工作区是用于规划、记录和调研的 markdown 笔记。每张卡片会显示图标、封面和最后编辑时间。"
+        },
+        "projects": {
+          "title": "按项目整理",
+          "body": "将文档归入有专属颜色和图标的项目，让每项计划都集中在一处。"
+        },
+        "create": {
+          "title": "创建文档",
+          "body": "“新建工作区”会创建空白文档，也可以从模板开始，不必从零写起。"
+        },
+        "link": {
+          "title": "关联任务",
+          "body": "文档可以关联任务：打开文档，在侧边面板中关联任务，就能在正文旁查看进度。"
+        },
+        "find": {
+          "title": "搜索和切换视图",
+          "body": "用 {{mod}} K 查找任意文档，并选择以画廊、网格或列表查看，支持筛选和排序。"
+        }
+      }
+    },
+    "editor": {
+      "label": "编辑器",
+      "steps": {
+        "markdown": {
+          "title": "用 markdown 书写",
+          "body": "标题、列表、复选框和粗体会在输入时即时成形。将光标放在元素上即可查看和编辑其 markdown。"
+        },
+        "blocks": {
+          "title": "特殊块",
+          "body": "除了文字，编辑器还能显示高亮代码、表格、Mermaid 图表、公式、GeoJSON 地图和可折叠章节。"
+        },
+        "ai": {
+          "title": "AI 处理你的文字",
+          "body": "选中文字后右键，即可创建任务、总结、修正、翻译或调整语气。{{mod}} J 打开 Lumina，它会提出修改建议，由你审阅后再应用。"
+        },
+        "canvas": {
+          "title": "画布",
+          "body": "从右键菜单创建画布页面：一块可以绘制图表的白板，以卡片形式关联在文档中。"
+        },
+        "sidebar": {
+          "title": "侧边面板",
+          "body": "查看笔记的大纲、标题图谱和统计数据，并管理关联任务。标题栏中的“专注”按钮可为其任务开始专注时段。"
+        },
+        "keys": {
+          "title": "键盘快捷键",
+          "body": "写作时最常用的快捷键。"
+        }
+      }
+    },
+    "insights": {
+      "label": "洞察",
+      "steps": {
+        "stats": {
+          "title": "用数字看你的效率",
+          "body": "按日、周、月或年查看总专注时间、已完成任务、平均精力和深度工作占比。"
+        },
+        "trends": {
+          "title": "趋势",
+          "body": "看看你的效率如何随时间变化，以及时间都花在了哪里。"
+        },
+        "activity": {
+          "title": "活跃度与黄金时段",
+          "body": "活跃度图显示你最稳定的日子，黄金时段显示你状态最好的时间，方便你把最难的工作安排在那时。"
+        },
+        "report": {
+          "title": "导出和分享",
+          "body": "导出你的数据，或创建一份总结该时段的报告。"
+        }
+      }
+    },
+    "askAi": {
+      "label": "询问 AI",
+      "steps": {
+        "chat": {
+          "title": "与 Lumina 对话",
+          "body": "Lumina 了解你的任务和日历。问问今天该做什么，寻求灵感，或者让它总结你的一周。"
+        },
+        "suggestions": {
+          "title": "从建议开始",
+          "body": "不知道从哪里开始？选一个建议：专注策略、效率分析等等。"
+        },
+        "plan": {
+          "title": "行动计划",
+          "body": "Lumina 可以提出可直接创建的任务和活动。查看并确认：未经你同意，不会创建任何内容。"
+        },
+        "history": {
+          "title": "你的对话",
+          "body": "每次聊天都会保存，方便你之后继续，或在不再需要时删除。"
+        }
+      }
+    }
+  }
+}
