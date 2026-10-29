@@ -170,7 +170,7 @@
     "cancelPlanning": "Cancelar",
     "optimizeFreeHint_one": "Usa tu último mensaje gratis de Lumina",
     "optimizeFreeHint_other": "Usa 1 de tus {{count}} mensajes gratis de Lumina",
-    "optimizeProOnly": "Usaste tus mensajes gratis: disponible con Pro",
+    "optimizeProOnly": "Usaste tus mensajes gratis de este mes: disponible con Pro",
     "draftGeneratedPartial_one": "Lumina propuso {{count}} bloque; {{left}} tarea(s) no cupieron en tus horas libres.",
     "draftGeneratedPartial_other": "Lumina propuso {{count}} bloques; {{left}} tarea(s) no cupieron en tus horas libres.",
     "scheduleSavedTitle": "Agenda confirmada",
@@ -1715,33 +1715,45 @@
       "cancelAnytime": "Sin permanencia: cancela cuando quieras."
     },
     "features": {
-      "aiTrial_one": "{{count}} mensaje con Lumina para probarla",
-      "aiTrial_other": "{{count}} mensajes con Lumina para probarla",
+      "aiTrial_one": "{{count}} mensaje al mes con Lumina",
+      "aiTrial_other": "{{count}} mensajes al mes con Lumina",
       "core": "Tareas, proyectos y documentos",
       "calendar": "Calendario y Google Calendar",
       "editorAi": "IA en el editor de documentos",
-      "unlimitedAi": "Chat con Lumina sin límites",
+      "unlimitedAi": "Chat con Lumina sin límites (uso justo)",
       "editorAiPro": "IA en el editor: redacta, resume y reescribe",
       "everythingFree": "Todo lo del plan Free",
       "cancelAnytime": "Cancela cuando quieras",
       "notIncluded": "No incluido"
     },
-    "usage": "{{used}} de {{limit}} mensajes gratis usados",
-    "usageLeft_one": "Te queda {{count}} mensaje gratis",
-    "usageLeft_other": "Te quedan {{count}} mensajes gratis",
-    "usageNone": "Ya usaste tus mensajes gratis",
+    "usage": "{{used}} de {{limit}} mensajes gratis usados este mes",
+    "renewsOn": "Se renuevan el {{date}}",
+    "usageLeft_one": "Te queda {{count}} mensaje gratis este mes",
+    "usageLeft_other": "Te quedan {{count}} mensajes gratis este mes",
+    "usageNone": "Ya usaste tus mensajes gratis de este mes · vuelven el {{date}}",
     "tryPro": "Prueba Pro",
+    "dailyLimit": {
+      "title": "Llegaste al límite diario de Lumina",
+      "body_one": "Pro incluye hasta {{count}} uso de IA al día. Se renueva el {{date}}.",
+      "body_other": "Para que Lumina vaya bien para todos, Pro incluye hasta {{count}} usos de IA al día (uso justo). Se renueva el {{date}}."
+    },
+    "dailyLow": {
+      "title_one": "Te queda {{count}} uso de Lumina hoy",
+      "title_other": "Te quedan {{count}} usos de Lumina hoy",
+      "body_one": "Pro incluye hasta {{count}} al día por uso justo. Se renueva el {{date}}.",
+      "body_other": "Pro incluye hasta {{count}} al día por uso justo. Se renueva el {{date}}."
+    },
     "upgrade": {
       "title": {
         "manual": "Mejora tu plan",
-        "limit_one": "Usaste tu mensaje gratis",
-        "limit_other": "Usaste tus {{count}} mensajes gratis",
+        "limit_one": "Usaste tu mensaje gratis de este mes",
+        "limit_other": "Usaste tus {{count}} mensajes gratis de este mes",
         "editor": "La IA del editor es parte de Pro",
         "canvas": "Más canvas con Pro"
       },
       "subtitle": {
         "manual": "Elige el plan que mejor va con tu forma de trabajar.",
-        "limit": "Pásate a Pro para seguir hablando con Lumina sin límites.",
+        "limit": "Se renuevan el {{date}}. Con Pro sigues hablando con Lumina ahora mismo.",
         "editor": "Con Pro, Lumina redacta, resume y reescribe dentro de tus documentos.",
         "canvas": "Con Pro creas canvas sin límite, más grandes y con imágenes de hasta 10 MB."
       },
@@ -1806,12 +1818,12 @@
       "body": "Tu plan Pro se activará en unos minutos. Puedes cerrar esta ventana."
     },
     "limitBanner": {
-      "title_one": "Usaste tu mensaje gratis con Lumina",
-      "title_other": "Usaste tus {{count}} mensajes gratis con Lumina",
-      "body": "Pásate a Focusly Pro para seguir conversando sin límites.",
+      "title_one": "Usaste tu mensaje gratis de este mes",
+      "title_other": "Usaste tus {{count}} mensajes gratis de este mes",
+      "body": "Se renuevan el {{date}}. Pásate a Focusly Pro para seguir conversando ahora.",
       "cta": "Ver planes"
     },
-    "limitReply": "Llegaste al límite de mensajes gratis. Tu mensaje no se envió: puedes reenviarlo con Focusly Pro.",
+    "limitReply": "Llegaste al límite de mensajes gratis de este mes. Tu mensaje no se envió: puedes reenviarlo con Focusly Pro, o el día 1, cuando se renuevan.",
     "editorGate": {
       "title": "La IA del editor es parte de Pro",
       "body": "Con Focusly Pro, Lumina redacta, resume y reescribe tus documentos.",

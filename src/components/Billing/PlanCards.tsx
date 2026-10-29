@@ -28,6 +28,7 @@ import {
   priceFor,
   yearlySavings,
 } from '@/config/plans';
+import { freeMessagesRenewal } from '@/utils/billing/aiRenewal';
 
 const BRAND = '#008767';
 
@@ -288,7 +289,9 @@ export const PlanCards: React.FC<PlanCardsProps> = ({
                   color={remaining === 0 ? 'error' : 'text.secondary'}
                 >
                   {remaining === 0
-                    ? t('billing.usageNone')
+                    ? t('billing.usageNone', {
+                        date: freeMessagesRenewal(null, i18n.language),
+                      })
                     : t('billing.usageLeft', { count: remaining })}
                 </Typography>
               </Box>

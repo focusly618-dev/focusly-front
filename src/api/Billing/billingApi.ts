@@ -19,8 +19,17 @@ export interface BillingStatus {
   cancel_at_period_end: boolean;
   /** Unix seconds. */
   current_period_end: number | null;
+  /** Free: messages used this month, and how many it gets (they renew on
+   * the 1st). */
   ai_messages_used: number;
   ai_messages_limit: number;
+  /** ISO instants (UTC) when the month's free messages, and Pro's fair use
+   * for the day, start over. */
+  ai_messages_resets_at?: string;
+  ai_daily_resets_at?: string;
+  /** Pro: AI uses today, and the daily fair-use limit. */
+  ai_daily_used?: number;
+  ai_daily_limit?: number;
   billing_enabled: boolean;
   /** The monthly Pro price as Stripe has it (null when unknown). */
   pro_price: ProPrice | null;

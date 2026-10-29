@@ -1,10 +1,15 @@
 import { useEffect, useSyncExternalStore } from 'react';
+import i18next from 'i18next';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { updateUser } from '@/redux/auth/auth.slice';
 import { billingService } from '@/services/billingService';
+import {
+  dailyUseRenewal,
+  freeMessagesRenewal,
+} from '@/utils/billing/aiRenewal';
 
 /** Shown until the backend answers (it sends the real limit). */
-const DEFAULT_FREE_LIMIT = 5;
+const DEFAULT_FREE_LIMIT = 10;
 
 /** The user's plan, free AI usage and the Pro dialog. */
 export const useBilling = () => {
@@ -46,6 +51,16 @@ export const useBilling = () => {
     used,
     remaining: isPro ? Infinity : Math.max(0, limit - used),
     billingEnabled: status?.billing_enabled ?? true,
+    /** When the free messages come back, and Pro's fair use for today starts
+     * over, in the user's own time zone and language. */
+    freeRenewal: freeMessagesRenewal(
+      status?.ai_messages_resets_at,
+      i18next.language || 'es',
+    ),
+    dailyRenewal: dailyUseRenewal(
+      status?.ai_daily_resets_at,
+      i18next.language || 'es',
+    ),
     /** Null until the backend answers; it checks them either way. */
     canvasLimits: status?.canvas_limits ?? null,
     upgrade: state.upgrade,

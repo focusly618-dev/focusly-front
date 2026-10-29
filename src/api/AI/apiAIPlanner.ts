@@ -1,6 +1,6 @@
 import axios from 'axios';
 import axiosInstance from '../axiosInstance';
-import { PlanLimitError } from '@/api/Billing/planLimit';
+import { PlanLimitError, announceDailyLimit } from '@/api/Billing/planLimit';
 import { billingService } from '@/services/billingService';
 import type { Task } from '@/redux/tasks/task.types';
 import type { WorkHoursConfig } from '@/api/User/apiUser.types';
@@ -26,8 +26,9 @@ export type {
 // ─── Plan limits ──────────────────────────────────────────────────────────────
 
 /**
- * Each planner call counts as an AI message on the free plan: the backend
- * answers 402 once they're used up, and the Pro plans open.
+ * Each planner call counts as an AI use: a free message (402 once the
+ * month's are used up, and the Pro plans open) or, on Pro, a use of the
+ * day's fair use (429 once it's reached, said in a toast).
  */
 const plannerPost = async <T>(
   url: string,
@@ -36,21 +37,28 @@ const plannerPost = async <T>(
 ): Promise<T> => {
   try {
     const response = await axiosInstance.post<T>(url, body, config);
-    const remaining = Number(response.headers['x-ai-messages-remaining']);
-    if (
-      response.headers['x-ai-messages-remaining'] !== undefined &&
-      Number.isFinite(remaining)
-    ) {
-      billingService.setRemaining(remaining);
-    }
+    billingService.noteAIAllowance((name) => {
+      const value: unknown = response.headers[name];
+      return value === undefined ? null : String(value);
+    });
     return response.data;
   } catch (err) {
-    if (axios.isAxiosError(err) && err.response?.status === 402) {
-      const detail = (err.response.data as { detail?: { limit?: number } })
-        ?.detail;
+    const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+    const detail = axios.isAxiosError(err)
+      ? (
+          err.response?.data as {
+            detail?: { code?: string; limit?: number; resets_at?: string };
+          }
+        )?.detail
+      : undefined;
+    if (status === 402) {
       billingService.markLimitReached(detail?.limit);
       billingService.openUpgrade('limit');
       throw new PlanLimitError('free_limit_reached', detail?.limit);
+    }
+    if (status === 429 && detail?.code === 'daily_limit_reached') {
+      announceDailyLimit(detail.limit, detail.resets_at);
+      throw new PlanLimitError('daily_limit_reached', detail.limit);
     }
     throw err;
   }

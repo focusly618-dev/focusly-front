@@ -169,7 +169,7 @@
     "cancelPlanning": "キャンセル",
     "optimizeFreeHint_one": "最後の無料Luminaメッセージを使用します",
     "optimizeFreeHint_other": "無料Luminaメッセージ{{count}}件のうち1件を使用します",
-    "optimizeProOnly": "無料メッセージを使い切りました：Proで利用できます",
+    "optimizeProOnly": "今月の無料メッセージを使い切りました：Proで利用できます",
     "draftGeneratedPartial_one": "Luminaが{{count}}件のブロックを提案しました。{{left}}件のタスクは空き時間に収まりませんでした。",
     "draftGeneratedPartial_other": "Luminaが{{count}}件のブロックを提案しました。{{left}}件のタスクは空き時間に収まりませんでした。",
     "scheduleSavedTitle": "スケジュールを確定しました",
@@ -1681,33 +1681,45 @@
       "cancelAnytime": "いつでも解約できます。"
     },
     "features": {
-      "aiTrial_one": "Lumina を試せるメッセージ {{count}} 件",
-      "aiTrial_other": "Lumina を試せるメッセージ {{count}} 件",
+      "aiTrial_one": "毎月 Lumina メッセージ {{count}} 件",
+      "aiTrial_other": "毎月 Lumina メッセージ {{count}} 件",
       "core": "タスク、プロジェクト、ドキュメント",
       "calendar": "カレンダーと Google カレンダー",
       "editorAi": "ドキュメントエディターの AI",
-      "unlimitedAi": "Lumina と無制限にチャット",
+      "unlimitedAi": "Lumina と無制限にチャット（フェアユース）",
       "editorAiPro": "エディターの AI：下書き、要約、書き直し",
       "everythingFree": "Free プランのすべて",
       "cancelAnytime": "いつでも解約可能",
       "notIncluded": "含まれません"
     },
-    "usage": "無料メッセージ {{limit}} 件中 {{used}} 件使用",
-    "usageLeft_one": "無料メッセージ残り {{count}} 件",
-    "usageLeft_other": "無料メッセージ残り {{count}} 件",
-    "usageNone": "無料メッセージを使い切りました",
+    "usage": "今月の無料メッセージ {{limit}} 件中 {{used}} 件使用",
+    "renewsOn": "{{date}}にリセット",
+    "usageLeft_one": "今月の無料メッセージ残り {{count}} 件",
+    "usageLeft_other": "今月の無料メッセージ残り {{count}} 件",
+    "usageNone": "今月の無料メッセージを使い切りました・{{date}}に再開",
     "tryPro": "Pro を試す",
+    "dailyLimit": {
+      "title": "本日の Lumina の上限に達しました",
+      "body_one": "Pro では1日 {{count}} 回まで AI を利用できます。{{date}}にリセットされます。",
+      "body_other": "すべての方に快適にご利用いただくため、Pro では1日 {{count}} 回まで AI を利用できます（フェアユース）。{{date}}にリセットされます。"
+    },
+    "dailyLow": {
+      "title_one": "本日の Lumina 残り {{count}} 回",
+      "title_other": "本日の Lumina 残り {{count}} 回",
+      "body_one": "Pro はフェアユースとして1日 {{count}} 回まで利用できます。{{date}}にリセットされます。",
+      "body_other": "Pro はフェアユースとして1日 {{count}} 回まで利用できます。{{date}}にリセットされます。"
+    },
     "upgrade": {
       "title": {
         "manual": "プランをアップグレード",
-        "limit_one": "無料メッセージを使い切りました",
-        "limit_other": "無料メッセージ {{count}} 件を使い切りました",
+        "limit_one": "今月の無料メッセージを使い切りました",
+        "limit_other": "今月の無料メッセージ {{count}} 件を使い切りました",
         "editor": "エディターの AI は Pro の機能です",
         "canvas": "Proでキャンバスをもっと"
       },
       "subtitle": {
         "manual": "あなたの働き方に合ったプランを選んでください。",
-        "limit": "Pro にすると Lumina と無制限に会話できます。",
+        "limit": "{{date}}にリセットされます。Pro なら今すぐ Lumina と話し続けられます。",
         "editor": "Pro なら、Lumina がドキュメント内で下書き、要約、書き直しを行います。",
         "canvas": "Proなら、キャンバスを無制限に、より大きく作成でき、最大10 MBの画像を使えます。"
       },
@@ -1770,12 +1782,12 @@
       "body": "数分以内に Pro プランが有効になります。このウィンドウは閉じてかまいません。"
     },
     "limitBanner": {
-      "title_one": "Lumina の無料メッセージを使い切りました",
-      "title_other": "Lumina の無料メッセージ {{count}} 件を使い切りました",
-      "body": "Focusly Pro にすると、無制限に会話を続けられます。",
+      "title_one": "今月の無料メッセージを使い切りました",
+      "title_other": "今月の無料メッセージ {{count}} 件を使い切りました",
+      "body": "{{date}}にリセットされます。今すぐ続けるには Focusly Pro にアップグレードしてください。",
       "cta": "プランを見る"
     },
-    "limitReply": "無料メッセージの上限に達しました。メッセージは送信されていません。Focusly Pro で再送信できます。",
+    "limitReply": "今月の無料メッセージの上限に達しました。メッセージは送信されていません。Focusly Pro で再送信するか、リセットされる毎月1日以降に送信できます。",
     "editorGate": {
       "title": "エディターの AI は Pro の機能です",
       "body": "Focusly Pro なら、Lumina がドキュメントの下書き、要約、書き直しを行います。",

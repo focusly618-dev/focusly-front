@@ -31,6 +31,8 @@ import {
 } from '@/api/AI/apiAIInsights';
 import { UPDATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { notify, getFriendlyErrorMessage } from '@/utils';
+import { isPlanLimitError, offersPro } from '@/api/Billing/planLimit';
+import { billingService } from '@/services/billingService';
 import { useAppSelector } from '@/redux/hooks';
 
 export interface GoldenHoursCardProps {
@@ -205,6 +207,14 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
         throw new Error('API Response was not successful');
       }
     } catch (err) {
+      // A plan limit: the Pro plans open, or a toast says to come back tomorrow
+      if (isPlanLimitError(err)) {
+        if (offersPro(err.code)) {
+          billingService.markLimitReached(err.limit);
+          billingService.openUpgrade('limit');
+        }
+        return;
+      }
       console.error('Error analyzing patterns:', err);
       notify.error({
         title: 'Error de Análisis',
