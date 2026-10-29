@@ -103,6 +103,13 @@ const HomePage: React.FC = () => {
                 lineHeight: 1.04,
                 letterSpacing: '-0.025em',
                 maxWidth: '15ch',
+                // "ch" is a Latin digit, about half a CJK character, so those
+                // scripts get a width in ems and lines of even length
+                '&:lang(ja), &:lang(ko), &:lang(zh)': {
+                  maxWidth: '12em',
+                  textWrap: 'balance',
+                  wordBreak: 'keep-all',
+                },
               }}
             >
               {c.hero.h1}

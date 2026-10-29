@@ -18,7 +18,7 @@ export const TryProButton: React.FC<{ reason?: UpgradeReason }> = ({
   const left = billing.remaining;
   const usage = billing.known
     ? left === 0
-      ? t('billing.usageNone')
+      ? t('billing.usageNone', { date: billing.freeRenewal })
       : t('billing.usageLeft', { count: left })
     : null;
 

@@ -694,7 +694,10 @@ export const es: SiteContent = {
         '¿Puedo exportar mis datos?',
         'Los documentos de tus workspaces se exportan en Markdown y Word. [PENDIENTE: exportación de tareas y disponibilidad por plan]',
       ],
-      ['¿En qué idiomas está disponible?', 'En español, inglés y japonés.'],
+      [
+        '¿En qué idiomas está disponible?',
+        'En español, inglés (EE. UU. y Reino Unido), portugués (Brasil), francés, alemán, italiano, japonés, coreano y chino simplificado.',
+      ],
       [
         '¿Funciona en el móvil?',
         'Focusly es una app web y funciona en el navegador del móvil. [PENDIENTE: app nativa]',

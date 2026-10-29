@@ -147,23 +147,26 @@ describe('guide translations', () => {
       ),
     ).guide;
 
-  it.each(['es', 'en', 'ja'])('has every page written in %s', (lang) => {
-    const guide = read(lang);
-    for (const [section, steps] of Object.entries(GUIDES)) {
-      expect(guide[section]?.label, `${lang} ${section}`).toBeTruthy();
-      for (const { id } of steps) {
-        expect(
-          guide[section].steps[id]?.title,
-          `${lang} ${section}.${id}`,
-        ).toBeTruthy();
-        expect(
-          guide[section].steps[id]?.body,
-          `${lang} ${section}.${id}`,
-        ).toBeTruthy();
+  it.each(['es', 'en', 'ja', 'pt-BR', 'fr', 'de', 'it', 'ko', 'zh-CN'])(
+    'has every page written in %s',
+    (lang) => {
+      const guide = read(lang);
+      for (const [section, steps] of Object.entries(GUIDES)) {
+        expect(guide[section]?.label, `${lang} ${section}`).toBeTruthy();
+        for (const { id } of steps) {
+          expect(
+            guide[section].steps[id]?.title,
+            `${lang} ${section}.${id}`,
+          ).toBeTruthy();
+          expect(
+            guide[section].steps[id]?.body,
+            `${lang} ${section}.${id}`,
+          ).toBeTruthy();
+        }
       }
-    }
-    for (const key of ['next', 'back', 'done', 'close', 'openGuide']) {
-      expect(guide.ui[key], `${lang} ui.${key}`).toBeTruthy();
-    }
-  });
+      for (const key of ['next', 'back', 'done', 'close', 'openGuide']) {
+        expect(guide.ui[key], `${lang} ui.${key}`).toBeTruthy();
+      }
+    },
+  );
 });

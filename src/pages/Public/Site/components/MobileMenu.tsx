@@ -28,7 +28,8 @@ export const MobileMenu = ({
   const { i18n } = useTranslation();
   const [expanded, setExpanded] = useState<string | null>(null);
   const { c, isLogged } = model;
-  const lang = (i18n.language || 'es').split('-')[0];
+  // The full code: "en-GB" and "en" are different choices
+  const lang = i18n.language || 'es';
   useBodyScrollLock(open);
 
   const sections: Section[] = [
@@ -255,7 +256,7 @@ export const MobileMenu = ({
             aria-label={c.nav.language}
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(2, 1fr)',
               gap: 0.5,
               p: 0.5,
               borderRadius: '12px',

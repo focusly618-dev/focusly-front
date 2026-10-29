@@ -80,7 +80,7 @@ import {
 import { TryProButton } from '@/components/Billing/TryProButton';
 import { useBilling } from '@/hooks/useBilling';
 import { billingService } from '@/services/billingService';
-import { isPlanLimitMessage } from '@/api/Billing/planLimit';
+import { isPlanLimitMessage, offersPro } from '@/api/Billing/planLimit';
 import { aiStreamService } from '@/services/aiStreamService';
 import {
   parseLuminaActions,
@@ -771,8 +771,9 @@ export const AskAI: React.FC = () => {
           })
           .catch(console.error);
       } else if (event.type === 'error' && isPlanLimitMessage(event.error)) {
-        // The backend refused the message (free messages used up): it wasn't
-        // sent, so drop it with the empty reply and put its text back.
+        // The backend refused the message (the month's free messages, or
+        // Pro's fair use for today): it wasn't sent, so drop it with the
+        // empty reply and put its text back.
         const list = event.activeMessages ?? [];
         const at = list.findIndex((msg) => msg.id === event.aiMsgId);
         const sent = at > 0 ? list[at - 1] : undefined;
@@ -784,8 +785,11 @@ export const AskAI: React.FC = () => {
         if (sentId && sent?.text) {
           setInputValue((current) => current || sent.text);
         }
-        billingService.markLimitReached();
-        billingService.openUpgrade('limit');
+        // Pro's daily fair use was already said in a toast
+        if (offersPro(event.error)) {
+          billingService.markLimitReached();
+          billingService.openUpgrade('limit');
+        }
       } else if (event.type === 'error') {
         setStatus('error');
         setMessages((prev) =>
@@ -2292,7 +2296,9 @@ export const AskAI: React.FC = () => {
                         lineHeight: 1.4,
                       }}
                     >
-                      {t('billing.limitBanner.body')}
+                      {t('billing.limitBanner.body', {
+                        date: billing.freeRenewal,
+                      })}
                     </Typography>
                   </Box>
                 </Box>

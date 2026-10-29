@@ -37,19 +37,14 @@ interface Notification {
   type: 'info' | 'success' | 'warning';
 }
 
-const LOCALE_MAP: Record<string, string> = {
-  es: 'es-ES',
-  en: 'en-US',
-  ja: 'ja-JP',
-};
-
 const formatNotifTime = (
   createdAtStr: string,
   t: TFunction,
   language: string,
 ) => {
   try {
-    const locale = LOCALE_MAP[language] || 'en-US';
+    // Intl takes the app's language code as it is ("pt-BR", "zh-CN")
+    const locale = language || 'en-US';
     const date = new Date(createdAtStr);
     const now = new Date();
     const isToday = date.toDateString() === now.toDateString();

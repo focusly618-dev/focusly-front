@@ -1,6 +1,8 @@
 import { API_BASE_URL } from '@/config/env.config';
 import axios from 'axios';
 import type { PatternAnalysisResponse } from './apiAI.types';
+import { throwIfPlanLimit } from '@/api/Billing/planLimit';
+import { billingService } from '@/services/billingService';
 
 export type {
   PatternChip,
@@ -49,9 +51,11 @@ export const fetchAIBehavioralPatterns =
       }
     }
 
+    await throwIfPlanLimit(response);
     if (!response.ok) {
       throw new Error(await response.text());
     }
+    billingService.noteAIAllowance((name) => response.headers.get(name));
 
     return response.json();
   };
