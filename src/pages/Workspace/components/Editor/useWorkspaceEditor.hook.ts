@@ -44,24 +44,6 @@ export const useWorkspaceEditor = ({
   const [showPalette, setShowPalette] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [runOnboarding, setRunOnboarding] = useState(() => {
-    return (
-      localStorage.getItem('onboarding_workspace_editor_completed') !== 'true'
-    );
-  });
-
-  const handleOnboardingComplete = () => {
-    setRunOnboarding(false);
-
-    localStorage.setItem('onboarding_workspace_editor_completed', 'true');
-  };
-
-  useEffect(() => {
-    if (runOnboarding) {
-      localStorage.setItem('onboarding_workspace_editor_completed', 'true');
-    }
-  }, [runOnboarding]);
-
   const filteredTasks = useMemo(() => {
     if (!tasksData?.tasks) return [];
 
@@ -104,19 +86,6 @@ export const useWorkspaceEditor = ({
     };
   }, []);
 
-  const onboardingSteps = [
-    {
-      target: '#joyride-editor-area',
-      content:
-        '¡Bienvenido al editor! Escribe en Markdown puro — encabezados, negritas, listas y bloques de código con formato en tiempo real.',
-    },
-    {
-      target: '#joyride-editor-sidebar',
-      content:
-        'Tu panel acompañante: consulta el índice de encabezados (Outline), el mapa visual de nodos y las estadísticas de tu documento.',
-    },
-  ];
-
   return {
     currentTitle,
     currentContent,
@@ -133,11 +102,5 @@ export const useWorkspaceEditor = ({
 
     initialMarkdown,
     markdownEditorRef,
-
-    onboardingSteps,
-
-    runOnboarding,
-    setRunOnboarding,
-    handleOnboardingComplete,
   };
 };

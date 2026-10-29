@@ -1,6 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { Suspense, lazy, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEditorContent } from './useEditorContent.hook';
+import { useCanvasCardPreviews } from './useCanvasCardPreviews.hook';
+import { useCanvasReadOnly } from './canvasPlan';
 import {
   Box,
   Typography,
@@ -67,12 +69,23 @@ import {
   TitleInput,
   MarkdownEditorSurface,
 } from './EditorContent.styles';
-import { colorPalette, isColorDark } from '@/utils';
-import { CuteRobotIcon } from '@/components/ui';
+import { colorPalette } from '@/utils';
+import { CuteRobotIcon, AutoflowIcon } from '@/components/ui';
 import { MarkdownEditor } from '../../codemirror/MarkdownEditor';
 import type { MarkdownEditorRef } from '../../codemirror/MarkdownEditor.types';
 import { EditorAskAI } from '../EditorAskAI/EditorAskAI';
 import { surfaceColor } from '@/context';
+import { CanvasLoading } from './CanvasLoading';
+import type { CanvasView } from '../../useCanvasView.hook';
+import { splitCanvasLabel } from './canvasLinks.utils';
+import { CreateCanvasPopover } from '../CanvasIdentity/CreateCanvasPopover';
+import { editorFontVars, type EditorFontStyle } from '../../editorFonts';
+
+// Excalidraw is heavy and only a canvas needs it: it's split into its own
+// chunk, fetched when a canvas is opened rather than with every note.
+const EditorCanvas = lazy(() =>
+  import('./EditorCanvas').then((m) => ({ default: m.EditorCanvas })),
+);
 
 interface EditorContentProps {
   currentFolder?: { name: string; color?: string };
@@ -86,6 +99,8 @@ interface EditorContentProps {
   targetLanguage?: string;
   isCentered: boolean;
   toggleCentered: () => void;
+  canvasView: CanvasView;
+  fontStyle: EditorFontStyle;
 }
 
 export const EditorContent = ({
@@ -100,12 +115,17 @@ export const EditorContent = ({
   targetLanguage,
   isCentered,
   toggleCentered,
+  canvasView,
+  fontStyle,
 }: EditorContentProps) => {
   const theme = useTheme();
   const isThemeDark = theme.palette.mode === 'dark';
   const editorSurfaceRef = useRef<HTMLDivElement>(null);
   const [liveSelectedText, setLiveSelectedText] = useState('');
   const workspaceId = (watch?.('id') as string | undefined) || null;
+  useCanvasCardPreviews(workspaceId, markdownEditorRef);
+  // Phones only view canvases, so they don't make new ones either
+  const canvasReadOnly = useCanvasReadOnly();
   const [coverColorCategory, setCoverColorCategory] = useState<
     'all' | 'gradient' | 'pastel' | 'solid'
   >('all');
@@ -126,6 +146,7 @@ export const EditorContent = ({
     handleIconSelect,
     handleContextMenu,
     handleClose,
+    selectedText,
     getLanguageLabel,
     handleCreateTask,
     processTextWithAI,
@@ -135,11 +156,20 @@ export const EditorContent = ({
     setIsAITaskPreviewOpen,
     handleConfirmAITask,
     isCreatingTask,
+    handleGenerateCanvasPage,
+    canvasDraft,
+    isCreatingCanvas,
+    handleCancelCanvasDraft,
+    handleCreateCanvas,
   } = useEditorContent({
     setValue,
     watch,
     markdownEditorRef,
+    canvasView,
   });
+  const isCanvasActive = canvasView.isActive;
+  // The right-click menu's actions need a selection or a paragraph to act on
+  const hasMenuTarget = selectedText.trim().length > 0;
 
   const { t } = useTranslation();
 
@@ -181,57 +211,37 @@ export const EditorContent = ({
   const handleCreateResume = () => {
     processTextWithAI('summarize');
   };
-  const isCoverDark = isColorDark(currentBgGradient || headerColor);
-  // The icon / cover / view actions over the document: always readable
-  // (on a cover, solid enough to read on any color).
-  const ghostBtnSx = (onCover: boolean) => ({
+  // The icon / cover / view actions over the document, styled like the
+  // header's buttons: solid, with a hairline border, the same on a cover as
+  // off it (where a light shadow lifts them off the picture).
+  const actionBtnSx = (onCover: boolean) => ({
     display: 'inline-flex',
     alignItems: 'center',
     gap: 0.75,
+    height: 30,
     px: 1.25,
-    py: 0.6,
     borderRadius: '8px',
     border: '1px solid',
+    borderColor: 'divider',
+    bgcolor: 'background.paper',
+    color: 'text.secondary',
     fontFamily: 'inherit',
-    fontSize: '12.5px',
+    fontSize: '12px',
     fontWeight: 600,
-    lineHeight: 1.2,
+    lineHeight: 1,
     whiteSpace: 'nowrap',
-    transition:
-      'background-color .15s, border-color .15s, color .15s, transform .15s',
+    boxShadow: onCover ? '0 1px 2px rgba(0,0,0,0.12)' : 'none',
+    transition: 'border-color .15s, color .15s',
     '& svg': { fontSize: 16 },
+    '&:hover': {
+      color: 'text.primary',
+      borderColor: alpha(theme.palette.text.primary, 0.3),
+    },
     '&.Mui-focusVisible': {
       outline: '2px solid',
       outlineColor: 'primary.main',
       outlineOffset: 2,
     },
-    ...(onCover
-      ? {
-          color: isCoverDark ? '#ffffff' : '#0f172a',
-          borderColor: isCoverDark
-            ? 'rgba(255,255,255,0.35)'
-            : 'rgba(15,23,42,0.18)',
-          bgcolor: isCoverDark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.9)',
-          backdropFilter: 'blur(12px)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-          '&:hover': {
-            bgcolor: isCoverDark ? 'rgba(0,0,0,0.7)' : '#ffffff',
-            borderColor: isCoverDark
-              ? 'rgba(255,255,255,0.55)'
-              : 'rgba(15,23,42,0.3)',
-            transform: 'translateY(-1px)',
-          },
-        }
-      : {
-          color: 'text.secondary',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          '&:hover': {
-            color: 'text.primary',
-            borderColor: 'text.secondary',
-            bgcolor: 'action.hover',
-          },
-        }),
   });
 
   /** The three actions: icon, cover, and the focused (centered) view. */
@@ -268,7 +278,7 @@ export const EditorContent = ({
         onClick={action.onClick}
         aria-label={action.label}
         title={action.label}
-        sx={ghostBtnSx(onCover)}
+        sx={actionBtnSx(onCover)}
       >
         {action.icon}
         {/* Small screens: icons only (the label is the button's name). */}
@@ -279,293 +289,354 @@ export const EditorContent = ({
     ));
   };
 
-  return (
-    <StyledEditorContent>
-      {hasCover ? (
-        <Box
-          sx={{
-            ml: { xs: '-8px', md: '-60px' },
-            mr: { xs: '-8px', md: '-60px' },
-            mt: { xs: '-16px', md: '-40px' },
-            position: 'relative',
-            mb: headerIcon ? '36px' : '16px',
-          }}
-        >
-          {/* Gradient banner */}
-          <Box
-            sx={{
-              height: '180px',
-              background: currentBgGradient,
-              transition: 'background 0.5s ease',
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor:
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(0, 0, 0, 0.1)'
-                    : 'rgba(255, 255, 255, 0.05)',
-              },
-            }}
-          />
+  const handleEditorSurfaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    // A canvas link with a line to itself is a card that carries its name
+    // and icon; one inside a sentence has them in its text.
+    const card = target.closest<HTMLElement>('.cm-canvas-card');
+    if (card) {
+      canvasView.open(
+        card.dataset.canvasId || null,
+        card.dataset.canvasName || 'Canvas',
+        card.dataset.canvasIcon || null,
+      );
+      return;
+    }
+    const canvasLinkEl = target.closest<HTMLElement>('.cm-live-canvas-link');
+    if (canvasLinkEl) {
+      // The link's text stands in until the saved name and icon load.
+      const { icon, name } = splitCanvasLabel(canvasLinkEl.textContent || '');
+      canvasView.open(
+        canvasLinkEl.dataset.canvasId || null,
+        name || 'Canvas',
+        icon,
+      );
+    }
+  };
 
-          {/* Bottom row: icon (floating) + action buttons */}
+  return (
+    <StyledEditorContent
+      sx={{
+        ...editorFontVars(fontStyle),
+        // An open canvas takes the whole area under the header.
+        ...(isCanvasActive && {
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+          p: { xs: 1, md: 1.5 },
+        }),
+      }}
+    >
+      {!isCanvasActive &&
+        (hasCover ? (
           <Box
             sx={{
-              position: 'absolute',
-              bottom: headerIcon ? '-36px' : 0,
-              left: isCentered ? '50%' : { xs: '20px', md: '60px' },
-              right: isCentered ? 'auto' : { xs: '20px', md: '60px' },
-              width: isCentered ? '100%' : 'auto',
-              maxWidth: isCentered ? '800px' : 'none',
-              transform: isCentered ? 'translateX(-50%)' : 'none',
-              display: 'flex',
-              alignItems: 'flex-end',
-              justifyContent: 'space-between',
-              px: isCentered ? { xs: 2, md: 0 } : 0,
-              pb: headerIcon ? 0 : 1.5,
-              transition: 'all 0.3s ease',
+              ml: { xs: '-8px', md: '-60px' },
+              mr: { xs: '-8px', md: '-60px' },
+              mt: { xs: '-16px', md: '-40px' },
+              position: 'relative',
+              mb: headerIcon ? '36px' : '16px',
             }}
           >
-            {/* Large icon card — sits on top of the cover edge */}
-            {headerIcon ? (
-              <Tooltip title="Change icon">
-                <Box
-                  onClick={handleIconClick}
-                  sx={{
-                    display: 'inline-flex',
-                    width: 60,
-                    height: 60,
-                    borderRadius: '14px',
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.22)',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    zIndex: 2,
-                    position: 'relative',
-                    transition: 'transform 0.18s',
-                    '&:hover': { transform: 'scale(1.06)' },
-                  }}
-                >
-                  {iconMap[headerIcon] ? (
-                    React.createElement(iconMap[headerIcon], {
-                      sx: { fontSize: 30, color: 'text.primary' },
-                    })
-                  ) : (
-                    <span style={{ fontSize: '30px', lineHeight: 1 }}>
-                      {headerIcon}
-                    </span>
-                  )}
-                </Box>
-              </Tooltip>
-            ) : (
-              <Box />
-            )}
-
+            {/* Gradient banner */}
             <Box
               sx={{
+                height: '180px',
+                background: currentBgGradient,
+                transition: 'background 0.5s ease',
+                position: 'relative',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(0, 0, 0, 0.1)'
+                      : 'rgba(255, 255, 255, 0.05)',
+                },
+              }}
+            />
+
+            {/* Bottom row: icon (floating) + action buttons */}
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: headerIcon ? '-36px' : 0,
+                left: isCentered ? '50%' : { xs: '20px', md: '60px' },
+                right: isCentered ? 'auto' : { xs: '20px', md: '60px' },
+                width: isCentered ? '100%' : 'auto',
+                maxWidth: isCentered ? '800px' : 'none',
+                transform: isCentered ? 'translateX(-50%)' : 'none',
                 display: 'flex',
-                gap: 1,
-                alignItems: 'center',
-                pb: headerIcon ? 1.5 : 1.4,
+                alignItems: 'flex-end',
+                justifyContent: 'space-between',
+                px: isCentered ? { xs: 2, md: 0 } : 0,
+                pb: headerIcon ? 0 : 1.5,
+                transition: 'all 0.3s ease',
               }}
             >
-              {headerActions(true)}
+              {/* Large icon card — sits on top of the cover edge */}
+              {headerIcon ? (
+                <Tooltip title="Change icon">
+                  <Box
+                    onClick={handleIconClick}
+                    sx={{
+                      display: 'inline-flex',
+                      width: 60,
+                      height: 60,
+                      borderRadius: '14px',
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 4px 24px rgba(0,0,0,0.22)',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 2,
+                      position: 'relative',
+                      transition: 'transform 0.18s',
+                      '&:hover': { transform: 'scale(1.06)' },
+                    }}
+                  >
+                    {iconMap[headerIcon] ? (
+                      React.createElement(iconMap[headerIcon], {
+                        sx: { fontSize: 30, color: 'text.primary' },
+                      })
+                    ) : (
+                      <span style={{ fontSize: '30px', lineHeight: 1 }}>
+                        {headerIcon}
+                      </span>
+                    )}
+                  </Box>
+                </Tooltip>
+              ) : (
+                <Box />
+              )}
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  alignItems: 'center',
+                  pb: headerIcon ? 1.5 : 1.4,
+                }}
+              >
+                {headerActions(true)}
+              </Box>
             </Box>
           </Box>
-        </Box>
-      ) : (
-        /* ── NO COVER: ghost toolbar row, always visible ── */
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            mb: headerIcon ? 1 : 1.5,
-            transition: 'all 0.3s ease',
-            maxWidth: isCentered ? '800px' : '100%',
-            margin: isCentered ? '0 auto' : '0',
-            width: '100%',
-          }}
-        >
-          {headerActions(false)}
-        </Box>
-      )}
+        ) : (
+          /* ── NO COVER: ghost toolbar row, always visible ── */
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: headerIcon ? 1 : 1.5,
+              transition: 'all 0.3s ease',
+              maxWidth: isCentered ? '800px' : '100%',
+              margin: isCentered ? '0 auto' : '0',
+              width: '100%',
+            }}
+          >
+            {headerActions(false)}
+          </Box>
+        ))}
 
       {/* ── Center Content Wrapper ── */}
       <Box
         sx={{
-          maxWidth: isCentered ? '800px' : '100%',
-          margin: isCentered ? '0 auto' : '0',
+          maxWidth: isCanvasActive ? '100%' : isCentered ? '800px' : '100%',
+          margin: isCanvasActive ? '0' : isCentered ? '0 auto' : '0',
           width: '100%',
           transition: 'all 0.3s ease',
+          ...(isCanvasActive && {
+            flex: 1,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+          }),
         }}
       >
-        {/* ── LARGE ICON when no cover ── */}
-        {!hasCover && headerIcon && (
-          <Tooltip title="Change icon">
-            <Box
-              onClick={handleIconClick}
-              sx={{
-                display: 'inline-flex',
-                mb: 2,
-                width: 56,
-                height: 56,
-                borderRadius: '16px',
-                bgcolor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: isThemeDark
-                  ? '0 4px 20px rgba(0,0,0,0.4)'
-                  : '0 4px 12px rgba(0,0,0,0.06)',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'transform 0.18s, box-shadow 0.18s',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: isThemeDark
-                    ? '0 8px 30px rgba(0,0,0,0.6)'
-                    : '0 8px 16px rgba(0,0,0,0.12)',
-                },
-              }}
-            >
-              {iconMap[headerIcon] ? (
-                React.createElement(iconMap[headerIcon], {
-                  sx: { fontSize: 32, color: 'text.primary' },
-                })
-              ) : (
-                <span style={{ fontSize: '32px', lineHeight: 1 }}>
-                  {headerIcon}
-                </span>
-              )}
-            </Box>
-          </Tooltip>
+        {isCanvasActive && (
+          // The drawing tool downloads the first time a canvas opens
+          <Suspense fallback={<CanvasLoading />}>
+            <EditorCanvas
+              title={canvasView.title}
+              icon={canvasView.icon}
+              onLoaded={canvasView.applySaved}
+              onClose={canvasView.close}
+              canvasId={canvasView.id}
+            />
+          </Suspense>
         )}
-
-        {/* ── FOLDER BADGE ── */}
-        {currentFolder && (
-          <FolderBadge bgColor={currentFolder.color}>
-            <FolderIcon sx={{ fontSize: 12 }} />
-            <Typography
-              variant="caption"
-              fontWeight={700}
-              sx={{ textTransform: 'uppercase' }}
-            >
-              {currentFolder.name}
-            </Typography>
-          </FolderBadge>
-        )}
-
-        <TitleInput
-          placeholder="Untitled Document"
-          value={currentTitle}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <MarkdownEditorSurface
-          id="joyride-editor-area"
-          ref={editorSurfaceRef}
-          onContextMenu={handleContextMenu}
-          // Reserve room below the last line so it can scroll clear of the
-          // fixed "Ask Lumina" button instead of ending up hidden behind it
-          // — that button sits on top of the viewport, not in document flow.
-          style={{ position: 'relative', paddingBottom: '96px' }}
-        >
-          <MarkdownEditor
-            ref={markdownEditorRef}
-            initialValue={initialMarkdown}
-            onChange={onChange}
-            placeholder="Start writing..."
-            onSelectionChange={setLiveSelectedText}
-          />
-
-          {isAIProcessing && (
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                bgcolor: surfaceColor(
-                  theme,
-                  'rgba(15, 23, 42, 0.45)',
-                  'rgba(36, 36, 36, 0.45)',
-                  'rgba(255, 255, 255, 0.45)',
-                ),
-                backdropFilter: 'blur(4px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 10,
-                borderRadius: '12px',
-                animation: 'fadeIn 0.25s ease-out',
-                '@keyframes fadeIn': {
-                  from: { opacity: 0 },
-                  to: { opacity: 1 },
-                },
-              }}
-            >
+        {/* Hidden, not unmounted, while a canvas is open: unmounting would drop
+            edits still inside the editor's change debounce (such as the link
+            just inserted for a new canvas), and its undo history. */}
+        <Box sx={{ display: isCanvasActive ? 'none' : 'block' }}>
+          {/* ── LARGE ICON when no cover ── */}
+          {!hasCover && headerIcon && (
+            <Tooltip title="Change icon">
               <Box
+                onClick={handleIconClick}
                 sx={{
-                  display: 'flex',
+                  display: 'inline-flex',
+                  mb: 2,
+                  width: 56,
+                  height: 56,
+                  borderRadius: '16px',
+                  bgcolor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  boxShadow: isThemeDark
+                    ? '0 4px 20px rgba(0,0,0,0.4)'
+                    : '0 4px 12px rgba(0,0,0,0.06)',
                   alignItems: 'center',
-                  gap: 1.5,
-                  px: 3,
-                  py: 1.5,
-                  borderRadius: '99px',
-                  bgcolor:
-                    theme.palette.mode === 'dark' ? '#1e1b4b' : '#e0f2fe',
-                  border: `1px solid ${theme.palette.primary.main}30`,
-                  boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
-                  animation: 'pulseGlow 2s infinite ease-in-out',
-                  '@keyframes pulseGlow': {
-                    '0%, 100%': {
-                      transform: 'scale(1)',
-                      boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
-                    },
-                    '50%': {
-                      transform: 'scale(1.02)',
-                      boxShadow: `0 8px 32px rgba(15, 23, 76, 0.35), 0 0 24px ${theme.palette.primary.main}30`,
-                    },
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'transform 0.18s, box-shadow 0.18s',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: isThemeDark
+                      ? '0 8px 30px rgba(0,0,0,0.6)'
+                      : '0 8px 16px rgba(0,0,0,0.12)',
                   },
                 }}
               >
-                <CuteRobotIcon
-                  size={22}
-                  variant="mini"
-                  primaryColor="#137fec"
-                  eyeColor="#22d3ee"
-                />
-                <Typography
-                  variant="body2"
-                  fontWeight={750}
-                  color="text.primary"
-                  sx={{ letterSpacing: '0.2px' }}
-                >
-                  Lumina AI is writing...
-                </Typography>
+                {iconMap[headerIcon] ? (
+                  React.createElement(iconMap[headerIcon], {
+                    sx: { fontSize: 32, color: 'text.primary' },
+                  })
+                ) : (
+                  <span style={{ fontSize: '32px', lineHeight: 1 }}>
+                    {headerIcon}
+                  </span>
+                )}
               </Box>
-            </Box>
+            </Tooltip>
           )}
 
-          {/* Keyed by document so switching notes starts on that note's thread */}
-          <EditorAskAI
-            key={workspaceId ?? 'unsaved'}
-            markdownEditorRef={markdownEditorRef}
-            selectedText={liveSelectedText}
-            workspaceId={workspaceId}
-            documentTitle={currentTitle}
+          {/* ── FOLDER BADGE ── */}
+          {currentFolder && (
+            <FolderBadge bgColor={currentFolder.color}>
+              <FolderIcon sx={{ fontSize: 12 }} />
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                sx={{ textTransform: 'uppercase' }}
+              >
+                {currentFolder.name}
+              </Typography>
+            </FolderBadge>
+          )}
+
+          <TitleInput
+            placeholder="Untitled Document"
+            value={currentTitle}
+            onChange={(e) => setTitle(e.target.value)}
           />
-        </MarkdownEditorSurface>
+
+          <MarkdownEditorSurface
+            id="joyride-editor-area"
+            ref={editorSurfaceRef}
+            onContextMenu={handleContextMenu}
+            onClick={handleEditorSurfaceClick}
+            // Reserve room below the last line so it can scroll clear of the
+            // fixed "Ask Lumina" button instead of ending up hidden behind it
+            // — that button sits on top of the viewport, not in document flow.
+            style={{ position: 'relative', paddingBottom: '96px' }}
+          >
+            <MarkdownEditor
+              ref={markdownEditorRef}
+              initialValue={initialMarkdown}
+              onChange={onChange}
+              placeholder="Start writing..."
+              onSelectionChange={setLiveSelectedText}
+            />
+
+            {isAIProcessing && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  bgcolor: surfaceColor(
+                    theme,
+                    'rgba(15, 23, 42, 0.45)',
+                    'rgba(36, 36, 36, 0.45)',
+                    'rgba(255, 255, 255, 0.45)',
+                  ),
+                  backdropFilter: 'blur(4px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10,
+                  borderRadius: '12px',
+                  animation: 'fadeIn 0.25s ease-out',
+                  '@keyframes fadeIn': {
+                    from: { opacity: 0 },
+                    to: { opacity: 1 },
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    px: 3,
+                    py: 1.5,
+                    borderRadius: '99px',
+                    bgcolor:
+                      theme.palette.mode === 'dark' ? '#1e1b4b' : '#e0f2fe',
+                    border: `1px solid ${theme.palette.primary.main}30`,
+                    boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
+                    animation: 'pulseGlow 2s infinite ease-in-out',
+                    '@keyframes pulseGlow': {
+                      '0%, 100%': {
+                        transform: 'scale(1)',
+                        boxShadow: `0 8px 32px rgba(15, 23, 76, 0.25), 0 0 16px ${theme.palette.primary.main}15`,
+                      },
+                      '50%': {
+                        transform: 'scale(1.02)',
+                        boxShadow: `0 8px 32px rgba(15, 23, 76, 0.35), 0 0 24px ${theme.palette.primary.main}30`,
+                      },
+                    },
+                  }}
+                >
+                  <CuteRobotIcon
+                    size={22}
+                    variant="mini"
+                    primaryColor="#137fec"
+                    eyeColor="#22d3ee"
+                  />
+                  <Typography
+                    variant="body2"
+                    fontWeight={750}
+                    color="text.primary"
+                    sx={{ letterSpacing: '0.2px' }}
+                  >
+                    Lumina AI is writing...
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
+            {/* Keyed by document so switching notes starts on that note's thread */}
+            <EditorAskAI
+              key={workspaceId ?? 'unsaved'}
+              markdownEditorRef={markdownEditorRef}
+              selectedText={liveSelectedText}
+              workspaceId={workspaceId}
+              documentTitle={currentTitle}
+            />
+          </MarkdownEditorSurface>
+        </Box>
       </Box>
 
       <Menu
@@ -587,7 +658,20 @@ export const EditorContent = ({
           },
         }}
       >
-        <MenuItem onClick={handleCreateTask} sx={{ py: 1.2 }}>
+        {!hasMenuTarget && (
+          <Typography
+            variant="caption"
+            component="div"
+            sx={{ px: 2, pt: 0.5, pb: 1, color: 'text.secondary' }}
+          >
+            Select text, or right-click a paragraph
+          </Typography>
+        )}
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={handleCreateTask}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#7c3aed' }}>
             <AutoAwesomeIcon fontSize="small" />
           </ListItemIcon>
@@ -597,7 +681,11 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem onClick={handleCreateResume} sx={{ py: 1.2 }}>
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={handleCreateResume}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#137fec' }}>
             <DescriptionIcon fontSize="small" />
           </ListItemIcon>
@@ -607,7 +695,11 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem onClick={() => processTextWithAI('grammar')} sx={{ py: 1.2 }}>
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={() => processTextWithAI('grammar')}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#ec4899' }}>
             <SpellcheckIcon fontSize="small" />
           </ListItemIcon>
@@ -617,7 +709,11 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem onClick={() => processTextWithAI('expand')} sx={{ py: 1.2 }}>
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={() => processTextWithAI('expand')}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#10b981' }}>
             <ExpandIcon fontSize="small" />
           </ListItemIcon>
@@ -627,7 +723,11 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem onClick={() => processTextWithAI('shorten')} sx={{ py: 1.2 }}>
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={() => processTextWithAI('shorten')}
+          sx={{ py: 1.2 }}
+        >
           <ListItemIcon sx={{ color: '#f59e0b' }}>
             <ShortenIcon fontSize="small" />
           </ListItemIcon>
@@ -638,6 +738,7 @@ export const EditorContent = ({
         </MenuItem>
 
         <MenuItem
+          disabled={!hasMenuTarget}
           onClick={() => processTextWithAI('tone_professional')}
           sx={{ py: 1.2 }}
         >
@@ -651,6 +752,7 @@ export const EditorContent = ({
         </MenuItem>
 
         <MenuItem
+          disabled={!hasMenuTarget}
           onClick={() => processTextWithAI('tone_casual')}
           sx={{ py: 1.2 }}
         >
@@ -664,6 +766,7 @@ export const EditorContent = ({
         </MenuItem>
 
         <MenuItem
+          disabled={!hasMenuTarget}
           onClick={() =>
             processTextWithAI(`translate_${targetLanguage || 'en'}`)
           }
@@ -677,6 +780,22 @@ export const EditorContent = ({
             primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
           />
         </MenuItem>
+
+        {!canvasReadOnly && (
+          <MenuItem
+            disabled={!hasMenuTarget}
+            onClick={handleGenerateCanvasPage}
+            sx={{ py: 1.2 }}
+          >
+            <ListItemIcon sx={{ color: '#0ea5e9' }}>
+              <AutoflowIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary={'Create Canvas Page'}
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+        )}
       </Menu>
 
       {/* ── Color / Cover Picker ── */}
@@ -1010,6 +1129,13 @@ export const EditorContent = ({
           lazyLoadEmojis={true}
         />
       </Menu>
+
+      <CreateCanvasPopover
+        draft={canvasDraft}
+        creating={isCreatingCanvas}
+        onCancel={handleCancelCanvasDraft}
+        onCreate={handleCreateCanvas}
+      />
 
       <AITaskPreviewModal
         open={isAITaskPreviewOpen}

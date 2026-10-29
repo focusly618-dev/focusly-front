@@ -24,9 +24,6 @@ export const useTasks = () => {
   const [viewMode, setViewMode] = useState<
     'list' | 'grid' | 'board' | 'workload'
   >('list');
-  const [runOnboarding, setRunOnboarding] = useState(
-    () => localStorage.getItem('onboarding_tasks_completed') !== 'true',
-  );
 
   // ── Composed hooks ─────────────────────────────────────────────────
 
@@ -159,11 +156,6 @@ export const useTasks = () => {
     }
   };
 
-  const handleFinishOnboarding = (): void => {
-    setRunOnboarding(false);
-    localStorage.setItem('onboarding_tasks_completed', 'true');
-  };
-
   // ── Return ─────────────────────────────────────────────────────────
   return {
     // Data
@@ -217,15 +209,12 @@ export const useTasks = () => {
     // View & modal
     viewMode,
     setViewMode,
-    runOnboarding,
-    setRunOnboarding,
 
     // Actions
     handleTaskClick,
     handleFilterClick,
     handleFilterClose: () => ui.setFilterAnchorEl(null),
     handleSortClose: () => ui.setSortAnchorEl(null),
-    handleFinishOnboarding,
     setPriorityFilter: filterLogic.setPriorityFilter,
     setStatusFilter: filterLogic.setStatusFilter,
     statusCounts,

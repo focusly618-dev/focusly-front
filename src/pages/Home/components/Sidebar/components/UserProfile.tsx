@@ -1,8 +1,17 @@
-import { Box, Typography, Avatar, IconButton, alpha } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Avatar,
+  IconButton,
+  Tooltip,
+  alpha,
+} from '@mui/material';
 import {
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
+  HelpOutlineRounded as HelpIcon,
 } from '@mui/icons-material';
+import { openSectionGuide } from '@/components/Guide';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/ui';
 import type { UseSidebarReturn } from '../hooks/useSidebar';
@@ -122,6 +131,22 @@ export const UserProfile = ({ sidebar }: UserProfileProps) => {
             flexShrink: 0,
           }}
         >
+          {/* The guide to the section on screen, again */}
+          <Tooltip title={t('guide.ui.openGuide', 'Guide to this section')}>
+            <IconButton
+              size="small"
+              onClick={openSectionGuide}
+              aria-label={t('guide.ui.openGuide', 'Guide to this section')}
+              sx={{
+                width: 24,
+                height: 24,
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary', bgcolor: 'action.hover' },
+              }}
+            >
+              <HelpIcon sx={{ fontSize: 15 }} />
+            </IconButton>
+          </Tooltip>
           <LanguageSelector variant="icon" />
           <IconButton
             size="small"

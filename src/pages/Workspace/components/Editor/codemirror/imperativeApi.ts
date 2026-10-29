@@ -1,4 +1,5 @@
-import type { EditorView } from '@codemirror/view';
+import type { Text } from '@codemirror/state';
+import { EditorView } from '@codemirror/view';
 import type { MarkdownEditorRef } from './MarkdownEditor.types';
 import {
   buildDiff,
@@ -6,6 +7,26 @@ import {
   setPendingDiff,
 } from './extensions/diffReview';
 import { setTargetHighlight } from './extensions/targetHighlight';
+import { setCanvasPreviews } from './extensions/livePreview/canvasCard';
+import {
+  normalizeInsertedMarkdown,
+  ownLineInsert,
+  prepareMarkdownInsert,
+} from './markdownInsert';
+
+/** The paragraph (run of non-blank lines) holding `pos`; null on a blank line. */
+export const paragraphAt = (
+  doc: Text,
+  pos: number,
+): { from: number; to: number } | null => {
+  const isBlank = (n: number) => doc.line(n).text.trim() === '';
+  let first = doc.lineAt(pos).number;
+  if (isBlank(first)) return null;
+  let last = first;
+  while (first > 1 && !isBlank(first - 1)) first--;
+  while (last < doc.lines && !isBlank(last + 1)) last++;
+  return { from: doc.line(first).from, to: doc.line(last).to };
+};
 
 // All BlockNote call sites (AI text-actions menu, the Lumina chat
 // insert-content event) used to reach into `editor.document`/`insertBlocks`
@@ -21,34 +42,101 @@ export const createImperativeApi = (
     const { from, to } = view.state.selection.main;
     return { text: view.state.sliceDoc(from, to), from, to };
   },
+  selectParagraphAt: (x, y) => {
+    const view = getView();
+    if (!view) return null;
+    const pos = view.posAtCoords({ x, y });
+    if (pos === null) return null;
+    // posAtCoords snaps to the nearest line: a click in the empty space below
+    // the text would otherwise pick the last paragraph.
+    const block = view.lineBlockAt(pos);
+    const top = view.documentTop + block.top;
+    if (y < top || y > top + block.height) return null;
+    const range = paragraphAt(view.state.doc, pos);
+    if (!range) return null;
+    view.dispatch({ selection: { anchor: range.from, head: range.to } });
+    return {
+      text: view.state.doc.sliceString(range.from, range.to),
+      ...range,
+    };
+  },
   replaceRange: (from, to, text) => {
     const view = getView();
     if (!view) return;
+    const insert = prepareMarkdownInsert(
+      view.state.doc.toString(),
+      from,
+      to,
+      text,
+    );
     view.dispatch({
-      changes: { from, to, insert: text },
-      selection: { anchor: from + text.length },
+      changes: { from, to, insert },
+      selection: { anchor: from + insert.trimEnd().length },
       scrollIntoView: true,
     });
     view.focus();
+  },
+  applyChanges: (changes) => {
+    const view = getView();
+    if (!view || changes.length === 0) return;
+    view.dispatch({ changes });
+  },
+  coordsAtPos: (pos, side = 1) => {
+    const view = getView();
+    if (!view) return null;
+    const rect = view.coordsAtPos(pos, side);
+    return rect
+      ? {
+          left: rect.left,
+          right: rect.right,
+          top: rect.top,
+          bottom: rect.bottom,
+        }
+      : null;
   },
   insertAtCursor: (text) => {
     const view = getView();
     if (!view) return;
     const { from, to } = view.state.selection.main;
+    const insert = prepareMarkdownInsert(
+      view.state.doc.toString(),
+      from,
+      to,
+      text,
+    );
     view.dispatch({
-      changes: { from, to, insert: text },
-      selection: { anchor: from + text.length },
+      changes: { from, to, insert },
+      selection: { anchor: from + insert.trimEnd().length },
       scrollIntoView: true,
     });
     view.focus();
+  },
+  insertLine: (text, pos) => {
+    const view = getView();
+    if (!view) return;
+    const change = ownLineInsert(
+      view.state.doc.toString(),
+      pos ?? view.state.selection.main.head,
+      text,
+    );
+    view.dispatch({
+      changes: change,
+      selection: { anchor: change.from + change.insert.length },
+      scrollIntoView: true,
+    });
+    view.focus();
+  },
+  setCanvasPreviews: (previews) => {
+    getView()?.dispatch({ effects: setCanvasPreviews.of(previews) });
   },
   insertAtEnd: (text) => {
     const view = getView();
     if (!view) return;
     const end = view.state.doc.length;
+    const body = normalizeInsertedMarkdown(text);
     const needsSeparator =
       end > 0 && view.state.sliceDoc(end - 1, end) !== '\n';
-    const insert = (needsSeparator ? '\n\n' : '') + text;
+    const insert = (needsSeparator ? '\n\n' : '') + body;
     view.dispatch({
       changes: { from: end, insert },
       selection: { anchor: end + insert.length },
@@ -127,21 +215,21 @@ export const createImperativeApi = (
       }
     }
 
-    // 4. Scroll smoothly into view, set selection on the heading, and fire pulsing highlight
+    // 4. Bring the heading to the middle of the screen and tint it briefly.
+    // The selection is left alone: selecting the line would reveal its "##"
+    // and move the caret away from where the user was writing.
     const line = view.state.doc.lineAt(targetFrom);
     view.dispatch({
-      selection: { anchor: line.from, head: line.to },
-      scrollIntoView: true,
-      effects: [setTargetHighlight.of({ from: line.from, to: line.to })],
+      effects: [
+        EditorView.scrollIntoView(line.from, { y: 'center' }),
+        setTargetHighlight.of({ from: line.from, to: line.to }),
+      ],
     });
-    view.focus();
 
-    // Auto-clear highlight effect after 3.8s
+    // The tint has faded by then; drop its decoration
     setTimeout(() => {
-      view.dispatch({
-        effects: [setTargetHighlight.of(null)],
-      });
-    }, 3800);
+      view.dispatch({ effects: [setTargetHighlight.of(null)] });
+    }, 1800);
 
     return true;
   },

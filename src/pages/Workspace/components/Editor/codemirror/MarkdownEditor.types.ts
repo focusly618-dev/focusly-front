@@ -6,9 +6,33 @@ export interface MarkdownSelection {
 
 export interface MarkdownEditorRef {
   getSelection: () => MarkdownSelection;
+  // Selects the paragraph (run of non-blank lines) under a screen point, as
+  // the right-click menu's target when nothing is selected. Null on a blank
+  // line or outside the text.
+  selectParagraphAt: (x: number, y: number) => MarkdownSelection | null;
   replaceRange: (from: number, to: number, text: string) => void;
+  // Rewrites ranges in place without moving the cursor, scrolling or taking
+  // focus — for edits made from outside the text, like renaming a canvas
+  // link while its title is being typed. Positions are in the current doc.
+  applyChanges: (
+    changes: { from: number; to: number; insert: string }[],
+  ) => void;
   insertAtCursor: (text: string) => void;
+  // Where a document position is drawn on screen (viewport coordinates), to
+  // anchor UI to the text. `side` picks the character before (-1) or after
+  // (1) it, which matters at line ends. Null when it isn't rendered.
+  coordsAtPos: (
+    pos: number,
+    side?: -1 | 1,
+  ) => { left: number; right: number; top: number; bottom: number } | null;
+  // Puts text on a line of its own at pos (by default, where the cursor
+  // is), then scrolls to it and focuses the editor.
+  insertLine: (text: string, pos?: number) => void;
   insertAtEnd: (text: string) => void;
+  // The pictures the document's canvas cards show, by canvas id
+  setCanvasPreviews: (
+    previews: ReadonlyMap<string, { url: string; version: string }>,
+  ) => void;
   setCursor: (pos: number) => void;
   jumpToSection: (target: { pos?: number; text?: string }) => boolean;
   getValue: () => string;

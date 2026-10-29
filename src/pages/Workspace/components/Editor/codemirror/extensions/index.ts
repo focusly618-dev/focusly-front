@@ -16,6 +16,7 @@ import { livePreviewExtensions, imageKeymap } from './livePreview';
 import { imagePasteExtension } from './imagePaste';
 import { diffReviewExtensions } from './diffReview';
 import { targetHighlightExtension } from './targetHighlight';
+import { canvasDropExtension } from './canvasDrop';
 
 export interface BuildMarkdownExtensionsOptions {
   editorThemeCompartment: Compartment;
@@ -45,6 +46,7 @@ export const buildMarkdownExtensions = ({
   highlightCompartment.of(syntaxHighlighting(initialHighlightStyle)),
   ...livePreviewExtensions,
   imagePasteExtension,
+  ...canvasDropExtension,
   ...diffReviewExtensions,
   ...targetHighlightExtension,
   ...(placeholder ? [placeholderExt(placeholder)] : []),

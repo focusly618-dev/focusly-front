@@ -50,6 +50,11 @@ const mathBlockParser: BlockParser = {
     cx.addElement(cx.elt('MathBlock', start, end, children));
     return true;
   },
+  // A $$ line starts a math block even right under a paragraph line, as a
+  // ``` fence does, instead of being swallowed as paragraph text.
+  endLeaf(_cx, line) {
+    return isDollarFence(line.text, line.pos);
+  },
 };
 
 const DOLLAR = 36;

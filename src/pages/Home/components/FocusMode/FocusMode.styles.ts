@@ -22,50 +22,60 @@ export const ripple = keyframes`
 `;
 
 // Styled Components
+// The floating mini timer: a small pill that stays out of the way and can be
+// dragged anywhere on screen.
 export const MiniModeContainer = styled(Box)(({ theme }) => ({
   position: 'fixed',
   zIndex: 9999,
-  backgroundColor: theme.palette.background.paper,
-  color: theme.palette.text.primary,
-  padding: theme.spacing(2),
-  borderRadius: '16px',
-  // Remove default positioning to rely on transform
-  bottom: 'auto',
-  right: 'auto',
-  boxShadow:
-    theme.palette.mode === 'dark'
-      ? '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)'
-      : '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(3),
+  gap: theme.spacing(1),
+  boxSizing: 'border-box',
+  padding: '0 6px 0 14px',
+  borderRadius: '999px',
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
   border: `1px solid ${theme.palette.divider}`,
-  minWidth: 380,
-  userSelect: 'none',
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? '0 8px 24px rgba(0, 0, 0, 0.45)'
+      : '0 8px 24px rgba(15, 23, 42, 0.12)',
   overflow: 'hidden',
+  userSelect: 'none',
+  cursor: 'grab',
+  '&:active': { cursor: 'grabbing' },
   // Optimize for dragging: avoid 'all' transitions
-  transition: 'opacity 0.3s ease, box-shadow 0.3s ease, transform 0.05s linear',
+  transition: 'box-shadow 0.2s ease',
   willChange: 'transform',
 }));
 
 export const RippleDot = styled(Box)(({ theme }) => ({
-  width: 8,
-  height: 8,
+  flexShrink: 0,
+  width: 6,
+  height: 6,
   borderRadius: '50%',
   backgroundColor: theme.palette.primary.main,
   position: 'relative',
   '&::after': {
     content: '""',
     position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
+    inset: 0,
     borderRadius: '50%',
     animation: `${ripple} 1.2s infinite ease-in-out`,
-    border: `1px solid ${theme.palette.primary.main}`,
     backgroundColor: theme.palette.primary.main,
     opacity: 0.7,
+  },
+}));
+
+export const MiniIconButton = styled(IconButton)(({ theme }) => ({
+  flexShrink: 0,
+  width: 28,
+  height: 28,
+  color: theme.palette.text.secondary,
+  '& svg': { fontSize: 18 },
+  '&:hover': {
+    color: theme.palette.text.primary,
+    backgroundColor: theme.palette.action.hover,
   },
 }));
 
@@ -181,14 +191,19 @@ export const HeaderIconButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-export const MainContentContainer = styled(Box)(({ theme }) => ({
+// The spacing tightens on short windows; on one too short even for that,
+// the column scrolls ("safe" centering keeps its top reachable) instead of
+// cutting off the controls at the bottom.
+export const MainContentContainer = styled(Box)({
   flex: 1,
+  minHeight: 0,
+  overflowY: 'auto',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
-  gap: theme.spacing(4),
-}));
+  justifyContent: 'safe center',
+  gap: 'clamp(12px, 2.5vh, 32px)',
+});
 
 export const TaskTitleContainer = styled(Box)({
   textAlign: 'center',
@@ -210,7 +225,7 @@ export const TimerContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: theme.spacing(3),
   alignItems: 'center',
-  margin: `${theme.spacing(6)} 0`,
+  margin: 'clamp(4px, 2vh, 48px) 0',
 }));
 
 export const TimerSeparator = styled(Typography)(({ theme }) => ({
@@ -297,54 +312,6 @@ export const AmbientIconButton = styled(IconButton)(({ theme }) => ({
     theme.palette.mode === 'dark'
       ? 'rgba(255,255,255,0.1)'
       : 'rgba(0,0,0,0.05)',
-  color: theme.palette.text.secondary,
-  '&:hover': {
-    color: theme.palette.text.primary,
-  },
-}));
-
-// Mini Mode styles
-export const MiniTimerBox = styled(Box)(({ theme }) => ({
-  backgroundColor: surfaceColor(
-    theme,
-    '#000000',
-    '#1F1F20',
-    theme.palette.background.default,
-  ),
-  borderRadius: '12px',
-  padding: theme.spacing(1.5),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  width: '100px',
-  border:
-    theme.palette.mode === 'light'
-      ? `1px solid ${theme.palette.divider}`
-      : 'none',
-}));
-
-export const MiniInfoBox = styled(Box)({
-  flex: 1,
-});
-
-export const MiniControlsBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(1),
-  borderLeft: `1px solid ${theme.palette.divider}`,
-  paddingLeft: theme.spacing(2),
-}));
-
-export const MiniExpandButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  borderRadius: '6px',
-  color: 'white',
-  '&:hover': {
-    backgroundColor: theme.palette.primary.dark,
-  },
-}));
-
-export const MiniPlayButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.secondary,
   '&:hover': {
     color: theme.palette.text.primary,
@@ -457,7 +424,7 @@ export const MainArea = styled(Box)({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  padding: '32px',
+  padding: 'clamp(16px, 3vh, 32px) 32px',
   position: 'relative',
   height: '100%',
   overflow: 'hidden',

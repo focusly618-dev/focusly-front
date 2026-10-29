@@ -3,148 +3,75 @@ import type { GraphEdge, GraphNode } from '../NoteGraphView.types';
 
 export const SETTINGS_STORAGE_KEY = 'workspace_graph_settings';
 export const DRAG_THRESHOLD_PX = 4;
-export const ZOOM_MIN = 0.6;
-export const ZOOM_MAX = 3.5;
+export const ZOOM_MIN = 0.3;
+export const ZOOM_MAX = 3;
+
+/** Space kept between any two nodes, and around the whole graph. */
+const NODE_GAP = 14;
+const CANVAS_MARGIN = 40;
+const MAX_LABEL_CHARS = 24;
 
 export const truncate = (text: string, max: number): string =>
   text.length > max ? `${text.slice(0, max - 1)}…` : text;
 
-export const baseRadiusFor = (titleCount: number): number =>
-  Math.min(150 + Math.max(0, titleCount - 4) * 16, 260);
+// A leading emoji in a heading becomes its node's icon.
+const LEADING_EMOJI =
+  /^(\p{Extended_Pictographic}(?:️|\p{Emoji_Modifier}|‍\p{Extended_Pictographic})*)\s*/u;
 
-export const baseRadiusForLevel = (level: number): number =>
-  level === 0 ? 17 : Math.max(6, 12 - (level - 1) * 1.8);
-
-export const getHeadingIcon = (text: string, level: number): string => {
-  // Check if starts with emoji
-  const emojiMatch = text.match(
-    /^([\p{Extended_Pictographic}\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}])/u,
-  );
-  if (emojiMatch) return emojiMatch[1];
-
-  const lower = text.toLowerCase();
-  if (
-    lower.includes('objetivo') ||
-    lower.includes('meta') ||
-    lower.includes('goal') ||
-    lower.includes('contexto')
-  )
-    return '🎯';
-  if (
-    lower.includes('estructura') ||
-    lower.includes('sección') ||
-    lower.includes('secciones') ||
-    lower.includes('outline')
-  )
-    return '📑';
-  if (
-    lower.includes('paso') ||
-    lower.includes('inmediato') ||
-    lower.includes('acción') ||
-    lower.includes('quickstart')
-  )
-    return '🚀';
-  if (
-    lower.includes('recurso') ||
-    lower.includes('fuente') ||
-    lower.includes('buscar') ||
-    lower.includes('referencia') ||
-    lower.includes('docs')
-  )
-    return '📚';
-  if (
-    lower.includes('criterio') ||
-    lower.includes('fin') ||
-    lower.includes('complet') ||
-    lower.includes('done') ||
-    lower.includes('check')
-  )
-    return '✅';
-  if (
-    lower.includes('pregunta') ||
-    lower.includes('investig') ||
-    lower.includes('faq') ||
-    lower.includes('duda')
-  )
-    return '💡';
-  if (
-    lower.includes('resumen') ||
-    lower.includes('intro') ||
-    lower.includes('portada')
-  )
-    return '📖';
-  if (lower.includes('nota') || lower.includes('idea')) return '📌';
-
-  if (level === 1) return '📄';
-  if (level === 2) return '📁';
-  if (level === 3) return '🔹';
-  return '•';
+export const splitHeadingIcon = (
+  text: string,
+): { icon?: string; label: string } => {
+  const trimmed = text.trim();
+  const match = trimmed.match(LEADING_EMOJI);
+  return match
+    ? { icon: match[1], label: trimmed.slice(match[0].length).trim() }
+    : { label: trimmed };
 };
 
+/** The text a node shows: its label, cut to fit the pill. */
+export const nodeText = (node: Pick<GraphNode, 'label'>): string =>
+  truncate(node.label || '', MAX_LABEL_CHARS);
+
+/** A node's box. Depends only on what it shows (never on selection or hover),
+ * so the layout that keeps nodes apart holds whatever is selected. */
 export const getNodeDimensions = (
-  node: { type?: string; label?: string; level?: number },
-  isSelected = false,
+  node: Pick<GraphNode, 'label' | 'level' | 'icon'>,
 ): { width: number; height: number } => {
-  if (!node) return { width: 185, height: 54 };
-  const label = node.label || '';
-  if (node.level === 0 || node.type === 'document') {
-    return { width: 185, height: 54 };
-  }
-  if (node.type === 'source' || node.type === 'concept') {
-    const width = Math.max(95, Math.min(135, label.length * 9.5 + 24));
-    return { width, height: 30 };
-  }
-  if (isSelected) {
-    return { width: 195, height: 52 };
-  }
-  const width = Math.max(145, Math.min(205, label.length * 8.5 + 46));
-  return { width, height: 40 };
+  const isRoot = node.level === 0;
+  const chars = nodeText(node).length;
+  const charWidth = isRoot ? 7.4 : 6.6;
+  const leading = node.icon ? 30 : 24; // icon or depth dot, plus padding
+  const width = Math.round(
+    Math.min(
+      isRoot ? 220 : 200,
+      Math.max(72, leading + chars * charWidth + 14),
+    ),
+  );
+  return { width, height: isRoot ? 36 : 28 };
 };
 
 export const calculateCurvedPath = (
   from: { x: number; y: number },
   to: { x: number; y: number },
-  fromSize: { width: number; height: number } = { width: 180, height: 40 },
-  toSize: { width: number; height: number } = { width: 180, height: 40 },
+  fromSize: { width: number; height: number },
+  toSize: { width: number; height: number },
 ): string => {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
 
-  let startX = from.x;
-  let startY = from.y;
-  let endX = to.x;
-  let endY = to.y;
-
-  // Determine if horizontal flow or vertical flow
+  // Leave and enter through the sides facing each other
   if (Math.abs(dx) >= Math.abs(dy) * 0.6) {
-    // Horizontal connection
-    if (dx > 0) {
-      startX = from.x + fromSize.width / 2;
-      endX = to.x - toSize.width / 2;
-    } else {
-      startX = from.x - fromSize.width / 2;
-      endX = to.x + toSize.width / 2;
-    }
-    const rawDist = endX - startX;
-    const dist = Math.abs(rawDist) < 20 ? (dx >= 0 ? 30 : -30) : rawDist;
-    const cp1x = startX + dist * 0.45;
-    const cp2x = endX - dist * 0.45;
-    return `M ${startX} ${startY} C ${cp1x} ${startY}, ${cp2x} ${endY}, ${endX} ${endY}`;
-  } else {
-    // Vertical connection (e.g. downward to Criterios)
-    if (dy > 0) {
-      startY = from.y + fromSize.height / 2;
-      endY = to.y - toSize.height / 2;
-    } else {
-      startY = from.y - fromSize.height / 2;
-      endY = to.y + toSize.height / 2;
-    }
-    const rawDist = endY - startY;
-    const dist = Math.abs(rawDist) < 20 ? (dy >= 0 ? 30 : -30) : rawDist;
-    const cp1y = startY + dist * 0.45;
-    const cp2y = endY - dist * 0.45;
-    return `M ${startX} ${startY} C ${startX} ${cp1y}, ${endX} ${cp2y}, ${endX} ${endY}`;
+    const dir = dx >= 0 ? 1 : -1;
+    const startX = from.x + (dir * fromSize.width) / 2;
+    const endX = to.x - (dir * toSize.width) / 2;
+    const bend = Math.max(24, Math.abs(endX - startX) * 0.5) * dir;
+    return `M ${startX} ${from.y} C ${startX + bend} ${from.y}, ${endX - bend} ${to.y}, ${endX} ${to.y}`;
   }
+  const dir = dy >= 0 ? 1 : -1;
+  const startY = from.y + (dir * fromSize.height) / 2;
+  const endY = to.y - (dir * toSize.height) / 2;
+  const bend = Math.max(20, Math.abs(endY - startY) * 0.5) * dir;
+  return `M ${from.x} ${startY} C ${from.x} ${startY + bend}, ${to.x} ${endY - bend}, ${to.x} ${endY}`;
 };
 
 interface HeadingTreeNode {
@@ -173,16 +100,91 @@ const buildHeadingTree = (headings: HeadingItem[]): HeadingTreeNode[] => {
   return roots;
 };
 
-const countLeaves = (node: HeadingTreeNode): number =>
-  node.children.length === 0
-    ? 1
-    : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+/**
+ * Pushes apart any two nodes whose boxes (plus a gap) overlap, along the
+ * axis where they overlap least, until none do. The root stays put. Mutates
+ * the nodes' x/y.
+ */
+export const resolveOverlaps = (nodes: GraphNode[], gap = NODE_GAP): void => {
+  const sizes = nodes.map(getNodeDimensions);
+  for (let iteration = 0; iteration < 300; iteration++) {
+    let moved = false;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i];
+        const b = nodes[j];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const overlapX =
+          (sizes[i].width + sizes[j].width) / 2 + gap - Math.abs(dx);
+        const overlapY =
+          (sizes[i].height + sizes[j].height) / 2 + gap - Math.abs(dy);
+        if (overlapX <= 0 || overlapY <= 0) continue;
+        moved = true;
 
-const maxLevelOf = (node: HeadingTreeNode): number =>
-  node.children.reduce(
-    (max, child) => Math.max(max, maxLevelOf(child)),
-    node.heading.level,
-  );
+        // Share the push, unless one of them is the fixed root
+        const aShare = a.level === 0 ? 0 : b.level === 0 ? 1 : 0.5;
+        const bShare = 1 - aShare;
+        if (overlapX < overlapY) {
+          const dir = dx === 0 ? 1 : Math.sign(dx);
+          a.x -= dir * overlapX * aShare;
+          b.x += dir * overlapX * bShare;
+        } else {
+          const dir = dy === 0 ? 1 : Math.sign(dy);
+          a.y -= dir * overlapY * aShare;
+          b.y += dir * overlapY * bShare;
+        }
+      }
+    }
+    if (!moved) return;
+  }
+};
+
+/** Tree columns, left-aligned so links land on a straight edge, each as wide
+ * as its widest node so neighbors never touch. */
+const placeColumns = (
+  nodes: GraphNode[],
+  depthOf: Map<GraphNode, number>,
+  columnGap: number,
+) => {
+  const widestAt: number[] = [];
+  nodes.forEach((node) => {
+    const depth = depthOf.get(node) ?? 0;
+    widestAt[depth] = Math.max(
+      widestAt[depth] ?? 0,
+      getNodeDimensions(node).width,
+    );
+  });
+  const columnLeft = [0];
+  for (let d = 1; d < widestAt.length; d++) {
+    columnLeft[d] = columnLeft[d - 1] + widestAt[d - 1] + columnGap;
+  }
+  nodes.forEach((node) => {
+    node.x =
+      columnLeft[depthOf.get(node) ?? 0] + getNodeDimensions(node).width / 2;
+  });
+};
+
+/** An outline link: down from under the parent's marker, then a rounded
+ * turn into the child's left edge. */
+export const calculateElbowPath = (
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  fromSize: { width: number; height: number },
+  toSize: { width: number; height: number },
+): string => {
+  const x = from.x - fromSize.width / 2 + 13; // under the parent's dot
+  const startY = from.y + fromSize.height / 2;
+  const endX = to.x - toSize.width / 2;
+  const radius = Math.min(8, Math.max(0, endX - x), Math.max(0, to.y - startY));
+  return `M ${x} ${startY} V ${to.y - radius} Q ${x} ${to.y} ${x + radius} ${to.y} H ${endX}`;
+};
+
+/**
+ * `tree`: a left-to-right map for wide views. `outline`: the same structure
+ * as an indented list, one heading per row, for narrow ones (the sidebar).
+ */
+export type GraphLayout = 'tree' | 'outline';
 
 export const buildGraph = (
   rootLabel: string,
@@ -190,6 +192,7 @@ export const buildGraph = (
   spacing = 1,
   _markdownContent?: string,
   rootIcon?: string,
+  layout: GraphLayout = 'tree',
 ): {
   nodes: GraphNode[];
   edges: GraphEdge[];
@@ -220,96 +223,109 @@ export const buildGraph = (
     };
   }
 
-  const totalLeaves = roots.reduce((sum, r) => sum + countLeaves(r), 0);
-  const maxLevel = Math.max(...roots.map(maxLevelOf));
-  const baseRadius = baseRadiusFor(totalLeaves) * spacing;
-  const ringStep = 90 * spacing;
-  const maxRadius = baseRadius + (maxLevel - 1) * ringStep;
-  const canvasSize = Math.max(400, maxRadius * 2 + 160);
-  const center = canvasSize / 2;
+  // Both layouts keep the note's own order top to bottom and give each node
+  // a row of its own within its column, so nodes can't overlap.
+  //  - tree: the note on the left, each nesting depth a column to its right;
+  //    leaves take rows and parents sit midway along their children, with a
+  //    little extra air between top-level branches.
+  //  - outline: every node takes the next row, indented by its depth.
+  const rowStep = (28 + 10) * spacing;
+  const columnGap = 56 * spacing;
+  const indent = 28 * spacing;
 
   const nodes: GraphNode[] = [
     {
       id: 'root',
-      x: center,
-      y: center,
+      x: 0,
+      y: 0,
       label: rootLabel || 'Esta nota',
       type: 'document',
       level: 0,
       pos: null,
-      icon: rootIcon || '📄',
-      subtitle: 'Documento Principal',
-      status: 'Activo',
-      statusColor: 'indigo',
+      icon: rootIcon,
     },
   ];
-
   const edges: GraphEdge[] = [];
+  const depthOf = new Map<GraphNode, number>([[nodes[0], 0]]);
 
+  let nextRow = 0;
   const place = (
     node: HeadingTreeNode,
     parentId: string,
-    angleStart: number,
-    angleEnd: number,
-  ) => {
-    const angle = (angleStart + angleEnd) / 2;
-    const radius = baseRadius + (node.heading.level - 1) * ringStep;
-    const x = center + radius * Math.cos(angle);
-    const y = center + radius * Math.sin(angle);
+    depth: number,
+  ): number => {
     const id = `h-${node.heading.pos}`;
-    const cleanText = node.heading.text.trim();
-    const icon = getHeadingIcon(cleanText, node.heading.level);
-
-    nodes.push({
+    const { icon, label } = splitHeadingIcon(node.heading.text);
+    const graphNode: GraphNode = {
       id,
-      x,
-      y,
-      label: cleanText,
+      x: 0,
+      y: 0,
+      label: label || node.heading.text.trim(),
       type: 'section',
       level: node.heading.level,
       pos: node.heading.pos,
       icon,
-      subtitle: 'Sección del Documento',
-      status: cleanText.includes('✅') ? 'Completado' : 'En progreso',
-      statusColor: cleanText.includes('✅') ? 'green' : 'amber',
       category: 'section',
-    });
+    };
+    nodes.push(graphNode);
+    depthOf.set(graphNode, depth);
+    edges.push({ from: parentId, to: id });
 
-    edges.push({
-      from: parentId,
-      to: id,
-    });
-
-    if (node.children.length === 0) return;
-
-    const childLeafCounts = node.children.map(countLeaves);
-    const totalChildLeaves = childLeafCounts.reduce((a, b) => a + b, 0);
-    const span = angleEnd - angleStart;
-    let cursor = angleStart;
-
-    node.children.forEach((child, i) => {
-      const childSpan = (childLeafCounts[i] / totalChildLeaves) * span;
-      place(child, id, cursor, cursor + childSpan);
-      cursor += childSpan;
-    });
+    if (layout === 'outline') {
+      graphNode.y = nextRow++ * rowStep;
+      node.children.forEach((child) => place(child, id, depth + 1));
+    } else if (node.children.length === 0) {
+      graphNode.y = nextRow++ * rowStep;
+    } else {
+      const childYs = node.children.map((child) => place(child, id, depth + 1));
+      graphNode.y = (childYs[0] + childYs[childYs.length - 1]) / 2;
+    }
+    return graphNode.y;
   };
 
-  const rootLeafCounts = roots.map(countLeaves);
-  const totalRootLeaves = rootLeafCounts.reduce((a, b) => a + b, 0);
-  const fullSpan = 2 * Math.PI;
-  let cursor = -Math.PI / 2;
+  if (layout === 'outline') {
+    nextRow = 1; // the note itself takes the first row
+    roots.forEach((root) => place(root, 'root', 1));
+    nodes.forEach((node) => {
+      node.x =
+        (depthOf.get(node) ?? 0) * indent + getNodeDimensions(node).width / 2;
+    });
+  } else {
+    const rootYs = roots.map((root, i) => {
+      if (i > 0) nextRow += 0.5;
+      return place(root, 'root', 1);
+    });
+    nodes[0].y = (rootYs[0] + rootYs[rootYs.length - 1]) / 2;
+    placeColumns(nodes, depthOf, columnGap);
+  }
 
-  roots.forEach((root, i) => {
-    const span = (rootLeafCounts[i] / totalRootLeaves) * fullSpan;
-    place(root, 'root', cursor, cursor + span);
-    cursor += span;
+  // A safety net: nothing above should leave two nodes touching
+  resolveOverlaps(nodes);
+
+  // The canvas is the graph's own bounds plus a margin, so the default view
+  // (and "organize") always shows every node.
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  nodes.forEach((node) => {
+    const { width, height } = getNodeDimensions(node);
+    minX = Math.min(minX, node.x - width / 2);
+    maxX = Math.max(maxX, node.x + width / 2);
+    minY = Math.min(minY, node.y - height / 2);
+    maxY = Math.max(maxY, node.y + height / 2);
   });
+  nodes.forEach((node) => {
+    node.x += CANVAS_MARGIN - minX;
+    node.y += CANVAS_MARGIN - minY;
+  });
+  const canvasWidth = Math.round(maxX - minX + CANVAS_MARGIN * 2);
+  const canvasHeight = Math.round(maxY - minY + CANVAS_MARGIN * 2);
 
   const outgoingCounts: Record<string, number> = {};
   edges.forEach((edge) => {
     outgoingCounts[edge.from] = (outgoingCounts[edge.from] || 0) + 1;
   });
-
   nodes.forEach((n) => {
     n.outgoingCount = outgoingCounts[n.id] || 0;
   });
@@ -317,28 +333,8 @@ export const buildGraph = (
   return {
     nodes,
     edges,
-    canvasWidth: canvasSize,
-    canvasHeight: canvasSize,
-    canvasSize,
+    canvasWidth,
+    canvasHeight,
+    canvasSize: Math.max(canvasWidth, canvasHeight),
   };
-};
-
-export const calculateNodeRadius = (
-  level: number,
-  isHovered: boolean,
-  nodeSize: number,
-): number => (level === 0 ? 20 : 12) * nodeSize + (isHovered ? 2 : 0);
-
-export const calculateTrimmedEdgeTarget = (
-  from: { x: number; y: number },
-  to: { x: number; y: number },
-  targetRadius: number,
-  nodeSize: number,
-): { trimmedX: number; trimmedY: number } => {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const len = Math.hypot(dx, dy) || 1;
-  const trimmedX = to.x - (dx / len) * (targetRadius * nodeSize + 4);
-  const trimmedY = to.y - (dy / len) * (targetRadius * nodeSize + 4);
-  return { trimmedX, trimmedY };
 };

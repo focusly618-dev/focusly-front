@@ -7,6 +7,7 @@ import { FONT_MONO, stripes, useSiteTokens } from '../tokens';
 import { h2Sx } from '../styles';
 import { SiteIcon, type IconName } from '../icons';
 import { scrollToSection, useReducedMotion } from '../hooks';
+import { useSiteContent } from '../content';
 
 const REVEAL_EASE = 'cubic-bezier(.16,1,.3,1)';
 
@@ -246,9 +247,14 @@ export const MediaPlaceholder = ({
   );
 };
 
+// The videos show the app with its text: these languages have their own
+// (`-en`, `-ja`); Spanish is the base set and the fallback.
+const VIDEO_LANGUAGES = ['en', 'ja'];
+
 /**
  * Muted looping video from MEDIA_BASE_URL/videos, in the variant matching the
- * theme: `<name>-light` or `<name>-dark` (.webm, .mp4 and -poster.webp).
+ * theme: `<name>-light` or `<name>-dark` (.webm, .mp4 and -poster.webp), in
+ * the site's language when it has its own (`<name>-light-en`).
  * It plays only while `active` and on screen, and shows just the poster with
  * reduced motion.
  */
@@ -272,11 +278,25 @@ export const LoopVideo = ({
   // graydark has no video of its own: the dark one sits fine in its frame
   const variant =
     (theme.appMode ?? theme.palette.mode) === 'light' ? 'light' : 'dark';
-  const src = `${MEDIA_BASE_URL}/videos/${name}-${variant}`;
+  const { lang } = useSiteContent();
+  const base = `${MEDIA_BASE_URL}/videos/${name}-${variant}`;
+  const localized = VIDEO_LANGUAGES.includes(lang) ? `${base}-${lang}` : null;
+  // A language's video that can't be loaded (not uploaded yet): Spanish instead
+  const [missing, setMissing] = useState<string | null>(null);
+  const src = localized && localized !== missing ? localized : base;
   // The backend answers with a signed link that expires. If a long-open tab
   // reloads the file with a stale one, ask again past the cached redirect.
   const [retry, setRetry] = useState(0);
   const query = retry ? `?r=${retry}` : '';
+  const handleError = () => {
+    // One more try first: it may just be an expired link
+    if (src === localized && retry >= 1) {
+      setMissing(localized);
+      setRetry(0);
+      return;
+    }
+    setRetry((r) => (r < 2 ? r + 1 : r));
+  };
 
   useEffect(() => {
     const video = ref.current;
@@ -317,7 +337,13 @@ export const LoopVideo = ({
 
   if (reduced) {
     return (
-      <Box component="img" src={`${src}-poster.webp`} alt={alt} sx={frame} />
+      <Box
+        component="img"
+        src={`${src}-poster.webp`}
+        alt={alt}
+        sx={frame}
+        onError={() => src === localized && setMissing(localized)}
+      />
     );
   }
   return (
@@ -339,7 +365,7 @@ export const LoopVideo = ({
       <source
         src={`${src}.mp4${query}`}
         type="video/mp4"
-        onError={() => setRetry((r) => (r < 2 ? r + 1 : r))}
+        onError={handleError}
       />
     </Box>
   );

@@ -46,6 +46,8 @@ export const useBilling = () => {
     used,
     remaining: isPro ? Infinity : Math.max(0, limit - used),
     billingEnabled: status?.billing_enabled ?? true,
+    /** Null until the backend answers; it checks them either way. */
+    canvasLimits: status?.canvas_limits ?? null,
     upgrade: state.upgrade,
     openUpgrade: billingService.openUpgrade.bind(billingService),
     closeUpgrade: billingService.closeUpgrade.bind(billingService),

@@ -3,7 +3,6 @@ import { useMutation } from '@apollo/client';
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
 import { WorkspaceLibrarySkeleton } from './components/Library/WorkspaceLibrarySkeleton';
-import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
 import { CREATE_PROJECT_GROUP } from './Workspace.graphql';
 import { CreateProjectModal } from './components/Library/modals/CreateProjectModal';
 import { notify } from '@/utils';
@@ -65,9 +64,6 @@ export const Workspace = ({
     handleSelectTask,
     selectTask,
     handleUpdateTask,
-    runOnboarding,
-    handleFinishOnboarding,
-    onboardingSteps,
     workspaces,
     workspacesData,
     workspacesLoading,
@@ -175,12 +171,6 @@ export const Workspace = ({
         open={isCreateProjectModalOpen}
         onClose={() => setIsCreateProjectModalOpen(false)}
         onCreate={handleCreateProject}
-      />
-
-      <OnboardingWrapper
-        steps={onboardingSteps}
-        run={runOnboarding}
-        onFinish={handleFinishOnboarding}
       />
     </Box>
   );

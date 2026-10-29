@@ -9,12 +9,10 @@ export interface TargetHighlightRange {
 export const setTargetHighlight =
   StateEffect.define<TargetHighlightRange | null>();
 
+// A soft tint behind the lines jumped to, fading out on its own (see
+// .cm-target-line in the editor theme).
 const lineHighlightDeco = Decoration.line({
-  attributes: { class: 'cm-target-line-glow' },
-});
-
-const markHighlightDeco = Decoration.mark({
-  class: 'cm-target-text-glow',
+  attributes: { class: 'cm-target-line' },
 });
 
 export const targetHighlightField = StateField.define<DecorationSet>({
@@ -41,10 +39,6 @@ export const targetHighlightField = StateField.define<DecorationSet>({
           for (let l = startLine.number; l <= endLine.number; l++) {
             const line = tr.state.doc.line(l);
             decos.push(lineHighlightDeco.range(line.from));
-          }
-
-          if (safeFrom < safeTo) {
-            decos.push(markHighlightDeco.range(safeFrom, safeTo));
           }
 
           return Decoration.set(decos, true);

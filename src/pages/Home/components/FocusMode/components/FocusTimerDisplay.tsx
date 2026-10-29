@@ -10,6 +10,21 @@ import {
 } from '../FocusMode.styles';
 import { surfaceColor } from '@/context';
 
+// The cards and their digits shrink with the window's height (up to their
+// full size on tall screens), so the controls under them always fit.
+const CARD_SIZES = {
+  regular: {
+    width: 'clamp(130px, 22vh, 220px)',
+    height: 'clamp(140px, 24vh, 240px)',
+    fontSize: 'clamp(3.5rem, 10vh, 6rem)',
+  },
+  withHours: {
+    width: 'clamp(110px, 18vh, 180px)',
+    height: 'clamp(120px, 20vh, 200px)',
+    fontSize: 'clamp(3rem, 8.5vh, 5rem)',
+  },
+};
+
 interface FocusTimerDisplayProps {
   timeLeft: number;
   formatTime: (seconds: number) => string;
@@ -31,17 +46,21 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
         {(() => {
           const timeParts = formatTime(timeLeft).split(':');
           const hasHours = timeParts.length === 3;
+          const size = CARD_SIZES[hasHours ? 'withHours' : 'regular'];
 
           return (
             <>
               {hasHours && (
                 <>
-                  <TimerCard label="HOURS" sx={{ width: 180, height: 200 }}>
+                  <TimerCard
+                    label="HOURS"
+                    sx={{ width: size.width, height: size.height }}
+                  >
                     <Typography
                       variant="h2"
                       sx={{
                         fontWeight: 'bold',
-                        fontSize: '5rem',
+                        fontSize: size.fontSize,
                         lineHeight: 1,
                         fontFamily: 'Inter, sans-serif',
                       }}
@@ -54,16 +73,13 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
               )}
               <TimerCard
                 label="MINUTES"
-                sx={{
-                  width: hasHours ? 180 : 220,
-                  height: hasHours ? 200 : 240,
-                }}
+                sx={{ width: size.width, height: size.height }}
               >
                 <Typography
                   variant="h2"
                   sx={{
                     fontWeight: 'bold',
-                    fontSize: hasHours ? '5rem' : '6rem',
+                    fontSize: size.fontSize,
                     lineHeight: 1,
                     fontFamily: 'Inter, sans-serif',
                   }}
@@ -74,16 +90,13 @@ export const FocusTimerDisplay: React.FC<FocusTimerDisplayProps> = ({
               <TimerSeparator>:</TimerSeparator>
               <TimerCard
                 label="SECONDS"
-                sx={{
-                  width: hasHours ? 180 : 220,
-                  height: hasHours ? 200 : 240,
-                }}
+                sx={{ width: size.width, height: size.height }}
               >
                 <Typography
                   variant="h2"
                   sx={{
                     fontWeight: 'bold',
-                    fontSize: hasHours ? '5rem' : '6rem',
+                    fontSize: size.fontSize,
                     lineHeight: 1,
                     fontFamily: 'Inter, sans-serif',
                   }}

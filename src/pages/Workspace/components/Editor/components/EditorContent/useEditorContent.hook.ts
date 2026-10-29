@@ -5,6 +5,7 @@ import {
 } from '@/api/refreshQueries';
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
+import { useTheme } from '@mui/material';
 import { useAppSelector } from '@/redux/hooks';
 import { useBilling } from '@/hooks/useBilling';
 import type {
@@ -18,6 +19,10 @@ import {
   getFriendlyErrorMessage,
 } from '@/utils';
 import { fetchEditResult } from '@/api/AI/apiAI';
+import { CREATE_CANVAS } from '@/pages/Workspace/Canvas.graphql';
+import type { Canvas } from '@/pages/Workspace/canvas.types';
+import { canvasLink, canvasNameFrom } from './canvasLinks.utils';
+import { canvasLimitError, useCanvasLimitNotice } from './canvasPlan';
 import { CREATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
 import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
@@ -27,8 +32,16 @@ export const useEditorContent = ({
   setValue,
   watch,
   markdownEditorRef,
+  canvasView,
 }: UseEditorContentProps): UseEditorContentReturn => {
   const [createTaskMutation] = useMutation(CREATE_TASK);
+  const [createCanvasMutation] = useMutation<{ createCanvas: Canvas }>(
+    CREATE_CANVAS,
+    // The header lists the document's canvases
+    { refetchQueries: ['GetCanvasesByWorkspace'] },
+  );
+  const theme = useTheme();
+  const canvasLimitNotice = useCanvasLimitNotice();
   const { user } = useAppSelector((state) => state.auth);
   // The editor's AI (rewrites, task from selection) is a Pro feature.
   const { isPro, openUpgrade } = useBilling();
@@ -87,16 +100,23 @@ export const useEditorContent = ({
   };
 
   const handleContextMenu = (event: React.MouseEvent) => {
-    const selection = markdownEditorRef.current?.getSelection();
-    if (selection && selection.text.trim().length > 0) {
-      event.preventDefault();
-      setSelectedText(selection.text);
-      setSelectedRange({ from: selection.from, to: selection.to });
-      setMenuAnchor({
-        mouseX: event.clientX - 2,
-        mouseY: event.clientY - 4,
-      });
+    const editor = markdownEditorRef.current;
+    if (!editor) return;
+    event.preventDefault();
+    // Without a selection, the actions apply to the paragraph right-clicked,
+    // which gets selected so it's clear what will change. On a blank line the
+    // menu still opens, with its actions disabled.
+    let target: { text: string; from: number; to: number } | null =
+      editor.getSelection();
+    if (!target.text.trim()) {
+      target = editor.selectParagraphAt(event.clientX, event.clientY);
     }
+    setSelectedText(target?.text ?? '');
+    setSelectedRange(target ? { from: target.from, to: target.to } : null);
+    setMenuAnchor({
+      mouseX: event.clientX - 2,
+      mouseY: event.clientY - 4,
+    });
   };
 
   const handleClose = () => {
@@ -132,15 +152,15 @@ export const useEditorContent = ({
     setIsAIProcessing(true);
 
     const aiPrompt = `You are a helpful productivity assistant. Analyze the selected text and turn it into a clear, actionable task.
-Respond with a single raw JSON object and no extra commentary, matching this schema exactly:
-{
-  "title": "Short, action-oriented task title (max 60 chars)",
-  "description": "A well-structured task description in rich Markdown. Use ## for sections, **bold** for key terms, - for bullet points, and \`code\` or \`\`\`lang\\n...\`\`\` for code snippets. Make it informative and scannable.",
-  "priority": "High" | "Medium" | "Low",
-  "duration": "15m" | "30m" | "1h" | "2h"
-}
+    Respond with a single raw JSON object and no extra commentary, matching this schema exactly:
+    {
+      "title": "Short, action-oriented task title (max 60 chars)",
+      "description": "A well-structured task description in rich Markdown. Use ## for sections, **bold** for key terms, - for bullet points, and \`code\` or \`\`\`lang\\n...\`\`\` for code snippets. Make it informative and scannable.",
+      "priority": "High" | "Medium" | "Low",
+      "duration": "15m" | "30m" | "1h" | "2h"
+    }
 
-Text: "${selectedText}"`;
+    Text: "${selectedText}"`;
 
     const analyzeProcess = async () => {
       if (!user) throw new Error('User not logged in');
@@ -231,6 +251,92 @@ Text: "${selectedText}"`;
     } finally {
       setIsAIProcessing(false);
     }
+  };
+
+  // "Create Canvas Page" first asks for a name and icon, in a popover right
+  // under the text it was opened on. That text (and where it sits) is kept
+  // for when the canvas is created.
+  const [canvasDraft, setCanvasDraft] = useState<{
+    sourceText: string;
+    range: { from: number; to: number } | null;
+    name: string;
+    anchor: { top: number; left: number };
+  } | null>(null);
+  const [isCreatingCanvas, setIsCreatingCanvas] = useState(false);
+
+  const handleGenerateCanvasPage = () => {
+    // Below the selection's last line, lined up with where it starts; failing
+    // that (the text scrolled out of view), where the menu was opened.
+    const editor = markdownEditorRef.current;
+    const start = selectedRange && editor?.coordsAtPos(selectedRange.from, 1);
+    const end = selectedRange && editor?.coordsAtPos(selectedRange.to, -1);
+    const anchor =
+      start && end
+        ? { top: end.bottom + 6, left: start.left }
+        : { top: menuAnchor?.mouseY ?? 0, left: menuAnchor?.mouseX ?? 0 };
+
+    handleClose();
+    setCanvasDraft({
+      sourceText: selectedText,
+      range: selectedRange,
+      name: canvasNameFrom(selectedText),
+      anchor,
+    });
+  };
+
+  const handleCancelCanvasDraft = () => {
+    if (!isCreatingCanvas) setCanvasDraft(null);
+  };
+
+  // The canvas is created first so its link carries the id the backend gave
+  // it: [🎨 Name](#canvas-<id>). The selected text becomes its first card.
+  const handleCreateCanvas = async (name: string, icon: string) => {
+    if (!canvasDraft) return;
+    const { sourceText, range } = canvasDraft;
+
+    let canvas: Canvas | undefined;
+    setIsCreatingCanvas(true);
+    try {
+      // Fetched now, not with the editor: it pulls in Excalidraw
+      const { buildInitialCanvasData } = await import('./canvasScene.utils');
+      const { data } = await createCanvasMutation({
+        variables: {
+          input: {
+            name,
+            icon,
+            workspaceId: (watch?.('id') as string | undefined) || null,
+            data: buildInitialCanvasData(sourceText, theme),
+          },
+        },
+      });
+      canvas = data?.createCanvas;
+    } catch (e) {
+      const limit = canvasLimitError(e);
+      if (limit) {
+        setCanvasDraft(null);
+        canvasLimitNotice(limit);
+        return;
+      }
+      notify.error({
+        title: 'Error creating canvas',
+        description: getFriendlyErrorMessage(e, 'Could not create the canvas.'),
+      });
+      return;
+    } finally {
+      setIsCreatingCanvas(false);
+    }
+    if (!canvas) return;
+    setCanvasDraft(null);
+
+    const canvasMarkdown = `${canvasLink(canvas.id, canvas.name, canvas.icon)}\n`;
+    const editor = markdownEditorRef.current;
+    if (range && editor) {
+      editor.replaceRange(range.from, range.to, canvasMarkdown);
+    } else if (editor) {
+      editor.insertAtCursor(canvasMarkdown);
+    }
+
+    canvasView.open(canvas.id, canvas.name, canvas.icon);
   };
 
   const handleConfirmAITask = async (finalData: AITaskPreviewData) => {
@@ -409,6 +515,14 @@ Text: "${selectedText}"`;
     handleClose,
     getLanguageLabel,
     handleCreateTask,
+    handleGenerateCanvasPage,
+    canvasDraft: canvasDraft
+      ? { name: canvasDraft.name, anchor: canvasDraft.anchor }
+      : null,
+    isCreatingCanvas,
+    handleCancelCanvasDraft,
+    handleCreateCanvas,
+
     processTextWithAI,
     isAIProcessing,
     aiTaskPreviewData,

@@ -216,3 +216,60 @@ export const ModernFolderOutlinedIcon = (props: SvgIconProps) => (
     />
   </SvgIcon>
 );
+
+// Modern Canvas / Autoflow icon (connected visual nodes in canvas workspace)
+export const CanvasPageIcon = (props: SvgIconProps) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <rect
+      x="3"
+      y="3.5"
+      width="7"
+      height="6.5"
+      rx="1.75"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+    />
+    <rect
+      x="14"
+      y="3.5"
+      width="7"
+      height="6.5"
+      rx="1.75"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      opacity="0.55"
+      strokeDasharray="2 1.5"
+    />
+    <rect
+      x="14"
+      y="14"
+      width="7"
+      height="6.5"
+      rx="1.75"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+    />
+    <path
+      d="M10 6.75h4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      opacity="0.55"
+    />
+    <path
+      d="M6.5 10v4.75a2.5 2.5 0 0 0 2.5 2.5H14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </SvgIcon>
+);
+
+export const AutoflowIcon = CanvasPageIcon;
+export const CanvasIcon = CanvasPageIcon;

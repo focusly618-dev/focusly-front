@@ -1547,7 +1547,7 @@
       "changeIcon": "Cambiar icono",
       "addCover": "Añadir portada",
       "changeCover": "Cambiar portada",
-      "focusView": "Vista enfocada",
+      "focusView": "Vista centrada",
       "defaultView": "Vista normal"
     },
     "untitledNote": "Nota sin título",
@@ -1633,7 +1633,34 @@
       "linkTask": "Vincular tarea",
       "noLinkedTasks": "Sin tareas vinculadas",
       "unlinkTask": "Desvincular tarea"
-    }
+    },
+    "canvases": {
+      "button": "Canvas del documento",
+      "title": "Canvas de este documento",
+      "open": "Abrir canvas",
+      "inDocument": "En el documento",
+      "notInDocument": "No está en el documento",
+      "insert": "Insertar en el documento",
+      "delete": "Eliminar",
+      "deleteTitle": "¿Eliminar «{{name}}»?",
+      "deleteHint": "Se borran el dibujo, sus imágenes y sus enlaces en el documento.",
+      "dragHint": "Arrastra un canvas al documento para colocarlo donde quieras.",
+      "deleteFailed": "No se pudo eliminar el canvas",
+      "deleteFailedDesc": "Inténtalo de nuevo en un momento.",
+      "limitReached": "Tu plan incluye {{count}} canvas",
+      "limitReachedDesc": "Elimina uno o pásate a Pro para crear más.",
+      "tooLarge": "Este canvas llegó al tamaño de tu plan",
+      "tooLargeDesc": "Los últimos cambios no se guardan mientras pase de {{size}}. Quita elementos o pásate a Pro.",
+      "imageTooLarge": "Esta imagen no se guardará",
+      "imageTooLargeDesc": "En tu plan las imágenes pueden pesar hasta {{size}}.",
+      "imageLimit": "Este canvas ya tiene todas las imágenes de tu plan",
+      "imageLimitDesc": "Un canvas puede tener hasta {{count}} imágenes en tu plan.",
+      "readOnlyPhone": "Solo lectura en el teléfono",
+      "readOnlyPhoneDesc": "Ábrelo en una computadora para editarlo."
+    },
+    "focusButton": "Enfoque",
+    "startFocus": "Empezar una sesión de enfoque",
+    "startFocusOn": "Enfocarte en «{{title}}»"
   },
   "legal": {
     "termsTitle": "Términos y Condiciones",
@@ -1709,12 +1736,14 @@
         "manual": "Mejora tu plan",
         "limit_one": "Usaste tu mensaje gratis",
         "limit_other": "Usaste tus {{count}} mensajes gratis",
-        "editor": "La IA del editor es parte de Pro"
+        "editor": "La IA del editor es parte de Pro",
+        "canvas": "Más canvas con Pro"
       },
       "subtitle": {
         "manual": "Elige el plan que mejor va con tu forma de trabajar.",
         "limit": "Pásate a Pro para seguir hablando con Lumina sin límites.",
-        "editor": "Con Pro, Lumina redacta, resume y reescribe dentro de tus documentos."
+        "editor": "Con Pro, Lumina redacta, resume y reescribe dentro de tus documentos.",
+        "canvas": "Con Pro creas canvas sin límite, más grandes y con imágenes de hasta 10 MB."
       },
       "cta": "Continuar al pago",
       "alreadyPro": "Ya tienes Focusly Pro",
@@ -1872,5 +1901,177 @@
     "reasoning": "Razonamiento",
     "reasoningHint": "Planes, análisis y documentos",
     "select": "Seleccionar modelo"
+  },
+  "guide": {
+    "ui": {
+      "next": "Siguiente",
+      "back": "Atrás",
+      "done": "Entendido",
+      "close": "Cerrar guía",
+      "pages": "Páginas",
+      "page": "Página {{current}} de {{total}}",
+      "openGuide": "Guía de esta sección"
+    },
+    "frames": {
+      "markdownSample": "## Plan\n- [ ] Revisar\n- [x] Diseñar\n**Clave**",
+      "confirm": "Confirmar"
+    },
+    "keys": {
+      "period": "Periodo anterior / siguiente",
+      "today": "Volver a hoy",
+      "views": "Vista de día, semana o mes",
+      "lumina": "Abrir Lumina, el asistente",
+      "linkTask": "Buscar y vincular una tarea",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "moveLine": "Mover la línea arriba o abajo",
+      "copyLine": "Duplicar la línea"
+    },
+    "calendar": {
+      "label": "Plan diario",
+      "steps": {
+        "overview": {
+          "title": "Tu tiempo, de un vistazo",
+          "body": "El calendario reúne tus bloques de enfoque, tareas agendadas y eventos. Cambia entre día, semana o mes según cuánto quieras ver."
+        },
+        "blocks": {
+          "title": "Crea y ajusta bloques",
+          "body": "Haz clic en un espacio libre para crear una tarea rápida. Arrastra un bloque para cambiarlo de hora o de día, y estira su borde para cambiar cuánto dura."
+        },
+        "awaited": {
+          "title": "Tareas en espera",
+          "body": "El panel lateral reúne las tareas pendientes que todavía no tienen horario, para que ninguna se quede olvidada."
+        },
+        "ai": {
+          "title": "Planifica con IA",
+          "body": "Con «Optimizar agenda», Lumina busca tus huecos libres y propone cuándo hacer cada tarea. Revisa el borrador y confírmalo o descártalo: nada se agenda sin tu visto bueno."
+        },
+        "keys": {
+          "title": "Muévete con el teclado",
+          "body": "Cambia de periodo con las flechas, vuelve a hoy con T y alterna entre las vistas con D, W y M."
+        }
+      }
+    },
+    "tasks": {
+      "label": "Tareas",
+      "steps": {
+        "lists": {
+          "title": "Inbox, Hoy y Próximas",
+          "body": "Tus tareas se reparten en tres listas: el Inbox para lo que aún no organizas, Hoy para tu plan del día y Próximas para lo que viene."
+        },
+        "create": {
+          "title": "Crea una tarea",
+          "body": "Dale un título y, si quieres, prioridad, duración y fecha. Mientras más detalle tenga, mejor la puede planificar Lumina."
+        },
+        "board": {
+          "title": "Lista o tablero",
+          "body": "Cambia entre la vista de lista y la de tablero. En el tablero, arrastra una tarea a otra columna para cambiar su estado."
+        },
+        "find": {
+          "title": "Encuentra lo que buscas",
+          "body": "Busca por nombre o etiqueta y filtra por prioridad o responsable para quedarte solo con lo importante."
+        },
+        "ai": {
+          "title": "Organiza con IA",
+          "body": "«Organizar con IA» ordena tus pendientes según su prioridad y fecha. Desde cualquier tarea también puedes iniciar una sesión de Focus."
+        }
+      }
+    },
+    "workspaces": {
+      "label": "Workspaces",
+      "steps": {
+        "docs": {
+          "title": "Tus documentos",
+          "body": "Los workspaces son notas en markdown para planear, documentar e investigar. Cada tarjeta muestra su icono, su portada y cuándo se editó."
+        },
+        "projects": {
+          "title": "Organiza en proyectos",
+          "body": "Agrupa tus documentos en proyectos con su propio color e icono, para tener cada iniciativa en un solo lugar."
+        },
+        "create": {
+          "title": "Crea un documento",
+          "body": "Con «Nuevo workspace» empiezas un documento en blanco, o parte de una plantilla para no empezar de cero."
+        },
+        "link": {
+          "title": "Vincula tareas",
+          "body": "Un documento puede tener tareas vinculadas: ábrelo y conéctalas desde su panel lateral para ver el avance junto al texto."
+        },
+        "find": {
+          "title": "Busca y cambia de vista",
+          "body": "Encuentra cualquier documento con {{mod}} K y elige verlos en galería, cuadrícula o lista, con filtros y orden."
+        }
+      }
+    },
+    "editor": {
+      "label": "Editor",
+      "steps": {
+        "markdown": {
+          "title": "Escribe en markdown",
+          "body": "Títulos, listas, casillas y negritas toman forma mientras escribes. Pon el cursor sobre un elemento para ver y editar su markdown."
+        },
+        "blocks": {
+          "title": "Bloques especiales",
+          "body": "Además de texto, el editor muestra código con resaltado, tablas, diagramas Mermaid, fórmulas, mapas GeoJSON y secciones colapsables."
+        },
+        "ai": {
+          "title": "IA sobre tu texto",
+          "body": "Selecciona texto y haz clic derecho para crear una tarea, resumir, corregir, traducir o cambiar el tono. Con {{mod}} J abres Lumina, que te propone cambios para revisar antes de aplicarlos."
+        },
+        "canvas": {
+          "title": "Canvas",
+          "body": "Desde el clic derecho crea una página de canvas: un lienzo para dibujar diagramas que queda enlazado en el documento como una tarjeta."
+        },
+        "sidebar": {
+          "title": "Panel lateral",
+          "body": "Consulta el índice, el grafo de títulos y las estadísticas de la nota, y maneja sus tareas vinculadas. El botón Focus del encabezado inicia una sesión con su tarea."
+        },
+        "keys": {
+          "title": "Atajos de teclado",
+          "body": "Los atajos que más vas a usar mientras escribes."
+        }
+      }
+    },
+    "insights": {
+      "label": "Insights",
+      "steps": {
+        "stats": {
+          "title": "Tu productividad en cifras",
+          "body": "Tiempo total de enfoque, tareas completadas, energía promedio y tu proporción de trabajo profundo, por día, semana, mes o año."
+        },
+        "trends": {
+          "title": "Tendencias",
+          "body": "Mira cómo evoluciona tu productividad con el tiempo y en qué se reparte tu tiempo."
+        },
+        "activity": {
+          "title": "Actividad y horas doradas",
+          "body": "El mapa de actividad muestra tus días más constantes, y las horas doradas, cuándo rindes más, para agendar ahí lo más difícil."
+        },
+        "report": {
+          "title": "Exporta y comparte",
+          "body": "Exporta tus datos o crea un reporte con el resumen del periodo."
+        }
+      }
+    },
+    "askAi": {
+      "label": "Ask AI",
+      "steps": {
+        "chat": {
+          "title": "Conversa con Lumina",
+          "body": "Lumina conoce tus tareas y tu calendario. Pregúntale qué hacer hoy, pídele ideas o que resuma tu semana."
+        },
+        "suggestions": {
+          "title": "Empieza con una sugerencia",
+          "body": "Si no sabes por dónde empezar, elige una sugerencia: una estrategia de enfoque, un análisis de tu productividad y más."
+        },
+        "plan": {
+          "title": "Planes de acción",
+          "body": "Lumina puede proponerte tareas y eventos listos para crear. Revísalos y confírmalos: nada se crea sin tu aprobación."
+        },
+        "history": {
+          "title": "Tus conversaciones",
+          "body": "Cada chat se guarda para que lo retomes después, o lo borres cuando ya no lo necesites."
+        }
+      }
+    }
   }
 }

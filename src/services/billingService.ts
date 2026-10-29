@@ -8,7 +8,7 @@ import {
 // profile), plus the one "Pro plans" dialog any of them can open. The
 // backend decides all of it; this only mirrors GET /api/billing/status.
 
-export type UpgradeReason = 'limit' | 'editor' | 'manual';
+export type UpgradeReason = 'limit' | 'editor' | 'canvas' | 'manual';
 
 export interface BillingState {
   userId: string | null;

@@ -16,6 +16,11 @@ export const calloutFoldField = StateField.define<Map<number, boolean>>({
   },
   update(value, tr) {
     let map = value;
+    // Keys are positions: follow them through edits above the block
+    if (tr.docChanged && value.size > 0) {
+      map = new Map();
+      value.forEach((folded, pos) => map.set(tr.changes.mapPos(pos), folded));
+    }
     for (const effect of tr.effects) {
       if (effect.is(setCalloutFold)) {
         if (map === value) map = new Map(value);

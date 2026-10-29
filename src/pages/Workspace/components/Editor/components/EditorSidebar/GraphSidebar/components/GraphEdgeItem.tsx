@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from '@mui/material';
+import { alpha, useTheme } from '@mui/material';
 import type {
   GraphEdge,
   GraphNode,
@@ -7,79 +7,59 @@ import type {
 } from '../NoteGraphView.types';
 import {
   calculateCurvedPath,
+  calculateElbowPath,
   getNodeDimensions,
+  type GraphLayout,
 } from '../utils/graphLayout.utils';
 
 interface GraphEdgeItemProps {
   edge: GraphEdge;
   nodeById: Map<string, GraphNode>;
-  selectedNodeId: string | null;
-  neighborIds: Set<string> | null;
+  /** The hovered (or else selected) node: its links are drawn in color. */
+  highlightedId: string | null;
+  focusIds: Set<string> | null;
   settings: GraphSettings;
+  layout: GraphLayout;
 }
 
+/** A thin, quiet link; the hovered or selected node's links stand out. */
 export const GraphEdgeItem: React.FC<GraphEdgeItemProps> = ({
   edge,
   nodeById,
-  selectedNodeId,
-  neighborIds,
+  highlightedId,
+  focusIds,
   settings,
+  layout,
 }) => {
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-
   const from = nodeById.get(edge.from);
   const to = nodeById.get(edge.to);
-
   if (!from || !to) return null;
 
-  const isConnectedToSelected =
-    Boolean(selectedNodeId) &&
-    (edge.from === selectedNodeId || edge.to === selectedNodeId);
-
-  const active =
-    !neighborIds || (neighborIds.has(edge.from) && neighborIds.has(edge.to));
-
-  // Determine stroke color
-  let strokeColor = edge.color;
-
-  if (to.type === 'source' || from.type === 'source') {
-    strokeColor = isDark ? '#34d399' : '#059669';
-  } else if (to.type === 'concept' || from.type === 'concept') {
-    strokeColor = isDark ? '#60a5fa' : '#2563eb';
-  } else if (isConnectedToSelected) {
-    strokeColor = isDark ? '#c7d2fe' : '#312e81';
-  } else if (!strokeColor) {
-    strokeColor = isDark ? '#818cf8' : '#4f46e5';
-  }
-
-  const isDashed =
-    !isConnectedToSelected && to.type !== 'source' && to.type !== 'concept';
-  const strokeWidth =
-    (isConnectedToSelected ? 3.2 : 2.2) * settings.linkThickness;
-
-  const fromSize = getNodeDimensions(from, from.id === selectedNodeId);
-  const toSize = getNodeDimensions(to, to.id === selectedNodeId);
-  const pathData = calculateCurvedPath(from, to, fromSize, toSize);
+  const highlighted =
+    highlightedId !== null &&
+    (edge.from === highlightedId || edge.to === highlightedId);
+  const dimmed =
+    Boolean(focusIds) && !(focusIds?.has(edge.from) && focusIds.has(edge.to));
 
   return (
     <path
-      d={pathData}
+      d={(layout === 'outline' ? calculateElbowPath : calculateCurvedPath)(
+        from,
+        to,
+        getNodeDimensions(from),
+        getNodeDimensions(to),
+      )}
       fill="none"
-      stroke={strokeColor}
-      strokeWidth={strokeWidth}
-      strokeDasharray={isDashed ? '7 4' : undefined}
+      stroke={
+        highlighted
+          ? alpha(theme.palette.primary.main, 0.7)
+          : alpha(theme.palette.text.primary, 0.18)
+      }
+      strokeWidth={(highlighted ? 1.6 : 1.2) * settings.linkThickness}
       strokeLinecap="round"
-      opacity={active ? 1 : 0.4}
-      style={{
-        filter: isConnectedToSelected
-          ? isDark
-            ? 'drop-shadow(0 0 5px rgba(199, 210, 254, 0.75))'
-            : 'drop-shadow(0 0 4px rgba(79, 70, 229, 0.5))'
-          : undefined,
-        transition:
-          'stroke 0.2s ease, opacity 0.2s ease, stroke-width 0.2s ease',
-      }}
+      opacity={dimmed ? 0.35 : 1}
+      style={{ transition: 'stroke 0.15s ease, opacity 0.15s ease' }}
     />
   );
 };
