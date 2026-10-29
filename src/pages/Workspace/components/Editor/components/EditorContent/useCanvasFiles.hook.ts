@@ -17,6 +17,7 @@ import type {
   CanvasFileLink,
   CanvasFileMeta,
 } from '@/pages/Workspace/canvas.types';
+import { canvasLimitError, type CanvasLimitCode } from './canvasPlan';
 import {
   MAX_CANVAS_FILE_BYTES,
   blobToDataUrl,
@@ -33,10 +34,16 @@ import {
 export const useCanvasFiles = ({
   canvasId,
   onStored,
+  maxImageBytes,
+  onPlanLimit,
 }: {
   canvasId: string | null;
   /** An image finished uploading: the scene's `files` should be saved. */
   onStored: () => void;
+  /** The user's plan's limit, when known; the largest plan's otherwise. */
+  maxImageBytes?: number;
+  /** An image the plan doesn't cover: it isn't stored, nor tried again. */
+  onPlanLimit?: (limit: { code: CanvasLimitCode; limit?: number }) => void;
 }) => {
   const client = useApolloClient();
   const [createUpload] = useMutation<{
@@ -65,6 +72,18 @@ export const useCanvasFiles = ({
       try {
         const blob = await dataUrlToBlob(file.dataURL);
         const problem = canvasFileProblem(file.mimeType, blob.size);
+        if (
+          !problem &&
+          maxImageBytes !== undefined &&
+          blob.size > maxImageBytes
+        ) {
+          refused.current.add(id);
+          onPlanLimit?.({
+            code: 'canvas_image_too_large',
+            limit: maxImageBytes,
+          });
+          return;
+        }
         if (problem) {
           refused.current.add(id);
           notify.warning({
@@ -100,7 +119,13 @@ export const useCanvasFiles = ({
           [id]: { mimeType: file.mimeType, created: file.created },
         };
         onStored();
-      } catch {
+      } catch (error) {
+        const limit = canvasLimitError(error);
+        if (limit) {
+          refused.current.add(id);
+          onPlanLimit?.(limit);
+          return;
+        }
         // Left out of `stored`: the next change to the canvas retries it
         notify.error({
           title: 'No se pudo guardar una imagen',
@@ -110,7 +135,7 @@ export const useCanvasFiles = ({
         uploading.current.delete(id);
       }
     },
-    [canvasId, createUpload, onStored],
+    [canvasId, createUpload, onStored, maxImageBytes, onPlanLimit],
   );
 
   /** Sends up any image the canvas shows that isn't stored yet. */

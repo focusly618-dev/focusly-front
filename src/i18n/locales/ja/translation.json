@@ -1602,6 +1602,30 @@
       "noLinkedTasks": "リンクされたタスクはありません",
       "unlinkTask": "タスクのリンクを解除"
     },
+    "canvases": {
+      "button": "ドキュメントのキャンバス",
+      "title": "このドキュメントのキャンバス",
+      "open": "キャンバスを開く",
+      "inDocument": "ドキュメント内にあります",
+      "notInDocument": "ドキュメントにありません",
+      "insert": "ドキュメントに挿入",
+      "delete": "削除",
+      "deleteTitle": "「{{name}}」を削除しますか？",
+      "deleteHint": "描画、画像、ドキュメント内のリンクが削除されます。",
+      "dragHint": "キャンバスをドキュメントにドラッグして好きな場所に配置できます。",
+      "deleteFailed": "キャンバスを削除できませんでした",
+      "deleteFailedDesc": "しばらくしてからもう一度お試しください。",
+      "limitReached": "ご利用のプランのキャンバスは{{count}}個までです",
+      "limitReachedDesc": "1つ削除するか、Proにアップグレードしてください。",
+      "tooLarge": "このキャンバスはプランのサイズ上限に達しました",
+      "tooLargeDesc": "{{size}}を超えている間、最新の変更は保存されません。要素を減らすか、Proにアップグレードしてください。",
+      "imageTooLarge": "この画像は保存されません",
+      "imageTooLargeDesc": "ご利用のプランでは、画像は{{size}}までです。",
+      "imageLimit": "このキャンバスはプランの画像上限に達しています",
+      "imageLimitDesc": "ご利用のプランでは、1つのキャンバスに画像を{{count}}枚まで追加できます。",
+      "readOnlyPhone": "スマートフォンでは閲覧のみ",
+      "readOnlyPhoneDesc": "編集するにはパソコンで開いてください。"
+    },
     "focusButton": "集中",
     "startFocus": "集中セッションを開始",
     "startFocusOn": "「{{title}}」に集中"
@@ -1678,12 +1702,14 @@
         "manual": "プランをアップグレード",
         "limit_one": "無料メッセージを使い切りました",
         "limit_other": "無料メッセージ {{count}} 件を使い切りました",
-        "editor": "エディターの AI は Pro の機能です"
+        "editor": "エディターの AI は Pro の機能です",
+        "canvas": "Proでキャンバスをもっと"
       },
       "subtitle": {
         "manual": "あなたの働き方に合ったプランを選んでください。",
         "limit": "Pro にすると Lumina と無制限に会話できます。",
-        "editor": "Pro なら、Lumina がドキュメント内で下書き、要約、書き直しを行います。"
+        "editor": "Pro なら、Lumina がドキュメント内で下書き、要約、書き直しを行います。",
+        "canvas": "Proなら、キャンバスを無制限に、より大きく作成でき、最大10 MBの画像を使えます。"
       },
       "cta": "お支払いへ進む",
       "alreadyPro": "すでに Focusly Pro をご利用中です",

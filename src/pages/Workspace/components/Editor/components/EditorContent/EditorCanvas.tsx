@@ -19,6 +19,14 @@ import type {
 import { toSavedAppState } from './canvasScene.utils';
 import { CanvasCentered, CanvasFrame } from './CanvasLoading';
 import { useCanvasFiles } from './useCanvasFiles.hook';
+import { useCanvasPreview } from './useCanvasPreview.hook';
+import {
+  canvasLimitError,
+  useCanvasLimitNotice,
+  useCanvasReadOnly,
+} from './canvasPlan';
+import { CanvasReadOnlyNotice } from './CanvasReadOnlyNotice';
+import { useBilling } from '@/hooks/useBilling';
 
 // Excalidraw reports every pointer move; saves wait for this much quiet.
 const SAVE_DEBOUNCE_MS = 1500;
@@ -64,20 +72,39 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   );
   const lastSceneVersion = useRef<number | null>(null);
 
+  // On a phone the canvas is only looked at: nothing is saved from there
+  const readOnly = useCanvasReadOnly();
+  const { canvasLimits } = useBilling();
+  const canvasLimitNotice = useCanvasLimitNotice();
+  // Said once while the canvas stays over its plan's size, not on every save
+  const toldTooLarge = useRef(false);
+
   const flush = useCallback(() => {
     clearTimeout(saveTimer.current);
     const input = pending.current;
     if (!input) return;
     pending.current = null;
-    updateCanvasMutation({ variables: { input } }).catch((e) => {
-      notify.error({
-        title: 'No se pudo guardar el canvas',
-        description: getFriendlyErrorMessage(e, 'Se reintentará al editar.'),
+    updateCanvasMutation({ variables: { input } })
+      .then(() => {
+        toldTooLarge.current = false;
+      })
+      .catch((e) => {
+        const limit = canvasLimitError(e);
+        if (limit) {
+          if (!toldTooLarge.current) canvasLimitNotice(limit);
+          toldTooLarge.current = true;
+          // Kept: once the drawing is back under the limit, it saves
+          pending.current = { ...input, ...pending.current };
+          return;
+        }
+        notify.error({
+          title: 'No se pudo guardar el canvas',
+          description: getFriendlyErrorMessage(e, 'Se reintentará al editar.'),
+        });
+        // Back in line, under any newer change, so the next save carries it.
+        pending.current = { ...input, ...pending.current };
       });
-      // Back in line, under any newer change, so the next save carries it.
-      pending.current = { ...input, ...pending.current };
-    });
-  }, [updateCanvasMutation]);
+  }, [updateCanvasMutation, canvasLimitNotice]);
 
   const scheduleSave = useCallback(
     (changes: Omit<UpdateCanvasInput, 'id'>) => {
@@ -99,7 +126,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const images = useCanvasFiles({
     canvasId,
     onStored: useCallback(() => onImageStored.current(), []),
+    maxImageBytes: canvasLimits?.max_image_bytes,
+    onPlanLimit: canvasLimitNotice,
   });
+  // The small picture of the drawing its card shows
+  const schedulePreview = useCanvasPreview(canvasId);
+
   const saveScene = useCallback(() => {
     scheduleSave({
       data: { ...lastScene.current, files: images.storedFiles() },
@@ -165,6 +197,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       appState: AppState,
       files: BinaryFiles,
     ) => {
+      if (readOnly) return;
       images.storeNewImages(elements, files);
       // Scrolling, zooming and selecting don't change the version; only
       // edits to the drawing are worth a save.
@@ -176,8 +209,13 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         appState: toSavedAppState(appState),
       };
       saveScene();
+      schedulePreview({
+        elements,
+        appState: lastScene.current.appState,
+        files,
+      });
     },
-    [images, saveScene],
+    [images, saveScene, schedulePreview, readOnly],
   );
 
   const renderBody = () => {
@@ -205,20 +243,24 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       );
     }
     return (
-      <Excalidraw
-        key={canvas.id}
-        theme={isDark ? 'dark' : 'light'}
-        onChange={handleChange}
-        excalidrawAPI={setExcalidraw}
-        initialData={{
-          elements: canvas.data?.elements ?? [],
-          appState: {
-            viewBackgroundColor: 'transparent',
-            ...canvas.data?.appState,
-            theme: isDark ? 'dark' : 'light',
-          },
-        }}
-      />
+      <>
+        <Excalidraw
+          key={canvas.id}
+          viewModeEnabled={readOnly}
+          theme={isDark ? 'dark' : 'light'}
+          onChange={handleChange}
+          excalidrawAPI={setExcalidraw}
+          initialData={{
+            elements: canvas.data?.elements ?? [],
+            appState: {
+              viewBackgroundColor: 'transparent',
+              ...canvas.data?.appState,
+              theme: isDark ? 'dark' : 'light',
+            },
+          }}
+        />
+        {readOnly && <CanvasReadOnlyNotice />}
+      </>
     );
   };
 

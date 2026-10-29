@@ -51,6 +51,10 @@ export interface EditorHeaderProps {
   /** While a canvas is open, the header names it (editable) after the
    * document's title, and going back returns to the document. */
   canvasView?: CanvasView;
+  /** The saved document's id and its text: they list its canvases, and
+   * which of them the text still links to. */
+  workspaceId?: string | null;
+  documentText?: string;
   /** The editor's typeface, picked in the "…" menu. */
   fontStyle?: EditorFontStyle;
   onFontStyleChange?: (style: EditorFontStyle) => void;

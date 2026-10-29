@@ -20,6 +20,8 @@ export const GET_CANVASES_BY_WORKSPACE = gql`
       id
       name
       icon
+      previewUrl
+      previewAt
       workspaceId
       createdAt
       updatedAt
@@ -75,5 +77,21 @@ export const GET_CANVAS_FILES = gql`
       mimeType
       url
     }
+  }
+`;
+
+// Where the browser uploads a new picture of the drawing, for its card
+export const CREATE_CANVAS_PREVIEW_UPLOAD = gql`
+  mutation CreateCanvasPreviewUpload($input: CreateCanvasPreviewUploadInput!) {
+    createCanvasPreviewUpload(input: $input) {
+      uploadUrl
+    }
+  }
+`;
+
+// A drawing left empty: its card goes back to showing the icon
+export const REMOVE_CANVAS_PREVIEW = gql`
+  mutation RemoveCanvasPreview($canvasId: ID!) {
+    removeCanvasPreview(canvasId: $canvasId)
   }
 `;

@@ -1,4 +1,27 @@
+import { StateEffect, StateField } from '@codemirror/state';
 import { WidgetType } from '@codemirror/view';
+
+/** A canvas's preview: a link to a small picture of its drawing, and when
+ * that picture changed (the link is re-signed on every read; this isn't). */
+export interface CanvasPreview {
+  url: string;
+  version: string;
+}
+
+/** Hands the editor the previews of the document's canvases, by id. */
+export const setCanvasPreviews =
+  StateEffect.define<ReadonlyMap<string, CanvasPreview>>();
+
+export const canvasPreviewsField = StateField.define<
+  ReadonlyMap<string, CanvasPreview>
+>({
+  create: () => new Map(),
+  update(previews, tr) {
+    for (const effect of tr.effects)
+      if (effect.is(setCanvasPreviews)) return effect.value;
+    return previews;
+  },
+});
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -26,23 +49,44 @@ const span = (className: string, text?: string): HTMLSpanElement => {
   return el;
 };
 
-/** A canvas link with a line to itself, drawn as a full-width card: its icon,
- * its name and an "open" button. The data attributes carry what the editor
- * needs to open it (see EditorContent's click handler). */
+/** The small picture of the drawing; the icon again if it can't load (its
+ * link expired, or the upload never finished). */
+const previewImage = (preview: CanvasPreview, icon: string): HTMLElement => {
+  const frame = span('cm-canvas-card-preview');
+  const img = document.createElement('img');
+  img.src = preview.url;
+  img.alt = '';
+  img.loading = 'lazy';
+  img.draggable = false;
+  img.addEventListener('error', () =>
+    frame.replaceWith(span('cm-canvas-card-icon', icon)),
+  );
+  frame.appendChild(img);
+  return frame;
+};
+
+/** A canvas link with a line to itself, drawn as a full-width card: a small
+ * picture of the drawing (or its icon, until it has one), its name and an
+ * "open" button. The data attributes carry what the editor needs to open it
+ * (see EditorContent's click handler). */
 export class CanvasCardWidget extends WidgetType {
   constructor(
     readonly id: string,
     readonly name: string,
     readonly icon: string,
+    readonly preview: CanvasPreview | null = null,
   ) {
     super();
   }
 
+  // By the picture's version, not its link: a re-signed link to the same
+  // picture keeps the card (and the image already loaded) as it is.
   eq(other: CanvasCardWidget) {
     return (
       other.id === this.id &&
       other.name === this.name &&
-      other.icon === this.icon
+      other.icon === this.icon &&
+      other.preview?.version === this.preview?.version
     );
   }
 
@@ -57,14 +101,24 @@ export class CanvasCardWidget extends WidgetType {
 
     const text = span('cm-canvas-card-text');
     text.append(
-      span('cm-canvas-card-title', this.name),
+      // With the picture in the icon's place, the icon goes before the name
+      span(
+        'cm-canvas-card-title',
+        this.preview ? `${this.icon} ${this.name}` : this.name,
+      ),
       span('cm-canvas-card-sub', 'Canvas'),
     );
 
     const action = span('cm-canvas-card-action', 'Abrir canvas');
     action.appendChild(chevron());
 
-    card.append(span('cm-canvas-card-icon', this.icon), text, action);
+    card.append(
+      this.preview
+        ? previewImage(this.preview, this.icon)
+        : span('cm-canvas-card-icon', this.icon),
+      text,
+      action,
+    );
     return card;
   }
 

@@ -29,6 +29,10 @@ export interface Canvas {
   workspaceId: string | null;
   /** Only filled when reading one canvas; null on lists and saves. */
   data: CanvasData | null;
+  /** On lists: a short-lived link to a small picture of the drawing, and
+   * when that picture last changed. Null while it has none. */
+  previewUrl?: string | null;
+  previewAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

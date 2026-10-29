@@ -22,6 +22,7 @@ import { fetchEditResult } from '@/api/AI/apiAI';
 import { CREATE_CANVAS } from '@/pages/Workspace/Canvas.graphql';
 import type { Canvas } from '@/pages/Workspace/canvas.types';
 import { canvasLink, canvasNameFrom } from './canvasLinks.utils';
+import { canvasLimitError, useCanvasLimitNotice } from './canvasPlan';
 import { CREATE_TASK } from '@/pages/Tasks/Tasks.graphql';
 import { parseDuration } from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
 import type { TaskSearchItems } from '@/pages/Workspace/workspace.types';
@@ -36,8 +37,11 @@ export const useEditorContent = ({
   const [createTaskMutation] = useMutation(CREATE_TASK);
   const [createCanvasMutation] = useMutation<{ createCanvas: Canvas }>(
     CREATE_CANVAS,
+    // The header lists the document's canvases
+    { refetchQueries: ['GetCanvasesByWorkspace'] },
   );
   const theme = useTheme();
+  const canvasLimitNotice = useCanvasLimitNotice();
   const { user } = useAppSelector((state) => state.auth);
   // The editor's AI (rewrites, task from selection) is a Pro feature.
   const { isPro, openUpgrade } = useBilling();
@@ -307,6 +311,12 @@ export const useEditorContent = ({
       });
       canvas = data?.createCanvas;
     } catch (e) {
+      const limit = canvasLimitError(e);
+      if (limit) {
+        setCanvasDraft(null);
+        canvasLimitNotice(limit);
+        return;
+      }
       notify.error({
         title: 'Error creating canvas',
         description: getFriendlyErrorMessage(e, 'Could not create the canvas.'),

@@ -4,7 +4,7 @@ import {
   LEADING_EMOJI,
   splitCanvasLabel,
 } from '../../../components/EditorContent/canvasLinks.utils';
-import { CanvasCardWidget } from './canvasCard';
+import { CanvasCardWidget, canvasPreviewsField } from './canvasCard';
 import { overlaps, type Handler, type Push } from './utils';
 
 // A canvas link inside a sentence reads like a Notion page link: its icon
@@ -77,6 +77,7 @@ export const handleLink: Handler = (node, view, sel, push) => {
           canvasId,
           name || 'Canvas',
           icon || DEFAULT_CANVAS_ICON,
+          view.state.field(canvasPreviewsField, false)?.get(canvasId) ?? null,
         ),
       }),
     );

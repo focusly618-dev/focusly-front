@@ -7,8 +7,10 @@ import {
   setPendingDiff,
 } from './extensions/diffReview';
 import { setTargetHighlight } from './extensions/targetHighlight';
+import { setCanvasPreviews } from './extensions/livePreview/canvasCard';
 import {
   normalizeInsertedMarkdown,
+  ownLineInsert,
   prepareMarkdownInsert,
 } from './markdownInsert';
 
@@ -108,6 +110,24 @@ export const createImperativeApi = (
       scrollIntoView: true,
     });
     view.focus();
+  },
+  insertLine: (text, pos) => {
+    const view = getView();
+    if (!view) return;
+    const change = ownLineInsert(
+      view.state.doc.toString(),
+      pos ?? view.state.selection.main.head,
+      text,
+    );
+    view.dispatch({
+      changes: change,
+      selection: { anchor: change.from + change.insert.length },
+      scrollIntoView: true,
+    });
+    view.focus();
+  },
+  setCanvasPreviews: (previews) => {
+    getView()?.dispatch({ effects: setCanvasPreviews.of(previews) });
   },
   insertAtEnd: (text) => {
     const view = getView();

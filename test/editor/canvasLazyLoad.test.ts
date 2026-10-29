@@ -10,6 +10,7 @@ vi.mock('@excalidraw/excalidraw', () => {
   return {
     Excalidraw: () => null,
     hashElementsVersion: () => 0,
+    exportToBlob: async () => new Blob(),
     convertToExcalidrawElements: (elements: unknown[]) => elements,
   };
 });

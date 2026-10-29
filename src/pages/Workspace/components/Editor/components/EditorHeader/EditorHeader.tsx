@@ -41,6 +41,7 @@ import type { EditorHeaderProps } from './EditorHeader.types';
 import { useEditorHeader } from './useEditorHeader.hook';
 import { CanvasBreadcrumb } from './components/CanvasBreadcrumb/CanvasBreadcrumb';
 import { FontStylePicker } from './components/FontStylePicker/FontStylePicker';
+import { CanvasesMenu } from './components/CanvasesMenu/CanvasesMenu';
 
 export const EditorHeader = (props: EditorHeaderProps) => {
   const { t } = useTranslation();
@@ -61,6 +62,8 @@ export const EditorHeader = (props: EditorHeaderProps) => {
     canvasView,
     fontStyle,
     onFontStyleChange,
+    workspaceId,
+    documentText,
   } = props;
   const isCanvasOpen = Boolean(canvasView?.isActive);
   // With a canvas open, "back" leaves the canvas, not the editor.
@@ -292,6 +295,17 @@ export const EditorHeader = (props: EditorHeaderProps) => {
             ) : null}
           </Box>
         </Fade>
+
+        {/* The document's canvases, also those whose card left the text. A
+            document not saved yet has none. */}
+        {workspaceId && (
+          <CanvasesMenu
+            workspaceId={workspaceId}
+            documentText={documentText ?? ''}
+            markdownEditorRef={markdownEditorRef}
+            canvasView={canvasView}
+          />
+        )}
 
         {/* Focus Mode: the timed session, on the note's linked task if any */}
         {onStartFocus && (

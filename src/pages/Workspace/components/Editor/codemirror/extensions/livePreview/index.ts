@@ -22,6 +22,7 @@ import { handleInlineMath } from './math';
 import { handleListMark } from './list';
 import { setCalloutFold, calloutFoldField } from './foldState';
 import { blockDecorationsField } from './blockDecorations';
+import { canvasPreviewsField } from './canvasCard';
 import type { Handler, Push } from './utils';
 
 export { imageKeymap };
@@ -95,7 +96,9 @@ export const livePreviewPlugin = ViewPlugin.fromClass(
         update.docChanged ||
         update.viewportChanged ||
         update.selectionSet ||
-        syntaxTree(update.state) !== syntaxTree(update.startState)
+        syntaxTree(update.state) !== syntaxTree(update.startState) ||
+        update.state.field(canvasPreviewsField, false) !==
+          update.startState.field(canvasPreviewsField, false)
       ) {
         this.decorations = buildDecorations(update.view);
       }
@@ -123,6 +126,7 @@ export const livePreviewPlugin = ViewPlugin.fromClass(
 export const livePreviewExtensions: Extension[] = [
   livePreviewPlugin,
   calloutFoldField,
+  canvasPreviewsField,
   blockDecorationsField,
   imageAtomicRangesExtension,
 ];

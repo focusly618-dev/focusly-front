@@ -3,6 +3,15 @@ import axiosInstance from '../axiosInstance';
 export type PlanId = 'free' | 'pro';
 export type BillingInterval = 'month' | 'year';
 
+/** What a plan lets canvases hold (the server enforces it). */
+export interface CanvasLimits {
+  /** Null: as many as wanted. */
+  max_canvases: number | null;
+  max_scene_bytes: number;
+  max_image_bytes: number;
+  max_images_per_canvas: number;
+}
+
 export interface BillingStatus {
   plan: PlanId;
   /** Stripe's subscription status, when it was read (refresh=true). */
@@ -25,6 +34,8 @@ export interface BillingStatus {
   discount?: Discount | null;
   /** Days of free trial this user would get (0: none). */
   trial_days?: number;
+  /** What the user's canvases may hold on their plan. */
+  canvas_limits?: CanvasLimits;
 }
 
 export interface Discount {

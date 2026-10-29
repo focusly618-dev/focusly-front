@@ -59,3 +59,33 @@ export const findCanvasLinks = (
     text: m[0],
   }));
 };
+
+/** The ids of every canvas the document links to, in one pass. */
+export const linkedCanvasIds = (doc: string): Set<string> =>
+  new Set(
+    [...doc.matchAll(/\]\((?:#canvas-?|canvas:)([^)\s]+)\)/g)].map((m) => m[1]),
+  );
+
+/** The edits that take a canvas's links out of the document. A link on a
+ * line of its own (drawn as a card) goes with its line. */
+export const canvasLinkRemovals = (
+  doc: string,
+  id: string,
+): { from: number; to: number; insert: string }[] =>
+  findCanvasLinks(doc, id).map(({ from, to }) => {
+    const lineStart = doc.lastIndexOf('\n', from - 1) + 1;
+    const lineBreak = doc.indexOf('\n', to);
+    const lineEnd = lineBreak === -1 ? doc.length : lineBreak;
+    const isAlone =
+      doc.slice(lineStart, from).trim() === '' &&
+      doc.slice(to, lineEnd).trim() === '';
+    if (!isAlone) return { from, to, insert: '' };
+    return {
+      from: lineStart,
+      to: lineBreak === -1 ? lineEnd : lineEnd + 1,
+      insert: '',
+    };
+  });
+
+/** What a canvas dragged from the header carries, for the editor to drop. */
+export const CANVAS_DRAG_TYPE = 'application/x-focusly-canvas';

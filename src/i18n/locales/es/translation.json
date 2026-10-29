@@ -1634,6 +1634,30 @@
       "noLinkedTasks": "Sin tareas vinculadas",
       "unlinkTask": "Desvincular tarea"
     },
+    "canvases": {
+      "button": "Canvas del documento",
+      "title": "Canvas de este documento",
+      "open": "Abrir canvas",
+      "inDocument": "En el documento",
+      "notInDocument": "No está en el documento",
+      "insert": "Insertar en el documento",
+      "delete": "Eliminar",
+      "deleteTitle": "¿Eliminar «{{name}}»?",
+      "deleteHint": "Se borran el dibujo, sus imágenes y sus enlaces en el documento.",
+      "dragHint": "Arrastra un canvas al documento para colocarlo donde quieras.",
+      "deleteFailed": "No se pudo eliminar el canvas",
+      "deleteFailedDesc": "Inténtalo de nuevo en un momento.",
+      "limitReached": "Tu plan incluye {{count}} canvas",
+      "limitReachedDesc": "Elimina uno o pásate a Pro para crear más.",
+      "tooLarge": "Este canvas llegó al tamaño de tu plan",
+      "tooLargeDesc": "Los últimos cambios no se guardan mientras pase de {{size}}. Quita elementos o pásate a Pro.",
+      "imageTooLarge": "Esta imagen no se guardará",
+      "imageTooLargeDesc": "En tu plan las imágenes pueden pesar hasta {{size}}.",
+      "imageLimit": "Este canvas ya tiene todas las imágenes de tu plan",
+      "imageLimitDesc": "Un canvas puede tener hasta {{count}} imágenes en tu plan.",
+      "readOnlyPhone": "Solo lectura en el teléfono",
+      "readOnlyPhoneDesc": "Ábrelo en una computadora para editarlo."
+    },
     "focusButton": "Enfoque",
     "startFocus": "Empezar una sesión de enfoque",
     "startFocusOn": "Enfocarte en «{{title}}»"
@@ -1712,12 +1736,14 @@
         "manual": "Mejora tu plan",
         "limit_one": "Usaste tu mensaje gratis",
         "limit_other": "Usaste tus {{count}} mensajes gratis",
-        "editor": "La IA del editor es parte de Pro"
+        "editor": "La IA del editor es parte de Pro",
+        "canvas": "Más canvas con Pro"
       },
       "subtitle": {
         "manual": "Elige el plan que mejor va con tu forma de trabajar.",
         "limit": "Pásate a Pro para seguir hablando con Lumina sin límites.",
-        "editor": "Con Pro, Lumina redacta, resume y reescribe dentro de tus documentos."
+        "editor": "Con Pro, Lumina redacta, resume y reescribe dentro de tus documentos.",
+        "canvas": "Con Pro creas canvas sin límite, más grandes y con imágenes de hasta 10 MB."
       },
       "cta": "Continuar al pago",
       "alreadyPro": "Ya tienes Focusly Pro",

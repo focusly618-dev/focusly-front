@@ -245,6 +245,8 @@ export const WorkspaceEditor = ({
             onToggleSidebar={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
             onStartFocus={onStartFocus}
             canvasView={canvasView}
+            workspaceId={workspaceId ?? null}
+            documentText={liveContent || currentContent || ''}
             fontStyle={fontStyle}
             onFontStyleChange={setFontStyle}
           />

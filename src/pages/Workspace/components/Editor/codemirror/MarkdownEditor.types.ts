@@ -25,7 +25,14 @@ export interface MarkdownEditorRef {
     pos: number,
     side?: -1 | 1,
   ) => { left: number; right: number; top: number; bottom: number } | null;
+  // Puts text on a line of its own at pos (by default, where the cursor
+  // is), then scrolls to it and focuses the editor.
+  insertLine: (text: string, pos?: number) => void;
   insertAtEnd: (text: string) => void;
+  // The pictures the document's canvas cards show, by canvas id
+  setCanvasPreviews: (
+    previews: ReadonlyMap<string, { url: string; version: string }>,
+  ) => void;
   setCursor: (pos: number) => void;
   jumpToSection: (target: { pos?: number; text?: string }) => boolean;
   getValue: () => string;

@@ -1,6 +1,8 @@
 import React, { Suspense, lazy, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEditorContent } from './useEditorContent.hook';
+import { useCanvasCardPreviews } from './useCanvasCardPreviews.hook';
+import { useCanvasReadOnly } from './canvasPlan';
 import {
   Box,
   Typography,
@@ -121,6 +123,9 @@ export const EditorContent = ({
   const editorSurfaceRef = useRef<HTMLDivElement>(null);
   const [liveSelectedText, setLiveSelectedText] = useState('');
   const workspaceId = (watch?.('id') as string | undefined) || null;
+  useCanvasCardPreviews(workspaceId, markdownEditorRef);
+  // Phones only view canvases, so they don't make new ones either
+  const canvasReadOnly = useCanvasReadOnly();
   const [coverColorCategory, setCoverColorCategory] = useState<
     'all' | 'gradient' | 'pastel' | 'solid'
   >('all');
@@ -776,19 +781,21 @@ export const EditorContent = ({
           />
         </MenuItem>
 
-        <MenuItem
-          disabled={!hasMenuTarget}
-          onClick={handleGenerateCanvasPage}
-          sx={{ py: 1.2 }}
-        >
-          <ListItemIcon sx={{ color: '#0ea5e9' }}>
-            <AutoflowIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText
-            primary={'Create Canvas Page'}
-            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
-          />
-        </MenuItem>
+        {!canvasReadOnly && (
+          <MenuItem
+            disabled={!hasMenuTarget}
+            onClick={handleGenerateCanvasPage}
+            sx={{ py: 1.2 }}
+          >
+            <ListItemIcon sx={{ color: '#0ea5e9' }}>
+              <AutoflowIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary={'Create Canvas Page'}
+              primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+            />
+          </MenuItem>
+        )}
       </Menu>
 
       {/* ── Color / Cover Picker ── */}

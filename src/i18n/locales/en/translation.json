@@ -1630,6 +1630,30 @@
       "noLinkedTasks": "No linked tasks",
       "unlinkTask": "Unlink task"
     },
+    "canvases": {
+      "button": "Document canvases",
+      "title": "Canvases in this document",
+      "open": "Open canvas",
+      "inDocument": "In the document",
+      "notInDocument": "Not in the document",
+      "insert": "Insert into the document",
+      "delete": "Delete",
+      "deleteTitle": "Delete “{{name}}”?",
+      "deleteHint": "Its drawing, images and links in the document are removed.",
+      "dragHint": "Drag a canvas into the document to place it anywhere.",
+      "deleteFailed": "Couldn't delete the canvas",
+      "deleteFailedDesc": "Try again in a moment.",
+      "limitReached": "Your plan includes {{count}} canvases",
+      "limitReachedDesc": "Delete one or upgrade to Pro to create more.",
+      "tooLarge": "This canvas reached your plan's size",
+      "tooLargeDesc": "Your latest changes aren't saved while it's over {{size}}. Remove some elements or upgrade to Pro.",
+      "imageTooLarge": "This image won't be saved",
+      "imageTooLargeDesc": "On your plan, images can be up to {{size}}.",
+      "imageLimit": "This canvas already has all the images your plan allows",
+      "imageLimitDesc": "A canvas can hold up to {{count}} images on your plan.",
+      "readOnlyPhone": "View only on your phone",
+      "readOnlyPhoneDesc": "Open it on a computer to edit it."
+    },
     "focusButton": "Focus",
     "startFocus": "Start a focus session",
     "startFocusOn": "Focus on \"{{title}}\""
@@ -1708,12 +1732,14 @@
         "manual": "Upgrade your plan",
         "limit_one": "You've used your free message",
         "limit_other": "You've used your {{count}} free messages",
-        "editor": "Editor AI is part of Pro"
+        "editor": "Editor AI is part of Pro",
+        "canvas": "More canvases with Pro"
       },
       "subtitle": {
         "manual": "Pick the plan that fits the way you work.",
         "limit": "Go Pro to keep talking with Lumina without limits.",
-        "editor": "With Pro, Lumina drafts, summarizes and rewrites inside your documents."
+        "editor": "With Pro, Lumina drafts, summarizes and rewrites inside your documents.",
+        "canvas": "With Pro you create unlimited, larger canvases with images up to 10 MB."
       },
       "cta": "Continue to payment",
       "alreadyPro": "You already have Focusly Pro",

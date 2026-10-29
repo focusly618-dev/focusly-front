@@ -58,3 +58,22 @@ export const prepareMarkdownInsert = (
   to: number,
   text: string,
 ): string => padBlockInsert(doc, from, to, normalizeInsertedMarkdown(text));
+
+/**
+ * The edit that puts `line` on a line of its own at `pos`: in place of the
+ * line there when it's blank, or right after it. A canvas link put this way
+ * is drawn as its card.
+ */
+export const ownLineInsert = (
+  doc: string,
+  pos: number,
+  line: string,
+): { from: number; to: number; insert: string } => {
+  const at = Math.max(0, Math.min(pos, doc.length));
+  const start = at === 0 ? 0 : doc.lastIndexOf('\n', at - 1) + 1;
+  const lineBreak = doc.indexOf('\n', at);
+  const end = lineBreak === -1 ? doc.length : lineBreak;
+  if (doc.slice(start, end).trim() === '')
+    return { from: start, to: end, insert: line };
+  return { from: end, to: end, insert: `\n${line}` };
+};

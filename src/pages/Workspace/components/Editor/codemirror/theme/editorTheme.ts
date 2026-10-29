@@ -214,6 +214,22 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         fontSize: '20px',
         backgroundColor: alpha(CANVAS_ACCENT, isDark ? 0.14 : 0.1),
       },
+      '.cm-canvas-card-preview': {
+        flexShrink: 0,
+        width: '72px',
+        height: '48px',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        // The picture has a white background whatever the theme
+        backgroundColor: '#ffffff',
+        border: `1px solid ${theme.palette.divider}`,
+        '& img': {
+          display: 'block',
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+        },
+      },
       '.cm-canvas-card-text': {
         flex: 1,
         minWidth: 0,
