@@ -22,12 +22,15 @@ const SESSION_RE =
   /no valid refresh token|refresh token missing|token expired|invalid token|not authenticated/i;
 const MAGIC_LINK_EXPIRED_RE = /magic link has expired/i;
 const MAGIC_LINK_INVALID_RE = /invalid magic link token|invalid token purpose/i;
+// The backend's messages, old and current (it no longer passes Google's own
+// error text through)
 const GOOGLE_AUTH_RE =
-  /invalid google oauth token|failed to refresh google token/i;
+  /invalid google oauth token|failed to refresh google token|no pudimos iniciar sesi[oó]n con google|vuelve a conectar google calendar/i;
 const GOOGLE_CALENDAR_RE =
   /failed to (retrieve|create|patch|delete) google calendar event/i;
 const AI_UNAVAILABLE_RE =
-  /focusly-ai service returned code|failed to delegate .* to focusly-ai/i;
+  /focusly-ai service returned code|failed to delegate .* to focusly-ai|lumina no est[aá] disponible/i;
+const EMAIL_NOT_SENT_RE = /no pudimos enviar el correo/i;
 const EMPTY_MESSAGES_RE = /messages array cannot be empty/i;
 
 const isNetworkFailure = (error: unknown): boolean => {
@@ -82,6 +85,10 @@ export const getFriendlyErrorMessage = (
 ): string => {
   if (isTimeout(error)) return i18n.t('errors.timeout');
   if (isNetworkFailure(error)) return i18n.t('errors.network');
+  // The sign-in endpoints' request limit
+  if ((error as AxiosLikeError)?.response?.status === 429) {
+    return i18n.t('errors.tooManyAttempts');
+  }
 
   const raw = extractRawMessage(error);
 
@@ -89,6 +96,7 @@ export const getFriendlyErrorMessage = (
   if (SESSION_RE.test(raw)) return i18n.t('errors.sessionExpired');
   if (MAGIC_LINK_EXPIRED_RE.test(raw)) return i18n.t('errors.magicLinkExpired');
   if (MAGIC_LINK_INVALID_RE.test(raw)) return i18n.t('errors.magicLinkInvalid');
+  if (EMAIL_NOT_SENT_RE.test(raw)) return i18n.t('errors.emailNotSent');
   if (GOOGLE_AUTH_RE.test(raw)) return i18n.t('errors.googleAuthFailed');
   if (GOOGLE_CALENDAR_RE.test(raw)) return i18n.t('errors.googleCalendarSync');
   if (AI_UNAVAILABLE_RE.test(raw)) return i18n.t('errors.aiUnavailable');

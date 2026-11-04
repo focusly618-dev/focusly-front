@@ -35,6 +35,8 @@
     "googleCalendarSync": "无法与 Google 日历同步。请稍后重试。",
     "aiUnavailable": "AI 助手暂时不可用。请稍后重试。",
     "emptyMessage": "发送前请先输入消息。",
+    "tooManyAttempts": "尝试次数过多。请稍等几分钟后再试。",
+    "emailNotSent": "我们无法发送登录邮件。请几分钟后重试，或使用 Google 继续。",
     "generic": "出了点问题。请稍后重试。"
   },
   "nav": {

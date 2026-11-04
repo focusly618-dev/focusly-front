@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { safeHref } from '@/utils/sanitizeHtml';
 import {
   Box,
   Typography,
@@ -272,12 +273,16 @@ const renderMarkdown = (text: string, isDark: boolean, theme: Theme) => {
   html = html.replace(/`(.*?)`/g, '<code>$1</code>');
 
   // 4. Links: [text](url) -> <a href="url" target="_blank">text</a>
+  // Only web, email, phone and in-app links, with quotes escaped: the reply
+  // can echo text from tasks and calendar events written by others.
   html = html.replace(/\[(.*?)\]\((.*?)\)/g, (_, text, url) => {
-    const isInternal = /^\/(?!\/)/.test(url);
+    const href = safeHref(url);
+    if (!href) return text;
+    const isInternal = /^\/(?!\/)/.test(url.trim());
     if (isInternal) {
-      return `<a href="${url}" style="color: #008767; text-decoration: underline; font-weight: 600;">${text}</a>`;
+      return `<a href="${href}" style="color: #008767; text-decoration: underline; font-weight: 600;">${text}</a>`;
     }
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #008767; text-decoration: underline; font-weight: 600;">${text}</a>`;
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer" style="color: #008767; text-decoration: underline; font-weight: 600;">${text}</a>`;
   });
 
   // 4b. Quoted task names or entities: "Task name" -> styled highlighted pill

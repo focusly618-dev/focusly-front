@@ -81,8 +81,11 @@ export const useLoginAuth = ({
     flow: 'auth-code',
     scope: 'https://www.googleapis.com/auth/calendar',
     redirect_uri: window.location.origin,
-    // @ts-expect-error: prompt is a valid Google OAuth parameter not included in UseGoogleLoginOptionsAuthCodeFlow types
-    prompt: 'consent',
+    // No prompt=consent: Google asks for the Calendar permission the first
+    // time only (and hands the refresh token then), so a returning user signs
+    // in without the permissions screen. The backend keeps the stored refresh
+    // token when a sign-in brings none; reconnecting Calendar (Settings >
+    // Integrations, onboarding) still forces consent to get a new one.
     onSuccess: async (codeResponse) => {
       setIsLoading(true);
       try {

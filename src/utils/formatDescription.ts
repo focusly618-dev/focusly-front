@@ -1,6 +1,12 @@
+import { sanitizeHtml } from './sanitizeHtml';
+
 /**
  * Utility to parse and format task descriptions (supporting Markdown & HTML tags)
  * into rich HTML for rendering formatted titles, headings, bold, highlights, lists, etc.
+ *
+ * The result is always sanitized: descriptions can come from a Google
+ * Calendar event, written by anyone who invites the user, and are rendered
+ * with dangerouslySetInnerHTML.
  */
 
 export const formatDescriptionToHtml = (raw?: string): string => {
@@ -24,9 +30,11 @@ export const formatDescriptionToHtml = (raw?: string): string => {
       text,
     )
   ) {
-    return text.replace(
-      /==([^=]+)==/g,
-      '<mark class="formatted-highlight">$1</mark>',
+    return sanitizeHtml(
+      text.replace(
+        /==([^=]+)==/g,
+        '<mark class="formatted-highlight">$1</mark>',
+      ),
     );
   }
 
@@ -182,5 +190,5 @@ export const formatDescriptionToHtml = (raw?: string): string => {
     );
   }
 
-  return result.join('');
+  return sanitizeHtml(result.join(''));
 };
