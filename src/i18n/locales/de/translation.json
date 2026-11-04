@@ -301,7 +301,7 @@
       "remindersTitle": "Aufgabenerinnerungen",
       "remindersDesc": "Erinnert dich 5 Minuten und 1 Minute vor Beginn einer terminierten Aufgabe: zeigt einen Hinweis in Focusly und spielt den unten gewählten Ton ab. Wenn du sie ausschaltest, erhältst du auf diesem Gerät keine Erinnerungen.",
       "systemTitle": "Systembenachrichtigungen",
-      "systemDesc": "Zeigt jede Erinnerung auch als Benachrichtigung des Betriebssystems, damit du sie siehst, auch wenn Focusly in einem anderen Tab oder minimiert ist. Erfordert die Erlaubnis des Browsers.",
+      "systemDesc": "Zeigt jede Erinnerung auch als Benachrichtigung des Betriebssystems, auch wenn Focusly in einem anderen Tab, minimiert oder geschlossen ist, und schickt dir um 7 Uhr morgens eine Übersicht deiner Aufgaben des Tages. Erfordert die Erlaubnis des Browsers.",
       "allow": "Erlauben",
       "permission": {
         "granted": "In diesem Browser erlaubt.",
