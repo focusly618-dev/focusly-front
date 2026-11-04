@@ -163,8 +163,8 @@ export interface SiteContent {
       PlanKey,
       { name: string; desc: string; cta: string; feats: string[] }
     >;
-    /** [feature, free, pro, business] */
-    table: [string, string, string, string][];
+    /** [feature, free, pro] */
+    table: [string, string, string][];
   };
 
   security: {
