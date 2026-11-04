@@ -10,7 +10,7 @@ import { PRICING, SIGNUP_PATH, type PlanKey } from '../routes';
 import { useStartCta } from './navModel';
 import { Reveal, SiteLink } from './ui';
 
-const PLAN_ORDER: PlanKey[] = ['free', 'pro', 'business'];
+const PLAN_ORDER: PlanKey[] = ['free', 'pro'];
 const RECOMMENDED: PlanKey = 'pro';
 
 export const BillingToggle = ({
@@ -89,7 +89,7 @@ export const BillingToggle = ({
   );
 };
 
-/** The three plan cards; `showFeatures` adds each plan's feature list. */
+/** The plan cards; `showFeatures` adds each plan's feature list. */
 export const PlanCards = ({
   annual,
   fading,
@@ -140,6 +140,10 @@ export const PlanCards = ({
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: 2.5,
         alignItems: 'stretch',
+        // Two plans: keep the cards card-sized instead of page-wide
+        maxWidth: 820,
+        mx: 'auto',
+        width: '100%',
       }}
     >
       {PLAN_ORDER.map((key, i) => {
@@ -242,10 +246,6 @@ export const PlanCards = ({
                   fontWeight: 600,
                   fontSize: 34,
                   lineHeight: 1.1,
-                  bgcolor: t.surface2,
-                  border: `1px dashed ${t.border}`,
-                  px: 1.25,
-                  borderRadius: '8px',
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
@@ -326,7 +326,7 @@ export const ComparisonTable = () => {
         component="table"
         sx={{
           width: '100%',
-          minWidth: 640,
+          minWidth: 480,
           borderCollapse: 'collapse',
           fontSize: 15,
         }}
@@ -357,7 +357,7 @@ export const ComparisonTable = () => {
           </Box>
         </Box>
         <Box component="tbody">
-          {p.table.map(([feature, free, pro, business]) => (
+          {p.table.map(([feature, free, pro]) => (
             <Box
               key={feature}
               component="tr"
@@ -375,9 +375,6 @@ export const ComparisonTable = () => {
               </Box>
               <Box component="td" sx={{ ...cell, bgcolor: t.brandSoft }}>
                 {pro}
-              </Box>
-              <Box component="td" sx={{ ...cell, color: t.muted }}>
-                {business}
               </Box>
             </Box>
           ))}

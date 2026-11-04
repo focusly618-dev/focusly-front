@@ -329,8 +329,7 @@ export const SIGNUP_PATH = '/login?mode=signup';
 // them from. Fill in the real values here.
 export const PRICING = {
   free: { monthly: '$0', annual: '$0' },
-  pro: { monthly: '[PRECIO]', annual: '[PRECIO]' },
-  business: { monthly: '[PRECIO]', annual: '[PRECIO]' },
+  pro: { monthly: '$14', annual: '$12' },
 } as const;
 
 export type PlanKey = keyof typeof PRICING;
