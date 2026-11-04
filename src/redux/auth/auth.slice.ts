@@ -68,6 +68,15 @@ export const logout = createAsyncThunk<void, LogoutReason | undefined>(
       const state = getState() as { auth: AuthState };
       const userId = state.auth.user?.id;
 
+      // This device stops getting the user's reminders (a shared computer
+      // must not show them to the next person). Before logoutUser: removing
+      // it from the server needs the session. Skipped when the session
+      // already expired: same person, about to sign back in.
+      if (reason === 'manual') {
+        const { disablePush } = await import('@/services/pushNotifications');
+        await disablePush();
+      }
+
       await logoutUser(userId);
     } catch (error) {
       console.error('Logout error:', error);
