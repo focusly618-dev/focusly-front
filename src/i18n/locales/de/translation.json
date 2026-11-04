@@ -35,6 +35,8 @@
     "googleCalendarSync": "Synchronisierung mit Google Kalender fehlgeschlagen. Bitte versuche es gleich noch einmal.",
     "aiUnavailable": "Der KI-Assistent ist gerade nicht verfügbar. Bitte versuche es später erneut.",
     "emptyMessage": "Schreibe eine Nachricht, bevor du sie sendest.",
+    "tooManyAttempts": "Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.",
+    "emailNotSent": "Wir konnten die Anmelde-E-Mail nicht senden. Versuche es in ein paar Minuten erneut oder melde dich mit Google an.",
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es später erneut."
   },
   "nav": {

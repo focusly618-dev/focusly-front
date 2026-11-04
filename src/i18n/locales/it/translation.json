@@ -35,6 +35,8 @@
     "googleCalendarSync": "Impossibile sincronizzare con Google Calendar. Riprova tra un momento.",
     "aiUnavailable": "L'assistente IA non è disponibile al momento. Riprova più tardi.",
     "emptyMessage": "Scrivi un messaggio prima di inviarlo.",
+    "tooManyAttempts": "Troppi tentativi. Attendi qualche minuto e riprova.",
+    "emailNotSent": "Non siamo riusciti a inviare l'email di accesso. Riprova tra qualche minuto o continua con Google.",
     "generic": "Qualcosa è andato storto. Riprova più tardi."
   },
   "nav": {

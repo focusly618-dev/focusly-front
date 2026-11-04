@@ -9153,6 +9153,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dompurify@npm:^3.4.13":
+  version: 3.4.17
+  resolution: "dompurify@npm:3.4.17"
+  dependencies:
+    "@types/trusted-types": "npm:^2.0.7"
+  dependenciesMeta:
+    "@types/trusted-types":
+      optional: true
+  checksum: 10c0/6a12251ef5e700fc91b6d96d33e9f8b5fd590c55276f632cf42d182c5808e9f48d5bef435ab26eac235dfcc05ed8fe95e1c8308dcc502bf1050e561f14d0361a
+  languageName: node
+  linkType: hard
+
 "duck@npm:^0.1.12":
   version: 0.1.12
   resolution: "duck@npm:0.1.12"
@@ -9964,6 +9976,7 @@ __metadata:
     date-fns: "npm:^4.1.0"
     diff: "npm:^9.0.0"
     docx: "npm:^9.7.1"
+    dompurify: "npm:^3.4.13"
     emoji-picker-react: "npm:^4.19.1"
     eslint: "npm:^9.39.1"
     eslint-plugin-react-hooks: "npm:^7.0.1"
