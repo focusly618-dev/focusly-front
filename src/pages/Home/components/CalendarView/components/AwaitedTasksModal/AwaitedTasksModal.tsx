@@ -25,7 +25,7 @@ import {
   ArrowUpwardRounded as ArrowUpIcon,
 } from '@mui/icons-material';
 import { format, isToday, startOfDay, endOfDay } from 'date-fns';
-import { es, enUS } from 'date-fns/locale';
+import { dateFnsLocale } from '@/i18n/dateLocales';
 import { surfaceColor } from '@/context';
 import type { ICalendarEvent } from '@/pages/Home/components/CalendarEvent';
 import type { Task } from '@/redux/tasks/task.types';
@@ -63,8 +63,7 @@ export const AwaitedTasksModal: React.FC<AwaitedTasksModalProps> = ({
     Record<string, boolean>
   >({});
 
-  const isSpanish = !i18n.language || i18n.language.startsWith('es');
-  const dateLocale = isSpanish ? es : enUS;
+  const dateLocale = dateFnsLocale(i18n.language);
 
   // Filter events scheduled for the current day that are tasks
   const dailyTasks = useMemo(() => {

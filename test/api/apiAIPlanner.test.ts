@@ -5,6 +5,7 @@ const { post, billing } = vi.hoisted(() => ({
   post: vi.fn(),
   billing: {
     setRemaining: vi.fn(),
+    noteAIAllowance: vi.fn(),
     markLimitReached: vi.fn(),
     openUpgrade: vi.fn(),
   },
@@ -42,7 +43,27 @@ describe('planner calls and the free plan', () => {
     );
     const result = await improveTaskAI({ title: 'x', mode: 'estimate' });
     expect(result).toEqual({ estimatedTime: '30m' });
-    expect(billing.setRemaining).toHaveBeenCalledWith(2);
+    // Both allowances are read from the response's headers
+    const header = billing.noteAIAllowance.mock.calls[0][0];
+    expect(header('x-ai-messages-remaining')).toBe('2');
+    expect(header('x-ai-daily-remaining')).toBeNull();
+  });
+
+  it("says Pro's daily limit in a toast, without opening the Pro plans", async () => {
+    post.mockRejectedValue(
+      new AxiosError(
+        'Too many requests',
+        '429',
+        undefined,
+        undefined,
+        response(429, {
+          detail: { code: 'daily_limit_reached', limit: 150 },
+        }),
+      ),
+    );
+    const failed = improveTaskAI({ title: 'x', mode: 'estimate' });
+    await expect(failed).rejects.toMatchObject({ code: 'daily_limit_reached' });
+    expect(billing.openUpgrade).not.toHaveBeenCalled();
   });
 
   it('opens the Pro plans when the free messages are used up', async () => {

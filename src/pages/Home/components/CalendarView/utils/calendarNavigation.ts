@@ -12,7 +12,7 @@ import {
   startOfWeek,
   type Locale,
 } from 'date-fns';
-import { enUS, es, ja } from 'date-fns/locale';
+import { DAY_TITLE_FORMATS, dateFnsLocale } from '@/i18n/dateLocales';
 
 // Moving through the calendar: what one step is in each view, and how the
 // period on screen is named. The header's arrows used to move one day in
@@ -24,7 +24,7 @@ export type CalendarViewName = 'day' | 'week' | 'month';
 export const WEEK_STARTS_ON = 1 as const;
 
 export const dateLocale = (language?: string): Locale =>
-  language?.startsWith('es') ? es : language?.startsWith('ja') ? ja : enUS;
+  dateFnsLocale(language);
 
 /** One step back (-1) or forward (+1) in the view: a day, a week or a month. */
 export const stepDate = (
@@ -59,14 +59,6 @@ export const formatWeekRange = (date: Date, locale: Locale) => {
   return `${format(start, 'd', { locale })} – ${format(end, 'd MMM yyyy', { locale })}`;
 };
 
-/** A day's title per language: "Lunes, 12 de octubre", "Monday, October
- * 12", "10月12日 月曜日". */
-const DAY_TITLE: Record<string, string> = {
-  es: "EEEE, d 'de' MMMM",
-  'en-US': 'EEEE, MMMM d',
-  ja: 'M月d日 EEEE',
-};
-
 /** The big title over the calendar, for the view on screen. */
 export const periodTitle = (
   view: CalendarViewName,
@@ -77,7 +69,9 @@ export const periodTitle = (
     return capitalize(format(date, 'LLLL yyyy', { locale }));
   if (view === 'week') return formatWeekRange(date, locale);
   return capitalize(
-    format(date, DAY_TITLE[locale.code ?? ''] ?? 'EEEE, MMMM d', { locale }),
+    format(date, DAY_TITLE_FORMATS[locale.code ?? ''] ?? 'EEEE, MMMM d', {
+      locale,
+    }),
   );
 };
 

@@ -1,10 +1,23 @@
-import { describe, it, expect } from 'vitest';
-import {
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const notify = vi.hoisted(() => ({ warning: vi.fn(), info: vi.fn() }));
+vi.mock('@/utils', () => ({ notify }));
+vi.mock('i18next', () => ({
+  default: {
+    t: (key: string, values?: Record<string, unknown>) =>
+      values ? `${key} ${JSON.stringify(values)}` : key,
+  },
+}));
+
+const {
   PlanLimitError,
   isPlanLimitMessage,
+  noteDailyRemaining,
+  offersPro,
   remainingFromHeaders,
+  resetDailyWarning,
   throwIfPlanLimit,
-} from '@/api/Billing/planLimit';
+} = await import('@/api/Billing/planLimit');
 
 const json = (status: number, body: unknown, headers: HeadersInit = {}) =>
   new Response(JSON.stringify(body), { status, headers });
@@ -38,5 +51,50 @@ describe('plan limits from the AI endpoints', () => {
       isPlanLimitMessage(new PlanLimitError('free_limit_reached').message),
     ).toBe(true);
     expect(isPlanLimitMessage('Network error')).toBe(false);
+  });
+
+  it("says when Pro's fair use for today is used up, without offering Pro", async () => {
+    await expect(
+      throwIfPlanLimit(
+        json(429, { detail: { code: 'daily_limit_reached', limit: 150 } }),
+      ),
+    ).rejects.toMatchObject({ code: 'daily_limit_reached', limit: 150 });
+    expect(notify.warning.mock.calls[0][0].title).toBe(
+      'billing.dailyLimit.title',
+    );
+    expect(offersPro('daily_limit_reached')).toBe(false);
+    expect(offersPro('free_limit_reached')).toBe(true);
+    expect(isPlanLimitMessage('daily_limit_reached')).toBe(true);
+  });
+
+  it('lets other 429s through', async () => {
+    await expect(
+      throwIfPlanLimit(json(429, { detail: 'Too many requests' })),
+    ).resolves.toBeUndefined();
+  });
+});
+
+describe("a Pro account's fair use for today", () => {
+  beforeEach(() => {
+    notify.info.mockClear();
+    resetDailyWarning();
+  });
+
+  it('warns once a day, when a fifth or less is left', () => {
+    noteDailyRemaining('100', 150);
+    expect(notify.info).not.toHaveBeenCalled();
+
+    noteDailyRemaining('30', 150);
+    noteDailyRemaining('12', 150);
+    expect(notify.info).toHaveBeenCalledTimes(1);
+    expect(notify.info.mock.calls[0][0].title).toBe(
+      'billing.dailyLow.title {"count":30}',
+    );
+  });
+
+  it('says nothing without the header (free accounts, older servers)', () => {
+    noteDailyRemaining(null);
+    noteDailyRemaining(undefined);
+    expect(notify.info).not.toHaveBeenCalled();
   });
 });

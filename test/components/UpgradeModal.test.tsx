@@ -119,7 +119,8 @@ describe('UpgradeModal', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('billing.plans.free.name')).toBeInTheDocument();
     expect(screen.getByText('billing.plans.pro.name')).toBeInTheDocument();
-    expect(screen.getByText('billing.usageNone')).toBeInTheDocument();
+    // With when the free messages come back, in the user's own time
+    expect(screen.getByText(/^billing\.usageNone:\S/)).toBeInTheDocument();
     expect(screen.getByText('$9.99')).toBeInTheDocument();
     // Free lacks the editor assistant; Pro has it.
     expect(

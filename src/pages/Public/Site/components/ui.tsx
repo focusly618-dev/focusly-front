@@ -247,9 +247,11 @@ export const MediaPlaceholder = ({
   );
 };
 
-// The videos show the app with its text: these languages have their own
-// (`-en`, `-ja`); Spanish is the base set and the fallback.
-const VIDEO_LANGUAGES = ['en', 'ja'];
+// The videos show the app with its text: Spanish is the base set, and
+// Japanese and English have their own (`-ja`, `-en`). Other languages get the
+// English ones.
+const videoLanguage = (lang: string): string | null =>
+  lang === 'es' ? null : lang === 'ja' ? 'ja' : 'en';
 
 /**
  * Muted looping video from MEDIA_BASE_URL/videos, in the variant matching the
@@ -280,7 +282,8 @@ export const LoopVideo = ({
     (theme.appMode ?? theme.palette.mode) === 'light' ? 'light' : 'dark';
   const { lang } = useSiteContent();
   const base = `${MEDIA_BASE_URL}/videos/${name}-${variant}`;
-  const localized = VIDEO_LANGUAGES.includes(lang) ? `${base}-${lang}` : null;
+  const videoLang = videoLanguage(lang);
+  const localized = videoLang ? `${base}-${videoLang}` : null;
   // A language's video that can't be loaded (not uploaded yet): Spanish instead
   const [missing, setMissing] = useState<string | null>(null);
   const src = localized && localized !== missing ? localized : base;

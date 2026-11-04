@@ -27,7 +27,8 @@ export const SiteFooter = () => {
   const { c } = useSiteContent();
   const { i18n } = useTranslation();
   const colorMode = useContext(ColorModeContext);
-  const lang = (i18n.language || 'es').split('-')[0];
+  // The full code: "en-GB" and "en" are different choices
+  const lang = i18n.language || 'es';
 
   const columns = [
     {

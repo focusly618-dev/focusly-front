@@ -1,0 +1,2089 @@
+{
+  "taskReminder": {
+    "upcomingTitle": "곧 시작: {{title}}",
+    "urgentTitle": "지금 시작: {{title}}!",
+    "startsIn_one": "{{count}}분 후 시작 ({{time}})",
+    "startsIn_other": "{{count}}분 후 시작 ({{time}})"
+  },
+  "common": {
+    "loadingConversations": "대화를 불러오는 중…",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "search": "검색",
+    "loading": "불러오는 중...",
+    "actions": "작업",
+    "close": "닫기",
+    "back": "뒤로",
+    "add": "추가",
+    "active": "활성",
+    "connected": "연결됨",
+    "error": "오류",
+    "connect": "연결",
+    "all": "전체",
+    "create": "만들기"
+  },
+  "errors": {
+    "network": "서버에 연결할 수 없어요. 인터넷 연결을 확인하고 다시 시도해 주세요.",
+    "timeout": "요청 응답 시간이 너무 오래 걸렸어요. 다시 시도해 주세요.",
+    "sessionExpired": "세션이 만료되었어요. 다시 로그인해 주세요.",
+    "notFound": "요청한 항목을 찾을 수 없어요. 더 이상 존재하지 않을 수 있어요.",
+    "magicLinkExpired": "이 로그인 링크는 만료되었어요. 새 링크를 요청해 주세요.",
+    "magicLinkInvalid": "이 로그인 링크는 유효하지 않아요.",
+    "googleAuthFailed": "Google 계정에 연결하는 중 문제가 발생했어요. 다시 로그인해 주세요.",
+    "googleCalendarSync": "Google 캘린더와 동기화할 수 없어요. 잠시 후 다시 시도해 주세요.",
+    "aiUnavailable": "지금은 AI 어시스턴트를 사용할 수 없어요. 나중에 다시 시도해 주세요.",
+    "emptyMessage": "보내기 전에 메시지를 입력해 주세요.",
+    "generic": "문제가 발생했어요. 나중에 다시 시도해 주세요."
+  },
+  "nav": {
+    "agenda": "일정",
+    "dailyPlan": "오늘의 계획",
+    "tasks": "작업",
+    "inbox": "수신함",
+    "today": "오늘",
+    "upcoming": "예정",
+    "intelligence": "인텔리전스",
+    "askAi": "AI에게 묻기",
+    "insights": "인사이트",
+    "workspace": "워크스페이스",
+    "collections": "컬렉션",
+    "projects": "프로젝트",
+    "recentProjects": "최근",
+    "viewAllProjects": "모두 보기 ({{count}})",
+    "noProjectsYet": "아직 프로젝트가 없어요",
+    "templates": "템플릿",
+    "features": "기능",
+    "howItWorks": "사용 방법",
+    "pricing": "요금",
+    "logIn": "로그인",
+    "getStarted": "시작하기",
+    "viewProfile": "프로필 보기",
+    "searchWorkspaces": "워크스페이스 검색..."
+  },
+  "settings": {
+    "theme": {
+      "title": "테마",
+      "subtitle": "이 기기에서 Focusly가 보이는 방식을 선택하세요.",
+      "system": "자동",
+      "light": "라이트",
+      "dark": "다크",
+      "graydark": "그레이 다크"
+    },
+    "language": {
+      "title": "언어",
+      "spanish": "Español",
+      "english": "English",
+      "japanese": "日本語"
+    }
+  },
+  "calendar": {
+    "nav": {
+      "previous": {
+        "day": "이전 날 (←)",
+        "week": "이전 주 (←)",
+        "month": "이전 달 (←)"
+      },
+      "next": {
+        "day": "다음 날 (→)",
+        "week": "다음 주 (→)",
+        "month": "다음 달 (→)"
+      },
+      "views": "캘린더 보기",
+      "openPanel": "캘린더 패널 열기",
+      "todayShortcut": "오늘로 이동 (T)"
+    },
+    "loadingEvents": "일정을 불러오는 중…",
+    "title": "캘린더",
+    "subtitle": "딥 워크 세션을 위한 체계적인 명료함.",
+    "aiPlannerTitle": "AI 플래너",
+    "aiPlannerDescription": "Lumina가 작업에 가장 좋은 집중 시간을 찾고 있어요...",
+    "noPendingTasksTitle": "플래너",
+    "noPendingTasksDesc": "예약할 대기 중인 작업이 없어요.",
+    "noAvailabilityTitle": "가능한 시간 없음",
+    "noAvailabilityDesc": "캘린더에 예약할 빈 시간이 없어요.",
+    "noSuggestionsTitle": "플래너",
+    "noSuggestionsDesc": "최적의 타임 블록 제안을 찾지 못했어요.",
+    "draftGeneratedTitle": "초안 생성됨",
+    "draftGeneratedDesc": "Lumina가 작업을 배분했어요. 일정을 검토하고 조정하거나 확정하세요.",
+    "planningErrorTitle": "계획 오류",
+    "planningErrorDesc": "타임 블록 제안을 생성할 수 없어요.",
+    "organizingBackdrop": "Lumina AI가 캘린더에 작업을 정리하고 있어요...",
+    "draftProposed": "✨ Lumina가 집중 블록 {{count}}개를 제안했어요",
+    "discard": "버리기",
+    "confirmSchedule": "일정 확정 🚀",
+    "scheduling": "예약 중...",
+    "quickCreateTask": "빠른 작업 만들기",
+    "showMore": "+{{count}}개 더",
+    "addTask": "작업 추가",
+    "month": "월",
+    "week": "주",
+    "day": "일",
+    "today": "오늘",
+    "awaitedTasks": "대기 중인 작업",
+    "viewAll": "모두 보기",
+    "noAwaitedTasks": "대기 중인 작업이 없어요",
+    "freeTimeDesc": "여유 시간을 즐기세요!",
+    "optimizeSchedule": "일정 최적화",
+    "plan": {
+      "review": "검토",
+      "closeReview": "닫고 캘린더 보기",
+      "previewLabel": "캘린더에서 제안 미리보기",
+      "workingTitle": "Lumina가 일정을 정리하고 있어요",
+      "elapsed_one": "{{count}}초",
+      "elapsed_other": "{{count}}초",
+      "steps": {
+        "tasks": "진행 중인 작업 읽는 중",
+        "slots": "빈 시간 찾는 중",
+        "thinking": "집중 블록 배치 중",
+        "checking": "제안 확인 중"
+      },
+      "backgroundHint": "Focusly를 계속 사용하세요. 준비되면 알려 드릴게요.",
+      "reviewTitle": "Lumina의 제안",
+      "reviewSummary_one": "블록 {{count}}개",
+      "reviewSummary_other": "블록 {{count}}개",
+      "focusTime": "집중 {{hours}}시간 {{minutes}}분",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "duration_one": "{{count}}분",
+      "duration_other": "{{count}}분",
+      "include": "“{{title}}” 포함",
+      "priority": {
+        "high": "높음",
+        "medium": "보통",
+        "low": "낮음"
+      },
+      "beforeDeadline": "마감 전",
+      "afterDeadline": "마감 후",
+      "rescheduled": "일정 변경됨",
+      "unplaced_one": "작업 {{count}}개를 배치하지 못했어요",
+      "unplaced_other": "작업 {{count}}개를 배치하지 못했어요",
+      "unplacedHint": "시간을 비우거나 프로필에서 근무 시간을 늘려 주세요.",
+      "dragHint": "캘린더에서 블록을 드래그해 조정할 수 있어요.",
+      "confirm_one": "블록 {{count}}개 예약",
+      "confirm_other": "블록 {{count}}개 예약"
+    },
+    "draftReadyTitle": "최적화된 일정이 준비되었어요 ✨",
+    "viewProposal": "제안 보기",
+    "optimizing": "최적화 중…",
+    "cancelPlanning": "취소",
+    "optimizeFreeHint_one": "마지막 무료 Lumina 메시지를 사용해요",
+    "optimizeFreeHint_other": "무료 Lumina 메시지 {{count}}개 중 1개를 사용해요",
+    "optimizeProOnly": "이번 달 무료 메시지를 모두 사용했어요: Pro로 이용 가능",
+    "draftGeneratedPartial_one": "Lumina가 블록 {{count}}개를 제안했어요. 작업 {{left}}개는 빈 시간에 들어가지 않았어요.",
+    "draftGeneratedPartial_other": "Lumina가 블록 {{count}}개를 제안했어요. 작업 {{left}}개는 빈 시간에 들어가지 않았어요.",
+    "scheduleSavedTitle": "일정 확정됨",
+    "scheduleSavedDesc": "집중 블록이 예약되었어요.",
+    "scheduleSaveError": "블록 {{count}}개를 저장하지 못했어요. 다시 확정할 수 있어요.",
+    "openWeeklyPlanner": "주간 플래너 열기",
+    "notifications": {
+      "title": "알림",
+      "new": "새 알림 {{count}}개",
+      "empty": "아직 알림이 없어요",
+      "emptyDesc": "모두 확인했어요! 작업과 집중 세션에 대한 알림이 여기에 표시돼요.",
+      "markAllRead": "모두 읽음으로 표시"
+    }
+  },
+  "notificationSettings": {
+    "sound": {
+      "title": "알림음",
+      "classicChime": "클래식 차임",
+      "digitalTone": "디지털 톤",
+      "softBell": "부드러운 벨",
+      "successArpeggio": "성공 아르페지오"
+    }
+  },
+  "accountSettings": {
+    "emailAddress": "이메일 주소",
+    "emailManagedBy": "로그인 서비스에서 관리하므로 여기서 변경할 수 없어요.",
+    "toast": {
+      "title": "프로필 업데이트됨",
+      "desc": "표시 이름이 저장되었어요."
+    }
+  },
+  "integrationsSettings": {
+    "googleCalendar": "Google 캘린더 및 Meet",
+    "connectedAs": "{{email}}(으)로 연결됨",
+    "notConnected": "연결되지 않음",
+    "connect": "연결",
+    "refreshPermissions": "권한 새로 고침",
+    "toast": {
+      "connectedTitle": "Google 캘린더 연결됨",
+      "connectedDesc": "캘린더와 Meet 접근 권한이 새로 고쳐졌어요.",
+      "connectErrorTitle": "Google 캘린더를 연결할 수 없어요",
+      "connectFailedTitle": "Google 연결 실패"
+    }
+  },
+  "securitySettings": {
+    "activeSession": "활성 세션",
+    "signInMethod": "로그인 방법",
+    "google": "Google",
+    "magicLink": "매직 링크",
+    "googleDesc": "Google 계정으로 로그인해요. 따로 관리할 Focusly 비밀번호는 없어요.",
+    "magicLinkDesc": "이메일로 보내 드리는 비밀번호 없는 매직 링크로 로그인해요.",
+    "deleteAccount": "계정 삭제",
+    "deleteConfirm": {
+      "title": "계정을 삭제할까요?",
+      "subtitle": "이 작업은 되돌릴 수 없어요",
+      "desc": "계정, 작업, 문서, 프로젝트, AI 대화와 프로필 사진이 영구적으로 삭제돼요. Google 캘린더를 연결했다면 Focusly의 접근 권한을 해제하며, 캘린더 일정은 삭제되지 않아요.",
+      "confirm": "계정 삭제",
+      "cancel": "취소",
+      "success": "계정이 삭제되었어요",
+      "error": "계정을 삭제하지 못했어요. 다시 시도해 주세요."
+    }
+  },
+  "tasksHeader": {
+    "eyebrow": "업무를 관리하고 우선순위를 정하세요",
+    "title": "내 작업"
+  },
+  "endSessionModal": {
+    "title": "집중 세션을 종료할까요?",
+    "confirmText": "이 세션을 일찍 종료하시겠어요?",
+    "warningText": "지금까지 기록된 시간은 작업에 저장돼요.",
+    "endSession": "세션 종료"
+  },
+  "focusTimer": {
+    "timeUp": "시간이 다 됐어요! 작업을 완료하거나 5분을 추가해 계속하세요."
+  },
+  "profilePage": {
+    "title": "설정",
+    "back": "뒤로",
+    "logout": "로그아웃",
+    "nav": {
+      "account": "프로필",
+      "billing": "요금제 및 결제",
+      "workFocus": "일정 및 집중",
+      "notifications": "알림",
+      "appearance": "화면",
+      "integrations": "연동",
+      "privacy": "개인정보 및 보안"
+    },
+    "descriptions": {
+      "account": "사진, 이름, 로그인하는 계정이에요.",
+      "billing": "구독, 저장된 결제 수단, Focusly Pro 혜택을 관리하세요.",
+      "workFocus": "근무 시간과 집중 세션 길이예요. Focusly가 작업을 배치할 때 사용해요.",
+      "notifications": "작업이 곧 시작될 때 Focusly가 알려 주는 방식이에요.",
+      "appearance": "이 기기에서 Focusly의 테마와 언어예요.",
+      "integrations": "Focusly가 캘린더를 동기화하고 Meet 링크를 만드는 데 사용하는 외부 계정이에요.",
+      "privacy": "세션, 법률 문서, 계정 삭제예요."
+    },
+    "account": {
+      "photoTitle": "프로필 사진",
+      "photoDesc": "Focusly 사이드 메뉴에 표시돼요. JPG, PNG 또는 WebP.",
+      "upload": "사진 업로드",
+      "remove": "사진 삭제",
+      "nameTitle": "이름",
+      "nameDesc": "Focusly에서 표시되는 이름이에요.",
+      "nameError": "이름을 저장하지 못했어요. 다시 시도해 주세요."
+    },
+    "workFocus": {
+      "daysTitle": "근무일",
+      "daysDesc": "근무하는 요일을 표시하세요. 자동 일정과 Lumina의 주간 계획은 이 요일에만 작업을 배치해요.",
+      "hoursTitle": "근무 시간",
+      "hoursDesc": "작업과 집중 블록은 표시한 요일의 이 시간 안에 예약돼요.",
+      "start": "시작",
+      "end": "종료",
+      "focusTitle": "집중 세션 길이",
+      "focusDesc": "작업에 예상 시간이 없을 때 집중 모드 타이머가 실행되는 시간이에요.",
+      "minutes": "{{count}}분",
+      "save": "변경 사항 저장",
+      "discard": "버리기",
+      "savedTitle": "설정 저장됨",
+      "savedDesc": "Focusly가 이 시간을 사용해 작업을 배치할 거예요.",
+      "saveError": "설정을 저장하지 못했어요. 다시 시도해 주세요.",
+      "errors": {
+        "noDays": "하루 이상 선택해 주세요.",
+        "hours": "종료 시간은 시작 시간 이후여야 해요."
+      }
+    },
+    "notifications": {
+      "remindersTitle": "작업 알림",
+      "remindersDesc": "시간이 정해진 작업이 시작되기 5분 전과 1분 전에 알려 드려요. Focusly에 알림을 표시하고 아래에서 고른 소리를 재생해요. 끄면 이 기기에서 알림을 받지 않아요.",
+      "systemTitle": "시스템 알림",
+      "systemDesc": "각 알림을 운영체제 알림으로도 표시해, Focusly가 다른 탭에 있거나 최소화되어 있어도 볼 수 있어요. 브라우저 권한이 필요해요.",
+      "allow": "허용",
+      "permission": {
+        "granted": "이 브라우저에서 허용됨.",
+        "default": "아직 이 브라우저에서 권한을 허용하지 않았어요.",
+        "denied": "브라우저에서 차단됨. 사이트 설정(주소 왼쪽 아이콘)에서 켜 주세요.",
+        "unsupported": "이 브라우저는 시스템 알림을 지원하지 않아요."
+      },
+      "soundDesc": "각 알림에서 재생되는 소리예요. 옵션을 탭해 들어 보고 선택하세요. 이 기기에 저장돼요."
+    },
+    "appearance": {
+      "languageDesc": "이 기기의 인터페이스 언어예요."
+    },
+    "integrations": {
+      "googleDesc": "Focusly가 Google 캘린더의 일정을 읽고 만들어 일정을 표시하고, 작업을 예약하고, Meet 링크를 생성할 수 있게 해요. Google 계정에서 접근 권한을 해제할 수 있어요."
+    },
+    "privacy": {
+      "sessionDesc": "이 브라우저에서 로그아웃해요. 데이터는 그대로 저장되며 평소 방법으로 다시 로그인하면 돼요.",
+      "termsAccepted": "{{date}}에 버전 {{version}}에 동의했어요.",
+      "termsAcceptedNoVersion": "{{date}}에 약관에 동의했어요.",
+      "deleteDesc": "계정, 작업, 문서, 프로젝트와 Lumina와의 대화를 영구적으로 삭제해요. 되돌릴 수 없어요."
+    }
+  },
+  "editorAI": {
+    "launcher": "Lumina에게 묻기",
+    "conversationTitle": "📝 {{title}}",
+    "untitled": "제목 없는 문서",
+    "header": {
+      "title": "Lumina",
+      "subtitle": "“{{title}}” 관련",
+      "newChat": "새 대화",
+      "minimize": "최소화"
+    },
+    "empty": {
+      "title": "이 문서에서 무엇을 도와드릴까요?",
+      "description": "노트에 대해 무엇이든 묻거나 빠른 작업을 사용하세요. 텍스트를 선택하면 해당 부분에 대한 작업이 표시돼요.",
+      "withSelection": "선택한 텍스트가 있어요. 작업을 고르거나 어떻게 할지 알려 주세요."
+    },
+    "actions": {
+      "label": "빠른 작업",
+      "improve": {
+        "label": "글 다듬기",
+        "hint": "선택 영역을 더 명확하고 매끄럽게 다시 써요"
+      },
+      "fix": {
+        "label": "교정",
+        "hint": "선택 영역의 맞춤법과 문법을 고쳐요"
+      },
+      "shorter": {
+        "label": "짧게",
+        "hint": "선택 영역을 줄여요"
+      },
+      "longer": {
+        "label": "길게",
+        "hint": "선택 영역을 확장해요"
+      },
+      "translate": {
+        "label": "번역",
+        "hint": "선택 영역을 다른 언어로 번역해요"
+      },
+      "explain": {
+        "label": "설명",
+        "hint": "선택 영역을 바꾸지 않고 설명해요"
+      },
+      "matchStyle": {
+        "label": "스타일 맞추기",
+        "hint": "선택 영역을 문서의 스타일에 맞춰요"
+      },
+      "summarize": {
+        "label": "요약",
+        "hint": "문서 전체를 요약해요"
+      },
+      "continue": {
+        "label": "이어 쓰기",
+        "hint": "커서 위치부터 이어서 써요"
+      },
+      "extractTasks": {
+        "label": "작업 추출",
+        "hint": "문서에서 작업을 제안해요"
+      },
+      "proofread": {
+        "label": "교정 보기",
+        "hint": "문서 전체의 맞춤법을 고쳐요"
+      }
+    },
+    "prompts": {
+      "improve": "선택한 텍스트를 더 명확하고 매끄럽게 다듬어 주세요. 의미와 언어는 그대로 유지해 주세요.",
+      "fix": "선택한 텍스트의 스타일은 바꾸지 말고 맞춤법과 문법을 고쳐 주세요.",
+      "shorter": "핵심 내용은 유지하면서 선택한 텍스트를 더 짧게 만들어 주세요.",
+      "longer": "같은 스타일로 유용한 세부 내용과 맥락을 더해 선택한 텍스트를 확장해 주세요.",
+      "translate": "선택한 텍스트를 {{language}}(으)로 번역해 주세요.",
+      "explain": "선택한 텍스트를 쉬운 말로 설명해 주세요.",
+      "matchStyle": "의미는 바꾸지 말고 선택한 텍스트를 문서의 나머지 부분의 글쓰기 스타일(어조, 어휘, 문장 구조)에 맞춰 주세요.",
+      "summarize": "이 문서를 명확하고 간결하게 요약해 주세요.",
+      "continue": "문서의 어조와 구조를 따라 내 커서 위치부터 이어서 써 주세요.",
+      "extractTasks": "이 문서에서 실행할 수 있는 작업을 추출해 Focusly 작업으로 제안해 주세요.",
+      "proofread": "문서 전체의 맞춤법과 문법을 검토하고 스타일은 바꾸지 말고 오류를 고쳐 주세요."
+    },
+    "quote": {
+      "selection": "선택 영역",
+      "cursor": "커서 앞"
+    },
+    "status": {
+      "thinking": "생각 중…",
+      "preparingEdit": "문서 변경 사항을 준비하는 중…",
+      "preparingTasks": "작업을 준비하는 중…",
+      "editProposed": "문서 변경 제안",
+      "stopped": "응답이 중지되었어요.",
+      "error": "응답을 완료하지 못했어요."
+    },
+    "fragment": {
+      "docChanged": "Lumina가 쓰는 동안 문서가 변경되었어요. 원하는 곳에 텍스트를 삽입하세요:",
+      "editChanged": "요청 후 문서가 변경되었어요. 현재 버전과 비교해 변경 사항을 검토하세요:"
+    },
+    "message": {
+      "copy": "복사",
+      "insertAtCursor": "커서 위치에 삽입",
+      "replaceSelection": "선택 영역 바꾸기",
+      "retry": "다시 시도",
+      "stop": "중지",
+      "reviewEdit": "변경 사항 검토"
+    },
+    "diff": {
+      "review": "문서의 변경 사항을 검토하세요. 취소선 텍스트는 삭제되고 밑줄 텍스트는 추가돼요.",
+      "accept": "수락",
+      "discard": "버리기",
+      "applied": "문서에 변경 사항이 적용되었어요",
+      "discarded": "변경 사항을 버렸어요"
+    },
+    "selection": {
+      "attached": "선택 영역: “{{text}}”",
+      "detached": "선택 영역은 전송되지 않아요",
+      "detach": "선택 영역 보내지 않기",
+      "attach": "사용"
+    },
+    "input": {
+      "placeholder": "이 문서에 대해 Lumina에게 물어보세요…",
+      "placeholderSelection": "선택한 텍스트로 무엇을 할까요?",
+      "send": "보내기"
+    },
+    "disclaimer": "Lumina는 실수할 수 있어요. 수락하기 전에 변경 사항을 검토하세요.",
+    "toasts": {
+      "inserted": "문서에 추가되었어요",
+      "copied": "복사됨"
+    },
+    "errors": {
+      "title": "Lumina가 응답하지 못했어요",
+      "retry": "잠시 후 다시 시도해 주세요.",
+      "copy": "복사하지 못했어요"
+    },
+    "launcherWriting": "Lumina가 쓰는 중…",
+    "launcherReady": "응답 준비됨",
+    "backgroundHint": "편집기를 나가도 돼요. Lumina가 백그라운드에서 계속 작업해요.",
+    "history": {
+      "title": "이 문서의 채팅",
+      "open": "채팅 보기",
+      "back": "채팅으로 돌아가기",
+      "empty": "이 문서에는 아직 채팅이 없어요.",
+      "untitled": "제목 없는 채팅",
+      "active": "열림",
+      "delete": "채팅 삭제",
+      "confirmDelete": "삭제할까요?",
+      "yes": "예",
+      "no": "아니요",
+      "loadError": "채팅을 불러오지 못했어요.",
+      "deleteError": "채팅을 삭제하지 못했어요."
+    },
+    "background": {
+      "writing": "Lumina가 쓰는 중",
+      "done": "Lumina가 완료했어요",
+      "in": "“{{title}}”에서",
+      "open": "“{{title}}” 열기",
+      "dismiss": "닫기"
+    }
+  },
+  "actionPlan": {
+    "header": {
+      "title": "Lumina의 계획",
+      "changesTitle": "제안된 변경 사항",
+      "review": "세부 내용을 검토하고 만들 항목을 고르세요.",
+      "running": "{{total}}개 중 {{done}}개 만드는 중…",
+      "done": "완료: 선택한 모든 항목이 Focusly에 있어요.",
+      "someFailed": "일부 항목을 만들지 못했어요."
+    },
+    "summary": {
+      "projects_one": "프로젝트 {{count}}개",
+      "projects_other": "프로젝트 {{count}}개",
+      "documents_one": "문서 {{count}}개",
+      "documents_other": "문서 {{count}}개",
+      "tasks_one": "작업 {{count}}개",
+      "tasks_other": "작업 {{count}}개",
+      "subtasks_one": "하위 작업 {{count}}개",
+      "subtasks_other": "하위 작업 {{count}}개",
+      "updates_one": "변경 {{count}}건",
+      "updates_other": "변경 {{count}}건",
+      "deletions_one": "삭제 {{count}}건",
+      "deletions_other": "삭제 {{count}}건",
+      "events_one": "일정 {{count}}개",
+      "events_other": "일정 {{count}}개",
+      "guests_one": "게스트 {{count}}명",
+      "guests_other": "게스트 {{count}}명"
+    },
+    "sections": {
+      "otherTasks": "기타 작업",
+      "updates": "기존 항목 변경",
+      "deletions": "삭제 예정",
+      "events": "Google 캘린더 일정"
+    },
+    "footer": {
+      "selectAll": "전체",
+      "selectNone": "없음",
+      "errors": "오류로 표시된 항목을 확인하세요.",
+      "running": "만드는 중…",
+      "create_one": "항목 {{count}}개 만들기",
+      "create_other": "항목 {{count}}개 만들기",
+      "apply_one": "변경 {{count}}건 적용",
+      "apply_other": "변경 {{count}}건 적용",
+      "retry_one": "{{count}}개 다시 시도",
+      "retry_other": "{{count}}개 다시 시도",
+      "done_one": "항목 {{count}}개 완료",
+      "done_other": "항목 {{count}}개 완료",
+      "delete_one": "{{count}}개 삭제",
+      "delete_other": "{{count}}개 삭제"
+    },
+    "status": {
+      "done": "생성됨",
+      "error": "만들지 못함",
+      "skipped": "건너뜀"
+    },
+    "edit": {
+      "edit": "만들기 전에 편집",
+      "save": "저장",
+      "cancel": "취소",
+      "title": "제목",
+      "start": "시작",
+      "name": "이름"
+    },
+    "details": {
+      "show": "세부 정보 보기",
+      "hide": "세부 정보 숨기기"
+    },
+    "priority": {
+      "1": "낮음",
+      "2": "보통",
+      "3": "높음",
+      "4": "긴급"
+    },
+    "untitledTask": "제목 없는 작업",
+    "untitledNote": "제목 없는 노트",
+    "untitledDocument": "제목 없는 문서",
+    "task": {
+      "subtaskCount_one": "하위 작업 {{count}}개",
+      "subtaskCount_other": "하위 작업 {{count}}개",
+      "subtasks": "하위 작업",
+      "notes": "메모"
+    },
+    "open": {
+      "goTo": "만든 항목으로 이동",
+      "inCalendar": "캘린더에서 보기",
+      "tasks_other": "작업 {{count}}개 보기",
+      "tasks_one": "작업 보기",
+      "viewProject": "프로젝트 보기",
+      "task": "작업 보기",
+      "document": "문서 열기",
+      "project": "프로젝트 열기",
+      "calendar": "Google 캘린더에서 열기",
+      "meet": "Meet 참여"
+    },
+    "document": {
+      "label": "문서",
+      "note": "노트",
+      "sections_one": "섹션 {{count}}개",
+      "sections_other": "섹션 {{count}}개",
+      "words_one": "약 {{count}}단어",
+      "words_other": "약 {{count}}단어",
+      "linkedTasks_one": "연결된 작업 {{count}}개",
+      "linkedTasks_other": "연결된 작업 {{count}}개",
+      "outline": "문서 섹션",
+      "showContent": "전체 문서 보기",
+      "hideContent": "문서 숨기기"
+    },
+    "project": {
+      "new": "새 프로젝트",
+      "existing": "기존 프로젝트",
+      "existingFallback": "기존 프로젝트",
+      "documents_one": "문서 {{count}}개",
+      "documents_other": "문서 {{count}}개",
+      "tasks_one": "작업 {{count}}개",
+      "tasks_other": "작업 {{count}}개"
+    },
+    "fields": {
+      "title": "제목",
+      "start": "시작",
+      "end": "종료",
+      "priority": "우선순위",
+      "duration": "소요 시간",
+      "notes": "메모",
+      "status": "상태",
+      "document": "문서",
+      "project": "프로젝트",
+      "when": "날짜",
+      "location": "장소",
+      "description": "설명",
+      "guests": "게스트",
+      "meet": "Google Meet"
+    },
+    "update": {
+      "changes_one": "변경 {{count}}건",
+      "changes_other": "변경 {{count}}건",
+      "notesReplaced": "메모가 교체돼요",
+      "unknownTask": "기존 작업",
+      "aDocument": "문서",
+      "aProject": "프로젝트"
+    },
+    "insert": {
+      "title": "열린 문서에 추가",
+      "hint": "열려 있는 문서에 삽입됨"
+    },
+    "taskStatus": {
+      "todo": "할 일",
+      "planning": "계획 중",
+      "pending": "대기",
+      "onHold": "보류",
+      "review": "검토 중",
+      "done": "완료",
+      "backlog": "백로그",
+      "scheduled": "예약됨",
+      "archived": "보관됨"
+    },
+    "subtasks": {
+      "add_one": "+{{count}}개 새로 추가",
+      "add_other": "+{{count}}개 새로 추가",
+      "complete_one": "{{count}}개 완료",
+      "complete_other": "{{count}}개 완료",
+      "reopen_one": "{{count}}개 다시 열림",
+      "reopen_other": "{{count}}개 다시 열림",
+      "remove_one": "{{count}}개 삭제됨",
+      "remove_other": "{{count}}개 삭제됨",
+      "missing": "다음 하위 작업을 찾을 수 없어요: {{titles}}"
+    },
+    "delete": {
+      "permanent": "영구 삭제",
+      "alsoGoogle": "Google 캘린더에서도 삭제",
+      "confirm_one": "작업 {{count}}개가 영구적으로 삭제된다는 것을 이해해요.",
+      "confirm_other": "작업 {{count}}개가 영구적으로 삭제된다는 것을 이해해요.",
+      "confirmEvents_one": "일정 {{count}}개가 취소되고 게스트에게 알림이 간다는 것을 이해해요.",
+      "confirmEvents_other": "일정 {{count}}개가 취소되고 게스트에게 알림이 간다는 것을 이해해요.",
+      "confirmMixed_one": "항목 {{count}}개가 영구적으로 삭제된다는 것을 이해해요.",
+      "confirmMixed_other": "항목 {{count}}개가 영구적으로 삭제된다는 것을 이해해요."
+    },
+    "event": {
+      "untitled": "제목 없는 일정",
+      "unknown": "캘린더의 일정",
+      "allDay": "종일",
+      "meet": "Google Meet",
+      "meetCreated": "회의용 Google Meet 링크가 만들어져요.",
+      "meetAdded": "Meet 링크가 추가돼요",
+      "guests_one": "게스트 {{count}}명",
+      "guests_other": "게스트 {{count}}명",
+      "guestsNotice": "Google이 각 게스트에게 초대장을 이메일로 보내요.",
+      "updateNotice": "게스트에게 변경 사항이 알려져요.",
+      "addGuests_one": "+게스트 {{count}}명",
+      "addGuests_other": "+게스트 {{count}}명",
+      "removeGuests_one": "−게스트 {{count}}명",
+      "removeGuests_other": "−게스트 {{count}}명",
+      "descriptionReplaced": "설명이 교체돼요",
+      "organizedBy": "{{email}}님이 주최",
+      "notOrganizerHint": "이 일정의 주최자가 아니에요. 주최자만 모든 참석자의 시간이나 게스트를 변경할 수 있어요.",
+      "cancel": "취소됨",
+      "cancelNotice_one": "게스트 {{count}}명이 취소 알림을 받아요",
+      "cancelNotice_other": "게스트 {{count}}명이 취소 알림을 받아요",
+      "needsCalendar": "Google 캘린더 필요",
+      "connectHint": "Lumina가 일정을 만들고 편집할 수 있도록 Google 캘린더를 연결하세요.",
+      "connect": "Google 캘린더 연결",
+      "you": "나",
+      "response": {
+        "accepted": "수락함",
+        "declined": "거절함",
+        "tentative": "미정",
+        "needsAction": "응답 없음"
+      }
+    }
+  },
+  "insightsHeader": {
+    "title": "{{period}} 인사이트",
+    "periods": {
+      "daily": "일간",
+      "weekly": "주간",
+      "monthly": "월간",
+      "yearly": "연간"
+    },
+    "subtitle": "생산성 요약 및 분석",
+    "export": "내보내기",
+    "createReport": "보고서 만들기",
+    "previousMonth": "이전 달",
+    "nextMonth": "다음 달"
+  },
+  "notificationsPage": {
+    "loading": "알림을 불러오는 중…",
+    "title": "알림",
+    "subtitle": "최근 활동을 확인하세요",
+    "newBadge": "새 알림 {{count}}개",
+    "markAllRead": "모두 읽음으로 표시",
+    "deleteAll": "모두 삭제",
+    "error": "알림을 불러오는 중 오류가 발생했어요",
+    "emptyTitle": "아직 알림이 없어요",
+    "emptyDesc": "작업, 집중 세션, AI 추천에 대한 알림을 받으면 여기에 표시돼요.",
+    "timeToday": "오늘 {{time}}",
+    "timeYesterday": "어제 {{time}}",
+    "timeOther": "{{date}} {{time}}"
+  },
+  "login": {
+    "toggleTheme": "테마 전환",
+    "checkEmail": {
+      "title": "이메일을 확인하세요",
+      "desc": "다음 주소로 로그인 링크를 보냈어요",
+      "instructions": "링크를 클릭하면 바로 로그인돼요.",
+      "back": "로그인으로 돌아가기"
+    },
+    "signUpTitle": "계정 만들기",
+    "signInTitle": "다시 오신 것을 환영해요",
+    "subtitle": "워크스페이스에 접속하려면 정보를 입력하세요.",
+    "tabs": {
+      "signIn": "로그인",
+      "signUp": "회원가입"
+    },
+    "continueWithGoogle": "Google로 계속하기",
+    "orWithEmail": "또는 이메일로",
+    "fullName": "이름",
+    "fullNamePlaceholder": "예: 홍길동",
+    "email": "이메일 주소",
+    "emailPlaceholder": "name@company.com",
+    "createAccount": "계정 만들기",
+    "signIn": "로그인",
+    "noAccount": "계정이 없으신가요? ",
+    "hasAccount": "이미 계정이 있으신가요? ",
+    "signUpHere": "무료로 가입하기",
+    "signInHere": "여기서 로그인",
+    "termsOfService": "서비스 약관",
+    "privacyPolicy": "개인정보 처리방침",
+    "helpCenter": "고객 센터",
+    "copyright": "© 2026 Focusly",
+    "enterEmailWarning": "이메일을 입력해 주세요"
+  },
+  "rightPanel": {
+    "quickInsights": "빠른 인사이트",
+    "productivityScore": "생산성 점수",
+    "moreProductive": "오늘 아침은 평소보다 생산적이에요.",
+    "habitTracker": "습관 트래커",
+    "focusTime": "집중 시간"
+  },
+  "calendarAiPlanner": {
+    "title": "AI 타임 블록 플래너",
+    "loading": "Lumina AI가 캘린더에 작업을 정리하고 있어요...",
+    "intro": "Lumina가 캘린더의 빈 시간을 찾아 대기 중인 작업을 위한 다음 집중 블록을 제안해요:",
+    "confirm": "수락 및 예약",
+    "creating": "일정 만드는 중...",
+    "toast": {
+      "scheduledTitle": "캘린더 정리 완료",
+      "scheduledDesc": "작업이 타임 블록으로 변환되었어요.",
+      "errorDesc": "타임 블록을 저장하지 못했어요."
+    }
+  },
+  "calendarWeeklyPlanner": {
+    "title": "Focusly AI 주간 플래너",
+    "loading": "Lumina AI가 주간 일정을 정리하고 있어요...",
+    "recommendation": "🎯 Lumina의 추천:",
+    "noTasksAssigned": "할당된 작업이 없어요.",
+    "confirm": "주간 계획 확정",
+    "applying": "작업 할당 중...",
+    "toast": {
+      "noTasksTitle": "주간 플래너",
+      "noTasksDesc": "이번 주에 계획할 대기 중인 작업이 없어요.",
+      "fetchErrorDesc": "Lumina의 주간 계획을 가져오지 못했어요.",
+      "appliedTitle": "주간 계획 적용됨",
+      "appliedDesc": "작업에 예상 작업 날짜가 설정되었어요.",
+      "applyErrorDesc": "계획 날짜를 저장하는 중 문제가 발생했어요."
+    }
+  },
+  "onboarding": {
+    "progress": {
+      "step": "{{total}}단계 중 {{current}}단계",
+      "percentCompleted": "{{percent}}% 완료"
+    },
+    "next": "다음",
+    "saveAndContinue": "저장 후 계속",
+    "workHours": {
+      "heading": "근무 시간 설정",
+      "subheading": "평소 일정을 알려 주시면 개인 시간을 침범하지 않고 가장 생산적인 시간에 작업을 계획해 드려요.",
+      "workDays": "근무일",
+      "monToFri": "월 - 금",
+      "dailySchedule": "하루 일정",
+      "startTime": "시작 시간",
+      "endTime": "종료 시간",
+      "setLater": "나중에 설정할게요",
+      "privacyNote": "일정은 나만 볼 수 있어요. 작업을 계획하는 데만 사용해요.",
+      "days": {
+        "mon": "월",
+        "tue": "화",
+        "wed": "수",
+        "thu": "목",
+        "fri": "금",
+        "sat": "토",
+        "sun": "일"
+      }
+    },
+    "profileCompletion": {
+      "heading": "프로필 완성하기",
+      "subheading": "Focusly 안에서 나를 소개하세요.",
+      "profilePhoto": "프로필 사진",
+      "fullName": "이름",
+      "fullNamePlaceholder": "예: 알렉스 리베라",
+      "jobTitle": "직함 / 역할",
+      "jobTitlePlaceholder": "예: 수석 시스템 아키텍트",
+      "focusPhilosophy": "집중 철학",
+      "charCounter": "{{count}} / 최대 160자",
+      "bioPlaceholder": "딥 워크에 어떻게 접근하는지 간단히 설명해 주세요...",
+      "continueToDashboard": "대시보드로 계속",
+      "completeLater": "나중에 완성하기"
+    },
+    "calendarConnection": {
+      "chooseProvider": "서비스 선택",
+      "selectService": "계속하려면 캘린더 서비스를 선택하세요",
+      "googleCalendar": "Google 캘린더",
+      "syncDesc": "Google 일정 동기화",
+      "skipForNow": "지금은 건너뛰기",
+      "connectedHeading": "캘린더가 연결되었어요!",
+      "connectedDesc": "캘린더에서 일정 {{count}}개를 가져왔어요.",
+      "continue": "계속",
+      "privacyNote": "작업과 동기화하기 위해 기본 캘린더의 일정만 읽고 업데이트해요. 언제든지 연결을 해제할 수 있어요."
+    },
+    "focusBlocks": {
+      "heading": "집중 블록 맞춤 설정",
+      "subheading": "딥 워크 세션과 휴식의 원하는 길이를 정하세요. 나의 리듬에 맞춰 스마트 캘린더를 구성해 드려요.",
+      "focusSession": "집중 세션",
+      "deepWorkDuration": "딥 워크 시간",
+      "length": "길이",
+      "minutes": "{{count}}분",
+      "recoveryBreaks": "회복 휴식",
+      "restRecharge": "쉬면서 재충전",
+      "shortBreak": "짧은 휴식",
+      "shortBreakNote": "집중 세션이 끝날 때마다 쉬어요.",
+      "longBreak": "긴 휴식",
+      "longBreakNote": "4세션 연속 후에 쉬어요.",
+      "infoLabel": "하루에 미치는 영향:",
+      "infoDesc": "캘린더의 빈 시간을 찾아 이 집중 블록으로 채워, 쉬지 않고 과로하는 일이 없도록 해요.",
+      "useDefaults": "뽀모도로 기본값 사용 (25분 / 5분)"
+    },
+    "finalSetup": {
+      "steps": {
+        "importing": "연동 서비스에서 작업 가져오는 중",
+        "analyzing": "에너지 피크와 습관 분석 중",
+        "finalizing": "주간 일정 마무리 중"
+      },
+      "headingPart1": "나만의",
+      "headingGradient": "스마트 캘린더를 다듬고 있어요...",
+      "subheading": "완벽한 일정을 만들기 위해 습관을 분석하고 있어요.",
+      "optimizing": "집중 블록 최적화 중..."
+    }
+  },
+  "landing": {
+    "newBadge": "✨ 새 소식: 워크스페이스 2.0 출시 →",
+    "heroTitle": "집중에 필요한 모든 것.",
+    "heroSubtitle": "프로젝트, 작업, 캘린더, 노트, 워크스페이스를 하나의 아름다운 생산성 플랫폼에서 정리하세요.",
+    "getStarted": "시작하기 🚀",
+    "watchDemo": "데모 보기",
+    "trustedBy": "10,000명 이상의 크리에이터가 사용 중",
+    "features": {
+      "heading": "생산성을 위한 운영체제.",
+      "subheading": "고성과 팀을 위한 강력한 도구. 업무 흐름을 단순하게 만드세요.",
+      "workspaces": {
+        "title": "워크스페이스",
+        "description": "전용 워크스페이스로 개인, 스타트업, 사이드 프로젝트를 깔끔하게 나누세요."
+      },
+      "tasks": {
+        "title": "작업",
+        "description": "목록을 만들고 우선순위를 정하고 라벨, 태그, 담당자, 마감일을 추가하세요."
+      },
+      "calendar": {
+        "title": "캘린더",
+        "description": "Google 캘린더에서 모든 작업과 집중 시간을 바로 동기화하고 한곳에 모으세요."
+      },
+      "notes": {
+        "title": "노트",
+        "description": "프로젝트 사양, 계획, 가이드라인을 위한 마크다운 문서."
+      },
+      "aiAssistant": {
+        "title": "AI 어시스턴트",
+        "description": "스마트 도우미가 집중 블록을 예약하고 상태를 업데이트하고 파일을 요약해요."
+      },
+      "analytics": {
+        "title": "분석",
+        "description": "자세한 지표로 집중 추세와 행동 인사이트를 확인하세요."
+      },
+      "notifications": {
+        "title": "알림",
+        "description": "정말 중요할 때만 알려 주는 스마트 업데이트."
+      }
+    },
+    "ai": {
+      "heading": "AI 생산성 파트너를 만나 보세요.",
+      "subheading": "Focusly AI는 프로젝트를 이해하고 에너지를 분석하며 하루를 계획하는 스마트한 코파일럿이에요.",
+      "tryButton": "Focusly AI 사용해 보기",
+      "bullets": {
+        "createTasks": {
+          "title": "아이디어만으로 작업 만들기",
+          "desc": "목표를 설명하면 작업 목록, 우선순위, 마감일을 구성해 드려요."
+        },
+        "summarize": {
+          "title": "무엇이든 요약",
+          "desc": "녹취록이나 문서를 동기화하고 핵심 실행 항목을 받아 보세요."
+        },
+        "automate": {
+          "title": "워크플로 자동화",
+          "desc": "캘린더나 작업 업데이트에 따라 루틴을 실행하세요."
+        },
+        "instantAnswers": {
+          "title": "즉각적인 답변",
+          "desc": "워크스페이스 전체 맥락을 바로 검색하세요."
+        }
+      }
+    },
+    "howItWorks": {
+      "heading": "성공을 위한 간결한 흐름.",
+      "subheading": "간단한 네 단계로 혼돈에서 집중으로.",
+      "step1": {
+        "title": "워크스페이스 만들기 🗂",
+        "desc": "프로젝트, 스타트업, 목표별로 나만의 공간을 만드세요."
+      },
+      "step2": {
+        "title": "작업 만들기 📝",
+        "desc": "목표를 체계적인 체크리스트로 나누고 우선순위를 정하고 항목을 워크스페이스에 바로 연결하세요."
+      },
+      "step3": {
+        "title": "집중 시간 ⚡",
+        "desc": "맞춤 타이머와 보기 좋은 진행 카드로 집중 스프린트를 시작하고 몰입을 유지하세요."
+      },
+      "step4": {
+        "title": "프로젝트 만들기 📁",
+        "desc": "마일스톤 보드로 핵심 요소를 모두 추적해요."
+      },
+      "plusMore": "그 밖에도: 집중 상태 🟢, 스마트 분석 📈, 알림 🔔"
+    },
+    "pricing": {
+      "heading": "규모에 맞는 요금제.",
+      "subheading": "무료로 시작하고 성장하면 업그레이드하세요.",
+      "perMonth": " / 월",
+      "free": {
+        "name": "무료",
+        "tagline": "개인에게 딱 맞아요.",
+        "cta": "시작하기",
+        "features": [
+          "사용자 워크스페이스 1개",
+          "무제한 작업",
+          "기본 캘린더"
+        ]
+      },
+      "pro": {
+        "badge": "무료 체험 시작",
+        "name": "Pro",
+        "tagline": "파워 유저와 전문가를 위해.",
+        "cta": "Pro 시작하기",
+        "features": [
+          "무제한 워크스페이스",
+          "AI 어시스턴트 (500회 실행)",
+          "고급 분석",
+          "Google 캘린더 연동"
+        ]
+      },
+      "enterprise": {
+        "name": "비즈니스",
+        "tagline": "최고의 생산성을 위해.",
+        "cta": "비즈니스 시작하기",
+        "features": [
+          "Lumina AI 무제한 실행",
+          "AI 대기열 우선 처리",
+          "고급 인사이트 및 감사",
+          "워크스페이스 내보내기 (PDF/마크다운)",
+          "우선 지원 및 베타 이용",
+          "SLA 및 보안 프로토콜"
+        ]
+      }
+    },
+    "testimonials": {
+      "heading": "최고의 팀이 신뢰해요.",
+      "items": [
+        {
+          "role": "프로덕트 리드, Stripe",
+          "quote": "Focusly는 디자인 팀의 일하는 방식을 바꿨어요. 타임 블록 덕분에 프로젝트 지연이 거의 40% 줄었어요."
+        },
+        {
+          "role": "CTO, Linear",
+          "quote": "캘린더 동기화가 완벽해요. AI 연동은 하루 일정을 정리하는 데 마법처럼 작동해요."
+        },
+        {
+          "role": "창업자 겸 CEO, Raycast",
+          "quote": "워크스페이스 분리가 바로 제게 필요했던 거예요. 미니멀하고, 프리미엄하고, 정말 빨라요."
+        }
+      ]
+    },
+    "faq": {
+      "heading": "자주 묻는 질문",
+      "items": [
+        {
+          "q": "Google 캘린더 연동은 어떻게 작동하나요?",
+          "a": "Focusly는 Google 캘린더와 연동되어 모든 회의와 블록을 즉시 동기화하고 중복 예약을 막아 줘요."
+        },
+        {
+          "q": "내 데이터는 안전한가요?",
+          "a": "네. 데이터는 HTTPS로 암호화되어 전송되고, 서비스 제공에만 사용되며, 절대 판매되지 않아요. 자세한 내용은 개인정보 처리방침을 확인하세요."
+        },
+        {
+          "q": "Focusly를 무료로 사용할 수 있나요?",
+          "a": "물론이죠. 무료 요금제에는 작업 관리와 캘린더의 핵심 기능이 모두 포함되어 있어요."
+        }
+      ]
+    },
+    "footer": {
+      "tagline": "고성과 팀을 위한 열린 운영체제.",
+      "product": "제품",
+      "company": "회사",
+      "legal": "법적 고지",
+      "features": "기능",
+      "pricing": "요금",
+      "blog": "블로그",
+      "resources": "자료",
+      "aboutUs": "회사 소개",
+      "careers": "채용",
+      "terms": "약관",
+      "privacy": "개인정보",
+      "copyright": "© {{year}} Focusly Tech. 집중을 돕기 위해 만들었어요."
+    }
+  },
+  "colorNames": {
+    "black": "블랙",
+    "slate": "슬레이트",
+    "zinc": "징크",
+    "darkGreen": "다크 그린",
+    "red": "레드",
+    "orange": "오렌지",
+    "amber": "앰버",
+    "yellow": "옐로",
+    "lime": "라임",
+    "green": "그린",
+    "emerald": "에메랄드",
+    "teal": "틸",
+    "seafoam": "시폼",
+    "cyan": "시안",
+    "sky": "스카이",
+    "skyBlue": "스카이 블루",
+    "blue": "블루",
+    "indigo": "인디고",
+    "purple": "퍼플",
+    "violet": "바이올렛",
+    "fuchsia": "푸크시아",
+    "pink": "핑크",
+    "rose": "로즈",
+    "lightSlate": "라이트 슬레이트",
+    "mediumSlate": "미디엄 슬레이트",
+    "darkSlate": "다크 슬레이트"
+  },
+  "selection": {
+    "select": "선택",
+    "selectAll": "모두 선택",
+    "selectedCount_one": "{{count}}개 선택됨",
+    "selectedCount_other": "{{count}}개 선택됨",
+    "deleteCount": "삭제 ({{count}})"
+  },
+  "deleteConfirm": {
+    "andMore": "외 {{count}}개"
+  },
+  "projectTasks": {
+    "loading": "작업을 불러오는 중…",
+    "attendees": "초대됨: {{names}}",
+    "empty": {
+      "title": "아직 프로젝트에 작업이 없어요",
+      "description": "프로젝트 안에 작업을 만들면 상태별로 묶여 여기에 표시돼요.",
+      "action": "작업 만들기"
+    },
+    "emptySearch": {
+      "title": "작업을 찾을 수 없어요",
+      "description": "검색과 일치하는 작업이 없어요. 다른 단어로 검색해 보세요."
+    },
+    "error": {
+      "title": "작업을 불러오지 못했어요",
+      "description": "연결을 확인하고 다시 시도해 주세요.",
+      "retry": "다시 시도"
+    },
+    "loadMore": "작업 더 불러오기",
+    "loadingMore": "불러오는 중…",
+    "toast": {
+      "authError": "계속하려면 다시 로그인해 주세요",
+      "created": "작업이 만들어졌어요",
+      "createFailed": "작업을 만들지 못했어요",
+      "updateFailed": "작업을 업데이트하지 못했어요",
+      "deleted_one": "작업이 삭제되었어요",
+      "deleted_other": "작업 {{count}}개가 삭제되었어요",
+      "deleteFailed": "일부 작업을 삭제하지 못했어요",
+      "completed": "작업 완료",
+      "undo": "실행 취소"
+    },
+    "moveTo": "이동",
+    "changeStatus": "상태 변경",
+    "markDone": "완료로 표시",
+    "markNotDone": "미완료로 표시",
+    "toggleSubtasks": "하위 작업 표시 또는 숨기기",
+    "linkedDocument": "연결된 문서",
+    "addTo": "{{status}}에 작업 추가",
+    "quickAddPlaceholder": "{{status}}의 새 작업 (Enter로 하나 더 추가, Esc로 닫기)",
+    "allProjects": "모든 프로젝트",
+    "showEmptyStatuses": "빈 상태 표시",
+    "columns": {
+      "task": "작업",
+      "project": "프로젝트",
+      "due": "마감",
+      "priority": "우선순위",
+      "estimate": "예상"
+    },
+    "summary": {
+      "completed": "{{total}}개 중 {{done}}개 완료",
+      "progress": "진행률: {{percent}}%",
+      "remaining": "{{time}} 남음",
+      "overdue_one": "{{count}}개 기한 지남",
+      "overdue_other": "{{count}}개 기한 지남",
+      "loaded": "{{total}}개 중 {{loaded}}개 표시"
+    },
+    "filters": {
+      "overdue": "기한 지남",
+      "noDate": "날짜 없음",
+      "highPriority": "높은 우선순위",
+      "clear": "필터 지우기"
+    },
+    "sort": {
+      "dueDate": "날짜순",
+      "priority": "우선순위순",
+      "title": "이름순",
+      "recent": "최신순"
+    },
+    "emptyProject": {
+      "title": "이 프로젝트에는 아직 작업이 없어요",
+      "description": "첫 작업을 만들어 프로젝트 업무를 정리해 보세요."
+    },
+    "emptyFilters": {
+      "title": "필터와 일치하는 작업이 없어요",
+      "description": "필터를 제거하면 더 많은 작업을 볼 수 있어요."
+    },
+    "bulk": {
+      "complete": "완료",
+      "move": "이동…"
+    },
+    "bulkDelete": {
+      "title_one": "작업 {{count}}개를 삭제할까요?",
+      "title_other": "작업 {{count}}개를 삭제할까요?",
+      "description_one": "하위 작업과 함께 영구적으로 삭제돼요.",
+      "description_other": "하위 작업과 함께 영구적으로 삭제돼요."
+    }
+  },
+  "workspaceLibrary": {
+    "loadingDocuments": "문서를 불러오는 중…",
+    "toast": {
+      "deleteProjectsTitle": "프로젝트 삭제",
+      "deleteProjectsDesc": "다음 프로젝트를 삭제하시겠어요: {{names}}? 안에 있는 워크스페이스는 연결만 해제되고 삭제되지 않아요.",
+      "projectsDeleted_one": "프로젝트가 삭제되었어요",
+      "projectsDeleted_other": "프로젝트 {{count}}개가 삭제되었어요",
+      "projectsDeleteFailed_one": "프로젝트 {{count}}개를 삭제하지 못했어요.",
+      "projectsDeleteFailed_other": "프로젝트 {{count}}개를 삭제하지 못했어요.",
+      "workspacesDeleted_one": "워크스페이스가 삭제되었어요",
+      "workspacesDeleted_other": "워크스페이스 {{count}}개가 삭제되었어요",
+      "workspacesDeleteFailed_one": "워크스페이스 {{count}}개를 삭제하지 못했어요.",
+      "workspacesDeleteFailed_other": "워크스페이스 {{count}}개를 삭제하지 못했어요.",
+      "deletedTitle": "프로젝트 삭제됨"
+    },
+    "breadcrumb": {
+      "home": "홈",
+      "folderFallback": "폴더"
+    },
+    "newFolder": "새 폴더",
+    "newWorkspace": "새 워크스페이스",
+    "status": {
+      "recent": "최근",
+      "empty": "비어 있음"
+    },
+    "notesInside_one": "노트 {{count}}개",
+    "notesInside_other": "노트 {{count}}개",
+    "lastUpdated": "마지막 업데이트: ",
+    "error": "워크스페이스를 불러오는 중 오류가 발생했어요. 다시 시도해 주세요.",
+    "emptySearch": {
+      "title": "결과 없음",
+      "desc": "검색어나 필터와 일치하는 워크스페이스가 없어요. 필터나 검색어를 바꿔 보세요."
+    },
+    "emptyFolder": {
+      "title": "아직 워크스페이스가 없어요",
+      "desc": "전략 계획을 정리하는 가벼운 노트예요. 첫 워크스페이스를 만들어 시작하세요.",
+      "action": "워크스페이스 만들기",
+      "subAction": "노트나 문서 만들기"
+    },
+    "recentWorkspace": "최근 워크스페이스",
+    "emptyFolderSnippet": "이 폴더는 비어 있어요. 첫 워크스페이스를 만들어 시작하세요...",
+    "filterAndSortNotes": "노트 필터 및 정렬",
+    "switchViewMode": "보기 모드 전환",
+    "sortNotes": "노트 정렬",
+    "filterNotes": "노트 필터",
+    "allNotes": "모든 노트",
+    "linkedToTask": "작업에 연결됨",
+    "withBackgroundCover": "배경 커버 있음",
+    "viewGallery": "갤러리",
+    "viewGrid": "그리드",
+    "viewList": "목록",
+    "deleteWorkspace": "워크스페이스 삭제",
+    "deleteDialog": {
+      "title": "프로젝트 삭제",
+      "description": "“{{name}}” 프로젝트를 삭제하시겠어요?",
+      "bulkTitle": "프로젝트 {{count}}개 삭제",
+      "bulkDescription": "다음 프로젝트 {{count}}개를 삭제하시겠어요?",
+      "workspacesWarning_one": "이 프로젝트에는 영구적으로 삭제될 워크스페이스 {{count}}개가 있어요.",
+      "workspacesWarning_other": "이 프로젝트에는 영구적으로 삭제될 워크스페이스 {{count}}개가 있어요.",
+      "bulkWorkspacesWarning_one": "이 프로젝트들에는 영구적으로 삭제될 워크스페이스가 총 {{count}}개 있어요.",
+      "bulkWorkspacesWarning_other": "이 프로젝트들에는 영구적으로 삭제될 워크스페이스가 총 {{count}}개 있어요.",
+      "noWorkspacesWarning": "이 작업은 되돌릴 수 없어요."
+    },
+    "deleteWorkspacesDialog": {
+      "title": "워크스페이스 삭제",
+      "description": "“{{name}}”을(를) 삭제하시겠어요?",
+      "bulkTitle": "워크스페이스 {{count}}개 삭제",
+      "bulkDescription": "다음 워크스페이스 {{count}}개를 삭제하시겠어요?",
+      "warning_one": "이 워크스페이스의 내용이 영구적으로 삭제돼요.",
+      "warning_other": "워크스페이스 {{count}}개의 내용이 영구적으로 삭제돼요."
+    },
+    "renameFolder": "폴더 이름 변경",
+    "customizeStyle": "스타일 맞춤 설정",
+    "deleteFolder": "폴더 삭제",
+    "customizeDialog": {
+      "title": "폴더 맞춤 설정"
+    },
+    "folderName": "폴더 이름",
+    "iconShape": "아이콘 모양",
+    "filled": "채움",
+    "solid": "단색",
+    "outlined": "윤곽선",
+    "folderColor": "폴더 색상",
+    "colorAccent": "강조 색상",
+    "colors": {
+      "Red": "레드",
+      "Orange": "오렌지",
+      "Amber": "앰버",
+      "Yellow": "옐로",
+      "Green": "그린",
+      "Emerald": "에메랄드",
+      "Teal": "틸",
+      "Cyan": "시안",
+      "Sky": "스카이",
+      "Blue": "블루",
+      "Indigo": "인디고",
+      "Purple": "퍼플",
+      "Fuchsia": "푸크시아",
+      "Pink": "핑크",
+      "Rose": "로즈",
+      "Slate": "슬레이트"
+    },
+    "createDialog": {
+      "title": "새 폴더 만들기"
+    },
+    "namePlaceholder": "예: 스프린트 계획, 개인, 마케팅",
+    "createFolder": "폴더 만들기",
+    "editedOn": "{{date}}에 편집됨",
+    "card": {
+      "created": "만든 날짜",
+      "taskStatus": "작업 상태",
+      "time": "예상 / 실제 시간",
+      "none": "없음",
+      "noTask": "연결된 작업 없음",
+      "more_one": "+{{count}}개 더",
+      "more_other": "+{{count}}개 더",
+      "doneCount": "{{done}}/{{total}} 완료",
+      "linkedTasks_one": "연결된 작업 ({{count}})",
+      "linkedTasks_other": "연결된 작업 ({{count}})",
+      "noContent": "아직 내용이 없어요",
+      "options": "문서 옵션"
+    },
+    "folderView": {
+      "label": "프로젝트 보기",
+      "documents": "문서",
+      "tasks": "작업"
+    }
+  },
+  "allProjectsModal": {
+    "title": "모든 폴더",
+    "subtitle": "라이브러리 보기에 표시할 폴더를 찾아 선택하세요.",
+    "searchPlaceholder": "폴더 {{count}}개에서 검색...",
+    "emptyNoFolders": "아직 추가된 폴더가 없어요",
+    "emptyNoMatch": "일치하는 폴더 없음",
+    "emptyNoFoldersDesc": "라이브러리나 사이드바에서 사용자 지정 폴더를 만들어 계획을 묶어 보세요.",
+    "emptyNoMatchDesc": "검색어를 바꿔 보세요.",
+    "items": "항목 {{count}}개",
+    "visible": "표시됨",
+    "select": "선택",
+    "deleteSelected": "삭제 ({{count}})",
+    "applyChanges": "변경 사항 적용"
+  },
+  "createProjectModal": {
+    "title": "새 프로젝트 만들기",
+    "subtitle": "이름과 색상을 골라 워크스페이스를 깔끔하게 정리하세요.",
+    "projectName": "프로젝트 이름",
+    "namePlaceholder": "예: 마케팅 전략, 1분기 계획...",
+    "projectColor": "프로젝트 색상",
+    "create": "프로젝트 만들기"
+  },
+  "updateProjectModal": {
+    "title": "폴더 편집",
+    "subtitle": "폴더 이름과 색상을 바꿔 워크스페이스를 더 잘 정리하세요.",
+    "folderColor": "폴더 색상",
+    "update": "폴더 업데이트"
+  },
+  "templatesModal": {
+    "title": "전문 템플릿 탐색기",
+    "subtitle": "템플릿을 선택하고 대상 프로젝트 폴더에 지정하세요",
+    "searchPlaceholder": "템플릿 검색...",
+    "previewing": "미리보기 중",
+    "liveRenderedPreview": "실시간 미리보기",
+    "generalUnassigned": "일반 / 미지정",
+    "useTemplate": "이 템플릿 사용",
+    "proTip": "Pro 팁",
+    "categories": {
+      "all": "전체",
+      "productStrategy": "제품 및 전략",
+      "engineering": "엔지니어링",
+      "productivity": "생산성",
+      "systems": "시스템"
+    }
+  },
+  "tasks": {
+    "createTask": "새 작업",
+    "changeStatus": "상태 변경",
+    "changePriority": "우선순위 변경",
+    "header": {
+      "inboxTitle": "수신함",
+      "inboxEyebrow": "수신함",
+      "todayTitle": "오늘의 계획",
+      "todayEyebrow": "오늘의 계획",
+      "upcomingTitle": "예정된 작업",
+      "upcomingEyebrow": "예정된 작업",
+      "addToInbox": "수신함에 추가",
+      "newTaskToday": "오늘의 새 작업",
+      "newUpcomingTask": "새 예정 작업",
+      "aiOrganize": "AI로 정리",
+      "pending": "대기 중",
+      "completed": "완료됨"
+    },
+    "controls": {
+      "searchPlaceholder": "작업, 태그 검색...",
+      "priority": "우선순위",
+      "assignees": "담당자",
+      "allAssignees": "모든 담당자",
+      "all": "전체"
+    },
+    "status": {
+      "all": "전체",
+      "todo": "할 일",
+      "planning": "계획 중",
+      "scheduled": "예약됨",
+      "review": "검토 중",
+      "pending": "대기 중",
+      "onHold": "보류",
+      "done": "완료",
+      "backlog": "백로그",
+      "archived": "보관됨"
+    },
+    "priority": {
+      "high": "높음",
+      "medium": "보통",
+      "low": "낮음",
+      "none": "우선순위 없음",
+      "critical": "긴급"
+    },
+    "columns": {
+      "taskName": "작업 이름",
+      "subtasks": "하위 작업",
+      "priority": "우선순위",
+      "deadline": "마감일",
+      "estimated": "예상",
+      "real": "실제",
+      "actions": "작업"
+    },
+    "actions": {
+      "startFocus": "집중 시작",
+      "editTask": "작업 편집",
+      "markAsTodo": "할 일로 표시",
+      "markAsDone": "완료로 표시",
+      "deleteTask": "작업 삭제"
+    },
+    "subtasksCount": "하위 작업 {{completed}}/{{total}}",
+    "dates": {
+      "all": "모든 작업",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "overdue": "기한 지남",
+      "in3Days": "3일 후",
+      "nextWeek": "다음 주",
+      "thisWeek": "이번 주",
+      "thisMonth": "이번 달",
+      "noDate": "날짜 없음",
+      "noDateInbox": "날짜 없음 (수신함)"
+    },
+    "empty": {
+      "noTasksTitle": "아직 작업이 없어요",
+      "noTasksDesc": "하루를 계획하고 생산성을 높이세요. 첫 작업을 만들면 여기에 표시돼요.",
+      "noMatchTitle": "검색과 일치하는 작업이 없어요",
+      "noMatchDesc": "다른 키워드나 필터로 찾아보거나 위에서 새 작업을 만들어 보세요.",
+      "clearFilters": "모든 필터 지우기",
+      "noTasksInTab": "{{tab}}에 작업이 없어요",
+      "noTasksInTabDesc": "작업을 여기로 옮기거나 탭을 바꿔 작업을 확인하세요."
+    },
+    "pagination": {
+      "showing": "예정된 작업 총 {{total}}개 중 {{count}}개 표시"
+    },
+    "bulk": {
+      "selected_one": "작업 {{count}}개 선택됨",
+      "selected_other": "작업 {{count}}개 선택됨",
+      "cancel": "취소",
+      "deleteSelected": "선택 항목 삭제",
+      "confirmTitle": "삭제 확인",
+      "confirmDesc_one": "선택한 작업 {{count}}개를 삭제하시겠어요? 이 작업은 되돌릴 수 없어요.",
+      "confirmDesc_other": "선택한 작업 {{count}}개를 삭제하시겠어요? 이 작업은 되돌릴 수 없어요.",
+      "deleteButton": "삭제"
+    },
+    "properties": {
+      "status": "상태",
+      "priority": "우선순위",
+      "category": "카테고리",
+      "tags": "태그",
+      "addTag": "추가",
+      "tagPlaceholder": "#태그",
+      "scheduleAndTimes": "일정 및 시간",
+      "plannedDate": "계획 날짜",
+      "estimatedDuration": "예상 소요 시간",
+      "durationPlaceholder": "4시간 (또는 2h 30m)",
+      "startTime": "시작 시간",
+      "trackedDuration": "기록된 시간",
+      "plannedWindow": "계획된 작업 시간대",
+      "createdOn": "생성 위치",
+      "createdAt": "생성일",
+      "dueOn": "마감",
+      "workspacesProjects": "워크스페이스 / 프로젝트",
+      "backgroundColor": "배경색",
+      "removeBackground": "배경 제거",
+      "removeBackgroundColor": "배경색 제거",
+      "noBackground": "배경 없음",
+      "custom": "사용자 지정",
+      "logTime": "시간 기록",
+      "noTimeLogged": "아직 기록된 시간이 없어요.",
+      "titlePlaceholder": "분기별 성과 보고서 완성하기"
+    },
+    "projectRequired": {
+      "title": "프로젝트 선택",
+      "description": "먼저 프로젝트를 만드세요. 이 보기의 작업은 항상 프로젝트에 속해요."
+    },
+    "deleteTaskDialog": {
+      "title": "작업 삭제",
+      "description": "“{{title}}” 작업을 삭제하시겠어요?",
+      "warning": "하위 작업과 함께 삭제되며 되돌릴 수 없어요."
+    },
+    "createProjectTaskModal": {
+      "noEstimate": "예상 없음",
+      "selectProject": "프로젝트 선택",
+      "toast": {
+        "titleRequired": "제목 필요",
+        "titleRequiredDesc": "작업 제목을 입력하세요.",
+        "taskUpdated": "작업이 업데이트되었어요",
+        "workspaceTitleRequired": "제목 필요",
+        "workspaceTitleRequiredDesc": "워크스페이스 제목을 입력하세요.",
+        "workspaceLinked": "워크스페이스를 만들고 연결했어요",
+        "workspaceCreateFailed": "워크스페이스를 만들지 못했어요. 다시 시도해 주세요."
+      },
+      "titlePlaceholder": "작업 제목...",
+      "status": "상태",
+      "priority": "우선순위",
+      "tagsModules": "태그 / 모듈",
+      "tagPlaceholder": "태그 이름...",
+      "scheduleExecution": "일정 및 실행",
+      "autoSynced": "일일 계획과 자동 동기화됨",
+      "dueDate": "마감일",
+      "duration": "소요 시간",
+      "setDuration": "소요 시간 설정",
+      "linkedSpec": "연결된 사양 및 PRD",
+      "createWorkspace": "워크스페이스 만들기",
+      "changeWorkspace": "워크스페이스 변경",
+      "linkWorkspace": "워크스페이스 연결",
+      "noWorkspaceLinked": "연결된 워크스페이스 없음",
+      "clickToLink": "클릭해서 이 작업을 사양 문서나 노트와 연결하세요",
+      "unlinkWorkspace": "워크스페이스 연결 해제",
+      "openWorkspace": "열기",
+      "linked": "연결됨",
+      "descAndContext": "설명 및 맥락",
+      "descPlaceholder": "더 자세한 설명을 추가하세요...",
+      "subtasks": "하위 작업",
+      "subtaskPlaceholder": "하위 작업 추가... (Enter 누르기)",
+      "add": "추가",
+      "aiBreakdown": "Lumina AI 세분화",
+      "deleteTask": "작업 삭제",
+      "createMore": "계속 만들기",
+      "cancel": "취소",
+      "createTask": "작업 만들기",
+      "saveChanges": "변경 사항 저장",
+      "createWorkspaceDialogDesc": "원하는 제목으로 새 워크스페이스를 만들면 이 작업에 자동으로 연결돼요.",
+      "project": "프로젝트:",
+      "workspaceTitle": "워크스페이스 제목",
+      "workspaceTitlePlaceholder": "예: 기술 사양, 요구사항, PRD...",
+      "createAndLink": "만들고 연결",
+      "searchWorkspacePlaceholder": "워크스페이스나 노트 검색..."
+    }
+  },
+  "projects": {
+    "loading": "프로젝트를 불러오는 중…",
+    "newProject": "새 프로젝트",
+    "createCleanFolder": "빈 폴더 만들기",
+    "showingResultsFor": "“{{term}}” 검색 결과 {{count}}개",
+    "showingCountOfTotal": "프로젝트 {{total}}개 중 {{current}}개 표시",
+    "searchProjects": "프로젝트 검색...",
+    "searchTasks": "작업 검색...",
+    "filterAndSort": "필터 및 정렬",
+    "noProjects": "프로젝트가 없어요",
+    "filterBy": "필터:",
+    "statusFilter": "상태:",
+    "modifiedDate": "마지막 수정",
+    "tags": "태그",
+    "tabs": {
+      "viewProjects": "프로젝트 보기",
+      "viewTasks": "프로젝트 작업 보기"
+    },
+    "sort": {
+      "title": "프로젝트 정렬",
+      "recent": "최근 업데이트순",
+      "nameAsc": "이름 (가나다순)",
+      "notesCount": "노트 개수",
+      "mostNotes": "노트 많은 순",
+      "filterByColor": "색상으로 필터",
+      "allColors": "모든 색상",
+      "resetFilters": "필터 초기화"
+    }
+  },
+  "workspaceEditor": {
+    "header": {
+      "addIcon": "아이콘 추가",
+      "changeIcon": "아이콘 변경",
+      "addCover": "커버 추가",
+      "changeCover": "커버 변경",
+      "focusView": "가운데 보기",
+      "defaultView": "기본 보기"
+    },
+    "untitledNote": "제목 없는 노트",
+    "saving": "저장 중",
+    "saved": "저장됨",
+    "savingChanges": "변경 사항 저장 중...",
+    "allChangesSaved": "모든 변경 사항이 저장됨",
+    "openSidebar": "보조 패널 열기",
+    "closeSidebar": "패널 닫기",
+    "detectLanguage": "언어 감지",
+    "startDictation": "받아쓰기 시작",
+    "stopDictation": "받아쓰기 중지",
+    "focusMode": "집중 모드",
+    "normalView": "기본 보기",
+    "importDocument": "문서 가져오기",
+    "exportDocument": "문서 내보내기",
+    "exportFailed": "내보내기 실패",
+    "exportFailedDesc": "Word 문서를 만들지 못했어요.",
+    "markdown": "Markdown (.md)",
+    "word": "Word (.docx)",
+    "searchTasksToLink": "연결할 작업 검색...",
+    "palette": {
+      "availableTasks": "사용 가능한 작업",
+      "linkedCount": "{{count}}개 연결됨",
+      "noTasksFound": "작업을 찾을 수 없어요",
+      "pressKey": "누르기",
+      "toLinkOrUnlink": "작업 연결 또는 연결 해제"
+    },
+    "outline": {
+      "noHeadings": "이 노트에는 제목이 없어요",
+      "addHeadingsHint": "마크다운 문법(# 제목 또는 ## 섹션)으로 제목을 추가하면 탐색 개요가 만들어져요.",
+      "searchPlaceholder": "개요에서 검색...",
+      "locationInDoc": "문서 내 위치",
+      "jumpTooltip": "편집기에서 이 섹션으로 이동",
+      "goToSection": "섹션으로 이동",
+      "noSectionsFound": "“{{query}}”에 해당하는 섹션이 없어요"
+    },
+    "graph": {
+      "rootDoc": "루트 문서",
+      "mainHeadingH1": "주요 제목 (H1)",
+      "sectionH2": "섹션 (H2)",
+      "subSection": "하위 섹션 (H{{level}})",
+      "noConnections": "연결 0개",
+      "terminalSection": "마지막 섹션",
+      "connectionCount": "연결 {{count}}개",
+      "document": "문서",
+      "tabH1": "제목 (H1)",
+      "tabH2": "섹션 (H2)",
+      "tabH3": "하위 섹션 (H3+)",
+      "filterNodesPlaceholder": "노드 필터...",
+      "reorganize": "재정렬",
+      "emptyGuideHint": "노트에 제목(# 섹션)을 입력하면 그래프가 실시간으로 뻗어 나가요",
+      "resetPositionsAndZoom": "위치 및 확대/축소 초기화",
+      "centerView": "가운데로 보기",
+      "expandDetails": "세부 정보 펼치기",
+      "minimizePanel": "패널 최소화",
+      "connectionsShort": "연결",
+      "jumpDone": "완료!",
+      "jump": "이동",
+      "hierarchy": "계층:",
+      "root": "루트",
+      "level": "레벨 {{level}}",
+      "connections": "연결:",
+      "sectionLocated": "편집기에서 섹션을 찾았어요!",
+      "goToSectionInEditor": "편집기에서 섹션으로 이동"
+    },
+    "sidebar": {
+      "outline": "개요",
+      "graph": "그래프",
+      "details": "세부 정보",
+      "words": "단어",
+      "characters": "글자",
+      "readingTime": "읽기",
+      "headings": "제목",
+      "document": "문서",
+      "structure": "구조",
+      "mainHeadings": "주요 제목",
+      "sections": "섹션",
+      "subsections": "하위 섹션",
+      "paragraphs": "단락",
+      "linkedTasks": "연결된 작업",
+      "link": "연결",
+      "linkTask": "작업 연결",
+      "noLinkedTasks": "연결된 작업 없음",
+      "unlinkTask": "작업 연결 해제"
+    },
+    "canvases": {
+      "button": "문서의 캔버스",
+      "title": "이 문서의 캔버스",
+      "open": "캔버스 열기",
+      "inDocument": "문서에 있음",
+      "notInDocument": "문서에 없음",
+      "insert": "문서에 삽입",
+      "delete": "삭제",
+      "deleteTitle": "“{{name}}”을(를) 삭제할까요?",
+      "deleteHint": "그림, 이미지, 문서 안의 링크가 삭제돼요.",
+      "dragHint": "캔버스를 문서로 드래그해 원하는 곳에 배치하세요.",
+      "deleteFailed": "캔버스를 삭제하지 못했어요",
+      "deleteFailedDesc": "잠시 후 다시 시도해 주세요.",
+      "limitReached": "현재 플랜에는 캔버스가 {{count}}개 포함돼요",
+      "limitReachedDesc": "하나를 삭제하거나 Pro로 업그레이드해 더 만드세요.",
+      "tooLarge": "이 캔버스가 플랜의 크기 한도에 도달했어요",
+      "tooLargeDesc": "{{size}}를 넘는 동안에는 최근 변경 사항이 저장되지 않아요. 요소를 일부 지우거나 Pro로 업그레이드하세요.",
+      "imageTooLarge": "이 이미지는 저장되지 않아요",
+      "imageTooLargeDesc": "현재 플랜에서는 이미지가 최대 {{size}}까지 가능해요.",
+      "imageLimit": "이 캔버스에는 플랜에서 허용하는 이미지가 이미 모두 있어요",
+      "imageLimitDesc": "현재 플랜에서 캔버스 하나에 이미지를 최대 {{count}}개까지 넣을 수 있어요.",
+      "readOnlyPhone": "휴대폰에서는 보기만 가능",
+      "readOnlyPhoneDesc": "편집하려면 컴퓨터에서 여세요."
+    },
+    "focusButton": "집중",
+    "startFocus": "집중 세션 시작",
+    "startFocusOn": "“{{title}}”에 집중"
+  },
+  "legal": {
+    "termsTitle": "이용약관",
+    "privacyTitle": "개인정보 처리방침",
+    "backHome": "홈으로 돌아가기",
+    "onlySpanish": "현재 이 문서는 스페인어로만 제공돼요.",
+    "loginNotice": "계속하면 Focusly의 <terms>이용약관</terms> 및 <privacy>개인정보 처리방침</privacy>에 동의하게 돼요.",
+    "aiNotice": "AI는 실수할 수 있어요. 메시지와 작업 맥락은 외부 AI 제공업체에서 처리돼요. <privacy>자세히 알아보기</privacy>",
+    "settingsTitle": "법적 고지",
+    "settingsDesc": "Focusly 이용과 데이터 처리 방식을 규정하는 문서예요.",
+    "acceptModal": {
+      "title": "약관 및 개인정보",
+      "subtitle": "계속하려면 동의가 필요해요",
+      "newBody": "Focusly를 사용하려면 <terms>이용약관</terms>과 <privacy>개인정보 처리방침</privacy>을 확인하고 동의해 주세요.",
+      "updatedBody": "<terms>이용약관</terms>과 <privacy>개인정보 처리방침</privacy>이 업데이트되었어요. Focusly를 계속 사용하려면 확인하고 동의해 주세요.",
+      "accept": "동의합니다",
+      "logout": "로그아웃",
+      "error": "동의 내용을 저장하지 못했어요. 다시 시도해 주세요."
+    }
+  },
+  "billing": {
+    "plans": {
+      "free": {
+        "name": "Focusly Free",
+        "tagline": "정리를 시작하고 Lumina를 체험해 보세요",
+        "price": "무료"
+      },
+      "pro": {
+        "name": "Focusly Pro",
+        "tagline": "문서 안에서도 제한 없는 Lumina"
+      },
+      "recommended": "추천",
+      "current": "현재 플랜",
+      "perInterval": "/ {{interval}}",
+      "interval": {
+        "month": "월",
+        "year": "년",
+        "week": "주",
+        "day": "일"
+      },
+      "priceLater": "가격은 다음 단계에서 확인할 수 있어요",
+      "intervalLabel": "결제 주기",
+      "monthly": "월간",
+      "yearly": "연간",
+      "monthsFree_one": "{{count}}개월 무료",
+      "monthsFree_other": "{{count}}개월 무료",
+      "save": "{{percent}}% 절약",
+      "perMonthEquivalent": "월 {{price}}, 연 1회 청구",
+      "trialBadge_one": "{{count}}일 무료 체험",
+      "trialBadge_other": "{{count}}일 무료 체험",
+      "trialNote": "오늘은 아무것도 청구되지 않아요. 체험 기간이 끝나기 전에 취소하면 비용이 들지 않아요.",
+      "cancelAnytime": "약정 없음: 언제든 취소할 수 있어요."
+    },
+    "features": {
+      "aiTrial_one": "매월 Lumina 메시지 {{count}}개",
+      "aiTrial_other": "매월 Lumina 메시지 {{count}}개",
+      "core": "작업, 프로젝트, 문서",
+      "calendar": "캘린더 및 Google 캘린더",
+      "editorAi": "문서 편집기의 AI",
+      "unlimitedAi": "Lumina와 무제한 채팅 (공정 사용)",
+      "editorAiPro": "편집기 AI: 초안 작성, 요약, 다시 쓰기",
+      "everythingFree": "Free의 모든 기능",
+      "cancelAnytime": "언제든 취소 가능",
+      "notIncluded": "포함되지 않음"
+    },
+    "usage": "이번 달 무료 메시지 {{limit}}개 중 {{used}}개 사용",
+    "renewsOn": "{{date}}에 갱신돼요",
+    "usageLeft_one": "이번 달 무료 메시지 {{count}}개 남음",
+    "usageLeft_other": "이번 달 무료 메시지 {{count}}개 남음",
+    "usageNone": "이번 달 무료 메시지를 모두 사용했어요 · {{date}}에 다시 제공돼요",
+    "tryPro": "Pro 체험하기",
+    "dailyLimit": {
+      "title": "오늘의 Lumina 한도에 도달했어요",
+      "body_one": "Pro에는 하루 최대 {{count}}회의 AI 사용이 포함돼요. {{date}}에 갱신돼요.",
+      "body_other": "모두가 Lumina를 원활하게 쓸 수 있도록 Pro에는 하루 최대 {{count}}회의 AI 사용이 포함돼요(공정 사용). {{date}}에 갱신돼요."
+    },
+    "dailyLow": {
+      "title_one": "오늘 Lumina 사용 {{count}}회 남음",
+      "title_other": "오늘 Lumina 사용 {{count}}회 남음",
+      "body_one": "Pro는 공정 사용 기준으로 하루 최대 {{count}}회까지 포함돼요. {{date}}에 갱신돼요.",
+      "body_other": "Pro는 공정 사용 기준으로 하루 최대 {{count}}회까지 포함돼요. {{date}}에 갱신돼요."
+    },
+    "upgrade": {
+      "title": {
+        "manual": "플랜 업그레이드",
+        "limit_one": "이번 달 무료 메시지를 사용했어요",
+        "limit_other": "이번 달 무료 메시지 {{count}}개를 모두 사용했어요",
+        "editor": "편집기 AI는 Pro에 포함돼요",
+        "canvas": "Pro로 더 많은 캔버스"
+      },
+      "subtitle": {
+        "manual": "작업 방식에 맞는 플랜을 고르세요.",
+        "limit": "{{date}}에 갱신돼요. Pro로 지금 바로 Lumina와 계속 대화하세요.",
+        "editor": "Pro에서는 Lumina가 문서 안에서 초안 작성, 요약, 다시 쓰기를 해요.",
+        "canvas": "Pro에서는 더 큰 캔버스를 무제한으로 만들고 최대 10 MB 이미지를 넣을 수 있어요."
+      },
+      "cta": "결제 계속하기",
+      "alreadyPro": "이미 Focusly Pro를 사용 중이에요",
+      "notConfigured": "아직 결제를 이용할 수 없어요. 나중에 다시 시도해 주세요.",
+      "startError": "결제 화면을 열지 못했어요. 다시 시도해 주세요.",
+      "close": "닫기",
+      "ctaTrial_one": "{{count}}일 무료 체험 시작",
+      "ctaTrial_other": "{{count}}일 무료 체험 시작"
+    },
+    "checkout": {
+      "title": "구독 완료하기",
+      "back": "플랜으로 돌아가기",
+      "renews": "{{interval}}마다 자동 갱신",
+      "pay": "{{price}}에 구독",
+      "payNoPrice": "구독",
+      "secure": "Stripe를 통한 안전한 결제. Focusly는 카드 정보를 볼 수 없어요.",
+      "cancelNote": "프로필 → 요금제 및 결제에서 언제든 취소할 수 있어요.",
+      "error": "결제를 처리하지 못했어요. 정보를 확인하고 다시 시도해 주세요.",
+      "loading": "결제 양식을 불러오는 중…",
+      "applePayDescription": "Focusly Pro 구독",
+      "summary": "주문 요약",
+      "plan": {
+        "month": "월간",
+        "year": "연간"
+      },
+      "discountOnce": "코드 {{code}} (첫 결제 {{value}} 할인)",
+      "discountMonths_one": "코드 {{code}} ({{count}}개월간 {{value}} 할인)",
+      "discountMonths_other": "코드 {{code}} ({{count}}개월간 {{value}} 할인)",
+      "discountForever": "코드 {{code}} (계속 {{value}} 할인)",
+      "trialRow": "{{date}}까지 무료 체험",
+      "free": "무료",
+      "dueToday": "오늘 결제 금액",
+      "afterTrial": "{{date}}에 {{price}}가 청구되며 자동으로 갱신돼요.",
+      "disclosure": "구독하면 취소할 때까지 Focusly가 {{price}}를 정기적으로 청구하는 데 동의하게 돼요.",
+      "startTrial": "무료 체험 시작",
+      "promo": {
+        "toggle": "프로모션 코드가 있나요?",
+        "placeholder": "코드",
+        "label": "프로모션 코드",
+        "apply": "적용",
+        "applied": "코드 {{code}} 적용됨",
+        "invalid": "유효하지 않거나 만료된 코드예요.",
+        "error": "코드를 적용하지 못했어요. 다시 시도해 주세요."
+      }
+    },
+    "activating": {
+      "title": "플랜을 활성화하는 중…",
+      "body": "Stripe에서 결제를 확인하고 있어요."
+    },
+    "done": {
+      "title": "Focusly Pro에 오신 걸 환영해요!",
+      "body": "이제 편집기에서도 Lumina를 제한 없이 사용할 수 있어요.",
+      "cta": "시작하기",
+      "trialTitle": "Focusly Pro 체험이 시작되었어요!",
+      "trialBody": "{{date}}까지 Lumina를 무료로 무제한 사용하세요. 그 전에 취소하면 비용이 들지 않아요.",
+      "nextCharge": "다음 결제일은 {{date}}이에요."
+    },
+    "pending": {
+      "title": "결제가 접수되었어요",
+      "body": "몇 분 안에 Pro 플랜이 활성화돼요. 이 창은 닫아도 돼요."
+    },
+    "limitBanner": {
+      "title_one": "이번 달 무료 메시지를 사용했어요",
+      "title_other": "이번 달 무료 메시지 {{count}}개를 모두 사용했어요",
+      "body": "{{date}}에 갱신돼요. 지금 계속 대화하려면 Focusly Pro로 업그레이드하세요.",
+      "cta": "플랜 보기"
+    },
+    "limitReply": "이번 달 무료 메시지 한도에 도달했어요. 메시지가 전송되지 않았어요. Focusly Pro로 다시 보내거나 메시지가 갱신되는 1일에 다시 보낼 수 있어요.",
+    "editorGate": {
+      "title": "편집기 AI는 Pro에 포함돼요",
+      "body": "Focusly Pro에서는 Lumina가 문서의 초안 작성, 요약, 다시 쓰기를 해요.",
+      "cta": "Pro 체험하기"
+    },
+    "section": {
+      "title": "내 플랜",
+      "description": "구독, Lumina 사용량, 결제 정보를 확인하세요.",
+      "free": "Free 플랜",
+      "pro": "Pro 플랜",
+      "renews": "{{date}}에 갱신",
+      "cancels": "Pro 플랜은 {{date}}에 종료되며 더 이상 청구되지 않아요.",
+      "pastDue": "마지막 청구서를 결제하지 못했어요. Pro를 유지하려면 카드를 업데이트하세요.",
+      "manage": "결제 및 청구서 관리",
+      "manageHint": "Stripe의 안전한 포털에서 카드를 변경하거나 청구서를 내려받거나 구독을 취소하세요.",
+      "portalError": "Stripe 포털을 열지 못했어요.",
+      "plansTitle": "플랜",
+      "plansDescription": "각 플랜에 포함된 기능이에요.",
+      "returnSuccess": "Focusly Pro 구독이 활성화되었어요!",
+      "returnPending": "결제가 접수되었어요. 몇 분 안에 플랜이 활성화돼요.",
+      "returnFailed": "결제가 완료되지 않았어요. 다시 시도할 수 있어요.",
+      "plan": {
+        "month": "Focusly Pro 월간",
+        "year": "Focusly Pro 연간"
+      },
+      "trialEnds": "{{date}}까지 무료 체험 중이에요. 이후에는 {{price}}가 청구돼요.",
+      "trialCancels": "무료 체험은 {{date}}에 끝나며 비용이 청구되지 않아요.",
+      "discount": "코드 {{code}}: {{value}} 할인.",
+      "discountUntil": "코드 {{code}}: {{date}}까지 {{value}} 할인."
+    },
+    "history": {
+      "title": "결제 내역",
+      "description": "Focusly에 결제한 내역과 영수증, PDF 청구서예요.",
+      "loading": "결제 내역을 불러오는 중…",
+      "empty": "아직 결제 내역이 없어요.",
+      "error": "결제 내역을 불러오지 못했어요.",
+      "retry": "다시 시도",
+      "plan": {
+        "month": "Focusly Pro · 월간",
+        "year": "Focusly Pro · 연간"
+      },
+      "discount": "{{amount}} 할인",
+      "status": {
+        "paid": "결제 완료",
+        "trial": "무료 체험",
+        "open": "결제 예정",
+        "uncollectible": "미수금",
+        "refunded": "환불됨",
+        "partially_refunded": "부분 환불됨"
+      },
+      "receipt": "영수증 보기",
+      "receiptFor": "영수증 {{number}} 보기",
+      "pdf": "PDF 다운로드",
+      "pdfFor": "청구서 {{number}} PDF 다운로드"
+    }
+  },
+  "toasts": {
+    "region": "알림"
+  },
+  "confirmDialogs": {
+    "deleteTask": {
+      "title": "이 작업을 삭제할까요?",
+      "description": "하위 작업과 함께 영구적으로 삭제돼요.",
+      "confirm": "작업 삭제",
+      "done": "작업이 삭제되었어요"
+    },
+    "deleteProject": {
+      "title": "이 프로젝트를 삭제할까요?",
+      "description": "문서는 삭제되지 않고 프로젝트에서만 빠져요.",
+      "confirm": "프로젝트 삭제",
+      "done": "프로젝트가 삭제되었어요",
+      "failed": "프로젝트를 삭제하지 못했어요"
+    },
+    "deleteDocument": {
+      "title": "이 문서를 삭제할까요?",
+      "description": "영구적으로 삭제돼요.",
+      "confirm": "문서 삭제",
+      "done": "문서가 삭제되었어요",
+      "failed": "문서를 삭제하지 못했어요"
+    }
+  },
+  "aiModels": {
+    "auto": "자동",
+    "autoHint": "메시지에 맞춰 Lumina가 선택해요",
+    "fast": "빠름",
+    "fastHint": "빠른 답변과 간단한 작업",
+    "reasoning": "추론",
+    "reasoningHint": "계획, 분석, 문서",
+    "select": "모델 선택"
+  },
+  "guide": {
+    "ui": {
+      "next": "다음",
+      "back": "이전",
+      "done": "확인",
+      "close": "가이드 닫기",
+      "pages": "페이지",
+      "page": "{{total}}페이지 중 {{current}}페이지",
+      "openGuide": "이 섹션 가이드"
+    },
+    "frames": {
+      "markdownSample": "## 계획\n- [ ] 검토\n- [x] 디자인\n**핵심**",
+      "confirm": "확인"
+    },
+    "keys": {
+      "period": "이전 / 다음 기간",
+      "today": "오늘로 돌아가기",
+      "views": "일, 주, 월 보기",
+      "lumina": "어시스턴트 Lumina 열기",
+      "linkTask": "작업 찾아서 연결하기",
+      "undo": "실행 취소",
+      "redo": "다시 실행",
+      "moveLine": "줄을 위아래로 이동",
+      "copyLine": "줄 복제"
+    },
+    "calendar": {
+      "label": "오늘의 계획",
+      "steps": {
+        "overview": {
+          "title": "내 시간을 한눈에",
+          "body": "캘린더에서 집중 블록, 예약된 작업, 일정을 한데 볼 수 있어요. 보고 싶은 범위에 따라 일, 주, 월 보기로 바꿔 보세요."
+        },
+        "blocks": {
+          "title": "블록 만들기와 조정",
+          "body": "빈 시간대를 클릭해 빠르게 작업을 만드세요. 블록을 드래그해 다른 시간이나 날로 옮기고, 가장자리를 늘려 길이를 바꿀 수 있어요."
+        },
+        "awaited": {
+          "title": "대기 중인 작업",
+          "body": "사이드 패널에 아직 시간이 정해지지 않은 대기 작업이 모여 있어서 하나도 잊지 않아요."
+        },
+        "ai": {
+          "title": "AI로 계획하기",
+          "body": "“일정 최적화”를 누르면 Lumina가 빈 시간을 찾아 각 작업을 언제 할지 제안해요. 초안을 검토하고 확정하거나 버리세요. 승인 없이는 아무것도 예약되지 않아요."
+        },
+        "keys": {
+          "title": "키보드로 이동하기",
+          "body": "화살표 키로 기간을 바꾸고, T로 오늘로 돌아가고, D, W, M으로 보기를 전환하세요."
+        }
+      }
+    },
+    "tasks": {
+      "label": "작업",
+      "steps": {
+        "lists": {
+          "title": "수신함, 오늘, 예정",
+          "body": "작업은 세 목록에 있어요. 아직 정리하지 않은 건 수신함, 오늘의 계획은 오늘, 다음에 할 일은 예정에 있어요."
+        },
+        "create": {
+          "title": "작업 만들기",
+          "body": "제목을 붙이고, 원하면 우선순위, 소요 시간, 날짜도 정하세요. 자세할수록 Lumina가 더 잘 계획해요."
+        },
+        "board": {
+          "title": "목록 또는 보드",
+          "body": "목록 보기와 보드 보기를 전환하세요. 보드에서는 작업을 다른 열로 드래그해 상태를 바꿀 수 있어요."
+        },
+        "find": {
+          "title": "필요한 것 찾기",
+          "body": "이름이나 태그로 검색하고 우선순위나 담당자로 필터링해 중요한 것만 남기세요."
+        },
+        "ai": {
+          "title": "AI로 정리하기",
+          "body": "“AI로 정리”는 대기 중인 작업을 우선순위와 날짜순으로 정렬해요. 어떤 작업에서든 집중 세션을 시작할 수도 있어요."
+        }
+      }
+    },
+    "workspaces": {
+      "label": "워크스페이스",
+      "steps": {
+        "docs": {
+          "title": "내 문서",
+          "body": "워크스페이스는 계획, 문서화, 리서치를 위한 마크다운 노트예요. 각 카드에 아이콘, 커버, 마지막 편집 시각이 표시돼요."
+        },
+        "projects": {
+          "title": "프로젝트로 정리하기",
+          "body": "문서를 고유한 색상과 아이콘을 가진 프로젝트로 묶어 각 이니셔티브를 한곳에 모으세요."
+        },
+        "create": {
+          "title": "문서 만들기",
+          "body": "“새 워크스페이스”로 빈 문서를 시작하거나, 템플릿에서 시작해 처음부터 쓰지 않아도 돼요."
+        },
+        "link": {
+          "title": "작업 연결하기",
+          "body": "문서에는 연결된 작업이 있을 수 있어요. 문서를 열고 사이드 패널에서 연결하면 본문 옆에서 진행 상황을 볼 수 있어요."
+        },
+        "find": {
+          "title": "검색과 보기 전환",
+          "body": "{{mod}} K로 어떤 문서든 찾고, 필터와 정렬을 사용해 갤러리, 그리드, 목록으로 볼 수 있어요."
+        }
+      }
+    },
+    "editor": {
+      "label": "편집기",
+      "steps": {
+        "markdown": {
+          "title": "마크다운으로 쓰기",
+          "body": "제목, 목록, 체크박스, 굵은 글씨가 입력하는 대로 모양을 갖춰요. 요소에 커서를 두면 마크다운을 보고 편집할 수 있어요."
+        },
+        "blocks": {
+          "title": "특수 블록",
+          "body": "텍스트 외에도 코드 하이라이트, 표, Mermaid 다이어그램, 수식, GeoJSON 지도, 접을 수 있는 섹션을 보여 줘요."
+        },
+        "ai": {
+          "title": "텍스트에 AI 활용",
+          "body": "텍스트를 선택하고 마우스 오른쪽 버튼을 눌러 작업 만들기, 요약, 교정, 번역, 어조 변경을 할 수 있어요. {{mod}} J로 Lumina를 열면 적용 전에 검토할 수 있는 변경 사항을 제안해요."
+        },
+        "canvas": {
+          "title": "캔버스",
+          "body": "오른쪽 클릭 메뉴에서 캔버스 페이지를 만드세요. 다이어그램을 그리는 보드로, 문서에 카드로 연결돼요."
+        },
+        "sidebar": {
+          "title": "사이드 패널",
+          "body": "노트의 개요, 제목 그래프, 통계를 보고 연결된 작업을 관리하세요. 헤더의 집중 버튼을 누르면 해당 작업으로 세션이 시작돼요."
+        },
+        "keys": {
+          "title": "키보드 단축키",
+          "body": "글을 쓸 때 가장 많이 쓰는 단축키예요."
+        }
+      }
+    },
+    "insights": {
+      "label": "인사이트",
+      "steps": {
+        "stats": {
+          "title": "숫자로 보는 생산성",
+          "body": "총 집중 시간, 완료한 작업, 평균 에너지, 딥 워크 비율을 일, 주, 월, 연 단위로 보여 줘요."
+        },
+        "trends": {
+          "title": "추세",
+          "body": "생산성이 시간에 따라 어떻게 변하는지, 시간이 어디에 쓰이는지 확인하세요."
+        },
+        "activity": {
+          "title": "활동과 골든 아워",
+          "body": "활동 지도는 가장 꾸준했던 날을, 골든 아워는 성과가 가장 좋은 시간대를 보여 줘요. 가장 어려운 일을 그때 배치하세요."
+        },
+        "report": {
+          "title": "내보내기와 공유",
+          "body": "데이터를 내보내거나 기간을 요약한 보고서를 만드세요."
+        }
+      }
+    },
+    "askAi": {
+      "label": "AI에게 묻기",
+      "steps": {
+        "chat": {
+          "title": "Lumina와 대화하기",
+          "body": "Lumina는 내 작업과 캘린더를 알고 있어요. 오늘 무엇을 할지 묻거나, 아이디어를 요청하거나, 한 주를 요약해 달라고 하세요."
+        },
+        "suggestions": {
+          "title": "추천 질문으로 시작하기",
+          "body": "어디서 시작할지 모르겠다면 추천 질문을 고르세요. 집중 전략, 생산성 분석 등이 있어요."
+        },
+        "plan": {
+          "title": "실행 계획",
+          "body": "Lumina가 바로 만들 수 있는 작업과 일정을 제안해요. 검토하고 확정하세요. 승인 없이는 아무것도 만들어지지 않아요."
+        },
+        "history": {
+          "title": "내 대화",
+          "body": "모든 채팅이 저장되어 나중에 이어서 하거나, 필요 없어지면 삭제할 수 있어요."
+        }
+      }
+    }
+  }
+}

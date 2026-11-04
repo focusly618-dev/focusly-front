@@ -1,0 +1,2089 @@
+{
+  "taskReminder": {
+    "upcomingTitle": "Bientôt : {{title}}",
+    "urgentTitle": "Ça commence : {{title}} !",
+    "startsIn_one": "Commence dans {{count}} minute ({{time}})",
+    "startsIn_other": "Commence dans {{count}} minutes ({{time}})"
+  },
+  "common": {
+    "loadingConversations": "Chargement des conversations…",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "actions": "Actions",
+    "close": "Fermer",
+    "back": "Retour",
+    "add": "Ajouter",
+    "active": "Actif",
+    "connected": "Connecté",
+    "error": "Erreur",
+    "connect": "Connecter",
+    "all": "Tout",
+    "create": "Créer"
+  },
+  "errors": {
+    "network": "Impossible de se connecter au serveur. Vérifiez votre connexion Internet et réessayez.",
+    "timeout": "La requête a mis trop de temps à répondre. Veuillez réessayer.",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+    "notFound": "L'élément demandé est introuvable. Il n'existe peut-être plus.",
+    "magicLinkExpired": "Ce lien de connexion a expiré. Demandez-en un nouveau.",
+    "magicLinkInvalid": "Ce lien de connexion n'est pas valide.",
+    "googleAuthFailed": "Un problème est survenu lors de la connexion à votre compte Google. Veuillez vous reconnecter.",
+    "googleCalendarSync": "Impossible de synchroniser avec Google Agenda. Réessayez dans un instant.",
+    "aiUnavailable": "L'assistant IA n'est pas disponible pour le moment. Réessayez plus tard.",
+    "emptyMessage": "Écrivez un message avant de l'envoyer.",
+    "generic": "Une erreur s'est produite. Réessayez plus tard."
+  },
+  "nav": {
+    "agenda": "Agenda",
+    "dailyPlan": "Plan du jour",
+    "tasks": "Tâches",
+    "inbox": "Boîte de réception",
+    "today": "Aujourd'hui",
+    "upcoming": "À venir",
+    "intelligence": "Intelligence",
+    "askAi": "Demander à l'IA",
+    "insights": "Insights",
+    "workspace": "Espaces de travail",
+    "collections": "Collections",
+    "projects": "Projets",
+    "recentProjects": "Récents",
+    "viewAllProjects": "Tout voir ({{count}})",
+    "noProjectsYet": "Aucun projet pour l'instant",
+    "templates": "Modèles",
+    "features": "Fonctionnalités",
+    "howItWorks": "Comment ça marche",
+    "pricing": "Tarifs",
+    "logIn": "Se connecter",
+    "getStarted": "Commencer",
+    "viewProfile": "Voir le profil",
+    "searchWorkspaces": "Rechercher des espaces de travail..."
+  },
+  "settings": {
+    "theme": {
+      "title": "Thème",
+      "subtitle": "Choisissez l'apparence de Focusly sur cet appareil.",
+      "system": "Automatique",
+      "light": "Clair",
+      "dark": "Sombre",
+      "graydark": "Gris foncé"
+    },
+    "language": {
+      "title": "Langue",
+      "spanish": "Español",
+      "english": "English",
+      "japanese": "日本語"
+    }
+  },
+  "calendar": {
+    "nav": {
+      "previous": {
+        "day": "Jour précédent (←)",
+        "week": "Semaine précédente (←)",
+        "month": "Mois précédent (←)"
+      },
+      "next": {
+        "day": "Jour suivant (→)",
+        "week": "Semaine suivante (→)",
+        "month": "Mois suivant (→)"
+      },
+      "views": "Vue du calendrier",
+      "openPanel": "Ouvrir le panneau du calendrier",
+      "todayShortcut": "Aller à aujourd'hui (T)"
+    },
+    "loadingEvents": "Chargement de votre planning…",
+    "title": "Calendrier",
+    "subtitle": "Une clarté organisée pour vos sessions de travail en profondeur.",
+    "aiPlannerTitle": "Planificateur IA",
+    "aiPlannerDescription": "Lumina cherche les meilleurs créneaux de concentration pour vos tâches...",
+    "noPendingTasksTitle": "Planificateur",
+    "noPendingTasksDesc": "Vous n'avez aucune tâche en attente à planifier.",
+    "noAvailabilityTitle": "Aucune disponibilité",
+    "noAvailabilityDesc": "Il n'y a aucun créneau libre dans le calendrier pour planifier.",
+    "noSuggestionsTitle": "Planificateur",
+    "noSuggestionsDesc": "Aucune suggestion de bloc de temps optimal n'a été trouvée.",
+    "draftGeneratedTitle": "Brouillon généré",
+    "draftGeneratedDesc": "Lumina a réparti vos tâches. Vérifiez, ajustez ou confirmez votre planning.",
+    "planningErrorTitle": "Erreur de planification",
+    "planningErrorDesc": "Impossible de générer la proposition de blocs de temps.",
+    "organizingBackdrop": "Lumina IA organise vos tâches dans le calendrier...",
+    "draftProposed": "✨ Lumina a proposé {{count}} blocs de concentration",
+    "discard": "Ignorer",
+    "confirmSchedule": "Confirmer le planning 🚀",
+    "scheduling": "Planification...",
+    "quickCreateTask": "Création rapide de tâche",
+    "showMore": "+{{count}} de plus",
+    "addTask": "Ajouter une tâche",
+    "month": "Mois",
+    "week": "Semaine",
+    "day": "Jour",
+    "today": "Aujourd'hui",
+    "awaitedTasks": "Tâches en attente",
+    "viewAll": "Tout voir",
+    "noAwaitedTasks": "Aucune tâche en attente",
+    "freeTimeDesc": "Profitez de votre temps libre !",
+    "optimizeSchedule": "Optimiser le planning",
+    "plan": {
+      "review": "Vérifier",
+      "closeReview": "Fermer et voir le calendrier",
+      "previewLabel": "Aperçu de la proposition dans le calendrier",
+      "workingTitle": "Lumina organise votre planning",
+      "elapsed_one": "{{count}} seconde",
+      "elapsed_other": "{{count}} secondes",
+      "steps": {
+        "tasks": "Lecture de vos tâches ouvertes",
+        "slots": "Recherche de votre temps libre",
+        "thinking": "Placement des blocs de concentration",
+        "checking": "Vérification de la proposition"
+      },
+      "backgroundHint": "Continuez à utiliser Focusly : nous vous préviendrons quand ce sera prêt.",
+      "reviewTitle": "Proposition de Lumina",
+      "reviewSummary_one": "{{count}} bloc",
+      "reviewSummary_other": "{{count}} blocs",
+      "focusTime": "{{hours}} h {{minutes}} min de concentration",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "duration_one": "{{count}} min",
+      "duration_other": "{{count}} min",
+      "include": "Inclure « {{title}} »",
+      "priority": {
+        "high": "Haute",
+        "medium": "Moyenne",
+        "low": "Basse"
+      },
+      "beforeDeadline": "Avant l'échéance",
+      "afterDeadline": "Après l'échéance",
+      "rescheduled": "Replanifiée",
+      "unplaced_one": "{{count}} tâche n'a pas pu être placée",
+      "unplaced_other": "{{count}} tâches n'ont pas pu être placées",
+      "unplacedHint": "Libérez du temps ou élargissez vos horaires de travail dans votre profil.",
+      "dragHint": "Vous pouvez faire glisser les blocs dans le calendrier pour les ajuster.",
+      "confirm_one": "Planifier {{count}} bloc",
+      "confirm_other": "Planifier {{count}} blocs"
+    },
+    "draftReadyTitle": "Votre planning optimisé est prêt ✨",
+    "viewProposal": "Voir la proposition",
+    "optimizing": "Optimisation…",
+    "cancelPlanning": "Annuler",
+    "optimizeFreeHint_one": "Utilise votre dernier message gratuit de Lumina",
+    "optimizeFreeHint_other": "Utilise 1 de vos {{count}} messages gratuits de Lumina",
+    "optimizeProOnly": "Vous avez utilisé les messages gratuits de ce mois : disponible avec Pro",
+    "draftGeneratedPartial_one": "Lumina a proposé {{count}} bloc ; {{left}} tâche(s) n'ont pas tenu dans votre temps libre.",
+    "draftGeneratedPartial_other": "Lumina a proposé {{count}} blocs ; {{left}} tâche(s) n'ont pas tenu dans votre temps libre.",
+    "scheduleSavedTitle": "Planning confirmé",
+    "scheduleSavedDesc": "Vos blocs de concentration sont planifiés.",
+    "scheduleSaveError": "{{count}} bloc(s) n'ont pas pu être enregistrés. Vous pouvez les confirmer à nouveau.",
+    "openWeeklyPlanner": "Ouvrir le planificateur hebdomadaire",
+    "notifications": {
+      "title": "Notifications",
+      "new": "{{count}} NOUVELLES",
+      "empty": "Aucune notification pour l'instant",
+      "emptyDesc": "Vous êtes à jour ! Les notifications sur vos tâches et sessions de concentration apparaîtront ici.",
+      "markAllRead": "Tout marquer comme lu"
+    }
+  },
+  "notificationSettings": {
+    "sound": {
+      "title": "Son de notification",
+      "classicChime": "Carillon classique",
+      "digitalTone": "Tonalité numérique",
+      "softBell": "Cloche douce",
+      "successArpeggio": "Arpège de réussite"
+    }
+  },
+  "accountSettings": {
+    "emailAddress": "Adresse e-mail",
+    "emailManagedBy": "Gérée par votre fournisseur de connexion ; elle ne peut pas être modifiée ici.",
+    "toast": {
+      "title": "Profil mis à jour",
+      "desc": "Votre nom d'affichage a été enregistré."
+    }
+  },
+  "integrationsSettings": {
+    "googleCalendar": "Google Agenda et Meet",
+    "connectedAs": "Connecté en tant que {{email}}",
+    "notConnected": "Non connecté",
+    "connect": "Connecter",
+    "refreshPermissions": "Actualiser les autorisations",
+    "toast": {
+      "connectedTitle": "Google Agenda connecté",
+      "connectedDesc": "Votre accès à l'agenda et à Meet a été actualisé.",
+      "connectErrorTitle": "Impossible de connecter Google Agenda",
+      "connectFailedTitle": "Échec de la connexion à Google"
+    }
+  },
+  "securitySettings": {
+    "activeSession": "Session active",
+    "signInMethod": "Méthode de connexion",
+    "google": "Google",
+    "magicLink": "Lien magique",
+    "googleDesc": "Vous vous connectez avec votre compte Google. Il n'y a pas de mot de passe Focusly séparé à gérer.",
+    "magicLinkDesc": "Vous vous connectez avec un lien magique sans mot de passe envoyé à votre adresse e-mail.",
+    "deleteAccount": "Supprimer le compte",
+    "deleteConfirm": {
+      "title": "Supprimer votre compte ?",
+      "subtitle": "Cette action est irréversible",
+      "desc": "Votre compte, vos tâches, documents, projets, conversations avec l'IA et votre photo de profil seront définitivement supprimés. Si vous avez connecté Google Agenda, nous révoquerons l'accès de Focusly ; les événements de votre agenda ne sont pas supprimés.",
+      "confirm": "Supprimer le compte",
+      "cancel": "Annuler",
+      "success": "Votre compte a été supprimé",
+      "error": "Impossible de supprimer votre compte. Veuillez réessayer."
+    }
+  },
+  "tasksHeader": {
+    "eyebrow": "Gérez et priorisez votre travail",
+    "title": "Mes tâches"
+  },
+  "endSessionModal": {
+    "title": "Terminer la session de concentration ?",
+    "confirmText": "Voulez-vous vraiment terminer cette session plus tôt ?",
+    "warningText": "Le temps enregistré jusqu'ici sera sauvegardé dans la tâche.",
+    "endSession": "Terminer la session"
+  },
+  "focusTimer": {
+    "timeUp": "Le temps est écoulé ! Terminez la tâche ou ajoutez 5 minutes pour continuer."
+  },
+  "profilePage": {
+    "title": "Paramètres",
+    "back": "Retour",
+    "logout": "Se déconnecter",
+    "nav": {
+      "account": "Profil",
+      "billing": "Forfaits et facturation",
+      "workFocus": "Horaires et concentration",
+      "notifications": "Notifications",
+      "appearance": "Apparence",
+      "integrations": "Intégrations",
+      "privacy": "Confidentialité et sécurité"
+    },
+    "descriptions": {
+      "account": "Votre photo, votre nom et le compte avec lequel vous vous connectez.",
+      "billing": "Gérez votre abonnement, vos moyens de paiement enregistrés et les avantages de Focusly Pro.",
+      "workFocus": "Quand vous travaillez et la durée d'une session de concentration. Focusly s'en sert pour placer vos tâches.",
+      "notifications": "Comment Focusly vous prévient qu'une tâche va commencer.",
+      "appearance": "Le thème et la langue de Focusly sur cet appareil.",
+      "integrations": "Les comptes externes que Focusly utilise pour synchroniser votre agenda et créer des liens Meet.",
+      "privacy": "Votre session, les documents juridiques et la suppression de votre compte."
+    },
+    "account": {
+      "photoTitle": "Photo de profil",
+      "photoDesc": "Affichée dans le menu latéral de Focusly. JPG, PNG ou WebP.",
+      "upload": "Importer une photo",
+      "remove": "Supprimer la photo",
+      "nameTitle": "Nom",
+      "nameDesc": "Le nom sous lequel vous apparaissez dans Focusly.",
+      "nameError": "Impossible d'enregistrer votre nom. Veuillez réessayer."
+    },
+    "workFocus": {
+      "daysTitle": "Jours de travail",
+      "daysDesc": "Cochez les jours où vous travaillez. Le planificateur automatique et le plan hebdomadaire de Lumina ne placent des tâches que ces jours-là.",
+      "hoursTitle": "Horaires de travail",
+      "hoursDesc": "Les tâches et les blocs de concentration sont planifiés dans ces horaires, les jours que vous avez cochés.",
+      "start": "Début",
+      "end": "Fin",
+      "focusTitle": "Durée d'une session de concentration",
+      "focusDesc": "Durée du minuteur du mode concentration quand une tâche n'a pas d'estimation de temps.",
+      "minutes": "{{count}} min",
+      "save": "Enregistrer les modifications",
+      "discard": "Ignorer",
+      "savedTitle": "Préférences enregistrées",
+      "savedDesc": "Focusly utilisera ces horaires pour placer vos tâches.",
+      "saveError": "Impossible d'enregistrer vos préférences. Veuillez réessayer.",
+      "errors": {
+        "noDays": "Choisissez au moins un jour.",
+        "hours": "L'heure de fin doit être après l'heure de début."
+      }
+    },
+    "notifications": {
+      "remindersTitle": "Rappels de tâches",
+      "remindersDesc": "Vous prévient 5 minutes et 1 minute avant le début d'une tâche planifiée : un avis s'affiche dans Focusly et le son choisi ci-dessous est joué. Si vous le désactivez, vous ne recevrez aucun rappel sur cet appareil.",
+      "systemTitle": "Notifications du système",
+      "systemDesc": "Affiche aussi chaque rappel comme notification du système d'exploitation, pour le voir même quand Focusly est dans un autre onglet ou réduit. Nécessite l'autorisation du navigateur.",
+      "allow": "Autoriser",
+      "permission": {
+        "granted": "Autorisées dans ce navigateur.",
+        "default": "Vous n'avez pas encore donné l'autorisation dans ce navigateur.",
+        "denied": "Bloquées par le navigateur. Activez-les dans les paramètres du site (l'icône à gauche de l'adresse).",
+        "unsupported": "Ce navigateur ne prend pas en charge les notifications du système."
+      },
+      "soundDesc": "Le son joué par chaque rappel. Touchez une option pour l'écouter et la choisir ; elle est enregistrée sur cet appareil."
+    },
+    "appearance": {
+      "languageDesc": "Langue de l'interface sur cet appareil."
+    },
+    "integrations": {
+      "googleDesc": "Permet à Focusly de lire et de créer des événements dans votre Google Agenda pour afficher votre planning, planifier vos tâches et générer des liens Meet. Vous pouvez révoquer l'accès depuis votre compte Google."
+    },
+    "privacy": {
+      "sessionDesc": "Vous déconnecte de ce navigateur. Vos données restent enregistrées et vous vous reconnectez avec votre méthode habituelle.",
+      "termsAccepted": "Vous avez accepté la version {{version}} le {{date}}.",
+      "termsAcceptedNoVersion": "Vous avez accepté les conditions le {{date}}.",
+      "deleteDesc": "Supprime définitivement votre compte, vos tâches, documents, projets et conversations avec Lumina. Cette action est irréversible."
+    }
+  },
+  "editorAI": {
+    "launcher": "Demander à Lumina",
+    "conversationTitle": "📝 {{title}}",
+    "untitled": "Document sans titre",
+    "header": {
+      "title": "Lumina",
+      "subtitle": "À propos de « {{title}} »",
+      "newChat": "Nouvelle conversation",
+      "minimize": "Réduire"
+    },
+    "empty": {
+      "title": "Comment puis-je vous aider avec ce document ?",
+      "description": "Posez n'importe quelle question sur la note ou utilisez une action rapide. Sélectionnez du texte pour voir les actions sur ce passage.",
+      "withSelection": "Vous avez sélectionné du texte : choisissez une action ou dites-moi quoi en faire."
+    },
+    "actions": {
+      "label": "Actions rapides",
+      "improve": {
+        "label": "Améliorer le style",
+        "hint": "Réécrit la sélection de façon plus claire et fluide"
+      },
+      "fix": {
+        "label": "Corriger",
+        "hint": "Corrige l'orthographe et la grammaire de la sélection"
+      },
+      "shorter": {
+        "label": "Plus court",
+        "hint": "Condense la sélection"
+      },
+      "longer": {
+        "label": "Plus long",
+        "hint": "Développe la sélection"
+      },
+      "translate": {
+        "label": "Traduire",
+        "hint": "Traduit la sélection dans une autre langue"
+      },
+      "explain": {
+        "label": "Expliquer",
+        "hint": "Explique la sélection sans la modifier"
+      },
+      "matchStyle": {
+        "label": "Adapter au style",
+        "hint": "Adapte la sélection au style du document"
+      },
+      "summarize": {
+        "label": "Résumer",
+        "hint": "Résume tout le document"
+      },
+      "continue": {
+        "label": "Continuer l'écriture",
+        "hint": "Écrit la suite à partir du curseur"
+      },
+      "extractTasks": {
+        "label": "Extraire des tâches",
+        "hint": "Suggère des tâches à partir du document"
+      },
+      "proofread": {
+        "label": "Relire",
+        "hint": "Corrige l'orthographe de tout le document"
+      }
+    },
+    "prompts": {
+      "improve": "Améliore le style du texte sélectionné : plus clair et plus fluide, même sens et même langue.",
+      "fix": "Corrige l'orthographe et la grammaire du texte sélectionné sans changer son style.",
+      "shorter": "Raccourcis le texte sélectionné en gardant les idées clés.",
+      "longer": "Développe le texte sélectionné avec des détails et du contexte utiles, dans le même style.",
+      "translate": "Traduis le texte sélectionné en {{language}}.",
+      "explain": "Explique le texte sélectionné en termes simples.",
+      "matchStyle": "Adapte le texte sélectionné au style d'écriture du reste du document (ton, vocabulaire et structure des phrases), sans changer son sens.",
+      "summarize": "Résume ce document de façon claire et concise.",
+      "continue": "Continue d'écrire là où se trouve mon curseur, en suivant le ton et la structure du document.",
+      "extractTasks": "Extrais les tâches concrètes de ce document et propose-les comme tâches Focusly.",
+      "proofread": "Relis tout le document pour l'orthographe et la grammaire et corrige les fautes sans changer le style."
+    },
+    "quote": {
+      "selection": "Sélection",
+      "cursor": "Avant le curseur"
+    },
+    "status": {
+      "thinking": "Réflexion…",
+      "preparingEdit": "Préparation des modifications de votre document…",
+      "preparingTasks": "Préparation des tâches…",
+      "editProposed": "Modifications proposées pour le document",
+      "stopped": "Réponse interrompue.",
+      "error": "La réponse n'a pas pu être terminée."
+    },
+    "fragment": {
+      "docChanged": "Le document a changé pendant que Lumina écrivait. Insérez le texte où vous voulez :",
+      "editChanged": "Le document a changé depuis votre demande. Comparez la modification avec la version actuelle :"
+    },
+    "message": {
+      "copy": "Copier",
+      "insertAtCursor": "Insérer au curseur",
+      "replaceSelection": "Remplacer la sélection",
+      "retry": "Réessayer",
+      "stop": "Arrêter",
+      "reviewEdit": "Vérifier les modifications"
+    },
+    "diff": {
+      "review": "Vérifiez les modifications dans le document : le texte barré est supprimé et le texte souligné est ajouté.",
+      "accept": "Accepter",
+      "discard": "Ignorer",
+      "applied": "Modifications appliquées à votre document",
+      "discarded": "Modifications ignorées"
+    },
+    "selection": {
+      "attached": "Sélection : « {{text}} »",
+      "detached": "La sélection ne sera pas envoyée",
+      "detach": "Ne pas envoyer la sélection",
+      "attach": "Utiliser"
+    },
+    "input": {
+      "placeholder": "Posez une question à Lumina sur ce document…",
+      "placeholderSelection": "Que dois-je faire avec le texte sélectionné ?",
+      "send": "Envoyer"
+    },
+    "disclaimer": "Lumina peut se tromper. Vérifiez les modifications avant de les accepter.",
+    "toasts": {
+      "inserted": "Ajouté à votre document",
+      "copied": "Copié"
+    },
+    "errors": {
+      "title": "Lumina n'a pas pu répondre",
+      "retry": "Réessayez dans un instant.",
+      "copy": "Impossible de copier"
+    },
+    "launcherWriting": "Lumina écrit…",
+    "launcherReady": "Réponse prête",
+    "backgroundHint": "Vous pouvez quitter l'éditeur : Lumina continue de travailler en arrière-plan.",
+    "history": {
+      "title": "Conversations de ce document",
+      "open": "Voir les conversations",
+      "back": "Retour à la conversation",
+      "empty": "Aucune conversation dans ce document pour l'instant.",
+      "untitled": "Conversation sans titre",
+      "active": "Ouverte",
+      "delete": "Supprimer la conversation",
+      "confirmDelete": "Supprimer ?",
+      "yes": "Oui",
+      "no": "Non",
+      "loadError": "Impossible de charger les conversations.",
+      "deleteError": "Impossible de supprimer la conversation."
+    },
+    "background": {
+      "writing": "Lumina écrit",
+      "done": "Lumina a terminé",
+      "in": "Dans « {{title}} »",
+      "open": "Ouvrir « {{title}} »",
+      "dismiss": "Ignorer"
+    }
+  },
+  "actionPlan": {
+    "header": {
+      "title": "Le plan de Lumina",
+      "changesTitle": "Modifications suggérées",
+      "review": "Vérifiez les détails et choisissez ce qu'il faut créer.",
+      "running": "Création de {{done}} sur {{total}}…",
+      "done": "Terminé : tout ce que vous avez sélectionné est dans Focusly.",
+      "someFailed": "Certains éléments n'ont pas pu être créés."
+    },
+    "summary": {
+      "projects_one": "{{count}} projet",
+      "projects_other": "{{count}} projets",
+      "documents_one": "{{count}} document",
+      "documents_other": "{{count}} documents",
+      "tasks_one": "{{count}} tâche",
+      "tasks_other": "{{count}} tâches",
+      "subtasks_one": "{{count}} sous-tâche",
+      "subtasks_other": "{{count}} sous-tâches",
+      "updates_one": "{{count}} modification",
+      "updates_other": "{{count}} modifications",
+      "deletions_one": "{{count}} suppression",
+      "deletions_other": "{{count}} suppressions",
+      "events_one": "{{count}} événement",
+      "events_other": "{{count}} événements",
+      "guests_one": "{{count}} invité",
+      "guests_other": "{{count}} invités"
+    },
+    "sections": {
+      "otherTasks": "Autres tâches",
+      "updates": "Modifications d'éléments existants",
+      "deletions": "À supprimer",
+      "events": "Événements Google Agenda"
+    },
+    "footer": {
+      "selectAll": "Tout",
+      "selectNone": "Aucun",
+      "errors": "Vérifiez les éléments signalés par une erreur.",
+      "running": "Création…",
+      "create_one": "Créer {{count}} élément",
+      "create_other": "Créer {{count}} éléments",
+      "apply_one": "Appliquer {{count}} modification",
+      "apply_other": "Appliquer {{count}} modifications",
+      "retry_one": "Réessayer {{count}}",
+      "retry_other": "Réessayer {{count}}",
+      "done_one": "{{count}} élément terminé",
+      "done_other": "{{count}} éléments terminés",
+      "delete_one": "Supprimer {{count}}",
+      "delete_other": "Supprimer {{count}}"
+    },
+    "status": {
+      "done": "Créé",
+      "error": "Création impossible",
+      "skipped": "Ignoré"
+    },
+    "edit": {
+      "edit": "Modifier avant de créer",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "title": "Titre",
+      "start": "Début",
+      "name": "Nom"
+    },
+    "details": {
+      "show": "Afficher les détails",
+      "hide": "Masquer les détails"
+    },
+    "priority": {
+      "1": "Basse",
+      "2": "Moyenne",
+      "3": "Haute",
+      "4": "Urgente"
+    },
+    "untitledTask": "Tâche sans titre",
+    "untitledNote": "Note sans titre",
+    "untitledDocument": "Document sans titre",
+    "task": {
+      "subtaskCount_one": "{{count}} sous-tâche",
+      "subtaskCount_other": "{{count}} sous-tâches",
+      "subtasks": "Sous-tâches",
+      "notes": "Notes"
+    },
+    "open": {
+      "goTo": "Aller à ce qui a été créé",
+      "inCalendar": "Voir dans le calendrier",
+      "tasks_other": "Voir {{count}} tâches",
+      "tasks_one": "Voir la tâche",
+      "viewProject": "Voir le projet",
+      "task": "Voir la tâche",
+      "document": "Ouvrir le document",
+      "project": "Ouvrir le projet",
+      "calendar": "Ouvrir dans Google Agenda",
+      "meet": "Rejoindre Meet"
+    },
+    "document": {
+      "label": "Document",
+      "note": "Note",
+      "sections_one": "{{count}} section",
+      "sections_other": "{{count}} sections",
+      "words_one": "~{{count}} mot",
+      "words_other": "~{{count}} mots",
+      "linkedTasks_one": "{{count}} tâche liée",
+      "linkedTasks_other": "{{count}} tâches liées",
+      "outline": "Sections du document",
+      "showContent": "Voir le document complet",
+      "hideContent": "Masquer le document"
+    },
+    "project": {
+      "new": "Nouveau projet",
+      "existing": "Projet existant",
+      "existingFallback": "Projet existant",
+      "documents_one": "{{count}} document",
+      "documents_other": "{{count}} documents",
+      "tasks_one": "{{count}} tâche",
+      "tasks_other": "{{count}} tâches"
+    },
+    "fields": {
+      "title": "Titre",
+      "start": "Début",
+      "end": "Fin",
+      "priority": "Priorité",
+      "duration": "Durée",
+      "notes": "Notes",
+      "status": "Statut",
+      "document": "Document",
+      "project": "Projet",
+      "when": "Date",
+      "location": "Lieu",
+      "description": "Description",
+      "guests": "Invités",
+      "meet": "Google Meet"
+    },
+    "update": {
+      "changes_one": "{{count}} modification",
+      "changes_other": "{{count}} modifications",
+      "notesReplaced": "Les notes sont remplacées",
+      "unknownTask": "Tâche existante",
+      "aDocument": "Un document",
+      "aProject": "Un projet"
+    },
+    "insert": {
+      "title": "Ajouter au document ouvert",
+      "hint": "Inséré dans le document que vous avez ouvert"
+    },
+    "taskStatus": {
+      "todo": "À faire",
+      "planning": "Planification",
+      "pending": "En attente",
+      "onHold": "En pause",
+      "review": "En revue",
+      "done": "Terminée",
+      "backlog": "Backlog",
+      "scheduled": "Planifiée",
+      "archived": "Archivée"
+    },
+    "subtasks": {
+      "add_one": "+{{count}} nouvelle",
+      "add_other": "+{{count}} nouvelles",
+      "complete_one": "{{count}} terminée",
+      "complete_other": "{{count}} terminées",
+      "reopen_one": "{{count}} rouverte",
+      "reopen_other": "{{count}} rouvertes",
+      "remove_one": "{{count}} supprimée",
+      "remove_other": "{{count}} supprimées",
+      "missing": "Ces sous-tâches sont introuvables : {{titles}}"
+    },
+    "delete": {
+      "permanent": "Supprimé définitivement",
+      "alsoGoogle": "Aussi de Google Agenda",
+      "confirm_one": "Je comprends que {{count}} tâche sera définitivement supprimée.",
+      "confirm_other": "Je comprends que {{count}} tâches seront définitivement supprimées.",
+      "confirmEvents_one": "Je comprends que {{count}} événement sera annulé et que ses invités seront prévenus.",
+      "confirmEvents_other": "Je comprends que {{count}} événements seront annulés et que leurs invités seront prévenus.",
+      "confirmMixed_one": "Je comprends que {{count}} élément sera définitivement supprimé.",
+      "confirmMixed_other": "Je comprends que {{count}} éléments seront définitivement supprimés."
+    },
+    "event": {
+      "untitled": "Événement sans titre",
+      "unknown": "Événement de votre agenda",
+      "allDay": "Toute la journée",
+      "meet": "Google Meet",
+      "meetCreated": "Un lien Google Meet sera créé pour la réunion.",
+      "meetAdded": "Un lien Meet est ajouté",
+      "guests_one": "{{count}} invité",
+      "guests_other": "{{count}} invités",
+      "guestsNotice": "Google enverra une invitation par e-mail à chaque invité.",
+      "updateNotice": "Les invités seront prévenus de la modification.",
+      "addGuests_one": "+{{count}} invité",
+      "addGuests_other": "+{{count}} invités",
+      "removeGuests_one": "−{{count}} invité",
+      "removeGuests_other": "−{{count}} invités",
+      "descriptionReplaced": "La description est remplacée",
+      "organizedBy": "Organisé par {{email}}",
+      "notOrganizerHint": "Vous n'organisez pas cet événement : seul l'organisateur peut changer l'heure ou les invités pour tous.",
+      "cancel": "Annulé",
+      "cancelNotice_one": "{{count}} invité recevra l'annulation",
+      "cancelNotice_other": "{{count}} invités recevront l'annulation",
+      "needsCalendar": "Nécessite Google Agenda",
+      "connectHint": "Connectez Google Agenda pour que Lumina puisse créer et modifier vos événements.",
+      "connect": "Connecter Google Agenda",
+      "you": "Vous",
+      "response": {
+        "accepted": "Accepté",
+        "declined": "Refusé",
+        "tentative": "Peut-être",
+        "needsAction": "Sans réponse"
+      }
+    }
+  },
+  "insightsHeader": {
+    "title": "Insights {{period}}",
+    "periods": {
+      "daily": "quotidiens",
+      "weekly": "hebdomadaires",
+      "monthly": "mensuels",
+      "yearly": "annuels"
+    },
+    "subtitle": "Résumé et analyse de la productivité",
+    "export": "Exporter",
+    "createReport": "Créer un rapport",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant"
+  },
+  "notificationsPage": {
+    "loading": "Chargement des notifications…",
+    "title": "Notifications",
+    "subtitle": "Restez au courant de votre activité récente",
+    "newBadge": "{{count}} NOUVELLES",
+    "markAllRead": "Tout marquer comme lu",
+    "deleteAll": "Tout supprimer",
+    "error": "Une erreur s'est produite lors du chargement des notifications",
+    "emptyTitle": "Aucune notification pour l'instant",
+    "emptyDesc": "Les notifications sur vos tâches, vos sessions de concentration ou les recommandations de l'IA apparaîtront ici.",
+    "timeToday": "Aujourd'hui à {{time}}",
+    "timeYesterday": "Hier à {{time}}",
+    "timeOther": "{{date}} à {{time}}"
+  },
+  "login": {
+    "toggleTheme": "Changer de thème",
+    "checkEmail": {
+      "title": "Vérifiez vos e-mails",
+      "desc": "Nous avons envoyé un lien de connexion à",
+      "instructions": "Cliquez sur le lien pour vous connecter instantanément.",
+      "back": "Retour à la connexion"
+    },
+    "signUpTitle": "Créer un compte",
+    "signInTitle": "Bon retour parmi nous",
+    "subtitle": "Saisissez vos informations pour accéder à votre espace de travail.",
+    "tabs": {
+      "signIn": "Connexion",
+      "signUp": "Inscription"
+    },
+    "continueWithGoogle": "Continuer avec Google",
+    "orWithEmail": "ou avec une adresse e-mail",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "ex. : Marie Dupont",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "nom@entreprise.com",
+    "createAccount": "Créer un compte",
+    "signIn": "Se connecter",
+    "noAccount": "Vous n'avez pas de compte ? ",
+    "hasAccount": "Vous avez déjà un compte ? ",
+    "signUpHere": "Inscrivez-vous gratuitement",
+    "signInHere": "Connectez-vous ici",
+    "termsOfService": "Conditions d'utilisation",
+    "privacyPolicy": "Politique de confidentialité",
+    "helpCenter": "Centre d'aide",
+    "copyright": "© 2026 Focusly",
+    "enterEmailWarning": "Veuillez saisir votre adresse e-mail"
+  },
+  "rightPanel": {
+    "quickInsights": "Aperçus rapides",
+    "productivityScore": "Score de productivité",
+    "moreProductive": "Vous êtes plus productif que d'habitude ce matin.",
+    "habitTracker": "Suivi des habitudes",
+    "focusTime": "Temps de concentration"
+  },
+  "calendarAiPlanner": {
+    "title": "Planificateur de blocs de temps IA",
+    "loading": "Lumina IA organise vos tâches dans le calendrier...",
+    "intro": "Lumina a repéré les créneaux libres de votre calendrier et propose les blocs de concentration suivants pour vos tâches en attente :",
+    "confirm": "Accepter et planifier",
+    "creating": "Création des événements...",
+    "toast": {
+      "scheduledTitle": "Calendrier organisé",
+      "scheduledDesc": "Vos tâches ont bien été transformées en blocs de temps.",
+      "errorDesc": "Impossible d'enregistrer les blocs de temps."
+    }
+  },
+  "calendarWeeklyPlanner": {
+    "title": "Planificateur hebdomadaire IA de Focusly",
+    "loading": "Lumina IA organise votre semaine...",
+    "recommendation": "🎯 Recommandation de Lumina :",
+    "noTasksAssigned": "Aucune tâche assignée.",
+    "confirm": "Confirmer le plan hebdomadaire",
+    "applying": "Attribution des tâches...",
+    "toast": {
+      "noTasksTitle": "Planificateur hebdomadaire",
+      "noTasksDesc": "Vous n'avez aucune tâche en attente à planifier cette semaine.",
+      "fetchErrorDesc": "Impossible d'obtenir le plan hebdomadaire de Lumina.",
+      "appliedTitle": "Plan hebdomadaire appliqué",
+      "appliedDesc": "Des dates de travail estimées ont été définies pour vos tâches.",
+      "applyErrorDesc": "Un problème est survenu lors de l'enregistrement des dates de planification."
+    }
+  },
+  "onboarding": {
+    "progress": {
+      "step": "Étape {{current}} sur {{total}}",
+      "percentCompleted": "{{percent}} % terminé"
+    },
+    "next": "Suivant",
+    "saveAndContinue": "Enregistrer et continuer",
+    "workHours": {
+      "heading": "Définissez vos horaires de travail",
+      "subheading": "Indiquez votre emploi du temps habituel pour que nous planifiions vos tâches pendant vos heures les plus productives, sans empiéter sur votre temps personnel.",
+      "workDays": "Jours de travail",
+      "monToFri": "Lun - Ven",
+      "dailySchedule": "Horaires quotidiens",
+      "startTime": "Heure de début",
+      "endTime": "Heure de fin",
+      "setLater": "Je le ferai plus tard",
+      "privacyNote": "Vous seul voyez vos horaires. Nous les utilisons pour planifier vos tâches.",
+      "days": {
+        "mon": "L",
+        "tue": "M",
+        "wed": "M",
+        "thu": "J",
+        "fri": "V",
+        "sat": "S",
+        "sun": "D"
+      }
+    },
+    "profileCompletion": {
+      "heading": "Complétez votre profil",
+      "subheading": "Définissez votre présence dans l'écosystème Focusly.",
+      "profilePhoto": "Photo de profil",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "ex. : Alex Rivera",
+      "jobTitle": "Poste / rôle",
+      "jobTitlePlaceholder": "ex. : Architecte systèmes principal",
+      "focusPhilosophy": "Philosophie de concentration",
+      "charCounter": "{{count}} / 160 MAX",
+      "bioPlaceholder": "Décrivez brièvement votre façon d'aborder le travail en profondeur...",
+      "continueToDashboard": "Continuer vers le tableau de bord",
+      "completeLater": "Compléter plus tard"
+    },
+    "calendarConnection": {
+      "chooseProvider": "Choisissez un fournisseur",
+      "selectService": "Sélectionnez votre service d'agenda pour continuer",
+      "googleCalendar": "Google Agenda",
+      "syncDesc": "Synchroniser les événements de Google",
+      "skipForNow": "Passer pour l'instant",
+      "connectedHeading": "Calendrier connecté !",
+      "connectedDesc": "Nous avons récupéré {{count}} événements de votre calendrier.",
+      "continue": "Continuer",
+      "privacyNote": "Nous lisons et mettons à jour uniquement les événements de votre agenda principal pour les synchroniser avec vos tâches. Vous pouvez vous déconnecter à tout moment."
+    },
+    "focusBlocks": {
+      "heading": "Personnalisez vos blocs de concentration",
+      "subheading": "Choisissez la durée de vos sessions de travail en profondeur et de vos pauses. Nous organiserons votre calendrier intelligent selon votre rythme.",
+      "focusSession": "Session de concentration",
+      "deepWorkDuration": "Durée du travail en profondeur",
+      "length": "Durée",
+      "minutes": "{{count}} min",
+      "recoveryBreaks": "Pauses de récupération",
+      "restRecharge": "Reposez-vous et rechargez",
+      "shortBreak": "Pause courte",
+      "shortBreakNote": "Après chaque session de concentration.",
+      "longBreak": "Pause longue",
+      "longBreakNote": "Après 4 sessions consécutives.",
+      "infoLabel": "Ce que cela change dans votre journée :",
+      "infoDesc": "Nous chercherons des créneaux libres dans votre calendrier et les remplirons avec ces blocs de concentration, pour que vous ne travailliez jamais trop sans pause.",
+      "useDefaults": "Utiliser les valeurs Pomodoro (25 min / 5 min)"
+    },
+    "finalSetup": {
+      "steps": {
+        "importing": "Importation des tâches depuis les intégrations",
+        "analyzing": "Analyse de vos pics d'énergie et habitudes",
+        "finalizing": "Finalisation du planning hebdomadaire"
+      },
+      "headingPart1": "Nous peaufinons votre",
+      "headingGradient": "calendrier intelligent...",
+      "subheading": "Nous analysons vos habitudes pour créer le planning idéal.",
+      "optimizing": "Optimisation des blocs de concentration..."
+    }
+  },
+  "landing": {
+    "newBadge": "✨ Nouveau : les espaces de travail 2.0 sont disponibles →",
+    "heroTitle": "Tout ce qu'il vous faut pour rester concentré.",
+    "heroSubtitle": "Organisez projets, tâches, calendriers, notes et espaces de travail dans une seule et belle plateforme de productivité.",
+    "getStarted": "Commencer 🚀",
+    "watchDemo": "Voir la démo",
+    "trustedBy": "Adopté par plus de 10 000 créateurs",
+    "features": {
+      "heading": "Le système d'exploitation de la productivité.",
+      "subheading": "Des outils puissants pour les équipes performantes. Simplifiez votre façon de travailler.",
+      "workspaces": {
+        "title": "Espaces de travail",
+        "description": "Séparez sans effort projets personnels, startup et projets annexes grâce à des espaces de travail dédiés."
+      },
+      "tasks": {
+        "title": "Tâches",
+        "description": "Créez des listes, priorisez et ajoutez des libellés, des étiquettes, des responsables et des échéances."
+      },
+      "calendar": {
+        "title": "Calendrier",
+        "description": "Synchronisez et regroupez toutes vos tâches et vos créneaux de concentration directement depuis Google Agenda."
+      },
+      "notes": {
+        "title": "Notes",
+        "description": "De la documentation en Markdown pour les spécifications, plans et consignes de vos projets."
+      },
+      "aiAssistant": {
+        "title": "Assistant IA",
+        "description": "Un assistant intelligent planifie vos blocs de concentration, met à jour les statuts et résume les fichiers."
+      },
+      "analytics": {
+        "title": "Analyses",
+        "description": "Des indicateurs détaillés révèlent vos tendances de concentration et vos habitudes."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Des mises à jour intelligentes qui ne vous préviennent que lorsque c'est vraiment utile."
+      }
+    },
+    "ai": {
+      "heading": "Découvrez votre partenaire de productivité IA.",
+      "subheading": "Focusly AI agit comme un copilote intelligent qui comprend vos projets, analyse votre énergie et organise votre journée.",
+      "tryButton": "Essayer Focusly AI",
+      "bullets": {
+        "createTasks": {
+          "title": "Créez des tâches à partir de rien",
+          "desc": "Décrivez un objectif : nous structurons la liste de tâches, les priorités et les échéances."
+        },
+        "summarize": {
+          "title": "Résumez tout",
+          "desc": "Synchronisez des transcriptions ou des documents et obtenez les actions clés."
+        },
+        "automate": {
+          "title": "Automatisez vos processus",
+          "desc": "Déclenchez des routines selon les mises à jour de votre calendrier ou de vos tâches."
+        },
+        "instantAnswers": {
+          "title": "Réponses instantanées",
+          "desc": "Interrogez tout le contexte de votre espace de travail en un instant."
+        }
+      }
+    },
+    "howItWorks": {
+      "heading": "Pensé pour réussir.",
+      "subheading": "Passez du chaos à la concentration en quatre étapes simples.",
+      "step1": {
+        "title": "Créez des espaces de travail 🗂",
+        "desc": "Montez des laboratoires privés pour vos projets, startups ou objectifs séparés."
+      },
+      "step2": {
+        "title": "Créez des tâches 📝",
+        "desc": "Découpez vos objectifs en checklists structurées, définissez les priorités et reliez les éléments directement à vos espaces de travail."
+      },
+      "step3": {
+        "title": "Temps de concentration ⚡",
+        "desc": "Lancez des sprints de concentration avec des minuteurs personnalisés et de belles cartes de progression pour rester dans votre bulle."
+      },
+      "step4": {
+        "title": "Créez des projets 📁",
+        "desc": "Des tableaux de jalons suivent tous les éléments essentiels."
+      },
+      "plusMore": "Et bien plus : statut de concentration 🟢, analyses intelligentes 📈, rappels 🔔"
+    },
+    "pricing": {
+      "heading": "Des forfaits pour chaque besoin.",
+      "subheading": "Commencez gratuitement, évoluez à votre rythme.",
+      "perMonth": " / mois",
+      "free": {
+        "name": "Gratuit",
+        "tagline": "Idéal pour les particuliers.",
+        "cta": "Commencer",
+        "features": [
+          "1 espace de travail utilisateur",
+          "Tâches illimitées",
+          "Calendrier de base"
+        ]
+      },
+      "pro": {
+        "badge": "ESSAI GRATUIT",
+        "name": "Pro",
+        "tagline": "Pour les utilisateurs avancés et les professionnels.",
+        "cta": "Passer à Pro",
+        "features": [
+          "Espaces de travail illimités",
+          "Assistant IA (500 exécutions)",
+          "Analyses avancées",
+          "Intégration Google Agenda"
+        ]
+      },
+      "enterprise": {
+        "name": "Entreprise",
+        "tagline": "Pour une productivité maximale.",
+        "cta": "Passer à Entreprise",
+        "features": [
+          "Exécutions illimitées de Lumina IA",
+          "Traitement prioritaire dans la file IA",
+          "Insights et audits avancés",
+          "Export des espaces de travail (PDF/Markdown)",
+          "Support prioritaire et accès bêta",
+          "SLA et protocoles de sécurité"
+        ]
+      }
+    },
+    "testimonials": {
+      "heading": "La confiance des meilleurs.",
+      "items": [
+        {
+          "role": "Responsable produit, Stripe",
+          "quote": "Focusly a changé la façon de travailler de notre équipe design. Les blocs de temps ont réduit les retards de projet de près de 40 %."
+        },
+        {
+          "role": "CTO, Linear",
+          "quote": "La synchronisation avec le calendrier est parfaite. L'intégration de l'IA fait des merveilles pour organiser ma journée."
+        },
+        {
+          "role": "Fondateur et PDG, Raycast",
+          "quote": "La séparation par espaces de travail est exactement ce qu'il me fallait. Minimaliste, haut de gamme et extrêmement rapide."
+        }
+      ]
+    },
+    "faq": {
+      "heading": "Questions fréquentes",
+      "items": [
+        {
+          "q": "Comment fonctionne l'intégration avec Google Agenda ?",
+          "a": "Focusly s'intègre à Google Agenda pour synchroniser instantanément toutes vos réunions et vos blocs, et éviter les doubles réservations."
+        },
+        {
+          "q": "Mes données sont-elles en sécurité ?",
+          "a": "Oui. Vos données circulent chiffrées en HTTPS, ne servent qu'à fournir le service et ne sont jamais vendues. Consultez notre Avis de confidentialité pour en savoir plus."
+        },
+        {
+          "q": "Puis-je utiliser Focusly gratuitement ?",
+          "a": "Bien sûr : notre forfait Gratuit inclut toutes les fonctions essentielles de gestion des tâches et du calendrier."
+        }
+      ]
+    },
+    "footer": {
+      "tagline": "Le système d'exploitation ouvert pour les équipes performantes.",
+      "product": "Produit",
+      "company": "Entreprise",
+      "legal": "Mentions légales",
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "blog": "Blog",
+      "resources": "Ressources",
+      "aboutUs": "À propos",
+      "careers": "Carrières",
+      "terms": "Conditions",
+      "privacy": "Confidentialité",
+      "copyright": "© {{year}} Focusly Tech. Conçu pour vous aider à rester concentré."
+    }
+  },
+  "colorNames": {
+    "black": "Noir",
+    "slate": "Ardoise",
+    "zinc": "Zinc",
+    "darkGreen": "Vert foncé",
+    "red": "Rouge",
+    "orange": "Orange",
+    "amber": "Ambre",
+    "yellow": "Jaune",
+    "lime": "Citron vert",
+    "green": "Vert",
+    "emerald": "Émeraude",
+    "teal": "Sarcelle",
+    "seafoam": "Vert d'eau",
+    "cyan": "Cyan",
+    "sky": "Ciel",
+    "skyBlue": "Bleu ciel",
+    "blue": "Bleu",
+    "indigo": "Indigo",
+    "purple": "Pourpre",
+    "violet": "Violet",
+    "fuchsia": "Fuchsia",
+    "pink": "Rose",
+    "rose": "Rose poudré",
+    "lightSlate": "Ardoise clair",
+    "mediumSlate": "Ardoise moyen",
+    "darkSlate": "Ardoise foncé"
+  },
+  "selection": {
+    "select": "Sélectionner",
+    "selectAll": "Tout sélectionner",
+    "selectedCount_one": "{{count}} sélectionné",
+    "selectedCount_other": "{{count}} sélectionnés",
+    "deleteCount": "Supprimer ({{count}})"
+  },
+  "deleteConfirm": {
+    "andMore": "et {{count}} de plus"
+  },
+  "projectTasks": {
+    "loading": "Chargement des tâches…",
+    "attendees": "Invités : {{names}}",
+    "empty": {
+      "title": "Aucune tâche dans vos projets pour l'instant",
+      "description": "Créez des tâches dans un projet pour les voir ici, regroupées par statut.",
+      "action": "Créer une tâche"
+    },
+    "emptySearch": {
+      "title": "Aucune tâche trouvée",
+      "description": "Aucune tâche ne correspond à votre recherche. Essayez d'autres mots."
+    },
+    "error": {
+      "title": "Impossible de charger les tâches",
+      "description": "Vérifiez votre connexion et réessayez.",
+      "retry": "Réessayer"
+    },
+    "loadMore": "Charger plus de tâches",
+    "loadingMore": "Chargement…",
+    "toast": {
+      "authError": "Reconnectez-vous pour continuer",
+      "created": "Tâche créée",
+      "createFailed": "Impossible de créer la tâche",
+      "updateFailed": "Impossible de mettre à jour la tâche",
+      "deleted_one": "Tâche supprimée",
+      "deleted_other": "{{count}} tâches supprimées",
+      "deleteFailed": "Certaines tâches n'ont pas pu être supprimées",
+      "completed": "Tâche terminée",
+      "undo": "Annuler"
+    },
+    "moveTo": "Déplacer vers",
+    "changeStatus": "Changer le statut",
+    "markDone": "Marquer comme terminée",
+    "markNotDone": "Marquer comme non terminée",
+    "toggleSubtasks": "Afficher ou masquer les sous-tâches",
+    "linkedDocument": "Document lié",
+    "addTo": "Ajouter une tâche à {{status}}",
+    "quickAddPlaceholder": "Nouvelle tâche dans {{status}} (Entrée pour en ajouter une autre, Échap pour fermer)",
+    "allProjects": "Tous les projets",
+    "showEmptyStatuses": "Afficher les statuts vides",
+    "columns": {
+      "task": "Tâche",
+      "project": "Projet",
+      "due": "Échéance",
+      "priority": "Priorité",
+      "estimate": "Est."
+    },
+    "summary": {
+      "completed": "{{done}} sur {{total}} terminées",
+      "progress": "Progression : {{percent}} %",
+      "remaining": "Il reste {{time}}",
+      "overdue_one": "{{count}} en retard",
+      "overdue_other": "{{count}} en retard",
+      "loaded": "{{loaded}} sur {{total}} affichées"
+    },
+    "filters": {
+      "overdue": "En retard",
+      "noDate": "Sans date",
+      "highPriority": "Priorité haute",
+      "clear": "Effacer les filtres"
+    },
+    "sort": {
+      "dueDate": "Par date",
+      "priority": "Par priorité",
+      "title": "Par nom",
+      "recent": "Les plus récentes d'abord"
+    },
+    "emptyProject": {
+      "title": "Ce projet n'a encore aucune tâche",
+      "description": "Créez la première pour commencer à organiser le travail du projet."
+    },
+    "emptyFilters": {
+      "title": "Aucune tâche ne correspond aux filtres",
+      "description": "Retirez un filtre pour voir plus de tâches."
+    },
+    "bulk": {
+      "complete": "Terminer",
+      "move": "Déplacer vers…"
+    },
+    "bulkDelete": {
+      "title_one": "Supprimer {{count}} tâche ?",
+      "title_other": "Supprimer {{count}} tâches ?",
+      "description_one": "Elle sera définitivement supprimée, avec ses sous-tâches.",
+      "description_other": "Elles seront définitivement supprimées, avec leurs sous-tâches."
+    }
+  },
+  "workspaceLibrary": {
+    "loadingDocuments": "Chargement des documents…",
+    "toast": {
+      "deleteProjectsTitle": "Supprimer des projets",
+      "deleteProjectsDesc": "Voulez-vous vraiment supprimer les projets suivants : {{names}} ? Les espaces de travail qu'ils contiennent seront dissociés mais pas supprimés.",
+      "projectsDeleted_one": "Projet supprimé",
+      "projectsDeleted_other": "{{count}} projets supprimés",
+      "projectsDeleteFailed_one": "{{count}} projet n'a pas pu être supprimé.",
+      "projectsDeleteFailed_other": "{{count}} projets n'ont pas pu être supprimés.",
+      "workspacesDeleted_one": "Espace de travail supprimé",
+      "workspacesDeleted_other": "{{count}} espaces de travail supprimés",
+      "workspacesDeleteFailed_one": "{{count}} espace de travail n'a pas pu être supprimé.",
+      "workspacesDeleteFailed_other": "{{count}} espaces de travail n'ont pas pu être supprimés.",
+      "deletedTitle": "Projets supprimés"
+    },
+    "breadcrumb": {
+      "home": "Accueil",
+      "folderFallback": "Dossier"
+    },
+    "newFolder": "Nouveau dossier",
+    "newWorkspace": "Nouvel espace de travail",
+    "status": {
+      "recent": "Récent",
+      "empty": "Vide"
+    },
+    "notesInside_one": "{{count}} note à l'intérieur",
+    "notesInside_other": "{{count}} notes à l'intérieur",
+    "lastUpdated": "Dernière mise à jour : ",
+    "error": "Erreur lors du chargement des espaces de travail. Veuillez réessayer.",
+    "emptySearch": {
+      "title": "Aucun résultat",
+      "desc": "Aucun espace de travail ne correspond à votre recherche ou à votre filtre. Essayez de les ajuster."
+    },
+    "emptyFolder": {
+      "title": "Aucun espace de travail pour l'instant",
+      "desc": "Des notes légères pour organiser votre planification stratégique. Créez votre premier espace de travail pour commencer.",
+      "action": "Créer un espace de travail",
+      "subAction": "Créez une note ou un document"
+    },
+    "recentWorkspace": "ESPACE DE TRAVAIL RÉCENT",
+    "emptyFolderSnippet": "Ce dossier est vide. Créez votre premier espace de travail pour commencer...",
+    "filterAndSortNotes": "Filtrer et trier les notes",
+    "switchViewMode": "Changer de mode d'affichage",
+    "sortNotes": "Trier les notes",
+    "filterNotes": "Filtrer les notes",
+    "allNotes": "Toutes les notes",
+    "linkedToTask": "Liées à une tâche",
+    "withBackgroundCover": "Avec image de couverture",
+    "viewGallery": "Galerie",
+    "viewGrid": "Grille",
+    "viewList": "Liste",
+    "deleteWorkspace": "Supprimer l'espace de travail",
+    "deleteDialog": {
+      "title": "Supprimer le projet",
+      "description": "Voulez-vous vraiment supprimer le projet « {{name}} » ?",
+      "bulkTitle": "Supprimer {{count}} projets",
+      "bulkDescription": "Voulez-vous vraiment supprimer les {{count}} projets suivants ?",
+      "workspacesWarning_one": "Ce projet contient {{count}} espace de travail qui sera définitivement supprimé.",
+      "workspacesWarning_other": "Ce projet contient {{count}} espaces de travail qui seront définitivement supprimés.",
+      "bulkWorkspacesWarning_one": "Ces projets contiennent au total {{count}} espace de travail qui sera définitivement supprimé.",
+      "bulkWorkspacesWarning_other": "Ces projets contiennent au total {{count}} espaces de travail qui seront définitivement supprimés.",
+      "noWorkspacesWarning": "Cette action est irréversible."
+    },
+    "deleteWorkspacesDialog": {
+      "title": "Supprimer l'espace de travail",
+      "description": "Voulez-vous vraiment supprimer « {{name}} » ?",
+      "bulkTitle": "Supprimer {{count}} espaces de travail",
+      "bulkDescription": "Voulez-vous vraiment supprimer les {{count}} espaces de travail suivants ?",
+      "warning_one": "Le contenu de cet espace de travail sera définitivement supprimé.",
+      "warning_other": "Le contenu de {{count}} espaces de travail sera définitivement supprimé."
+    },
+    "renameFolder": "Renommer le dossier",
+    "customizeStyle": "Personnaliser le style",
+    "deleteFolder": "Supprimer le dossier",
+    "customizeDialog": {
+      "title": "Personnaliser le dossier"
+    },
+    "folderName": "Nom du dossier",
+    "iconShape": "Forme de l'icône",
+    "filled": "Rempli",
+    "solid": "Plein",
+    "outlined": "Contour",
+    "folderColor": "Couleur du dossier",
+    "colorAccent": "Couleur d'accent",
+    "colors": {
+      "Red": "Rouge",
+      "Orange": "Orange",
+      "Amber": "Ambre",
+      "Yellow": "Jaune",
+      "Green": "Vert",
+      "Emerald": "Émeraude",
+      "Teal": "Sarcelle",
+      "Cyan": "Cyan",
+      "Sky": "Ciel",
+      "Blue": "Bleu",
+      "Indigo": "Indigo",
+      "Purple": "Pourpre",
+      "Fuchsia": "Fuchsia",
+      "Pink": "Rose",
+      "Rose": "Rose poudré",
+      "Slate": "Ardoise"
+    },
+    "createDialog": {
+      "title": "Créer un nouveau dossier"
+    },
+    "namePlaceholder": "ex. : Plan de sprint, Personnel, Marketing",
+    "createFolder": "Créer le dossier",
+    "editedOn": "Modifié le {{date}}",
+    "card": {
+      "created": "Créé",
+      "taskStatus": "Statut de la tâche",
+      "time": "Temps estimé / réel",
+      "none": "Aucun",
+      "noTask": "Aucune tâche liée",
+      "more_one": "+{{count}} de plus",
+      "more_other": "+{{count}} de plus",
+      "doneCount": "{{done}}/{{total}} terminées",
+      "linkedTasks_one": "Tâches liées ({{count}})",
+      "linkedTasks_other": "Tâches liées ({{count}})",
+      "noContent": "Pas encore de contenu",
+      "options": "Options du document"
+    },
+    "folderView": {
+      "label": "Vue du projet",
+      "documents": "Documents",
+      "tasks": "Tâches"
+    }
+  },
+  "allProjectsModal": {
+    "title": "Tous les dossiers",
+    "subtitle": "Parcourez et sélectionnez les dossiers de votre bibliothèque.",
+    "searchPlaceholder": "Rechercher parmi {{count}} dossiers...",
+    "emptyNoFolders": "Aucun dossier pour l'instant",
+    "emptyNoMatch": "Aucun dossier correspondant",
+    "emptyNoFoldersDesc": "Créez un dossier personnalisé dans la bibliothèque ou la barre latérale pour regrouper vos plans.",
+    "emptyNoMatchDesc": "Essayez d'ajuster vos termes de recherche.",
+    "items": "{{count}} éléments",
+    "visible": "Visible",
+    "select": "Sélectionner",
+    "deleteSelected": "Supprimer ({{count}})",
+    "applyChanges": "Appliquer les modifications"
+  },
+  "createProjectModal": {
+    "title": "Créer un nouveau projet",
+    "subtitle": "Choisissez un nom et une couleur pour garder vos espaces de travail bien organisés.",
+    "projectName": "Nom du projet",
+    "namePlaceholder": "ex. : Stratégie marketing, Plans du T1...",
+    "projectColor": "Couleur du projet",
+    "create": "Créer le projet"
+  },
+  "updateProjectModal": {
+    "title": "Modifier le dossier",
+    "subtitle": "Modifiez le nom et la couleur du dossier pour mieux organiser vos espaces de travail.",
+    "folderColor": "Couleur du dossier",
+    "update": "Mettre à jour le dossier"
+  },
+  "templatesModal": {
+    "title": "Explorateur de modèles professionnels",
+    "subtitle": "Sélectionnez un modèle et attribuez-le au dossier du projet de destination",
+    "searchPlaceholder": "Rechercher des modèles...",
+    "previewing": "Aperçu",
+    "liveRenderedPreview": "Aperçu en direct",
+    "generalUnassigned": "Général / Non attribué",
+    "useTemplate": "Utiliser ce modèle",
+    "proTip": "Astuce Pro",
+    "categories": {
+      "all": "Tout",
+      "productStrategy": "Produit et stratégie",
+      "engineering": "Ingénierie",
+      "productivity": "Productivité",
+      "systems": "Systèmes"
+    }
+  },
+  "tasks": {
+    "createTask": "Nouvelle tâche",
+    "changeStatus": "Changer le statut",
+    "changePriority": "Changer la priorité",
+    "header": {
+      "inboxTitle": "Boîte de réception",
+      "inboxEyebrow": "Boîte de réception",
+      "todayTitle": "Plan du jour",
+      "todayEyebrow": "Plan du jour",
+      "upcomingTitle": "Tâches à venir",
+      "upcomingEyebrow": "Tâches à venir",
+      "addToInbox": "Ajouter à la boîte de réception",
+      "newTaskToday": "Nouvelle tâche pour aujourd'hui",
+      "newUpcomingTask": "Nouvelle tâche à venir",
+      "aiOrganize": "Organiser avec l'IA",
+      "pending": "En attente",
+      "completed": "Terminées"
+    },
+    "controls": {
+      "searchPlaceholder": "Rechercher des tâches, des tags...",
+      "priority": "Priorité",
+      "assignees": "Responsables",
+      "allAssignees": "Tous les responsables",
+      "all": "Toutes"
+    },
+    "status": {
+      "all": "Toutes",
+      "todo": "À faire",
+      "planning": "Planification",
+      "scheduled": "Planifiée",
+      "review": "En revue",
+      "pending": "En attente",
+      "onHold": "Suspendue",
+      "done": "Terminée",
+      "backlog": "Backlog",
+      "archived": "Archivée"
+    },
+    "priority": {
+      "high": "Haute",
+      "medium": "Moyenne",
+      "low": "Basse",
+      "none": "Sans priorité",
+      "critical": "Urgente"
+    },
+    "columns": {
+      "taskName": "NOM DE LA TÂCHE",
+      "subtasks": "SOUS-TÂCHES",
+      "priority": "PRIORITÉ",
+      "deadline": "ÉCHÉANCE",
+      "estimated": "ESTIMÉ",
+      "real": "RÉEL",
+      "actions": "ACTIONS"
+    },
+    "actions": {
+      "startFocus": "Démarrer la concentration",
+      "editTask": "Modifier la tâche",
+      "markAsTodo": "Marquer comme à faire",
+      "markAsDone": "Marquer comme terminée",
+      "deleteTask": "Supprimer la tâche"
+    },
+    "subtasksCount": "{{completed}}/{{total}} sous-tâches",
+    "dates": {
+      "all": "Toutes les tâches",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "overdue": "En retard",
+      "in3Days": "Dans 3 jours",
+      "nextWeek": "Semaine prochaine",
+      "thisWeek": "Cette semaine",
+      "thisMonth": "Ce mois-ci",
+      "noDate": "Sans date",
+      "noDateInbox": "Sans date (boîte de réception)"
+    },
+    "empty": {
+      "noTasksTitle": "Aucune tâche pour l'instant",
+      "noTasksDesc": "Planifiez votre journée et boostez votre productivité. Créez votre première tâche pour la voir ici.",
+      "noMatchTitle": "Aucune tâche ne correspond à votre recherche",
+      "noMatchDesc": "Essayez un autre mot-clé ou filtre pour trouver ce que vous cherchez, ou créez une nouvelle tâche ci-dessus.",
+      "clearFilters": "Effacer tous les filtres",
+      "noTasksInTab": "Aucune tâche dans {{tab}}",
+      "noTasksInTabDesc": "Déplacez une tâche ici ou changez d'onglet pour voir des tâches."
+    },
+    "pagination": {
+      "showing": "{{count}} tâches à venir affichées sur {{total}}"
+    },
+    "bulk": {
+      "selected_one": "{{count}} tâche sélectionnée",
+      "selected_other": "{{count}} tâches sélectionnées",
+      "cancel": "Annuler",
+      "deleteSelected": "Supprimer la sélection",
+      "confirmTitle": "Confirmer la suppression",
+      "confirmDesc_one": "Voulez-vous vraiment supprimer {{count}} tâche sélectionnée ? Cette action est irréversible.",
+      "confirmDesc_other": "Voulez-vous vraiment supprimer {{count}} tâches sélectionnées ? Cette action est irréversible.",
+      "deleteButton": "Supprimer"
+    },
+    "properties": {
+      "status": "Statut",
+      "priority": "Priorité",
+      "category": "Catégorie",
+      "tags": "Tags",
+      "addTag": "Ajouter",
+      "tagPlaceholder": "#tag",
+      "scheduleAndTimes": "Planning et horaires",
+      "plannedDate": "Date prévue",
+      "estimatedDuration": "Durée estimée",
+      "durationPlaceholder": "4 heures (ou 2h 30m)",
+      "startTime": "Heure de début",
+      "trackedDuration": "Durée suivie",
+      "plannedWindow": "Créneau prévu",
+      "createdOn": "Créée dans",
+      "createdAt": "Créée le",
+      "dueOn": "Échéance",
+      "workspacesProjects": "Espaces de travail / Projets",
+      "backgroundColor": "Couleur de fond",
+      "removeBackground": "Retirer le fond",
+      "removeBackgroundColor": "Retirer la couleur de fond",
+      "noBackground": "Sans fond",
+      "custom": "Personnalisée",
+      "logTime": "Enregistrer du temps",
+      "noTimeLogged": "Aucun temps enregistré pour l'instant.",
+      "titlePlaceholder": "Terminer le rapport de performance trimestriel"
+    },
+    "projectRequired": {
+      "title": "Choisissez un projet",
+      "description": "Créez d'abord un projet : dans cette vue, les tâches appartiennent toujours à un projet."
+    },
+    "deleteTaskDialog": {
+      "title": "Supprimer la tâche",
+      "description": "Voulez-vous vraiment supprimer la tâche « {{title}} » ?",
+      "warning": "Elle sera supprimée avec ses sous-tâches. Cette action est irréversible."
+    },
+    "createProjectTaskModal": {
+      "noEstimate": "Sans estimation",
+      "selectProject": "Choisir un projet",
+      "toast": {
+        "titleRequired": "Titre requis",
+        "titleRequiredDesc": "Saisissez un titre pour la tâche.",
+        "taskUpdated": "Tâche mise à jour",
+        "workspaceTitleRequired": "Titre requis",
+        "workspaceTitleRequiredDesc": "Saisissez un titre pour l'espace de travail.",
+        "workspaceLinked": "Espace de travail créé et lié",
+        "workspaceCreateFailed": "Impossible de créer l'espace de travail. Réessayez."
+      },
+      "titlePlaceholder": "Titre de la tâche...",
+      "status": "Statut",
+      "priority": "Priorité",
+      "tagsModules": "Tags / Modules",
+      "tagPlaceholder": "Nom du tag...",
+      "scheduleExecution": "Planning et exécution",
+      "autoSynced": "Synchronisée automatiquement avec le plan du jour",
+      "dueDate": "Date d'échéance",
+      "duration": "Durée",
+      "setDuration": "Définir la durée",
+      "linkedSpec": "Spécification et PRD liés",
+      "createWorkspace": "Créer un espace de travail",
+      "changeWorkspace": "Changer d'espace de travail",
+      "linkWorkspace": "Lier un espace de travail",
+      "noWorkspaceLinked": "Aucun espace de travail lié",
+      "clickToLink": "Cliquez pour associer cette tâche à une spécification ou à une note",
+      "unlinkWorkspace": "Dissocier l'espace de travail",
+      "openWorkspace": "Ouvrir",
+      "linked": "Lié",
+      "descAndContext": "Description et contexte",
+      "descPlaceholder": "Ajoutez une description plus détaillée...",
+      "subtasks": "Sous-tâches",
+      "subtaskPlaceholder": "Ajouter une sous-tâche... (appuyez sur Entrée)",
+      "add": "Ajouter",
+      "aiBreakdown": "Découpage par Lumina AI",
+      "deleteTask": "Supprimer la tâche",
+      "createMore": "Créer d'autres",
+      "cancel": "Annuler",
+      "createTask": "Créer la tâche",
+      "saveChanges": "Enregistrer",
+      "createWorkspaceDialogDesc": "Créez un nouvel espace de travail avec le titre de votre choix ; il sera automatiquement lié à cette tâche.",
+      "project": "Projet :",
+      "workspaceTitle": "Titre de l'espace de travail",
+      "workspaceTitlePlaceholder": "Ex. : Spécifications techniques, Exigences, PRD...",
+      "createAndLink": "Créer et lier",
+      "searchWorkspacePlaceholder": "Rechercher un espace de travail ou une note..."
+    }
+  },
+  "projects": {
+    "loading": "Chargement des projets…",
+    "newProject": "Nouveau projet",
+    "createCleanFolder": "Créer un dossier vierge",
+    "showingResultsFor": "{{count}} résultats pour « {{term}} »",
+    "showingCountOfTotal": "{{current}} projets affichés sur {{total}}",
+    "searchProjects": "Rechercher des projets...",
+    "searchTasks": "Rechercher des tâches...",
+    "filterAndSort": "Filtrer et trier",
+    "noProjects": "Aucun projet disponible",
+    "filterBy": "Filtrer par :",
+    "statusFilter": "Statut :",
+    "modifiedDate": "Dernière modification",
+    "tags": "Tags",
+    "tabs": {
+      "viewProjects": "Voir les projets",
+      "viewTasks": "Voir les tâches des projets"
+    },
+    "sort": {
+      "title": "Trier les projets",
+      "recent": "Mis à jour récemment",
+      "nameAsc": "Nom (A à Z)",
+      "notesCount": "Nombre de notes",
+      "mostNotes": "Le plus de notes",
+      "filterByColor": "Filtrer par couleur",
+      "allColors": "Toutes les couleurs",
+      "resetFilters": "Réinitialiser les filtres"
+    }
+  },
+  "workspaceEditor": {
+    "header": {
+      "addIcon": "Ajouter une icône",
+      "changeIcon": "Changer d'icône",
+      "addCover": "Ajouter une couverture",
+      "changeCover": "Changer de couverture",
+      "focusView": "Vue centrée",
+      "defaultView": "Vue normale"
+    },
+    "untitledNote": "Note sans titre",
+    "saving": "enregistrement",
+    "saved": "enregistré",
+    "savingChanges": "Enregistrement des modifications...",
+    "allChangesSaved": "Toutes les modifications sont enregistrées",
+    "openSidebar": "Ouvrir le panneau latéral",
+    "closeSidebar": "Fermer le panneau",
+    "detectLanguage": "Détecter la langue",
+    "startDictation": "Démarrer la dictée",
+    "stopDictation": "Arrêter la dictée",
+    "focusMode": "Mode concentration",
+    "normalView": "Vue normale",
+    "importDocument": "Importer un document",
+    "exportDocument": "Exporter le document",
+    "exportFailed": "Échec de l'export",
+    "exportFailedDesc": "Impossible de générer le document Word.",
+    "markdown": "Markdown (.md)",
+    "word": "Word (.docx)",
+    "searchTasksToLink": "Rechercher des tâches à lier...",
+    "palette": {
+      "availableTasks": "TÂCHES DISPONIBLES",
+      "linkedCount": "{{count}} liées",
+      "noTasksFound": "Aucune tâche trouvée",
+      "pressKey": "Appuyez sur",
+      "toLinkOrUnlink": "pour lier ou dissocier des tâches"
+    },
+    "outline": {
+      "noHeadings": "Aucun titre dans cette note",
+      "addHeadingsHint": "Ajoutez des titres en syntaxe markdown (# Titre ou ## Section) pour construire le plan de navigation.",
+      "searchPlaceholder": "Rechercher dans le plan...",
+      "locationInDoc": "Emplacement dans le document",
+      "jumpTooltip": "Aller à cette section dans l'éditeur",
+      "goToSection": "Aller à la section",
+      "noSectionsFound": "Aucune section trouvée pour « {{query}} »"
+    },
+    "graph": {
+      "rootDoc": "Document racine",
+      "mainHeadingH1": "Titre principal (H1)",
+      "sectionH2": "Section (H2)",
+      "subSection": "Sous-section (H{{level}})",
+      "noConnections": "0 connexion",
+      "terminalSection": "Section terminale",
+      "connectionCount": "{{count}} connexions",
+      "document": "Document",
+      "tabH1": "Titres (H1)",
+      "tabH2": "Sections (H2)",
+      "tabH3": "Sous-sections (H3+)",
+      "filterNodesPlaceholder": "Filtrer les nœuds...",
+      "reorganize": "Réorganiser",
+      "emptyGuideHint": "Tapez des titres (# Section) dans votre note pour faire grandir le graphe en direct",
+      "resetPositionsAndZoom": "Réinitialiser les positions et le zoom",
+      "centerView": "Centrer la vue",
+      "expandDetails": "Afficher les détails",
+      "minimizePanel": "Réduire le panneau",
+      "connectionsShort": "conn.",
+      "jumpDone": "C'est fait !",
+      "jump": "Aller",
+      "hierarchy": "Hiérarchie :",
+      "root": "Racine",
+      "level": "Niveau {{level}}",
+      "connections": "Connexions :",
+      "sectionLocated": "Section trouvée dans l'éditeur !",
+      "goToSectionInEditor": "Aller à la section dans l'éditeur"
+    },
+    "sidebar": {
+      "outline": "Plan",
+      "graph": "Graphe",
+      "details": "Détails",
+      "words": "Mots",
+      "characters": "Caractères",
+      "readingTime": "Lecture",
+      "headings": "Titres",
+      "document": "DOCUMENT",
+      "structure": "STRUCTURE",
+      "mainHeadings": "Titres principaux",
+      "sections": "Sections",
+      "subsections": "Sous-sections",
+      "paragraphs": "Paragraphes",
+      "linkedTasks": "TÂCHES LIÉES",
+      "link": "Lier",
+      "linkTask": "Lier une tâche",
+      "noLinkedTasks": "Aucune tâche liée",
+      "unlinkTask": "Dissocier la tâche"
+    },
+    "canvases": {
+      "button": "Canvas du document",
+      "title": "Canvas de ce document",
+      "open": "Ouvrir le canvas",
+      "inDocument": "Dans le document",
+      "notInDocument": "Hors du document",
+      "insert": "Insérer dans le document",
+      "delete": "Supprimer",
+      "deleteTitle": "Supprimer « {{name}} » ?",
+      "deleteHint": "Son dessin, ses images et ses liens dans le document seront supprimés.",
+      "dragHint": "Faites glisser un canvas dans le document pour le placer où vous voulez.",
+      "deleteFailed": "Impossible de supprimer le canvas",
+      "deleteFailedDesc": "Réessayez dans un instant.",
+      "limitReached": "Votre forfait inclut {{count}} canvas",
+      "limitReachedDesc": "Supprimez-en un ou passez à Pro pour en créer davantage.",
+      "tooLarge": "Ce canvas a atteint la taille autorisée par votre forfait",
+      "tooLargeDesc": "Vos dernières modifications ne sont pas enregistrées tant qu'il dépasse {{size}}. Retirez des éléments ou passez à Pro.",
+      "imageTooLarge": "Cette image ne sera pas enregistrée",
+      "imageTooLargeDesc": "Avec votre forfait, les images peuvent faire jusqu'à {{size}}.",
+      "imageLimit": "Ce canvas contient déjà toutes les images autorisées par votre forfait",
+      "imageLimitDesc": "Un canvas peut contenir jusqu'à {{count}} images avec votre forfait.",
+      "readOnlyPhone": "Lecture seule sur votre téléphone",
+      "readOnlyPhoneDesc": "Ouvrez-le sur un ordinateur pour le modifier."
+    },
+    "focusButton": "Focus",
+    "startFocus": "Démarrer une session de concentration",
+    "startFocusOn": "Se concentrer sur « {{title}} »"
+  },
+  "legal": {
+    "termsTitle": "Conditions générales",
+    "privacyTitle": "Politique de confidentialité",
+    "backHome": "Retour à l'accueil",
+    "onlySpanish": "Ce document n'est actuellement disponible qu'en espagnol.",
+    "loginNotice": "En continuant, vous acceptez les <terms>Conditions générales</terms> et la <privacy>Politique de confidentialité</privacy> de Focusly.",
+    "aiNotice": "L'IA peut se tromper. Vos messages et le contexte de vos tâches sont traités par un fournisseur d'IA tiers. <privacy>En savoir plus</privacy>",
+    "settingsTitle": "Mentions légales",
+    "settingsDesc": "Les documents qui encadrent votre utilisation de Focusly et le traitement de vos données.",
+    "acceptModal": {
+      "title": "Conditions et confidentialité",
+      "subtitle": "Nous avons besoin de votre consentement pour continuer",
+      "newBody": "Pour utiliser Focusly, veuillez lire et accepter nos <terms>Conditions générales</terms> et notre <privacy>Politique de confidentialité</privacy>.",
+      "updatedBody": "Nous avons mis à jour nos <terms>Conditions générales</terms> et notre <privacy>Politique de confidentialité</privacy>. Veuillez les lire et les accepter pour continuer à utiliser Focusly.",
+      "accept": "J'accepte",
+      "logout": "Se déconnecter",
+      "error": "Impossible d'enregistrer votre acceptation. Veuillez réessayer."
+    }
+  },
+  "billing": {
+    "plans": {
+      "free": {
+        "name": "Focusly Free",
+        "tagline": "Pour vous organiser et essayer Lumina",
+        "price": "Gratuit"
+      },
+      "pro": {
+        "name": "Focusly Pro",
+        "tagline": "Lumina sans limites, jusque dans vos documents"
+      },
+      "recommended": "Recommandé",
+      "current": "Votre forfait actuel",
+      "perInterval": "/ {{interval}}",
+      "interval": {
+        "month": "mois",
+        "year": "an",
+        "week": "semaine",
+        "day": "jour"
+      },
+      "priceLater": "Vous verrez le prix à l'étape suivante",
+      "intervalLabel": "Facturation",
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "monthsFree_one": "{{count}} mois offert",
+      "monthsFree_other": "{{count}} mois offerts",
+      "save": "Économisez {{percent}} %",
+      "perMonthEquivalent": "Soit {{price}}/mois, facturé une fois par an",
+      "trialBadge_one": "Essai gratuit de {{count}} jour",
+      "trialBadge_other": "Essai gratuit de {{count}} jours",
+      "trialNote": "Rien n'est prélevé aujourd'hui. Annulez avant la fin de l'essai et vous ne payez rien.",
+      "cancelAnytime": "Sans engagement : annulez à tout moment."
+    },
+    "features": {
+      "aiTrial_one": "{{count}} message Lumina par mois",
+      "aiTrial_other": "{{count}} messages Lumina par mois",
+      "core": "Tâches, projets et documents",
+      "calendar": "Calendrier et Google Agenda",
+      "editorAi": "IA dans l'éditeur de documents",
+      "unlimitedAi": "Chat illimité avec Lumina (usage raisonnable)",
+      "editorAiPro": "IA dans l'éditeur : rédige, résume et reformule",
+      "everythingFree": "Tout le forfait Free",
+      "cancelAnytime": "Annulez à tout moment",
+      "notIncluded": "Non inclus"
+    },
+    "usage": "{{used}} messages gratuits utilisés sur {{limit}} ce mois-ci",
+    "renewsOn": "Ils se renouvellent le {{date}}",
+    "usageLeft_one": "Il reste {{count}} message gratuit ce mois-ci",
+    "usageLeft_other": "Il reste {{count}} messages gratuits ce mois-ci",
+    "usageNone": "Vous avez utilisé les messages gratuits du mois · de retour le {{date}}",
+    "tryPro": "Essayer Pro",
+    "dailyLimit": {
+      "title": "Vous avez atteint la limite de Lumina pour aujourd'hui",
+      "body_one": "Pro inclut jusqu'à {{count}} utilisation de l'IA par jour. Renouvellement le {{date}}.",
+      "body_other": "Pour que Lumina fonctionne bien pour tout le monde, Pro inclut jusqu'à {{count}} utilisations de l'IA par jour (usage raisonnable). Renouvellement le {{date}}."
+    },
+    "dailyLow": {
+      "title_one": "Il vous reste {{count}} utilisation de Lumina aujourd'hui",
+      "title_other": "Il vous reste {{count}} utilisations de Lumina aujourd'hui",
+      "body_one": "Pro inclut jusqu'à {{count}} par jour dans le cadre d'un usage raisonnable. Renouvellement le {{date}}.",
+      "body_other": "Pro inclut jusqu'à {{count}} par jour dans le cadre d'un usage raisonnable. Renouvellement le {{date}}."
+    },
+    "upgrade": {
+      "title": {
+        "manual": "Changez de forfait",
+        "limit_one": "Vous avez utilisé le message gratuit du mois",
+        "limit_other": "Vous avez utilisé les {{count}} messages gratuits du mois",
+        "editor": "L'IA de l'éditeur fait partie de Pro",
+        "canvas": "Plus de canvas avec Pro"
+      },
+      "subtitle": {
+        "manual": "Choisissez le forfait adapté à votre façon de travailler.",
+        "limit": "Ils se renouvellent le {{date}}. Avec Pro, vous continuez à parler à Lumina dès maintenant.",
+        "editor": "Avec Pro, Lumina rédige, résume et reformule directement dans vos documents.",
+        "canvas": "Avec Pro, vous créez des canvas illimités et plus grands, avec des images jusqu'à 10 Mo."
+      },
+      "cta": "Continuer vers le paiement",
+      "alreadyPro": "Vous avez déjà Focusly Pro",
+      "notConfigured": "Les paiements ne sont pas encore disponibles. Veuillez réessayer plus tard.",
+      "startError": "Impossible d'ouvrir le paiement. Veuillez réessayer.",
+      "close": "Fermer",
+      "ctaTrial_one": "Commencer l'essai gratuit de {{count}} jour",
+      "ctaTrial_other": "Commencer l'essai gratuit de {{count}} jours"
+    },
+    "checkout": {
+      "title": "Finalisez votre abonnement",
+      "back": "Retour aux forfaits",
+      "renews": "Renouvellement automatique chaque {{interval}}",
+      "pay": "S'abonner pour {{price}}",
+      "payNoPrice": "S'abonner",
+      "secure": "Paiement sécurisé avec Stripe. Focusly ne voit jamais les données de votre carte.",
+      "cancelNote": "Vous pouvez annuler à tout moment depuis Profil → Forfaits et facturation.",
+      "error": "Le paiement n'a pas pu être traité. Vérifiez vos informations et réessayez.",
+      "loading": "Chargement du formulaire de paiement…",
+      "applePayDescription": "Abonnement Focusly Pro",
+      "summary": "Récapitulatif de la commande",
+      "plan": {
+        "month": "Mensuel",
+        "year": "Annuel"
+      },
+      "discountOnce": "Code {{code}} ({{value}} de remise sur le premier paiement)",
+      "discountMonths_one": "Code {{code}} ({{value}} de remise pendant {{count}} mois)",
+      "discountMonths_other": "Code {{code}} ({{value}} de remise pendant {{count}} mois)",
+      "discountForever": "Code {{code}} ({{value}} de remise, pour toujours)",
+      "trialRow": "Essai gratuit jusqu'au {{date}}",
+      "free": "Gratuit",
+      "dueToday": "À payer aujourd'hui",
+      "afterTrial": "Le {{date}}, {{price}} vous seront facturés, avec renouvellement automatique.",
+      "disclosure": "En vous abonnant, vous autorisez Focusly à prélever {{price}} de façon récurrente jusqu'à votre résiliation.",
+      "startTrial": "Commencer l'essai gratuit",
+      "promo": {
+        "toggle": "Vous avez un code promo ?",
+        "placeholder": "CODE",
+        "label": "Code promo",
+        "apply": "Appliquer",
+        "applied": "Code {{code}} appliqué",
+        "invalid": "Ce code n'est pas valide ou a expiré.",
+        "error": "Impossible d'appliquer le code. Veuillez réessayer."
+      }
+    },
+    "activating": {
+      "title": "Activation de votre forfait…",
+      "body": "Nous confirmons le paiement avec Stripe."
+    },
+    "done": {
+      "title": "Bienvenue dans Focusly Pro !",
+      "body": "Vous pouvez maintenant utiliser Lumina sans limites, y compris dans l'éditeur.",
+      "cta": "C'est parti",
+      "trialTitle": "Votre essai de Focusly Pro a commencé !",
+      "trialBody": "Lumina illimitée, gratuite jusqu'au {{date}}. Annulez avant et vous ne payez rien.",
+      "nextCharge": "Votre prochain prélèvement aura lieu le {{date}}."
+    },
+    "pending": {
+      "title": "Nous avons reçu votre paiement",
+      "body": "Votre forfait Pro sera actif dans quelques minutes. Vous pouvez fermer cette fenêtre."
+    },
+    "limitBanner": {
+      "title_one": "Vous avez utilisé le message gratuit du mois",
+      "title_other": "Vous avez utilisé les {{count}} messages gratuits du mois",
+      "body": "Ils se renouvellent le {{date}}. Passez à Focusly Pro pour continuer à discuter dès maintenant.",
+      "cta": "Voir les forfaits"
+    },
+    "limitReply": "Vous avez atteint la limite de messages gratuits du mois. Votre message n'a pas été envoyé : vous pouvez le renvoyer avec Focusly Pro, ou le 1er du mois, quand ils se renouvellent.",
+    "editorGate": {
+      "title": "L'IA de l'éditeur fait partie de Pro",
+      "body": "Avec Focusly Pro, Lumina rédige, résume et reformule vos documents.",
+      "cta": "Essayer Pro"
+    },
+    "section": {
+      "title": "Votre forfait",
+      "description": "Votre abonnement, votre utilisation de Lumina et vos informations de paiement.",
+      "free": "Forfait Free",
+      "pro": "Forfait Pro",
+      "renews": "Renouvellement le {{date}}",
+      "cancels": "Votre forfait Pro se termine le {{date}} et ne sera plus facturé.",
+      "pastDue": "Nous n'avons pas pu prélever votre dernière facture. Mettez à jour votre carte pour garder Pro.",
+      "manage": "Gérer le paiement et les factures",
+      "manageHint": "Changez de carte, téléchargez vos factures ou résiliez dans le portail sécurisé de Stripe.",
+      "portalError": "Impossible d'ouvrir le portail Stripe.",
+      "plansTitle": "Forfaits",
+      "plansDescription": "Ce que comprend chaque forfait.",
+      "returnSuccess": "Votre abonnement Focusly Pro est actif !",
+      "returnPending": "Nous avons reçu votre paiement ; votre forfait sera actif dans quelques minutes.",
+      "returnFailed": "Le paiement n'a pas abouti. Vous pouvez réessayer.",
+      "plan": {
+        "month": "Focusly Pro mensuel",
+        "year": "Focusly Pro annuel"
+      },
+      "trialEnds": "Vous êtes en essai gratuit jusqu'au {{date}}. Ensuite, {{price}} seront facturés.",
+      "trialCancels": "Votre essai gratuit se termine le {{date}} et vous ne serez pas facturé.",
+      "discount": "Code {{code}} : {{value}} de remise.",
+      "discountUntil": "Code {{code}} : {{value}} de remise jusqu'au {{date}}."
+    },
+    "history": {
+      "title": "Historique des paiements",
+      "description": "Vos paiements à Focusly, avec leur reçu et leur facture PDF.",
+      "loading": "Chargement de vos paiements…",
+      "empty": "Aucun paiement pour l'instant.",
+      "error": "Impossible de charger votre historique de paiements.",
+      "retry": "Réessayer",
+      "plan": {
+        "month": "Focusly Pro · mensuel",
+        "year": "Focusly Pro · annuel"
+      },
+      "discount": "Remise de {{amount}}",
+      "status": {
+        "paid": "Payé",
+        "trial": "Essai gratuit",
+        "open": "À payer",
+        "uncollectible": "Non recouvré",
+        "refunded": "Remboursé",
+        "partially_refunded": "Remboursé en partie"
+      },
+      "receipt": "Voir le reçu",
+      "receiptFor": "Voir le reçu {{number}}",
+      "pdf": "Télécharger le PDF",
+      "pdfFor": "Télécharger la facture {{number}} en PDF"
+    }
+  },
+  "toasts": {
+    "region": "Notifications"
+  },
+  "confirmDialogs": {
+    "deleteTask": {
+      "title": "Supprimer cette tâche ?",
+      "description": "Elle sera définitivement supprimée, avec ses sous-tâches.",
+      "confirm": "Supprimer la tâche",
+      "done": "Tâche supprimée"
+    },
+    "deleteProject": {
+      "title": "Supprimer ce projet ?",
+      "description": "Ses documents ne sont pas supprimés : ils sont simplement retirés du projet.",
+      "confirm": "Supprimer le projet",
+      "done": "Projet supprimé",
+      "failed": "Impossible de supprimer le projet"
+    },
+    "deleteDocument": {
+      "title": "Supprimer ce document ?",
+      "description": "Il sera définitivement supprimé.",
+      "confirm": "Supprimer le document",
+      "done": "Document supprimé",
+      "failed": "Impossible de supprimer le document"
+    }
+  },
+  "aiModels": {
+    "auto": "Auto",
+    "autoHint": "Lumina choisit selon votre message",
+    "fast": "Rapide",
+    "fastHint": "Réponses rapides et actions simples",
+    "reasoning": "Raisonnement",
+    "reasoningHint": "Plans, analyses et documents",
+    "select": "Choisir le modèle"
+  },
+  "guide": {
+    "ui": {
+      "next": "Suivant",
+      "back": "Retour",
+      "done": "Compris",
+      "close": "Fermer le guide",
+      "pages": "Pages",
+      "page": "Page {{current}} sur {{total}}",
+      "openGuide": "Guide de cette section"
+    },
+    "frames": {
+      "markdownSample": "## Plan\n- [ ] Relire\n- [x] Design\n**Important**",
+      "confirm": "Confirmer"
+    },
+    "keys": {
+      "period": "Période précédente / suivante",
+      "today": "Revenir à aujourd'hui",
+      "views": "Vue jour, semaine ou mois",
+      "lumina": "Ouvrir Lumina, l'assistante",
+      "linkTask": "Trouver et lier une tâche",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "moveLine": "Déplacer la ligne vers le haut ou le bas",
+      "copyLine": "Dupliquer la ligne"
+    },
+    "calendar": {
+      "label": "Plan du jour",
+      "steps": {
+        "overview": {
+          "title": "Votre temps en un coup d'œil",
+          "body": "Le calendrier rassemble vos blocs de concentration, tâches planifiées et événements. Passez du jour à la semaine ou au mois selon ce que vous voulez voir."
+        },
+        "blocks": {
+          "title": "Créez et ajustez des blocs",
+          "body": "Cliquez sur un créneau libre pour créer une tâche rapide. Faites glisser un bloc pour le déplacer à une autre heure ou un autre jour, et étirez son bord pour changer sa durée."
+        },
+        "awaited": {
+          "title": "Tâches en attente",
+          "body": "Le panneau latéral rassemble les tâches en attente qui n'ont pas encore d'horaire, pour qu'aucune ne soit oubliée."
+        },
+        "ai": {
+          "title": "Planifiez avec l'IA",
+          "body": "Avec « Optimiser le planning », Lumina trouve vos créneaux libres et propose quand faire chaque tâche. Relisez la proposition, puis confirmez-la ou rejetez-la : rien n'est planifié sans votre accord."
+        },
+        "keys": {
+          "title": "Naviguez au clavier",
+          "body": "Changez de période avec les flèches, revenez à aujourd'hui avec T et changez de vue avec D, W et M."
+        }
+      }
+    },
+    "tasks": {
+      "label": "Tâches",
+      "steps": {
+        "lists": {
+          "title": "Boîte de réception, Aujourd'hui et À venir",
+          "body": "Vos tâches vivent dans trois listes : la Boîte de réception pour ce que vous n'avez pas encore organisé, Aujourd'hui pour votre plan du jour et À venir pour la suite."
+        },
+        "create": {
+          "title": "Créez une tâche",
+          "body": "Donnez-lui un titre et, si vous voulez, une priorité, une durée et une date. Plus elle est détaillée, mieux Lumina peut la planifier."
+        },
+        "board": {
+          "title": "Liste ou tableau",
+          "body": "Passez de la vue liste à la vue tableau. Dans le tableau, faites glisser une tâche vers une autre colonne pour changer son statut."
+        },
+        "find": {
+          "title": "Trouvez ce qu'il vous faut",
+          "body": "Recherchez par nom ou tag et filtrez par priorité ou responsable pour ne garder que l'essentiel."
+        },
+        "ai": {
+          "title": "Organisez avec l'IA",
+          "body": "« Organiser avec l'IA » trie vos tâches en attente par priorité et par date. Depuis n'importe quelle tâche, vous pouvez aussi lancer une session de concentration."
+        }
+      }
+    },
+    "workspaces": {
+      "label": "Espaces de travail",
+      "steps": {
+        "docs": {
+          "title": "Vos documents",
+          "body": "Les espaces de travail sont des notes markdown pour planifier, documenter et rechercher. Chaque carte affiche son icône, sa couverture et sa dernière modification."
+        },
+        "projects": {
+          "title": "Organisez en projets",
+          "body": "Regroupez vos documents en projets avec leur propre couleur et icône, pour que chaque initiative soit au même endroit."
+        },
+        "create": {
+          "title": "Créez un document",
+          "body": "« Nouvel espace de travail » crée un document vierge, ou partez d'un modèle pour ne pas commencer de zéro."
+        },
+        "link": {
+          "title": "Liez des tâches",
+          "body": "Un document peut avoir des tâches liées : ouvrez-le et associez-les depuis son panneau latéral pour voir la progression à côté du texte."
+        },
+        "find": {
+          "title": "Recherchez et changez de vue",
+          "body": "Trouvez n'importe quel document avec {{mod}} K et choisissez de les afficher en galerie, grille ou liste, avec filtres et tri."
+        }
+      }
+    },
+    "editor": {
+      "label": "Éditeur",
+      "steps": {
+        "markdown": {
+          "title": "Écrivez en markdown",
+          "body": "Titres, listes, cases à cocher et gras prennent forme pendant que vous tapez. Placez le curseur sur un élément pour voir et modifier son markdown."
+        },
+        "blocks": {
+          "title": "Blocs spéciaux",
+          "body": "Au-delà du texte, l'éditeur affiche du code coloré, des tableaux, des diagrammes Mermaid, des formules, des cartes GeoJSON et des sections repliables."
+        },
+        "ai": {
+          "title": "L'IA sur votre texte",
+          "body": "Sélectionnez du texte et faites un clic droit pour créer une tâche, résumer, corriger, traduire ou changer le ton. {{mod}} J ouvre Lumina, qui propose des modifications à relire avant de les appliquer."
+        },
+        "canvas": {
+          "title": "Canvas",
+          "body": "Depuis le menu du clic droit, créez une page canvas : un tableau pour dessiner des diagrammes, lié au document sous forme de carte."
+        },
+        "sidebar": {
+          "title": "Panneau latéral",
+          "body": "Consultez le plan de la note, le graphe des titres et les statistiques, et gérez ses tâches liées. Le bouton Focus de l'en-tête lance une session sur sa tâche."
+        },
+        "keys": {
+          "title": "Raccourcis clavier",
+          "body": "Les raccourcis que vous utiliserez le plus en écrivant."
+        }
+      }
+    },
+    "insights": {
+      "label": "Insights",
+      "steps": {
+        "stats": {
+          "title": "Votre productivité en chiffres",
+          "body": "Temps de concentration total, tâches terminées, énergie moyenne et part de travail en profondeur, par jour, semaine, mois ou année."
+        },
+        "trends": {
+          "title": "Tendances",
+          "body": "Voyez comment votre productivité évolue dans le temps et où va votre temps."
+        },
+        "activity": {
+          "title": "Activité et heures d'or",
+          "body": "La carte d'activité montre vos jours les plus réguliers, et les heures d'or indiquent quand vous êtes le plus performant, pour y placer le travail le plus exigeant."
+        },
+        "report": {
+          "title": "Exportez et partagez",
+          "body": "Exportez vos données ou créez un rapport qui résume la période."
+        }
+      }
+    },
+    "askAi": {
+      "label": "Demander à l'IA",
+      "steps": {
+        "chat": {
+          "title": "Parlez à Lumina",
+          "body": "Lumina connaît vos tâches et votre calendrier. Demandez-lui quoi faire aujourd'hui, des idées, ou un résumé de votre semaine."
+        },
+        "suggestions": {
+          "title": "Commencez par une suggestion",
+          "body": "Vous ne savez pas par où commencer ? Choisissez une suggestion : une stratégie de concentration, une analyse de votre productivité, et plus encore."
+        },
+        "plan": {
+          "title": "Plans d'action",
+          "body": "Lumina peut proposer des tâches et des événements prêts à créer. Relisez-les et confirmez : rien n'est créé sans votre accord."
+        },
+        "history": {
+          "title": "Vos conversations",
+          "body": "Chaque conversation est enregistrée pour que vous puissiez la reprendre plus tard, ou la supprimer quand vous n'en avez plus besoin."
+        }
+      }
+    }
+  }
+}

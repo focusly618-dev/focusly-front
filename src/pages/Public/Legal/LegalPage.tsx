@@ -23,9 +23,12 @@ const documents = import.meta.glob<string>('/src/content/legal/*/*.md', {
 const SOURCE_LANGUAGE = 'es';
 
 const getDocument = (doc: LegalDocument, language: string) => {
-  const lang = language.split('-')[0];
-  const localized = documents[`/src/content/legal/${lang}/${doc}.md`];
-  if (localized) return { content: localized, language: lang };
+  // The language's own version ("pt-BR"), else its base language's
+  // ("en-GB" reads the English one)
+  for (const lang of [language, language.split('-')[0]]) {
+    const localized = documents[`/src/content/legal/${lang}/${doc}.md`];
+    if (localized) return { content: localized, language: lang };
+  }
   return {
     content: documents[`/src/content/legal/${SOURCE_LANGUAGE}/${doc}.md`] ?? '',
     language: SOURCE_LANGUAGE,

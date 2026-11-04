@@ -44,11 +44,14 @@ describe('the site loop videos', () => {
     );
   });
 
-  it('keep the Spanish set for languages without videos of their own', () => {
-    i18n.language = 'fr';
-    const { container } = render(<LoopVideo name="tasks-hero" alt="" />);
-    expect(sources(container)[0]).toBe('tasks-hero-light.webm');
-  });
+  it.each(['fr', 'pt-BR', 'en-GB', 'zh-CN'])(
+    'play the English set on the %s site, which has none of its own',
+    (lang) => {
+      i18n.language = lang;
+      const { container } = render(<LoopVideo name="tasks-hero" alt="" />);
+      expect(sources(container)[0]).toBe('tasks-hero-light-en.webm');
+    },
+  );
 
   it("fall back to Spanish when a language's video won't load", () => {
     i18n.language = 'en';

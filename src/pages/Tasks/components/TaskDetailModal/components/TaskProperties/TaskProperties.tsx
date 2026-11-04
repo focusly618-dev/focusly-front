@@ -40,7 +40,7 @@ import {
 } from '@mui/icons-material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { format, isSameDay } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { dateFnsLocale } from '@/i18n/dateLocales';
 import { PRIORITY_OPTIONS } from '@/components/ui';
 import {
   tagChipSx,
@@ -204,7 +204,7 @@ export const TaskProperties = ({
   deadline,
   isLoadingDetail,
 }: TaskPropertiesProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
   const [priorityAnchor, setPriorityAnchor] = useState<HTMLElement | null>(
     null,
@@ -554,7 +554,9 @@ export const TaskProperties = ({
                     }}
                   >
                     {currentDate
-                      ? format(currentDate, "d 'de' MMM, yyyy", { locale: es })
+                      ? format(currentDate, 'PP', {
+                          locale: dateFnsLocale(i18n.language),
+                        })
                       : t('tasks.dates.noDateInbox', 'Sin fecha (Inbox)')}
                   </Typography>
                 </Box>

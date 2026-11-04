@@ -54,6 +54,9 @@ export const TRANSLATE_LANGUAGES = [
   'pt',
   'fr',
   'de',
+  'it',
+  'ko',
+  'zh-Hans',
 ] as const;
 
 /** How much text before the cursor "continue writing" sends along. */

@@ -3,6 +3,7 @@ import { API_BASE_URL } from '@/config/env.config';
 import type { AIMessage } from './apiAI.types';
 import type { ConversationMessage } from './apiAI';
 import { throwIfPlanLimit } from '@/api/Billing/planLimit';
+import { billingService } from '@/services/billingService';
 
 // Markers the editor assistant wraps document text in. The backend strips the
 // same blocks before saving a reply to the history
@@ -121,6 +122,7 @@ export const streamEditorAssistant = async ({
   if (!response.ok) {
     throw new Error(await response.text());
   }
+  billingService.noteAIAllowance((name) => response.headers.get(name));
 
   const reader = response.body?.getReader();
   if (!reader) throw new Error('No response body reader');

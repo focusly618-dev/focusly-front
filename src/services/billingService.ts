@@ -3,6 +3,7 @@ import {
   type BillingInterval,
   type BillingStatus,
 } from '@/api/Billing/billingApi';
+import { noteDailyRemaining } from '@/api/Billing/planLimit';
 
 // The user's plan and free AI usage, shared by every screen (chat, editor,
 // profile), plus the one "Pro plans" dialog any of them can open. The
@@ -149,6 +150,17 @@ class BillingService {
     if (limit !== undefined) {
       this.patchStatus({ ai_messages_used: Math.max(0, limit - remaining) });
     }
+  }
+
+  /** What an AI response says is left: the month's free messages, or a Pro
+   * account's fair use for today (warned about once it runs low). */
+  noteAIAllowance(header: (name: string) => string | null | undefined) {
+    const remaining = Number(header('x-ai-messages-remaining') ?? NaN);
+    if (Number.isFinite(remaining)) this.setRemaining(remaining);
+    noteDailyRemaining(
+      header('x-ai-daily-remaining'),
+      this.state.status?.ai_daily_limit,
+    );
   }
 
   /** The backend refused a message: the free ones are used up. */

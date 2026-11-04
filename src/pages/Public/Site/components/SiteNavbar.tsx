@@ -297,7 +297,8 @@ export const SiteNavbar = () => {
   const themeIndex = Math.max(0, THEME_ORDER.indexOf(colorMode.mode));
   const nextTheme = THEME_ORDER[(themeIndex + 1) % THEME_ORDER.length];
   const themeAria = fill(c.nav.themeAria, { name: c.themes[colorMode.mode] });
-  const lang = (i18n.language || 'es').split('-')[0];
+  // The full code: "en-GB" and "en" are different choices
+  const lang = i18n.language || 'es';
 
   const panelSx = (id: MenuId) => {
     const isOpen = open === id;

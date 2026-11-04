@@ -668,7 +668,10 @@ export const ja: SiteContent = {
         'データをエクスポートできますか？',
         'ワークスペースのドキュメントはMarkdownとWordでエクスポートできます。[PENDIENTE: exportación de tareas y disponibilidad por plan]',
       ],
-      ['対応言語は？', 'スペイン語、英語、日本語です。'],
+      [
+        '対応言語は？',
+        'スペイン語、英語（米国・英国）、ポルトガル語（ブラジル）、フランス語、ドイツ語、イタリア語、日本語、韓国語、簡体字中国語です。',
+      ],
       [
         'スマートフォンで使えますか？',
         'FocuslyはWebアプリなので、スマートフォンのブラウザで使えます。[PENDIENTE: app nativa]',

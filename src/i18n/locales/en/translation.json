@@ -170,7 +170,7 @@
     "cancelPlanning": "Cancel",
     "optimizeFreeHint_one": "Uses your last free Lumina message",
     "optimizeFreeHint_other": "Uses 1 of your {{count}} free Lumina messages",
-    "optimizeProOnly": "Free messages used up: available with Pro",
+    "optimizeProOnly": "You've used this month's free messages: available with Pro",
     "draftGeneratedPartial_one": "Lumina proposed {{count}} block; {{left}} task(s) didn't fit in your free hours.",
     "draftGeneratedPartial_other": "Lumina proposed {{count}} blocks; {{left}} task(s) didn't fit in your free hours.",
     "scheduleSavedTitle": "Schedule confirmed",
@@ -1711,33 +1711,45 @@
       "cancelAnytime": "No commitment: cancel anytime."
     },
     "features": {
-      "aiTrial_one": "{{count}} message with Lumina to try it",
-      "aiTrial_other": "{{count}} messages with Lumina to try it",
+      "aiTrial_one": "{{count}} Lumina message a month",
+      "aiTrial_other": "{{count}} Lumina messages a month",
       "core": "Tasks, projects and documents",
       "calendar": "Calendar and Google Calendar",
       "editorAi": "AI in the document editor",
-      "unlimitedAi": "Unlimited chat with Lumina",
+      "unlimitedAi": "Unlimited chat with Lumina (fair use)",
       "editorAiPro": "AI in the editor: drafts, summarizes and rewrites",
       "everythingFree": "Everything in Free",
       "cancelAnytime": "Cancel anytime",
       "notIncluded": "Not included"
     },
-    "usage": "{{used}} of {{limit}} free messages used",
-    "usageLeft_one": "{{count}} free message left",
-    "usageLeft_other": "{{count}} free messages left",
-    "usageNone": "You've used your free messages",
+    "usage": "{{used}} of {{limit}} free messages used this month",
+    "renewsOn": "They renew on {{date}}",
+    "usageLeft_one": "{{count}} free message left this month",
+    "usageLeft_other": "{{count}} free messages left this month",
+    "usageNone": "You've used this month's free messages · back on {{date}}",
     "tryPro": "Try Pro",
+    "dailyLimit": {
+      "title": "You've reached today's Lumina limit",
+      "body_one": "Pro includes up to {{count}} AI use a day. It renews on {{date}}.",
+      "body_other": "So Lumina runs well for everyone, Pro includes up to {{count}} AI uses a day (fair use). It renews on {{date}}."
+    },
+    "dailyLow": {
+      "title_one": "{{count}} Lumina use left today",
+      "title_other": "{{count}} Lumina uses left today",
+      "body_one": "Pro includes up to {{count}} a day under fair use. It renews on {{date}}.",
+      "body_other": "Pro includes up to {{count}} a day under fair use. It renews on {{date}}."
+    },
     "upgrade": {
       "title": {
         "manual": "Upgrade your plan",
-        "limit_one": "You've used your free message",
-        "limit_other": "You've used your {{count}} free messages",
+        "limit_one": "You've used this month's free message",
+        "limit_other": "You've used this month's {{count}} free messages",
         "editor": "Editor AI is part of Pro",
         "canvas": "More canvases with Pro"
       },
       "subtitle": {
         "manual": "Pick the plan that fits the way you work.",
-        "limit": "Go Pro to keep talking with Lumina without limits.",
+        "limit": "They renew on {{date}}. With Pro you keep talking to Lumina right now.",
         "editor": "With Pro, Lumina drafts, summarizes and rewrites inside your documents.",
         "canvas": "With Pro you create unlimited, larger canvases with images up to 10 MB."
       },
@@ -1802,12 +1814,12 @@
       "body": "Your Pro plan will be active in a few minutes. You can close this window."
     },
     "limitBanner": {
-      "title_one": "You've used your free message with Lumina",
-      "title_other": "You've used your {{count}} free messages with Lumina",
-      "body": "Go Focusly Pro to keep chatting without limits.",
+      "title_one": "You've used this month's free message",
+      "title_other": "You've used this month's {{count}} free messages",
+      "body": "They renew on {{date}}. Upgrade to Focusly Pro to keep chatting now.",
       "cta": "See plans"
     },
-    "limitReply": "You've reached the free message limit. Your message wasn't sent: you can resend it with Focusly Pro.",
+    "limitReply": "You've reached this month's free message limit. Your message wasn't sent: you can resend it with Focusly Pro, or on the 1st, when they renew.",
     "editorGate": {
       "title": "Editor AI is part of Pro",
       "body": "With Focusly Pro, Lumina drafts, summarizes and rewrites your documents.",

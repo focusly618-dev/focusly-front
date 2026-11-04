@@ -214,7 +214,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
           : t(`billing.upgrade.title.${reason}`);
   const subtitle =
     step === 'plans' && !billing.isPro
-      ? t(`billing.upgrade.subtitle.${reason}`)
+      ? t(`billing.upgrade.subtitle.${reason}`, { date: billing.freeRenewal })
       : null;
 
   const statusPanel = (
