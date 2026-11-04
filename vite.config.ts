@@ -14,6 +14,7 @@ const BACKEND_PATHS = [
   '/socket.io',
   '/media',
   '/uploads',
+  '/push',
 ];
 
 // https://vite.dev/config/
@@ -96,6 +97,8 @@ export default defineConfig(({ mode }) => {
           cleanupOutdatedCaches: true,
           clientsClaim: true,
           skipWaiting: true,
+          // Web push handlers (task reminders, morning summary)
+          importScripts: ['/push-sw.js'],
           navigateFallback: '/index.html',
           navigateFallbackDenylist: BACKEND_PATHS.map(
             (p) => new RegExp(`^${p}(/|$)`),
@@ -167,6 +170,12 @@ export default defineConfig(({ mode }) => {
           secure: IS_SECURE,
         },
         '/ai': {
+          target: BACKEND_TARGET,
+          changeOrigin: true,
+          secure: IS_SECURE,
+        },
+        // With the slash: '/push' alone would also catch /push-sw.js
+        '/push/': {
           target: BACKEND_TARGET,
           changeOrigin: true,
           secure: IS_SECURE,

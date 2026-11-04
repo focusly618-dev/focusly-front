@@ -12,6 +12,7 @@ import {
 import { notify } from '@/utils';
 import { RealTimeContext } from './RealTimeContext';
 import { showTaskReminder, type TaskUpcomingEvent } from './taskReminder';
+import { disablePush, enablePush } from '@/services/pushNotifications';
 
 export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -26,6 +27,16 @@ export const RealTimeProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     remindersOnRef.current = user?.pushEnabled !== false;
   }, [user?.pushEnabled]);
+
+  // Reminders with Focusly closed (web push) follow the same switch. On
+  // every start, so the server always has this device for whoever is
+  // signed in; enablePush does nothing until notifications are allowed.
+  const remindersOn = user?.pushEnabled !== false;
+  useEffect(() => {
+    if (!userId) return;
+    if (remindersOn) void enablePush();
+    else void disablePush();
+  }, [userId, remindersOn]);
 
   useEffect(() => {
     if (!userId) {

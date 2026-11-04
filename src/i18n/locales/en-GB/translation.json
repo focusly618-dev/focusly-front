@@ -14,7 +14,7 @@
   },
   "profilePage": {
     "notifications": {
-      "systemDesc": "Also shows each reminder as an operating system notification, so you see it even when Focusly is in another tab or minimised. Requires the browser's permission."
+      "systemDesc": "Also shows each reminder as an operating system notification, even when Focusly is in another tab, minimised or closed, and sends you a summary of the day's tasks at 7 am. Requires the browser's permission."
     }
   },
   "editorAI": {
