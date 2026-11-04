@@ -303,7 +303,7 @@
       "remindersTitle": "Recordatorios de tareas",
       "remindersDesc": "Te avisa 5 minutos y 1 minuto antes de que empiece una tarea con hora: muestra un aviso en Focusly y reproduce el sonido que elijas abajo. Si lo desactivas, no recibirás ningún recordatorio en este dispositivo.",
       "systemTitle": "Notificaciones del sistema",
-      "systemDesc": "Muestra además cada recordatorio como notificación de tu sistema operativo, para que lo veas aunque Focusly esté en otra pestaña o minimizado. Requiere el permiso del navegador.",
+      "systemDesc": "Muestra además cada recordatorio como notificación de tu sistema operativo, aunque Focusly esté en otra pestaña, minimizado o cerrado, y te envía un resumen de tus tareas del día a las 7 de la mañana. Requiere el permiso del navegador.",
       "allow": "Permitir",
       "permission": {
         "granted": "Permitidas en este navegador.",

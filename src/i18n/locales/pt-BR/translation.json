@@ -303,7 +303,7 @@
       "remindersTitle": "Lembretes de tarefas",
       "remindersDesc": "Avisa 5 minutos e 1 minuto antes de uma tarefa com horário começar: mostra um aviso no Focusly e toca o som que você escolher abaixo. Se desativar, você não receberá lembretes neste dispositivo.",
       "systemTitle": "Notificações do sistema",
-      "systemDesc": "Também mostra cada lembrete como uma notificação do sistema operacional, para que você veja mesmo quando o Focusly estiver em outra aba ou minimizado. Requer a permissão do navegador.",
+      "systemDesc": "Também mostra cada lembrete como uma notificação do sistema operacional, mesmo quando o Focusly estiver em outra aba, minimizado ou fechado, e envia um resumo das tarefas do dia às 7 da manhã. Requer a permissão do navegador.",
       "allow": "Permitir",
       "permission": {
         "granted": "Permitido neste navegador.",

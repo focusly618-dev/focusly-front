@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { updateUser } from '@/redux/auth/auth.slice';
 import { useNotificationSounds } from '@/hooks/useNotificationSounds';
 import { soundPlayer, type SoundType } from '@/utils';
+import { enablePush } from '@/services/pushNotifications';
 import {
   Card,
   CardDescription,
@@ -50,7 +51,10 @@ export const NotificationsSection = () => {
 
   const requestPermission = async () => {
     if (permission === 'unsupported') return;
-    setPermission(await Notification.requestPermission());
+    const result = await Notification.requestPermission();
+    setPermission(result);
+    // Allowed: this device starts getting reminders with Focusly closed too
+    if (result === 'granted' && remindersOn) void enablePush();
   };
 
   const chooseSound = (sound: SoundType) => {

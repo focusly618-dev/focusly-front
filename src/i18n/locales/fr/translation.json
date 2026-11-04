@@ -303,7 +303,7 @@
       "remindersTitle": "Rappels de tâches",
       "remindersDesc": "Vous prévient 5 minutes et 1 minute avant le début d'une tâche planifiée : un avis s'affiche dans Focusly et le son choisi ci-dessous est joué. Si vous le désactivez, vous ne recevrez aucun rappel sur cet appareil.",
       "systemTitle": "Notifications du système",
-      "systemDesc": "Affiche aussi chaque rappel comme notification du système d'exploitation, pour le voir même quand Focusly est dans un autre onglet ou réduit. Nécessite l'autorisation du navigateur.",
+      "systemDesc": "Affiche aussi chaque rappel comme notification du système d'exploitation, même quand Focusly est dans un autre onglet, réduit ou fermé, et t'envoie un résumé des tâches du jour à 7 h du matin. Nécessite l'autorisation du navigateur.",
       "allow": "Autoriser",
       "permission": {
         "granted": "Autorisées dans ce navigateur.",

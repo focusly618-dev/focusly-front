@@ -303,7 +303,7 @@
       "remindersTitle": "Task reminders",
       "remindersDesc": "Alerts you 5 minutes and 1 minute before a timed task starts: shows a notice in Focusly and plays the sound you pick below. Turn it off and you won't get any reminders on this device.",
       "systemTitle": "System notifications",
-      "systemDesc": "Also shows each reminder as an operating system notification, so you see it even when Focusly is in another tab or minimized. Requires the browser's permission.",
+      "systemDesc": "Also shows each reminder as an operating system notification, even when Focusly is in another tab, minimized or closed, and sends you a summary of the day's tasks at 7 AM. Requires the browser's permission.",
       "allow": "Allow",
       "permission": {
         "granted": "Allowed in this browser.",

@@ -303,7 +303,7 @@
       "remindersTitle": "Promemoria delle attività",
       "remindersDesc": "Ti avvisa 5 minuti e 1 minuto prima dell'inizio di un'attività con orario: mostra un avviso in Focusly e riproduce il suono che scegli qui sotto. Se lo disattivi, non riceverai promemoria su questo dispositivo.",
       "systemTitle": "Notifiche di sistema",
-      "systemDesc": "Mostra ogni promemoria anche come notifica del sistema operativo, così lo vedi anche quando Focusly è in un'altra scheda o ridotto a icona. Richiede l'autorizzazione del browser.",
+      "systemDesc": "Mostra ogni promemoria anche come notifica del sistema operativo, anche quando Focusly è in un'altra scheda, ridotto a icona o chiuso, e ti invia un riepilogo delle attività del giorno alle 7 del mattino. Richiede l'autorizzazione del browser.",
       "allow": "Consenti",
       "permission": {
         "granted": "Consentite in questo browser.",
