@@ -2,8 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111215" />
+    <meta name="apple-mobile-web-app-title" content="Focusly" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="description"
+      content="Tareas, calendario, notas e IA en un solo lugar. Lumina convierte tus objetivos en bloques de enfoque en tu Google Calendar."
+    />
     <title>Focusly</title>
     <script>
       // Apply the saved theme before first paint (no light flash on dark
@@ -27,6 +36,14 @@
         root.classList.toggle('dark', mode !== 'light');
         root.classList.toggle('graydark', mode === 'graydark');
         root.style.colorScheme = mode === 'light' ? 'light' : 'dark';
+        // The installed app's title bar (THEME_COLORS in documentMode.ts)
+        var themeColor = {
+          light: '#FFFFFF',
+          dark: '#111215',
+          graydark: '#19191A',
+        }[mode];
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', themeColor);
       })();
     </script>
     <link

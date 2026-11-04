@@ -11,7 +11,7 @@ export interface TaskUpcomingEvent {
   type: '5min' | '1min';
 }
 
-const ICON = '/Focusly.png';
+const ICON = '/pwa-192x192.png';
 
 /**
  * A task is about to start: the sound, a toast in Focusly and, when the
