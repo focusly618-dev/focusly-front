@@ -25,6 +25,7 @@ import {
 import { NavLink } from 'react-router-dom';
 import { ColorModeContext } from '@/context';
 import { brand, byMode, emerald, slate } from '@/styles/mui';
+import { FocuslyLogo } from '@/components/ui';
 import { useLogin } from './Login.hook';
 
 // Dark surfaces of the login screen.
@@ -264,24 +265,17 @@ export const Login: React.FC = () => {
             '&:hover .login-logo-mark': { transform: 'scale(1.05)' },
           }}
         >
+          {/* The brand mark, as in the sidebar, the site and the tab */}
           <Box
             className="login-logo-mark"
             sx={{
-              width: 40,
-              height: 40,
-              borderRadius: '12px',
-              background: `linear-gradient(to top right, ${brand.main}, ${emerald[600]})`,
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              fontWeight: 900,
-              fontSize: '20px',
+              borderRadius: '12px',
               boxShadow: `0 10px 15px -3px ${brand.main}40`,
               transition: 'transform 0.2s ease',
             }}
           >
-            F
+            <FocuslyLogo size={40} />
           </Box>
           <Typography
             component="span"
