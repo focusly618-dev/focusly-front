@@ -59,4 +59,7 @@ export interface MarkdownEditorProps {
   // the floating Ask Lumina input) never triggers it — only an actual
   // selection change inside the editor does.
   onSelectionChange?: (text: string) => void;
+  // Fired when the user picks "/canvas" from the slash menu; receives the
+  // screen coordinates where the create-canvas popover should open.
+  onCreateCanvas?: (anchor: { top: number; left: number }) => void;
 }

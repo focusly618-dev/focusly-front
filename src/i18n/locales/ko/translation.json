@@ -2108,7 +2108,8 @@
         "table": "표",
         "divider": "구분선",
         "math": "수식",
-        "diagram": "다이어그램"
+        "diagram": "다이어그램",
+        "canvas": "캔버스"
       },
       "templates": {
         "toggle": "제목",

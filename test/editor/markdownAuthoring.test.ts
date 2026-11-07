@@ -2,7 +2,6 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { EditorSelection, EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { CompletionContext } from '@codemirror/autocomplete';
-import { markdown } from '@codemirror/lang-markdown';
 import i18n from '@/i18n';
 import {
   insertLink,
@@ -16,6 +15,12 @@ import {
   slashSource,
 } from '@/pages/Workspace/components/Editor/codemirror/extensions/slashMenu';
 import { htmlToMarkdown } from '@/pages/Workspace/components/Editor/codemirror/extensions/htmlPaste';
+import {
+  handleMarkupBackspace,
+  markupEditingExtensions,
+} from '@/pages/Workspace/components/Editor/codemirror/extensions/markupEditing';
+import { livePreviewPlugin } from '@/pages/Workspace/components/Editor/codemirror/extensions/livePreview';
+import { markdownExtension } from '@/pages/Workspace/components/Editor/codemirror/extensions/markdownLanguage';
 
 let views: EditorView[] = [];
 
@@ -37,7 +42,11 @@ const editor = (doc: string) => {
     state: EditorState.create({
       doc: text,
       selection: EditorSelection.single(anchor, head),
-      extensions: [markdown()],
+      extensions: [
+        markdownExtension,
+        livePreviewPlugin,
+        ...markupEditingExtensions,
+      ],
     }),
     parent: document.body,
   });
@@ -154,13 +163,26 @@ describe('slash menu', () => {
     expect(ids('ecuacion')).toEqual(['math']);
     expect(ids('heading')).toEqual(['h1', 'h2', 'h3']);
     expect(ids('numer')).toContain('numbered');
+    expect(ids('canvas')).toContain('canvas');
+    expect(ids('pizarra')).toEqual(['canvas']);
     expect(ids('zzz')).toEqual([]);
   });
 
-  it('labels show in the current language with the Markdown as a hint', () => {
+  it('labels show in the current language without raw Markdown hints', () => {
     const option = result('/tabla|')?.options[0];
     expect(option?.label).toBe('Tabla');
-    expect(option?.detail).toBe('| |');
+    expect(option?.detail).toBeUndefined();
+  });
+
+  it('picking "/canvas" clears the slash query and triggers the canvas popover', () => {
+    const view = editor('Notas\n/canv|');
+    const item = SLASH_ITEMS.find((i) => i.id === 'canvas')!;
+    let openedAt: { top: number; left: number } | null = null;
+    applySlashItem(view, item, 6, 11, (anchor) => {
+      openedAt = anchor;
+    });
+    expect(docOf(view)).toBe('Notas\n');
+    expect(openedAt).not.toBeNull();
   });
 
   it('replaces "/query" with the block, cursor in place', () => {
@@ -218,5 +240,54 @@ describe('pasting formatted text', () => {
         '<div><span style="color:#569cd6">const</span> a = 1;</div>',
       ),
     ).toBeNull();
+  });
+});
+
+describe('hidden markup editing', () => {
+  it('hides strikethrough markers even when the cursor is inside', () => {
+    const view = editor('hola ~~mun|do~~');
+    expect(view.contentDOM.querySelector('.cm-live-strike')?.textContent).toBe(
+      'mundo',
+    );
+    expect(view.contentDOM.textContent).toBe('hola mundo');
+  });
+
+  it('keeps the cursor out of hidden block prefixes and steps to previous line on left', () => {
+    const view = editor('Intro\n## |Título');
+    // Clicking or jumping into the `# ` prefix snaps to after `## `
+    view.dispatch({
+      selection: EditorSelection.cursor(6),
+      userEvent: 'select.pointer',
+    });
+    expect(view.state.selection.main.head).toBe(9);
+
+    // Moving left from the start of the heading text jumps to the previous line end
+    view.dispatch({ selection: EditorSelection.cursor(8) });
+    expect(view.state.selection.main.head).toBe(5);
+  });
+
+  it('backspace at the start of a heading or list item removes the whole prefix', () => {
+    const heading = editor('## |Título');
+    expect(handleMarkupBackspace(heading)).toBe(true);
+    expect(docOf(heading)).toBe('Título');
+    expect(heading.state.selection.main.head).toBe(0);
+
+    const todo = editor('|');
+    todo.dispatch({
+      changes: { from: 0, insert: '- [ ] Tarea' },
+      selection: { anchor: 6 },
+    });
+    expect(handleMarkupBackspace(todo)).toBe(true);
+    expect(docOf(todo)).toBe('Tarea');
+  });
+
+  it('backspace right after closing inline markers edits the text inside and removes empty spans', () => {
+    const bold = editor('hola **mundo**|');
+    expect(handleMarkupBackspace(bold)).toBe(true);
+    expect(docOf(bold)).toBe('hola **mund**');
+
+    const singleChar = editor('hola **m**|');
+    expect(handleMarkupBackspace(singleChar)).toBe(true);
+    expect(docOf(singleChar)).toBe('hola ');
   });
 });

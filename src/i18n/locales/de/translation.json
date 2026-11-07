@@ -2108,7 +2108,8 @@
         "table": "Tabelle",
         "divider": "Trennlinie",
         "math": "Formel",
-        "diagram": "Diagramm"
+        "diagram": "Diagramm",
+        "canvas": "Canvas"
       },
       "templates": {
         "toggle": "Titel",

@@ -1,5 +1,5 @@
 import { Decoration, WidgetType } from '@codemirror/view';
-import { overlaps, type Handler } from './utils';
+import { showsMarkup, type Handler } from './utils';
 
 class BulletWidget extends WidgetType {
   toDOM() {
@@ -16,7 +16,7 @@ class BulletWidget extends WidgetType {
 // When the cursor is elsewhere, replaces the marker with a clean bullet point (•).
 export const handleListMark: Handler = (node, view, sel, push) => {
   const line = view.state.doc.lineAt(node.from);
-  const revealed = overlaps(sel, line.from, line.to);
+  const revealed = showsMarkup(sel, line.from, line.to);
 
   // Check if parent ListItem contains a Task or TaskMarker (e.g. - [ ] or * [ ])
   const parent = node.node.parent;

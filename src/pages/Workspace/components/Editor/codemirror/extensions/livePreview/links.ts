@@ -5,7 +5,7 @@ import {
   splitCanvasLabel,
 } from '../../../components/EditorContent/canvasLinks.utils';
 import { CanvasCardWidget, canvasPreviewsField } from './canvasCard';
-import { overlaps, type Handler, type Push } from './utils';
+import { showsMarkup, type Handler, type Push } from './utils';
 
 // A canvas link inside a sentence reads like a Notion page link: its icon
 // apart from an underlined title. [textFrom, textTo) is the link's text, its
@@ -48,7 +48,7 @@ export const handleLink: Handler = (node, view, sel, push) => {
     }
   }
 
-  const revealed = overlaps(sel, node.from, node.to);
+  const revealed = showsMarkup(sel, node.from, node.to);
 
   const marks: { from: number; to: number }[] = [];
   const cursor = node.node.cursor();

@@ -312,6 +312,15 @@ export const useEditorContent = ({
     });
   };
 
+  const handleStartBlankCanvas = (anchor: { top: number; left: number }) => {
+    setCanvasDraft({
+      sourceText: '',
+      range: null,
+      name: canvasNameFrom(''),
+      anchor,
+    });
+  };
+
   const handleCancelCanvasDraft = () => {
     if (!isCreatingCanvas) setCanvasDraft(null);
   };
@@ -356,12 +365,12 @@ export const useEditorContent = ({
     if (!canvas) return;
     setCanvasDraft(null);
 
-    const canvasMarkdown = `${canvasLink(canvas.id, canvas.name, canvas.icon)}\n`;
+    const link = canvasLink(canvas.id, canvas.name, canvas.icon);
     const editor = markdownEditorRef.current;
     if (range && editor) {
-      editor.replaceRange(range.from, range.to, canvasMarkdown);
+      editor.replaceRange(range.from, range.to, `${link}\n`);
     } else if (editor) {
-      editor.insertAtCursor(canvasMarkdown);
+      editor.insertLine(link);
     }
 
     canvasView.open(canvas.id, canvas.name, canvas.icon);
@@ -545,6 +554,7 @@ export const useEditorContent = ({
     getLanguageLabel,
     handleCreateTask,
     handleGenerateCanvasPage,
+    handleStartBlankCanvas,
     canvasDraft: canvasDraft
       ? { name: canvasDraft.name, anchor: canvasDraft.anchor }
       : null,

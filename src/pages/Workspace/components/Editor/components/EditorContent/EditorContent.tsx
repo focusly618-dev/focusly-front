@@ -167,6 +167,7 @@ export const EditorContent = ({
     handleConfirmAITask,
     isCreatingTask,
     handleGenerateCanvasPage,
+    handleStartBlankCanvas,
     canvasDraft,
     isCreatingCanvas,
     handleCancelCanvasDraft,
@@ -565,6 +566,7 @@ export const EditorContent = ({
               onChange={onChange}
               placeholder="Start writing..."
               onSelectionChange={handleSelectionChange}
+              onCreateCanvas={handleStartBlankCanvas}
             />
 
             {isAIProcessing && (

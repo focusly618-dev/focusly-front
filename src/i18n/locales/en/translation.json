@@ -2108,7 +2108,8 @@
         "table": "Table",
         "divider": "Divider",
         "math": "Equation",
-        "diagram": "Diagram"
+        "diagram": "Diagram",
+        "canvas": "Canvas"
       },
       "templates": {
         "toggle": "Title",

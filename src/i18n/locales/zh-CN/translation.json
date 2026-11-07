@@ -2108,7 +2108,8 @@
         "table": "表格",
         "divider": "分隔线",
         "math": "公式",
-        "diagram": "图表"
+        "diagram": "图表",
+        "canvas": "画布"
       },
       "templates": {
         "toggle": "标题",

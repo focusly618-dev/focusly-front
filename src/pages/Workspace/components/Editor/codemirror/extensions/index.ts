@@ -18,8 +18,12 @@ import { diffReviewExtensions } from './diffReview';
 import { targetHighlightExtension } from './targetHighlight';
 import { canvasDropExtension } from './canvasDrop';
 import { formattingKeymap } from './formatting';
-import { slashMenuExtension } from './slashMenu';
+import {
+  buildSlashMenuExtension,
+  type CreateCanvasFromSlash,
+} from './slashMenu';
 import { htmlPasteExtension } from './htmlPaste';
+import { markupEditingExtensions } from './markupEditing';
 
 export interface BuildMarkdownExtensionsOptions {
   editorThemeCompartment: Compartment;
@@ -27,6 +31,7 @@ export interface BuildMarkdownExtensionsOptions {
   initialEditorTheme: Extension;
   initialHighlightStyle: HighlightStyle;
   placeholder?: string;
+  onCreateCanvas?: CreateCanvasFromSlash;
 }
 
 export const buildMarkdownExtensions = ({
@@ -35,10 +40,12 @@ export const buildMarkdownExtensions = ({
   initialEditorTheme,
   initialHighlightStyle,
   placeholder,
+  onCreateCanvas,
 }: BuildMarkdownExtensionsOptions): Extension[] => [
   history(),
   // Before the defaults: Cmd/Ctrl+B, I... format instead of their defaults
   formattingKeymap,
+  ...markupEditingExtensions,
   keymap.of([
     ...imageKeymap,
     ...defaultKeymap,
@@ -53,7 +60,7 @@ export const buildMarkdownExtensions = ({
   imagePasteExtension,
   // After images: a paste with image files is theirs
   htmlPasteExtension,
-  slashMenuExtension,
+  buildSlashMenuExtension(onCreateCanvas),
   ...canvasDropExtension,
   ...diffReviewExtensions,
   ...targetHighlightExtension,

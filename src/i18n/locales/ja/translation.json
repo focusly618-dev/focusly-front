@@ -2072,7 +2072,8 @@
         "table": "表",
         "divider": "区切り線",
         "math": "数式",
-        "diagram": "図"
+        "diagram": "図",
+        "canvas": "キャンバス"
       },
       "templates": {
         "toggle": "タイトル",

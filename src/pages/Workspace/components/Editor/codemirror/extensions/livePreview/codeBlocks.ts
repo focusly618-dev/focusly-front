@@ -1,7 +1,12 @@
 import type { EditorState } from '@codemirror/state';
 import { Decoration } from '@codemirror/view';
 import type { SyntaxNode } from '@lezer/common';
-import { overlaps, type BlockHandler, type Handler } from './utils';
+import {
+  overlaps,
+  showsMarkup,
+  type BlockHandler,
+  type Handler,
+} from './utils';
 import { MermaidWidget } from './mermaidWidget';
 import { MathWidget } from './mathWidget';
 import { GeoJsonWidget } from './geojsonWidget';
@@ -84,8 +89,9 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
     return false;
   }
 
-  const cursorOnStart = overlaps(sel, startLine.from, startLine.to);
-  const cursorOnEnd = overlaps(sel, endLine.from, endLine.to);
+  // The ``` fences never show (markupEditing.ts keeps the cursor off them)
+  const cursorOnStart = showsMarkup(sel, startLine.from, startLine.to);
+  const cursorOnEnd = showsMarkup(sel, endLine.from, endLine.to);
 
   for (let ln = startLine.number; ln <= endLine.number; ln++) {
     const line = doc.line(ln);

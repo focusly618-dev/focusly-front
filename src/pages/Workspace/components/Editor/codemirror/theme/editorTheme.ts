@@ -110,6 +110,7 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         color: isDark ? '#ffffff' : theme.palette.text.primary,
       },
       '.cm-live-em': { fontStyle: 'italic' },
+      '.cm-live-strike': { textDecoration: 'line-through' },
       '.cm-live-h1': {
         fontSize: '1.7em',
         fontWeight: 800,
