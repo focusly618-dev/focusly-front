@@ -7,6 +7,7 @@ import {
   setPendingDiff,
 } from './extensions/diffReview';
 import { setTargetHighlight } from './extensions/targetHighlight';
+import { applyFormat } from './extensions/formatting';
 import { setCanvasPreviews } from './extensions/livePreview/canvasCard';
 import {
   normalizeInsertedMarkdown,
@@ -93,6 +94,11 @@ export const createImperativeApi = (
           bottom: rect.bottom,
         }
       : null;
+  },
+  format: (format, linkPlaceholder) => {
+    const view = getView();
+    if (!view) return;
+    applyFormat(view, format, linkPlaceholder);
   },
   insertAtCursor: (text) => {
     const view = getView();

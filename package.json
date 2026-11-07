@@ -25,6 +25,7 @@
     "@apollo/client": "3.13.0",
     "@assistant-ui/react": "^0.14.23",
     "@blocknote/core": "^0.46.2",
+    "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/commands": "^6.10.4",
     "@codemirror/lang-markdown": "^6.5.2",
     "@codemirror/language": "^6.12.4",
@@ -87,6 +88,7 @@
     "sweetalert2": "^11.26.24",
     "temporal-polyfill": "^0.3.0",
     "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

@@ -1,3 +1,5 @@
+import type { TextFormat } from './extensions/formatting';
+
 export interface MarkdownSelection {
   text: string;
   from: number;
@@ -18,6 +20,9 @@ export interface MarkdownEditorRef {
     changes: { from: number; to: number; insert: string }[],
   ) => void;
   insertAtCursor: (text: string) => void;
+  // Bold, italic, a heading, a list... on the selection (the format
+  // toolbar's buttons); toggles off what's already applied.
+  format: (format: TextFormat, linkPlaceholder?: string) => void;
   // Where a document position is drawn on screen (viewport coordinates), to
   // anchor UI to the text. `side` picks the character before (-1) or after
   // (1) it, which matters at line ends. Null when it isn't rendered.

@@ -2091,5 +2091,44 @@
         }
       }
     }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "Titolo 1",
+        "h2": "Titolo 2",
+        "h3": "Titolo 3",
+        "bullet": "Elenco puntato",
+        "numbered": "Elenco numerato",
+        "todo": "Elenco di attività",
+        "quote": "Citazione",
+        "callout": "Riquadro",
+        "toggle": "Sezione espandibile",
+        "code": "Codice",
+        "table": "Tabella",
+        "divider": "Separatore",
+        "math": "Equazione",
+        "diagram": "Diagramma"
+      },
+      "templates": {
+        "toggle": "Titolo",
+        "column": "Colonna {{n}}",
+        "start": "Inizio",
+        "end": "Fine"
+      }
+    },
+    "format": {
+      "toolbar": "Formattazione",
+      "bold": "Grassetto",
+      "italic": "Corsivo",
+      "strike": "Barrato",
+      "code": "Codice",
+      "link": "Link",
+      "h2": "Titolo",
+      "bullet": "Elenco puntato",
+      "todo": "Elenco di attività",
+      "quote": "Citazione",
+      "linkPlaceholder": "link"
+    }
   }
 }

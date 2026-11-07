@@ -17,6 +17,9 @@ import { imagePasteExtension } from './imagePaste';
 import { diffReviewExtensions } from './diffReview';
 import { targetHighlightExtension } from './targetHighlight';
 import { canvasDropExtension } from './canvasDrop';
+import { formattingKeymap } from './formatting';
+import { slashMenuExtension } from './slashMenu';
+import { htmlPasteExtension } from './htmlPaste';
 
 export interface BuildMarkdownExtensionsOptions {
   editorThemeCompartment: Compartment;
@@ -34,6 +37,8 @@ export const buildMarkdownExtensions = ({
   placeholder,
 }: BuildMarkdownExtensionsOptions): Extension[] => [
   history(),
+  // Before the defaults: Cmd/Ctrl+B, I... format instead of their defaults
+  formattingKeymap,
   keymap.of([
     ...imageKeymap,
     ...defaultKeymap,
@@ -46,6 +51,9 @@ export const buildMarkdownExtensions = ({
   highlightCompartment.of(syntaxHighlighting(initialHighlightStyle)),
   ...livePreviewExtensions,
   imagePasteExtension,
+  // After images: a paste with image files is theirs
+  htmlPasteExtension,
+  slashMenuExtension,
   ...canvasDropExtension,
   ...diffReviewExtensions,
   ...targetHighlightExtension,

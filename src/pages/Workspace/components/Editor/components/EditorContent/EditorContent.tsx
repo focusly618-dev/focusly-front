@@ -81,6 +81,7 @@ import { splitCanvasLabel } from './canvasLinks.utils';
 import { CreateCanvasPopover } from '../CanvasIdentity/CreateCanvasPopover';
 import { editorFontVars, type EditorFontStyle } from '../../editorFonts';
 import { TextActionsButton } from './TextActionsButton';
+import { FormatToolbar } from './FormatToolbar';
 
 // Excalidraw is heavy and only a canvas needs it: it's split into its own
 // chunk, fetched when a canvas is opened rather than with every note.
@@ -635,6 +636,14 @@ export const EditorContent = ({
                 </Box>
               </Box>
             )}
+
+            <FormatToolbar
+              editorRef={markdownEditorRef}
+              surfaceRef={editorSurfaceRef}
+              selectedText={liveSelectedText}
+              selectionTick={selectionTick}
+              hidden={isAIProcessing}
+            />
 
             <TextActionsButton
               editorRef={markdownEditorRef}

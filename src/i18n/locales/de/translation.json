@@ -2091,5 +2091,44 @@
         }
       }
     }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "Überschrift 1",
+        "h2": "Überschrift 2",
+        "h3": "Überschrift 3",
+        "bullet": "Aufzählung",
+        "numbered": "Nummerierte Liste",
+        "todo": "To-do-Liste",
+        "quote": "Zitat",
+        "callout": "Hinweis",
+        "toggle": "Aufklappbereich",
+        "code": "Code",
+        "table": "Tabelle",
+        "divider": "Trennlinie",
+        "math": "Formel",
+        "diagram": "Diagramm"
+      },
+      "templates": {
+        "toggle": "Titel",
+        "column": "Spalte {{n}}",
+        "start": "Start",
+        "end": "Ende"
+      }
+    },
+    "format": {
+      "toolbar": "Formatierung",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "strike": "Durchgestrichen",
+      "code": "Code",
+      "link": "Link",
+      "h2": "Überschrift",
+      "bullet": "Aufzählung",
+      "todo": "To-do-Liste",
+      "quote": "Zitat",
+      "linkPlaceholder": "Link"
+    }
   }
 }

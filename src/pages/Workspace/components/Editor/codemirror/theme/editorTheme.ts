@@ -569,6 +569,69 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         fontSize: '0.85em',
       },
 
+      // The "/" menu (extensions/slashMenu.ts): a quiet list, icon + name,
+      // the Markdown it writes in grey on the right.
+      '.cm-tooltip.cm-slash-menu': {
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: '12px',
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: isDark
+          ? '0 12px 32px rgba(0,0,0,0.45)'
+          : '0 12px 32px rgba(15,23,42,0.12)',
+        padding: '6px',
+        overflow: 'hidden',
+      },
+      '.cm-tooltip.cm-slash-menu > ul': {
+        fontFamily: theme.typography.fontFamily ?? 'inherit',
+        minWidth: '248px',
+        maxWidth: '280px',
+        maxHeight: '320px',
+      },
+      '.cm-tooltip.cm-slash-menu > ul > li.cm-slash-option': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        padding: '5px 8px',
+        borderRadius: '8px',
+        color: theme.palette.text.primary,
+        fontSize: '13.5px',
+        lineHeight: 1.3,
+      },
+      '.cm-tooltip.cm-slash-menu > ul > li.cm-slash-option[aria-selected]': {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          isDark ? 0.16 : 0.09,
+        ),
+        color: theme.palette.text.primary,
+      },
+      '.cm-slash-icon': {
+        flex: '0 0 auto',
+        width: '26px',
+        height: '26px',
+        display: 'grid',
+        placeItems: 'center',
+        borderRadius: '7px',
+        border: `1px solid ${theme.palette.divider}`,
+        color: theme.palette.text.secondary,
+        backgroundColor: alpha(
+          theme.palette.text.primary,
+          isDark ? 0.03 : 0.02,
+        ),
+      },
+      '.cm-slash-icon svg': { width: '15px', height: '15px' },
+      '.cm-slash-option[aria-selected] .cm-slash-icon': {
+        color: theme.palette.primary.main,
+        borderColor: alpha(theme.palette.primary.main, 0.4),
+      },
+      '.cm-slash-menu .cm-completionLabel': { flex: 1 },
+      '.cm-slash-menu .cm-completionDetail': {
+        marginLeft: 'auto',
+        fontStyle: 'normal',
+        fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+        fontSize: '11px',
+        color: theme.palette.text.disabled,
+      },
+
       // The heading jumped to (from the graph or the outline): a soft tint
       // behind its line that holds for a moment, then fades away.
       '.cm-target-line': {
