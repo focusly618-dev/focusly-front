@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina: Aktionen für die Auswahl",
+      "paragraph": "Lumina: Aktionen für diesen Absatz"
+    },
     "launcher": "Lumina fragen",
     "conversationTitle": "📝 {{title}}",
     "untitled": "Unbenanntes Dokument",

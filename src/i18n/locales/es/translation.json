@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina: acciones para la selección",
+      "paragraph": "Lumina: acciones para este párrafo"
+    },
     "launcher": "Pregúntale a Lumina",
     "conversationTitle": "📝 {{title}}",
     "untitled": "Documento sin título",

@@ -326,6 +326,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina：選択範囲へのアクション",
+      "paragraph": "Lumina：この段落へのアクション"
+    },
     "launcher": "Lumina に質問",
     "conversationTitle": "📝 {{title}}",
     "untitled": "無題のドキュメント",

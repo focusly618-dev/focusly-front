@@ -31,6 +31,7 @@ export interface UseEditorContentReturn {
   handleColorSelect: (color: HeaderColor) => void;
   handleIconSelect: (iconName: string) => void;
   handleContextMenu: (event: React.MouseEvent) => void;
+  handleActionsButton: (button: DOMRect) => void;
   handleClose: () => void;
   getLanguageLabel: (code: string) => string;
   handleCreateTask: () => void;

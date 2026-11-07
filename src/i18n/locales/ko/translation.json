@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina: 선택 영역 작업",
+      "paragraph": "Lumina: 이 단락 작업"
+    },
     "launcher": "Lumina에게 묻기",
     "conversationTitle": "📝 {{title}}",
     "untitled": "제목 없는 문서",

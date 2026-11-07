@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina：针对所选内容的操作",
+      "paragraph": "Lumina：针对此段落的操作"
+    },
     "launcher": "询问 Lumina",
     "conversationTitle": "📝 {{title}}",
     "untitled": "未命名文档",
