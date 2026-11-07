@@ -573,6 +573,9 @@ export const buildEditorTheme = (theme: Theme): Extension => {
       // The "/" menu (extensions/slashMenu.ts): a quiet list, icon + name,
       // the Markdown it writes in grey on the right.
       '.cm-tooltip.cm-slash-menu': {
+        // CodeMirror shrinks a tooltip that doesn't fit and keeps that height
+        // after filtering; the list's own max height bounds it instead.
+        height: 'auto !important',
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: '12px',
         backgroundColor: theme.palette.background.paper,
