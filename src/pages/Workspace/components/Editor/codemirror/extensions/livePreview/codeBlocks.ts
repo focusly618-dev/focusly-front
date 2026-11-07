@@ -2,12 +2,13 @@ import type { EditorState } from '@codemirror/state';
 import { Decoration } from '@codemirror/view';
 import type { SyntaxNode } from '@lezer/common';
 import {
-  overlaps,
+  isEditingBlock,
   showsMarkup,
   type BlockHandler,
   type Handler,
 } from './utils';
-import { MermaidWidget } from './mermaidWidget';
+import { isDiagramInCodeMode } from './foldState';
+import { MermaidHeaderToolbarWidget, MermaidWidget } from './mermaidWidget';
 import { MathWidget } from './mathWidget';
 import { GeoJsonWidget } from './geojsonWidget';
 
@@ -79,14 +80,16 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
     }
   }
 
-  // A drawn fence (mermaid, math, geojson) with the cursor outside is
-  // replaced by its widget in blockDecorations.ts
-  if (
-    codeInfo &&
-    RENDERED_FENCES.has(fenceLanguage(codeInfo.text)) &&
-    !overlaps(sel, node.from, node.to)
-  ) {
-    return false;
+  const lang = codeInfo ? fenceLanguage(codeInfo.text) : '';
+  const isMermaid = lang === 'mermaid';
+
+  // A drawn fence (mermaid, math, geojson) in preview mode is replaced by its
+  // widget in blockDecorations.ts
+  if (codeInfo && RENDERED_FENCES.has(lang)) {
+    const editing = isMermaid
+      ? isDiagramInCodeMode(view.state, node.from)
+      : isEditingBlock(view.state, node.from, node.to);
+    if (!editing) return false;
   }
 
   // The ``` fences never show (markupEditing.ts keeps the cursor off them)
@@ -98,6 +101,7 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
     let cls = 'cm-code-block-line';
     if (ln === startLine.number) {
       cls += ' cm-code-block-header';
+      if (isMermaid) cls += ' cm-mermaid-code-header';
       if (cursorOnStart) cls += ' cm-code-fence-active';
     } else if (ln === endLine.number) {
       cls += ' cm-code-block-footer';
@@ -118,6 +122,17 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
     }
   }
 
+  if (isMermaid) {
+    push(
+      startLine.to,
+      startLine.to,
+      Decoration.widget({
+        widget: new MermaidHeaderToolbarWidget(node.from),
+        side: 1,
+      }),
+    );
+  }
+
   // When cursor is NOT on the closing fence line, hide the closing backticks (```)
   if (!cursorOnEnd && closeMark) {
     push(closeMark.from, closeMark.to, Decoration.replace({}));
@@ -129,19 +144,31 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
 // Renders ```mermaid as a diagram, ```math as a formula (GitHub's other math
 // syntax) and ```geojson as a map. A BlockHandler (state-based, full-document
 // walk) since it needs `block: true` — see blockDecorations.ts.
-export const handleRenderedFence: BlockHandler = (node, state, sel, push) => {
+export const handleRenderedFence: BlockHandler = (node, state, _sel, push) => {
   const { info, code } = extractFenceInfo(node.node, state);
   const language = fenceLanguage(info);
 
-  // Being edited: the code shows (as a code block, its ``` hidden) and
-  // what it draws right under it, live
-  if (overlaps(sel, node.from, node.to)) {
+  if (language === 'mermaid') {
+    // In code mode (`</>` icon active), show only the code block — never render
+    // the colorful diagram underneath the code editor.
+    if (isDiagramInCodeMode(state, node.from)) return;
+    const startLine = state.doc.lineAt(node.from);
+    const endLine = state.doc.lineAt(node.to);
+    push(
+      startLine.from,
+      endLine.to,
+      Decoration.replace({
+        widget: new MermaidWidget(code, node.from),
+        block: true,
+      }),
+    );
+    return;
+  }
+
+  // Being edited: a math fence shows its source and the formula under it
+  if (isEditingBlock(state, node.from, node.to)) {
     const preview =
-      language === 'mermaid'
-        ? new MermaidWidget(code)
-        : language === 'math'
-          ? new MathWidget(code.trim() || ' ', true)
-          : null;
+      language === 'math' ? new MathWidget(code.trim() || ' ', true) : null;
     if (preview && code.trim()) {
       push(
         state.doc.lineAt(node.to).to,
@@ -152,13 +179,11 @@ export const handleRenderedFence: BlockHandler = (node, state, sel, push) => {
     return;
   }
   const widget =
-    language === 'mermaid'
-      ? new MermaidWidget(code)
-      : language === 'math'
-        ? new MathWidget(code, true)
-        : language === 'geojson'
-          ? new GeoJsonWidget(code)
-          : null;
+    language === 'math'
+      ? new MathWidget(code, true)
+      : language === 'geojson'
+        ? new GeoJsonWidget(code)
+        : null;
   if (!widget) return;
 
   const startLine = state.doc.lineAt(node.from);

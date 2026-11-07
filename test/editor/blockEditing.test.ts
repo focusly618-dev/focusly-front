@@ -14,6 +14,11 @@ import {
   applySlashItem,
   SLASH_ITEMS,
 } from '@/pages/Workspace/components/Editor/codemirror/extensions/slashMenu';
+import {
+  handleMarkupBackspace,
+  markupEditingExtensions,
+} from '@/pages/Workspace/components/Editor/codemirror/extensions/markupEditing';
+import { resolveValidMermaidCode } from '@/pages/Workspace/components/Editor/codemirror/extensions/livePreview/mermaidWidget';
 
 let views: EditorView[] = [];
 
@@ -22,7 +27,11 @@ const editor = (doc: string, cursor = doc.length) => {
     state: EditorState.create({
       doc,
       selection: { anchor: cursor },
-      extensions: [markdownExtension, livePreviewExtensions],
+      extensions: [
+        markdownExtension,
+        livePreviewExtensions,
+        ...markupEditingExtensions,
+      ],
     }),
     parent: document.body,
   });
@@ -110,12 +119,19 @@ describe('a table in the editor', () => {
     expect(view.state.doc.toString()).toBe(`Intro\n\n${TABLE}\n\nD`);
   });
 
-  it('the cursor never rests on its edge', () => {
-    const view = editor(`Intro\n\n${TABLE}\n\nFin`, 0);
-    const tableStart = view.state.doc.toString().indexOf('| Tarea');
+  it('the cursor never rests on its edge, and moves past it in both directions', () => {
+    const doc = `Intro\n\n${TABLE}\n\nFin`;
+    const view = editor(doc, 0);
+    const tableStart = doc.indexOf('| Tarea');
+    const tableEnd = doc.indexOf('|  |  |') + '|  |  |'.length;
+
+    // Moving down onto the table's start steps past the table
     view.dispatch({ selection: EditorSelection.cursor(tableStart) });
-    const head = view.state.selection.main.head;
-    expect(head === tableStart).toBe(false);
+    expect(view.state.selection.main.head).toBe(tableEnd + 1);
+
+    // Moving up from below onto the table's end steps above the table
+    view.dispatch({ selection: EditorSelection.cursor(tableEnd) });
+    expect(view.state.selection.main.head).toBe(tableStart - 1);
   });
 });
 
@@ -146,6 +162,78 @@ describe('a math block', () => {
     expect(visible(view)).not.toContain('$$');
     expect(view.dom.querySelector('.cm-math-source-line')).not.toBeNull();
   });
+
+  it('can step out of the formula upwards and downwards without getting trapped', () => {
+    const doc = 'Intro\n\n$$\nE = mc^2\n$$\n\nFin';
+    const view = editor(doc, doc.indexOf('E ='));
+    const openFence = doc.indexOf('$$');
+    const closeFence = doc.lastIndexOf('$$');
+
+    // Moving up onto the opening $$ steps to the line above the math block
+    view.dispatch({ selection: EditorSelection.cursor(openFence) });
+    expect(view.state.selection.main.head).toBe(openFence - 1);
+
+    // Re-enter and move down onto the closing $$: steps to the line below
+    view.dispatch({ selection: EditorSelection.cursor(doc.indexOf('E =')) });
+    view.dispatch({ selection: EditorSelection.cursor(closeFence) });
+    expect(view.state.selection.main.head).toBe(closeFence + 3);
+  });
+});
+
+describe('selecting and deleting blocks smoothly', () => {
+  it('dragging a selection from below or above across a diagram or table snaps across the whole block without expanding code', () => {
+    const doc = 'Arriba\n\n```mermaid\nflowchart TD\n  A --> B\n```\n\nAbajo';
+    const blockStart = doc.indexOf('```mermaid');
+    const blockEnd = doc.lastIndexOf('```') + 3;
+    const view = editor(doc, doc.length);
+
+    // Dragging from below into the middle of the mermaid block snaps head to blockStart
+    view.dispatch({
+      selection: EditorSelection.range(doc.length, doc.indexOf('flowchart')),
+      userEvent: 'select.pointer',
+    });
+    expect(view.state.selection.main.from).toBe(blockStart);
+    expect(view.state.selection.main.to).toBe(doc.length);
+    // The diagram stays a rendered widget (never expands into code lines mid-drag)
+    expect(view.dom.querySelector('.cm-code-block-line')).toBeNull();
+
+    // Dragging from above into the middle of the mermaid block snaps head to blockEnd
+    view.dispatch({
+      selection: EditorSelection.range(0, doc.indexOf('flowchart')),
+      userEvent: 'select.pointer',
+    });
+    expect(view.state.selection.main.from).toBe(0);
+    expect(view.state.selection.main.to).toBe(blockEnd);
+  });
+
+  it('backspace on the line under a diagram or empty block deletes the whole block', () => {
+    const doc = 'Intro\n\n```mermaid\nflowchart TD\n  A --> B\n```\n';
+    const view = editor(doc, doc.length);
+    expect(handleMarkupBackspace(view)).toBe(true);
+    expect(view.state.doc.toString()).toBe('Intro\n\n');
+  });
+
+  it('selecting all or clicking at the end of a document with a diagram at the bottom never opens the diagram for editing', () => {
+    const doc = 'Intro\n\n```mermaid\nflowchart TD\n  A --> B\n```';
+    const view = editor(doc, 0);
+    expect(view.dom.querySelector('.cm-code-block-line')).toBeNull();
+
+    // Select All (0 .. doc.length) where doc.length is the end of the closing ``` fence
+    view.dispatch({
+      selection: EditorSelection.range(0, doc.length),
+      userEvent: 'select',
+    });
+    expect(view.dom.querySelector('.cm-code-block-line')).toBeNull();
+    expect(view.dom.querySelector('.cm-live-mermaid')).not.toBeNull();
+
+    // Pointer click at the very end of the document (after the closing ``` fence)
+    view.dispatch({
+      selection: EditorSelection.cursor(doc.length),
+      userEvent: 'select.pointer',
+    });
+    expect(view.state.selection.main.head).toBe(doc.length);
+    expect(view.dom.querySelector('.cm-code-block-line')).toBeNull();
+  });
 });
 
 describe('"/" templates', () => {
@@ -164,5 +252,84 @@ describe('"/" templates', () => {
 
   it('a callout comes with a translated title', () => {
     expect(insert('callout')).toBe('> [!note] Nota\n> ');
+  });
+
+  it('an invalid mermaid diagram shows a friendly error and leaves no Syntax error DOM nodes on the page', async () => {
+    const doc = 'Intro\n\n```mermaid\nflowchart TD\n  A -->\n```\n\nFin';
+    const view = editor(doc, 0);
+    await new Promise((r) => setTimeout(r, 80));
+    const errEl = view.dom.querySelector('.cm-live-mermaid-error');
+    expect(errEl?.textContent).toBe(
+      'Este diagrama tiene un error de escritura. Revisa su código.',
+    );
+    expect(document.body.textContent).not.toContain('Syntax error in text');
+  });
+
+  it('a flowchart with parentheses inside unquoted node labels auto-quotes and parses without syntax error', async () => {
+    const code = `flowchart TD
+    classDef energy fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff;
+    classDef storage fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff;
+
+    A[🍞 1. Ingestión: Alimentos ricos en Carbohidratos<br/>(Pan, Frutas, Arroz, Azúcares)] --> B[🦷 2. Digestión en Boca y Estómago<br/>(La amilasa salival inicia la descomposición)]
+    B --> C[🧪 3. Intestino Delgado<br/>(Enzimas los convierten en Monosacáridos:<br/>Glucosa, Fructosa y Galactosa)]
+    C --> D[🩸 4. Torrente Sanguíneo<br/>(La glucosa viaja por la sangre hacia las células)]
+    D --> E{¿Qué necesita el cuerpo?}
+    E -- Energía Inmediata ⚡ --> F[🔋 5A. Producción de ATP<br/>(Respiración celular en mitocondrias<br/>para cerebro, músculos y órganos)]:::energy
+    E -- Exceso de Glucosa 🗄️ --> G[📦 5B. Almacenamiento (Glucogénesis)<br/>• Glucógeno en Hígado y Músculos]:::storage
+    G --> H[⚖️ 5C. Si el glucógeno está lleno...<br/>Lipogénesis (Transformación en Grasa corporal)]:::storage`;
+    const valid = await resolveValidMermaidCode(code);
+    expect(valid).not.toBeNull();
+  });
+
+  it('inserting a diagram via "/" opens only the code editor (no diagram rendered below) with 2 toggle icons (Eye and Code)', () => {
+    const view = editor('Intro\n\n/');
+    const end = view.state.doc.length;
+    applySlashItem(
+      view,
+      SLASH_ITEMS.find((i) => i.id === 'diagram')!,
+      end - 1,
+      end,
+    );
+
+    // In Code mode: code block lines are visible, NO diagram preview rendered below
+    expect(view.dom.querySelector('.cm-code-block-line')).not.toBeNull();
+    expect(view.dom.querySelector('.cm-live-mermaid')).toBeNull();
+
+    // Both toggle icons (Eye = preview, </> = code) are rendered in the header
+    const previewBtn = view.dom.querySelector<HTMLElement>(
+      '[data-mermaid-mode="preview"]',
+    );
+    const codeBtn = view.dom.querySelector<HTMLElement>(
+      '[data-mermaid-mode="code"]',
+    );
+    expect(previewBtn).not.toBeNull();
+    expect(codeBtn).not.toBeNull();
+    expect(codeBtn?.classList.contains('is-active')).toBe(true);
+
+    // Clicking the Eye icon switches to Preview mode (shows only the diagram, hides code)
+    previewBtn!.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0 }),
+    );
+    expect(view.dom.querySelector('.cm-code-block-line')).toBeNull();
+    expect(view.dom.querySelector('.cm-live-mermaid')).not.toBeNull();
+
+    // Clicking the Code icon on the rendered diagram switches back to Code mode
+    const renderedCodeBtn = view.dom.querySelector<HTMLElement>(
+      '.cm-live-mermaid [data-mermaid-mode="code"]',
+    );
+    expect(renderedCodeBtn).not.toBeNull();
+    renderedCodeBtn!.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0 }),
+    );
+    expect(view.dom.querySelector('.cm-code-block-line')).not.toBeNull();
+    expect(view.dom.querySelector('.cm-live-mermaid')).toBeNull();
+
+    // Clicking anywhere outside the diagram in the editor also closes the code editor
+    view.dispatch({
+      selection: EditorSelection.cursor(0),
+      userEvent: 'select.pointer',
+    });
+    expect(view.dom.querySelector('.cm-code-block-line')).toBeNull();
+    expect(view.dom.querySelector('.cm-live-mermaid')).not.toBeNull();
   });
 });

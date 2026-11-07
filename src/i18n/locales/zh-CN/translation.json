@@ -2138,6 +2138,10 @@
       "deleteRow": "删除行",
       "deleteColumn": "删除列",
       "deleteTable": "删除表格"
+    },
+    "diagram": {
+      "rendering": "正在绘制图表…",
+      "error": "此图表存在语法错误，请检查其代码。"
     }
   }
 }

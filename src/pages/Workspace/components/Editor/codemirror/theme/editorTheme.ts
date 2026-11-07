@@ -380,6 +380,7 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         borderRight: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
       },
       '.cm-code-block-header': {
+        position: 'relative',
         borderTop: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
         borderTopLeftRadius: '10px',
         borderTopRightRadius: '10px',
@@ -387,6 +388,10 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         paddingBottom: '3px',
         marginTop: '8px',
         borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'}`,
+      },
+      '.cm-mermaid-code-header': {
+        paddingTop: '7px',
+        paddingBottom: '7px',
       },
       '.cm-code-block-footer': {
         borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
@@ -431,6 +436,19 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         padding: '0 12px !important',
       },
 
+      // While drag-selecting in the document, block widgets let pointer and
+      // wheel events pass straight through to the editor so dragging from
+      // top-to-bottom or bottom-to-top across tables, diagrams or formulas
+      // never gets trapped inside nested DOM.
+      '&.cm-dragging-selection .cm-live-table-wrapper, &.cm-dragging-selection .cm-live-mermaid, &.cm-dragging-selection .cm-live-math-block, &.cm-dragging-selection .cm-live-details-header, &.cm-dragging-selection .cm-live-callout-header':
+        {
+          pointerEvents: 'none !important',
+          userSelect: 'none !important',
+        },
+      '.cm-live-table-wrapper:not(.cm-live-table-editing), .cm-live-table-wrapper:not(.cm-live-table-editing) [contenteditable="true"]':
+        {
+          userSelect: 'none',
+        },
       // Tables
       '.cm-live-table-wrapper': {
         position: 'relative',
@@ -544,20 +562,79 @@ export const buildEditorTheme = (theme: Theme): Extension => {
 
       // Mermaid diagrams: centered, scrolling sideways when wider than the note
       '.cm-live-mermaid': {
+        position: 'relative',
         display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'center',
         overflowX: 'auto',
         margin: '10px 0',
+        padding: '36px 12px 12px',
+        borderRadius: '10px',
+        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
         color: theme.palette.text.secondary,
         fontSize: '0.85em',
       },
-      '.cm-live-mermaid svg': { maxWidth: '100%', height: 'auto' },
+      '.cm-live-mermaid-body': {
+        display: 'flex',
+        justifyContent: 'center',
+        width: '100%',
+        overflowX: 'auto',
+      },
+      '.cm-live-mermaid-body svg': { maxWidth: '100%', height: 'auto' },
+      '.cm-mermaid-toolbar': {
+        position: 'absolute',
+        top: '6px',
+        right: '8px',
+        zIndex: 5,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '2px',
+        padding: '2px',
+        borderRadius: '8px',
+        backgroundColor: isDark
+          ? 'rgba(30, 41, 59, 0.88)'
+          : 'rgba(241, 245, 249, 0.94)',
+        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
+        backdropFilter: 'blur(6px)',
+        userSelect: 'none',
+      },
+      '.cm-mermaid-code-header .cm-mermaid-toolbar': {
+        top: '4px',
+        right: '10px',
+      },
+      '.cm-mermaid-mode-btn': {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '26px',
+        height: '24px',
+        padding: 0,
+        border: 'none',
+        borderRadius: '6px',
+        backgroundColor: 'transparent',
+        color: theme.palette.text.secondary,
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+      },
+      '.cm-mermaid-mode-btn:hover': {
+        color: theme.palette.text.primary,
+        backgroundColor: isDark
+          ? 'rgba(255, 255, 255, 0.08)'
+          : 'rgba(0, 0, 0, 0.06)',
+      },
+      '.cm-mermaid-mode-btn.is-active': {
+        color: theme.palette.primary.main,
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          isDark ? 0.22 : 0.14,
+        ),
+      },
       '.cm-live-mermaid-error, .cm-live-geojson-error': {
-        display: 'block',
         color: theme.palette.error.main,
         fontFamily: '"JetBrains Mono", ui-monospace, monospace',
         fontSize: '0.85em',
-        padding: '8px 12px',
+        padding: '36px 12px 12px',
         borderRadius: '8px',
         border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`,
       },

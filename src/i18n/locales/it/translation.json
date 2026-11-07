@@ -2138,6 +2138,10 @@
       "deleteRow": "Rimuovi riga",
       "deleteColumn": "Rimuovi colonna",
       "deleteTable": "Elimina tabella"
+    },
+    "diagram": {
+      "rendering": "Disegno del diagramma…",
+      "error": "Questo diagramma ha un errore di sintassi. Controlla il codice."
     }
   }
 }

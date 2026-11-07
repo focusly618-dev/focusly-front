@@ -140,7 +140,7 @@ export const SLASH_ITEMS: SlashItem[] = [
       '<rect x="3" y="3.5" width="7" height="5.5" rx="1.2"/><rect x="14" y="15" width="7" height="5.5" rx="1.2"/><path d="M6.5 9v3.5h11V15"/>',
     ),
     template: () =>
-      `\`\`\`mermaid\nflowchart TD\n  A[{|}${t('templates.start')}] --> B[${t('templates.end')}]\n\`\`\``,
+      `\`\`\`mermaid\nflowchart TD\n  A[{|}${t('templates.start')}] --> B[${t('templates.end')}]\n\`\`\`\n`,
   },
   {
     id: 'canvas',

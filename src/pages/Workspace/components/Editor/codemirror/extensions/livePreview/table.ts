@@ -335,6 +335,11 @@ class TableWidget extends WidgetType {
       (el as HTMLElement | null)?.closest?.<HTMLElement>('[data-row]') ?? null;
     let current: HTMLElement | null = null;
 
+    wrapper.addEventListener('mousedown', (e) => {
+      if (e.shiftKey || e.button !== 0) return;
+      if (cellOf(e.target)) wrapper.classList.add('cm-live-table-editing');
+    });
+
     wrapper.addEventListener('focusin', (e) => {
       const cell = cellOf(e.target);
       if (!cell) return;
@@ -509,8 +514,24 @@ class TableWidget extends WidgetType {
       });
   }
 
-  // The cells handle their own typing, clicks and keys
-  ignoreEvent() {
+  // The cells handle their own typing, clicks and keys while being edited;
+  // wheel scrolling and selection drags from outside pass through to the editor.
+  ignoreEvent(event: Event) {
+    if (
+      event.type === 'wheel' ||
+      event.type === 'scroll' ||
+      event.type === 'touchmove'
+    ) {
+      return false;
+    }
+    const target = event.target as HTMLElement | null;
+    const wrapper = target?.closest?.('.cm-live-table-wrapper');
+    if (!wrapper?.classList.contains('cm-live-table-editing')) {
+      if (event.type === 'mousedown' && !(event as MouseEvent).shiftKey) {
+        return Boolean(target?.closest?.('[data-row], .cm-live-table-toolbar'));
+      }
+      return false;
+    }
     return true;
   }
 }
@@ -558,17 +579,21 @@ const tableEdgeGuard = EditorState.transactionFilter.of((tr) => {
   if (!sel.empty || tr.newSelection.ranges.length > 1) return tr;
   const state = tr.state;
   const line = state.doc.lineAt(sel.head);
+  const oldHead = tr.startState.selection.main.head;
+  const isPointer = tr.isUserEvent('select.pointer');
   for (const table of tableLineRanges(state, line.from, line.to)) {
     if (sel.head < table.from || sel.head > table.to) continue;
-    const goingDown = tr.startState.selection.main.head < table.from;
-    const target =
-      goingDown || sel.head === table.to
-        ? table.to < state.doc.length
-          ? table.to + 1
-          : null
-        : table.from > 0
-          ? table.from - 1
-          : null;
+    const before = table.from > 0 ? table.from - 1 : null;
+    const after = table.to < state.doc.length ? table.to + 1 : null;
+    let preferAfter: boolean;
+    if (isPointer) {
+      preferAfter = sel.head > (table.from + table.to) / 2;
+    } else if (oldHead > table.to) {
+      preferAfter = false;
+    } else {
+      preferAfter = true;
+    }
+    const target = preferAfter ? (after ?? before) : (before ?? after);
     if (target === null || target === sel.head) return tr;
     return [
       tr,
@@ -579,8 +604,8 @@ const tableEdgeGuard = EditorState.transactionFilter.of((tr) => {
 });
 
 /** Backspace at the start of the line under a table, or Delete at the end
- * of the line over one, would merge text into its rows: nothing happens
- * (an empty line under it goes, though). */
+ * of the line over one, deletes the table cleanly instead of merging text
+ * into its pipe syntax. */
 const protectTable = (view: EditorView, direction: 'back' | 'forward') => {
   const { state } = view;
   const sel = state.selection.main;
@@ -588,18 +613,22 @@ const protectTable = (view: EditorView, direction: 'back' | 'forward') => {
   const line = state.doc.lineAt(sel.head);
   if (direction === 'back' && sel.head === line.from && line.number > 1) {
     const above = state.doc.line(line.number - 1);
-    if (
-      !tableLineRanges(state, above.from, above.to).some(
-        (r) => r.to === above.to,
-      )
-    )
-      return false;
-    if (line.length === 0 && line.number < state.doc.lines) {
-      view.dispatch({
-        changes: { from: line.from, to: line.to + 1 },
-        selection: EditorSelection.cursor(line.from),
-      });
-    }
+    const table = tableLineRanges(state, above.from, above.to).find(
+      (r) => r.to === above.to,
+    );
+    if (!table) return false;
+    const to =
+      line.length === 0
+        ? line.to < state.doc.length
+          ? line.to + 1
+          : line.to
+        : table.to + 1;
+    view.dispatch({
+      changes: { from: table.from, to },
+      selection: EditorSelection.cursor(table.from),
+      scrollIntoView: true,
+      userEvent: 'delete.table',
+    });
     return true;
   }
   if (
@@ -608,9 +637,19 @@ const protectTable = (view: EditorView, direction: 'back' | 'forward') => {
     line.number < state.doc.lines
   ) {
     const below = state.doc.line(line.number + 1);
-    return tableLineRanges(state, below.from, below.to).some(
+    const table = tableLineRanges(state, below.from, below.to).find(
       (r) => r.from === below.from,
     );
+    if (!table) return false;
+    const from = line.length === 0 ? line.from : table.from;
+    const to = table.to < state.doc.length ? table.to + 1 : table.to;
+    view.dispatch({
+      changes: { from, to },
+      selection: EditorSelection.cursor(from),
+      scrollIntoView: true,
+      userEvent: 'delete.table',
+    });
+    return true;
   }
   return false;
 };

@@ -2138,6 +2138,10 @@
       "deleteRow": "Zeile entfernen",
       "deleteColumn": "Spalte entfernen",
       "deleteTable": "Tabelle löschen"
+    },
+    "diagram": {
+      "rendering": "Diagramm wird gezeichnet…",
+      "error": "Dieses Diagramm enthält einen Syntaxfehler. Prüfe seinen Code."
     }
   }
 }

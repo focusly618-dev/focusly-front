@@ -2138,6 +2138,10 @@
       "deleteRow": "Quitar fila",
       "deleteColumn": "Quitar columna",
       "deleteTable": "Eliminar tabla"
+    },
+    "diagram": {
+      "rendering": "Dibujando diagrama…",
+      "error": "Este diagrama tiene un error de escritura. Revisa su código."
     }
   }
 }

@@ -1,4 +1,5 @@
-import { StateEffect, StateField } from '@codemirror/state';
+import { type EditorState, StateEffect, StateField } from '@codemirror/state';
+import { syntaxTree } from '@codemirror/language';
 
 // Callout fold state, keyed by the blockquote's start position. A real
 // StateField (not a plugin instance property) because it must be readable
@@ -30,3 +31,107 @@ export const calloutFoldField = StateField.define<Map<number, boolean>>({
     return map;
   },
 });
+
+// Explicit view/code mode for ```mermaid blocks, keyed by the FencedCode
+// block's start position (`node.from`).
+// - Not in set (default): Preview mode (eye icon active — rendered diagram).
+// - In set: Code mode (`</>` icon active — editable Markdown code, without
+//   a duplicate diagram rendered underneath).
+export const setDiagramCodeMode = StateEffect.define<{
+  pos: number;
+  codeMode: boolean;
+}>();
+
+export const diagramCodeModeField = StateField.define<Set<number>>({
+  create() {
+    return new Set();
+  },
+  update(value, tr) {
+    let set = value;
+
+    if (tr.docChanged && value.size > 0) {
+      const mapped = new Set<number>();
+      value.forEach((pos) => mapped.add(tr.changes.mapPos(pos)));
+      set = mapped;
+    }
+
+    // When a new ```mermaid block is inserted (e.g. from the `/` menu) or its
+    // inner code is edited while the cursor is inside it, keep/put it in code mode.
+    if (tr.docChanged && tr.state.selection.main.empty) {
+      const head = tr.state.selection.main.head;
+      syntaxTree(tr.state).iterate({
+        from: head,
+        to: head,
+        enter(node) {
+          if (node.name !== 'FencedCode') return;
+          const startLine = tr.state.doc.lineAt(node.from);
+          const endLine = tr.state.doc.lineAt(node.to);
+          if (endLine.number - startLine.number < 2) return false;
+          const lang = startLine.text
+            .replace(/^`{3,}\s*/, '')
+            .trim()
+            .split(/\s+/)[0]
+            ?.toLowerCase();
+          if (
+            lang === 'mermaid' &&
+            head > startLine.to &&
+            head < endLine.from
+          ) {
+            let touched = false;
+            tr.changes.iterChangedRanges((_fA, _tA, fromB, toB) => {
+              if (fromB <= node.to && toB >= node.from) touched = true;
+            });
+            if (touched) {
+              if (set === value) set = new Set(value);
+              set.add(node.from);
+            }
+          }
+          return false;
+        },
+      });
+    }
+
+    // Moving the cursor or clicking outside an open diagram block exits code
+    // mode so clicking anywhere else in the editor closes the diagram editor.
+    if (tr.selection && !tr.docChanged && set.size > 0) {
+      const sel = tr.state.selection.main;
+      for (const pos of Array.from(set)) {
+        let stillInside = false;
+        syntaxTree(tr.state).iterate({
+          from: Math.max(0, pos),
+          to: Math.min(tr.state.doc.length, pos + 1),
+          enter(node) {
+            if (node.name === 'FencedCode' && node.from === pos) {
+              if (sel.from >= node.from && sel.to <= node.to) {
+                stillInside = true;
+              }
+              return false;
+            }
+          },
+        });
+        if (!stillInside) {
+          if (set === value) set = new Set(value);
+          set.delete(pos);
+        }
+      }
+    }
+
+    for (const effect of tr.effects) {
+      if (effect.is(setDiagramCodeMode)) {
+        if (set === value) set = new Set(value);
+        if (effect.value.codeMode) {
+          set.add(effect.value.pos);
+        } else {
+          set.delete(effect.value.pos);
+        }
+      }
+    }
+
+    return set;
+  },
+});
+
+export const isDiagramInCodeMode = (
+  state: EditorState,
+  nodeFrom: number,
+): boolean => state.field(diagramCodeModeField, false)?.has(nodeFrom) ?? false;
