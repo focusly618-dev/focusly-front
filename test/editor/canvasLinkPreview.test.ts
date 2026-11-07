@@ -46,12 +46,12 @@ describe('canvas links in the live preview', () => {
     ).toBe('🎨');
   });
 
-  it('shows the markdown again while the cursor is on it', () => {
+  it('keeps the card rendered even while the cursor is on it', () => {
     const doc = `Intro\n\n[🧠 Ideas](#canvas-${ID})`;
     const dom = render(doc, doc.indexOf('Ideas'));
 
-    expect(dom.querySelector('.cm-canvas-card')).toBeNull();
-    expect(dom.textContent).toContain(`(#canvas-${ID})`);
+    expect(dom.querySelector('.cm-canvas-card')).not.toBeNull();
+    expect(dom.textContent).not.toContain(`(#canvas-${ID})`);
   });
 
   it('keeps a link inside a sentence inline, with its icon apart', () => {

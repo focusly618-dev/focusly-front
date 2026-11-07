@@ -220,92 +220,116 @@ export const TasksAIOrganizeModal: React.FC<TasksAIOrganizeModalProps> = ({
                 overflow: 'hidden',
               }}
             >
-              <Table size="small">
-                <TableHead sx={{ bgcolor: 'action.hover' }}>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Tarea</TableCell>
-                    <TableCell sx={{ fontWeight: 700, textAlign: 'center' }}>
-                      Prioridad
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700, textAlign: 'center' }}>
-                      Orden Sugerido
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>
-                      Justificación de Lumina
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {plan.map((item) => {
-                    const task = tasks.find((t) => t.id === item.taskId);
-                    if (!task) return null;
+              {plan.length > 0 ? (
+                <Table size="small">
+                  <TableHead sx={{ bgcolor: 'action.hover' }}>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 700 }}>Tarea</TableCell>
+                      <TableCell sx={{ fontWeight: 700, textAlign: 'center' }}>
+                        Prioridad
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 700, textAlign: 'center' }}>
+                        Orden Sugerido
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>
+                        Justificación de Lumina
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {plan.map((item) => {
+                      const task = tasks.find((t) => t.id === item.taskId);
+                      if (!task) return null;
 
-                    const currentPriority = getPriorityLabel(
-                      task.priority_level,
-                    );
-                    const isPriorityChanged =
-                      currentPriority.toUpperCase() !==
-                      item.recommendedPriority.toUpperCase();
+                      const currentPriority = getPriorityLabel(
+                        task.priority_level,
+                      );
+                      const isPriorityChanged =
+                        currentPriority.toUpperCase() !==
+                        item.recommendedPriority.toUpperCase();
 
-                    return (
-                      <TableRow key={item.taskId} hover>
-                        <TableCell sx={{ fontWeight: 600 }}>
-                          {task.title}
-                        </TableCell>
-                        <TableCell sx={{ textAlign: 'center' }}>
-                          <Box
+                      return (
+                        <TableRow key={item.taskId} hover>
+                          <TableCell sx={{ fontWeight: 600 }}>
+                            {task.title}
+                          </TableCell>
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 0.5,
+                              }}
+                            >
+                              <Chip
+                                label={currentPriority}
+                                size="small"
+                                variant="outlined"
+                                color={getPriorityChipColor(currentPriority)}
+                              />
+                              {isPriorityChanged && (
+                                <>
+                                  <ArrowForwardIcon
+                                    sx={{
+                                      fontSize: 12,
+                                      color: 'text.secondary',
+                                    }}
+                                  />
+                                  <Chip
+                                    label={item.recommendedPriority}
+                                    size="small"
+                                    color={getPriorityChipColor(
+                                      item.recommendedPriority,
+                                    )}
+                                  />
+                                </>
+                              )}
+                            </Box>
+                          </TableCell>
+                          <TableCell
                             sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: 0.5,
+                              textAlign: 'center',
+                              fontWeight: 700,
+                              color: 'primary.main',
                             }}
                           >
-                            <Chip
-                              label={currentPriority}
-                              size="small"
-                              variant="outlined"
-                              color={getPriorityChipColor(currentPriority)}
-                            />
-                            {isPriorityChanged && (
-                              <>
-                                <ArrowForwardIcon
-                                  sx={{ fontSize: 12, color: 'text.secondary' }}
-                                />
-                                <Chip
-                                  label={item.recommendedPriority}
-                                  size="small"
-                                  color={getPriorityChipColor(
-                                    item.recommendedPriority,
-                                  )}
-                                />
-                              </>
-                            )}
-                          </Box>
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            textAlign: 'center',
-                            fontWeight: 700,
-                            color: 'primary.main',
-                          }}
-                        >
-                          #{item.suggestedOrder}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            color: 'text.secondary',
-                            fontSize: '0.8rem',
-                            maxWidth: '300px',
-                          }}
-                        >
-                          {item.reason}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                            #{item.suggestedOrder}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: '0.8rem',
+                              maxWidth: '300px',
+                            }}
+                          >
+                            {item.reason}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              ) : (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    py: 8,
+                    gap: 2.5,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    fontWeight={500}
+                  >
+                    No hay tareas para organizar.
+                  </Typography>
+                </Box>
+              )}
             </TableContainer>
           </Box>
         )}

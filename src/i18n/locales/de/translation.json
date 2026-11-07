@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina: Aktionen für die Auswahl",
+      "paragraph": "Lumina: Aktionen für diesen Absatz"
+    },
     "launcher": "Lumina fragen",
     "conversationTitle": "📝 {{title}}",
     "untitled": "Unbenanntes Dokument",
@@ -2086,6 +2090,46 @@
           "body": "Jeder Chat wird gespeichert, damit du ihn später fortsetzen oder löschen kannst, wenn du ihn nicht mehr brauchst."
         }
       }
+    }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "Überschrift 1",
+        "h2": "Überschrift 2",
+        "h3": "Überschrift 3",
+        "bullet": "Aufzählung",
+        "numbered": "Nummerierte Liste",
+        "todo": "To-do-Liste",
+        "quote": "Zitat",
+        "callout": "Hinweis",
+        "toggle": "Aufklappbereich",
+        "code": "Code",
+        "table": "Tabelle",
+        "divider": "Trennlinie",
+        "math": "Formel",
+        "diagram": "Diagramm",
+        "canvas": "Canvas"
+      },
+      "templates": {
+        "toggle": "Titel",
+        "column": "Spalte {{n}}",
+        "start": "Start",
+        "end": "Ende"
+      }
+    },
+    "format": {
+      "toolbar": "Formatierung",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "strike": "Durchgestrichen",
+      "code": "Code",
+      "link": "Link",
+      "h2": "Überschrift",
+      "bullet": "Aufzählung",
+      "todo": "To-do-Liste",
+      "quote": "Zitat",
+      "linkPlaceholder": "Link"
     }
   }
 }

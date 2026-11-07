@@ -99,24 +99,52 @@ export const useEditorContent = ({
     setIconAnchor(null);
   };
 
-  const handleContextMenu = (event: React.MouseEvent) => {
+  /**
+   * Opens the text actions menu at (menuX, menuY). Without a selection, the
+   * actions apply to the paragraph under `paragraphPoint`, which gets
+   * selected so it's clear what will change. On a blank line the menu still
+   * opens, with its actions disabled.
+   */
+  const openActionsMenu = (
+    menuX: number,
+    menuY: number,
+    paragraphPoint: { x: number; y: number } | null,
+  ) => {
     const editor = markdownEditorRef.current;
     if (!editor) return;
-    event.preventDefault();
-    // Without a selection, the actions apply to the paragraph right-clicked,
-    // which gets selected so it's clear what will change. On a blank line the
-    // menu still opens, with its actions disabled.
     let target: { text: string; from: number; to: number } | null =
       editor.getSelection();
     if (!target.text.trim()) {
-      target = editor.selectParagraphAt(event.clientX, event.clientY);
+      target = paragraphPoint
+        ? editor.selectParagraphAt(paragraphPoint.x, paragraphPoint.y)
+        : null;
     }
     setSelectedText(target?.text ?? '');
     setSelectedRange(target ? { from: target.from, to: target.to } : null);
-    setMenuAnchor({
-      mouseX: event.clientX - 2,
-      mouseY: event.clientY - 4,
+    setMenuAnchor({ mouseX: menuX, mouseY: menuY });
+  };
+
+  const handleContextMenu = (event: React.MouseEvent) => {
+    if (!markdownEditorRef.current) return;
+    event.preventDefault();
+    openActionsMenu(event.clientX - 2, event.clientY - 4, {
+      x: event.clientX,
+      y: event.clientY,
     });
+  };
+
+  /** The floating actions button: the menu opens under it, for the
+   * selection or else the paragraph the cursor is in. */
+  const handleActionsButton = (button: DOMRect) => {
+    const editor = markdownEditorRef.current;
+    if (!editor) return;
+    const { from } = editor.getSelection();
+    const caret = editor.coordsAtPos(from);
+    openActionsMenu(
+      button.left,
+      button.bottom + 6,
+      caret ? { x: caret.left + 1, y: (caret.top + caret.bottom) / 2 } : null,
+    );
   };
 
   const handleClose = () => {
@@ -284,6 +312,15 @@ export const useEditorContent = ({
     });
   };
 
+  const handleStartBlankCanvas = (anchor: { top: number; left: number }) => {
+    setCanvasDraft({
+      sourceText: '',
+      range: null,
+      name: canvasNameFrom(''),
+      anchor,
+    });
+  };
+
   const handleCancelCanvasDraft = () => {
     if (!isCreatingCanvas) setCanvasDraft(null);
   };
@@ -328,12 +365,12 @@ export const useEditorContent = ({
     if (!canvas) return;
     setCanvasDraft(null);
 
-    const canvasMarkdown = `${canvasLink(canvas.id, canvas.name, canvas.icon)}\n`;
+    const link = canvasLink(canvas.id, canvas.name, canvas.icon);
     const editor = markdownEditorRef.current;
     if (range && editor) {
-      editor.replaceRange(range.from, range.to, canvasMarkdown);
+      editor.replaceRange(range.from, range.to, `${link}\n`);
     } else if (editor) {
-      editor.insertAtCursor(canvasMarkdown);
+      editor.insertLine(link);
     }
 
     canvasView.open(canvas.id, canvas.name, canvas.icon);
@@ -512,10 +549,12 @@ export const useEditorContent = ({
     handleColorSelect,
     handleIconSelect,
     handleContextMenu,
+    handleActionsButton,
     handleClose,
     getLanguageLabel,
     handleCreateTask,
     handleGenerateCanvasPage,
+    handleStartBlankCanvas,
     canvasDraft: canvasDraft
       ? { name: canvasDraft.name, anchor: canvasDraft.anchor }
       : null,

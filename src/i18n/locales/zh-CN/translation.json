@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina：针对所选内容的操作",
+      "paragraph": "Lumina：针对此段落的操作"
+    },
     "launcher": "询问 Lumina",
     "conversationTitle": "📝 {{title}}",
     "untitled": "未命名文档",
@@ -2086,6 +2090,46 @@
           "body": "每次聊天都会保存，方便你之后继续，或在不再需要时删除。"
         }
       }
+    }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "标题 1",
+        "h2": "标题 2",
+        "h3": "标题 3",
+        "bullet": "项目符号列表",
+        "numbered": "编号列表",
+        "todo": "待办清单",
+        "quote": "引用",
+        "callout": "标注",
+        "toggle": "折叠块",
+        "code": "代码",
+        "table": "表格",
+        "divider": "分隔线",
+        "math": "公式",
+        "diagram": "图表",
+        "canvas": "画布"
+      },
+      "templates": {
+        "toggle": "标题",
+        "column": "第 {{n}} 列",
+        "start": "开始",
+        "end": "结束"
+      }
+    },
+    "format": {
+      "toolbar": "格式",
+      "bold": "加粗",
+      "italic": "斜体",
+      "strike": "删除线",
+      "code": "代码",
+      "link": "链接",
+      "h2": "标题",
+      "bullet": "项目符号列表",
+      "todo": "待办清单",
+      "quote": "引用",
+      "linkPlaceholder": "链接"
     }
   }
 }

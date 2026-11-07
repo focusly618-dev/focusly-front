@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina: ações para a seleção",
+      "paragraph": "Lumina: ações para este parágrafo"
+    },
     "launcher": "Perguntar à Lumina",
     "conversationTitle": "📝 {{title}}",
     "untitled": "Documento sem título",
@@ -2086,6 +2090,46 @@
           "body": "Cada conversa fica salva para você retomá-la depois ou excluí-la quando não precisar mais."
         }
       }
+    }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "Título 1",
+        "h2": "Título 2",
+        "h3": "Título 3",
+        "bullet": "Lista com marcadores",
+        "numbered": "Lista numerada",
+        "todo": "Lista de tarefas",
+        "quote": "Citação",
+        "callout": "Destaque",
+        "toggle": "Seção recolhível",
+        "code": "Código",
+        "table": "Tabela",
+        "divider": "Divisor",
+        "math": "Equação",
+        "diagram": "Diagrama",
+        "canvas": "Canvas"
+      },
+      "templates": {
+        "toggle": "Título",
+        "column": "Coluna {{n}}",
+        "start": "Início",
+        "end": "Fim"
+      }
+    },
+    "format": {
+      "toolbar": "Formatação",
+      "bold": "Negrito",
+      "italic": "Itálico",
+      "strike": "Tachado",
+      "code": "Código",
+      "link": "Link",
+      "h2": "Título",
+      "bullet": "Lista com marcadores",
+      "todo": "Lista de tarefas",
+      "quote": "Citação",
+      "linkPlaceholder": "link"
     }
   }
 }

@@ -2,7 +2,7 @@ import type { EditorState } from '@codemirror/state';
 import { Decoration, WidgetType } from '@codemirror/view';
 import { syntaxTree } from '@codemirror/language';
 import { renderInlineMarkdown } from './inlineMarkdown';
-import { overlaps, type Push } from './utils';
+import { showsMarkup, type Push } from './utils';
 
 // <details><summary>…</summary> … </details>, GitHub's collapsed section.
 // Markdown parses it as loose HTML (the tags end their HTML block at the
@@ -135,7 +135,7 @@ export const decorateDetails = (
     // Inside a folded section: already out of sight
     if (hidden.some((r) => block.from >= r.from && block.to <= r.to)) continue;
     // The cursor in it shows the raw HTML, for editing
-    if (overlaps(sel, block.from, block.to)) continue;
+    if (showsMarkup(sel, block.from, block.to)) continue;
 
     const folded = foldOverrides.get(block.from) ?? !block.openByDefault;
     const header = new DetailsHeaderWidget(block.summary, folded, block.from);

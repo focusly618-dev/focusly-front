@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useRef, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEditorContent } from './useEditorContent.hook';
 import { useCanvasCardPreviews } from './useCanvasCardPreviews.hook';
@@ -80,6 +80,8 @@ import type { CanvasView } from '../../useCanvasView.hook';
 import { splitCanvasLabel } from './canvasLinks.utils';
 import { CreateCanvasPopover } from '../CanvasIdentity/CreateCanvasPopover';
 import { editorFontVars, type EditorFontStyle } from '../../editorFonts';
+import { TextActionsButton } from './TextActionsButton';
+import { FormatToolbar } from './FormatToolbar';
 
 // Excalidraw is heavy and only a canvas needs it: it's split into its own
 // chunk, fetched when a canvas is opened rather than with every note.
@@ -122,6 +124,13 @@ export const EditorContent = ({
   const isThemeDark = theme.palette.mode === 'dark';
   const editorSurfaceRef = useRef<HTMLDivElement>(null);
   const [liveSelectedText, setLiveSelectedText] = useState('');
+  // Moves the text actions button along with the cursor, even when the
+  // selected text stays '' (a cursor moving between lines)
+  const [selectionTick, setSelectionTick] = useState(0);
+  const handleSelectionChange = useCallback((text: string) => {
+    setLiveSelectedText(text);
+    setSelectionTick((tick) => tick + 1);
+  }, []);
   const workspaceId = (watch?.('id') as string | undefined) || null;
   useCanvasCardPreviews(workspaceId, markdownEditorRef);
   // Phones only view canvases, so they don't make new ones either
@@ -145,6 +154,7 @@ export const EditorContent = ({
     handleColorSelect,
     handleIconSelect,
     handleContextMenu,
+    handleActionsButton,
     handleClose,
     selectedText,
     getLanguageLabel,
@@ -157,6 +167,7 @@ export const EditorContent = ({
     handleConfirmAITask,
     isCreatingTask,
     handleGenerateCanvasPage,
+    handleStartBlankCanvas,
     canvasDraft,
     isCreatingCanvas,
     handleCancelCanvasDraft,
@@ -554,7 +565,8 @@ export const EditorContent = ({
               initialValue={initialMarkdown}
               onChange={onChange}
               placeholder="Start writing..."
-              onSelectionChange={setLiveSelectedText}
+              onSelectionChange={handleSelectionChange}
+              onCreateCanvas={handleStartBlankCanvas}
             />
 
             {isAIProcessing && (
@@ -626,6 +638,23 @@ export const EditorContent = ({
                 </Box>
               </Box>
             )}
+
+            <FormatToolbar
+              editorRef={markdownEditorRef}
+              surfaceRef={editorSurfaceRef}
+              selectedText={liveSelectedText}
+              selectionTick={selectionTick}
+              hidden={isAIProcessing}
+            />
+
+            <TextActionsButton
+              editorRef={markdownEditorRef}
+              surfaceRef={editorSurfaceRef}
+              selectedText={liveSelectedText}
+              selectionTick={selectionTick}
+              hidden={isAIProcessing}
+              onOpen={handleActionsButton}
+            />
 
             {/* Keyed by document so switching notes starts on that note's thread */}
             <EditorAskAI

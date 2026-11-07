@@ -33,6 +33,7 @@ export { imageKeymap };
 const HANDLERS: Record<string, Handler> = {
   StrongEmphasis: handleEmphasis,
   Emphasis: handleEmphasis,
+  Strikethrough: handleEmphasis,
   ATXHeading1: handleHeading,
   ATXHeading2: handleHeading,
   ATXHeading3: handleHeading,

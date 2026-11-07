@@ -40,3 +40,22 @@ export const overlaps = (
   const { from: selFrom, to: selTo } = sel.main;
   return selFrom <= to && selTo >= from;
 };
+
+/**
+ * Whether formatting markup (a heading's #, **bold** stars, list markers,
+ * > quotes, link brackets and addresses, ``` fences...) shows. Never: the
+ * user formats through the "/" menu, the toolbar and shortcuts, and never
+ * sees Markdown. markupEditing.ts keeps the cursor and deletions off the
+ * hidden markup. Tables, equations and diagrams still show their source
+ * while being edited (`overlaps`): their source is their content.
+ */
+export const showsMarkup = (
+  sel: EditorSelection,
+  from: number,
+  to: number,
+): boolean => {
+  void sel;
+  void from;
+  void to;
+  return false;
+};

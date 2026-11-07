@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina : actions pour la sélection",
+      "paragraph": "Lumina : actions pour ce paragraphe"
+    },
     "launcher": "Demander à Lumina",
     "conversationTitle": "📝 {{title}}",
     "untitled": "Document sans titre",
@@ -2086,6 +2090,46 @@
           "body": "Chaque conversation est enregistrée pour que vous puissiez la reprendre plus tard, ou la supprimer quand vous n'en avez plus besoin."
         }
       }
+    }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "Titre 1",
+        "h2": "Titre 2",
+        "h3": "Titre 3",
+        "bullet": "Liste à puces",
+        "numbered": "Liste numérotée",
+        "todo": "Liste de tâches",
+        "quote": "Citation",
+        "callout": "Encadré",
+        "toggle": "Section repliable",
+        "code": "Code",
+        "table": "Tableau",
+        "divider": "Séparateur",
+        "math": "Équation",
+        "diagram": "Diagramme",
+        "canvas": "Canvas"
+      },
+      "templates": {
+        "toggle": "Titre",
+        "column": "Colonne {{n}}",
+        "start": "Début",
+        "end": "Fin"
+      }
+    },
+    "format": {
+      "toolbar": "Mise en forme",
+      "bold": "Gras",
+      "italic": "Italique",
+      "strike": "Barré",
+      "code": "Code",
+      "link": "Lien",
+      "h2": "Titre",
+      "bullet": "Liste à puces",
+      "todo": "Liste de tâches",
+      "quote": "Citation",
+      "linkPlaceholder": "lien"
     }
   }
 }

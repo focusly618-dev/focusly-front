@@ -31,10 +31,12 @@ export interface UseEditorContentReturn {
   handleColorSelect: (color: HeaderColor) => void;
   handleIconSelect: (iconName: string) => void;
   handleContextMenu: (event: React.MouseEvent) => void;
+  handleActionsButton: (button: DOMRect) => void;
   handleClose: () => void;
   getLanguageLabel: (code: string) => string;
   handleCreateTask: () => void;
   handleGenerateCanvasPage: () => void;
+  handleStartBlankCanvas: (anchor: { top: number; left: number }) => void;
   /** The create-canvas popover's starting name and where it opens (under the
    * selected text); null while it's closed. */
   canvasDraft: { name: string; anchor: { top: number; left: number } } | null;

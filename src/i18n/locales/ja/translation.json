@@ -326,6 +326,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina：選択範囲へのアクション",
+      "paragraph": "Lumina：この段落へのアクション"
+    },
     "launcher": "Lumina に質問",
     "conversationTitle": "📝 {{title}}",
     "untitled": "無題のドキュメント",
@@ -2050,6 +2054,46 @@
           "body": "チャットはすべて保存されるので、あとで続きから再開でき、不要になれば削除できます。"
         }
       }
+    }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "見出し1",
+        "h2": "見出し2",
+        "h3": "見出し3",
+        "bullet": "箇条書き",
+        "numbered": "番号付きリスト",
+        "todo": "ToDoリスト",
+        "quote": "引用",
+        "callout": "コールアウト",
+        "toggle": "折りたたみ",
+        "code": "コード",
+        "table": "表",
+        "divider": "区切り線",
+        "math": "数式",
+        "diagram": "図",
+        "canvas": "キャンバス"
+      },
+      "templates": {
+        "toggle": "タイトル",
+        "column": "列{{n}}",
+        "start": "開始",
+        "end": "終了"
+      }
+    },
+    "format": {
+      "toolbar": "書式",
+      "bold": "太字",
+      "italic": "斜体",
+      "strike": "取り消し線",
+      "code": "コード",
+      "link": "リンク",
+      "h2": "見出し",
+      "bullet": "箇条書き",
+      "todo": "ToDoリスト",
+      "quote": "引用",
+      "linkPlaceholder": "リンク"
     }
   }
 }

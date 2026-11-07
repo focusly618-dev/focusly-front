@@ -29,90 +29,98 @@ import type {
 export const MarkdownEditor = forwardRef<
   MarkdownEditorRef,
   MarkdownEditorProps
->(({ initialValue, onChange, placeholder, onSelectionChange }, ref) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<EditorView | null>(null);
-  const theme = useTheme();
-
-  const editorThemeCompartment = useRef(new Compartment()).current;
-  const highlightCompartment = useRef(new Compartment()).current;
-
-  const debouncedOnChange = useMemo(
-    () => debounce((value: string) => onChange(value), 200),
-    [onChange],
-  );
-
-  // "Latest ref" pattern so the mount-once updateListener below always calls
-  // the current callback without needing to reconfigure the editor.
-  const onSelectionChangeRef = useRef(onSelectionChange);
-  onSelectionChangeRef.current = onSelectionChange;
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const state = EditorState.create({
-      doc: initialValue,
-      extensions: [
-        ...buildMarkdownExtensions({
-          editorThemeCompartment,
-          highlightCompartment,
-          initialEditorTheme: buildEditorTheme(theme),
-          initialHighlightStyle: buildHighlightStyle(theme),
-          placeholder,
-        }),
-        EditorView.updateListener.of((update) => {
-          // While a diff is under review the document holds both versions
-          // (struck-through and added text). Reporting that would autosave
-          // the mix; the resolution reports the final text instead.
-          const reviewingDiff =
-            (update.state.field(diffRangesField, false) ?? []).length > 0;
-          if (update.docChanged && !reviewingDiff) {
-            debouncedOnChange(update.state.doc.toString());
-          }
-          if (update.selectionSet) {
-            const range = update.state.selection.main;
-            onSelectionChangeRef.current?.(
-              range.empty ? '' : update.state.sliceDoc(range.from, range.to),
-            );
-          }
-        }),
-      ],
-    });
-
-    const view = new EditorView({ state, parent: containerRef.current });
-    viewRef.current = view;
-
-    return () => {
-      debouncedOnChange.cancel();
-      view.destroy();
-      viewRef.current = null;
-    };
-    // Intentionally mount once — see the note above on why `initialValue`
-    // is not a dependency here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const view = viewRef.current;
-    if (!view) return;
-    view.dispatch({
-      effects: [
-        editorThemeCompartment.reconfigure(buildEditorTheme(theme)),
-        highlightCompartment.reconfigure(
-          syntaxHighlighting(buildHighlightStyle(theme)),
-        ),
-      ],
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme.appMode]);
-
-  useImperativeHandle(
+>(
+  (
+    { initialValue, onChange, placeholder, onSelectionChange, onCreateCanvas },
     ref,
-    () => createImperativeApi(() => viewRef.current),
-    [],
-  );
+  ) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const viewRef = useRef<EditorView | null>(null);
+    const theme = useTheme();
 
-  return <div ref={containerRef} style={{ height: '100%' }} />;
-});
+    const editorThemeCompartment = useRef(new Compartment()).current;
+    const highlightCompartment = useRef(new Compartment()).current;
+
+    const debouncedOnChange = useMemo(
+      () => debounce((value: string) => onChange(value), 200),
+      [onChange],
+    );
+
+    // "Latest ref" pattern so the mount-once updateListener below always calls
+    // the current callback without needing to reconfigure the editor.
+    const onSelectionChangeRef = useRef(onSelectionChange);
+    onSelectionChangeRef.current = onSelectionChange;
+    const onCreateCanvasRef = useRef(onCreateCanvas);
+    onCreateCanvasRef.current = onCreateCanvas;
+
+    useEffect(() => {
+      if (!containerRef.current) return;
+
+      const state = EditorState.create({
+        doc: initialValue,
+        extensions: [
+          ...buildMarkdownExtensions({
+            editorThemeCompartment,
+            highlightCompartment,
+            initialEditorTheme: buildEditorTheme(theme),
+            initialHighlightStyle: buildHighlightStyle(theme),
+            placeholder,
+            onCreateCanvas: (anchor) => onCreateCanvasRef.current?.(anchor),
+          }),
+          EditorView.updateListener.of((update) => {
+            // While a diff is under review the document holds both versions
+            // (struck-through and added text). Reporting that would autosave
+            // the mix; the resolution reports the final text instead.
+            const reviewingDiff =
+              (update.state.field(diffRangesField, false) ?? []).length > 0;
+            if (update.docChanged && !reviewingDiff) {
+              debouncedOnChange(update.state.doc.toString());
+            }
+            if (update.selectionSet) {
+              const range = update.state.selection.main;
+              onSelectionChangeRef.current?.(
+                range.empty ? '' : update.state.sliceDoc(range.from, range.to),
+              );
+            }
+          }),
+        ],
+      });
+
+      const view = new EditorView({ state, parent: containerRef.current });
+      viewRef.current = view;
+
+      return () => {
+        debouncedOnChange.cancel();
+        view.destroy();
+        viewRef.current = null;
+      };
+      // Intentionally mount once — see the note above on why `initialValue`
+      // is not a dependency here.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+      const view = viewRef.current;
+      if (!view) return;
+      view.dispatch({
+        effects: [
+          editorThemeCompartment.reconfigure(buildEditorTheme(theme)),
+          highlightCompartment.reconfigure(
+            syntaxHighlighting(buildHighlightStyle(theme)),
+          ),
+        ],
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [theme.appMode]);
+
+    useImperativeHandle(
+      ref,
+      () => createImperativeApi(() => viewRef.current),
+      [],
+    );
+
+    return <div ref={containerRef} style={{ height: '100%' }} />;
+  },
+);
 
 MarkdownEditor.displayName = 'MarkdownEditor';

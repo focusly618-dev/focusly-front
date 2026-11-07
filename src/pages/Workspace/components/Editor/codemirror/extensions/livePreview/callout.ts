@@ -1,7 +1,7 @@
 import type { EditorState } from '@codemirror/state';
 import { Decoration, WidgetType } from '@codemirror/view';
 import type { SyntaxNodeRef } from '@lezer/common';
-import { overlaps, type BlockHandler, type Handler } from './utils';
+import { showsMarkup, type BlockHandler, type Handler } from './utils';
 import { renderInlineMarkdown } from './inlineMarkdown';
 
 // Obsidian's callout syntax: the blockquote's first line is `[!type]`,
@@ -156,7 +156,7 @@ export const handleCallout: BlockHandler = (
     );
   }
 
-  if (!overlaps(sel, startLine.from, startLine.to)) {
+  if (!showsMarkup(sel, startLine.from, startLine.to)) {
     push(
       startLine.from,
       startLine.to,

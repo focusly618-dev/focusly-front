@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina: 선택 영역 작업",
+      "paragraph": "Lumina: 이 단락 작업"
+    },
     "launcher": "Lumina에게 묻기",
     "conversationTitle": "📝 {{title}}",
     "untitled": "제목 없는 문서",
@@ -2086,6 +2090,46 @@
           "body": "모든 채팅이 저장되어 나중에 이어서 하거나, 필요 없어지면 삭제할 수 있어요."
         }
       }
+    }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "제목 1",
+        "h2": "제목 2",
+        "h3": "제목 3",
+        "bullet": "글머리 기호 목록",
+        "numbered": "번호 목록",
+        "todo": "할 일 목록",
+        "quote": "인용",
+        "callout": "콜아웃",
+        "toggle": "토글",
+        "code": "코드",
+        "table": "표",
+        "divider": "구분선",
+        "math": "수식",
+        "diagram": "다이어그램",
+        "canvas": "캔버스"
+      },
+      "templates": {
+        "toggle": "제목",
+        "column": "열 {{n}}",
+        "start": "시작",
+        "end": "끝"
+      }
+    },
+    "format": {
+      "toolbar": "서식",
+      "bold": "굵게",
+      "italic": "기울임꼴",
+      "strike": "취소선",
+      "code": "코드",
+      "link": "링크",
+      "h2": "제목",
+      "bullet": "글머리 기호 목록",
+      "todo": "할 일 목록",
+      "quote": "인용",
+      "linkPlaceholder": "링크"
     }
   }
 }

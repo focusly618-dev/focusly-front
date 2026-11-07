@@ -327,6 +327,10 @@
     }
   },
   "editorAI": {
+    "textActions": {
+      "selection": "Lumina: actions for the selection",
+      "paragraph": "Lumina: actions for this paragraph"
+    },
     "launcher": "Ask Lumina",
     "conversationTitle": "📝 {{title}}",
     "untitled": "Untitled document",
@@ -954,7 +958,11 @@
         "name": "Free",
         "tagline": "Perfect for individuals.",
         "cta": "Get Started",
-        "features": ["1 User Workspace", "Unlimited Tasks", "Basic Calendar"]
+        "features": [
+          "1 User Workspace",
+          "Unlimited Tasks",
+          "Basic Calendar"
+        ]
       },
       "pro": {
         "badge": "START FREE TRIAL",
@@ -2082,6 +2090,46 @@
           "body": "Every chat is saved so you can pick it up later, or delete it when you no longer need it."
         }
       }
+    }
+  },
+  "editor": {
+    "slash": {
+      "items": {
+        "h1": "Heading 1",
+        "h2": "Heading 2",
+        "h3": "Heading 3",
+        "bullet": "Bulleted list",
+        "numbered": "Numbered list",
+        "todo": "To-do list",
+        "quote": "Quote",
+        "callout": "Callout",
+        "toggle": "Toggle",
+        "code": "Code",
+        "table": "Table",
+        "divider": "Divider",
+        "math": "Equation",
+        "diagram": "Diagram",
+        "canvas": "Canvas"
+      },
+      "templates": {
+        "toggle": "Title",
+        "column": "Column {{n}}",
+        "start": "Start",
+        "end": "End"
+      }
+    },
+    "format": {
+      "toolbar": "Formatting",
+      "bold": "Bold",
+      "italic": "Italic",
+      "strike": "Strikethrough",
+      "code": "Code",
+      "link": "Link",
+      "h2": "Heading",
+      "bullet": "Bulleted list",
+      "todo": "To-do list",
+      "quote": "Quote",
+      "linkPlaceholder": "link"
     }
   }
 }

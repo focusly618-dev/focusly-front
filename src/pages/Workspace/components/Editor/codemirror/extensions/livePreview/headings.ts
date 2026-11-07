@@ -1,12 +1,12 @@
 import { Decoration } from '@codemirror/view';
-import { overlaps, type Handler } from './utils';
+import { showsMarkup, type Handler } from './utils';
 
 // ATX headings (# .. ######) — hides the `#` marker(s) plus the following
 // space unless the cursor is on the heading's line. Only a mark-level style
 // is applied (font-size/weight), never a block-level one, so the heading
 // stays on its own single line instead of reflowing like a real <h1>.
 export const handleHeading: Handler = (node, _view, sel, push) => {
-  const revealed = overlaps(sel, node.from, node.to);
+  const revealed = showsMarkup(sel, node.from, node.to);
   const level = Number(node.type.name.slice('ATXHeading'.length));
   push(node.from, node.to, Decoration.mark({ class: `cm-live-h${level}` }));
   if (revealed) return;
