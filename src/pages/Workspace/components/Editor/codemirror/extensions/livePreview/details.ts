@@ -1,5 +1,5 @@
-import type { EditorState } from '@codemirror/state';
-import { Decoration, WidgetType } from '@codemirror/view';
+import { EditorSelection, type EditorState } from '@codemirror/state';
+import { Decoration, WidgetType, type EditorView } from '@codemirror/view';
 import { syntaxTree } from '@codemirror/language';
 import { renderInlineMarkdown } from './inlineMarkdown';
 import { showsMarkup, type Push } from './utils';
@@ -92,32 +92,124 @@ class DetailsHeaderWidget extends WidgetType {
     );
   }
 
-  toDOM() {
-    // Same toggle contract as callouts, so the plugin's click handler folds it
+  toDOM(view: EditorView) {
     const header = document.createElement('div');
     header.className = 'cm-live-details-header';
-    header.dataset.calloutToggle = 'true';
-    header.dataset.calloutPos = String(this.pos);
-    header.dataset.calloutFolded = String(this.folded);
-    header.setAttribute('role', 'button');
     header.setAttribute('aria-expanded', String(!this.folded));
 
+    // The chevron folds it (same toggle contract as callouts); the title is
+    // edited in place
     const chevron = document.createElement('span');
     chevron.className = `cm-live-details-chevron${this.folded ? '' : ' cm-live-details-chevron-open'}`;
     chevron.textContent = '▸';
+    chevron.setAttribute('role', 'button');
+    chevron.dataset.calloutToggle = 'true';
+    chevron.dataset.calloutPos = String(this.pos);
+    chevron.dataset.calloutFolded = String(this.folded);
 
     const summary = document.createElement('span');
     summary.className = 'cm-live-details-summary';
+    summary.setAttribute('contenteditable', 'true');
+    summary.spellcheck = true;
+    summary.dataset.raw = this.summary;
     summary.innerHTML = renderInlineMarkdown(this.summary);
+
+    summary.addEventListener('focus', () => {
+      summary.textContent = summary.dataset.raw ?? '';
+    });
+    summary.addEventListener('blur', () => {
+      summary.innerHTML = renderInlineMarkdown(summary.dataset.raw ?? '');
+    });
+    summary.addEventListener('input', () => {
+      const text = (summary.textContent ?? '').replace(/\s+/g, ' ');
+      summary.dataset.raw = text;
+      writeSummary(view, Number(chevron.dataset.calloutPos), text);
+    });
+    summary.addEventListener('keydown', (e) => {
+      // Select all: the title, not the whole document around it
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        const range = document.createRange();
+        range.selectNodeContents(summary);
+        window.getSelection()?.removeAllRanges();
+        window.getSelection()?.addRange(range);
+        return;
+      }
+      if (e.key !== 'Enter' && e.key !== 'Escape') return;
+      e.preventDefault();
+      // Done: on to the section's content
+      const block = findDetailsBlocks(view.state).find(
+        (b) => b.from === Number(chevron.dataset.calloutPos),
+      );
+      view.focus();
+      if (block) {
+        view.dispatch({
+          selection: EditorSelection.cursor(
+            Math.min(block.headerTo + 1, block.closeFrom),
+          ),
+        });
+      }
+    });
+    summary.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData?.getData('text/plain') ?? '').replace(
+        /\s+/g,
+        ' ',
+      );
+      document.execCommand('insertText', false, text);
+    });
 
     header.append(chevron, summary);
     return header;
   }
 
-  ignoreEvent() {
-    return false;
+  /** Same fold state: updated in place, so the title being typed keeps
+   * its focus. */
+  updateDOM(dom: HTMLElement) {
+    const chevron = dom.querySelector<HTMLElement>('.cm-live-details-chevron');
+    const summary = dom.querySelector<HTMLElement>('.cm-live-details-summary');
+    if (!chevron || !summary) return false;
+    if (chevron.dataset.calloutFolded !== String(this.folded)) return false;
+    chevron.dataset.calloutPos = String(this.pos);
+    if (
+      document.activeElement !== summary &&
+      summary.dataset.raw !== this.summary
+    ) {
+      summary.dataset.raw = this.summary;
+      summary.innerHTML = renderInlineMarkdown(this.summary);
+    }
+    return true;
+  }
+
+  // Typing and clicks in the title are the title's, not the editor's
+  ignoreEvent(event: Event) {
+    return Boolean(
+      (event.target as HTMLElement | null)?.closest?.(
+        '.cm-live-details-summary',
+      ),
+    );
   }
 }
+
+const escapeHtml = (text: string) =>
+  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/** Writes a section's title into its <summary>, adding one when missing. */
+const writeSummary = (view: EditorView, pos: number, text: string) => {
+  const block = findDetailsBlocks(view.state).find((b) => b.from === pos);
+  if (!block) return;
+  const header = view.state.sliceDoc(block.from, block.headerTo);
+  const match = /<summary>(.*?)<\/summary>/i.exec(header);
+  const value = escapeHtml(text.trim());
+  const changes = match
+    ? {
+        from: block.from + match.index + '<summary>'.length,
+        to: block.from + match.index + '<summary>'.length + match[1].length,
+        insert: value,
+      }
+    : { from: block.headerTo, insert: `\n<summary>${value}</summary>` };
+  view.dispatch({ changes, userEvent: 'input.summary' });
+};
 
 /**
  * Draws the document's <details> sections; returns the ranges now hidden

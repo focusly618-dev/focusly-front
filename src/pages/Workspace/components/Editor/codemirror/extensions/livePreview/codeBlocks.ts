@@ -130,10 +130,27 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
 // syntax) and ```geojson as a map. A BlockHandler (state-based, full-document
 // walk) since it needs `block: true` — see blockDecorations.ts.
 export const handleRenderedFence: BlockHandler = (node, state, sel, push) => {
-  if (overlaps(sel, node.from, node.to)) return;
-
   const { info, code } = extractFenceInfo(node.node, state);
   const language = fenceLanguage(info);
+
+  // Being edited: the code shows (as a code block, its ``` hidden) and
+  // what it draws right under it, live
+  if (overlaps(sel, node.from, node.to)) {
+    const preview =
+      language === 'mermaid'
+        ? new MermaidWidget(code)
+        : language === 'math'
+          ? new MathWidget(code.trim() || ' ', true)
+          : null;
+    if (preview && code.trim()) {
+      push(
+        state.doc.lineAt(node.to).to,
+        state.doc.lineAt(node.to).to,
+        Decoration.widget({ widget: preview, block: true, side: 1 }),
+      );
+    }
+    return;
+  }
   const widget =
     language === 'mermaid'
       ? new MermaidWidget(code)

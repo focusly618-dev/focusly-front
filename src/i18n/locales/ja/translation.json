@@ -2079,7 +2079,8 @@
         "toggle": "タイトル",
         "column": "列{{n}}",
         "start": "開始",
-        "end": "終了"
+        "end": "終了",
+        "callout": "メモ"
       }
     },
     "format": {
@@ -2094,6 +2095,13 @@
       "todo": "ToDoリスト",
       "quote": "引用",
       "linkPlaceholder": "リンク"
+    },
+    "table": {
+      "addRow": "行を追加",
+      "addColumn": "列を追加",
+      "deleteRow": "行を削除",
+      "deleteColumn": "列を削除",
+      "deleteTable": "表を削除"
     }
   }
 }

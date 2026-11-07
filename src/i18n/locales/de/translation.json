@@ -2115,7 +2115,8 @@
         "toggle": "Titel",
         "column": "Spalte {{n}}",
         "start": "Start",
-        "end": "Ende"
+        "end": "Ende",
+        "callout": "Hinweis"
       }
     },
     "format": {
@@ -2130,6 +2131,13 @@
       "todo": "To-do-Liste",
       "quote": "Zitat",
       "linkPlaceholder": "Link"
+    },
+    "table": {
+      "addRow": "Zeile hinzufügen",
+      "addColumn": "Spalte hinzufügen",
+      "deleteRow": "Zeile entfernen",
+      "deleteColumn": "Spalte entfernen",
+      "deleteTable": "Tabelle löschen"
     }
   }
 }

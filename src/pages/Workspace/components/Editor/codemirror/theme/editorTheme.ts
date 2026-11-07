@@ -420,10 +420,77 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         height: '1px',
       },
 
+      // A formula being edited: its source like code, the result under it
+      '.cm-math-source-line': {
+        fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+        fontSize: '0.88em',
+        backgroundColor: alpha(
+          theme.palette.text.primary,
+          isDark ? 0.04 : 0.03,
+        ),
+        padding: '0 12px !important',
+      },
+
       // Tables
       '.cm-live-table-wrapper': {
+        position: 'relative',
         overflowX: 'auto',
         margin: '10px 0',
+        // Room for the toolbar, which sits just over the table
+        paddingTop: '2px',
+      },
+      // Edited in place (extensions/livePreview/table.ts)
+      '.cm-live-table th, .cm-live-table td[contenteditable]': {
+        minWidth: '96px',
+        cursor: 'text',
+        outline: 'none',
+        transition: 'box-shadow 120ms ease',
+      },
+      '.cm-live-table [contenteditable]:empty::before': {
+        content: '"\\200b"',
+      },
+      '.cm-live-table [contenteditable]:focus': {
+        boxShadow: `inset 0 0 0 2px ${alpha(theme.palette.primary.main, 0.55)}`,
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          isDark ? 0.08 : 0.04,
+        ),
+      },
+      '.cm-live-table-toolbar': {
+        display: 'none',
+        position: 'sticky',
+        left: 0,
+        width: 'fit-content',
+        gap: '2px',
+        padding: '3px',
+        marginBottom: '6px',
+        borderRadius: '9px',
+        border: `1px solid ${theme.palette.divider}`,
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: isDark
+          ? '0 6px 18px rgba(0,0,0,0.4)'
+          : '0 6px 18px rgba(15,23,42,0.1)',
+      },
+      '.cm-live-table-editing .cm-live-table-toolbar': { display: 'flex' },
+      '.cm-live-table-action': {
+        width: '26px',
+        height: '26px',
+        display: 'grid',
+        placeItems: 'center',
+        border: 'none',
+        borderRadius: '6px',
+        background: 'transparent',
+        color: theme.palette.text.secondary,
+        cursor: 'pointer',
+        padding: 0,
+      },
+      '.cm-live-table-action svg': { width: '15px', height: '15px' },
+      '.cm-live-table-action:hover': {
+        color: theme.palette.text.primary,
+        backgroundColor: alpha(theme.palette.text.primary, 0.07),
+      },
+      '.cm-live-table-action[data-action="deleteTable"]:hover': {
+        color: theme.palette.error.main,
       },
       '.cm-live-table': {
         borderCollapse: 'collapse',

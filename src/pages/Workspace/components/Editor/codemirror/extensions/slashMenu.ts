@@ -7,6 +7,7 @@ import {
 import { syntaxTree } from '@codemirror/language';
 import type { EditorView } from '@codemirror/view';
 import i18n from '@/i18n';
+import { focusTableCell } from './livePreview/table';
 
 /**
  * The "/" menu: type "/" at the start of a line (or after a space) to add a
@@ -93,7 +94,7 @@ export const SLASH_ITEMS: SlashItem[] = [
     icon: svg(
       '<rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="M12 11v4.5M12 8.2v.1"/>',
     ),
-    template: () => '> [!note]\n> {|}',
+    template: () => `> [!note] ${t('templates.callout')}\n> {|}`,
   },
   {
     id: 'toggle',
@@ -116,7 +117,8 @@ export const SLASH_ITEMS: SlashItem[] = [
     ),
     template: () => {
       const col = (n: number) => t('templates.column', { n });
-      return `| {|}${col(1)} | ${col(2)} |\n| --- | --- |\n|  |  |`;
+      // A line under it, for the cursor; the first cell gets the focus
+      return `| ${col(1)} | ${col(2)} |\n| --- | --- |\n|  |  |\n{|}`;
     },
   },
   {
@@ -226,6 +228,9 @@ export const applySlashItem = (
     scrollIntoView: true,
     userEvent: 'input.complete',
   });
+  // A new table: straight into its first cell, its placeholder selected
+  if (item.id === 'table')
+    focusTableCell(view, from + lead.length, -1, 0, true);
 };
 
 // No menu inside code: "/" is just a character there

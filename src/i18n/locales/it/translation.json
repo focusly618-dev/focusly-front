@@ -2115,7 +2115,8 @@
         "toggle": "Titolo",
         "column": "Colonna {{n}}",
         "start": "Inizio",
-        "end": "Fine"
+        "end": "Fine",
+        "callout": "Nota"
       }
     },
     "format": {
@@ -2130,6 +2131,13 @@
       "todo": "Elenco di attività",
       "quote": "Citazione",
       "linkPlaceholder": "link"
+    },
+    "table": {
+      "addRow": "Aggiungi riga",
+      "addColumn": "Aggiungi colonna",
+      "deleteRow": "Rimuovi riga",
+      "deleteColumn": "Rimuovi colonna",
+      "deleteTable": "Elimina tabella"
     }
   }
 }

@@ -2115,7 +2115,8 @@
         "toggle": "Título",
         "column": "Coluna {{n}}",
         "start": "Início",
-        "end": "Fim"
+        "end": "Fim",
+        "callout": "Nota"
       }
     },
     "format": {
@@ -2130,6 +2131,13 @@
       "todo": "Lista de tarefas",
       "quote": "Citação",
       "linkPlaceholder": "link"
+    },
+    "table": {
+      "addRow": "Adicionar linha",
+      "addColumn": "Adicionar coluna",
+      "deleteRow": "Remover linha",
+      "deleteColumn": "Remover coluna",
+      "deleteTable": "Excluir tabela"
     }
   }
 }

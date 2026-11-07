@@ -118,8 +118,20 @@ const detectCallout = (
 // job is to skip descending into a callout's children so QuoteMark doesn't
 // separately (and redundantly) decorate its `>` markers. The actual callout
 // rendering happens in handleCallout below, via the block-only StateField.
-export const handleCalloutMarker: Handler = (node, view) => {
-  return detectCallout(view.state, node) ? false : undefined;
+// Since QuoteMark doesn't run inside a callout, the ">" starting each body
+// line is hidden here (the header line is drawn whole by handleCallout).
+export const handleCalloutMarker: Handler = (node, view, sel, push) => {
+  if (!detectCallout(view.state, node)) return undefined;
+  const { doc } = view.state;
+  const first = doc.lineAt(node.from).number;
+  const last = doc.lineAt(node.to).number;
+  for (let n = first + 1; n <= last; n++) {
+    const line = doc.line(n);
+    const marker = /^\s*(?:>\s?)+/.exec(line.text);
+    if (!marker || showsMarkup(sel, line.from, line.to)) continue;
+    push(line.from, line.from + marker[0].length, Decoration.replace({}));
+  }
+  return false;
 };
 
 export const handleCallout: BlockHandler = (

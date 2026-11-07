@@ -18,10 +18,11 @@ import { handleFencedCode } from './codeBlocks';
 import { handleHorizontalRule } from './horizontalRule';
 import { handleImage, imageAtomicRangesExtension, imageKeymap } from './image';
 import { handleCalloutMarker, handleCalloutToggleClick } from './callout';
-import { handleInlineMath } from './math';
+import { handleInlineMath, mathFenceGuard } from './math';
 import { handleListMark } from './list';
 import { setCalloutFold, calloutFoldField } from './foldState';
 import { blockDecorationsField } from './blockDecorations';
+import { tableEditingExtension } from './table';
 import { canvasPreviewsField } from './canvasCard';
 import type { Handler, Push } from './utils';
 
@@ -130,4 +131,6 @@ export const livePreviewExtensions: Extension[] = [
   canvasPreviewsField,
   blockDecorationsField,
   imageAtomicRangesExtension,
+  tableEditingExtension,
+  mathFenceGuard,
 ];

@@ -2115,7 +2115,8 @@
         "toggle": "Title",
         "column": "Column {{n}}",
         "start": "Start",
-        "end": "End"
+        "end": "End",
+        "callout": "Note"
       }
     },
     "format": {
@@ -2130,6 +2131,13 @@
       "todo": "To-do list",
       "quote": "Quote",
       "linkPlaceholder": "link"
+    },
+    "table": {
+      "addRow": "Add row",
+      "addColumn": "Add column",
+      "deleteRow": "Remove row",
+      "deleteColumn": "Remove column",
+      "deleteTable": "Delete table"
     }
   }
 }

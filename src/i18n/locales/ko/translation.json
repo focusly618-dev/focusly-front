@@ -2115,7 +2115,8 @@
         "toggle": "제목",
         "column": "열 {{n}}",
         "start": "시작",
-        "end": "끝"
+        "end": "끝",
+        "callout": "메모"
       }
     },
     "format": {
@@ -2130,6 +2131,13 @@
       "todo": "할 일 목록",
       "quote": "인용",
       "linkPlaceholder": "링크"
+    },
+    "table": {
+      "addRow": "행 추가",
+      "addColumn": "열 추가",
+      "deleteRow": "행 삭제",
+      "deleteColumn": "열 삭제",
+      "deleteTable": "표 삭제"
     }
   }
 }
