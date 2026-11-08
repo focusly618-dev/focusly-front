@@ -12,6 +12,7 @@ export const GET_TASKS_TITLES = gql`
       category
       deadline
       workspace_id
+      project_id
       source
     }
   }
@@ -239,6 +240,7 @@ export const GET_TASKS_CALENDAR = gql`
         estimate_timer
         real_timer
         is_owner
+        project_id
       }
       totalCount
     }

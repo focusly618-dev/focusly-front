@@ -1119,11 +1119,38 @@
     "allProjects": "All projects",
     "showEmptyStatuses": "Show empty statuses",
     "columns": {
-      "task": "Task",
+      "task": "Task name",
       "project": "Project",
+      "status": "Status",
       "due": "Due",
       "priority": "Priority",
       "estimate": "Est."
+    },
+    "statusTab": {
+      "all": "All",
+      "in_progress": "Pending",
+      "todo": "To Do",
+      "planning": "Planning",
+      "scheduled": "Scheduled",
+      "in_review": "In Review",
+      "on_hold": "On Hold",
+      "backlog": "Backlog",
+      "completed": "Done"
+    },
+    "statusBadge": {
+      "in_progress": "Pending",
+      "todo": "To Do",
+      "planning": "Planning",
+      "scheduled": "Scheduled",
+      "in_review": "In Review",
+      "on_hold": "On Hold",
+      "backlog": "Backlog",
+      "completed": "Done"
+    },
+    "viewMode": {
+      "label": "View mode",
+      "list": "List",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} of {{total}} done",

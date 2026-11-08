@@ -14,6 +14,7 @@ import { SelectButton, SelectionToolbar } from '../SelectionToolbar';
 import { ConfirmDeleteDialog } from '../../modals/ConfirmDeleteDialog/ConfirmDeleteDialog';
 import type { ProjectOption } from '../CreateProjectTaskModal/CreateProjectTaskModal.types';
 import { ProjectTasksByStatus } from './ProjectTasksByStatus';
+import { ProjectTasksKanban } from './ProjectTasksKanban';
 import { ProjectTasksSkeleton } from './ProjectTasksSkeleton';
 import { ProjectTasksToolbar } from './ProjectTasksToolbar';
 import { ProjectStatusMenu } from './ProjectStatusMenu';
@@ -22,6 +23,7 @@ import type { ProjectTaskViewState } from './hooks/useProjectTaskViewState.hook'
 import type { ProjectTaskItemData } from './projectTasks.types';
 import {
   NO_TASK_FILTERS,
+  countTasksByStatus,
   filterProjectTasks,
   hasActiveFilters,
   sortProjectTasks,
@@ -56,6 +58,7 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
   const [moveAnchor, setMoveAnchor] = useState<HTMLElement | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const { filters, sort } = view;
+  const layout = view.layout ?? 'list';
   const isAllProjects = !projectId;
 
   // Project names/colors from the project list (a task may only carry its id).
@@ -66,6 +69,14 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
       return project ? { ...task, project } : task;
     });
   }, [projectTasks.tasks, projects]);
+
+  const statusCounts = useMemo(
+    () =>
+      countTasksByStatus(
+        filterProjectTasks(tasks, { ...filters, status: null }),
+      ),
+    [tasks, filters],
+  );
 
   const shown = useMemo(
     () =>
@@ -130,6 +141,9 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
       onSortChange={view.setSort}
       showEmptyStatuses={view.showEmptyStatuses}
       onShowEmptyStatusesChange={view.setShowEmptyStatuses}
+      statusCounts={statusCounts}
+      layout={layout}
+      onLayoutChange={view.setLayout}
       projects={isAllProjects ? projects : undefined}
       selectAction={
         tasks.length > 0 && !selection.state.isSelecting ? (
@@ -159,7 +173,7 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
             : 'projectTasks.emptyProject.description',
         )}
         actionText={t('projectTasks.empty.action')}
-        onAction={() => onNewTask()}
+        onAction={() => onNewTask(filters.status ?? undefined)}
       />
     );
     // Keep the project picker reachable when the chosen project is empty.
@@ -174,6 +188,9 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
   }
 
   const selected = selection.state.selectedItems;
+  const showEmptyStatuses =
+    view.showEmptyStatuses && !hasActiveFilters(filters);
+  const showProject = isAllProjects && !filters.projectId;
 
   return (
     <Box>
@@ -229,14 +246,25 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
             })
           }
         />
+      ) : layout === 'kanban' ? (
+        <ProjectTasksKanban
+          tasks={shown}
+          showEmptyStatuses={showEmptyStatuses}
+          showProject={showProject}
+          onTaskClick={onOpenTask}
+          onToggleComplete={projectTasks.toggleProjectTaskComplete}
+          onChangeStatus={projectTasks.setProjectTaskStatus}
+          onAddTask={handleAddTask}
+          selectionMode={selection.state.isSelecting}
+          isSelected={selection.actions.isSelected}
+          onToggleSelect={selection.actions.toggle}
+        />
       ) : (
         <ProjectTasksByStatus
           tasks={shown}
           // Filtering by a quick filter shows only the groups with matches.
-          showEmptyStatuses={
-            view.showEmptyStatuses && !hasActiveFilters(filters)
-          }
-          showProject={isAllProjects && !filters.projectId}
+          showEmptyStatuses={showEmptyStatuses}
+          showProject={showProject}
           onTaskClick={onOpenTask}
           onToggleComplete={projectTasks.toggleProjectTaskComplete}
           onChangeStatus={projectTasks.setProjectTaskStatus}

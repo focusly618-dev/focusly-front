@@ -104,10 +104,22 @@ const diffTheme = EditorView.baseTheme({
     textDecoration: 'underline',
     textUnderlineOffset: '2px',
   },
-  '&light .cm-diff-del': { color: '#b91c1c', backgroundColor: 'rgba(239,68,68,0.12)' },
-  '&light .cm-diff-add': { color: '#15803d', backgroundColor: 'rgba(34,197,94,0.14)' },
-  '&dark .cm-diff-del': { color: '#fca5a5', backgroundColor: 'rgba(239,68,68,0.16)' },
-  '&dark .cm-diff-add': { color: '#86efac', backgroundColor: 'rgba(34,197,94,0.18)' },
+  '&light .cm-diff-del': {
+    color: '#b91c1c',
+    backgroundColor: 'rgba(239,68,68,0.12)',
+  },
+  '&light .cm-diff-add': {
+    color: '#15803d',
+    backgroundColor: 'rgba(34,197,94,0.14)',
+  },
+  '&dark .cm-diff-del': {
+    color: '#fca5a5',
+    backgroundColor: 'rgba(239,68,68,0.16)',
+  },
+  '&dark .cm-diff-add': {
+    color: '#86efac',
+    backgroundColor: 'rgba(34,197,94,0.18)',
+  },
 });
 
 export const diffReviewExtensions: Extension[] = [

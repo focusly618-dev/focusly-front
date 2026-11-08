@@ -201,4 +201,34 @@ describe('useTaskMutations', () => {
     expect(mocks.refetchQueries).toHaveBeenCalledTimes(1);
     expect(mocks.success).toHaveBeenCalledTimes(1);
   });
+
+  it('keeps the selected status (e.g. Pending) and skips auto-scheduling on create', async () => {
+    mocks.create.mockResolvedValueOnce({
+      data: {
+        createTask: {
+          id: 't-new',
+          user_id: 'u-1',
+          title: 'Revisar pipeline',
+          status: 'Pending',
+          priority_level: 2,
+          notes: '',
+          tags: [],
+          links: [],
+        },
+      },
+    });
+    const { result } = renderHook(() => useTaskMutations());
+
+    await act(async () => {
+      await result.current.createProjectTask({
+        title: 'Revisar pipeline',
+        status: 'in_progress',
+        projectId: 'p-1',
+      });
+    });
+
+    const input = mocks.create.mock.calls[0][0].variables.createTaskInput;
+    expect(input.status).toBe('Pending');
+    expect(input.skip_scheduling).toBe(true);
+  });
 });

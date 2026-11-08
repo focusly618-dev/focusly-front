@@ -8,18 +8,26 @@ const initialState: TaskState = {
   projectTab: 'projects',
 };
 
+const isProjectTask = (t?: Partial<Task> | null): boolean =>
+  Boolean(t?.project_id && String(t.project_id).trim() !== '');
+
 const taskSlice = createSlice({
   name: 'task',
   initialState,
   reducers: {
     setTasks: (state, action: PayloadAction<Task[]>) => {
-      state.tasks = action.payload;
+      state.tasks = action.payload.filter((t) => !isProjectTask(t));
     },
     addTask: (state, action: PayloadAction<Task>) => {
+      if (isProjectTask(action.payload)) return;
       state.tasks.push(action.payload);
     },
     updateTask: (state, action: PayloadAction<Task>) => {
       if (!action.payload.id) return;
+      if (isProjectTask(action.payload)) {
+        state.tasks = state.tasks.filter((t) => t.id !== action.payload.id);
+        return;
+      }
       const index = state.tasks.findIndex((t) => t.id === action.payload.id);
       if (index !== -1) {
         state.tasks[index] = action.payload;
@@ -27,6 +35,10 @@ const taskSlice = createSlice({
     },
     upsertTask: (state, action: PayloadAction<Task>) => {
       if (!action.payload.id) return;
+      if (isProjectTask(action.payload)) {
+        state.tasks = state.tasks.filter((t) => t.id !== action.payload.id);
+        return;
+      }
       const index = state.tasks.findIndex((t) => t.id === action.payload.id);
       if (index !== -1) {
         state.tasks[index] = action.payload;

@@ -3,16 +3,20 @@ import {
   type ProjectStatusConfig,
   type ProjectTaskItemData,
   type ProjectTaskPriority,
+  type ProjectTaskStatusId,
 } from './projectTasks.types';
 
 // Filtering, ordering and totals for the project tasks view (pure, so the
 // view and its tests share them).
 
 export type ProjectTaskSort = 'dueDate' | 'priority' | 'title' | 'recent';
+export type ProjectTaskLayout = 'list' | 'kanban';
 
 export interface ProjectTaskFilters {
   /** Only this project's tasks (the all-projects view). */
   projectId: string | null;
+  /** Only tasks in this status (null shows all statuses). */
+  status?: ProjectTaskStatusId | null;
   overdue: boolean;
   noDate: boolean;
   highPriority: boolean;
@@ -20,13 +24,17 @@ export interface ProjectTaskFilters {
 
 export const NO_TASK_FILTERS: ProjectTaskFilters = {
   projectId: null,
+  status: null,
   overdue: false,
   noDate: false,
   highPriority: false,
 };
 
 export const hasActiveFilters = (filters: ProjectTaskFilters) =>
-  filters.overdue || filters.noDate || filters.highPriority;
+  filters.overdue ||
+  filters.noDate ||
+  filters.highPriority ||
+  Boolean(filters.status);
 
 const PRIORITY_RANK: Record<ProjectTaskPriority, number> = {
   Critical: 4,
@@ -49,10 +57,27 @@ export const filterProjectTasks = (
 ) =>
   tasks.filter(
     (task) =>
+      (!filters.status ||
+        task.status.toLowerCase() === filters.status.toLowerCase()) &&
       (!filters.overdue || isOverdue(task)) &&
       (!filters.noDate || !task.rawDeadline) &&
       (!filters.highPriority || priorityRank(task.priority) >= 3),
   );
+
+/** Counts per status id across the given task list. */
+export const countTasksByStatus = (
+  tasks: ProjectTaskItemData[],
+): Record<string, number> => {
+  const counts: Record<string, number> = {};
+  for (const status of DEFAULT_PROJECT_STATUSES) {
+    counts[status.id] = 0;
+  }
+  for (const task of tasks) {
+    const key = task.status.toLowerCase();
+    counts[key] = (counts[key] ?? 0) + 1;
+  }
+  return counts;
+};
 
 const time = (value?: string) => {
   const ms = value ? new Date(value).getTime() : NaN;

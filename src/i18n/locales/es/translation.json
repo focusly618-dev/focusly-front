@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "Tarea",
       "project": "Proyecto",
+      "status": "Estado",
       "due": "Fecha",
       "priority": "Prioridad",
       "estimate": "Est."
+    },
+    "statusTab": {
+      "all": "Todas",
+      "in_progress": "Pendiente",
+      "todo": "Por hacer",
+      "planning": "Planificación",
+      "scheduled": "Programado",
+      "in_review": "En revisión",
+      "on_hold": "En espera",
+      "backlog": "Backlog",
+      "completed": "Completado"
+    },
+    "statusBadge": {
+      "in_progress": "Pendiente",
+      "todo": "Por hacer",
+      "planning": "Planificación",
+      "scheduled": "Programado",
+      "in_review": "En revisión",
+      "on_hold": "En espera",
+      "backlog": "Backlog",
+      "completed": "Completado"
+    },
+    "viewMode": {
+      "label": "Modo de vista",
+      "list": "Lista",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} de {{total}} completadas",

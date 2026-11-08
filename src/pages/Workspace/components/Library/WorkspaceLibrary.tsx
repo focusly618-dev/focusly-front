@@ -349,6 +349,8 @@ export const WorkspaceLibrary = ({
       <WorkspaceLibraryHeader
         isInsideFolder={isInsideFolder}
         activeGroupName={activeGroup?.name}
+        activeGroupColor={activeGroup?.color}
+        activeGroupEmoji={activeGroup?.emoji}
         searchTerm={notes.state.searchTerm}
         onSearchChange={notes.actions.setSearchTerm}
         onClearSearch={() => notes.actions.setSearchTerm('')}
@@ -369,7 +371,7 @@ export const WorkspaceLibrary = ({
           onCreate(undefined, undefined, selectedGroupId ?? undefined)
         }
         onCreateProject={() => setIsCreateFolderModalOpen(true)}
-        onCreateTask={() => openNewTask()}
+        onCreateTask={() => openNewTask(taskView.filters.status ?? undefined)}
         folderView={folderView}
         projectTab={projectTab}
         onProjectTabChange={(tab: ProjectTab) => {

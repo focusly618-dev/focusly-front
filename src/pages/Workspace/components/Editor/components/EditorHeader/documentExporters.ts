@@ -22,8 +22,7 @@ const NUMBERED_LIST_REF = 'exported-numbered-list';
 // italic, bold+italic, inline code) — not a full CommonMark parser, but
 // covers what the editor's own formatting toolbar actually produces.
 const parseInline = (text: string): TextRun[] => {
-  const pattern =
-    /\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|\*(.+?)\*|_(.+?)_|`(.+?)`/g;
+  const pattern = /\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|\*(.+?)\*|_(.+?)_|`(.+?)`/g;
   const runs: TextRun[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;

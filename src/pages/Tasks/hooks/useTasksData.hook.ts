@@ -31,7 +31,7 @@ export const useTasksData = ({
   const queryVariables = useMemo(
     () => ({
       userId,
-      filters: filters || null,
+      filters: { ...(filters || {}), has_project: false },
       sort: sort || null,
       offset,
       limit,
@@ -57,19 +57,38 @@ export const useTasksData = ({
   }, [error]);
 
   const tasks: TaskResponse[] = useMemo(() => {
-    return data?.result?.tasks || data?.tasks || [];
+    const raw: TaskResponse[] = data?.result?.tasks || data?.tasks || [];
+    return raw.filter(
+      (t) =>
+        !(t.project_id && String(t.project_id).trim() !== '') &&
+        !(
+          (t as { projectId?: string }).projectId &&
+          String((t as { projectId?: string }).projectId).trim() !== ''
+        ),
+    );
   }, [data]);
 
   const totalCount: number = useMemo(() => {
-    return data?.result?.totalCount ?? tasks.length;
+    const raw: TaskResponse[] = data?.result?.tasks || data?.tasks || [];
+    const excluded = raw.length - tasks.length;
+    const rawTotal = data?.result?.totalCount ?? tasks.length;
+    return Math.max(0, rawTotal - excluded);
   }, [data, tasks]);
 
   useEffect(() => {
-    const fetchedTasks = data?.result?.tasks || data?.tasks;
+    const fetchedTasks: TaskResponse[] | undefined =
+      data?.result?.tasks || data?.tasks;
     if (fetchedTasks) {
-      const mappedTasks = fetchedTasks.map((t: TaskResponse) =>
-        mapResponseToTask(t),
-      );
+      const mappedTasks = fetchedTasks
+        .filter(
+          (t) =>
+            !(t.project_id && String(t.project_id).trim() !== '') &&
+            !(
+              (t as { projectId?: string }).projectId &&
+              String((t as { projectId?: string }).projectId).trim() !== ''
+            ),
+        )
+        .map((t: TaskResponse) => mapResponseToTask(t));
       dispatch(setTasks(mappedTasks));
     }
   }, [data, dispatch]);

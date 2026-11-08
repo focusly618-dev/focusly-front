@@ -203,19 +203,21 @@ export const useTaskMutations = () => {
       ];
 
       const deadline = dateInputToISO(input.dueDate);
+      const backendStatus = mapStatusToBackend(input.status);
 
       const createTaskInput: Record<string, unknown> = {
         title: input.title.trim(),
         user_id: user.id,
         project_id: input.projectId || undefined,
         workspace_id: input.workspaceId || undefined,
-        status: mapStatusToBackend(input.status),
+        status: backendStatus,
         priority_level: mapPriorityToBackend(input.priority),
         estimate_timer: estimateMinutes,
         real_timer: 0,
         category: 'General',
         tags,
         notes: input.description || '',
+        skip_scheduling: backendStatus !== 'Scheduled',
       };
 
       if (deadline) createTaskInput.deadline = deadline;
@@ -230,7 +232,9 @@ export const useTaskMutations = () => {
 
       if (res.data?.createTask) {
         const mapped = mapResponseToTask(res.data.createTask);
-        dispatch(upsertTask(mapped));
+        if (!mapped.project_id && !input.projectId) {
+          dispatch(upsertTask(mapped));
+        }
         notify.success({
           title: t('projectTasks.toast.created'),
           description: input.title,
@@ -307,7 +311,11 @@ export const useTaskMutations = () => {
 
       if (res.data?.updateTask) {
         const mapped = mapResponseToTask(res.data.updateTask);
-        dispatch(upsertTask(mapped));
+        if (mapped.project_id || input.projectId) {
+          dispatch(removeTask({ id: mapped.id }));
+        } else {
+          dispatch(upsertTask(mapped));
+        }
         return res.data.updateTask;
       }
       return null;

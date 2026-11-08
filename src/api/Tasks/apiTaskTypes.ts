@@ -77,6 +77,14 @@ export interface TaskResponse {
   estimated_end_date?: string;
   task_type?: string;
   source?: string;
+  workspace_id?: string | null;
+  project_id?: string | null;
+  project?: {
+    id: string;
+    name: string;
+    color?: string | null;
+    emoji?: string | null;
+  } | null;
   workspace?: {
     id: string;
     title: string;

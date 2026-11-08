@@ -35,6 +35,11 @@ import {
   SegmentedTabs,
   StyledTextField,
 } from '../WorkspaceLibrary.styles';
+import {
+  ModernFolderFilledIcon,
+  ModernFolderOutlinedIcon,
+  isCustomEmoji,
+} from '@/components/ui';
 import { LibrarySearchHeader } from './LibrarySearchHeader';
 import { SEARCH_SHORTCUT } from '../constants/library.constants';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -50,6 +55,8 @@ export type ProjectSortOption =
 export interface WorkspaceLibraryHeaderProps {
   isInsideFolder: boolean;
   activeGroupName?: string;
+  activeGroupColor?: string;
+  activeGroupEmoji?: string;
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
@@ -118,6 +125,8 @@ const PROJECT_COLORS = [
 export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
   isInsideFolder,
   activeGroupName,
+  activeGroupColor,
+  activeGroupEmoji,
   searchTerm,
   onSearchChange,
   onClearSearch,
@@ -192,19 +201,80 @@ export const WorkspaceLibraryHeader: React.FC<WorkspaceLibraryHeaderProps> = ({
 
   return (
     <>
-      <LibraryHeader ref={headerRef} sx={{ mb: isInsideFolder ? 3 : 2 }}>
-        <Box>
-          <HeaderTitle
-            variant="h4"
-            sx={{
-              fontWeight: 800,
-              fontSize: '28px',
-              color: 'text.primary',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            {isInsideFolder ? activeGroupName : t('nav.projects', 'Proyectos')}
-          </HeaderTitle>
+      <LibraryHeader ref={headerRef} sx={{ mb: isInsideFolder ? 2.5 : 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.75 }}>
+          {isInsideFolder && (
+            <Box
+              sx={{
+                width: 46,
+                height: 46,
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                bgcolor: alpha(
+                  activeGroupColor || '#a855f7',
+                  isDark ? 0.18 : 0.12,
+                ),
+                border: `1px solid ${alpha(
+                  activeGroupColor || '#a855f7',
+                  isDark ? 0.3 : 0.2,
+                )}`,
+              }}
+            >
+              {isCustomEmoji(activeGroupEmoji) ? (
+                <Box component="span" sx={{ fontSize: '22px', lineHeight: 1 }}>
+                  {activeGroupEmoji}
+                </Box>
+              ) : activeGroupEmoji === 'filled' ? (
+                <ModernFolderFilledIcon
+                  sx={{ fontSize: 24, color: activeGroupColor || '#a855f7' }}
+                />
+              ) : (
+                <ModernFolderOutlinedIcon
+                  sx={{ fontSize: 24, color: activeGroupColor || '#a855f7' }}
+                />
+              )}
+            </Box>
+          )}
+          <Box>
+            <HeaderTitle
+              variant="h4"
+              sx={{
+                fontWeight: 800,
+                fontSize: '28px',
+                color: 'text.primary',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2,
+              }}
+            >
+              {isInsideFolder
+                ? activeGroupName
+                : t('nav.projects', 'Proyectos')}
+            </HeaderTitle>
+            {isInsideFolder && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  mt: 0.35,
+                }}
+              >
+                {folderView === 'tasks'
+                  ? t(
+                      'projects.folderTasksSubtitle',
+                      'Organiza y haz seguimiento de lo que sigue en este proyecto.',
+                    )
+                  : t(
+                      'projects.folderDocsSubtitle',
+                      'Documentación, notas y recursos vinculados a este proyecto.',
+                    )}
+              </Typography>
+            )}
+          </Box>
         </Box>
 
         <Box
