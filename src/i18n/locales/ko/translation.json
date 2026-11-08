@@ -1187,7 +1187,8 @@
     "newWorkspace": "새 워크스페이스",
     "status": {
       "recent": "최근",
-      "empty": "비어 있음"
+      "empty": "비어 있음",
+      "idle": "활동 없음"
     },
     "notesInside_one": "노트 {{count}}개",
     "notesInside_other": "노트 {{count}}개",
@@ -1545,6 +1546,10 @@
       "filterByColor": "색상으로 필터",
       "allColors": "모든 색상",
       "resetFilters": "필터 초기화"
+    },
+    "card": {
+      "lastDocument": "최근 문서: {{title}}",
+      "documents_other": "문서 {{count}}개"
     }
   },
   "workspaceEditor": {

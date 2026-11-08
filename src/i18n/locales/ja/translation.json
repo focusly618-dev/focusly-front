@@ -1158,7 +1158,8 @@
     "newWorkspace": "新しいワークスペース",
     "status": {
       "recent": "最近",
-      "empty": "空"
+      "empty": "空",
+      "idle": "アクティビティなし"
     },
     "notesInside_one": "{{count}}件のノート",
     "notesInside_other": "{{count}}件のノート",
@@ -1513,6 +1514,10 @@
       "filterByColor": "色で絞り込み",
       "allColors": "すべての色",
       "resetFilters": "フィルターをリセット"
+    },
+    "card": {
+      "lastDocument": "最新のドキュメント：{{title}}",
+      "documents_other": "{{count}} 件のドキュメント"
     }
   },
   "workspaceEditor": {

@@ -1187,7 +1187,8 @@
     "newWorkspace": "新建工作区",
     "status": {
       "recent": "最近",
-      "empty": "空"
+      "empty": "空",
+      "idle": "暂无活动"
     },
     "notesInside_one": "内含 {{count}} 篇笔记",
     "notesInside_other": "内含 {{count}} 篇笔记",
@@ -1545,6 +1546,10 @@
       "filterByColor": "按颜色筛选",
       "allColors": "所有颜色",
       "resetFilters": "重置筛选"
+    },
+    "card": {
+      "lastDocument": "最近的文档：{{title}}",
+      "documents_other": "{{count}} 个文档"
     }
   },
   "workspaceEditor": {

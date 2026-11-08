@@ -1187,7 +1187,8 @@
     "newWorkspace": "Nuovo spazio di lavoro",
     "status": {
       "recent": "Recente",
-      "empty": "Vuoto"
+      "empty": "Vuoto",
+      "idle": "Nessuna attività"
     },
     "notesInside_one": "{{count}} nota all'interno",
     "notesInside_other": "{{count}} note all'interno",
@@ -1545,6 +1546,11 @@
       "filterByColor": "Filtra per colore",
       "allColors": "Tutti i colori",
       "resetFilters": "Reimposta filtri"
+    },
+    "card": {
+      "lastDocument": "Ultimo documento: {{title}}",
+      "documents_one": "{{count}} documento",
+      "documents_other": "{{count}} documenti"
     }
   },
   "workspaceEditor": {

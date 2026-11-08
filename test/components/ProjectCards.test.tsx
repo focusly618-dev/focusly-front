@@ -13,7 +13,9 @@ vi.mock('react-i18next', () => ({
         ? `${key}:${opts.count}`
         : opts && typeof opts === 'object' && 'date' in opts
           ? `${key}:${opts.date}`
-          : key,
+          : opts && typeof opts === 'object' && 'title' in opts
+            ? `${key}:${opts.title}`
+            : key,
     i18n: { language: 'es' },
   }),
 }));
@@ -49,18 +51,18 @@ const group = (over: Partial<ProjectGroupTypes> = {}): ProjectGroupTypes => ({
 });
 
 describe('ProjectFolderCard', () => {
-  it('shows the document edited last, with real dates', () => {
+  it('shows the document edited last, its status and how many it holds', () => {
     render(<ProjectFolderCard group={group()} onSelect={vi.fn()} />);
 
     expect(screen.getByText('Nutrición')).toBeInTheDocument();
-    expect(screen.getByText('Recetas')).toBeInTheDocument();
-    expect(screen.queryByText('Menú semanal')).not.toBeInTheDocument();
     expect(
-      screen.getByText(/^workspaceLibrary\.editedOn:/),
+      screen.getByText('projects.card.lastDocument:Recetas'),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/Menú semanal/)).not.toBeInTheDocument();
     expect(
       screen.getByText('workspaceLibrary.status.recent'),
     ).toBeInTheDocument();
+    expect(screen.getByText('projects.card.documents:2')).toBeInTheDocument();
   });
 
   it('an empty project says so instead of inventing content', () => {
@@ -91,6 +93,9 @@ describe('ProjectFolderCard', () => {
     expect(
       screen.queryByText('workspaceLibrary.status.recent'),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByText('workspaceLibrary.status.idle'),
+    ).toBeInTheDocument();
   });
 });
 
