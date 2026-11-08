@@ -361,30 +361,51 @@ const cursorPrefixGuard = EditorState.transactionFilter.of((tr) => {
 
   // When dragging a range selection from outside a block into it, snap `head`
   // across the whole block so selecting from bottom-to-top or top-to-bottom
-  // highlights and deletes the entire block smoothly.
-  if (!sel.empty && tr.isUserEvent('select.pointer')) {
+  // highlights and deletes the entire block smoothly. When selecting inside a
+  // fenced block, clamp to its inner body lines so the hidden ``` fences are
+  // never overwritten or deleted.
+  if (!sel.empty) {
     const { anchor, head } = sel;
     for (const b of collectStructuredBlocks(tr.state)) {
-      if (anchor < b.from && head >= b.from && head <= b.to && head < b.to) {
-        return [
-          tr,
-          { selection: EditorSelection.range(anchor, b.to), sequential: true },
-        ];
-      }
-      if (anchor > b.to && head >= b.from && head <= b.to && head > b.from) {
+      if (
+        (b.kind === 'FencedCode' || b.kind === 'Details') &&
+        sel.from >= b.from &&
+        sel.to <= b.to &&
+        (sel.from < b.bodyFrom || sel.to > b.bodyTo)
+      ) {
+        const clampedAnchor = Math.max(b.bodyFrom, Math.min(b.bodyTo, anchor));
+        const clampedHead = Math.max(b.bodyFrom, Math.min(b.bodyTo, head));
         return [
           tr,
           {
-            selection: EditorSelection.range(anchor, b.from),
+            selection: EditorSelection.range(clampedAnchor, clampedHead),
             sequential: true,
           },
         ];
       }
+      if (tr.isUserEvent('select.pointer')) {
+        if (anchor < b.from && head >= b.from && head <= b.to && head < b.to) {
+          return [
+            tr,
+            {
+              selection: EditorSelection.range(anchor, b.to),
+              sequential: true,
+            },
+          ];
+        }
+        if (anchor > b.to && head >= b.from && head <= b.to && head > b.from) {
+          return [
+            tr,
+            {
+              selection: EditorSelection.range(anchor, b.from),
+              sequential: true,
+            },
+          ];
+        }
+      }
     }
     return tr;
   }
-
-  if (!sel.empty) return tr;
 
   const doc = tr.newDoc;
   const line = doc.lineAt(sel.head);

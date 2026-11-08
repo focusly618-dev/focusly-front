@@ -18,7 +18,11 @@ import {
   handleMarkupBackspace,
   markupEditingExtensions,
 } from '@/pages/Workspace/components/Editor/codemirror/extensions/markupEditing';
-import { resolveValidMermaidCode } from '@/pages/Workspace/components/Editor/codemirror/extensions/livePreview/mermaidWidget';
+import {
+  applyDiagramDrop,
+  applySvgSize,
+  resolveValidMermaidCode,
+} from '@/pages/Workspace/components/Editor/codemirror/extensions/livePreview/mermaidWidget';
 
 let views: EditorView[] = [];
 
@@ -324,12 +328,163 @@ describe('"/" templates', () => {
     expect(view.dom.querySelector('.cm-code-block-line')).not.toBeNull();
     expect(view.dom.querySelector('.cm-live-mermaid')).toBeNull();
 
-    // Clicking anywhere outside the diagram in the editor also closes the code editor
+    // Moving the cursor with the keyboard or selecting text inside the diagram
+    // never switches back to the Eye view on its own
+    const docText = view.state.doc.toString();
+    view.dispatch({
+      selection: EditorSelection.range(
+        docText.indexOf('flowchart'),
+        docText.lastIndexOf('```'),
+      ),
+    });
+    expect(view.dom.querySelector('.cm-code-block-line')).not.toBeNull();
+    expect(view.dom.querySelector('.cm-live-mermaid')).toBeNull();
+
     view.dispatch({
       selection: EditorSelection.cursor(0),
-      userEvent: 'select.pointer',
+      userEvent: 'select',
     });
-    expect(view.dom.querySelector('.cm-code-block-line')).toBeNull();
-    expect(view.dom.querySelector('.cm-live-mermaid')).not.toBeNull();
+    expect(view.dom.querySelector('.cm-code-block-line')).not.toBeNull();
+    expect(view.dom.querySelector('.cm-live-mermaid')).toBeNull();
+  });
+
+  it('scales tall diagrams compactly by default and resizes proportionally when dragging the bottom handle with the mouse', () => {
+    const doc = 'Intro\n\n```mermaid\nflowchart TD\n  A --> B\n```\n';
+    const view = editor(doc, 0);
+    const body = view.dom.querySelector<HTMLElement>('.cm-live-mermaid-body')!;
+    const handle = view.dom.querySelector<HTMLElement>(
+      '.cm-mermaid-resize-handle',
+    )!;
+    expect(body).not.toBeNull();
+    expect(handle).not.toBeNull();
+
+    // Inject a tall SVG (480x960) to verify default compact scaling and mouse drag resize
+    body.innerHTML = '<svg viewBox="0 0 480 960" width="100%"></svg>';
+    const svg = body.querySelector<SVGSVGElement>('svg')!;
+    applySvgSize(svg, null);
+    expect(svg.style.maxHeight).toBe('320px');
+    expect(svg.style.width).toBe('160px');
+
+    // Drag the resize handle upwards by 100px (320 -> 220)
+    handle.dispatchEvent(
+      new MouseEvent('mousedown', {
+        bubbles: true,
+        button: 0,
+        clientX: 200,
+        clientY: 320,
+      }),
+    );
+    window.dispatchEvent(
+      new MouseEvent('mousemove', {
+        bubbles: true,
+        clientX: 200,
+        clientY: 220,
+      }),
+    );
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+    expect(svg.style.maxHeight).toBe('220px');
+    expect(svg.style.width).toBe('110px');
+    expect(view.state.doc.toString()).toContain('```mermaid h=220');
+
+    // Drag the resize handle downwards by 100px: scales at 3x speed (220 + 300 = 520)
+    handle.dispatchEvent(
+      new MouseEvent('mousedown', {
+        bubbles: true,
+        button: 0,
+        clientX: 200,
+        clientY: 220,
+      }),
+    );
+    window.dispatchEvent(
+      new MouseEvent('mousemove', {
+        bubbles: true,
+        clientX: 120,
+        clientY: 320,
+      }),
+    );
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+    expect(svg.style.maxHeight).toBe('520px');
+    expect(svg.style.width).toBe('260px');
+    expect(view.state.doc.toString()).toContain('```mermaid h=520');
+  });
+
+  it('can move diagrams side-by-side into the same row/column and reorder them in the note', () => {
+    const doc =
+      'Intro\n\n```mermaid\nflowchart TD\n  A --> B\n```\n\nMedio\n\n```mermaid\nflowchart TD\n  C --> D\n```\n';
+    const view = editor(doc, 0);
+    const firstPos = doc.indexOf('```mermaid');
+    const secondPos = doc.lastIndexOf('```mermaid');
+
+    // Initially, the two diagrams are separate blocks (no side-by-side row)
+    expect(view.dom.querySelector('.cm-live-mermaid-row')).toBeNull();
+
+    // Drop the second diagram onto the right side of the first diagram
+    applyDiagramDrop(view, secondPos, {
+      kind: 'diagram',
+      targetPos: firstPos,
+      side: 'right',
+    });
+
+    // Both diagrams now sit side-by-side inside a single .cm-live-mermaid-row
+    const row = view.dom.querySelector('.cm-live-mermaid-row');
+    expect(row).not.toBeNull();
+    expect(row?.querySelectorAll('.cm-live-mermaid')).toHaveLength(2);
+  });
+
+  it('zooms in, zooms out, and resets the diagram size via toolbar buttons and persists z=<zoom>', () => {
+    const doc =
+      'Intro\n\n```mermaid\nflowchart TD\n  A --> B\n  B --> C\n```\n';
+    const view = editor(doc, 0);
+    const body = view.dom.querySelector<HTMLElement>('.cm-live-mermaid-body')!;
+    body.innerHTML = '<svg viewBox="0 0 400 800" width="100%"></svg>';
+    const svg = body.querySelector<SVGSVGElement>('svg')!;
+    applySvgSize(svg, null, 100);
+    expect(svg.style.maxHeight).toBe('320px');
+    expect(svg.style.width).toBe('160px');
+
+    const zoomInBtn = view.dom.querySelector<HTMLElement>(
+      '[data-mermaid-zoom="in"]',
+    )!;
+    const zoomOutBtn = view.dom.querySelector<HTMLElement>(
+      '[data-mermaid-zoom="out"]',
+    )!;
+    const zoomResetBtn = view.dom.querySelector<HTMLElement>(
+      '[data-mermaid-zoom="reset"]',
+    )!;
+    expect(zoomInBtn).not.toBeNull();
+    expect(zoomOutBtn).not.toBeNull();
+    expect(zoomResetBtn.dataset.zoomLabel).toBe('100%');
+
+    // Zoom In (+20% -> 120%)
+    zoomInBtn.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0 }),
+    );
+    expect(zoomResetBtn.dataset.zoomLabel).toBe('120%');
+    expect(svg.style.maxHeight).toBe('384px');
+    expect(svg.style.width).toBe('192px');
+    expect(view.state.doc.toString()).toContain('```mermaid z=120');
+
+    // Zoom Out twice (-40% -> 80%)
+    zoomOutBtn.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0 }),
+    );
+    zoomOutBtn.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0 }),
+    );
+    expect(zoomResetBtn.dataset.zoomLabel).toBe('80%');
+    expect(svg.style.maxHeight).toBe('256px');
+    expect(svg.style.width).toBe('128px');
+    expect(view.state.doc.toString()).toContain('```mermaid z=80');
+
+    // Reset zoom (100%)
+    zoomResetBtn.dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true, button: 0 }),
+    );
+    expect(zoomResetBtn.dataset.zoomLabel).toBe('100%');
+    expect(svg.style.maxHeight).toBe('320px');
+    expect(svg.style.width).toBe('160px');
+    expect(view.state.doc.toString()).not.toContain('z=');
   });
 });

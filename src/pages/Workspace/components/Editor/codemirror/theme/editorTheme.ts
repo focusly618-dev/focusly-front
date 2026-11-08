@@ -561,6 +561,17 @@ export const buildEditorTheme = (theme: Theme): Extension => {
       '.cm-live-math-inline': { display: 'inline-block' },
 
       // Mermaid diagrams: centered, scrolling sideways when wider than the note
+      '.cm-live-mermaid-row': {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '12px',
+        alignItems: 'stretch',
+        margin: '10px 0',
+      },
+      '.cm-live-mermaid-row .cm-live-mermaid': {
+        margin: 0,
+        minWidth: 0,
+      },
       '.cm-live-mermaid': {
         position: 'relative',
         display: 'flex',
@@ -569,19 +580,98 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         justifyContent: 'center',
         overflowX: 'auto',
         margin: '10px 0',
-        padding: '36px 12px 12px',
+        padding: '34px 12px 18px',
         borderRadius: '10px',
         border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
         color: theme.palette.text.secondary,
         fontSize: '0.85em',
+        transition:
+          'border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease',
+      },
+      '.cm-live-mermaid.is-resizing': {
+        borderColor: alpha(theme.palette.primary.main, 0.55),
+        userSelect: 'none',
+      },
+      '.cm-live-mermaid.is-dragging-diagram': {
+        opacity: 0.65,
+        borderColor: alpha(theme.palette.primary.main, 0.6),
+        userSelect: 'none',
+      },
+      '.cm-live-mermaid[data-drop-side="left"]': {
+        boxShadow: `inset 4px 0 0 0 ${theme.palette.primary.main}`,
+      },
+      '.cm-live-mermaid[data-drop-side="right"]': {
+        boxShadow: `inset -4px 0 0 0 ${theme.palette.primary.main}`,
+      },
+      '.cm-live-mermaid[data-drop-side="above"]': {
+        boxShadow: `inset 0 4px 0 0 ${theme.palette.primary.main}`,
+      },
+      '.cm-live-mermaid[data-drop-side="below"]': {
+        boxShadow: `inset 0 -4px 0 0 ${theme.palette.primary.main}`,
+      },
+      '.cm-mermaid-drag-handle': {
+        position: 'absolute',
+        top: '6px',
+        left: '8px',
+        zIndex: 5,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '26px',
+        height: '26px',
+        padding: 0,
+        borderRadius: '7px',
+        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
+        backgroundColor: isDark
+          ? 'rgba(30, 41, 59, 0.88)'
+          : 'rgba(241, 245, 249, 0.94)',
+        color: theme.palette.text.secondary,
+        cursor: 'grab',
+        userSelect: 'none',
+        transition: 'all 0.15s ease',
+      },
+      '.cm-mermaid-drag-handle:hover': {
+        color: theme.palette.text.primary,
+        borderColor: alpha(theme.palette.primary.main, 0.45),
+      },
+      '.cm-mermaid-drag-handle:active': {
+        cursor: 'grabbing',
       },
       '.cm-live-mermaid-body': {
         display: 'flex',
         justifyContent: 'center',
+        alignItems: 'center',
         width: '100%',
         overflowX: 'auto',
       },
       '.cm-live-mermaid-body svg': { maxWidth: '100%', height: 'auto' },
+      '.cm-mermaid-resize-handle': {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'ns-resize',
+        userSelect: 'none',
+        zIndex: 5,
+      },
+      '.cm-mermaid-resize-pill': {
+        width: '36px',
+        height: '4px',
+        borderRadius: '999px',
+        backgroundColor: isDark
+          ? 'rgba(255, 255, 255, 0.18)'
+          : 'rgba(0, 0, 0, 0.16)',
+        transition: 'all 0.15s ease',
+      },
+      '.cm-live-mermaid:hover .cm-mermaid-resize-pill, .cm-live-mermaid.is-resizing .cm-mermaid-resize-pill':
+        {
+          width: '48px',
+          backgroundColor: theme.palette.primary.main,
+        },
       '.cm-mermaid-toolbar': {
         position: 'absolute',
         top: '6px',
@@ -603,7 +693,7 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         top: '4px',
         right: '10px',
       },
-      '.cm-mermaid-mode-btn': {
+      '.cm-mermaid-mode-btn, .cm-mermaid-zoom-btn': {
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -617,11 +707,40 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         cursor: 'pointer',
         transition: 'all 0.15s ease',
       },
-      '.cm-mermaid-mode-btn:hover': {
-        color: theme.palette.text.primary,
+      '.cm-mermaid-mode-btn:hover, .cm-mermaid-zoom-btn:hover, .cm-mermaid-zoom-reset:hover':
+        {
+          color: theme.palette.text.primary,
+          backgroundColor: isDark
+            ? 'rgba(255, 255, 255, 0.08)'
+            : 'rgba(0, 0, 0, 0.06)',
+        },
+      '.cm-mermaid-zoom-reset': {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: '38px',
+        height: '24px',
+        padding: '0 4px',
+        border: 'none',
+        borderRadius: '6px',
+        backgroundColor: 'transparent',
+        color: theme.palette.text.secondary,
+        fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+        fontSize: '11px',
+        fontWeight: 600,
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+      },
+      '.cm-mermaid-zoom-reset::after': {
+        content: 'attr(data-zoom-label)',
+      },
+      '.cm-mermaid-toolbar-sep': {
+        width: '1px',
+        height: '16px',
+        margin: '0 2px',
         backgroundColor: isDark
-          ? 'rgba(255, 255, 255, 0.08)'
-          : 'rgba(0, 0, 0, 0.06)',
+          ? 'rgba(255, 255, 255, 0.12)'
+          : 'rgba(0, 0, 0, 0.1)',
       },
       '.cm-mermaid-mode-btn.is-active': {
         color: theme.palette.primary.main,

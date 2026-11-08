@@ -190,45 +190,6 @@ export const livePreviewPlugin = ViewPlugin.fromClass(
           return true;
         }
 
-        // Clicking anywhere in the editor outside an open diagram code block
-        // exits code mode and shows the rendered diagram.
-        const activeDiagrams = view.state.field(diagramCodeModeField, false);
-        if (
-          activeDiagrams &&
-          activeDiagrams.size > 0 &&
-          event.button === 0 &&
-          !target?.closest?.('.cm-code-block-line, .cm-mermaid-toolbar')
-        ) {
-          const effects = Array.from(activeDiagrams).map((pos) =>
-            setDiagramCodeMode.of({ pos, codeMode: false }),
-          );
-          const docLen = view.state.doc.length;
-          let needsTrailingNewline = false;
-          syntaxTree(view.state).iterate({
-            enter(ref) {
-              if (ref.name === 'FencedCode' && activeDiagrams.has(ref.from)) {
-                if (view.state.doc.lineAt(ref.to).to >= docLen) {
-                  const endCoords = view.coordsAtPos(docLen, -1);
-                  if (!endCoords || event.clientY >= endCoords.top) {
-                    needsTrailingNewline = true;
-                  }
-                }
-                return false;
-              }
-            },
-          });
-          if (needsTrailingNewline) {
-            event.preventDefault();
-            view.dispatch({
-              changes: { from: docLen, insert: '\n' },
-              selection: EditorSelection.cursor(docLen + 1),
-              effects,
-            });
-            return true;
-          }
-          view.dispatch({ effects });
-        }
-
         const renderedMath =
           !event.shiftKey &&
           event.button === 0 &&
@@ -272,7 +233,7 @@ export const livePreviewPlugin = ViewPlugin.fromClass(
           !event.shiftKey &&
           Boolean(
             target?.closest?.(
-              '[data-row], .cm-live-table-toolbar, .cm-live-details-summary, .cm-canvas-card, .cm-live-image-delete-btn, .cm-mermaid-toolbar',
+              '[data-row], .cm-live-table-toolbar, .cm-live-details-summary, .cm-canvas-card, .cm-live-image-delete-btn, .cm-mermaid-toolbar, .cm-mermaid-resize-handle, .cm-mermaid-drag-handle',
             ),
           );
         if (!interactiveWidget && event.button === 0) {

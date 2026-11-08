@@ -51,7 +51,21 @@ export const diagramCodeModeField = StateField.define<Set<number>>({
 
     if (tr.docChanged && value.size > 0) {
       const mapped = new Set<number>();
-      value.forEach((pos) => mapped.add(tr.changes.mapPos(pos)));
+      value.forEach((pos) => {
+        const nextPos = tr.changes.mapPos(pos, 1);
+        let snapped = nextPos;
+        syntaxTree(tr.state).iterate({
+          from: Math.max(0, nextPos - 1),
+          to: Math.min(tr.state.doc.length, nextPos + 1),
+          enter(node) {
+            if (node.name === 'FencedCode') {
+              snapped = node.from;
+              return false;
+            }
+          },
+        });
+        mapped.add(snapped);
+      });
       set = mapped;
     }
 
@@ -89,31 +103,6 @@ export const diagramCodeModeField = StateField.define<Set<number>>({
           return false;
         },
       });
-    }
-
-    // Moving the cursor or clicking outside an open diagram block exits code
-    // mode so clicking anywhere else in the editor closes the diagram editor.
-    if (tr.selection && !tr.docChanged && set.size > 0) {
-      const sel = tr.state.selection.main;
-      for (const pos of Array.from(set)) {
-        let stillInside = false;
-        syntaxTree(tr.state).iterate({
-          from: Math.max(0, pos),
-          to: Math.min(tr.state.doc.length, pos + 1),
-          enter(node) {
-            if (node.name === 'FencedCode' && node.from === pos) {
-              if (sel.from >= node.from && sel.to <= node.to) {
-                stillInside = true;
-              }
-              return false;
-            }
-          },
-        });
-        if (!stillInside) {
-          if (set === value) set = new Set(value);
-          set.delete(pos);
-        }
-      }
     }
 
     for (const effect of tr.effects) {

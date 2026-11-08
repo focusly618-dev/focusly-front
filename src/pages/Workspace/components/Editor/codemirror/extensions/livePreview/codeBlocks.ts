@@ -8,7 +8,12 @@ import {
   type Handler,
 } from './utils';
 import { isDiagramInCodeMode } from './foldState';
-import { MermaidHeaderToolbarWidget, MermaidWidget } from './mermaidWidget';
+import {
+  MermaidHeaderToolbarWidget,
+  MermaidRowWidget,
+  MermaidWidget,
+  parseMermaidMeta,
+} from './mermaidWidget';
 import { MathWidget } from './mathWidget';
 import { GeoJsonWidget } from './geojsonWidget';
 
@@ -19,6 +24,12 @@ const RENDERED_FENCES = new Set(['mermaid', 'math', 'geojson']);
 /** A fence's language: the first word of its info string, lowercased. */
 const fenceLanguage = (info: string) =>
   info.trim().split(/\s+/)[0]?.toLowerCase() ?? '';
+
+/** Optional height (`h=<px>`) stored on a ` ```mermaid h=240 ` fence. */
+export const parseFenceHeight = (info: string): number | null => {
+  const match = /\bh=(\d+)\b/.exec(info);
+  return match ? Number(match[1]) : null;
+};
 
 const extractFenceInfo = (
   node: SyntaxNode,
@@ -114,11 +125,17 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
   if (!cursorOnStart && openMark) {
     push(openMark.from, openMark.to, Decoration.replace({}));
     if (codeInfo) {
+      const langWordLen =
+        codeInfo.text.split(/\s+/)[0]?.length ?? codeInfo.text.length;
+      const badgeEnd = Math.min(codeInfo.to, codeInfo.from + langWordLen);
       push(
         codeInfo.from,
-        codeInfo.to,
+        badgeEnd,
         Decoration.mark({ class: 'cm-code-lang-badge' }),
       );
+      if (codeInfo.to > badgeEnd) {
+        push(badgeEnd, codeInfo.to, Decoration.replace({}));
+      }
     }
   }
 
@@ -141,6 +158,17 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
   return false;
 };
 
+const isPreviewMermaidNode = (
+  n: SyntaxNode | null,
+  state: EditorState,
+): { info: string; code: string } | null => {
+  if (!n || n.name !== 'FencedCode') return null;
+  if (isDiagramInCodeMode(state, n.from)) return null;
+  const extracted = extractFenceInfo(n, state);
+  if (fenceLanguage(extracted.info) !== 'mermaid') return null;
+  return extracted;
+};
+
 // Renders ```mermaid as a diagram, ```math as a formula (GitHub's other math
 // syntax) and ```geojson as a map. A BlockHandler (state-based, full-document
 // walk) since it needs `block: true` — see blockDecorations.ts.
@@ -152,13 +180,51 @@ export const handleRenderedFence: BlockHandler = (node, state, _sel, push) => {
     // In code mode (`</>` icon active), show only the code block — never render
     // the colorful diagram underneath the code editor.
     if (isDiagramInCodeMode(state, node.from)) return;
+
+    const meta = parseMermaidMeta(info);
+    const prev = node.node.prevSibling;
+    if (
+      meta.col &&
+      prev &&
+      isPreviewMermaidNode(prev, state) &&
+      !/\S/.test(state.sliceDoc(prev.to, node.from))
+    ) {
+      // Already rendered as part of the row started by an earlier sibling
+      return;
+    }
+
+    const items: MermaidWidget[] = [
+      new MermaidWidget(code, node.from, meta.height, meta.align, meta.zoom),
+    ];
+    let lastTo = node.to;
+    let cur = node.node.nextSibling;
+    while (cur) {
+      const nextMermaid = isPreviewMermaidNode(cur, state);
+      if (!nextMermaid) break;
+      const nextMeta = parseMermaidMeta(nextMermaid.info);
+      if (!nextMeta.col || /\S/.test(state.sliceDoc(lastTo, cur.from))) {
+        break;
+      }
+      items.push(
+        new MermaidWidget(
+          nextMermaid.code,
+          cur.from,
+          nextMeta.height,
+          nextMeta.align,
+          nextMeta.zoom,
+        ),
+      );
+      lastTo = cur.to;
+      cur = cur.nextSibling;
+    }
+
     const startLine = state.doc.lineAt(node.from);
-    const endLine = state.doc.lineAt(node.to);
+    const endLine = state.doc.lineAt(lastTo);
     push(
       startLine.from,
       endLine.to,
       Decoration.replace({
-        widget: new MermaidWidget(code, node.from),
+        widget: items.length > 1 ? new MermaidRowWidget(items) : items[0],
         block: true,
       }),
     );
