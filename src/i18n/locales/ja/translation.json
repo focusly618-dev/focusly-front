@@ -2110,7 +2110,22 @@
     },
     "diagram": {
       "rendering": "図を描画しています…",
-      "error": "この図には構文エラーがあります。コードを確認してください。"
+      "error": "この図には構文エラーがあります。コードを確認してください。",
+      "badge": "図",
+      "mapBadge": "地図"
+    },
+    "textActions": {
+      "diagram": "図に変換",
+      "diagramWorking": "Lumina が図を作成しています…",
+      "diagramDone": "図ができました",
+      "diagramFailed": "図に変換できませんでした"
+    },
+    "link": {
+      "open": "リンクを開く",
+      "edit": "リンクを編集",
+      "remove": "リンクを解除",
+      "address": "リンクのアドレス",
+      "empty": "アドレスなし"
     }
   }
 }

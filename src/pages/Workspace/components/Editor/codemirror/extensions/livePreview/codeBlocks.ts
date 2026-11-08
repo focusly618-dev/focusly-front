@@ -1,5 +1,6 @@
 import type { EditorState } from '@codemirror/state';
-import { Decoration } from '@codemirror/view';
+import { Decoration, WidgetType } from '@codemirror/view';
+import i18n from '@/i18n';
 import type { SyntaxNode } from '@lezer/common';
 import {
   isEditingBlock,
@@ -54,6 +55,30 @@ const extractFenceInfo = (
 // When cursor is NOT on the closing fence line, the closing ``` is hidden,
 // forming the rounded bottom of the code container.
 // Clicking on either fence line reveals the raw ``` backticks for editing.
+// Formats drawn as something (not code): named for what they are
+const FRIENDLY_LABELS: Record<string, string> = {
+  mermaid: 'editor.diagram.badge',
+  math: 'editor.slash.items.math',
+  geojson: 'editor.diagram.mapBadge',
+};
+
+class LangLabelWidget extends WidgetType {
+  constructor(readonly label: string) {
+    super();
+  }
+
+  eq(other: LangLabelWidget) {
+    return other.label === this.label;
+  }
+
+  toDOM() {
+    const span = document.createElement('span');
+    span.className = 'cm-code-lang-badge';
+    span.textContent = this.label;
+    return span;
+  }
+}
+
 export const handleFencedCode: Handler = (node, view, sel, push) => {
   const { doc } = view.state;
   const startLine = doc.lineAt(node.from);
@@ -128,10 +153,17 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
       const langWordLen =
         codeInfo.text.split(/\s+/)[0]?.length ?? codeInfo.text.length;
       const badgeEnd = Math.min(codeInfo.to, codeInfo.from + langWordLen);
+      const friendly = FRIENDLY_LABELS[fenceLanguage(codeInfo.text)];
       push(
         codeInfo.from,
         badgeEnd,
-        Decoration.mark({ class: 'cm-code-lang-badge' }),
+        // A drawn block says what it is ("Diagrama"), not its format's
+        // name ("mermaid"); code keeps its language's name
+        friendly
+          ? Decoration.replace({
+              widget: new LangLabelWidget(i18n.t(friendly)),
+            })
+          : Decoration.mark({ class: 'cm-code-lang-badge' }),
       );
       if (codeInfo.to > badgeEnd) {
         push(badgeEnd, codeInfo.to, Decoration.replace({}));

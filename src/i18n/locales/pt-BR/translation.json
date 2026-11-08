@@ -2147,7 +2147,22 @@
     },
     "diagram": {
       "rendering": "Desenhando o diagrama…",
-      "error": "Este diagrama tem um erro de sintaxe. Confira o código."
+      "error": "Este diagrama tem um erro de sintaxe. Confira o código.",
+      "badge": "Diagrama",
+      "mapBadge": "Mapa"
+    },
+    "textActions": {
+      "diagram": "Converter em diagrama",
+      "diagramWorking": "A Lumina está desenhando o diagrama…",
+      "diagramDone": "Diagrama pronto",
+      "diagramFailed": "Não foi possível converter em diagrama"
+    },
+    "link": {
+      "open": "Abrir link",
+      "edit": "Editar link",
+      "remove": "Remover link",
+      "address": "Endereço do link",
+      "empty": "Sem endereço"
     }
   }
 }

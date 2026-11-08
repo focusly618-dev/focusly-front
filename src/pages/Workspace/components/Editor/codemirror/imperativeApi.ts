@@ -1,5 +1,6 @@
 import type { Text } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
+import { syntaxTree } from '@codemirror/language';
 import type { MarkdownEditorRef } from './MarkdownEditor.types';
 import {
   buildDiff,
@@ -240,6 +241,56 @@ export const createImperativeApi = (
     return true;
   },
   getValue: () => getView()?.state.doc.toString() ?? '',
+  linkAt: (pos) => {
+    const view = getView();
+    if (!view) return null;
+    for (
+      let node: ReturnType<typeof syntaxTree>['topNode'] | null = syntaxTree(
+        view.state,
+      ).resolveInner(pos, -1);
+      node;
+      node = node.parent
+    ) {
+      if (node.name === 'Image') return null;
+      if (node.name !== 'Link') continue;
+      const marks: { from: number; to: number }[] = [];
+      let url: { from: number; to: number } | null = null;
+      for (let c = node.firstChild; c; c = c.nextSibling) {
+        if (c.name === 'LinkMark') marks.push({ from: c.from, to: c.to });
+        if (c.name === 'URL') url = { from: c.from, to: c.to };
+      }
+      if (!url || marks.length < 2) return null;
+      const href = view.state.sliceDoc(url.from, url.to);
+      // Canvas links open their canvas; they aren't edited as addresses
+      if (/^(#canvas|canvas:)/.test(href)) return null;
+      return {
+        from: node.from,
+        to: node.to,
+        text: view.state.sliceDoc(marks[0].to, marks[1].from),
+        url: href,
+        urlFrom: url.from,
+        urlTo: url.to,
+      };
+    }
+    return null;
+  },
+  fencedBlockAt: (pos) => {
+    const view = getView();
+    if (!view) return null;
+    for (
+      let node: ReturnType<typeof syntaxTree>['topNode'] | null = syntaxTree(
+        view.state,
+      ).resolveInner(pos, 1);
+      node;
+      node = node.parent
+    ) {
+      if (node.name !== 'FencedCode') continue;
+      const from = view.state.doc.lineAt(node.from).from;
+      const to = view.state.doc.lineAt(node.to).to;
+      return { from, to, text: view.state.sliceDoc(from, to) };
+    }
+    return null;
+  },
   focus: () => getView()?.focus(),
   showDiff: (proposedText) => {
     const view = getView();

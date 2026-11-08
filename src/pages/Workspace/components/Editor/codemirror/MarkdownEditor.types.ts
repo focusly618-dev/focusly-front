@@ -41,6 +41,19 @@ export interface MarkdownEditorRef {
   setCursor: (pos: number) => void;
   jumpToSection: (target: { pos?: number; text?: string }) => boolean;
   getValue: () => string;
+  // The fenced code block (``` ... ```) around a position, whole lines, or
+  // null outside one
+  fencedBlockAt: (pos: number) => MarkdownSelection | null;
+  // The [text](url) link around a position (not a canvas link or an
+  // image), with where its address sits, or null
+  linkAt: (pos: number) => {
+    from: number;
+    to: number;
+    text: string;
+    url: string;
+    urlFrom: number;
+    urlTo: number;
+  } | null;
   focus: () => void;
   // Replaces the whole document with a combined old+new preview (deletions
   // struck through, additions underlined) and holds both versions inline

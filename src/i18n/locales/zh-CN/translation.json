@@ -2146,7 +2146,22 @@
     },
     "diagram": {
       "rendering": "正在绘制图表…",
-      "error": "此图表存在语法错误，请检查其代码。"
+      "error": "此图表存在语法错误，请检查其代码。",
+      "badge": "图表",
+      "mapBadge": "地图"
+    },
+    "textActions": {
+      "diagram": "转换为图表",
+      "diagramWorking": "Lumina 正在绘制图表…",
+      "diagramDone": "图表已完成",
+      "diagramFailed": "无法转换为图表"
+    },
+    "link": {
+      "open": "打开链接",
+      "edit": "编辑链接",
+      "remove": "移除链接",
+      "address": "链接地址",
+      "empty": "无地址"
     }
   }
 }

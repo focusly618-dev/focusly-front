@@ -2147,7 +2147,22 @@
     },
     "diagram": {
       "rendering": "Drawing diagram…",
-      "error": "This diagram has a syntax error. Check its code."
+      "error": "This diagram has a syntax error. Check its code.",
+      "badge": "Diagram",
+      "mapBadge": "Map"
+    },
+    "textActions": {
+      "diagram": "Convert to diagram",
+      "diagramWorking": "Lumina is drawing the diagram…",
+      "diagramDone": "Diagram ready",
+      "diagramFailed": "Couldn't turn it into a diagram"
+    },
+    "link": {
+      "open": "Open link",
+      "edit": "Edit link",
+      "remove": "Remove link",
+      "address": "Link address",
+      "empty": "No address"
     }
   }
 }

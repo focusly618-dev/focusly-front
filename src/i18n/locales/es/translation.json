@@ -2147,7 +2147,22 @@
     },
     "diagram": {
       "rendering": "Dibujando diagrama…",
-      "error": "Este diagrama tiene un error de escritura. Revisa su código."
+      "error": "Este diagrama tiene un error de escritura. Revisa su código.",
+      "badge": "Diagrama",
+      "mapBadge": "Mapa"
+    },
+    "textActions": {
+      "diagram": "Convertir en diagrama",
+      "diagramWorking": "Lumina está dibujando el diagrama…",
+      "diagramDone": "Diagrama listo",
+      "diagramFailed": "No se pudo convertir en diagrama"
+    },
+    "link": {
+      "open": "Abrir enlace",
+      "edit": "Editar enlace",
+      "remove": "Quitar enlace",
+      "address": "Dirección del enlace",
+      "empty": "Sin dirección"
     }
   }
 }

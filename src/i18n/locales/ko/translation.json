@@ -2146,7 +2146,22 @@
     },
     "diagram": {
       "rendering": "다이어그램을 그리는 중…",
-      "error": "이 다이어그램에 구문 오류가 있어요. 코드를 확인해 주세요."
+      "error": "이 다이어그램에 구문 오류가 있어요. 코드를 확인해 주세요.",
+      "badge": "다이어그램",
+      "mapBadge": "지도"
+    },
+    "textActions": {
+      "diagram": "다이어그램으로 변환",
+      "diagramWorking": "Lumina가 다이어그램을 그리는 중…",
+      "diagramDone": "다이어그램 완성",
+      "diagramFailed": "다이어그램으로 변환하지 못했어요"
+    },
+    "link": {
+      "open": "링크 열기",
+      "edit": "링크 편집",
+      "remove": "링크 제거",
+      "address": "링크 주소",
+      "empty": "주소 없음"
     }
   }
 }

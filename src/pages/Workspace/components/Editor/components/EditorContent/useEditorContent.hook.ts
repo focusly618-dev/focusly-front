@@ -19,6 +19,8 @@ import {
   getFriendlyErrorMessage,
 } from '@/utils';
 import { fetchEditResult } from '@/api/AI/apiAI';
+import i18n from '@/i18n';
+import { asMermaidBlock, diagramPrompt } from './diagram.utils';
 import { CREATE_CANVAS } from '@/pages/Workspace/Canvas.graphql';
 import type { Canvas } from '@/pages/Workspace/canvas.types';
 import { canvasLink, canvasNameFrom } from './canvasLinks.utils';
@@ -446,6 +448,50 @@ export const useEditorContent = ({
     }
   };
 
+  /** The selection (or the whole code block it's in: a diagram drawn with
+   * text characters) rewritten by Lumina as a Mermaid diagram, which the
+   * editor draws. */
+  const handleConvertToDiagram = async () => {
+    handleClose();
+    if (!isPro) {
+      openUpgrade('editor');
+      return;
+    }
+    const editor = markdownEditorRef.current;
+    if (!editor || !selectedRange || !selectedText.trim()) return;
+    const block = editor.fencedBlockAt(selectedRange.from);
+    const range = block ?? selectedRange;
+    const source = block ? block.text : selectedText;
+
+    setIsAIProcessing(true);
+    try {
+      // A reply that isn't Mermaid fails here, so the toast says so
+      const reply = fetchEditResult(diagramPrompt(source)).then((text) => {
+        const mermaid = asMermaidBlock(text);
+        if (!mermaid) throw new Error('The reply is not a Mermaid diagram');
+        return mermaid;
+      });
+      const diagram = await notify.promise(reply, {
+        loading: {
+          title: 'Lumina',
+          description: i18n.t('editor.textActions.diagramWorking'),
+        },
+        success: {
+          title: i18n.t('editor.textActions.diagramDone'),
+          duration: 3000,
+        },
+        error: {
+          title: i18n.t('editor.textActions.diagramFailed'),
+        },
+      });
+      editor.replaceRange(range.from, range.to, diagram);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsAIProcessing(false);
+    }
+  };
+
   const processTextWithAI = async (action: string) => {
     handleClose();
     if (!isPro) {
@@ -550,6 +596,7 @@ export const useEditorContent = ({
     handleIconSelect,
     handleContextMenu,
     handleActionsButton,
+    handleConvertToDiagram,
     handleClose,
     getLanguageLabel,
     handleCreateTask,

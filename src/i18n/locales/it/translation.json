@@ -2147,7 +2147,22 @@
     },
     "diagram": {
       "rendering": "Disegno del diagramma…",
-      "error": "Questo diagramma ha un errore di sintassi. Controlla il codice."
+      "error": "Questo diagramma ha un errore di sintassi. Controlla il codice.",
+      "badge": "Diagramma",
+      "mapBadge": "Mappa"
+    },
+    "textActions": {
+      "diagram": "Converti in diagramma",
+      "diagramWorking": "Lumina sta disegnando il diagramma…",
+      "diagramDone": "Diagramma pronto",
+      "diagramFailed": "Impossibile convertirlo in diagramma"
+    },
+    "link": {
+      "open": "Apri link",
+      "edit": "Modifica link",
+      "remove": "Rimuovi link",
+      "address": "Indirizzo del link",
+      "empty": "Nessun indirizzo"
     }
   }
 }

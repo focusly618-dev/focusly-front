@@ -2147,7 +2147,22 @@
     },
     "diagram": {
       "rendering": "Diagramm wird gezeichnet…",
-      "error": "Dieses Diagramm enthält einen Syntaxfehler. Prüfe seinen Code."
+      "error": "Dieses Diagramm enthält einen Syntaxfehler. Prüfe seinen Code.",
+      "badge": "Diagramm",
+      "mapBadge": "Karte"
+    },
+    "textActions": {
+      "diagram": "In Diagramm umwandeln",
+      "diagramWorking": "Lumina zeichnet das Diagramm…",
+      "diagramDone": "Diagramm fertig",
+      "diagramFailed": "Konnte nicht in ein Diagramm umgewandelt werden"
+    },
+    "link": {
+      "open": "Link öffnen",
+      "edit": "Link bearbeiten",
+      "remove": "Link entfernen",
+      "address": "Linkadresse",
+      "empty": "Keine Adresse"
     }
   }
 }
