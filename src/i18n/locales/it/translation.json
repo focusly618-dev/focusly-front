@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "Attività",
       "project": "Progetto",
+      "status": "Stato",
       "due": "Scadenza",
       "priority": "Priorità",
       "estimate": "Stima"
+    },
+    "statusTab": {
+      "all": "Tutte",
+      "in_progress": "In attesa",
+      "todo": "Da fare",
+      "planning": "Pianificazione",
+      "scheduled": "Pianificate",
+      "in_review": "In revisione",
+      "on_hold": "In pausa",
+      "backlog": "Backlog",
+      "completed": "Completate"
+    },
+    "statusBadge": {
+      "in_progress": "In attesa",
+      "todo": "Da fare",
+      "planning": "Pianificazione",
+      "scheduled": "Pianificata",
+      "in_review": "In revisione",
+      "on_hold": "In pausa",
+      "backlog": "Backlog",
+      "completed": "Completata"
+    },
+    "viewMode": {
+      "label": "Modalità di visualizzazione",
+      "list": "Elenco",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} di {{total}} completate",
@@ -1187,7 +1214,8 @@
     "newWorkspace": "Nuovo spazio di lavoro",
     "status": {
       "recent": "Recente",
-      "empty": "Vuoto"
+      "empty": "Vuoto",
+      "idle": "Nessuna attività"
     },
     "notesInside_one": "{{count}} nota all'interno",
     "notesInside_other": "{{count}} note all'interno",
@@ -1545,6 +1573,11 @@
       "filterByColor": "Filtra per colore",
       "allColors": "Tutti i colori",
       "resetFilters": "Reimposta filtri"
+    },
+    "card": {
+      "lastDocument": "Ultimo documento: {{title}}",
+      "documents_one": "{{count}} documento",
+      "documents_other": "{{count}} documenti"
     }
   },
   "workspaceEditor": {
@@ -2109,13 +2142,16 @@
         "divider": "Separatore",
         "math": "Equazione",
         "diagram": "Diagramma",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Blocco interattivo"
       },
       "templates": {
         "toggle": "Titolo",
         "column": "Colonna {{n}}",
         "start": "Inizio",
-        "end": "Fine"
+        "end": "Fine",
+        "callout": "Nota",
+        "interactive": "Il mio blocco interattivo"
       }
     },
     "format": {
@@ -2130,6 +2166,40 @@
       "todo": "Elenco di attività",
       "quote": "Citazione",
       "linkPlaceholder": "link"
+    },
+    "table": {
+      "addRow": "Aggiungi riga",
+      "addColumn": "Aggiungi colonna",
+      "deleteRow": "Rimuovi riga",
+      "deleteColumn": "Rimuovi colonna",
+      "deleteTable": "Elimina tabella"
+    },
+    "diagram": {
+      "rendering": "Disegno del diagramma…",
+      "error": "Questo diagramma ha un errore di sintassi. Controlla il codice.",
+      "badge": "Diagramma",
+      "mapBadge": "Mappa"
+    },
+    "textActions": {
+      "diagram": "Converti in diagramma",
+      "diagramWorking": "Lumina sta disegnando il diagramma…",
+      "diagramDone": "Diagramma pronto",
+      "diagramFailed": "Impossibile convertirlo in diagramma"
+    },
+    "link": {
+      "open": "Apri link",
+      "edit": "Modifica link",
+      "remove": "Rimuovi link",
+      "address": "Indirizzo del link",
+      "empty": "Nessun indirizzo"
+    },
+    "htmlApp": {
+      "badge": "Blocco interattivo",
+      "gate": "Questo blocco contiene codice. Viene eseguito in isolamento: non può vedere i tuoi dati né connettersi a Internet.",
+      "run": "Esegui",
+      "stop": "Interrompi",
+      "previewMode": "Mostra blocco",
+      "codeMode": "Modifica codice"
     }
   }
 }

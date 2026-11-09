@@ -32,6 +32,7 @@ export interface UseEditorContentReturn {
   handleIconSelect: (iconName: string) => void;
   handleContextMenu: (event: React.MouseEvent) => void;
   handleActionsButton: (button: DOMRect) => void;
+  handleConvertToDiagram: () => Promise<void>;
   handleClose: () => void;
   getLanguageLabel: (code: string) => string;
   handleCreateTask: () => void;

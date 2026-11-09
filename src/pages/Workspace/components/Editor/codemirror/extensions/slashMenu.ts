@@ -7,6 +7,7 @@ import {
 import { syntaxTree } from '@codemirror/language';
 import type { EditorView } from '@codemirror/view';
 import i18n from '@/i18n';
+import { focusTableCell } from './livePreview/table';
 
 /**
  * The "/" menu: type "/" at the start of a line (or after a space) to add a
@@ -93,7 +94,7 @@ export const SLASH_ITEMS: SlashItem[] = [
     icon: svg(
       '<rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="M12 11v4.5M12 8.2v.1"/>',
     ),
-    template: () => '> [!note]\n> {|}',
+    template: () => `> [!note] ${t('templates.callout')}\n> {|}`,
   },
   {
     id: 'toggle',
@@ -116,7 +117,8 @@ export const SLASH_ITEMS: SlashItem[] = [
     ),
     template: () => {
       const col = (n: number) => t('templates.column', { n });
-      return `| {|}${col(1)} | ${col(2)} |\n| --- | --- |\n|  |  |`;
+      // A line under it, for the cursor; the first cell gets the focus
+      return `| ${col(1)} | ${col(2)} |\n| --- | --- |\n|  |  |\n{|}`;
     },
   },
   {
@@ -138,7 +140,16 @@ export const SLASH_ITEMS: SlashItem[] = [
       '<rect x="3" y="3.5" width="7" height="5.5" rx="1.2"/><rect x="14" y="15" width="7" height="5.5" rx="1.2"/><path d="M6.5 9v3.5h11V15"/>',
     ),
     template: () =>
-      `\`\`\`mermaid\nflowchart TD\n  A[{|}${t('templates.start')}] --> B[${t('templates.end')}]\n\`\`\``,
+      `\`\`\`mermaid\nflowchart TD\n  A[{|}${t('templates.start')}] --> B[${t('templates.end')}]\n\`\`\`\n`,
+  },
+  {
+    id: 'interactive',
+    keywords: ['interactive', 'html', 'app', 'widget', 'calculator'],
+    icon: svg(
+      '<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="m10 9.5 5 2.5-5 2.5z"/>',
+    ),
+    template: () =>
+      `\`\`\`html-app\n<h3>{|}${t('templates.interactive')}</h3>\n<button onclick="n.textContent = +n.textContent + 1">+1</button>\n<span id="n">0</span>\n\`\`\`\n`,
   },
   {
     id: 'canvas',
@@ -226,6 +237,9 @@ export const applySlashItem = (
     scrollIntoView: true,
     userEvent: 'input.complete',
   });
+  // A new table: straight into its first cell, its placeholder selected
+  if (item.id === 'table')
+    focusTableCell(view, from + lead.length, -1, 0, true);
 };
 
 // No menu inside code: "/" is just a character there

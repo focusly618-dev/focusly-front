@@ -1119,11 +1119,38 @@
     "allProjects": "All projects",
     "showEmptyStatuses": "Show empty statuses",
     "columns": {
-      "task": "Task",
+      "task": "Task name",
       "project": "Project",
+      "status": "Status",
       "due": "Due",
       "priority": "Priority",
       "estimate": "Est."
+    },
+    "statusTab": {
+      "all": "All",
+      "in_progress": "Pending",
+      "todo": "To Do",
+      "planning": "Planning",
+      "scheduled": "Scheduled",
+      "in_review": "In Review",
+      "on_hold": "On Hold",
+      "backlog": "Backlog",
+      "completed": "Done"
+    },
+    "statusBadge": {
+      "in_progress": "Pending",
+      "todo": "To Do",
+      "planning": "Planning",
+      "scheduled": "Scheduled",
+      "in_review": "In Review",
+      "on_hold": "On Hold",
+      "backlog": "Backlog",
+      "completed": "Done"
+    },
+    "viewMode": {
+      "label": "View mode",
+      "list": "List",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} of {{total}} done",
@@ -1187,7 +1214,8 @@
     "newWorkspace": "New Workspace",
     "status": {
       "recent": "Recent",
-      "empty": "Empty"
+      "empty": "Empty",
+      "idle": "No activity"
     },
     "notesInside_one": "{{count}} note inside",
     "notesInside_other": "{{count}} notes inside",
@@ -1545,6 +1573,11 @@
       "filterByColor": "Filter by Color",
       "allColors": "All Colors",
       "resetFilters": "Reset Filters"
+    },
+    "card": {
+      "lastDocument": "Last document: {{title}}",
+      "documents_one": "{{count}} document",
+      "documents_other": "{{count}} documents"
     }
   },
   "workspaceEditor": {
@@ -2109,13 +2142,16 @@
         "divider": "Divider",
         "math": "Equation",
         "diagram": "Diagram",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Interactive block"
       },
       "templates": {
         "toggle": "Title",
         "column": "Column {{n}}",
         "start": "Start",
-        "end": "End"
+        "end": "End",
+        "callout": "Note",
+        "interactive": "My interactive block"
       }
     },
     "format": {
@@ -2130,6 +2166,40 @@
       "todo": "To-do list",
       "quote": "Quote",
       "linkPlaceholder": "link"
+    },
+    "table": {
+      "addRow": "Add row",
+      "addColumn": "Add column",
+      "deleteRow": "Remove row",
+      "deleteColumn": "Remove column",
+      "deleteTable": "Delete table"
+    },
+    "diagram": {
+      "rendering": "Drawing diagram…",
+      "error": "This diagram has a syntax error. Check its code.",
+      "badge": "Diagram",
+      "mapBadge": "Map"
+    },
+    "textActions": {
+      "diagram": "Convert to diagram",
+      "diagramWorking": "Lumina is drawing the diagram…",
+      "diagramDone": "Diagram ready",
+      "diagramFailed": "Couldn't turn it into a diagram"
+    },
+    "link": {
+      "open": "Open link",
+      "edit": "Edit link",
+      "remove": "Remove link",
+      "address": "Link address",
+      "empty": "No address"
+    },
+    "htmlApp": {
+      "badge": "Interactive block",
+      "gate": "This block contains code. It runs isolated: it can't see your data or connect to the internet.",
+      "run": "Run",
+      "stop": "Stop",
+      "previewMode": "View block",
+      "codeMode": "Edit code"
     }
   }
 }

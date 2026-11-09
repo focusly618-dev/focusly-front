@@ -15,7 +15,7 @@ export const useFocusModeTasks = ({ initialTask }: UseFocusModeTasksProps) => {
   );
 
   const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, {
-    variables: { userId: user?.id },
+    variables: { userId: user?.id, filters: { has_project: false } },
     skip: !user?.id,
     fetchPolicy: 'cache-and-network',
   });
@@ -33,6 +33,7 @@ export const useFocusModeTasks = ({ initialTask }: UseFocusModeTasksProps) => {
 
     return all
       .filter((t) => {
+        if (t.project_id) return false;
         if (t.status === 'Done' || t.status === 'Archived') return false;
         if (!t.deadline) return false;
         const deadline = new Date(t.deadline);

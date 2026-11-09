@@ -59,6 +59,7 @@ import {
   LocalOffer as TagIcon,
   ViewSidebar as FocusModeIcon,
   ViewStream as DefaultModeIcon,
+  AccountTreeOutlined as DiagramIcon,
 } from '@mui/icons-material';
 import type { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import type { WorkspaceFormData } from '../../../../workspace.types';
@@ -82,6 +83,7 @@ import { CreateCanvasPopover } from '../CanvasIdentity/CreateCanvasPopover';
 import { editorFontVars, type EditorFontStyle } from '../../editorFonts';
 import { TextActionsButton } from './TextActionsButton';
 import { FormatToolbar } from './FormatToolbar';
+import { LinkChip } from './LinkChip';
 
 // Excalidraw is heavy and only a canvas needs it: it's split into its own
 // chunk, fetched when a canvas is opened rather than with every note.
@@ -167,6 +169,7 @@ export const EditorContent = ({
     handleConfirmAITask,
     isCreatingTask,
     handleGenerateCanvasPage,
+    handleConvertToDiagram,
     handleStartBlankCanvas,
     canvasDraft,
     isCreatingCanvas,
@@ -639,6 +642,14 @@ export const EditorContent = ({
               </Box>
             )}
 
+            <LinkChip
+              editorRef={markdownEditorRef}
+              surfaceRef={editorSurfaceRef}
+              selectedText={liveSelectedText}
+              selectionTick={selectionTick}
+              hidden={isAIProcessing}
+            />
+
             <FormatToolbar
               editorRef={markdownEditorRef}
               surfaceRef={editorSurfaceRef}
@@ -806,6 +817,20 @@ export const EditorContent = ({
           </ListItemIcon>
           <ListItemText
             primary={`Translate to ${getLanguageLabel(targetLanguage || 'en')}`}
+            primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+          />
+        </MenuItem>
+
+        <MenuItem
+          disabled={!hasMenuTarget}
+          onClick={handleConvertToDiagram}
+          sx={{ py: 1.2 }}
+        >
+          <ListItemIcon sx={{ color: '#8b5cf6' }}>
+            <DiagramIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('editor.textActions.diagram')}
             primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
           />
         </MenuItem>

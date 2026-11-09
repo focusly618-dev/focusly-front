@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '@/config/env.config';
+import { cleanTitle, stripLeakedReasoning } from './cleanAIOutput';
 import axios from 'axios';
 import { format } from 'date-fns';
 import type { AIMessage, AITaskContext } from './apiAI.types';
@@ -26,7 +27,7 @@ export const fetchEditResult = async (prompt: string): Promise<string> => {
         // One-shot rewrite: keep it out of the Lumina history.
         persist: false,
         system_context:
-          'You are a helpful AI writing assistant integrated into the Focusly workspace editor. Help users refine, summarize, expand, translate, or rewrite their text. Always respond concisely and only with the requested output, no preambles or explanations.',
+          'You are a helpful AI writing assistant integrated into the Focusly workspace editor. Help users refine, summarize, expand, translate, or rewrite their text. Always respond concisely and only with the requested output, no preambles or explanations. Never write your reasoning, notes or a "THOUGHT" section: your reply is inserted as-is into the document.',
       }),
     });
 
@@ -69,7 +70,8 @@ export const fetchEditResult = async (prompt: string): Promise<string> => {
     if (done) break;
     result += decoder.decode(value, { stream: true });
   }
-  return result.trim();
+  // A reasoning section the model wrote as text never reaches the document
+  return stripLeakedReasoning(result);
 };
 
 export const generateWorkspaceTitle = async (
@@ -78,7 +80,8 @@ export const generateWorkspaceTitle = async (
   const raw = await fetchEditResult(
     `Generate a short, specific title (3-7 words, no quotes, no trailing punctuation) for a document that starts like this:\n\n${plainTextContent.slice(0, 1500)}`,
   );
-  return raw.replace(/^["'“”]+|["'“”]+$/g, '').trim();
+  // '' (no title) rather than a sentence of reasoning as the name
+  return cleanTitle(raw);
 };
 
 export const fetchChatStreamResponse = async (

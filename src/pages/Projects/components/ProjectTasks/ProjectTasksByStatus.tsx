@@ -33,7 +33,23 @@ export const ProjectTasksByStatus: React.FC<ProjectTasksByStatusProps> = ({
   showProject = true,
   ...handlers
 }) => (
-  <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+  <Box
+    sx={{
+      width: '100%',
+      borderRadius: '14px',
+      border: '1px solid',
+      borderColor: 'divider',
+      bgcolor: 'background.paper',
+      overflow: 'hidden',
+      boxShadow: (theme) =>
+        theme.palette.mode === 'dark'
+          ? '0 4px 20px rgba(0, 0, 0, 0.22)'
+          : '0 2px 12px rgba(15, 23, 42, 0.04)',
+      '& > section:last-of-type > div:last-of-type > *:last-child': {
+        borderBottom: 'none',
+      },
+    }}
+  >
     <ProjectTaskColumns showProject={showProject} />
     {visibleStatuses(tasks, showEmptyStatuses).map((status) => (
       <ProjectTaskStatusGroup

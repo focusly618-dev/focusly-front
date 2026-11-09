@@ -1,6 +1,6 @@
 import {
   EditorHeader as StyledEditorHeader,
-  BackButton as StyledBackButton
+  BackButton as StyledBackButton,
 } from '../../WorkspaceEditor.styles';
 
 export const EditorHeader = StyledEditorHeader;

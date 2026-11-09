@@ -9,6 +9,7 @@ import {
   Tooltip,
   Typography,
   alpha,
+  useTheme,
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AddIcon from '@mui/icons-material/Add';
@@ -55,6 +56,8 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
   onToggleSelect,
 }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const statusLabel = t(status.labelKey, { defaultValue: status.label });
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -75,14 +78,20 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
 
   return (
     <Box component="section" aria-labelledby={`${groupId}-title`}>
-      {/* ── Header ── */}
+      {/* ── Section Header Row Inside Unified Table ── */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 1,
-          mb: 0.75,
+          px: { xs: 1.5, sm: 2.25 },
+          py: 0.9,
+          bgcolor: isDark
+            ? 'rgba(255, 255, 255, 0.015)'
+            : 'rgba(248, 250, 252, 0.75)',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
         }}
       >
         <ButtonBase
@@ -93,9 +102,9 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            py: 0.5,
-            px: 0.75,
-            borderRadius: '8px',
+            py: 0.35,
+            px: 0.5,
+            borderRadius: '6px',
             '&:hover': { bgcolor: 'action.hover' },
             '&.Mui-focusVisible': { outline: '2px solid #008767' },
           }}
@@ -114,7 +123,7 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
               height: 8,
               borderRadius: '50%',
               bgcolor: status.dotColor,
-              boxShadow: `0 0 6px ${alpha(status.dotColor, 0.6)}`,
+              boxShadow: `0 0 6px ${alpha(status.dotColor, 0.5)}`,
             }}
           />
           <Typography
@@ -136,8 +145,8 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
               py: '1px',
               borderRadius: '10px',
               fontSize: '11px',
-              fontWeight: 650,
-              bgcolor: alpha(status.dotColor, 0.14),
+              fontWeight: 700,
+              bgcolor: alpha(status.dotColor, isDark ? 0.18 : 0.12),
               color: status.dotColor,
               minWidth: 20,
               textAlign: 'center',
@@ -164,12 +173,9 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
         )}
       </Box>
 
-      {/* ── Tasks ── */}
+      {/* ── Tasks + Inline Quick Add Row ── */}
       <Collapse in={isExpanded} timeout={200} unmountOnExit>
-        <Box
-          id={groupId}
-          sx={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
-        >
+        <Box id={groupId} sx={{ display: 'flex', flexDirection: 'column' }}>
           {tasks.map((task) => (
             <ProjectTaskItem
               key={task.id}
@@ -186,23 +192,24 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
             />
           ))}
 
-          {/* Quick add */}
+          {/* Quick add row inside the table */}
           {!selectionMode &&
             (isAddingTask ? (
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1,
-                  px: 2,
-                  py: 0.75,
-                  borderRadius: '10px',
-                  border: '1px solid',
+                  gap: 1.25,
+                  px: { xs: 1.5, sm: 2.5 },
+                  py: 0.9,
+                  borderBottom: '1px solid',
                   borderColor: 'divider',
-                  bgcolor: 'background.paper',
+                  bgcolor: isDark
+                    ? 'rgba(255, 255, 255, 0.02)'
+                    : 'rgba(0, 135, 103, 0.03)',
                 }}
               >
-                <AddIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                <AddIcon sx={{ fontSize: 16, color: '#008767' }} />
                 <InputBase
                   autoFocus
                   fullWidth
@@ -227,15 +234,21 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
               <ButtonBase
                 onClick={() => setIsAddingTask(true)}
                 sx={{
+                  width: '100%',
                   justifyContent: 'flex-start',
                   gap: 1,
-                  px: 2,
-                  py: 0.85,
-                  borderRadius: '10px',
+                  px: { xs: 1.5, sm: 2.5 },
+                  py: 0.9,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
                   color: 'text.secondary',
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  '&:hover': { bgcolor: 'action.hover' },
+                  fontSize: '12.5px',
+                  fontWeight: 550,
+                  transition: 'background-color 0.12s ease, color 0.12s ease',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    color: 'text.primary',
+                  },
                   '&.Mui-focusVisible': { outline: '2px solid #008767' },
                 }}
               >

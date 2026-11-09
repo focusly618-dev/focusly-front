@@ -42,6 +42,31 @@ export const overlaps = (
 };
 
 /**
+ * True when the user is editing inside a rendered block (diagram, formula):
+ * the cursor (or a selection that both started and stayed inside the block)
+ * is strictly within the block's inner body lines (excluding the opening and
+ * closing fence lines). Selecting all, clicking below the block at the end of
+ * the document, or dragging across the block from outside keeps the rendered
+ * widget closed and stable.
+ */
+export const isEditingBlock = (
+  state: EditorState,
+  from: number,
+  to: number,
+): boolean => {
+  const { anchor, head, empty } = state.selection.main;
+  const startLine = state.doc.lineAt(from);
+  const endLine = state.doc.lineAt(to);
+  if (endLine.number - startLine.number < 2) return false;
+  const bodyFrom = startLine.to + 1;
+  const bodyTo = endLine.from - 1;
+  if (empty) return head >= bodyFrom && head <= bodyTo;
+  return (
+    anchor >= bodyFrom && anchor <= bodyTo && head >= bodyFrom && head <= bodyTo
+  );
+};
+
+/**
  * Whether formatting markup (a heading's #, **bold** stars, list markers,
  * > quotes, link brackets and addresses, ``` fences...) shows. Never: the
  * user formats through the "/" menu, the toolbar and shortcuts, and never

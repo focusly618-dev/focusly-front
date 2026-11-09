@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "Aufgabe",
       "project": "Projekt",
+      "status": "Status",
       "due": "Fällig",
       "priority": "Priorität",
       "estimate": "Schätz."
+    },
+    "statusTab": {
+      "all": "Alle",
+      "in_progress": "Ausstehend",
+      "todo": "Zu erledigen",
+      "planning": "Planung",
+      "scheduled": "Geplant",
+      "in_review": "In Prüfung",
+      "on_hold": "Pausiert",
+      "backlog": "Backlog",
+      "completed": "Erledigt"
+    },
+    "statusBadge": {
+      "in_progress": "Ausstehend",
+      "todo": "Zu erledigen",
+      "planning": "Planung",
+      "scheduled": "Geplant",
+      "in_review": "In Prüfung",
+      "on_hold": "Pausiert",
+      "backlog": "Backlog",
+      "completed": "Erledigt"
+    },
+    "viewMode": {
+      "label": "Ansichtsmodus",
+      "list": "Liste",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} von {{total}} erledigt",
@@ -1187,7 +1214,8 @@
     "newWorkspace": "Neuer Arbeitsbereich",
     "status": {
       "recent": "Zuletzt",
-      "empty": "Leer"
+      "empty": "Leer",
+      "idle": "Keine Aktivität"
     },
     "notesInside_one": "{{count}} Notiz darin",
     "notesInside_other": "{{count}} Notizen darin",
@@ -1545,6 +1573,11 @@
       "filterByColor": "Nach Farbe filtern",
       "allColors": "Alle Farben",
       "resetFilters": "Filter zurücksetzen"
+    },
+    "card": {
+      "lastDocument": "Letztes Dokument: {{title}}",
+      "documents_one": "{{count}} Dokument",
+      "documents_other": "{{count}} Dokumente"
     }
   },
   "workspaceEditor": {
@@ -2109,13 +2142,16 @@
         "divider": "Trennlinie",
         "math": "Formel",
         "diagram": "Diagramm",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Interaktiver Block"
       },
       "templates": {
         "toggle": "Titel",
         "column": "Spalte {{n}}",
         "start": "Start",
-        "end": "Ende"
+        "end": "Ende",
+        "callout": "Hinweis",
+        "interactive": "Mein interaktiver Block"
       }
     },
     "format": {
@@ -2130,6 +2166,40 @@
       "todo": "To-do-Liste",
       "quote": "Zitat",
       "linkPlaceholder": "Link"
+    },
+    "table": {
+      "addRow": "Zeile hinzufügen",
+      "addColumn": "Spalte hinzufügen",
+      "deleteRow": "Zeile entfernen",
+      "deleteColumn": "Spalte entfernen",
+      "deleteTable": "Tabelle löschen"
+    },
+    "diagram": {
+      "rendering": "Diagramm wird gezeichnet…",
+      "error": "Dieses Diagramm enthält einen Syntaxfehler. Prüfe seinen Code.",
+      "badge": "Diagramm",
+      "mapBadge": "Karte"
+    },
+    "textActions": {
+      "diagram": "In Diagramm umwandeln",
+      "diagramWorking": "Lumina zeichnet das Diagramm…",
+      "diagramDone": "Diagramm fertig",
+      "diagramFailed": "Konnte nicht in ein Diagramm umgewandelt werden"
+    },
+    "link": {
+      "open": "Link öffnen",
+      "edit": "Link bearbeiten",
+      "remove": "Link entfernen",
+      "address": "Linkadresse",
+      "empty": "Keine Adresse"
+    },
+    "htmlApp": {
+      "badge": "Interaktiver Block",
+      "gate": "Dieser Block enthält Code. Er läuft isoliert: Er kann weder deine Daten sehen noch auf das Internet zugreifen.",
+      "run": "Ausführen",
+      "stop": "Stoppen",
+      "previewMode": "Block anzeigen",
+      "codeMode": "Code bearbeiten"
     }
   }
 }

@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "작업",
       "project": "프로젝트",
+      "status": "상태",
       "due": "마감",
       "priority": "우선순위",
       "estimate": "예상"
+    },
+    "statusTab": {
+      "all": "전체",
+      "in_progress": "대기 중",
+      "todo": "할 일",
+      "planning": "계획 중",
+      "scheduled": "예정됨",
+      "in_review": "검토 중",
+      "on_hold": "보류 중",
+      "backlog": "백로그",
+      "completed": "완료됨"
+    },
+    "statusBadge": {
+      "in_progress": "대기 중",
+      "todo": "할 일",
+      "planning": "계획 중",
+      "scheduled": "예정됨",
+      "in_review": "검토 중",
+      "on_hold": "보류 중",
+      "backlog": "백로그",
+      "completed": "완료됨"
+    },
+    "viewMode": {
+      "label": "보기 모드",
+      "list": "목록",
+      "kanban": "칸반"
     },
     "summary": {
       "completed": "{{total}}개 중 {{done}}개 완료",
@@ -1187,7 +1214,8 @@
     "newWorkspace": "새 워크스페이스",
     "status": {
       "recent": "최근",
-      "empty": "비어 있음"
+      "empty": "비어 있음",
+      "idle": "활동 없음"
     },
     "notesInside_one": "노트 {{count}}개",
     "notesInside_other": "노트 {{count}}개",
@@ -1545,6 +1573,10 @@
       "filterByColor": "색상으로 필터",
       "allColors": "모든 색상",
       "resetFilters": "필터 초기화"
+    },
+    "card": {
+      "lastDocument": "최근 문서: {{title}}",
+      "documents_other": "문서 {{count}}개"
     }
   },
   "workspaceEditor": {
@@ -2109,13 +2141,16 @@
         "divider": "구분선",
         "math": "수식",
         "diagram": "다이어그램",
-        "canvas": "캔버스"
+        "canvas": "캔버스",
+        "interactive": "인터랙티브 블록"
       },
       "templates": {
         "toggle": "제목",
         "column": "열 {{n}}",
         "start": "시작",
-        "end": "끝"
+        "end": "끝",
+        "callout": "메모",
+        "interactive": "내 인터랙티브 블록"
       }
     },
     "format": {
@@ -2130,6 +2165,40 @@
       "todo": "할 일 목록",
       "quote": "인용",
       "linkPlaceholder": "링크"
+    },
+    "table": {
+      "addRow": "행 추가",
+      "addColumn": "열 추가",
+      "deleteRow": "행 삭제",
+      "deleteColumn": "열 삭제",
+      "deleteTable": "표 삭제"
+    },
+    "diagram": {
+      "rendering": "다이어그램을 그리는 중…",
+      "error": "이 다이어그램에 구문 오류가 있어요. 코드를 확인해 주세요.",
+      "badge": "다이어그램",
+      "mapBadge": "지도"
+    },
+    "textActions": {
+      "diagram": "다이어그램으로 변환",
+      "diagramWorking": "Lumina가 다이어그램을 그리는 중…",
+      "diagramDone": "다이어그램 완성",
+      "diagramFailed": "다이어그램으로 변환하지 못했어요"
+    },
+    "link": {
+      "open": "링크 열기",
+      "edit": "링크 편집",
+      "remove": "링크 제거",
+      "address": "링크 주소",
+      "empty": "주소 없음"
+    },
+    "htmlApp": {
+      "badge": "인터랙티브 블록",
+      "gate": "이 블록에는 코드가 포함되어 있습니다. 격리된 환경에서 실행되며 사용자의 데이터를 보거나 인터넷에 연결할 수 없습니다.",
+      "run": "실행",
+      "stop": "중지",
+      "previewMode": "블록 보기",
+      "codeMode": "코드 편집"
     }
   }
 }

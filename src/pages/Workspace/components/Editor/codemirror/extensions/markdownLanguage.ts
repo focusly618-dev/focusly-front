@@ -1,4 +1,5 @@
 import { markdown } from '@codemirror/lang-markdown';
+import { LanguageDescription } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 import { GFM } from '@lezer/markdown';
 import { MathExtension } from './mathExtension';
@@ -9,6 +10,12 @@ import { MathExtension } from './mathExtension';
 // highlighting, lazily loaded on first use. MathExtension adds $inline$ and
 // standalone $$ block math, which neither CommonMark nor GFM define.
 export const markdownExtension = markdown({
-  codeLanguages: languages,
+  // An interactive block's code is colored as the HTML it is
+  codeLanguages: (info) =>
+    LanguageDescription.matchLanguageName(
+      languages,
+      info === 'html-app' ? 'html' : info,
+      true,
+    ),
   extensions: [...GFM, MathExtension],
 });

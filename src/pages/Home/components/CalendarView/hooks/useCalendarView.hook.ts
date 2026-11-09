@@ -219,17 +219,18 @@ export const useCalendarView = () => {
       filters: {
         startDate: dateRange.start,
         endDate: dateRange.end,
+        has_project: false,
       },
     },
     fetchPolicy: 'cache-and-network',
   });
 
   useEffect(() => {
-    const fetchedTasks = tasksData?.result?.tasks;
+    const fetchedTasks: TaskResponse[] | undefined = tasksData?.result?.tasks;
     if (fetchedTasks) {
-      const validTasks: Task[] = fetchedTasks.map((t: TaskResponse) =>
-        mapResponseToTask(t),
-      );
+      const validTasks: Task[] = fetchedTasks
+        .filter((t) => !(t.project_id && String(t.project_id).trim() !== ''))
+        .map((t: TaskResponse) => mapResponseToTask(t));
       dispatch(setTasks(validTasks));
     }
   }, [tasksData, dispatch]);

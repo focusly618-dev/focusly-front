@@ -276,7 +276,9 @@ export function useCreateProjectTaskModal({
   // ── Core form fields ───────────────────────────────────────────────────────
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [title, setTitle] = useState('');
-  const [status, setStatus] = useState<string>(defaultStatus || 'in_progress');
+  const [status, setStatus] = useState<string>(() =>
+    mapStatusFromBackend(defaultStatus || 'in_progress'),
+  );
   const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(
     null,
   );
@@ -309,7 +311,8 @@ export function useCreateProjectTaskModal({
       filledForRef.current = null;
       return;
     }
-    const fillKey = task?.id ?? 'new';
+    const fillKey =
+      task?.id ?? `new:${defaultStatus ?? ''}:${defaultTitle ?? ''}`;
     if (filledForRef.current === fillKey) return;
     filledForRef.current = fillKey;
 
@@ -359,7 +362,7 @@ export function useCreateProjectTaskModal({
       initialSnapshotRef.current = null;
       setTitle(defaultTitle || '');
       setDescription('');
-      setStatus(defaultStatus || 'in_progress');
+      setStatus(mapStatusFromBackend(defaultStatus || 'in_progress'));
       setPriority('Medium');
       setDueDate('');
       setEstimatedDuration('30m');

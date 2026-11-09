@@ -210,4 +210,22 @@ describe('task.slice reducer — adversarial / can-it-break-the-app cases', () =
     const state = reducer(undefined, { type: '@@INIT' });
     expect(state.projectTab).toBe('projects');
   });
+
+  it('excludes project tasks (project_id set) from general Agenda state in setTasks, addTask, updateTask, and upsertTask', () => {
+    const regular = baseTask({ id: 't-regular', project_id: null });
+    const projTask = baseTask({ id: 't-project', project_id: 'proj-1' });
+
+    let state = reducer(emptyState, setTasks([regular, projTask]));
+    expect(state.tasks.map((t) => t.id)).toEqual(['t-regular']);
+
+    state = reducer(state, addTask(projTask));
+    expect(state.tasks.map((t) => t.id)).toEqual(['t-regular']);
+
+    state = reducer(state, upsertTask(projTask));
+    expect(state.tasks.map((t) => t.id)).toEqual(['t-regular']);
+
+    // Moving an existing regular task into a project removes it from general tasks
+    state = reducer(state, updateTask({ ...regular, project_id: 'proj-1' }));
+    expect(state.tasks).toEqual([]);
+  });
 });

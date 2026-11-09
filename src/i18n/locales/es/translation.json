@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "Tarea",
       "project": "Proyecto",
+      "status": "Estado",
       "due": "Fecha",
       "priority": "Prioridad",
       "estimate": "Est."
+    },
+    "statusTab": {
+      "all": "Todas",
+      "in_progress": "Pendiente",
+      "todo": "Por hacer",
+      "planning": "Planificación",
+      "scheduled": "Programado",
+      "in_review": "En revisión",
+      "on_hold": "En espera",
+      "backlog": "Backlog",
+      "completed": "Completado"
+    },
+    "statusBadge": {
+      "in_progress": "Pendiente",
+      "todo": "Por hacer",
+      "planning": "Planificación",
+      "scheduled": "Programado",
+      "in_review": "En revisión",
+      "on_hold": "En espera",
+      "backlog": "Backlog",
+      "completed": "Completado"
+    },
+    "viewMode": {
+      "label": "Modo de vista",
+      "list": "Lista",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} de {{total}} completadas",
@@ -1187,7 +1214,8 @@
     "newWorkspace": "Nuevo Workspace",
     "status": {
       "recent": "Reciente",
-      "empty": "Vacío"
+      "empty": "Vacío",
+      "idle": "Sin actividad"
     },
     "notesInside_one": "{{count}} nota dentro",
     "notesInside_other": "{{count}} notas dentro",
@@ -1545,6 +1573,11 @@
       "filterByColor": "Filtrar por Color",
       "allColors": "Todos los Colores",
       "resetFilters": "Restablecer Filtros"
+    },
+    "card": {
+      "lastDocument": "Último documento: {{title}}",
+      "documents_one": "{{count}} documento",
+      "documents_other": "{{count}} documentos"
     }
   },
   "workspaceEditor": {
@@ -2109,13 +2142,16 @@
         "divider": "Separador",
         "math": "Ecuación",
         "diagram": "Diagrama",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Bloque interactivo"
       },
       "templates": {
         "toggle": "Título",
         "column": "Columna {{n}}",
         "start": "Inicio",
-        "end": "Fin"
+        "end": "Fin",
+        "callout": "Nota",
+        "interactive": "Mi bloque interactivo"
       }
     },
     "format": {
@@ -2130,6 +2166,40 @@
       "todo": "Lista de tareas",
       "quote": "Cita",
       "linkPlaceholder": "enlace"
+    },
+    "table": {
+      "addRow": "Agregar fila",
+      "addColumn": "Agregar columna",
+      "deleteRow": "Quitar fila",
+      "deleteColumn": "Quitar columna",
+      "deleteTable": "Eliminar tabla"
+    },
+    "diagram": {
+      "rendering": "Dibujando diagrama…",
+      "error": "Este diagrama tiene un error de escritura. Revisa su código.",
+      "badge": "Diagrama",
+      "mapBadge": "Mapa"
+    },
+    "textActions": {
+      "diagram": "Convertir en diagrama",
+      "diagramWorking": "Lumina está dibujando el diagrama…",
+      "diagramDone": "Diagrama listo",
+      "diagramFailed": "No se pudo convertir en diagrama"
+    },
+    "link": {
+      "open": "Abrir enlace",
+      "edit": "Editar enlace",
+      "remove": "Quitar enlace",
+      "address": "Dirección del enlace",
+      "empty": "Sin dirección"
+    },
+    "htmlApp": {
+      "badge": "Bloque interactivo",
+      "gate": "Este bloque tiene código. Se ejecuta aislado: no puede ver tus datos ni conectarse a internet.",
+      "run": "Ejecutar",
+      "stop": "Detener",
+      "previewMode": "Ver bloque",
+      "codeMode": "Editar código"
     }
   }
 }

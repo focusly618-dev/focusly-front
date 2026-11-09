@@ -1,4 +1,5 @@
 import { isEmptyDocument } from '@/utils/documentContent';
+import { isLeakedReasoning } from '@/api/AI/cleanAIOutput';
 import { useCallback, useMemo, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm, useWatch } from 'react-hook-form';
@@ -201,7 +202,10 @@ export const useWorkspaceForm = () => {
 
   useEffect(() => {
     if (titleGenerationRef.current.attempted) return;
-    if (values.title?.trim()) return;
+    // A title that is a model's leaked reasoning ("THOUGHTThe user
+    // wants...", from before replies were cleaned) is replaced too
+    const leaked = isLeakedReasoning(values.title ?? '');
+    if (values.title?.trim() && !leaked) return;
 
     const plainText = stripMarkdown(values.content ?? '');
     if (plainText.length < MIN_CONTENT_LENGTH_FOR_AUTO_TITLE) return;
@@ -209,7 +213,9 @@ export const useWorkspaceForm = () => {
     titleGenerationRef.current.attempted = true;
     generateWorkspaceTitle(plainText)
       .then((generated) => {
-        if (generated && isMountedRef.current) {
+        if (!isMountedRef.current) return;
+        // No good title back: untitled beats keeping the leaked text
+        if (generated || leaked) {
           setValue('title', generated, { shouldDirty: true });
         }
       })

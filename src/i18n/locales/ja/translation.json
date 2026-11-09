@@ -1096,9 +1096,36 @@
     "columns": {
       "task": "タスク",
       "project": "プロジェクト",
+      "status": "ステータス",
       "due": "期限",
       "priority": "優先度",
       "estimate": "見積"
+    },
+    "statusTab": {
+      "all": "すべて",
+      "in_progress": "保留中",
+      "todo": "未着手",
+      "planning": "計画中",
+      "scheduled": "予定済み",
+      "in_review": "レビュー中",
+      "on_hold": "一時停止",
+      "backlog": "バックログ",
+      "completed": "完了"
+    },
+    "statusBadge": {
+      "in_progress": "保留中",
+      "todo": "未着手",
+      "planning": "計画中",
+      "scheduled": "予定済み",
+      "in_review": "レビュー中",
+      "on_hold": "一時停止",
+      "backlog": "バックログ",
+      "completed": "完了"
+    },
+    "viewMode": {
+      "label": "表示モード",
+      "list": "リスト",
+      "kanban": "カンバン"
     },
     "summary": {
       "completed": "{{total}} 件中 {{done}} 件完了",
@@ -1158,7 +1185,8 @@
     "newWorkspace": "新しいワークスペース",
     "status": {
       "recent": "最近",
-      "empty": "空"
+      "empty": "空",
+      "idle": "アクティビティなし"
     },
     "notesInside_one": "{{count}}件のノート",
     "notesInside_other": "{{count}}件のノート",
@@ -1513,6 +1541,10 @@
       "filterByColor": "色で絞り込み",
       "allColors": "すべての色",
       "resetFilters": "フィルターをリセット"
+    },
+    "card": {
+      "lastDocument": "最新のドキュメント：{{title}}",
+      "documents_other": "{{count}} 件のドキュメント"
     }
   },
   "workspaceEditor": {
@@ -2073,13 +2105,16 @@
         "divider": "区切り線",
         "math": "数式",
         "diagram": "図",
-        "canvas": "キャンバス"
+        "canvas": "キャンバス",
+        "interactive": "インタラクティブブロック"
       },
       "templates": {
         "toggle": "タイトル",
         "column": "列{{n}}",
         "start": "開始",
-        "end": "終了"
+        "end": "終了",
+        "callout": "メモ",
+        "interactive": "インタラクティブブロック"
       }
     },
     "format": {
@@ -2094,6 +2129,40 @@
       "todo": "ToDoリスト",
       "quote": "引用",
       "linkPlaceholder": "リンク"
+    },
+    "table": {
+      "addRow": "行を追加",
+      "addColumn": "列を追加",
+      "deleteRow": "行を削除",
+      "deleteColumn": "列を削除",
+      "deleteTable": "表を削除"
+    },
+    "diagram": {
+      "rendering": "図を描画しています…",
+      "error": "この図には構文エラーがあります。コードを確認してください。",
+      "badge": "図",
+      "mapBadge": "地図"
+    },
+    "textActions": {
+      "diagram": "図に変換",
+      "diagramWorking": "Lumina が図を作成しています…",
+      "diagramDone": "図ができました",
+      "diagramFailed": "図に変換できませんでした"
+    },
+    "link": {
+      "open": "リンクを開く",
+      "edit": "リンクを編集",
+      "remove": "リンクを解除",
+      "address": "リンクのアドレス",
+      "empty": "アドレスなし"
+    },
+    "htmlApp": {
+      "badge": "インタラクティブブロック",
+      "gate": "このブロックにはコードが含まれています。隔離された環境で実行され、あなたのデータの参照やインターネットへの接続はできません。",
+      "run": "実行",
+      "stop": "停止",
+      "previewMode": "ブロックを表示",
+      "codeMode": "コードを編集"
     }
   }
 }

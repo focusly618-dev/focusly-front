@@ -7,8 +7,8 @@ import { handleCallout } from './callout';
 import { handleMathBlock } from './math';
 import { handleRenderedFence } from './codeBlocks';
 import { decorateDetails } from './details';
-import { calloutFoldField } from './foldState';
-import type { BlockHandler, Push } from './utils';
+import { calloutFoldField, diagramCodeModeField } from './foldState';
+import { isEditingBlock, type BlockHandler, type Push } from './utils';
 import { diffRangesField } from '../diffReview';
 
 // Constructs that can render as a `block: true` replace decoration (tables,
@@ -23,6 +23,27 @@ const BLOCK_HANDLERS: Record<string, BlockHandler> = {
   Blockquote: handleCallout,
   MathBlock: handleMathBlock,
   FencedCode: handleRenderedFence,
+};
+
+/** Only MathBlock and FencedCode change their block decoration based on
+ * whether the cursor is editing inside them; tables, callouts and details
+ * never depend on selection. Checking this avoids rebuilding all block
+ * widgets on every mousemove frame during drag-selection. */
+const activeEditableBlockKey = (state: EditorState): string => {
+  const { main } = state.selection;
+  let key = '';
+  syntaxTree(state).iterate({
+    from: main.from,
+    to: main.to,
+    enter(node: SyntaxNodeRef) {
+      if (node.type.name === 'MathBlock' || node.type.name === 'FencedCode') {
+        if (isEditingBlock(state, node.from, node.to)) {
+          key += `${node.type.name}:${node.from}-${node.to};`;
+        }
+      }
+    },
+  });
+  return key;
 };
 
 function buildBlockDecorations(state: EditorState): DecorationSet {
@@ -75,12 +96,16 @@ export const blockDecorationsField = StateField.define<DecorationSet>({
   update(value, tr) {
     if (
       !tr.docChanged &&
-      !tr.selection &&
       tr.startState.field(calloutFoldField) ===
         tr.state.field(calloutFoldField) &&
+      tr.startState.field(diagramCodeModeField, false) ===
+        tr.state.field(diagramCodeModeField, false) &&
       tr.startState.field(diffRangesField, false) ===
         tr.state.field(diffRangesField, false) &&
-      syntaxTree(tr.state) === syntaxTree(tr.startState)
+      syntaxTree(tr.state) === syntaxTree(tr.startState) &&
+      (!tr.selection ||
+        activeEditableBlockKey(tr.startState) ===
+          activeEditableBlockKey(tr.state))
     ) {
       return value;
     }

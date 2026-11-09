@@ -119,11 +119,13 @@ export const useAIScheduler = ({
         filters: {
           startDate: window.start.toISOString(),
           endDate: window.end.toISOString(),
+          has_project: false,
         },
       },
       fetchPolicy: 'network-only',
     });
     for (const raw of (data?.result?.tasks ?? []) as TaskResponse[]) {
+      if (raw.project_id) continue;
       const task = mapResponseToTask(raw);
       if (skipTaskIds.has(task.id) || !task.estimated_start_date) continue;
       const start = new Date(task.estimated_start_date);
@@ -160,7 +162,7 @@ export const useAIScheduler = ({
       query: GET_TASKS_PAGINATED,
       variables: {
         userId,
-        filters: { status: OPEN_STATUSES },
+        filters: { status: OPEN_STATUSES, has_project: false },
         sort: { sort: 'priority_level', order: 'desc' },
         limit: CANDIDATES_LIMIT,
         offset: 0,
@@ -168,7 +170,9 @@ export const useAIScheduler = ({
       fetchPolicy: 'network-only',
     });
     const candidates = selectTasksToPlan(
-      ((data?.result?.tasks ?? []) as TaskResponse[]).map(mapResponseToTask),
+      ((data?.result?.tasks ?? []) as TaskResponse[])
+        .filter((t) => !t.project_id)
+        .map(mapResponseToTask),
       now,
     );
     if (candidates.length === 0) {

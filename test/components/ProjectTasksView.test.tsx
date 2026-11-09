@@ -188,4 +188,19 @@ describe('ProjectTasksView', () => {
     fireEvent.click(screen.getByText('projectTasks.empty.action'));
     expect(onNewTask).toHaveBeenCalled();
   });
+
+  it('filters by status pill and switches between List and Kanban views', () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByText('projectTasks.statusTab.in_progress'));
+    expect(screen.getByText('Comprar verduras')).toBeInTheDocument();
+    expect(screen.queryByText('Escribir capítulo')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('projectTasks.statusTab.all'));
+    expect(screen.getByText('Escribir capítulo')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('projectTasks.viewMode.kanban'));
+    expect(
+      screen.getByRole('button', { name: /projectTasks\.viewMode\.kanban/ }),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
 });

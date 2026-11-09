@@ -156,5 +156,8 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     use_ai: t.use_ai,
     is_owner: t.is_owner,
     workspaces: mapWorkspace(t.workspace),
+    workspace_id: t.workspace_id,
+    project_id: t.project_id,
+    project: t.project,
   };
 };

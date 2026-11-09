@@ -128,7 +128,7 @@ export const useSidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
     let upcoming = 0;
 
     tasks.forEach((t) => {
-      if (t.status === 'Done' || t.deleted_at) return;
+      if (t.status === 'Done' || t.deleted_at || t.project_id) return;
 
       const hasEstimatedStart =
         t.estimated_start_date &&

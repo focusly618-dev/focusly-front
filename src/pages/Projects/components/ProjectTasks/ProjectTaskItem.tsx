@@ -4,6 +4,7 @@ import {
   Avatar,
   AvatarGroup,
   Box,
+  ButtonBase,
   Checkbox,
   Collapse,
   IconButton,
@@ -19,6 +20,10 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
+import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
+import AdjustRoundedIcon from '@mui/icons-material/AdjustRounded';
+import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
+import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import { ProjectTaskSubtasks } from './ProjectTaskSubtasks';
 import { ProjectStatusMenu } from './ProjectStatusMenu';
 import {
@@ -28,9 +33,11 @@ import {
   ModernFolderFilledIcon,
   isCustomEmoji,
 } from '@/components/ui';
-import type {
-  ProjectTaskItemData,
-  ProjectTaskStatusId,
+import {
+  DEFAULT_PROJECT_STATUSES,
+  findProjectStatus,
+  type ProjectTaskItemData,
+  type ProjectTaskStatusId,
 } from './projectTasks.types';
 
 export interface ProjectTaskItemProps {
@@ -51,14 +58,14 @@ export interface ProjectTaskItemProps {
   onToggleSelect?: (task: ProjectTaskItemData) => void;
 }
 
-// Desktop columns, aligned across rows (every width but the title's is
-// fixed): check · title · [project] · due · priority · estimate · actions.
+// Desktop columns, aligned across rows:
+// check · title · [project] · status · priority · due · estimate · actions
 const columns = (showProject: boolean) =>
   showProject
-    ? '28px minmax(0, 1fr) 150px 92px 96px 52px 60px'
-    : '28px minmax(0, 1fr) 92px 96px 52px 60px';
+    ? '28px minmax(0, 1fr) 148px 132px 104px 104px 52px 52px'
+    : '28px minmax(0, 1fr) 132px 108px 108px 52px 52px';
 
-const ProjectChip = ({ task }: { task: ProjectTaskItemData }) => {
+export const ProjectChip = ({ task }: { task: ProjectTaskItemData }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -72,15 +79,15 @@ const ProjectChip = ({ task }: { task: ProjectTaskItemData }) => {
         sx={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '4px',
+          gap: '5px',
           maxWidth: '100%',
-          px: '7px',
-          py: '2px',
-          borderRadius: '5px',
-          fontSize: '11px',
+          px: '8px',
+          py: '2.5px',
+          borderRadius: '6px',
+          fontSize: '11.5px',
           fontWeight: 600,
           color,
-          bgcolor: alpha(color, isDark ? 0.15 : 0.08),
+          bgcolor: alpha(color, isDark ? 0.16 : 0.09),
           border: `1px solid ${alpha(color, isDark ? 0.3 : 0.2)}`,
           lineHeight: 1.4,
           minWidth: 0,
@@ -108,7 +115,73 @@ const ProjectChip = ({ task }: { task: ProjectTaskItemData }) => {
   );
 };
 
-const DueChip = ({ task }: { task: ProjectTaskItemData }) => {
+export const StatusChip = ({
+  task,
+  onClick,
+}: {
+  task: ProjectTaskItemData;
+  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+}) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const config =
+    findProjectStatus(task.status) ??
+    DEFAULT_PROJECT_STATUSES.find((s) => s.id === 'todo') ??
+    DEFAULT_PROJECT_STATUSES[0];
+  const label = t(`projectTasks.statusBadge.${config.id}`, {
+    defaultValue: config.label,
+  });
+
+  return (
+    <ButtonBase
+      component="button"
+      type="button"
+      disabled={!onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.(e);
+      }}
+      aria-label={`${t('projectTasks.columns.status', { defaultValue: 'Status' })}: ${label}`}
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        px: '9px',
+        py: '3px',
+        borderRadius: '999px',
+        fontSize: '11.5px',
+        fontWeight: 650,
+        whiteSpace: 'nowrap',
+        color: config.color,
+        bgcolor: alpha(config.color, isDark ? 0.16 : 0.1),
+        border: `1px solid ${alpha(config.color, isDark ? 0.32 : 0.22)}`,
+        transition: 'all 0.15s ease',
+        cursor: onClick ? 'pointer' : 'default',
+        '&:hover': onClick
+          ? {
+              bgcolor: alpha(config.color, isDark ? 0.24 : 0.16),
+              borderColor: alpha(config.color, 0.45),
+            }
+          : {},
+      }}
+    >
+      <Box
+        component="span"
+        sx={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          bgcolor: config.dotColor,
+          flexShrink: 0,
+        }}
+      />
+      <span>{label}</span>
+    </ButtonBase>
+  );
+};
+
+export const DueChip = ({ task }: { task: ProjectTaskItemData }) => {
   const { t } = useTranslation();
   if (!task.dueDate) return null;
   const color =
@@ -127,20 +200,19 @@ const DueChip = ({ task }: { task: ProjectTaskItemData }) => {
         sx={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '3px',
-          fontSize: '11px',
+          gap: '4px',
+          fontSize: '11.5px',
           fontWeight: 600,
           px: '7px',
           py: '2px',
-          borderRadius: '5px',
+          borderRadius: '6px',
           whiteSpace: 'nowrap',
-          bgcolor: color ? alpha(color, 0.14) : 'action.hover',
+          bgcolor: color ? alpha(color, 0.12) : 'transparent',
           color: color ?? 'text.secondary',
-          border: '1px solid',
-          borderColor: color ? alpha(color, 0.3) : 'divider',
+          border: color ? `1px solid ${alpha(color, 0.28)}` : 'none',
         }}
       >
-        <EventOutlinedIcon sx={{ fontSize: 12 }} />
+        <EventOutlinedIcon sx={{ fontSize: 13, opacity: 0.85 }} />
         {task.dueDate}
       </Box>
     </Tooltip>
@@ -148,7 +220,7 @@ const DueChip = ({ task }: { task: ProjectTaskItemData }) => {
 };
 
 /** Icon and name on desktop; just the icon where space is short. */
-const PriorityChip = ({
+export const PriorityChip = ({
   task,
   compact,
 }: {
@@ -176,9 +248,9 @@ const PriorityChip = ({
         display: 'inline-flex',
         alignItems: 'center',
         gap: '4px',
-        px: '6px',
+        px: '7px',
         py: '2px',
-        borderRadius: '5px',
+        borderRadius: '6px',
         fontSize: '11px',
         fontWeight: 700,
         whiteSpace: 'nowrap',
@@ -206,6 +278,8 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
   onToggleSelect,
 }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
 
@@ -279,7 +353,7 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
           fontSize: '11px',
           fontWeight: 600,
           color: 'info.main',
-          bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
+          bgcolor: (thm) => alpha(thm.palette.info.main, 0.1),
           flexShrink: 1,
         }}
       >
@@ -301,17 +375,18 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
   return (
     <Box
       sx={{
-        borderRadius: '10px',
-        bgcolor: 'background.paper',
-        border: '1px solid',
-        borderColor: selected ? '#008767' : 'divider',
-        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        bgcolor: selected
+          ? alpha('#008767', isDark ? 0.12 : 0.06)
+          : 'background.paper',
+        transition: 'background-color 0.12s ease',
         '&:hover': {
-          borderColor: selected ? '#008767' : 'action.disabled',
-          boxShadow: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'none'
-              : '0 2px 8px rgba(15, 23, 42, 0.06)',
+          bgcolor: selected
+            ? alpha('#008767', isDark ? 0.16 : 0.09)
+            : isDark
+              ? 'rgba(255, 255, 255, 0.025)'
+              : 'rgba(15, 23, 42, 0.02)',
         },
       }}
     >
@@ -335,10 +410,9 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
           },
           alignItems: 'center',
           columnGap: { xs: 1, sm: 1.5 },
-          px: { xs: 1.25, sm: 2 },
-          py: 1.1,
+          px: { xs: 1.5, sm: 2.25 },
+          py: 1.15,
           cursor: 'pointer',
-          borderRadius: '10px',
           '&:focus-visible': {
             outline: '2px solid #008767',
             outlineOffset: -2,
@@ -422,6 +496,14 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
             }}
           >
             {showProject && <ProjectChip task={task} />}
+            <StatusChip
+              task={task}
+              onClick={
+                !selectionMode && onChangeStatus
+                  ? (e) => setStatusAnchor(e.currentTarget)
+                  : undefined
+              }
+            />
             <DueChip task={task} />
             <PriorityChip task={task} compact />
             {subtasksToggle}
@@ -435,11 +517,21 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
             <ProjectChip task={task} />
           </Box>
         )}
-        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-          <DueChip task={task} />
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, minWidth: 0 }}>
+          <StatusChip
+            task={task}
+            onClick={
+              !selectionMode && onChangeStatus
+                ? (e) => setStatusAnchor(e.currentTarget)
+                : undefined
+            }
+          />
         </Box>
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
           <PriorityChip task={task} />
+        </Box>
+        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <DueChip task={task} />
         </Box>
         <Typography
           sx={{
@@ -536,27 +628,38 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
   );
 };
 
-/** Column titles over the rows, on screens wide enough for columns. */
+/** Column titles header at the top of the unified table card. */
 export const ProjectTaskColumns: React.FC<{ showProject?: boolean }> = ({
   showProject = true,
 }) => {
   const { t } = useTranslation();
-  const label = (text: string, align: 'left' | 'right' = 'left') => (
-    <Typography
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  const colHeader = (
+    text: string,
+    icon?: React.ReactNode,
+    align: 'left' | 'right' = 'left',
+  ) => (
+    <Box
       component="span"
       sx={{
-        fontSize: '10.5px',
-        fontWeight: 700,
-        letterSpacing: '0.04em',
-        textTransform: 'uppercase',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: align === 'right' ? 'flex-end' : 'flex-start',
+        gap: 0.6,
+        fontSize: '11.5px',
+        fontWeight: 650,
         color: 'text.secondary',
         textAlign: align,
         whiteSpace: 'nowrap',
       }}
     >
-      {text}
-    </Typography>
+      {icon}
+      <span>{text}</span>
+    </Box>
   );
+
   return (
     <Box
       aria-hidden
@@ -565,18 +668,45 @@ export const ProjectTaskColumns: React.FC<{ showProject?: boolean }> = ({
         gridTemplateColumns: columns(showProject),
         columnGap: 1.5,
         alignItems: 'center',
-        px: 2,
-        border: '1px solid transparent',
-        mb: 0.5,
+        px: 2.25,
+        py: 1.15,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        bgcolor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#f8fafc',
       }}
     >
-      <span />
-      {label(t('projectTasks.columns.task'))}
-      {showProject && label(t('projectTasks.columns.project'))}
-      {label(t('projectTasks.columns.due'))}
-      {label(t('projectTasks.columns.priority'))}
-      {label(t('projectTasks.columns.estimate'), 'right')}
-      <span />
+      <Box
+        sx={{
+          width: 15,
+          height: 15,
+          borderRadius: '4px',
+          border: '1.5px solid',
+          borderColor: 'text.disabled',
+          ml: 0.5,
+        }}
+      />
+      {colHeader(t('projectTasks.columns.task'))}
+      {showProject &&
+        colHeader(
+          t('projectTasks.columns.project'),
+          <GridViewOutlinedIcon sx={{ fontSize: 13.5, opacity: 0.75 }} />,
+        )}
+      {colHeader(
+        t('projectTasks.columns.status', { defaultValue: 'Status' }),
+        <AdjustRoundedIcon sx={{ fontSize: 13.5, opacity: 0.75 }} />,
+      )}
+      {colHeader(
+        t('projectTasks.columns.priority'),
+        <FlagOutlinedIcon sx={{ fontSize: 13.5, opacity: 0.75 }} />,
+      )}
+      {colHeader(
+        t('projectTasks.columns.due'),
+        <EventOutlinedIcon sx={{ fontSize: 13.5, opacity: 0.75 }} />,
+      )}
+      {colHeader(t('projectTasks.columns.estimate'), undefined, 'right')}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', pr: 0.5 }}>
+        <FilterListRoundedIcon sx={{ fontSize: 15, color: 'text.disabled' }} />
+      </Box>
     </Box>
   );
 };
