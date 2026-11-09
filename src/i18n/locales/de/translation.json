@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "Aufgabe",
       "project": "Projekt",
+      "status": "Status",
       "due": "Fällig",
       "priority": "Priorität",
       "estimate": "Schätz."
+    },
+    "statusTab": {
+      "all": "Alle",
+      "in_progress": "Ausstehend",
+      "todo": "Zu erledigen",
+      "planning": "Planung",
+      "scheduled": "Geplant",
+      "in_review": "In Prüfung",
+      "on_hold": "Pausiert",
+      "backlog": "Backlog",
+      "completed": "Erledigt"
+    },
+    "statusBadge": {
+      "in_progress": "Ausstehend",
+      "todo": "Zu erledigen",
+      "planning": "Planung",
+      "scheduled": "Geplant",
+      "in_review": "In Prüfung",
+      "on_hold": "Pausiert",
+      "backlog": "Backlog",
+      "completed": "Erledigt"
+    },
+    "viewMode": {
+      "label": "Ansichtsmodus",
+      "list": "Liste",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} von {{total}} erledigt",
@@ -2115,14 +2142,16 @@
         "divider": "Trennlinie",
         "math": "Formel",
         "diagram": "Diagramm",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Interaktiver Block"
       },
       "templates": {
         "toggle": "Titel",
         "column": "Spalte {{n}}",
         "start": "Start",
         "end": "Ende",
-        "callout": "Hinweis"
+        "callout": "Hinweis",
+        "interactive": "Mein interaktiver Block"
       }
     },
     "format": {
@@ -2163,6 +2192,14 @@
       "remove": "Link entfernen",
       "address": "Linkadresse",
       "empty": "Keine Adresse"
+    },
+    "htmlApp": {
+      "badge": "Interaktiver Block",
+      "gate": "Dieser Block enthält Code. Er läuft isoliert: Er kann weder deine Daten sehen noch auf das Internet zugreifen.",
+      "run": "Ausführen",
+      "stop": "Stoppen",
+      "previewMode": "Block anzeigen",
+      "codeMode": "Code bearbeiten"
     }
   }
 }

@@ -8,7 +8,11 @@ import {
   type BlockHandler,
   type Handler,
 } from './utils';
-import { isDiagramInCodeMode } from './foldState';
+import {
+  CODE_MODE_FENCES,
+  HTML_APP_FENCE,
+  isDiagramInCodeMode,
+} from './foldState';
 import {
   MermaidHeaderToolbarWidget,
   MermaidRowWidget,
@@ -17,10 +21,11 @@ import {
 } from './mermaidWidget';
 import { MathWidget } from './mathWidget';
 import { GeoJsonWidget } from './geojsonWidget';
+import { HtmlAppWidget, htmlAppModeLabels } from './htmlAppWidget';
 
 // Fences drawn as what they describe (a diagram, a formula, a map) while the
 // cursor is elsewhere, instead of as code.
-const RENDERED_FENCES = new Set(['mermaid', 'math', 'geojson']);
+const RENDERED_FENCES = new Set(['mermaid', 'math', 'geojson', HTML_APP_FENCE]);
 
 /** A fence's language: the first word of its info string, lowercased. */
 const fenceLanguage = (info: string) =>
@@ -60,6 +65,7 @@ const FRIENDLY_LABELS: Record<string, string> = {
   mermaid: 'editor.diagram.badge',
   math: 'editor.slash.items.math',
   geojson: 'editor.diagram.mapBadge',
+  [HTML_APP_FENCE]: 'editor.htmlApp.badge',
 };
 
 class LangLabelWidget extends WidgetType {
@@ -117,12 +123,12 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
   }
 
   const lang = codeInfo ? fenceLanguage(codeInfo.text) : '';
-  const isMermaid = lang === 'mermaid';
+  const hasCodeMode = CODE_MODE_FENCES.has(lang);
 
   // A drawn fence (mermaid, math, geojson) in preview mode is replaced by its
   // widget in blockDecorations.ts
   if (codeInfo && RENDERED_FENCES.has(lang)) {
-    const editing = isMermaid
+    const editing = hasCodeMode
       ? isDiagramInCodeMode(view.state, node.from)
       : isEditingBlock(view.state, node.from, node.to);
     if (!editing) return false;
@@ -137,7 +143,7 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
     let cls = 'cm-code-block-line';
     if (ln === startLine.number) {
       cls += ' cm-code-block-header';
-      if (isMermaid) cls += ' cm-mermaid-code-header';
+      if (hasCodeMode) cls += ' cm-mermaid-code-header';
       if (cursorOnStart) cls += ' cm-code-fence-active';
     } else if (ln === endLine.number) {
       cls += ' cm-code-block-footer';
@@ -171,12 +177,15 @@ export const handleFencedCode: Handler = (node, view, sel, push) => {
     }
   }
 
-  if (isMermaid) {
+  if (hasCodeMode) {
     push(
       startLine.to,
       startLine.to,
       Decoration.widget({
-        widget: new MermaidHeaderToolbarWidget(node.from),
+        widget: new MermaidHeaderToolbarWidget(
+          node.from,
+          lang === HTML_APP_FENCE ? htmlAppModeLabels() : undefined,
+        ),
         side: 1,
       }),
     );
@@ -257,6 +266,19 @@ export const handleRenderedFence: BlockHandler = (node, state, _sel, push) => {
       endLine.to,
       Decoration.replace({
         widget: items.length > 1 ? new MermaidRowWidget(items) : items[0],
+        block: true,
+      }),
+    );
+    return;
+  }
+
+  if (language === HTML_APP_FENCE) {
+    if (isDiagramInCodeMode(state, node.from)) return;
+    push(
+      state.doc.lineAt(node.from).from,
+      state.doc.lineAt(node.to).to,
+      Decoration.replace({
+        widget: new HtmlAppWidget(code, node.from),
         block: true,
       }),
     );

@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "任务",
       "project": "项目",
+      "status": "状态",
       "due": "截止",
       "priority": "优先级",
       "estimate": "预估"
+    },
+    "statusTab": {
+      "all": "全部",
+      "in_progress": "待处理",
+      "todo": "待办",
+      "planning": "规划中",
+      "scheduled": "已安排",
+      "in_review": "审核中",
+      "on_hold": "已暂停",
+      "backlog": "积压",
+      "completed": "已完成"
+    },
+    "statusBadge": {
+      "in_progress": "待处理",
+      "todo": "待办",
+      "planning": "规划中",
+      "scheduled": "已安排",
+      "in_review": "审核中",
+      "on_hold": "已暂停",
+      "backlog": "积压",
+      "completed": "已完成"
+    },
+    "viewMode": {
+      "label": "视图模式",
+      "list": "列表",
+      "kanban": "看板"
     },
     "summary": {
       "completed": "已完成 {{done}}/{{total}}",
@@ -2114,14 +2141,16 @@
         "divider": "分隔线",
         "math": "公式",
         "diagram": "图表",
-        "canvas": "画布"
+        "canvas": "画布",
+        "interactive": "交互式区块"
       },
       "templates": {
         "toggle": "标题",
         "column": "第 {{n}} 列",
         "start": "开始",
         "end": "结束",
-        "callout": "备注"
+        "callout": "备注",
+        "interactive": "我的交互式区块"
       }
     },
     "format": {
@@ -2162,6 +2191,14 @@
       "remove": "移除链接",
       "address": "链接地址",
       "empty": "无地址"
+    },
+    "htmlApp": {
+      "badge": "交互式区块",
+      "gate": "此区块包含代码。它在隔离环境中运行：无法查看你的数据，也无法连接互联网。",
+      "run": "运行",
+      "stop": "停止",
+      "previewMode": "查看区块",
+      "codeMode": "编辑代码"
     }
   }
 }

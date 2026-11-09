@@ -143,6 +143,15 @@ export const SLASH_ITEMS: SlashItem[] = [
       `\`\`\`mermaid\nflowchart TD\n  A[{|}${t('templates.start')}] --> B[${t('templates.end')}]\n\`\`\`\n`,
   },
   {
+    id: 'interactive',
+    keywords: ['interactive', 'html', 'app', 'widget', 'calculator'],
+    icon: svg(
+      '<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="m10 9.5 5 2.5-5 2.5z"/>',
+    ),
+    template: () =>
+      `\`\`\`html-app\n<h3>{|}${t('templates.interactive')}</h3>\n<button onclick="n.textContent = +n.textContent + 1">+1</button>\n<span id="n">0</span>\n\`\`\`\n`,
+  },
+  {
     id: 'canvas',
     keywords: [
       'canvas',

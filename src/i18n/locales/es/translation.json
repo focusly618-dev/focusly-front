@@ -2142,14 +2142,16 @@
         "divider": "Separador",
         "math": "Ecuación",
         "diagram": "Diagrama",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Bloque interactivo"
       },
       "templates": {
         "toggle": "Título",
         "column": "Columna {{n}}",
         "start": "Inicio",
         "end": "Fin",
-        "callout": "Nota"
+        "callout": "Nota",
+        "interactive": "Mi bloque interactivo"
       }
     },
     "format": {
@@ -2190,6 +2192,14 @@
       "remove": "Quitar enlace",
       "address": "Dirección del enlace",
       "empty": "Sin dirección"
+    },
+    "htmlApp": {
+      "badge": "Bloque interactivo",
+      "gate": "Este bloque tiene código. Se ejecuta aislado: no puede ver tus datos ni conectarse a internet.",
+      "run": "Ejecutar",
+      "stop": "Detener",
+      "previewMode": "Ver bloque",
+      "codeMode": "Editar código"
     }
   }
 }

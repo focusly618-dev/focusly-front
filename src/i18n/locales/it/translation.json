@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "Attività",
       "project": "Progetto",
+      "status": "Stato",
       "due": "Scadenza",
       "priority": "Priorità",
       "estimate": "Stima"
+    },
+    "statusTab": {
+      "all": "Tutte",
+      "in_progress": "In attesa",
+      "todo": "Da fare",
+      "planning": "Pianificazione",
+      "scheduled": "Pianificate",
+      "in_review": "In revisione",
+      "on_hold": "In pausa",
+      "backlog": "Backlog",
+      "completed": "Completate"
+    },
+    "statusBadge": {
+      "in_progress": "In attesa",
+      "todo": "Da fare",
+      "planning": "Pianificazione",
+      "scheduled": "Pianificata",
+      "in_review": "In revisione",
+      "on_hold": "In pausa",
+      "backlog": "Backlog",
+      "completed": "Completata"
+    },
+    "viewMode": {
+      "label": "Modalità di visualizzazione",
+      "list": "Elenco",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} di {{total}} completate",
@@ -2115,14 +2142,16 @@
         "divider": "Separatore",
         "math": "Equazione",
         "diagram": "Diagramma",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Blocco interattivo"
       },
       "templates": {
         "toggle": "Titolo",
         "column": "Colonna {{n}}",
         "start": "Inizio",
         "end": "Fine",
-        "callout": "Nota"
+        "callout": "Nota",
+        "interactive": "Il mio blocco interattivo"
       }
     },
     "format": {
@@ -2163,6 +2192,14 @@
       "remove": "Rimuovi link",
       "address": "Indirizzo del link",
       "empty": "Nessun indirizzo"
+    },
+    "htmlApp": {
+      "badge": "Blocco interattivo",
+      "gate": "Questo blocco contiene codice. Viene eseguito in isolamento: non può vedere i tuoi dati né connettersi a Internet.",
+      "run": "Esegui",
+      "stop": "Interrompi",
+      "previewMode": "Mostra blocco",
+      "codeMode": "Modifica codice"
     }
   }
 }

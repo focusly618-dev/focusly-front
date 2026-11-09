@@ -622,9 +622,12 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         padding: 0,
         borderRadius: '7px',
         border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
-        backgroundColor: isDark
-          ? 'rgba(30, 41, 59, 0.88)'
-          : 'rgba(241, 245, 249, 0.94)',
+        backgroundColor: surfaceColor(
+          theme,
+          'rgba(30, 41, 59, 0.88)',
+          'rgba(42, 42, 46, 0.9)',
+          'rgba(241, 245, 249, 0.94)',
+        ),
         color: theme.palette.text.secondary,
         cursor: 'grab',
         userSelect: 'none',
@@ -682,9 +685,12 @@ export const buildEditorTheme = (theme: Theme): Extension => {
         gap: '2px',
         padding: '2px',
         borderRadius: '8px',
-        backgroundColor: isDark
-          ? 'rgba(30, 41, 59, 0.88)'
-          : 'rgba(241, 245, 249, 0.94)',
+        backgroundColor: surfaceColor(
+          theme,
+          'rgba(30, 41, 59, 0.88)',
+          'rgba(42, 42, 46, 0.9)',
+          'rgba(241, 245, 249, 0.94)',
+        ),
         border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
         backdropFilter: 'blur(6px)',
         userSelect: 'none',
@@ -759,6 +765,61 @@ export const buildEditorTheme = (theme: Theme): Extension => {
       },
 
       // GeoJSON: a small map of its shapes on a quiet card
+      '.cm-live-html-app': {
+        position: 'relative',
+        width: '100%',
+        boxSizing: 'border-box',
+        margin: '10px 0',
+        borderRadius: '10px',
+        border: `1px solid ${theme.palette.divider}`,
+        overflow: 'hidden',
+      },
+      '.cm-html-app-header': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        minHeight: '40px',
+        padding: '4px 84px 4px 12px',
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        backgroundColor: alpha(
+          theme.palette.text.primary,
+          isDark ? 0.03 : 0.02,
+        ),
+      },
+      '.cm-html-app-gate': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '16px',
+        padding: '16px 14px',
+        fontSize: '13px',
+        lineHeight: 1.45,
+        color: theme.palette.text.secondary,
+      },
+      '.cm-html-app-run, .cm-html-app-stop': {
+        flexShrink: 0,
+        padding: '5px 12px',
+        borderRadius: '8px',
+        border: 'none',
+        fontFamily: 'inherit',
+        fontSize: '12px',
+        fontWeight: 600,
+        cursor: 'pointer',
+      },
+      '.cm-html-app-run': {
+        color: theme.palette.primary.contrastText,
+        backgroundColor: theme.palette.primary.main,
+      },
+      '.cm-html-app-stop': {
+        color: theme.palette.text.secondary,
+        backgroundColor: alpha(theme.palette.text.primary, 0.07),
+      },
+      '.cm-html-app-frame': {
+        display: 'block',
+        width: '100%',
+        height: '120px',
+        border: 'none',
+      },
       '.cm-live-geojson': {
         margin: '10px 0',
         borderRadius: '10px',

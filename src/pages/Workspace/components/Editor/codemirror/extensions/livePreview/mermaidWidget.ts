@@ -371,11 +371,13 @@ export const createMermaidModeToolbar = (
   pos: number,
   activeMode: 'preview' | 'code',
   zoom = 100,
+  // Another kind of block (no zoom), with its own wording
+  labels?: { preview: string; code: string },
 ): HTMLElement => {
   const toolbar = document.createElement('div');
   toolbar.className = 'cm-mermaid-toolbar';
 
-  if (activeMode === 'preview') {
+  if (activeMode === 'preview' && !labels) {
     const zoomOutBtn = document.createElement('button');
     zoomOutBtn.type = 'button';
     zoomOutBtn.className = 'cm-mermaid-zoom-btn';
@@ -427,7 +429,8 @@ export const createMermaidModeToolbar = (
   previewBtn.className = `cm-mermaid-mode-btn${activeMode === 'preview' ? ' is-active' : ''}`;
   previewBtn.dataset.mermaidMode = 'preview';
   previewBtn.dataset.mermaidPos = String(pos);
-  const previewLabel = i18n.t('editor.diagram.previewMode', 'Ver diagrama');
+  const previewLabel =
+    labels?.preview ?? i18n.t('editor.diagram.previewMode', 'Ver diagrama');
   previewBtn.title = previewLabel;
   previewBtn.setAttribute('aria-label', previewLabel);
   previewBtn.innerHTML = EYE_ICON_SVG;
@@ -437,7 +440,8 @@ export const createMermaidModeToolbar = (
   codeBtn.className = `cm-mermaid-mode-btn${activeMode === 'code' ? ' is-active' : ''}`;
   codeBtn.dataset.mermaidMode = 'code';
   codeBtn.dataset.mermaidPos = String(pos);
-  const codeLabel = i18n.t('editor.diagram.codeMode', 'Editar código Markdown');
+  const codeLabel =
+    labels?.code ?? i18n.t('editor.diagram.codeMode', 'Editar código Markdown');
   codeBtn.title = codeLabel;
   codeBtn.setAttribute('aria-label', codeLabel);
   codeBtn.innerHTML = CODE_ICON_SVG;
@@ -447,7 +451,10 @@ export const createMermaidModeToolbar = (
 };
 
 export class MermaidHeaderToolbarWidget extends WidgetType {
-  constructor(readonly pos: number) {
+  constructor(
+    readonly pos: number,
+    readonly labels?: { preview: string; code: string },
+  ) {
     super();
   }
 
@@ -456,7 +463,7 @@ export class MermaidHeaderToolbarWidget extends WidgetType {
   }
 
   toDOM() {
-    return createMermaidModeToolbar(this.pos, 'code');
+    return createMermaidModeToolbar(this.pos, 'code', 100, this.labels);
   }
 
   ignoreEvent() {

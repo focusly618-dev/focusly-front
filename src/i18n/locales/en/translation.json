@@ -2142,14 +2142,16 @@
         "divider": "Divider",
         "math": "Equation",
         "diagram": "Diagram",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Interactive block"
       },
       "templates": {
         "toggle": "Title",
         "column": "Column {{n}}",
         "start": "Start",
         "end": "End",
-        "callout": "Note"
+        "callout": "Note",
+        "interactive": "My interactive block"
       }
     },
     "format": {
@@ -2190,6 +2192,14 @@
       "remove": "Remove link",
       "address": "Link address",
       "empty": "No address"
+    },
+    "htmlApp": {
+      "badge": "Interactive block",
+      "gate": "This block contains code. It runs isolated: it can't see your data or connect to the internet.",
+      "run": "Run",
+      "stop": "Stop",
+      "previewMode": "View block",
+      "codeMode": "Edit code"
     }
   }
 }

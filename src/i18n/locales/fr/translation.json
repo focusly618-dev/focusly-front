@@ -1121,9 +1121,36 @@
     "columns": {
       "task": "Tâche",
       "project": "Projet",
+      "status": "Statut",
       "due": "Échéance",
       "priority": "Priorité",
       "estimate": "Est."
+    },
+    "statusTab": {
+      "all": "Toutes",
+      "in_progress": "En attente",
+      "todo": "À faire",
+      "planning": "Planification",
+      "scheduled": "Planifiées",
+      "in_review": "En révision",
+      "on_hold": "En pause",
+      "backlog": "Backlog",
+      "completed": "Terminées"
+    },
+    "statusBadge": {
+      "in_progress": "En attente",
+      "todo": "À faire",
+      "planning": "Planification",
+      "scheduled": "Planifiée",
+      "in_review": "En révision",
+      "on_hold": "En pause",
+      "backlog": "Backlog",
+      "completed": "Terminée"
+    },
+    "viewMode": {
+      "label": "Mode d'affichage",
+      "list": "Liste",
+      "kanban": "Kanban"
     },
     "summary": {
       "completed": "{{done}} sur {{total}} terminées",
@@ -2115,14 +2142,16 @@
         "divider": "Séparateur",
         "math": "Équation",
         "diagram": "Diagramme",
-        "canvas": "Canvas"
+        "canvas": "Canvas",
+        "interactive": "Bloc interactif"
       },
       "templates": {
         "toggle": "Titre",
         "column": "Colonne {{n}}",
         "start": "Début",
         "end": "Fin",
-        "callout": "Note"
+        "callout": "Note",
+        "interactive": "Mon bloc interactif"
       }
     },
     "format": {
@@ -2163,6 +2192,14 @@
       "remove": "Retirer le lien",
       "address": "Adresse du lien",
       "empty": "Aucune adresse"
+    },
+    "htmlApp": {
+      "badge": "Bloc interactif",
+      "gate": "Ce bloc contient du code. Il s'exécute de façon isolée : il ne peut ni voir vos données ni se connecter à Internet.",
+      "run": "Exécuter",
+      "stop": "Arrêter",
+      "previewMode": "Voir le bloc",
+      "codeMode": "Modifier le code"
     }
   }
 }

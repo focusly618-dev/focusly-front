@@ -1,6 +1,10 @@
 import { type EditorState, StateEffect, StateField } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';
 
+// Blocks with a view/code toggle: drawn by default, edited as code on demand.
+export const HTML_APP_FENCE = 'html-app';
+export const CODE_MODE_FENCES = new Set(['mermaid', HTML_APP_FENCE]);
+
 // Callout fold state, keyed by the blockquote's start position. A real
 // StateField (not a plugin instance property) because it must be readable
 // from blockDecorations.ts's StateField, which has no view/plugin access —
@@ -87,7 +91,7 @@ export const diagramCodeModeField = StateField.define<Set<number>>({
             .split(/\s+/)[0]
             ?.toLowerCase();
           if (
-            lang === 'mermaid' &&
+            CODE_MODE_FENCES.has(lang) &&
             head > startLine.to &&
             head < endLine.from
           ) {
