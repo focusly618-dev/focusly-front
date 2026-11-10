@@ -98,3 +98,21 @@ describe('moving through the calendar', () => {
     );
   });
 });
+
+describe('a task just created', () => {
+  it('brings its hour into view and clears the request', async () => {
+    const { result } = renderHook(
+      () => ({ view: useCalendarView(), params: useSearchParams()[0] }),
+      {
+        wrapper: ({ children }: { children: React.ReactNode }) => (
+          <MemoryRouter initialEntries={['/?v=day&d=2026-11-11&at=05:05']}>
+            {children}
+          </MemoryRouter>
+        ),
+      },
+    );
+    await act(async () => {});
+    expect(result.current.view.scrollToTime.getHours()).toBe(4);
+    expect(result.current.params.has('at')).toBe(false);
+  });
+});

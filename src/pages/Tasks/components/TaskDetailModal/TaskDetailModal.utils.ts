@@ -296,3 +296,31 @@ export const buildCreateTaskPayload = ({
     skip_scheduling: !hasValidDeadline,
   };
 };
+
+/**
+ * When a task starts if the user only picked its day: the start of their
+ * workday, or, later today, the next half hour.
+ */
+export const defaultStartForDay = (
+  day: Date,
+  now: Date,
+  workStartTime?: string,
+): Date => {
+  const workStart = /^(\d{1,2}):(\d{2})/.exec(workStartTime ?? '');
+  const start = new Date(day);
+  start.setHours(
+    workStart ? Number(workStart[1]) : 9,
+    workStart ? Number(workStart[2]) : 0,
+    0,
+    0,
+  );
+  const isToday = day.toDateString() === now.toDateString();
+  if (!isToday || start > now) return start;
+
+  const next = new Date(now);
+  next.setMinutes(Math.floor(now.getMinutes() / 30) * 30 + 30, 0, 0);
+  if (next.toDateString() === day.toDateString()) return next;
+  // The day has no half hour left
+  start.setHours(23, 30, 0, 0);
+  return start;
+};

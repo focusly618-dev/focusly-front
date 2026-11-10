@@ -6,7 +6,9 @@ import {
   Typography,
   Chip,
   TextField,
+  Paper,
   Popover,
+  Popper,
   Stack,
   MenuItem,
   List,
@@ -39,7 +41,9 @@ import {
   CalendarToday as PlannedIcon,
 } from '@mui/icons-material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
-import { format, isSameDay } from 'date-fns';
+import { addDays, format, isSameDay } from 'date-fns';
+import { useAppSelector } from '@/redux/hooks';
+import type { UserSettings } from '@/api/User/apiUser.types';
 import { dateFnsLocale } from '@/i18n/dateLocales';
 import { PRIORITY_OPTIONS } from '@/components/ui';
 import {
@@ -55,6 +59,7 @@ import {
   getTagColors,
   PASTEL_COLORS,
   getColorName,
+  defaultStartForDay,
   formatDuration,
   parseDuration,
   isTaskCustomColor,
@@ -222,6 +227,11 @@ export const TaskProperties = ({
     'all' | 'pastel' | 'solid'
   >('all');
 
+  const workStartTime = useAppSelector(
+    (state) =>
+      (state.auth.user?.settings as UserSettings | undefined)?.workHoursConfig
+        ?.startTime,
+  );
   const [durationSuggestions, setDurationSuggestions] = useState<string[]>([]);
   const [durationAnchor, setDurationAnchor] = useState<HTMLDivElement | null>(
     null,
@@ -583,7 +593,12 @@ export const TaskProperties = ({
                 onClose={() => setDatePickerOpen(false)}
                 value={currentDate}
                 onChange={(newValue) => {
-                  setCurrentDate(newValue);
+                  // A first date arrives at midnight: give it a real hour
+                  setCurrentDate(
+                    newValue && !currentDate
+                      ? defaultStartForDay(newValue, new Date(), workStartTime)
+                      : newValue,
+                  );
                   setDatePickerOpen(false);
                 }}
                 slotProps={{
@@ -668,6 +683,13 @@ export const TaskProperties = ({
                     );
                   }}
                   onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
+                  onKeyDown={(e) => {
+                    // Esc closes the suggestions, not the whole form
+                    if (e.key === 'Escape' && durationAnchor) {
+                      e.stopPropagation();
+                      setDurationAnchor(null);
+                    }
+                  }}
                   placeholder={t(
                     'tasks.properties.durationPlaceholder',
                     '4 horas (o 2h 30m)',
@@ -687,36 +709,36 @@ export const TaskProperties = ({
                   }}
                 />
               </Box>
-              <Popover
+              {/* A Popper, not a Popover: a Popover's invisible backdrop
+                  swallowed the next click, even on "Create Task" */}
+              <Popper
                 open={Boolean(durationAnchor)}
                 anchorEl={durationAnchor}
-                onClose={() => setDurationAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                disableAutoFocus
-                disableEnforceFocus
-                slotProps={{ paper: { sx: timerPopoverPaperSx } }}
+                placement="bottom-start"
+                sx={{ zIndex: (th) => th.zIndex.modal + 1 }}
               >
-                <List dense sx={{ py: 0 }}>
-                  {durationSuggestions.map((s) => (
-                    <MenuItem
-                      key={s}
-                      onClick={() => {
-                        setDuration(s);
-                        setDurationAnchor(null);
-                      }}
-                    >
-                      <ListItemText
-                        primary={s}
-                        primaryTypographyProps={{
-                          fontSize: '13px',
-                          fontWeight: 600,
+                <Paper sx={timerPopoverPaperSx}>
+                  <List dense sx={{ py: 0 }}>
+                    {durationSuggestions.map((s) => (
+                      <MenuItem
+                        key={s}
+                        onClick={() => {
+                          setDuration(s);
+                          setDurationAnchor(null);
                         }}
-                      />
-                    </MenuItem>
-                  ))}
-                </List>
-              </Popover>
+                      >
+                        <ListItemText
+                          primary={s}
+                          primaryTypographyProps={{
+                            fontSize: '13px',
+                            fontWeight: 600,
+                          }}
+                        />
+                      </MenuItem>
+                    ))}
+                  </List>
+                </Paper>
+              </Popper>
             </Box>
             {durationInputError && (
               <Typography
@@ -756,7 +778,15 @@ export const TaskProperties = ({
                       color: 'text.primary',
                     }}
                   >
-                    {currentDate ? format(currentDate, 'hh:mm a') : '10:00 AM'}
+                    {format(
+                      currentDate ??
+                        defaultStartForDay(
+                          addDays(new Date(), 1),
+                          new Date(),
+                          workStartTime,
+                        ),
+                      'hh:mm a',
+                    )}
                   </Typography>
                 </Box>
                 <ChevronDownIcon

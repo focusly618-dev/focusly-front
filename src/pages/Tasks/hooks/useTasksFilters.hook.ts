@@ -221,10 +221,7 @@ export const useTasksFilters = (
       } else if (urlFilter === 'today') {
         const todayStr = new Date().toLocaleDateString('en-CA');
         result = result.filter((task) => {
-          if (
-            task.status === 'Done' ||
-            (task as unknown as { deleted_at?: string }).deleted_at
-          )
+          if ((task as unknown as { deleted_at?: string }).deleted_at)
             return false;
           const hasEstimatedStart =
             task.estimated_start_date &&
@@ -239,15 +236,19 @@ export const useTasksFilters = (
           }
           const dateToUse = (task.estimated_start_date || task.deadline)!;
           const taskDateStr = new Date(dateToUse).toLocaleDateString('en-CA');
+          // Finished today stays in today's list; older ones would pile up
+          if (task.status === 'Done') {
+            const doneOn =
+              task.completed_at &&
+              new Date(task.completed_at).toLocaleDateString('en-CA');
+            return taskDateStr === todayStr || doneOn === todayStr;
+          }
           return taskDateStr <= todayStr;
         });
       } else if (urlFilter === 'upcoming') {
         const todayStr = new Date().toLocaleDateString('en-CA');
         result = result.filter((task) => {
-          if (
-            task.status === 'Done' ||
-            (task as unknown as { deleted_at?: string }).deleted_at
-          )
+          if ((task as unknown as { deleted_at?: string }).deleted_at)
             return false;
           const hasEstimatedStart =
             task.estimated_start_date &&

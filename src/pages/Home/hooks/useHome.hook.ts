@@ -3,7 +3,8 @@ import {
   TASK_QUERIES,
   WORKSPACE_QUERIES,
 } from '@/api/refreshQueries';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { format } from 'date-fns';
 import { useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { useMutation } from '@apollo/client';
@@ -90,6 +91,13 @@ export const useHome = () => {
 
   const isEditModalOpen = isTaskDetailsOpen || isCreatingNewTask;
 
+  // Where a task just created from the calendar landed, to show it on close.
+  // A ref: the form closes twice in a row, from the same render.
+  const createdStartRef = useRef<Date | null>(null);
+  useEffect(() => {
+    if (isCreatingNewTask) createdStartRef.current = null;
+  }, [isCreatingNewTask]);
+
   const initialStart = useMemo(() => {
     const startParam = searchParams.get('start');
     if (!startParam) return null;
@@ -142,6 +150,10 @@ export const useHome = () => {
     newParams.delete('action');
     newParams.delete('start');
     newParams.delete('end');
+    if (createdStartRef.current) {
+      newParams.set('d', format(createdStartRef.current, 'yyyy-MM-dd'));
+      newParams.set('at', format(createdStartRef.current, 'HH:mm'));
+    }
     setSearchParams(newParams);
     setTempTask(null);
   };
@@ -158,6 +170,14 @@ export const useHome = () => {
   const handleSaveTask = (updatedTask: Task | TaskResponse) => {
     const mappedTask = mapResponseToTask(updatedTask as TaskResponse);
     const prevTaskId = taskIdParam;
+
+    if (
+      isCreatingNewTask &&
+      activeTab === TaskBar.DailyPlan &&
+      mappedTask.estimated_start_date
+    ) {
+      createdStartRef.current = new Date(mappedTask.estimated_start_date);
+    }
 
     // 1. Immediately update tempTask to lock the UI state to the new Task data
     // This prevents the modal from closing when taskIdParam changes in the URL

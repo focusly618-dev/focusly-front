@@ -114,7 +114,7 @@ export const useCalendarView = () => {
   const [scrollAnchorHour] = useState(() =>
     initialScrollHour(new Date(), workStartTime),
   );
-  const [scrollToTime] = useState(() => {
+  const [scrollToTime, setScrollToTime] = useState(() => {
     const at = new Date();
     at.setHours(scrollAnchorHour, 0, 0, 0);
     return at;
@@ -159,6 +159,31 @@ export const useCalendarView = () => {
       }
     }
   }, [searchParams]);
+
+  // A task was just created (useHome adds ?at=HH:mm): bring its hour into view,
+  // with the hour before it above
+  useEffect(() => {
+    const at = searchParams.get('at');
+    if (at === null) return;
+    const hour = Number(at.split(':')[0]);
+    if (Number.isInteger(hour)) {
+      setScrollToTime((previous) => {
+        const next = new Date(previous);
+        // The calendar only scrolls when this value changes: alternating the
+        // minute also covers a second task at the same hour
+        next.setHours(
+          Math.max(0, hour - 1),
+          previous.getMinutes() ? 0 : 1,
+          0,
+          0,
+        );
+        return next;
+      });
+    }
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('at');
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   // Helper to update the view and/or date URL search parameters
   const updateUrlParams = (newView: View, newDate: Date) => {
