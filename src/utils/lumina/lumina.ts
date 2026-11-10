@@ -325,6 +325,15 @@ export const parseLuminaActions = (
   // Clean up any orphan `}]` leftovers
   cleanText = cleanText.replace(/^\s*\}\]\s*/gm, '');
   cleanText = cleanText.replace(/\s*\}\]\s*/g, '\n');
+  // Ids are for the action tags, never for reading
+  cleanText = cleanText.replace(
+    /\s*\((?:id:?\s*)?[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\)/gi,
+    '',
+  );
+  cleanText = cleanText.replace(
+    /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi,
+    '',
+  );
   cleanText = cleanText.replace(/\n{3,}/g, '\n\n').trim();
 
   // Cut inside an action tag: nothing more is coming, and the notice after

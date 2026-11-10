@@ -61,6 +61,9 @@ import type { ICalendarEvent } from '../../CalendarEvent';
 const NO_DRAFTS: ICalendarEvent[] = [];
 
 /** One hour before now once the work day started, else just before it. */
+const SLOT_MINUTES = 5;
+const CLICKED_SLOT_MINUTES = 30;
+
 export const initialScrollHour = (now: Date, workStart?: string) => {
   const parsed = Number.parseInt((workStart ?? '').split(':')[0], 10);
   // 0 is a real start (a night shift): only a missing value falls back.
@@ -655,7 +658,20 @@ export const useCalendarView = () => {
     updateUrlParams(view, date);
   };
 
-  const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
+  const handleSelectSlot = ({
+    start: rawStart,
+    end: rawEnd,
+  }: {
+    start: Date | string;
+    end: Date | string;
+  }) => {
+    const start = new Date(rawStart);
+    const selectedEnd = new Date(rawEnd);
+    // A click selects one 5-minute grid slot; only a drag means a length
+    const end =
+      selectedEnd.getTime() - start.getTime() > SLOT_MINUTES * 60000
+        ? selectedEnd
+        : new Date(start.getTime() + CLICKED_SLOT_MINUTES * 60000);
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set('action', 'create');
     newParams.set('start', start.toISOString());

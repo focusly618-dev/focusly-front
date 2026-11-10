@@ -20,6 +20,7 @@ import {
   DoneAll as DoneAllIcon,
   InboxOutlined as InboxIcon,
 } from '@mui/icons-material';
+import { parseServerDate } from '@/api/Tasks/taskMapper';
 import {
   GET_NOTIFICATIONS,
   MARK_NOTIFICATION_AS_READ,
@@ -45,7 +46,7 @@ const formatNotifTime = (
   try {
     // Intl takes the app's language code as it is ("pt-BR", "zh-CN")
     const locale = language || 'en-US';
-    const date = new Date(createdAtStr);
+    const date = parseServerDate(createdAtStr);
     const now = new Date();
     const isToday = date.toDateString() === now.toDateString();
     const yesterday = new Date(now);

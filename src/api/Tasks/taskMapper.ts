@@ -82,19 +82,30 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
   };
 };
 
+/** A date from the server, which stores naive UTC (no 'Z' or offset): read
+ * as it comes, the browser would take it for local time. */
+export const parseServerDate = (value: string): Date => {
+  const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(value);
+  return new Date(hasZone || !value.includes('T') ? value : `${value}Z`);
+};
+
 export const safeISO = (d: string | null | undefined): string | null => {
   if (!d) return null;
-  try {
-    // Backend stores naive UTC datetimes (no timezone suffix).
-    // If the string has no 'Z' or offset (+/-HH:MM), append 'Z' so the
-    // browser treats it as UTC instead of local time.
-    const normalized = /Z$|[+-]\d{2}:\d{2}$/.test(d) ? d : d + 'Z';
-    const date = new Date(normalized);
-    return isNaN(date.getTime()) ? null : date.toISOString();
-  } catch {
-    return null;
-  }
+  const date = parseServerDate(d);
+  return isNaN(date.getTime()) ? null : date.toISOString();
 };
+
+/** Some old unscheduled tasks were saved with Dec 31 23:59:59 for "no date". */
+const isPlaceholderDeadline = (task: {
+  deadline?: string | null;
+  estimated_start_date?: string | null;
+}) => !task.estimated_start_date && /-12-31T23:59:59/.test(task.deadline ?? '');
+
+export const withoutPlaceholderDeadline = <
+  T extends { deadline?: string | null; estimated_start_date?: string | null },
+>(
+  task: T,
+): T => (isPlaceholderDeadline(task) ? { ...task, deadline: null } : task);
 
 export const mapWorkspace = (w: TaskResponse['workspace']) => {
   if (!w) return [];
@@ -130,7 +141,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     real_timer: t.real_timer,
     duration: t.duration,
     priority_level: t.priority_level ?? 2,
-    deadline: safeISO(t.deadline) || null,
+    deadline: isPlaceholderDeadline(t) ? null : safeISO(t.deadline) || null,
     status: mapStatus(t.status, 'Todo'),
     category: t.category || 'General',
     color:

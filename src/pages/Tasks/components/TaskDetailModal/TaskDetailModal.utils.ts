@@ -3,7 +3,8 @@ import type { BuildCreateTaskPayloadParams } from './types/TaskDetailModal.types
 export const parseDuration = (duration: string | undefined | null): number => {
   if (!duration || typeof duration !== 'string') return 0;
 
-  const norm = duration.toLowerCase().trim();
+  // "1 h" and "2 h 30 m" are the same as "1h" and "2h30m"
+  const norm = duration.toLowerCase().replace(/\s+/g, '');
   if (!norm) return 0;
 
   const shortMatch = norm.match(/^(\d{1,3})(h|m)?$/i);
@@ -14,7 +15,7 @@ export const parseDuration = (duration: string | undefined | null): number => {
     return amount;
   }
 
-  const combinedMatch = norm.match(/^(\d{1,3})h\s*(\d{1,3})m$/i);
+  const combinedMatch = norm.match(/^(\d{1,3})h(\d{1,3})m?$/i);
   if (combinedMatch) {
     return parseInt(combinedMatch[1], 10) * 60 + parseInt(combinedMatch[2], 10);
   }

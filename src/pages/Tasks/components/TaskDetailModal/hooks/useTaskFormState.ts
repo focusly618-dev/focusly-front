@@ -138,9 +138,9 @@ export const useTaskFormState = ({
   };
 
   const isValidDurationInput = (value: string) => {
-    const trimmed = value.trim();
-    if (!trimmed) return true;
-    return /^(?:\d{1,3}(?:h|m)?|\d{1,3}h\s*\d{1,3}m)$/i.test(trimmed);
+    const compact = value.replace(/\s+/g, '');
+    if (!compact) return true;
+    return /^(?:\d{1,3}(?:h|m)?|\d{1,3}h\d{1,3}m?)$/i.test(compact);
   };
 
   const validateForm = () => {

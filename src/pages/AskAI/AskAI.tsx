@@ -118,6 +118,7 @@ import {
   convertDocxToMarkdown,
   readFileAsText,
 } from '@/pages/Workspace/components/Editor/components/EditorHeader/components/ImportContentModal/documentConverters';
+import { parseServerDate } from '@/api/Tasks/taskMapper';
 
 // Tiers the backend maps to its current Gemini models.
 type AIModelChoice = 'auto' | 'gemini-flash-lite' | 'gemini-flash';
@@ -179,7 +180,7 @@ const formatMessageTime = (date?: string | Date) => {
       hour12: false,
     });
   }
-  const d = typeof date === 'string' ? new Date(date) : date;
+  const d = typeof date === 'string' ? parseServerDate(date) : date;
   if (isNaN(d.getTime())) return '';
   return d.toLocaleTimeString([], {
     hour: '2-digit',
@@ -465,7 +466,7 @@ export interface AIContextSelector {
 const formatUpdateTime = (dateStr: string) => {
   if (!dateStr) return '';
   try {
-    const d = new Date(dateStr);
+    const d = parseServerDate(dateStr);
     if (isNaN(d.getTime())) return '';
     const now = new Date();
 
@@ -601,7 +602,7 @@ export const AskAI: React.FC = () => {
     const yesterdayStart = todayStart - 86400000;
 
     filteredConversations.forEach((c) => {
-      const time = c.updatedAt ? new Date(c.updatedAt).getTime() : 0;
+      const time = c.updatedAt ? parseServerDate(c.updatedAt).getTime() : 0;
       if (time >= todayStart) {
         today.push(c);
       } else if (time >= yesterdayStart) {

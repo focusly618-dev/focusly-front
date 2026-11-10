@@ -7,7 +7,10 @@ import type {
 } from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import { setTasks } from '@/redux/tasks/task.slice';
-import { mapResponseToTask } from '@/api/Tasks/taskMapper';
+import {
+  mapResponseToTask,
+  withoutPlaceholderDeadline,
+} from '@/api/Tasks/taskMapper';
 import { handleMutationError } from '@/utils';
 import { GET_TASKS_PAGINATED } from '@/pages/Tasks/Tasks.graphql';
 
@@ -58,14 +61,16 @@ export const useTasksData = ({
 
   const tasks: TaskResponse[] = useMemo(() => {
     const raw: TaskResponse[] = data?.result?.tasks || data?.tasks || [];
-    return raw.filter(
-      (t) =>
-        !(t.project_id && String(t.project_id).trim() !== '') &&
-        !(
-          (t as { projectId?: string }).projectId &&
-          String((t as { projectId?: string }).projectId).trim() !== ''
-        ),
-    );
+    return raw
+      .filter(
+        (t) =>
+          !(t.project_id && String(t.project_id).trim() !== '') &&
+          !(
+            (t as { projectId?: string }).projectId &&
+            String((t as { projectId?: string }).projectId).trim() !== ''
+          ),
+      )
+      .map(withoutPlaceholderDeadline);
   }, [data]);
 
   const totalCount: number = useMemo(() => {
