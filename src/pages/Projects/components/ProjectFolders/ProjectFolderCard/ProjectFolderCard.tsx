@@ -27,6 +27,7 @@ import {
   FooterItem,
 } from './ProjectFolderCard.styles';
 import { useProjectFolderCard } from './ProjectFolderCard.hook';
+import { parseServerDate } from '@/api/Tasks/taskMapper';
 import type { ProjectFolderCardProps } from './ProjectFolderCard.types';
 
 const BRAND = '#008767';
@@ -46,7 +47,7 @@ type GroupWorkspace = NonNullable<
 
 const toDate = (value?: string | null) => {
   if (!value) return null;
-  const date = new Date(value);
+  const date = parseServerDate(value);
   return Number.isNaN(date.getTime()) ? null : date;
 };
 

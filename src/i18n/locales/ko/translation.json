@@ -51,7 +51,7 @@
     "intelligence": "인텔리전스",
     "askAi": "AI에게 묻기",
     "insights": "인사이트",
-    "workspace": "워크스페이스",
+    "workspace": "문서",
     "collections": "컬렉션",
     "projects": "프로젝트",
     "recentProjects": "최근",
@@ -64,7 +64,7 @@
     "logIn": "로그인",
     "getStarted": "시작하기",
     "viewProfile": "프로필 보기",
-    "searchWorkspaces": "워크스페이스 검색..."
+    "searchWorkspaces": "문서 검색..."
   },
   "settings": {
     "theme": {
@@ -125,9 +125,9 @@
     "week": "주",
     "day": "일",
     "today": "오늘",
-    "awaitedTasks": "대기 중인 작업",
+    "awaitedTasks": "오늘의 작업",
     "viewAll": "모두 보기",
-    "noAwaitedTasks": "대기 중인 작업이 없어요",
+    "noAwaitedTasks": "이 날의 작업이 없습니다",
     "freeTimeDesc": "여유 시간을 즐기세요!",
     "optimizeSchedule": "일정 최적화",
     "plan": {
@@ -557,7 +557,7 @@
       "4": "긴급"
     },
     "untitledTask": "제목 없는 작업",
-    "untitledNote": "제목 없는 노트",
+    "untitledNote": "제목 없는 문서",
     "untitledDocument": "제목 없는 문서",
     "task": {
       "subtaskCount_one": "하위 작업 {{count}}개",
@@ -1197,23 +1197,23 @@
     "loadingDocuments": "문서를 불러오는 중…",
     "toast": {
       "deleteProjectsTitle": "프로젝트 삭제",
-      "deleteProjectsDesc": "다음 프로젝트를 삭제하시겠어요: {{names}}? 안에 있는 워크스페이스는 연결만 해제되고 삭제되지 않아요.",
+      "deleteProjectsDesc": "다음 프로젝트를 삭제하시겠어요: {{names}}? 안에 있는 문서는 연결만 해제되고 삭제되지 않아요.",
       "projectsDeleted_one": "프로젝트가 삭제되었어요",
       "projectsDeleted_other": "프로젝트 {{count}}개가 삭제되었어요",
       "projectsDeleteFailed_one": "프로젝트 {{count}}개를 삭제하지 못했어요.",
       "projectsDeleteFailed_other": "프로젝트 {{count}}개를 삭제하지 못했어요.",
-      "workspacesDeleted_one": "워크스페이스가 삭제되었어요",
-      "workspacesDeleted_other": "워크스페이스 {{count}}개가 삭제되었어요",
-      "workspacesDeleteFailed_one": "워크스페이스 {{count}}개를 삭제하지 못했어요.",
-      "workspacesDeleteFailed_other": "워크스페이스 {{count}}개를 삭제하지 못했어요.",
+      "workspacesDeleted_one": "문서가 삭제되었어요",
+      "workspacesDeleted_other": "문서 {{count}}개가 삭제되었어요",
+      "workspacesDeleteFailed_one": "문서 {{count}}개를 삭제하지 못했어요.",
+      "workspacesDeleteFailed_other": "문서 {{count}}개를 삭제하지 못했어요.",
       "deletedTitle": "프로젝트 삭제됨"
     },
     "breadcrumb": {
       "home": "홈",
-      "folderFallback": "폴더"
+      "folderFallback": "프로젝트"
     },
-    "newFolder": "새 폴더",
-    "newWorkspace": "새 워크스페이스",
+    "newFolder": "새 프로젝트",
+    "newWorkspace": "새 문서",
     "status": {
       "recent": "최근",
       "empty": "비어 있음",
@@ -1222,19 +1222,19 @@
     "notesInside_one": "노트 {{count}}개",
     "notesInside_other": "노트 {{count}}개",
     "lastUpdated": "마지막 업데이트: ",
-    "error": "워크스페이스를 불러오는 중 오류가 발생했어요. 다시 시도해 주세요.",
+    "error": "문서를 불러오는 중 오류가 발생했어요. 다시 시도해 주세요.",
     "emptySearch": {
       "title": "결과 없음",
-      "desc": "검색어나 필터와 일치하는 워크스페이스가 없어요. 필터나 검색어를 바꿔 보세요."
+      "desc": "검색어나 필터와 일치하는 문서가 없어요. 필터나 검색어를 바꿔 보세요."
     },
     "emptyFolder": {
-      "title": "아직 워크스페이스가 없어요",
-      "desc": "전략 계획을 정리하는 가벼운 노트예요. 첫 워크스페이스를 만들어 시작하세요.",
-      "action": "워크스페이스 만들기",
+      "title": "아직 문서가 없어요",
+      "desc": "전략 계획을 정리하는 가벼운 노트예요. 첫 문서를 만들어 시작하세요.",
+      "action": "문서 만들기",
       "subAction": "노트나 문서 만들기"
     },
-    "recentWorkspace": "최근 워크스페이스",
-    "emptyFolderSnippet": "이 폴더는 비어 있어요. 첫 워크스페이스를 만들어 시작하세요...",
+    "recentWorkspace": "최근 문서",
+    "emptyFolderSnippet": "이 프로젝트는 비어 있어요. 첫 문서를 만들어 시작하세요...",
     "filterAndSortNotes": "노트 필터 및 정렬",
     "switchViewMode": "보기 모드 전환",
     "sortNotes": "노트 정렬",
@@ -1245,38 +1245,38 @@
     "viewGallery": "갤러리",
     "viewGrid": "그리드",
     "viewList": "목록",
-    "deleteWorkspace": "워크스페이스 삭제",
+    "deleteWorkspace": "문서 삭제",
     "deleteDialog": {
       "title": "프로젝트 삭제",
       "description": "“{{name}}” 프로젝트를 삭제하시겠어요?",
       "bulkTitle": "프로젝트 {{count}}개 삭제",
       "bulkDescription": "다음 프로젝트 {{count}}개를 삭제하시겠어요?",
-      "workspacesWarning_one": "이 프로젝트에는 영구적으로 삭제될 워크스페이스 {{count}}개가 있어요.",
-      "workspacesWarning_other": "이 프로젝트에는 영구적으로 삭제될 워크스페이스 {{count}}개가 있어요.",
-      "bulkWorkspacesWarning_one": "이 프로젝트들에는 영구적으로 삭제될 워크스페이스가 총 {{count}}개 있어요.",
-      "bulkWorkspacesWarning_other": "이 프로젝트들에는 영구적으로 삭제될 워크스페이스가 총 {{count}}개 있어요.",
+      "workspacesWarning_one": "이 프로젝트에는 영구적으로 삭제될 문서 {{count}}개가 있어요.",
+      "workspacesWarning_other": "이 프로젝트에는 영구적으로 삭제될 문서 {{count}}개가 있어요.",
+      "bulkWorkspacesWarning_one": "이 프로젝트들에는 영구적으로 삭제될 문서가 총 {{count}}개 있어요.",
+      "bulkWorkspacesWarning_other": "이 프로젝트들에는 영구적으로 삭제될 문서가 총 {{count}}개 있어요.",
       "noWorkspacesWarning": "이 작업은 되돌릴 수 없어요."
     },
     "deleteWorkspacesDialog": {
-      "title": "워크스페이스 삭제",
+      "title": "문서 삭제",
       "description": "“{{name}}”을(를) 삭제하시겠어요?",
-      "bulkTitle": "워크스페이스 {{count}}개 삭제",
-      "bulkDescription": "다음 워크스페이스 {{count}}개를 삭제하시겠어요?",
-      "warning_one": "이 워크스페이스의 내용이 영구적으로 삭제돼요.",
-      "warning_other": "워크스페이스 {{count}}개의 내용이 영구적으로 삭제돼요."
+      "bulkTitle": "문서 {{count}}개 삭제",
+      "bulkDescription": "다음 문서 {{count}}개를 삭제하시겠어요?",
+      "warning_one": "이 문서의 내용이 영구적으로 삭제돼요.",
+      "warning_other": "문서 {{count}}개의 내용이 영구적으로 삭제돼요."
     },
-    "renameFolder": "폴더 이름 변경",
+    "renameFolder": "프로젝트 이름 변경",
     "customizeStyle": "스타일 맞춤 설정",
-    "deleteFolder": "폴더 삭제",
+    "deleteFolder": "프로젝트 삭제",
     "customizeDialog": {
-      "title": "폴더 맞춤 설정"
+      "title": "프로젝트 맞춤 설정"
     },
-    "folderName": "폴더 이름",
+    "folderName": "프로젝트 이름",
     "iconShape": "아이콘 모양",
     "filled": "채움",
     "solid": "단색",
     "outlined": "윤곽선",
-    "folderColor": "폴더 색상",
+    "folderColor": "프로젝트 색상",
     "colorAccent": "강조 색상",
     "colors": {
       "Red": "레드",
@@ -1297,10 +1297,10 @@
       "Slate": "슬레이트"
     },
     "createDialog": {
-      "title": "새 폴더 만들기"
+      "title": "새 프로젝트 만들기"
     },
     "namePlaceholder": "예: 스프린트 계획, 개인, 마케팅",
-    "createFolder": "폴더 만들기",
+    "createFolder": "프로젝트 만들기",
     "editedOn": "{{date}}에 편집됨",
     "card": {
       "created": "만든 날짜",
@@ -1323,12 +1323,12 @@
     }
   },
   "allProjectsModal": {
-    "title": "모든 폴더",
-    "subtitle": "라이브러리 보기에 표시할 폴더를 찾아 선택하세요.",
-    "searchPlaceholder": "폴더 {{count}}개에서 검색...",
-    "emptyNoFolders": "아직 추가된 폴더가 없어요",
-    "emptyNoMatch": "일치하는 폴더 없음",
-    "emptyNoFoldersDesc": "라이브러리나 사이드바에서 사용자 지정 폴더를 만들어 계획을 묶어 보세요.",
+    "title": "모든 프로젝트",
+    "subtitle": "라이브러리 보기에 표시할 프로젝트를 찾아 선택하세요.",
+    "searchPlaceholder": "프로젝트 {{count}}개에서 검색...",
+    "emptyNoFolders": "아직 추가된 프로젝트가 없어요",
+    "emptyNoMatch": "일치하는 프로젝트 없음",
+    "emptyNoFoldersDesc": "라이브러리나 사이드바에서 사용자 지정 프로젝트를 만들어 계획을 묶어 보세요.",
     "emptyNoMatchDesc": "검색어를 바꿔 보세요.",
     "items": "항목 {{count}}개",
     "visible": "표시됨",
@@ -1338,21 +1338,21 @@
   },
   "createProjectModal": {
     "title": "새 프로젝트 만들기",
-    "subtitle": "이름과 색상을 골라 워크스페이스를 깔끔하게 정리하세요.",
+    "subtitle": "이름과 색상을 골라 문서를 깔끔하게 정리하세요.",
     "projectName": "프로젝트 이름",
     "namePlaceholder": "예: 마케팅 전략, 1분기 계획...",
     "projectColor": "프로젝트 색상",
     "create": "프로젝트 만들기"
   },
   "updateProjectModal": {
-    "title": "폴더 편집",
-    "subtitle": "폴더 이름과 색상을 바꿔 워크스페이스를 더 잘 정리하세요.",
-    "folderColor": "폴더 색상",
-    "update": "폴더 업데이트"
+    "title": "프로젝트 편집",
+    "subtitle": "프로젝트 이름과 색상을 바꿔 문서를 더 잘 정리하세요.",
+    "folderColor": "프로젝트 색상",
+    "update": "프로젝트 업데이트"
   },
   "templatesModal": {
     "title": "전문 템플릿 탐색기",
-    "subtitle": "템플릿을 선택하고 대상 프로젝트 폴더에 지정하세요",
+    "subtitle": "템플릿을 선택하고 대상 프로젝트 프로젝트에 지정하세요",
     "searchPlaceholder": "템플릿 검색...",
     "previewing": "미리보기 중",
     "liveRenderedPreview": "실시간 미리보기",
@@ -1479,7 +1479,7 @@
       "createdOn": "생성 위치",
       "createdAt": "생성일",
       "dueOn": "마감",
-      "workspacesProjects": "워크스페이스 / 프로젝트",
+      "workspacesProjects": "문서 / 프로젝트",
       "backgroundColor": "배경색",
       "removeBackground": "배경 제거",
       "removeBackgroundColor": "배경색 제거",
@@ -1487,7 +1487,7 @@
       "custom": "사용자 지정",
       "logTime": "시간 기록",
       "noTimeLogged": "아직 기록된 시간이 없어요.",
-      "titlePlaceholder": "분기별 성과 보고서 완성하기",
+      "titlePlaceholder": "작업 이름",
       "palette": "색상 팔레트"
     },
     "projectRequired": {
@@ -1507,9 +1507,9 @@
         "titleRequiredDesc": "작업 제목을 입력하세요.",
         "taskUpdated": "작업이 업데이트되었어요",
         "workspaceTitleRequired": "제목 필요",
-        "workspaceTitleRequiredDesc": "워크스페이스 제목을 입력하세요.",
-        "workspaceLinked": "워크스페이스를 만들고 연결했어요",
-        "workspaceCreateFailed": "워크스페이스를 만들지 못했어요. 다시 시도해 주세요."
+        "workspaceTitleRequiredDesc": "문서 제목을 입력하세요.",
+        "workspaceLinked": "문서를 만들고 연결했어요",
+        "workspaceCreateFailed": "문서를 만들지 못했어요. 다시 시도해 주세요."
       },
       "titlePlaceholder": "작업 제목...",
       "status": "상태",
@@ -1522,12 +1522,12 @@
       "duration": "소요 시간",
       "setDuration": "소요 시간 설정",
       "linkedSpec": "연결된 사양 및 PRD",
-      "createWorkspace": "워크스페이스 만들기",
-      "changeWorkspace": "워크스페이스 변경",
-      "linkWorkspace": "워크스페이스 연결",
-      "noWorkspaceLinked": "연결된 워크스페이스 없음",
+      "createWorkspace": "문서 만들기",
+      "changeWorkspace": "문서 변경",
+      "linkWorkspace": "문서 연결",
+      "noWorkspaceLinked": "연결된 문서 없음",
       "clickToLink": "클릭해서 이 작업을 사양 문서나 노트와 연결하세요",
-      "unlinkWorkspace": "워크스페이스 연결 해제",
+      "unlinkWorkspace": "문서 연결 해제",
       "openWorkspace": "열기",
       "linked": "연결됨",
       "descAndContext": "설명 및 맥락",
@@ -1541,18 +1541,18 @@
       "cancel": "취소",
       "createTask": "작업 만들기",
       "saveChanges": "변경 사항 저장",
-      "createWorkspaceDialogDesc": "원하는 제목으로 새 워크스페이스를 만들면 이 작업에 자동으로 연결돼요.",
+      "createWorkspaceDialogDesc": "원하는 제목으로 새 문서를 만들면 이 작업에 자동으로 연결돼요.",
       "project": "프로젝트:",
-      "workspaceTitle": "워크스페이스 제목",
+      "workspaceTitle": "문서 제목",
       "workspaceTitlePlaceholder": "예: 기술 사양, 요구사항, PRD...",
       "createAndLink": "만들고 연결",
-      "searchWorkspacePlaceholder": "워크스페이스나 노트 검색..."
+      "searchWorkspacePlaceholder": "문서나 노트 검색..."
     }
   },
   "projects": {
     "loading": "프로젝트를 불러오는 중…",
     "newProject": "새 프로젝트",
-    "createCleanFolder": "빈 폴더 만들기",
+    "createCleanFolder": "빈 프로젝트 만들기",
     "showingResultsFor": "“{{term}}” 검색 결과 {{count}}개",
     "showingCountOfTotal": "프로젝트 {{total}}개 중 {{current}}개 표시",
     "searchProjects": "프로젝트 검색...",
@@ -1591,7 +1591,7 @@
       "focusView": "가운데 보기",
       "defaultView": "기본 보기"
     },
-    "untitledNote": "제목 없는 노트",
+    "untitledNote": "제목 없는 문서",
     "saving": "저장 중",
     "saved": "저장됨",
     "savingChanges": "변경 사항 저장 중...",
@@ -1992,7 +1992,7 @@
           "body": "빈 시간대를 클릭해 빠르게 작업을 만드세요. 블록을 드래그해 다른 시간이나 날로 옮기고, 가장자리를 늘려 길이를 바꿀 수 있어요."
         },
         "awaited": {
-          "title": "대기 중인 작업",
+          "title": "오늘의 작업",
           "body": "사이드 패널에 아직 시간이 정해지지 않은 대기 작업이 모여 있어서 하나도 잊지 않아요."
         },
         "ai": {
@@ -2202,6 +2202,78 @@
       "stop": "중지",
       "previewMode": "블록 보기",
       "codeMode": "코드 편집"
+    }
+  },
+  "insightsStats": {
+    "noData": "아직 데이터가 없습니다",
+    "ofTrackedTime": "기록된 시간 중"
+  },
+  "ui": {
+    "taskHeader": {
+      "detail": "작업 상세",
+      "new": "새 작업",
+      "notOwner": "소유자가 아니므로 이 작업을 수정할 수 없습니다"
+    },
+    "subtasks": {
+      "title": "하위 작업",
+      "addStep": "단계 추가...",
+      "loading": "불러오는 중...",
+      "add": "추가",
+      "remove": "하위 작업 삭제"
+    },
+    "pagination": {
+      "showing": "{{total}}개 중 {{count}}개 표시"
+    },
+    "empty": {
+      "listTitle": "아직 아무것도 없습니다",
+      "listDesc": "이 목록의 작업이 여기에 표시됩니다."
+    },
+    "priority": {
+      "urgent": "긴급"
+    },
+    "insights": {
+      "totalFocus": "총 집중 시간",
+      "tasksDone": "완료한 작업",
+      "energy": "평균 에너지",
+      "deepWork": "딥 워크 비율",
+      "trendsTitle": "집중 성과",
+      "trendsHelp": "예상 목표와 실제 기록 시간을 비교합니다.",
+      "trendsSubtitle": "예상 목표 대 실제 시간",
+      "actual": "실제 시간",
+      "target": "목표",
+      "goldenTitle": "골든 아워",
+      "analyzing": "분석 중...",
+      "analyze": "AI로 분석",
+      "optimizeTitle": "시간을 최적화하고 싶으신가요?",
+      "scoreLast7": "생산성 점수(최근 7일)",
+      "activityMap": "활동 지도",
+      "less": "적음",
+      "more": "많음",
+      "timeDistribution": "시간 분배",
+      "focus": "집중",
+      "activity": "활동"
+    },
+    "chat": {
+      "today": "오늘",
+      "yesterday": "어제",
+      "older": "이전",
+      "userAsked": "요청 내용",
+      "understanding": "요청 파악 중",
+      "consulting": "Focusly 확인 중",
+      "consultingDesc": "문서, 프로젝트, 작업, 캘린더",
+      "structuring": "답변 준비 중",
+      "actionsDetected": "{{count}}개 제안",
+      "thought": "Lumina의 생각",
+      "copy": "복사",
+      "regenerate": "다시 생성",
+      "goToEnd": "맨 아래로",
+      "askPlaceholder": "Lumina에게 물어보거나 @로 컨텍스트를 추가하세요...",
+      "context": "컨텍스트",
+      "attachTitle": "파일 첨부(PDF, DOCX, TXT, MD… 최대 3MB)",
+      "attach": "첨부",
+      "searchHistory": "기록 검색...",
+      "conversation": "Lumina 대화",
+      "newChat": "새 채팅"
     }
   }
 }

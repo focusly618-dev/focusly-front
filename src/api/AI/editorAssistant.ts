@@ -29,17 +29,19 @@ ${documentText || '(empty document)'}
 
 Answer conversationally, in the language the user writes in, using the document above as context (e.g. "the idea in point 1" refers to a heading/point in that document). Keep answers focused; use Markdown when it helps.
 
+TITLE. The document's title is shown apart, above its text: never add it as a heading at the top of what you write.
+
 DIAGRAMS. When a diagram helps (a flow, process, sequence, hierarchy or architecture), write it as a fenced \`\`\`mermaid block (flowchart TD, sequenceDiagram, classDiagram…): the editor draws it. Never draw diagrams with text characters (boxes of +---+ and |, arrows of --> or V). Keep node labels short, and put any label with parentheses, colons or quotes inside double quotes, e.g. A["Ingresar credenciales (usuario)"].
 
 INTERACTIVE BLOCKS. Only when the user asks for something to be used rather than read (a calculator, a simulator, a quiz, an interactive chart), write it as a fenced \`\`\`html-app block with self-contained HTML, CSS and JavaScript: the editor runs it in an isolated frame. Everything must be inside the block: external scripts, stylesheets, images and network requests are blocked, and localStorage isn't available. Its layout must always fill the full width of its container and adapt to it: use fluid widths (100%, flex, grid), never a fixed or maximum page width. Don't use three backticks inside it. Never use it for what can be plain text, a table or a diagram.
 
-FRAGMENT REQUESTS. A user message may quote part of the document in a fenced block labeled \`${SELECTION_FENCE}\` (text the user selected) or \`${CURSOR_FENCE}\` (the text right before their cursor). When they ask you to rewrite, fix, shorten, lengthen, translate or restyle a \`${SELECTION_FENCE}\` block, or to continue writing from a \`${CURSOR_FENCE}\` block: write one short sentence describing what you did, then ONLY the new text — not the whole document — wrapped exactly like this, with nothing after it:
+FRAGMENT REQUESTS. A user message may quote part of the document in a fenced block labeled \`${SELECTION_FENCE}\` (text the user selected) or \`${CURSOR_FENCE}\` (the text right before their cursor). When they ask you to rewrite, fix, shorten, lengthen, translate or restyle a \`${SELECTION_FENCE}\` block, or to continue writing from a \`${CURSOR_FENCE}\` block: write one short sentence describing the change you propose (the user still has to accept it), then ONLY the new text — not the whole document — wrapped exactly like this, with nothing after it:
 ${REPLACEMENT_START}
 (the rewritten selection, or only the new text to insert at the cursor)
 ${REPLACEMENT_END}
 Keep the fragment's Markdown formatting and language unless asked to translate. When they only ask a question about the quoted text (e.g. to explain it), just answer, without that block.
 
-WHOLE-DOCUMENT EDITS. If — and only if — the user asks you to change, rewrite, clarify, expand, shorten, proofread or otherwise edit the document itself (not a quoted fragment), write one short sentence describing what you changed, then on new lines include the COMPLETE revised document (the whole thing, in the same Markdown formatting) wrapped exactly like this, with no other text after it:
+WHOLE-DOCUMENT EDITS. If — and only if — the user asks you to change, rewrite, clarify, expand, shorten, proofread or otherwise edit the document itself (not a quoted fragment), write one short sentence describing the change you propose (the user still has to accept it), then on new lines include the COMPLETE revised document (the whole thing, in the same Markdown formatting) wrapped exactly like this, with no other text after it:
 ${EDIT_PROPOSAL_START}
 (full revised document markdown here)
 ${EDIT_PROPOSAL_END}

@@ -19,7 +19,12 @@ import {
   patchNeedsCurrent,
 } from './eventBody';
 import type { ParsedLuminaAction } from '@/utils';
-import { normalizeEstimateTimer, parseDeadline } from './planFormat';
+import {
+  normalizeEstimateTimer,
+  parseDeadline,
+  taskStart,
+  withoutLeadingTitle,
+} from './planFormat';
 
 export { normalizeEstimateTimer, parseDeadline };
 
@@ -105,7 +110,9 @@ export const executeSingleAction = async (
     const estimateTimer = normalizeEstimateTimer(
       Number(action.payload.estimate_timer) || 1800,
     );
-    const deadline = parseDeadline(action.payload.deadline) ?? new Date();
+    const start = taskStart(action.payload) ?? new Date();
+    const deadline = parseDeadline(action.payload.deadline) ?? start;
+    const end = parseDeadline(action.payload.estimated_end_date);
 
     const rawSubtasks = action.payload.subtasks || [];
     const formattedSubtasks = rawSubtasks.map((s, idx) => {
@@ -143,7 +150,8 @@ export const executeSingleAction = async (
           color: '#3b82f6',
           links: [],
           user_id: ctx.userId,
-          status: 'Backlog',
+          // It always gets a start below: it isn't waiting in the Inbox
+          status: 'Todo',
           use_ai: true,
           subtasks: formattedSubtasks,
           workspace_id: action.payload.workspace_id || undefined,
@@ -157,11 +165,12 @@ export const executeSingleAction = async (
           // awareness at all, and migration_service.py only excludes a task
           // from that sweep once BOTH estimated_start_date AND
           // estimated_end_date are set — so we set both explicitly here,
-          // matching the deadline/duration we just asked for. That's what
+          // matching the start/duration we just asked for. That's what
           // makes the protection durable, not just true at creation time.
-          estimated_start_date: deadline.toISOString(),
-          estimated_end_date: new Date(
-            deadline.getTime() + estimateTimer * 60000,
+          estimated_start_date: start.toISOString(),
+          estimated_end_date: (end && end > start
+            ? end
+            : new Date(start.getTime() + estimateTimer * 60000)
           ).toISOString(),
           skip_scheduling: true,
         },
@@ -334,9 +343,11 @@ export const executeSingleAction = async (
 
     if (isEmptyDocument(rawContent)) {
       rawContent = isNote
-        ? `# ${title}\n\nNota creada por Lumina.\n`
-        : `# ${title}\n\n## Resumen / Objetivos\nDocumento de trabajo generado por Lumina.\n\n## Secciones de Investigación\n- [ ] Recopilar fuentes y antecedentes\n- [ ] Desarrollo de conceptos clave\n- [ ] Conclusiones y referencias\n`;
+        ? 'Nota creada por Lumina.\n'
+        : `## Resumen / Objetivos\nDocumento de trabajo generado por Lumina.\n\n## Secciones de Investigación\n- [ ] Recopilar fuentes y antecedentes\n- [ ] Desarrollo de conceptos clave\n- [ ] Conclusiones y referencias\n`;
     }
+
+    rawContent = withoutLeadingTitle(rawContent, title);
 
     let targetGroupId =
       action.payload.project_group_id || action.payload.groupId || null;

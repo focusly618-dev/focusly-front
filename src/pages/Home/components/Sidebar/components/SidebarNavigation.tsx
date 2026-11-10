@@ -8,6 +8,7 @@ import {
   Box,
   Avatar,
   Collapse,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { aiStreamService } from '@/services/aiStreamService';
@@ -223,52 +224,61 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           },
         }}
       >
-        <NavItem
-          id="joyride-daily-plan"
-          active={isDailyPlanActive}
-          onClick={() => changeStatusTab(TaskBar.DailyPlan)}
+        <Tooltip
+          title={t('nav.dailyPlan')}
+          placement="right"
+          disableHoverListener={!isCollapsed}
+          disableFocusListener={!isCollapsed}
+          disableTouchListener
         >
-          <ListItemIcon sx={{ position: 'relative' }}>
-            <DailyPlanIcon />
-            {calendarPlanStatus && (
-              <Box
-                role="status"
-                aria-label={t(
-                  calendarPlanStatus === 'planning'
-                    ? 'calendar.organizingBackdrop'
-                    : 'calendar.draftReadyTitle',
-                )}
-                sx={{
-                  position: 'absolute',
-                  top: 2,
-                  right: 2,
-                  width: 7,
-                  height: 7,
-                  borderRadius: '50%',
-                  bgcolor: 'primary.main',
-                  boxShadow: (theme) => `0 0 8px ${theme.palette.primary.main}`,
-                  ...(calendarPlanStatus === 'planning' && {
-                    animation: 'calendarPlanPulse 1.5s infinite ease-in-out',
-                    '@keyframes calendarPlanPulse': {
-                      '0%, 100%': { transform: 'scale(1)', opacity: 1 },
-                      '50%': { transform: 'scale(1.4)', opacity: 0.6 },
-                    },
-                  }),
-                }}
-              />
-            )}
-          </ListItemIcon>
-          <ListItemText
-            primary={t('nav.dailyPlan')}
-            primaryTypographyProps={{
-              fontSize: '12.5px',
-              fontWeight: isDailyPlanActive ? 600 : 500,
-            }}
-            sx={{
-              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
-            }}
-          />
-        </NavItem>
+          <NavItem
+            id="joyride-daily-plan"
+            active={isDailyPlanActive}
+            onClick={() => changeStatusTab(TaskBar.DailyPlan)}
+          >
+            <ListItemIcon sx={{ position: 'relative' }}>
+              <DailyPlanIcon />
+              {calendarPlanStatus && (
+                <Box
+                  role="status"
+                  aria-label={t(
+                    calendarPlanStatus === 'planning'
+                      ? 'calendar.organizingBackdrop'
+                      : 'calendar.draftReadyTitle',
+                  )}
+                  sx={{
+                    position: 'absolute',
+                    top: 2,
+                    right: 2,
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    bgcolor: 'primary.main',
+                    boxShadow: (theme) =>
+                      `0 0 8px ${theme.palette.primary.main}`,
+                    ...(calendarPlanStatus === 'planning' && {
+                      animation: 'calendarPlanPulse 1.5s infinite ease-in-out',
+                      '@keyframes calendarPlanPulse': {
+                        '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                        '50%': { transform: 'scale(1.4)', opacity: 0.6 },
+                      },
+                    }),
+                  }}
+                />
+              )}
+            </ListItemIcon>
+            <ListItemText
+              primary={t('nav.dailyPlan')}
+              primaryTypographyProps={{
+                fontSize: '12.5px',
+                fontWeight: isDailyPlanActive ? 600 : 500,
+              }}
+              sx={{
+                display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
+              }}
+            />
+          </NavItem>
+        </Tooltip>
       </ListItem>
 
       {/* Tasks & GTD Sub-Items */}
@@ -282,77 +292,86 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           },
         }}
       >
-        <NavItem
-          id="joyride-tasks"
-          active={isTasksActive}
-          onClick={() => {
-            if (isCollapsed) {
-              closeToggleCollapse();
-              setIsTasksExpanded(true);
-            }
-            const newParams = new URLSearchParams();
-            newParams.set('tab', TaskBar.Tasks);
-            sidebar.setSearchParams(newParams);
-            changeStatusTab(TaskBar.Tasks, newParams);
-          }}
+        <Tooltip
+          title={t('nav.tasks')}
+          placement="right"
+          disableHoverListener={!isCollapsed}
+          disableFocusListener={!isCollapsed}
+          disableTouchListener
         >
-          <ListItemIcon>
-            <TasksIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('nav.tasks')}
-            primaryTypographyProps={{
-              fontSize: '12.5px',
-              fontWeight: isTasksActive ? 600 : 500,
+          <NavItem
+            id="joyride-tasks"
+            active={isTasksActive}
+            onClick={() => {
+              if (isCollapsed) {
+                closeToggleCollapse();
+                setIsTasksExpanded(true);
+              }
+              const newParams = new URLSearchParams();
+              newParams.set('tab', TaskBar.Tasks);
+              sidebar.setSearchParams(newParams);
+              changeStatusTab(TaskBar.Tasks, newParams);
             }}
-            sx={{
-              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
-            }}
-          />
-          {!isCollapsed && (
-            <Box
-              sx={{
-                display: { xs: 'none', lg: 'flex' },
-                alignItems: 'center',
-                gap: 0.5,
-                ml: 'auto',
+          >
+            <ListItemIcon>
+              <TasksIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('nav.tasks')}
+              primaryTypographyProps={{
+                fontSize: '12.5px',
+                fontWeight: isTasksActive ? 600 : 500,
               }}
-            >
-              {taskCounts.total > 0 && (
-                <NavCountBadge active={isTasksActive}>
-                  {taskCounts.total}
-                </NavCountBadge>
-              )}
+              sx={{
+                display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
+              }}
+            />
+            {!isCollapsed && (
               <Box
-                onClick={toggleTasksExpanded}
                 sx={{
-                  display: 'flex',
+                  display: { xs: 'none', lg: 'flex' },
                   alignItems: 'center',
-                  p: '2px',
-                  borderRadius: '4px',
-                  color: isTasksActive ? '#ffffff' : 'text.secondary',
-                  opacity: 0.8,
-                  '&:hover': {
-                    opacity: 1,
-                    bgcolor: isTasksActive
-                      ? 'rgba(255,255,255,0.2)'
-                      : 'action.hover',
-                  },
+                  gap: 0.5,
+                  ml: 'auto',
                 }}
               >
-                <ExpandMoreIcon
+                {taskCounts.total > 0 && (
+                  <NavCountBadge active={isTasksActive}>
+                    {taskCounts.total}
+                  </NavCountBadge>
+                )}
+                <Box
+                  onClick={toggleTasksExpanded}
                   sx={{
-                    fontSize: 14,
-                    transform: isTasksExpanded
-                      ? 'rotate(180deg)'
-                      : 'rotate(0deg)',
-                    transition: 'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    p: '2px',
+                    borderRadius: '4px',
+                    color: isTasksActive ? '#ffffff' : 'text.secondary',
+                    opacity: 0.8,
+                    '&:hover': {
+                      opacity: 1,
+                      bgcolor: isTasksActive
+                        ? 'rgba(255,255,255,0.2)'
+                        : 'action.hover',
+                    },
                   }}
-                />
+                >
+                  <ExpandMoreIcon
+                    sx={{
+                      fontSize: 14,
+                      transform: isTasksExpanded
+                        ? 'rotate(180deg)'
+                        : 'rotate(0deg)',
+                      transition:
+                        'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                  />
+                </Box>
               </Box>
-            </Box>
-          )}
-        </NavItem>
+            )}
+          </NavItem>
+        </Tooltip>
 
         {/* Sub-items: Inbox, Today, Upcoming */}
         {!isCollapsed && (
@@ -473,44 +492,52 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           },
         }}
       >
-        <NavItem
-          id="joyride-ask-ai"
-          active={isAskAIActive}
-          onClick={() => changeStatusTab(TaskBar.AskAI)}
+        <Tooltip
+          title={t('nav.askAi')}
+          placement="right"
+          disableHoverListener={!isCollapsed}
+          disableFocusListener={!isCollapsed}
+          disableTouchListener
         >
-          <ListItemIcon sx={{ position: 'relative' }}>
-            <AskAIIcon />
-            {isAIGenerating && !isAskAIActive && (
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 2,
-                  right: 2,
-                  width: 7,
-                  height: 7,
-                  borderRadius: '50%',
-                  bgcolor: '#a855f7',
-                  boxShadow: '0 0 8px #a855f7',
-                  animation: 'askAiNavPulse 1.5s infinite ease-in-out',
-                  '@keyframes askAiNavPulse': {
-                    '0%, 100%': { transform: 'scale(1)', opacity: 1 },
-                    '50%': { transform: 'scale(1.4)', opacity: 0.6 },
-                  },
-                }}
-              />
-            )}
-          </ListItemIcon>
-          <ListItemText
-            primary={t('nav.askAi')}
-            primaryTypographyProps={{
-              fontSize: '12.5px',
-              fontWeight: isAskAIActive ? 600 : 500,
-            }}
-            sx={{
-              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
-            }}
-          />
-        </NavItem>
+          <NavItem
+            id="joyride-ask-ai"
+            active={isAskAIActive}
+            onClick={() => changeStatusTab(TaskBar.AskAI)}
+          >
+            <ListItemIcon sx={{ position: 'relative' }}>
+              <AskAIIcon />
+              {isAIGenerating && !isAskAIActive && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 2,
+                    right: 2,
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    bgcolor: '#a855f7',
+                    boxShadow: '0 0 8px #a855f7',
+                    animation: 'askAiNavPulse 1.5s infinite ease-in-out',
+                    '@keyframes askAiNavPulse': {
+                      '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                      '50%': { transform: 'scale(1.4)', opacity: 0.6 },
+                    },
+                  }}
+                />
+              )}
+            </ListItemIcon>
+            <ListItemText
+              primary={t('nav.askAi')}
+              primaryTypographyProps={{
+                fontSize: '12.5px',
+                fontWeight: isAskAIActive ? 600 : 500,
+              }}
+              sx={{
+                display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
+              }}
+            />
+          </NavItem>
+        </Tooltip>
       </ListItem>
 
       {/* Insights */}
@@ -522,25 +549,33 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           },
         }}
       >
-        <NavItem
-          id="joyride-insights"
-          active={isInsightsActive}
-          onClick={() => changeStatusTab(TaskBar.Insights)}
+        <Tooltip
+          title={t('nav.insights')}
+          placement="right"
+          disableHoverListener={!isCollapsed}
+          disableFocusListener={!isCollapsed}
+          disableTouchListener
         >
-          <ListItemIcon>
-            <InsightsIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('nav.insights')}
-            primaryTypographyProps={{
-              fontSize: '12.5px',
-              fontWeight: isInsightsActive ? 600 : 500,
-            }}
-            sx={{
-              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
-            }}
-          />
-        </NavItem>
+          <NavItem
+            id="joyride-insights"
+            active={isInsightsActive}
+            onClick={() => changeStatusTab(TaskBar.Insights)}
+          >
+            <ListItemIcon>
+              <InsightsIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('nav.insights')}
+              primaryTypographyProps={{
+                fontSize: '12.5px',
+                fontWeight: isInsightsActive ? 600 : 500,
+              }}
+              sx={{
+                display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
+              }}
+            />
+          </NavItem>
+        </Tooltip>
       </ListItem>
 
       {/* ── WORKSPACE CATEGORY ── */}
@@ -558,72 +593,81 @@ export const SidebarNavigation = ({ sidebar }: SidebarNavigationProps) => {
           },
         }}
       >
-        <NavItem
-          id="joyride-workspace"
-          active={isProjectsActive}
-          onClick={handleProjectsTabClick}
+        <Tooltip
+          title={t('nav.projects')}
+          placement="right"
+          disableHoverListener={!isCollapsed}
+          disableFocusListener={!isCollapsed}
+          disableTouchListener
         >
-          <ListItemIcon>
-            <ProjectIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('nav.projects')}
-            primaryTypographyProps={{
-              fontSize: '12.5px',
-              fontWeight: isProjectsActive ? 600 : 500,
-            }}
-            sx={{
-              display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
-            }}
-          />
-          {!isCollapsed && (
-            <Box
-              sx={{
-                display: { xs: 'none', lg: 'flex' },
-                alignItems: 'center',
-                gap: 0.5,
-                ml: 'auto',
-                maxHeight: '10px',
+          <NavItem
+            id="joyride-workspace"
+            active={isProjectsActive}
+            onClick={handleProjectsTabClick}
+          >
+            <ListItemIcon>
+              <ProjectIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('nav.projects')}
+              primaryTypographyProps={{
+                fontSize: '12.5px',
+                fontWeight: isProjectsActive ? 600 : 500,
               }}
-            >
-              {projectGroups.length > 0 && (
-                <NavCountBadge active={isProjectsActive}>
-                  {projectGroups.length}
-                </NavCountBadge>
-              )}
+              sx={{
+                display: isCollapsed ? 'none' : { xs: 'none', lg: 'block' },
+              }}
+            />
+            {!isCollapsed && (
               <Box
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleProjectsExpanded(e);
-                }}
                 sx={{
-                  display: 'flex',
+                  display: { xs: 'none', lg: 'flex' },
                   alignItems: 'center',
-                  p: '2px',
-                  borderRadius: '4px',
-                  color: isProjectsActive ? '#ffffff' : 'text.secondary',
-                  opacity: 0.8,
-                  '&:hover': {
-                    opacity: 1,
-                    bgcolor: isProjectsActive
-                      ? 'rgba(255,255,255,0.2)'
-                      : 'action.hover',
-                  },
+                  gap: 0.5,
+                  ml: 'auto',
+                  maxHeight: '10px',
                 }}
               >
-                <ExpandMoreIcon
-                  sx={{
-                    fontSize: 14,
-                    transform: isProjectsExpanded
-                      ? 'rotate(180deg)'
-                      : 'rotate(0deg)',
-                    transition: 'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+                {projectGroups.length > 0 && (
+                  <NavCountBadge active={isProjectsActive}>
+                    {projectGroups.length}
+                  </NavCountBadge>
+                )}
+                <Box
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleProjectsExpanded(e);
                   }}
-                />
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    p: '2px',
+                    borderRadius: '4px',
+                    color: isProjectsActive ? '#ffffff' : 'text.secondary',
+                    opacity: 0.8,
+                    '&:hover': {
+                      opacity: 1,
+                      bgcolor: isProjectsActive
+                        ? 'rgba(255,255,255,0.2)'
+                        : 'action.hover',
+                    },
+                  }}
+                >
+                  <ExpandMoreIcon
+                    sx={{
+                      fontSize: 14,
+                      transform: isProjectsExpanded
+                        ? 'rotate(180deg)'
+                        : 'rotate(0deg)',
+                      transition:
+                        'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                  />
+                </Box>
               </Box>
-            </Box>
-          )}
-        </NavItem>
+            )}
+          </NavItem>
+        </Tooltip>
 
         {/* Sub-items: Projects Tree List */}
         {!isCollapsed && (

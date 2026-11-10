@@ -86,9 +86,13 @@ export const useTasksContentView = ({
         label: t('tasks.status.todo', 'Por Hacer'),
         color: '#008767',
         filter: (tTask: TaskResponse) =>
-          tTask.status === 'Todo' ||
-          tTask.status === 'Backlog' ||
-          !tTask.status,
+          tTask.status === 'Todo' || !tTask.status,
+      },
+      {
+        id: 'Backlog',
+        label: t('tasks.status.backlog', 'Backlog'),
+        color: '#64748b',
+        filter: (tTask: TaskResponse) => tTask.status === 'Backlog',
       },
       {
         id: 'Planning',

@@ -98,3 +98,58 @@ describe('moving through the calendar', () => {
     );
   });
 });
+
+describe('a task just created', () => {
+  it('brings its hour into view and clears the request', async () => {
+    const { result } = renderHook(
+      () => ({ view: useCalendarView(), params: useSearchParams()[0] }),
+      {
+        wrapper: ({ children }: { children: React.ReactNode }) => (
+          <MemoryRouter initialEntries={['/?v=day&d=2026-11-11&at=05:05']}>
+            {children}
+          </MemoryRouter>
+        ),
+      },
+    );
+    await act(async () => {});
+    expect(result.current.view.scrollToTime.getHours()).toBe(4);
+    expect(result.current.params.has('at')).toBe(false);
+  });
+});
+
+describe('creating from a calendar slot', () => {
+  const select = async (minutes: number) => {
+    const { result } = renderHook(
+      () => ({ view: useCalendarView(), params: useSearchParams()[0] }),
+      {
+        wrapper: ({ children }: { children: React.ReactNode }) => (
+          <MemoryRouter initialEntries={['/?v=day&d=2026-11-11']}>
+            {children}
+          </MemoryRouter>
+        ),
+      },
+    );
+    const start = new Date(2026, 10, 11, 5, 5);
+    act(() => {
+      result.current.view.handleSelectSlot({
+        start,
+        end: new Date(start.getTime() + minutes * 60000),
+      });
+    });
+    await act(async () => {});
+    const { params } = result.current;
+    return (
+      (new Date(params.get('end')!).getTime() -
+        new Date(params.get('start')!).getTime()) /
+      60000
+    );
+  };
+
+  it('a click makes a 30-minute task', async () => {
+    expect(await select(5)).toBe(30);
+  });
+
+  it('a drag keeps its length', async () => {
+    expect(await select(90)).toBe(90);
+  });
+});

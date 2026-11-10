@@ -55,7 +55,7 @@ function App() {
             element={
               isLogged ? (
                 <>
-                  <Navigate to={'/dashboard'} />
+                  <Navigate to={'/dashboard?tab=Tasks'} />
                 </>
               ) : (
                 <HomePage />

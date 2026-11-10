@@ -1,4 +1,4 @@
-import type { StatValue } from '../../useInsights.types';
+import type { DistributionEntry, StatValue } from '../../useInsights.types';
 
 export interface StatsCardsProps {
   totalFocusHours: StatValue;
@@ -6,4 +6,5 @@ export interface StatsCardsProps {
   energyScore: StatValue;
   breakHours: StatValue;
   goldenWindow: StatValue;
+  timeDistribution: DistributionEntry[];
 }

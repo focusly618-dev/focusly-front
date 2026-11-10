@@ -14,9 +14,12 @@ import { store } from '@/redux/store.ts';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@/api/apollo';
 import '@/i18n';
+import { removeLegacyStorage } from '@/utils/legacyStorage';
 import { FocuslyToaster } from '@/components/Notification/FocuslyToaster';
 import { BrowserRouter } from 'react-router-dom';
 import { tidyLocalStorage } from '@/utils/storage/localData';
+
+removeLegacyStorage();
 
 // Old records with task content, and expired ones (see localData).
 tidyLocalStorage();

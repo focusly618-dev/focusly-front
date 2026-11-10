@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { pickerLocale } from '@/pages/Home/components/CalendarView/utils/calendarNavigation';
 import { useSearchParams } from 'react-router-dom';
 import { addDays, addMinutes } from 'date-fns';
 import { Box, LinearProgress, Button } from '@mui/material';
@@ -26,7 +27,7 @@ export const Tasks = ({
   setIsAIScheduleEnabled: setIsAIScheduleEnabledProp,
   onStartFocus,
 }: TasksProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
   const {
@@ -129,7 +130,10 @@ export const Tasks = ({
   }, [urlFilter, dateRange, t]);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider
+      dateAdapter={AdapterDateFns}
+      adapterLocale={pickerLocale(i18n.language)}
+    >
       <TasksContainer sx={{ position: 'relative' }}>
         {isLoading && (
           <LinearProgress

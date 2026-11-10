@@ -26,6 +26,13 @@ export const WEEK_STARTS_ON = 1 as const;
 export const dateLocale = (language?: string): Locale =>
   dateFnsLocale(language);
 
+/** The date pickers' locale: the app's language, with Monday-first weeks like
+ * the calendars. */
+export const pickerLocale = (language: string): Locale => {
+  const locale = dateLocale(language);
+  return { ...locale, options: { ...locale.options, weekStartsOn: 1 } };
+};
+
 /** One step back (-1) or forward (+1) in the view: a day, a week or a month. */
 export const stepDate = (
   view: CalendarViewName,

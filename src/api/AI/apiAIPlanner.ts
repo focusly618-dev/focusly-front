@@ -164,6 +164,7 @@ export const availabilityFromSettings = (
 export const planWeeklyAI = async (
   tasks: Task[],
   availability?: AIAvailability,
+  options?: { availableDays?: string[]; language?: string },
 ): Promise<AIWeeklyPlanResponse> => {
   const mappedTasks = tasks.map((t) => ({
     title: t.title,
@@ -175,6 +176,8 @@ export const planWeeklyAI = async (
   const data = await plannerPost<AIWeeklyPlanResponse>('/ai/planner/weekly', {
     tasks: mappedTasks,
     availability,
+    available_days: options?.availableDays,
+    language: options?.language,
   });
   return data;
 };

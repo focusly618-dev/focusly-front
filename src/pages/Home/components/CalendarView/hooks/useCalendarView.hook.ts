@@ -61,6 +61,9 @@ import type { ICalendarEvent } from '../../CalendarEvent';
 const NO_DRAFTS: ICalendarEvent[] = [];
 
 /** One hour before now once the work day started, else just before it. */
+const SLOT_MINUTES = 5;
+const CLICKED_SLOT_MINUTES = 30;
+
 export const initialScrollHour = (now: Date, workStart?: string) => {
   const parsed = Number.parseInt((workStart ?? '').split(':')[0], 10);
   // 0 is a real start (a night shift): only a missing value falls back.
@@ -114,7 +117,7 @@ export const useCalendarView = () => {
   const [scrollAnchorHour] = useState(() =>
     initialScrollHour(new Date(), workStartTime),
   );
-  const [scrollToTime] = useState(() => {
+  const [scrollToTime, setScrollToTime] = useState(() => {
     const at = new Date();
     at.setHours(scrollAnchorHour, 0, 0, 0);
     return at;
@@ -159,6 +162,31 @@ export const useCalendarView = () => {
       }
     }
   }, [searchParams]);
+
+  // A task was just created (useHome adds ?at=HH:mm): bring its hour into view,
+  // with the hour before it above
+  useEffect(() => {
+    const at = searchParams.get('at');
+    if (at === null) return;
+    const hour = Number(at.split(':')[0]);
+    if (Number.isInteger(hour)) {
+      setScrollToTime((previous) => {
+        const next = new Date(previous);
+        // The calendar only scrolls when this value changes: alternating the
+        // minute also covers a second task at the same hour
+        next.setHours(
+          Math.max(0, hour - 1),
+          previous.getMinutes() ? 0 : 1,
+          0,
+          0,
+        );
+        return next;
+      });
+    }
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('at');
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   // Helper to update the view and/or date URL search parameters
   const updateUrlParams = (newView: View, newDate: Date) => {
@@ -630,7 +658,20 @@ export const useCalendarView = () => {
     updateUrlParams(view, date);
   };
 
-  const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
+  const handleSelectSlot = ({
+    start: rawStart,
+    end: rawEnd,
+  }: {
+    start: Date | string;
+    end: Date | string;
+  }) => {
+    const start = new Date(rawStart);
+    const selectedEnd = new Date(rawEnd);
+    // A click selects one 5-minute grid slot; only a drag means a length
+    const end =
+      selectedEnd.getTime() - start.getTime() > SLOT_MINUTES * 60000
+        ? selectedEnd
+        : new Date(start.getTime() + CLICKED_SLOT_MINUTES * 60000);
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set('action', 'create');
     newParams.set('start', start.toISOString());

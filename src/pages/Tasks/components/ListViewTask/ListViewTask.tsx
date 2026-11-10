@@ -21,6 +21,9 @@ import {
   DeleteOutlineRounded as DeleteIcon,
   FlagOutlined as FlagIcon,
   CheckCircleOutline as CompletedIcon,
+  CheckCircleRounded as DoneCircleIcon,
+  RadioButtonUnchecked as OpenCircleIcon,
+  MoreHorizRounded as MoreHorizIcon,
 } from '@mui/icons-material';
 
 import {
@@ -47,7 +50,7 @@ export const ListViewTask = ({
   isSelected,
   onToggleSelect,
 }: ListViewTaskProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
 
   const isReadOnly = useMemo(() => {
@@ -105,14 +108,14 @@ export const ListViewTask = ({
     if (!task.deadline) return '-';
     try {
       const date = new Date(task.deadline);
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString(i18n.language, {
         month: 'short',
         day: 'numeric',
       });
     } catch {
       return '-';
     }
-  }, [task.deadline]);
+  }, [task.deadline, i18n.language]);
 
   return (
     <>
@@ -195,6 +198,35 @@ export const ListViewTask = ({
             gap: 1,
           }}
         >
+          <IconButton
+            size="small"
+            aria-label={
+              isDone
+                ? t('tasks.actions.markAsTodo', 'Marcar como Por Hacer')
+                : t('tasks.actions.markAsDone', 'Marcar como Completada')
+            }
+            title={
+              isDone
+                ? t('tasks.actions.markAsTodo', 'Marcar como Por Hacer')
+                : t('tasks.actions.markAsDone', 'Marcar como Completada')
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              void handleStatusSelect(isDone ? 'Todo' : 'Done');
+            }}
+            sx={{
+              p: 0.25,
+              flexShrink: 0,
+              color: isDone ? '#10b981' : 'text.disabled',
+              '&:hover': { color: '#10b981' },
+            }}
+          >
+            {isDone ? (
+              <DoneCircleIcon sx={{ fontSize: 18 }} />
+            ) : (
+              <OpenCircleIcon sx={{ fontSize: 18 }} />
+            )}
+          </IconButton>
           <TaskTitle
             variant="body1"
             title={task.title}
@@ -359,38 +391,7 @@ export const ListViewTask = ({
               },
             }}
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="2"
-                y="2"
-                width="2.5"
-                height="12"
-                rx="1.25"
-                fill="currentColor"
-              />
-              <rect
-                x="6.75"
-                y="2"
-                width="2.5"
-                height="12"
-                rx="1.25"
-                fill="currentColor"
-              />
-              <rect
-                x="11.5"
-                y="2"
-                width="2.5"
-                height="12"
-                rx="1.25"
-                fill="currentColor"
-              />
-            </svg>
+            <MoreHorizIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Box>
       </TaskRow>

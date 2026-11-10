@@ -306,10 +306,15 @@ export const resolveSemanticTheme = (
   const jiraMatch = combined.match(/(jira|focus)-?\d+/i);
   const linkTag = jiraMatch ? jiraMatch[0].toUpperCase() : undefined;
 
+  // Anything unclassified lands here: only name what is really deep work
+  const isDeepWork = /deep work|trabajo profundo|enfoque profundo/.test(
+    combined,
+  );
+
   return {
     theme: SEMANTIC_THEMES.deep_work,
-    tagLabel: isDev ? 'Core Dev' : 'Deep Work',
-    tagPrefix: isDev ? undefined : '★',
+    tagLabel: isDev ? 'Core Dev' : isDeepWork ? 'Deep Work' : '',
+    tagPrefix: isDev || !isDeepWork ? undefined : '★',
     isDeepWork: true,
     linkTag,
   };

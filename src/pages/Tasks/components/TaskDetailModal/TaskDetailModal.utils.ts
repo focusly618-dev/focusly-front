@@ -3,7 +3,8 @@ import type { BuildCreateTaskPayloadParams } from './types/TaskDetailModal.types
 export const parseDuration = (duration: string | undefined | null): number => {
   if (!duration || typeof duration !== 'string') return 0;
 
-  const norm = duration.toLowerCase().trim();
+  // "1 h" and "2 h 30 m" are the same as "1h" and "2h30m"
+  const norm = duration.toLowerCase().replace(/\s+/g, '');
   if (!norm) return 0;
 
   const shortMatch = norm.match(/^(\d{1,3})(h|m)?$/i);
@@ -14,7 +15,7 @@ export const parseDuration = (duration: string | undefined | null): number => {
     return amount;
   }
 
-  const combinedMatch = norm.match(/^(\d{1,3})h\s*(\d{1,3})m$/i);
+  const combinedMatch = norm.match(/^(\d{1,3})h(\d{1,3})m?$/i);
   if (combinedMatch) {
     return parseInt(combinedMatch[1], 10) * 60 + parseInt(combinedMatch[2], 10);
   }
@@ -295,4 +296,32 @@ export const buildCreateTaskPayload = ({
     })),
     skip_scheduling: !hasValidDeadline,
   };
+};
+
+/**
+ * When a task starts if the user only picked its day: the start of their
+ * workday, or, later today, the next half hour.
+ */
+export const defaultStartForDay = (
+  day: Date,
+  now: Date,
+  workStartTime?: string,
+): Date => {
+  const workStart = /^(\d{1,2}):(\d{2})/.exec(workStartTime ?? '');
+  const start = new Date(day);
+  start.setHours(
+    workStart ? Number(workStart[1]) : 9,
+    workStart ? Number(workStart[2]) : 0,
+    0,
+    0,
+  );
+  const isToday = day.toDateString() === now.toDateString();
+  if (!isToday || start > now) return start;
+
+  const next = new Date(now);
+  next.setMinutes(Math.floor(now.getMinutes() / 30) * 30 + 30, 0, 0);
+  if (next.toDateString() === day.toDateString()) return next;
+  // The day has no half hour left
+  start.setHours(23, 30, 0, 0);
+  return start;
 };

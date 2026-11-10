@@ -278,7 +278,7 @@ export function useCreateProjectTaskModal({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [title, setTitle] = useState('');
   const [status, setStatus] = useState<string>(() =>
-    mapStatusFromBackend(defaultStatus || 'in_progress'),
+    mapStatusFromBackend(defaultStatus || 'todo'),
   );
   const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(
     null,
@@ -376,7 +376,7 @@ export function useCreateProjectTaskModal({
       initialSnapshotRef.current = null;
       setTitle(defaultTitle || '');
       setDescription('');
-      setStatus(mapStatusFromBackend(defaultStatus || 'in_progress'));
+      setStatus(mapStatusFromBackend(defaultStatus || 'todo'));
       setPriority('Medium');
       setDueDate('');
       setEstimatedDuration('30m');

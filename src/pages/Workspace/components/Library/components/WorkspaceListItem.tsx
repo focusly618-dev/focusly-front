@@ -17,6 +17,7 @@ import { surfaceColor } from '@/context';
 import { UNTITLED_WORKSPACE_TITLE } from '@/utils';
 import { CardAvatarCircle, BadgeChip } from '../WorkspaceLibrary.styles';
 import { iconMap } from '../constants/library.constants';
+import { parseServerDate } from '@/api/Tasks/taskMapper';
 import type { WorkspaceTypes } from '../../../workspace.types';
 
 interface WorkspaceListItemProps {
@@ -222,7 +223,7 @@ export const WorkspaceListItem = ({
           display: { xs: 'none', sm: 'block' },
         }}
       >
-        {format(new Date(workspace.updatedAt), 'MMM dd, yyyy, hh:mm a')}
+        {format(parseServerDate(workspace.updatedAt), 'MMM dd, yyyy, hh:mm a')}
       </Typography>
 
       {selectionMode ? (

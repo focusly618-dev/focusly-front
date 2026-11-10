@@ -7,6 +7,7 @@ import {
   Typography,
   LinearProgress,
 } from '@mui/material';
+import { pickerLocale } from '@/pages/Home/components/CalendarView/utils/calendarNavigation';
 import type { TransitionProps } from '@mui/material/transitions';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +58,7 @@ export const TaskDetailModal = ({
   isAIScheduleEnabled,
   setIsAIScheduleEnabled,
 }: TaskDetailModalProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const effectiveDelete = propHandleDelete || onDelete;
   const {
     effectiveTask,
@@ -213,7 +214,10 @@ export const TaskDetailModal = ({
   const hasCustomColor = isTaskCustomColor(color);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider
+      dateAdapter={AdapterDateFns}
+      adapterLocale={pickerLocale(i18n.language)}
+    >
       <Dialog
         open={open}
         onClose={onClose}
@@ -317,6 +321,13 @@ export const TaskDetailModal = ({
                   )}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter' || isReadOnly || !title.trim())
+                      return;
+                    e.preventDefault();
+                    if (effectiveTask || initialTask) handleUpdate();
+                    else handleSave();
+                  }}
                   sx={titleInputPropsSx}
                   error={!!errors.title}
                   helperText={errors.title}
@@ -400,7 +411,6 @@ export const TaskDetailModal = ({
                 onToggleSubtask={handleToggleSubtask}
                 onRemoveSubtask={handleRemoveSubtask}
                 onUpdateSubtask={handleUpdateSubtask}
-                onImproveWithAI={() => handleImproveTask('subtasks')}
                 isReadOnly={isReadOnly}
                 isLoading={isLoadingDetail}
               />

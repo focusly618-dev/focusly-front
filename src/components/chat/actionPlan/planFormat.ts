@@ -43,6 +43,24 @@ export const formatMinutes = (minutes: number) => {
   return `${m}m`;
 };
 
+/** When a task in a plan starts. Its deadline is when it's due, often later:
+ * only replies from before tasks had a start fall back on it. */
+export const taskStart = (payload: {
+  estimated_start_date?: string;
+  deadline?: string;
+}): Date | null =>
+  parseDeadline(payload.estimated_start_date) ??
+  parseDeadline(payload.deadline);
+
+/** A document's text without a first heading that repeats its title (the
+ * page shows the title above the text). */
+export const withoutLeadingTitle = (content: string, title: string) => {
+  const match = /^\s*#\s+(.+?)\s*(?:\n+|$)/.exec(content);
+  return match && match[1].trim().toLowerCase() === title.trim().toLowerCase()
+    ? content.slice(match[0].length)
+    : content;
+};
+
 /** A value for <input type="datetime-local"> from a plan date. */
 export const toDateTimeInput = (date: Date | null) => {
   if (!date) return '';

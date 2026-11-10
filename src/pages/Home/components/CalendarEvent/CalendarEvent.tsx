@@ -957,7 +957,7 @@ export const CalendarEvent = (props: CalendarEventProps) => {
 
                 <Box
                   sx={{
-                    display: 'inline-flex',
+                    display: tagLabel ? 'inline-flex' : 'none',
                     alignItems: 'center',
                     gap: 0.3,
                     fontSize: '10px',

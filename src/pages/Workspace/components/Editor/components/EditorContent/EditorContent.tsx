@@ -548,7 +548,7 @@ export const EditorContent = ({
           )}
 
           <TitleInput
-            placeholder="Untitled Document"
+            placeholder={t('workspaceEditor.untitledNote')}
             value={currentTitle}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -980,7 +980,7 @@ export const EditorContent = ({
         {/* Gradientes */}
         {(coverColorCategory === 'all' ||
           coverColorCategory === 'gradient') && (
-          <>
+          <Box>
             <Typography
               variant="caption"
               sx={{
@@ -1041,12 +1041,12 @@ export const EditorContent = ({
                   </Tooltip>
                 ))}
             </Box>
-          </>
+          </Box>
         )}
 
         {/* Tonos Pasteles */}
         {(coverColorCategory === 'all' || coverColorCategory === 'pastel') && (
-          <>
+          <Box>
             <Typography
               variant="caption"
               sx={{
@@ -1098,12 +1098,12 @@ export const EditorContent = ({
                   </Tooltip>
                 ))}
             </Box>
-          </>
+          </Box>
         )}
 
         {/* Tonos Sólidos */}
         {(coverColorCategory === 'all' || coverColorCategory === 'solid') && (
-          <>
+          <Box>
             <Typography
               variant="caption"
               sx={{
@@ -1155,7 +1155,7 @@ export const EditorContent = ({
                   </Tooltip>
                 ))}
             </Box>
-          </>
+          </Box>
         )}
       </Menu>
 

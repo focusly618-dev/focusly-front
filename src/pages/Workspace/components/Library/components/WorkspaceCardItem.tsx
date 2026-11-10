@@ -30,6 +30,7 @@ import {
 import type { WorkspaceTypes } from '../../../workspace.types';
 import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import { UNTITLED_WORKSPACE_TITLE, colorPalette } from '@/utils';
+import { parseServerDate } from '@/api/Tasks/taskMapper';
 import { surfaceColor } from '@/context';
 
 interface WorkspaceCardItemProps {
@@ -345,7 +346,7 @@ export const WorkspaceCardItem = ({
             <FooterItem title={t('workspaceLibrary.card.created')}>
               <CalendarIcon />
               <span>
-                {new Date(workspace.createdAt).toLocaleDateString(
+                {parseServerDate(workspace.createdAt).toLocaleDateString(
                   i18n.language,
                   { day: 'numeric', month: 'short', year: 'numeric' },
                 )}

@@ -7,6 +7,7 @@ import {
   InfoOutlined as InfoIcon,
   PaletteOutlined as PaletteIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import type { Task } from '@/redux/tasks/task.types';
 import { confirmTaskDeletion } from '@/services/confirmTaskDeletion';
 import { headerContainerSx, headerIconButtonSx } from './TaskHeader.styles';
@@ -35,6 +36,7 @@ export const TaskHeader = ({
   isReadOnly,
   onOpenColorPicker,
 }: TaskHeaderProps) => {
+  const { t } = useTranslation();
   const hasCustomColor = isTaskCustomColor(color);
   const isDark = hasCustomColor && isColorDark(color);
   const iconSx = headerIconButtonSx(hasCustomColor, color);
@@ -90,7 +92,7 @@ export const TaskHeader = ({
             color: badgeTextColor,
           }}
         >
-          {initialTask ? 'Detalles de Tarea' : 'Nueva Tarea'}
+          {initialTask ? t('ui.taskHeader.detail') : t('ui.taskHeader.new')}
         </Typography>
       </Box>
 
@@ -98,7 +100,7 @@ export const TaskHeader = ({
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
         {/* Background / Wallpaper color picker button */}
         {!isReadOnly && onOpenColorPicker && (
-          <Tooltip title="Color de fondo de la tarea" arrow>
+          <Tooltip title={t('tasks.properties.backgroundColor')} arrow>
             <IconButton
               size="small"
               onClick={(e) => onOpenColorPicker(e.currentTarget)}
@@ -129,7 +131,7 @@ export const TaskHeader = ({
         )}
 
         {initialTask && !initialTask.is_owner && (
-          <Tooltip title="Esta tarea no puede ser modificada porque no eres el propietario">
+          <Tooltip title={t('ui.taskHeader.notOwner')}>
             <IconButton size="small" sx={iconSx}>
               <InfoIcon sx={{ fontSize: 18 }} />
             </IconButton>
@@ -137,7 +139,10 @@ export const TaskHeader = ({
         )}
 
         {/* Minimize / Fullscreen button */}
-        <Tooltip title={isFullScreen ? 'Restaurar tamaño' : 'Maximizar'} arrow>
+        <Tooltip
+          title={isFullScreen ? t('common.restoreSize') : t('common.maximize')}
+          arrow
+        >
           <IconButton
             size="small"
             onClick={() => setIsFullScreen(!isFullScreen)}
@@ -152,7 +157,7 @@ export const TaskHeader = ({
         </Tooltip>
 
         {/* Close Button */}
-        <Tooltip title="Cerrar" arrow>
+        <Tooltip title={t('common.close')} arrow>
           <IconButton size="small" onClick={onClose} sx={iconSx}>
             <CloseIcon sx={{ fontSize: 19 }} />
           </IconButton>
@@ -160,7 +165,7 @@ export const TaskHeader = ({
 
         {/* Delete Button */}
         {!isReadOnly && initialTask && (
-          <Tooltip title="Eliminar tarea" arrow>
+          <Tooltip title={t('tasks.createProjectTaskModal.deleteTask')} arrow>
             <IconButton
               size="small"
               onClick={() => confirmTaskDeletion(handleDelete, onClose)}

@@ -535,28 +535,28 @@ export const SendButton = styled(IconButton)<{ active?: boolean }>(
 
 /* ── History Sidebar (Slide-over / Collapsible) ────────────────────────────── */
 
-export const HistorySidebar = styled(Box)<{ isOpen?: boolean }>(
-  ({ theme, isOpen = true }) => ({
-    width: isOpen ? '300px' : '0px',
-    height: '100%',
-    backgroundColor: surfaceColor(theme, '#0e0f12', '#1c1d20', '#ffffff'),
-    borderLeft: isOpen ? `1px solid ${theme.palette.divider}` : 'none',
-    display: 'flex',
-    flexDirection: 'column',
-    flexShrink: 0,
-    overflow: 'hidden',
-    transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-    zIndex: 20,
-    '@media (max-width: 768px)': {
-      position: 'absolute',
-      right: 0,
-      top: 0,
-      bottom: 0,
-      width: isOpen ? '280px' : '0px',
-      boxShadow: isOpen ? '-4px 0 24px rgba(0,0,0,0.25)' : 'none',
-    },
-  }),
-);
+export const HistorySidebar = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isOpen',
+})<{ isOpen?: boolean }>(({ theme, isOpen = true }) => ({
+  width: isOpen ? '300px' : '0px',
+  height: '100%',
+  backgroundColor: surfaceColor(theme, '#0e0f12', '#1c1d20', '#ffffff'),
+  borderLeft: isOpen ? `1px solid ${theme.palette.divider}` : 'none',
+  display: 'flex',
+  flexDirection: 'column',
+  flexShrink: 0,
+  overflow: 'hidden',
+  transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+  zIndex: 20,
+  '@media (max-width: 768px)': {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: isOpen ? '280px' : '0px',
+    boxShadow: isOpen ? '-4px 0 24px rgba(0,0,0,0.25)' : 'none',
+  },
+}));
 
 export const ChatAreaWrapper = styled(Box)({
   flex: 1,

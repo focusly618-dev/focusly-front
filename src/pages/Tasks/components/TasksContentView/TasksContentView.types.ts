@@ -10,8 +10,13 @@ export const STATUS_SECTIONS = [
     id: 'Todo',
     label: 'Por Hacer',
     color: '#008767',
-    filter: (t: TaskResponse) =>
-      t.status === 'Todo' || t.status === 'Backlog' || !t.status,
+    filter: (t: TaskResponse) => t.status === 'Todo' || !t.status,
+  },
+  {
+    id: 'Backlog',
+    label: 'Backlog',
+    color: '#64748b',
+    filter: (t: TaskResponse) => t.status === 'Backlog',
   },
   {
     id: 'Planning',

@@ -51,7 +51,7 @@
     "intelligence": "Intelligence",
     "askAi": "Demander à l'IA",
     "insights": "Insights",
-    "workspace": "Espaces de travail",
+    "workspace": "Documents",
     "collections": "Collections",
     "projects": "Projets",
     "recentProjects": "Récents",
@@ -64,7 +64,7 @@
     "logIn": "Se connecter",
     "getStarted": "Commencer",
     "viewProfile": "Voir le profil",
-    "searchWorkspaces": "Rechercher des espaces de travail..."
+    "searchWorkspaces": "Rechercher des documents..."
   },
   "settings": {
     "theme": {
@@ -125,9 +125,9 @@
     "week": "Semaine",
     "day": "Jour",
     "today": "Aujourd'hui",
-    "awaitedTasks": "Tâches en attente",
+    "awaitedTasks": "Tâches du jour",
     "viewAll": "Tout voir",
-    "noAwaitedTasks": "Aucune tâche en attente",
+    "noAwaitedTasks": "Aucune tâche ce jour-là",
     "freeTimeDesc": "Profitez de votre temps libre !",
     "optimizeSchedule": "Optimiser le planning",
     "plan": {
@@ -557,7 +557,7 @@
       "4": "Urgente"
     },
     "untitledTask": "Tâche sans titre",
-    "untitledNote": "Note sans titre",
+    "untitledNote": "Document sans titre",
     "untitledDocument": "Document sans titre",
     "task": {
       "subtaskCount_one": "{{count}} sous-tâche",
@@ -1197,23 +1197,23 @@
     "loadingDocuments": "Chargement des documents…",
     "toast": {
       "deleteProjectsTitle": "Supprimer des projets",
-      "deleteProjectsDesc": "Voulez-vous vraiment supprimer les projets suivants : {{names}} ? Les espaces de travail qu'ils contiennent seront dissociés mais pas supprimés.",
+      "deleteProjectsDesc": "Voulez-vous vraiment supprimer les projets suivants : {{names}} ? Les documents qu'ils contiennent seront dissociés mais pas supprimés.",
       "projectsDeleted_one": "Projet supprimé",
       "projectsDeleted_other": "{{count}} projets supprimés",
       "projectsDeleteFailed_one": "{{count}} projet n'a pas pu être supprimé.",
       "projectsDeleteFailed_other": "{{count}} projets n'ont pas pu être supprimés.",
-      "workspacesDeleted_one": "Espace de travail supprimé",
-      "workspacesDeleted_other": "{{count}} espaces de travail supprimés",
-      "workspacesDeleteFailed_one": "{{count}} espace de travail n'a pas pu être supprimé.",
-      "workspacesDeleteFailed_other": "{{count}} espaces de travail n'ont pas pu être supprimés.",
+      "workspacesDeleted_one": "Document supprimé",
+      "workspacesDeleted_other": "{{count}} documents supprimés",
+      "workspacesDeleteFailed_one": "{{count}} document n'a pas pu être supprimé.",
+      "workspacesDeleteFailed_other": "{{count}} documents n'ont pas pu être supprimés.",
       "deletedTitle": "Projets supprimés"
     },
     "breadcrumb": {
       "home": "Accueil",
-      "folderFallback": "Dossier"
+      "folderFallback": "Projet"
     },
-    "newFolder": "Nouveau dossier",
-    "newWorkspace": "Nouvel espace de travail",
+    "newFolder": "Nouveau projet",
+    "newWorkspace": "Nouvel document",
     "status": {
       "recent": "Récent",
       "empty": "Vide",
@@ -1222,19 +1222,19 @@
     "notesInside_one": "{{count}} note à l'intérieur",
     "notesInside_other": "{{count}} notes à l'intérieur",
     "lastUpdated": "Dernière mise à jour : ",
-    "error": "Erreur lors du chargement des espaces de travail. Veuillez réessayer.",
+    "error": "Erreur lors du chargement des documents. Veuillez réessayer.",
     "emptySearch": {
       "title": "Aucun résultat",
-      "desc": "Aucun espace de travail ne correspond à votre recherche ou à votre filtre. Essayez de les ajuster."
+      "desc": "Aucun document ne correspond à votre recherche ou à votre filtre. Essayez de les ajuster."
     },
     "emptyFolder": {
-      "title": "Aucun espace de travail pour l'instant",
-      "desc": "Des notes légères pour organiser votre planification stratégique. Créez votre premier espace de travail pour commencer.",
-      "action": "Créer un espace de travail",
+      "title": "Aucun document pour l'instant",
+      "desc": "Des notes légères pour organiser votre planification stratégique. Créez votre premier document pour commencer.",
+      "action": "Créer un document",
       "subAction": "Créez une note ou un document"
     },
     "recentWorkspace": "ESPACE DE TRAVAIL RÉCENT",
-    "emptyFolderSnippet": "Ce dossier est vide. Créez votre premier espace de travail pour commencer...",
+    "emptyFolderSnippet": "Ce projet est vide. Créez votre premier document pour commencer...",
     "filterAndSortNotes": "Filtrer et trier les notes",
     "switchViewMode": "Changer de mode d'affichage",
     "sortNotes": "Trier les notes",
@@ -1245,38 +1245,38 @@
     "viewGallery": "Galerie",
     "viewGrid": "Grille",
     "viewList": "Liste",
-    "deleteWorkspace": "Supprimer l'espace de travail",
+    "deleteWorkspace": "Supprimer l'document",
     "deleteDialog": {
       "title": "Supprimer le projet",
       "description": "Voulez-vous vraiment supprimer le projet « {{name}} » ?",
       "bulkTitle": "Supprimer {{count}} projets",
       "bulkDescription": "Voulez-vous vraiment supprimer les {{count}} projets suivants ?",
-      "workspacesWarning_one": "Ce projet contient {{count}} espace de travail qui sera définitivement supprimé.",
-      "workspacesWarning_other": "Ce projet contient {{count}} espaces de travail qui seront définitivement supprimés.",
-      "bulkWorkspacesWarning_one": "Ces projets contiennent au total {{count}} espace de travail qui sera définitivement supprimé.",
-      "bulkWorkspacesWarning_other": "Ces projets contiennent au total {{count}} espaces de travail qui seront définitivement supprimés.",
+      "workspacesWarning_one": "Ce projet contient {{count}} document qui sera définitivement supprimé.",
+      "workspacesWarning_other": "Ce projet contient {{count}} documents qui seront définitivement supprimés.",
+      "bulkWorkspacesWarning_one": "Ces projets contiennent au total {{count}} document qui sera définitivement supprimé.",
+      "bulkWorkspacesWarning_other": "Ces projets contiennent au total {{count}} documents qui seront définitivement supprimés.",
       "noWorkspacesWarning": "Cette action est irréversible."
     },
     "deleteWorkspacesDialog": {
-      "title": "Supprimer l'espace de travail",
+      "title": "Supprimer l'document",
       "description": "Voulez-vous vraiment supprimer « {{name}} » ?",
-      "bulkTitle": "Supprimer {{count}} espaces de travail",
-      "bulkDescription": "Voulez-vous vraiment supprimer les {{count}} espaces de travail suivants ?",
-      "warning_one": "Le contenu de cet espace de travail sera définitivement supprimé.",
-      "warning_other": "Le contenu de {{count}} espaces de travail sera définitivement supprimé."
+      "bulkTitle": "Supprimer {{count}} documents",
+      "bulkDescription": "Voulez-vous vraiment supprimer les {{count}} documents suivants ?",
+      "warning_one": "Le contenu de cet document sera définitivement supprimé.",
+      "warning_other": "Le contenu de {{count}} documents sera définitivement supprimé."
     },
-    "renameFolder": "Renommer le dossier",
+    "renameFolder": "Renommer le projet",
     "customizeStyle": "Personnaliser le style",
-    "deleteFolder": "Supprimer le dossier",
+    "deleteFolder": "Supprimer le projet",
     "customizeDialog": {
-      "title": "Personnaliser le dossier"
+      "title": "Personnaliser le projet"
     },
-    "folderName": "Nom du dossier",
+    "folderName": "Nom du projet",
     "iconShape": "Forme de l'icône",
     "filled": "Rempli",
     "solid": "Plein",
     "outlined": "Contour",
-    "folderColor": "Couleur du dossier",
+    "folderColor": "Couleur du projet",
     "colorAccent": "Couleur d'accent",
     "colors": {
       "Red": "Rouge",
@@ -1297,10 +1297,10 @@
       "Slate": "Ardoise"
     },
     "createDialog": {
-      "title": "Créer un nouveau dossier"
+      "title": "Créer un nouveau projet"
     },
     "namePlaceholder": "ex. : Plan de sprint, Personnel, Marketing",
-    "createFolder": "Créer le dossier",
+    "createFolder": "Créer le projet",
     "editedOn": "Modifié le {{date}}",
     "card": {
       "created": "Créé",
@@ -1323,12 +1323,12 @@
     }
   },
   "allProjectsModal": {
-    "title": "Tous les dossiers",
-    "subtitle": "Parcourez et sélectionnez les dossiers de votre bibliothèque.",
-    "searchPlaceholder": "Rechercher parmi {{count}} dossiers...",
-    "emptyNoFolders": "Aucun dossier pour l'instant",
-    "emptyNoMatch": "Aucun dossier correspondant",
-    "emptyNoFoldersDesc": "Créez un dossier personnalisé dans la bibliothèque ou la barre latérale pour regrouper vos plans.",
+    "title": "Tous les projets",
+    "subtitle": "Parcourez et sélectionnez les projets de votre bibliothèque.",
+    "searchPlaceholder": "Rechercher parmi {{count}} projets...",
+    "emptyNoFolders": "Aucun projet pour l'instant",
+    "emptyNoMatch": "Aucun projet correspondant",
+    "emptyNoFoldersDesc": "Créez un projet personnalisé dans la bibliothèque ou la barre latérale pour regrouper vos plans.",
     "emptyNoMatchDesc": "Essayez d'ajuster vos termes de recherche.",
     "items": "{{count}} éléments",
     "visible": "Visible",
@@ -1338,21 +1338,21 @@
   },
   "createProjectModal": {
     "title": "Créer un nouveau projet",
-    "subtitle": "Choisissez un nom et une couleur pour garder vos espaces de travail bien organisés.",
+    "subtitle": "Choisissez un nom et une couleur pour garder vos documents bien organisés.",
     "projectName": "Nom du projet",
     "namePlaceholder": "ex. : Stratégie marketing, Plans du T1...",
     "projectColor": "Couleur du projet",
     "create": "Créer le projet"
   },
   "updateProjectModal": {
-    "title": "Modifier le dossier",
-    "subtitle": "Modifiez le nom et la couleur du dossier pour mieux organiser vos espaces de travail.",
-    "folderColor": "Couleur du dossier",
-    "update": "Mettre à jour le dossier"
+    "title": "Modifier le projet",
+    "subtitle": "Modifiez le nom et la couleur du projet pour mieux organiser vos documents.",
+    "folderColor": "Couleur du projet",
+    "update": "Mettre à jour le projet"
   },
   "templatesModal": {
     "title": "Explorateur de modèles professionnels",
-    "subtitle": "Sélectionnez un modèle et attribuez-le au dossier du projet de destination",
+    "subtitle": "Sélectionnez un modèle et attribuez-le au projet du projet de destination",
     "searchPlaceholder": "Rechercher des modèles...",
     "previewing": "Aperçu",
     "liveRenderedPreview": "Aperçu en direct",
@@ -1479,7 +1479,7 @@
       "createdOn": "Créée dans",
       "createdAt": "Créée le",
       "dueOn": "Échéance",
-      "workspacesProjects": "Espaces de travail / Projets",
+      "workspacesProjects": "Documents / Projets",
       "backgroundColor": "Couleur de fond",
       "removeBackground": "Retirer le fond",
       "removeBackgroundColor": "Retirer la couleur de fond",
@@ -1487,7 +1487,7 @@
       "custom": "Personnalisée",
       "logTime": "Enregistrer du temps",
       "noTimeLogged": "Aucun temps enregistré pour l'instant.",
-      "titlePlaceholder": "Terminer le rapport de performance trimestriel",
+      "titlePlaceholder": "Nom de la tâche",
       "palette": "Palette de couleurs"
     },
     "projectRequired": {
@@ -1507,9 +1507,9 @@
         "titleRequiredDesc": "Saisissez un titre pour la tâche.",
         "taskUpdated": "Tâche mise à jour",
         "workspaceTitleRequired": "Titre requis",
-        "workspaceTitleRequiredDesc": "Saisissez un titre pour l'espace de travail.",
-        "workspaceLinked": "Espace de travail créé et lié",
-        "workspaceCreateFailed": "Impossible de créer l'espace de travail. Réessayez."
+        "workspaceTitleRequiredDesc": "Saisissez un titre pour l'document.",
+        "workspaceLinked": "Document créé et lié",
+        "workspaceCreateFailed": "Impossible de créer l'document. Réessayez."
       },
       "titlePlaceholder": "Titre de la tâche...",
       "status": "Statut",
@@ -1522,12 +1522,12 @@
       "duration": "Durée",
       "setDuration": "Définir la durée",
       "linkedSpec": "Spécification et PRD liés",
-      "createWorkspace": "Créer un espace de travail",
-      "changeWorkspace": "Changer d'espace de travail",
-      "linkWorkspace": "Lier un espace de travail",
-      "noWorkspaceLinked": "Aucun espace de travail lié",
+      "createWorkspace": "Créer un document",
+      "changeWorkspace": "Changer d'document",
+      "linkWorkspace": "Lier un document",
+      "noWorkspaceLinked": "Aucun document lié",
       "clickToLink": "Cliquez pour associer cette tâche à une spécification ou à une note",
-      "unlinkWorkspace": "Dissocier l'espace de travail",
+      "unlinkWorkspace": "Dissocier l'document",
       "openWorkspace": "Ouvrir",
       "linked": "Lié",
       "descAndContext": "Description et contexte",
@@ -1541,18 +1541,18 @@
       "cancel": "Annuler",
       "createTask": "Créer la tâche",
       "saveChanges": "Enregistrer",
-      "createWorkspaceDialogDesc": "Créez un nouvel espace de travail avec le titre de votre choix ; il sera automatiquement lié à cette tâche.",
+      "createWorkspaceDialogDesc": "Créez un nouvel document avec le titre de votre choix ; il sera automatiquement lié à cette tâche.",
       "project": "Projet :",
-      "workspaceTitle": "Titre de l'espace de travail",
+      "workspaceTitle": "Titre de l'document",
       "workspaceTitlePlaceholder": "Ex. : Spécifications techniques, Exigences, PRD...",
       "createAndLink": "Créer et lier",
-      "searchWorkspacePlaceholder": "Rechercher un espace de travail ou une note..."
+      "searchWorkspacePlaceholder": "Rechercher un document ou une note..."
     }
   },
   "projects": {
     "loading": "Chargement des projets…",
     "newProject": "Nouveau projet",
-    "createCleanFolder": "Créer un dossier vierge",
+    "createCleanFolder": "Créer un projet vierge",
     "showingResultsFor": "{{count}} résultats pour « {{term}} »",
     "showingCountOfTotal": "{{current}} projets affichés sur {{total}}",
     "searchProjects": "Rechercher des projets...",
@@ -1592,7 +1592,7 @@
       "focusView": "Vue centrée",
       "defaultView": "Vue normale"
     },
-    "untitledNote": "Note sans titre",
+    "untitledNote": "Document sans titre",
     "saving": "enregistrement",
     "saved": "enregistré",
     "savingChanges": "Enregistrement des modifications...",
@@ -1993,7 +1993,7 @@
           "body": "Cliquez sur un créneau libre pour créer une tâche rapide. Faites glisser un bloc pour le déplacer à une autre heure ou un autre jour, et étirez son bord pour changer sa durée."
         },
         "awaited": {
-          "title": "Tâches en attente",
+          "title": "Tâches du jour",
           "body": "Le panneau latéral rassemble les tâches en attente qui n'ont pas encore d'horaire, pour qu'aucune ne soit oubliée."
         },
         "ai": {
@@ -2203,6 +2203,78 @@
       "stop": "Arrêter",
       "previewMode": "Voir le bloc",
       "codeMode": "Modifier le code"
+    }
+  },
+  "insightsStats": {
+    "noData": "Pas encore de données",
+    "ofTrackedTime": "De votre temps enregistré"
+  },
+  "ui": {
+    "taskHeader": {
+      "detail": "Détails de la tâche",
+      "new": "Nouvelle tâche",
+      "notOwner": "Vous ne pouvez pas modifier cette tâche car vous n'en êtes pas propriétaire"
+    },
+    "subtasks": {
+      "title": "Sous-tâches",
+      "addStep": "Ajouter une étape...",
+      "loading": "Chargement...",
+      "add": "Ajouter",
+      "remove": "Supprimer la sous-tâche"
+    },
+    "pagination": {
+      "showing": "{{count}} sur {{total}} tâches"
+    },
+    "empty": {
+      "listTitle": "Rien ici pour le moment",
+      "listDesc": "Les tâches de cette liste apparaîtront ici."
+    },
+    "priority": {
+      "urgent": "Urgent"
+    },
+    "insights": {
+      "totalFocus": "CONCENTRATION TOTALE",
+      "tasksDone": "TÂCHES TERMINÉES",
+      "energy": "ÉNERGIE MOYENNE",
+      "deepWork": "PART DE TRAVAIL PROFOND",
+      "trendsTitle": "Performance de concentration",
+      "trendsHelp": "Nous comparons votre objectif estimé au temps réellement enregistré.",
+      "trendsSubtitle": "Objectif estimé vs. temps réel",
+      "actual": "Temps réel",
+      "target": "Objectif",
+      "goldenTitle": "Heures en or",
+      "analyzing": "Analyse...",
+      "analyze": "Analyser avec l’IA",
+      "optimizeTitle": "Envie d’optimiser votre temps ?",
+      "scoreLast7": "SCORE DE PRODUCTIVITÉ (7 DERNIERS JOURS)",
+      "activityMap": "Carte d’activité",
+      "less": "Moins",
+      "more": "Plus",
+      "timeDistribution": "Répartition du temps",
+      "focus": "CONCENTRATION",
+      "activity": "ACTIVITÉ"
+    },
+    "chat": {
+      "today": "Aujourd’hui",
+      "yesterday": "Hier",
+      "older": "Plus anciens",
+      "userAsked": "Vous avez demandé",
+      "understanding": "Compréhension de votre demande",
+      "consulting": "Consultation de votre Focusly",
+      "consultingDesc": "Documents, projets, tâches et calendrier",
+      "structuring": "Préparation de la réponse",
+      "actionsDetected": "{{count}} proposé(s)",
+      "thought": "Réflexion de Lumina",
+      "copy": "Copier",
+      "regenerate": "Régénérer",
+      "goToEnd": "Aller à la fin",
+      "askPlaceholder": "Demandez à Lumina ou tapez @ pour le contexte...",
+      "context": "Contexte",
+      "attachTitle": "Joindre un fichier (PDF, DOCX, TXT, MD… 3 Mo max.)",
+      "attach": "Joindre",
+      "searchHistory": "Rechercher dans l’historique...",
+      "conversation": "Conversation Lumina",
+      "newChat": "Nouvelle discussion"
     }
   }
 }

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -11,7 +12,6 @@ import {
 import {
   Check as CheckIcon,
   DeleteOutlineRounded as DeleteIcon,
-  AutoAwesomeRounded as SparklesIcon,
   AddRounded as AddIcon,
 } from '@mui/icons-material';
 import type { Subtask } from '@/redux/tasks/task.types';
@@ -22,7 +22,6 @@ import {
   progressBarContainerSx,
   subtaskItemSx,
   subtaskInputFormSx,
-  aiButtonSx,
 } from './TaskSubtasks.styles';
 
 interface TaskSubtasksProps {
@@ -31,7 +30,6 @@ interface TaskSubtasksProps {
   onToggleSubtask: (id: string) => void;
   onRemoveSubtask: (id: string) => void;
   onUpdateSubtask?: (id: string, title: string) => void;
-  onImproveWithAI?: () => void;
   isReadOnly?: boolean;
   isLoading?: boolean;
 }
@@ -42,10 +40,10 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
   onToggleSubtask,
   onRemoveSubtask,
   onUpdateSubtask,
-  onImproveWithAI,
   isReadOnly = false,
   isLoading = false,
 }) => {
+  const { t } = useTranslation();
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
@@ -98,7 +96,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
               letterSpacing: '0.06em',
             }}
           >
-            Subtareas
+            {t('ui.subtasks.title')}
           </Typography>
           {total > 0 && (
             <Box component="span" sx={subtaskCountBadgeSx(allCompleted)}>
@@ -108,24 +106,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
         </Box>
 
         {/* Action buttons */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {onImproveWithAI && !isReadOnly && (
-            <Tooltip title="Desglosar tarea en pasos con Lumina IA">
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={onImproveWithAI}
-                disabled={isLoading}
-                sx={aiButtonSx}
-                startIcon={
-                  <SparklesIcon sx={{ fontSize: '13px !important' }} />
-                }
-              >
-                Desglosar con IA
-              </Button>
-            </Tooltip>
-          )}
-        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}></Box>
       </Box>
 
       {/* Animated Progress Bar */}
@@ -254,7 +235,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
 
               {/* Delete Icon Button on right */}
               {!isReadOnly && (
-                <Tooltip title="Eliminar subtarea">
+                <Tooltip title={t('ui.subtasks.remove')}>
                   <IconButton
                     size="small"
                     disabled={isLoading}
@@ -286,7 +267,9 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
             <InputBase
               inputRef={inputRef}
               fullWidth
-              placeholder={isLoading ? 'Cargando...' : 'Añadir un paso...'}
+              placeholder={
+                isLoading ? t('ui.subtasks.loading') : t('ui.subtasks.addStep')
+              }
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -315,7 +298,7 @@ export const TaskSubtasks: React.FC<TaskSubtasksProps> = ({
                   borderRadius: '6px',
                 }}
               >
-                Añadir
+                {t('ui.subtasks.add')}
               </Button>
             )}
           </Box>
