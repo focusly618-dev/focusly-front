@@ -43,6 +43,15 @@ export const formatMinutes = (minutes: number) => {
   return `${m}m`;
 };
 
+/** When a task in a plan starts. Its deadline is when it's due, often later:
+ * only replies from before tasks had a start fall back on it. */
+export const taskStart = (payload: {
+  estimated_start_date?: string;
+  deadline?: string;
+}): Date | null =>
+  parseDeadline(payload.estimated_start_date) ??
+  parseDeadline(payload.deadline);
+
 /** A value for <input type="datetime-local"> from a plan date. */
 export const toDateTimeInput = (date: Date | null) => {
   if (!date) return '';

@@ -1,6 +1,6 @@
 import type { ParsedLuminaAction } from '@/utils';
 import { normalizeName } from './planExecution';
-import { normalizeEstimateTimer, parseDeadline } from './planFormat';
+import { normalizeEstimateTimer, taskStart } from './planFormat';
 import { cleanEmails, eventWindow } from './eventBody';
 
 // The shape of a Lumina plan as the user reviews it: projects holding their
@@ -327,7 +327,7 @@ export const summarizePlan = (
     summary.tasks += 1;
     summary.subtasks += action.payload.subtasks?.length ?? 0;
     summary.minutes += taskMinutes(action);
-    addDate(parseDeadline(action.payload.deadline));
+    addDate(taskStart(action.payload));
   });
   return summary;
 };

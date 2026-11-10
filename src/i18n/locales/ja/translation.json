@@ -2167,5 +2167,9 @@
       "previewMode": "ブロックを表示",
       "codeMode": "コードを編集"
     }
+  },
+  "insightsStats": {
+    "noData": "まだデータがありません",
+    "ofTrackedTime": "記録した時間のうち"
   }
 }

@@ -35,6 +35,7 @@ import {
   formatSlot,
   formatWhen,
   toDateTimeInput,
+  taskStart,
 } from '../planFormat';
 import { missingSubtaskTitles } from '../subtaskOps';
 import type { PlanController } from '../useActionPlan.hook';
@@ -77,7 +78,7 @@ export const TaskNode = ({ plan, index }: NodeProps & { index: number }) => {
   const action = plan.effectiveAction(index);
   const { payload } = action;
   const minutes = taskMinutes(action);
-  const start = parseDeadline(payload.deadline);
+  const start = taskStart(payload);
   const subtasks = payload.subtasks ?? [];
   const linkedDoc =
     payload.workspace_id && !payload.workspace_ref
@@ -198,7 +199,7 @@ export const TaskNode = ({ plan, index }: NodeProps & { index: number }) => {
           value: payload.title || '',
         },
         {
-          key: 'deadline',
+          key: 'start',
           label: t('actionPlan.edit.start'),
           type: 'datetime-local',
           value: toDateTimeInput(start),
@@ -207,7 +208,14 @@ export const TaskNode = ({ plan, index }: NodeProps & { index: number }) => {
       onSaveEdit={(values) =>
         plan.editItem(index, {
           title: values.title.trim() || payload.title,
-          deadline: values.deadline || payload.deadline,
+          // Moved by hand: the old end and due time no longer apply
+          ...(values.start && values.start !== toDateTimeInput(start)
+            ? {
+                estimated_start_date: values.start,
+                estimated_end_date: undefined,
+                deadline: values.start,
+              }
+            : {}),
         })
       }
       openLabel={t('actionPlan.open.task')}

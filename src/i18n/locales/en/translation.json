@@ -2204,5 +2204,9 @@
       "previewMode": "View block",
       "codeMode": "Edit code"
     }
+  },
+  "insightsStats": {
+    "noData": "No data yet",
+    "ofTrackedTime": "Of your tracked time"
   }
 }

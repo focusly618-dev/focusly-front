@@ -55,6 +55,7 @@ export const Insights = () => {
             energyScore={stats.energyScore}
             breakHours={stats.breakHours}
             goldenWindow={stats.goldenWindow}
+            timeDistribution={stats.timeDistribution}
           />
         </Box>
 

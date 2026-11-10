@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Card, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import {
   AccessTime,
   CheckCircleOutline,
@@ -7,24 +8,37 @@ import {
   Psychology as BrainIcon,
 } from '@mui/icons-material';
 import { amber, brand, byMode, emerald, purple } from '@/styles/mui';
+import type { StatValue } from '../../useInsights.types';
 import type { StatsCardsProps } from './StatsCards.types';
 
 const iconSx = { fontSize: 20 } as const;
+const EMPTY_VALUE = '—';
+
+// What the page holds before the numbers arrive: not worth showing
+const NO_CHANGE = new Set(['', 'No data', '0%', '0 pts']);
+const changeOf = (stat: StatValue) =>
+  NO_CHANGE.has(stat.change) ? '' : stat.change;
 
 export const StatsCards: React.FC<StatsCardsProps> = ({
   totalFocusHours,
   taskCompletion,
   energyScore,
+  timeDistribution,
 }) => {
+  const { t } = useTranslation();
+  const noData = t('insightsStats.noData');
+
+  // Of the time worked, how much was deep work (breaks aren't work)
+  const worked = timeDistribution.filter((e) => e.name !== 'Rest/Breaks');
+  const workedMinutes = worked.reduce((sum, e) => sum + e.value, 0);
+  const deepMinutes = worked.find((e) => e.name === 'Deep Work')?.value ?? 0;
+
   const cards = [
     {
       title: 'TOTAL FOCUS',
-      value:
-        totalFocusHours.value === '0h 0m' ? '24h 15m' : totalFocusHours.value,
+      value: totalFocusHours.value,
       change:
-        totalFocusHours.change === 'No data'
-          ? '📈 +12% vs período anterior'
-          : totalFocusHours.change,
+        totalFocusHours.value === '0h 0m' ? noData : changeOf(totalFocusHours),
       icon: (
         <AccessTime sx={{ ...iconSx, color: byMode(brand.main, brand.dark) }} />
       ),
@@ -33,11 +47,8 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
     },
     {
       title: 'TAREAS COMPLETADAS',
-      value: taskCompletion.value === '0%' ? '85%' : taskCompletion.value,
-      change:
-        taskCompletion.change === '0%'
-          ? '📈 +5% vs período anterior'
-          : taskCompletion.change,
+      value: taskCompletion.value,
+      change: changeOf(taskCompletion),
       icon: (
         <CheckCircleOutline
           sx={{ ...iconSx, color: byMode(emerald[600], emerald[400]) }}
@@ -48,19 +59,19 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
     },
     {
       title: 'ENERGÍA PROMEDIO',
-      value: energyScore.value === 'N/A' ? '78/100' : energyScore.value,
-      change:
-        energyScore.change === '0 pts'
-          ? 'Rendimiento estable'
-          : energyScore.change,
+      value: energyScore.value === 'N/A' ? EMPTY_VALUE : energyScore.value,
+      change: energyScore.value === 'N/A' ? noData : changeOf(energyScore),
       icon: <Bolt sx={{ ...iconSx, color: amber[500] }} />,
       iconBg: byMode(amber[50], `${amber[950]}99`),
       changeColor: null,
     },
     {
       title: 'DEEP WORK RATIO',
-      value: '65%',
-      change: 'Rango óptimo de enfoque',
+      value:
+        workedMinutes > 0
+          ? `${Math.round((deepMinutes / workedMinutes) * 100)}%`
+          : EMPTY_VALUE,
+      change: workedMinutes > 0 ? t('insightsStats.ofTrackedTime') : noData,
       icon: (
         <BrainIcon
           sx={{ ...iconSx, color: byMode(purple[600], purple[400]) }}

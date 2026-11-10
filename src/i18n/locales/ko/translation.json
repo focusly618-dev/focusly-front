@@ -2203,5 +2203,9 @@
       "previewMode": "블록 보기",
       "codeMode": "코드 편집"
     }
+  },
+  "insightsStats": {
+    "noData": "아직 데이터가 없습니다",
+    "ofTrackedTime": "기록된 시간 중"
   }
 }

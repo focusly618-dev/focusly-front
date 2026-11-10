@@ -2204,5 +2204,9 @@
       "previewMode": "Ver bloque",
       "codeMode": "Editar código"
     }
+  },
+  "insightsStats": {
+    "noData": "Sin datos todavía",
+    "ofTrackedTime": "Del tiempo registrado"
   }
 }

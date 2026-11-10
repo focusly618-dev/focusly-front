@@ -19,7 +19,7 @@ import {
   patchNeedsCurrent,
 } from './eventBody';
 import type { ParsedLuminaAction } from '@/utils';
-import { normalizeEstimateTimer, parseDeadline } from './planFormat';
+import { normalizeEstimateTimer, parseDeadline, taskStart } from './planFormat';
 
 export { normalizeEstimateTimer, parseDeadline };
 
@@ -105,7 +105,9 @@ export const executeSingleAction = async (
     const estimateTimer = normalizeEstimateTimer(
       Number(action.payload.estimate_timer) || 1800,
     );
-    const deadline = parseDeadline(action.payload.deadline) ?? new Date();
+    const start = taskStart(action.payload) ?? new Date();
+    const deadline = parseDeadline(action.payload.deadline) ?? start;
+    const end = parseDeadline(action.payload.estimated_end_date);
 
     const rawSubtasks = action.payload.subtasks || [];
     const formattedSubtasks = rawSubtasks.map((s, idx) => {
@@ -157,11 +159,12 @@ export const executeSingleAction = async (
           // awareness at all, and migration_service.py only excludes a task
           // from that sweep once BOTH estimated_start_date AND
           // estimated_end_date are set — so we set both explicitly here,
-          // matching the deadline/duration we just asked for. That's what
+          // matching the start/duration we just asked for. That's what
           // makes the protection durable, not just true at creation time.
-          estimated_start_date: deadline.toISOString(),
-          estimated_end_date: new Date(
-            deadline.getTime() + estimateTimer * 60000,
+          estimated_start_date: start.toISOString(),
+          estimated_end_date: (end && end > start
+            ? end
+            : new Date(start.getTime() + estimateTimer * 60000)
           ).toISOString(),
           skip_scheduling: true,
         },

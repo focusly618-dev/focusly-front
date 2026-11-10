@@ -2203,5 +2203,9 @@
       "previewMode": "查看区块",
       "codeMode": "编辑代码"
     }
+  },
+  "insightsStats": {
+    "noData": "暂无数据",
+    "ofTrackedTime": "占已记录时间"
   }
 }

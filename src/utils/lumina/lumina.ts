@@ -73,6 +73,8 @@ function fallbackExtractPayload(
 
       const deadlineMatch = rawSegment.match(/"deadline"\s*:\s*"([^"]+)"/);
       const deadline = deadlineMatch ? deadlineMatch[1] : undefined;
+      const dateField = (name: string) =>
+        new RegExp(`"${name}"\\s*:\\s*"([^"]+)"`).exec(rawSegment)?.[1];
 
       let notes = '';
       // "notes_encrypted" is the field's former name, still present in AI
@@ -104,6 +106,8 @@ function fallbackExtractPayload(
         estimate_timer,
         priority_level,
         deadline,
+        estimated_start_date: dateField('estimated_start_date'),
+        estimated_end_date: dateField('estimated_end_date'),
         notes,
       };
     }
