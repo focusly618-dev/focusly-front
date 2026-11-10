@@ -15,7 +15,7 @@ export const BASE_EMPTY_TASK: Partial<Task> = {
 // as a last-resort saved title if AI title generation fails — new
 // workspaces start with an empty title so the user can type their own, or
 // let it be auto-generated from their content. See useWorkspaceForm.hook.ts.
-export const UNTITLED_WORKSPACE_TITLE = 'Untitled Strategic Plan';
+export const UNTITLED_WORKSPACE_TITLE = 'Untitled document';
 
 export const DEFAULT_WORKSPACE_DATA = {
   title: '',

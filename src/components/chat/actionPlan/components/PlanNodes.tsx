@@ -30,6 +30,7 @@ import {
   type ProjectView,
   type WorkspaceView,
 } from '../planModel';
+import { isCustomEmoji } from '@/components/ui';
 import {
   formatMinutes,
   formatSlot,
@@ -371,7 +372,13 @@ export const ProjectNode = ({
             status: view.index !== null ? plan.statuses[view.index] : 'pending',
           })}
       tone="project"
-      icon={view.emoji ? <span aria-hidden>{view.emoji}</span> : <FolderIcon />}
+      icon={
+        isCustomEmoji(view.emoji) ? (
+          <span aria-hidden>{view.emoji}</span>
+        ) : (
+          <FolderIcon />
+        )
+      }
       iconColor={view.color || BRAND}
       title={name}
       meta={

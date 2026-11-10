@@ -51,7 +51,7 @@
     "intelligence": "智能",
     "askAi": "询问 AI",
     "insights": "洞察",
-    "workspace": "工作区",
+    "workspace": "文档",
     "collections": "合集",
     "projects": "项目",
     "recentProjects": "最近",
@@ -64,7 +64,7 @@
     "logIn": "登录",
     "getStarted": "开始使用",
     "viewProfile": "查看个人资料",
-    "searchWorkspaces": "搜索工作区..."
+    "searchWorkspaces": "搜索文档..."
   },
   "settings": {
     "theme": {
@@ -125,9 +125,9 @@
     "week": "周",
     "day": "日",
     "today": "今天",
-    "awaitedTasks": "待处理任务",
+    "awaitedTasks": "当天任务",
     "viewAll": "查看全部",
-    "noAwaitedTasks": "没有待处理的任务",
+    "noAwaitedTasks": "当天没有任务",
     "freeTimeDesc": "享受你的空闲时间吧！",
     "optimizeSchedule": "优化日程",
     "plan": {
@@ -557,7 +557,7 @@
       "4": "紧急"
     },
     "untitledTask": "未命名任务",
-    "untitledNote": "未命名笔记",
+    "untitledNote": "无标题文档",
     "untitledDocument": "未命名文档",
     "task": {
       "subtaskCount_one": "{{count}} 个子任务",
@@ -1197,23 +1197,23 @@
     "loadingDocuments": "正在加载文档…",
     "toast": {
       "deleteProjectsTitle": "删除项目",
-      "deleteProjectsDesc": "确定要删除以下项目吗：{{names}}？其中的工作区会被解除关联，但不会被删除。",
+      "deleteProjectsDesc": "确定要删除以下项目吗：{{names}}？其中的文档会被解除关联，但不会被删除。",
       "projectsDeleted_one": "项目已删除",
       "projectsDeleted_other": "已删除 {{count}} 个项目",
       "projectsDeleteFailed_one": "有 {{count}} 个项目无法删除。",
       "projectsDeleteFailed_other": "有 {{count}} 个项目无法删除。",
-      "workspacesDeleted_one": "工作区已删除",
-      "workspacesDeleted_other": "已删除 {{count}} 个工作区",
-      "workspacesDeleteFailed_one": "有 {{count}} 个工作区无法删除。",
-      "workspacesDeleteFailed_other": "有 {{count}} 个工作区无法删除。",
+      "workspacesDeleted_one": "文档已删除",
+      "workspacesDeleted_other": "已删除 {{count}} 个文档",
+      "workspacesDeleteFailed_one": "有 {{count}} 个文档无法删除。",
+      "workspacesDeleteFailed_other": "有 {{count}} 个文档无法删除。",
       "deletedTitle": "项目已删除"
     },
     "breadcrumb": {
       "home": "首页",
-      "folderFallback": "文件夹"
+      "folderFallback": "项目"
     },
-    "newFolder": "新建文件夹",
-    "newWorkspace": "新建工作区",
+    "newFolder": "新建项目",
+    "newWorkspace": "新建文档",
     "status": {
       "recent": "最近",
       "empty": "空",
@@ -1222,19 +1222,19 @@
     "notesInside_one": "内含 {{count}} 篇笔记",
     "notesInside_other": "内含 {{count}} 篇笔记",
     "lastUpdated": "最后更新：",
-    "error": "加载工作区时出错。请重试。",
+    "error": "加载文档时出错。请重试。",
     "emptySearch": {
       "title": "未找到结果",
-      "desc": "没有与搜索词或筛选条件匹配的工作区。请调整筛选或搜索。"
+      "desc": "没有与搜索词或筛选条件匹配的文档。请调整筛选或搜索。"
     },
     "emptyFolder": {
-      "title": "还没有工作区",
-      "desc": "用轻量笔记整理你的战略规划。创建你的第一个工作区开始吧。",
-      "action": "创建工作区",
+      "title": "还没有文档",
+      "desc": "用轻量笔记整理你的战略规划。创建你的第一个文档开始吧。",
+      "action": "创建文档",
       "subAction": "创建笔记或文档"
     },
-    "recentWorkspace": "最近的工作区",
-    "emptyFolderSnippet": "此文件夹为空。创建你的第一个工作区开始吧...",
+    "recentWorkspace": "最近的文档",
+    "emptyFolderSnippet": "此项目为空。创建你的第一个文档开始吧...",
     "filterAndSortNotes": "筛选和排序笔记",
     "switchViewMode": "切换视图模式",
     "sortNotes": "排序笔记",
@@ -1245,38 +1245,38 @@
     "viewGallery": "画廊",
     "viewGrid": "网格",
     "viewList": "列表",
-    "deleteWorkspace": "删除工作区",
+    "deleteWorkspace": "删除文档",
     "deleteDialog": {
       "title": "删除项目",
       "description": "确定要删除项目“{{name}}”吗？",
       "bulkTitle": "删除 {{count}} 个项目",
       "bulkDescription": "确定要删除以下 {{count}} 个项目吗？",
-      "workspacesWarning_one": "此项目包含 {{count}} 个将被永久删除的工作区。",
-      "workspacesWarning_other": "此项目包含 {{count}} 个将被永久删除的工作区。",
-      "bulkWorkspacesWarning_one": "这些项目总共包含 {{count}} 个将被永久删除的工作区。",
-      "bulkWorkspacesWarning_other": "这些项目总共包含 {{count}} 个将被永久删除的工作区。",
+      "workspacesWarning_one": "此项目包含 {{count}} 个将被永久删除的文档。",
+      "workspacesWarning_other": "此项目包含 {{count}} 个将被永久删除的文档。",
+      "bulkWorkspacesWarning_one": "这些项目总共包含 {{count}} 个将被永久删除的文档。",
+      "bulkWorkspacesWarning_other": "这些项目总共包含 {{count}} 个将被永久删除的文档。",
       "noWorkspacesWarning": "此操作无法撤销。"
     },
     "deleteWorkspacesDialog": {
-      "title": "删除工作区",
+      "title": "删除文档",
       "description": "确定要删除“{{name}}”吗？",
-      "bulkTitle": "删除 {{count}} 个工作区",
-      "bulkDescription": "确定要删除以下 {{count}} 个工作区吗？",
-      "warning_one": "此工作区的内容将被永久删除。",
-      "warning_other": "{{count}} 个工作区的内容将被永久删除。"
+      "bulkTitle": "删除 {{count}} 个文档",
+      "bulkDescription": "确定要删除以下 {{count}} 个文档吗？",
+      "warning_one": "此文档的内容将被永久删除。",
+      "warning_other": "{{count}} 个文档的内容将被永久删除。"
     },
-    "renameFolder": "重命名文件夹",
+    "renameFolder": "重命名项目",
     "customizeStyle": "自定义样式",
-    "deleteFolder": "删除文件夹",
+    "deleteFolder": "删除项目",
     "customizeDialog": {
-      "title": "自定义文件夹"
+      "title": "自定义项目"
     },
-    "folderName": "文件夹名称",
+    "folderName": "项目名称",
     "iconShape": "图标形状",
     "filled": "填充",
     "solid": "实心",
     "outlined": "描边",
-    "folderColor": "文件夹颜色",
+    "folderColor": "项目颜色",
     "colorAccent": "强调色",
     "colors": {
       "Red": "红色",
@@ -1297,10 +1297,10 @@
       "Slate": "石板灰"
     },
     "createDialog": {
-      "title": "新建文件夹"
+      "title": "新建项目"
     },
     "namePlaceholder": "例如：冲刺计划、个人、市场营销",
-    "createFolder": "创建文件夹",
+    "createFolder": "创建项目",
     "editedOn": "编辑于 {{date}}",
     "card": {
       "created": "创建时间",
@@ -1323,12 +1323,12 @@
     }
   },
   "allProjectsModal": {
-    "title": "所有文件夹",
-    "subtitle": "浏览并选择要在资料库视图中显示的文件夹。",
-    "searchPlaceholder": "在 {{count}} 个文件夹中搜索...",
-    "emptyNoFolders": "还没有添加文件夹",
-    "emptyNoMatch": "没有匹配的文件夹",
-    "emptyNoFoldersDesc": "在资料库或侧边栏中创建自定义文件夹，开始分组你的计划。",
+    "title": "所有项目",
+    "subtitle": "浏览并选择要在资料库视图中显示的项目。",
+    "searchPlaceholder": "在 {{count}} 个项目中搜索...",
+    "emptyNoFolders": "还没有添加项目",
+    "emptyNoMatch": "没有匹配的项目",
+    "emptyNoFoldersDesc": "在资料库或侧边栏中创建自定义项目，开始分组你的计划。",
     "emptyNoMatchDesc": "试试调整搜索词。",
     "items": "{{count}} 项",
     "visible": "可见",
@@ -1338,21 +1338,21 @@
   },
   "createProjectModal": {
     "title": "创建新项目",
-    "subtitle": "选择名称和颜色，让你的工作区井然有序又美观。",
+    "subtitle": "选择名称和颜色，让你的文档井然有序又美观。",
     "projectName": "项目名称",
     "namePlaceholder": "例如：营销策略、第一季度计划...",
     "projectColor": "项目颜色",
     "create": "创建项目"
   },
   "updateProjectModal": {
-    "title": "编辑文件夹",
-    "subtitle": "修改文件夹名称和颜色，更好地整理你的工作区。",
-    "folderColor": "文件夹颜色",
-    "update": "更新文件夹"
+    "title": "编辑项目",
+    "subtitle": "修改项目名称和颜色，更好地整理你的文档。",
+    "folderColor": "项目颜色",
+    "update": "更新项目"
   },
   "templatesModal": {
     "title": "专业模板浏览器",
-    "subtitle": "选择一个模板并分配到目标项目文件夹",
+    "subtitle": "选择一个模板并分配到目标项目项目",
     "searchPlaceholder": "搜索模板...",
     "previewing": "正在预览",
     "liveRenderedPreview": "实时渲染预览",
@@ -1479,7 +1479,7 @@
       "createdOn": "创建于",
       "createdAt": "创建日期",
       "dueOn": "截止",
-      "workspacesProjects": "工作区 / 项目",
+      "workspacesProjects": "文档 / 项目",
       "backgroundColor": "背景颜色",
       "removeBackground": "移除背景",
       "removeBackgroundColor": "移除背景颜色",
@@ -1487,7 +1487,7 @@
       "custom": "自定义",
       "logTime": "记录时间",
       "noTimeLogged": "还没有记录时间。",
-      "titlePlaceholder": "完成季度绩效报告",
+      "titlePlaceholder": "任务名称",
       "palette": "调色板"
     },
     "projectRequired": {
@@ -1507,9 +1507,9 @@
         "titleRequiredDesc": "请输入任务标题。",
         "taskUpdated": "任务已更新",
         "workspaceTitleRequired": "需要标题",
-        "workspaceTitleRequiredDesc": "请输入工作区标题。",
-        "workspaceLinked": "工作区已创建并关联",
-        "workspaceCreateFailed": "无法创建工作区。请重试。"
+        "workspaceTitleRequiredDesc": "请输入文档标题。",
+        "workspaceLinked": "文档已创建并关联",
+        "workspaceCreateFailed": "无法创建文档。请重试。"
       },
       "titlePlaceholder": "任务标题...",
       "status": "状态",
@@ -1522,12 +1522,12 @@
       "duration": "时长",
       "setDuration": "设置时长",
       "linkedSpec": "关联的规格与 PRD",
-      "createWorkspace": "创建工作区",
-      "changeWorkspace": "更换工作区",
-      "linkWorkspace": "关联工作区",
-      "noWorkspaceLinked": "未关联工作区",
+      "createWorkspace": "创建文档",
+      "changeWorkspace": "更换文档",
+      "linkWorkspace": "关联文档",
+      "noWorkspaceLinked": "未关联文档",
       "clickToLink": "点击将此任务关联到规格文档或笔记",
-      "unlinkWorkspace": "取消关联工作区",
+      "unlinkWorkspace": "取消关联文档",
       "openWorkspace": "打开",
       "linked": "已关联",
       "descAndContext": "描述与背景",
@@ -1541,18 +1541,18 @@
       "cancel": "取消",
       "createTask": "创建任务",
       "saveChanges": "保存更改",
-      "createWorkspaceDialogDesc": "用任意标题创建一个新工作区，它会自动关联到此任务。",
+      "createWorkspaceDialogDesc": "用任意标题创建一个新文档，它会自动关联到此任务。",
       "project": "项目：",
-      "workspaceTitle": "工作区标题",
+      "workspaceTitle": "文档标题",
       "workspaceTitlePlaceholder": "例如：技术规格、需求、PRD...",
       "createAndLink": "创建并关联",
-      "searchWorkspacePlaceholder": "搜索工作区或笔记..."
+      "searchWorkspacePlaceholder": "搜索文档或笔记..."
     }
   },
   "projects": {
     "loading": "正在加载项目…",
     "newProject": "新建项目",
-    "createCleanFolder": "创建空白文件夹",
+    "createCleanFolder": "创建空白项目",
     "showingResultsFor": "“{{term}}”的 {{count}} 个结果",
     "showingCountOfTotal": "显示 {{current}}/{{total}} 个项目",
     "searchProjects": "搜索项目...",
@@ -1591,7 +1591,7 @@
       "focusView": "居中视图",
       "defaultView": "普通视图"
     },
-    "untitledNote": "无标题笔记",
+    "untitledNote": "无标题文档",
     "saving": "保存中",
     "saved": "已保存",
     "savingChanges": "正在保存更改...",
@@ -1992,7 +1992,7 @@
           "body": "点击空闲时段即可快速创建任务。拖动时间块可移到其他时间或日期，拉伸边缘可调整时长。"
         },
         "awaited": {
-          "title": "待安排任务",
+          "title": "当天任务",
           "body": "侧边面板汇集了还没有安排时间的待办任务，确保一个也不会被遗忘。"
         },
         "ai": {
@@ -2207,5 +2207,73 @@
   "insightsStats": {
     "noData": "暂无数据",
     "ofTrackedTime": "占已记录时间"
+  },
+  "ui": {
+    "taskHeader": {
+      "detail": "任务详情",
+      "new": "新建任务",
+      "notOwner": "你不是所有者，无法修改此任务"
+    },
+    "subtasks": {
+      "title": "子任务",
+      "addStep": "添加步骤...",
+      "loading": "加载中...",
+      "add": "添加",
+      "remove": "删除子任务"
+    },
+    "pagination": {
+      "showing": "显示 {{count}} / {{total}} 个任务"
+    },
+    "empty": {
+      "listTitle": "这里还没有内容",
+      "listDesc": "此列表中的任务将显示在这里。"
+    },
+    "priority": {
+      "urgent": "紧急"
+    },
+    "insights": {
+      "totalFocus": "总专注时间",
+      "tasksDone": "已完成任务",
+      "energy": "平均精力",
+      "deepWork": "深度工作占比",
+      "trendsTitle": "专注表现",
+      "trendsHelp": "我们将你的预估目标与实际记录的时间进行比较。",
+      "trendsSubtitle": "预估目标与实际时间",
+      "actual": "实际时间",
+      "target": "目标",
+      "goldenTitle": "黄金时段",
+      "analyzing": "分析中...",
+      "analyze": "用 AI 分析",
+      "optimizeTitle": "想优化你的时间吗？",
+      "scoreLast7": "生产力评分（最近 7 天）",
+      "activityMap": "活动地图",
+      "less": "少",
+      "more": "多",
+      "timeDistribution": "时间分布",
+      "focus": "专注",
+      "activity": "活动"
+    },
+    "chat": {
+      "today": "今天",
+      "yesterday": "昨天",
+      "older": "更早",
+      "userAsked": "你的请求",
+      "understanding": "正在理解你的需求",
+      "consulting": "正在查看你的 Focusly",
+      "consultingDesc": "文档、项目、任务和日历",
+      "structuring": "正在准备回答",
+      "actionsDetected": "{{count}} 项建议",
+      "thought": "Lumina 的思路",
+      "copy": "复制",
+      "regenerate": "重新生成",
+      "goToEnd": "转到末尾",
+      "askPlaceholder": "向 Lumina 提问，或输入 @ 添加上下文...",
+      "context": "上下文",
+      "attachTitle": "附加文件（PDF、DOCX、TXT、MD… 最大 3 MB）",
+      "attach": "附加",
+      "searchHistory": "搜索历史记录...",
+      "conversation": "Lumina 对话",
+      "newChat": "新建聊天"
+    }
   }
 }

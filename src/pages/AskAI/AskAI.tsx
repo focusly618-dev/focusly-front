@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import i18next from '@/i18n';
 import { safeHref } from '@/utils/sanitizeHtml';
 import {
   Box,
@@ -477,7 +478,7 @@ const formatUpdateTime = (dateStr: string) => {
     const yesterday = new Date(now);
     yesterday.setDate(now.getDate() - 1);
     if (d.toDateString() === yesterday.toDateString()) {
-      return 'Ayer';
+      return i18next.t('ui.chat.yesterday');
     }
 
     return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
@@ -613,9 +614,12 @@ export const AskAI: React.FC = () => {
     });
 
     const groups: { label: string; items: AIConversation[] }[] = [];
-    if (today.length > 0) groups.push({ label: 'Hoy', items: today });
-    if (yesterday.length > 0) groups.push({ label: 'Ayer', items: yesterday });
-    if (older.length > 0) groups.push({ label: 'Anteriores', items: older });
+    if (today.length > 0)
+      groups.push({ label: t('ui.chat.today'), items: today });
+    if (yesterday.length > 0)
+      groups.push({ label: t('ui.chat.yesterday'), items: yesterday });
+    if (older.length > 0)
+      groups.push({ label: t('ui.chat.older'), items: older });
     if (groups.length === 0 && filteredConversations.length > 0) {
       groups.push({ label: 'Conversaciones', items: filteredConversations });
     }
@@ -1601,7 +1605,7 @@ export const AskAI: React.FC = () => {
                                 >
                                   {isStreamingOrSubmitted
                                     ? 'El usuario está queriendo'
-                                    : 'El usuario requirió'}
+                                    : t('ui.chat.userAsked')}
                                   :
                                 </Box>
                                 <Box
@@ -1620,7 +1624,7 @@ export const AskAI: React.FC = () => {
                             <ChainOfThoughtContent>
                               <ChainOfThoughtStep
                                 status="complete"
-                                label="Comprendiendo objetivo del usuario"
+                                label={t('ui.chat.understanding')}
                                 description={`"${userIntent}"`}
                               />
                               <ChainOfThoughtStep
@@ -1629,8 +1633,8 @@ export const AskAI: React.FC = () => {
                                     ? 'active'
                                     : 'complete'
                                 }
-                                label="Consultando contexto de Focusly"
-                                description="Workspaces, proyectos, tareas y calendario"
+                                label={t('ui.chat.consulting')}
+                                description={t('ui.chat.consultingDesc')}
                               />
                               <ChainOfThoughtStep
                                 status={
@@ -1640,10 +1644,12 @@ export const AskAI: React.FC = () => {
                                       : 'pending'
                                     : 'complete'
                                 }
-                                label="Estructurando respuesta y acciones"
+                                label={t('ui.chat.structuring')}
                                 description={
                                   actions.length > 0
-                                    ? `${actions.length} acción(es) detectada(s)`
+                                    ? t('ui.chat.actionsDetected', {
+                                        count: actions.length,
+                                      })
                                     : undefined
                                 }
                               />
@@ -1682,7 +1688,7 @@ export const AskAI: React.FC = () => {
                                       mb: 0.75,
                                     }}
                                   >
-                                    Pensamiento de Lumina
+                                    {t('ui.chat.thought')}
                                   </Box>
                                   <div
                                     dangerouslySetInnerHTML={{
@@ -1782,7 +1788,7 @@ export const AskAI: React.FC = () => {
                             onClick={() => handleCopyMessage(displayCleanText)}
                           >
                             <CopyIcon sx={{ fontSize: 13 }} />
-                            Copiar
+                            {t('ui.chat.copy')}
                           </button>
                           <button
                             type="button"
@@ -1790,7 +1796,7 @@ export const AskAI: React.FC = () => {
                             onClick={() => handleRetry(msg.id)}
                           >
                             <RefreshIcon sx={{ fontSize: 13 }} />
-                            Regenerar
+                            {t('ui.chat.regenerate')}
                           </button>
                           <button
                             type="button"
@@ -1860,7 +1866,7 @@ export const AskAI: React.FC = () => {
                   },
                 }}
               >
-                Ir al final
+                {t('ui.chat.goToEnd')}
               </Button>
             </Tooltip>
           </Box>
@@ -1890,7 +1896,7 @@ export const AskAI: React.FC = () => {
             }}
           >
             {contextMenuLevel === 'main' && (
-              <>
+              <Box>
                 <Typography
                   variant="caption"
                   sx={{
@@ -1925,11 +1931,11 @@ export const AskAI: React.FC = () => {
                 >
                   🗂️ Workspaces / Espacios de Trabajo
                 </MenuItem>
-              </>
+              </Box>
             )}
 
             {contextMenuLevel === 'tasks' && (
-              <>
+              <Box>
                 <MenuItem
                   onClick={() => setContextMenuLevel('main')}
                   sx={{
@@ -2035,11 +2041,11 @@ export const AskAI: React.FC = () => {
                     )}
                   </>
                 )}
-              </>
+              </Box>
             )}
 
             {contextMenuLevel === 'calendar' && (
-              <>
+              <Box>
                 <MenuItem
                   onClick={() => setContextMenuLevel('main')}
                   sx={{
@@ -2108,11 +2114,11 @@ export const AskAI: React.FC = () => {
                     </MenuItem>
                   ))
                 )}
-              </>
+              </Box>
             )}
 
             {contextMenuLevel === 'workspaces' && (
-              <>
+              <Box>
                 <MenuItem
                   onClick={() => setContextMenuLevel('main')}
                   sx={{
@@ -2187,7 +2193,7 @@ export const AskAI: React.FC = () => {
                       </MenuItem>
                     ))
                 )}
-              </>
+              </Box>
             )}
           </Menu>
 
@@ -2421,7 +2427,7 @@ export const AskAI: React.FC = () => {
                       ? 'Has alcanzado el límite de 10 mensajes de prueba. Actualiza a Plus para continuar...'
                       : attachedFiles.length > 0
                         ? 'Pregunta sobre los archivos adjuntos...'
-                        : 'Pregúntale a Lumina lo que necesites o escribe @ para contexto...'
+                        : t('ui.chat.askPlaceholder')
                   }
                 />
               </PromptInputBody>
@@ -2453,14 +2459,14 @@ export const AskAI: React.FC = () => {
                     >
                       {selectedContext
                         ? `@${selectedContext.title}`
-                        : 'Contexto'}
+                        : t('ui.chat.context')}
                     </Box>
                   </PromptInputButton>
 
                   <PromptInputButton
                     onClick={handleOpenFile}
                     disabled={isProcessingFile || isTrialLimitReached}
-                    title="Adjuntar archivo (PDF, DOCX, TXT, MD, etc. - Máx. 3MB)"
+                    title={t('ui.chat.attachTitle')}
                   >
                     {isProcessingFile ? (
                       <CircularProgress size={14} sx={{ color: 'inherit' }} />
@@ -2471,7 +2477,7 @@ export const AskAI: React.FC = () => {
                       component="span"
                       sx={{ display: { xs: 'none', sm: 'inline' } }}
                     >
-                      Adjuntar
+                      {t('ui.chat.attach')}
                     </Box>
                   </PromptInputButton>
 
@@ -2585,21 +2591,6 @@ export const AskAI: React.FC = () => {
               ))}
             </Menu>
           </Box>
-
-          <Typography
-            variant="caption"
-            sx={{
-              display: 'block',
-              textAlign: 'center',
-              fontSize: '11px',
-              color: 'text.secondary',
-              mt: 1,
-              opacity: 0.75,
-            }}
-          >
-            Lumina puede cometer errores. Verifica la información importante
-            sobre tareas y horarios.
-          </Typography>
         </InputWrapper>
       </ChatAreaWrapper>
 
@@ -2666,7 +2657,7 @@ export const AskAI: React.FC = () => {
             <SearchIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 1 }} />
             <input
               type="text"
-              placeholder="Buscar en el historial..."
+              placeholder={t('ui.chat.searchHistory')}
               value={historySearch}
               onChange={(e) => setHistorySearch(e.target.value)}
               style={{
@@ -2812,7 +2803,7 @@ export const AskAI: React.FC = () => {
                         >
                           {c.id === activeConversationId && messages.length > 0
                             ? messages[messages.length - 1].text.slice(0, 50)
-                            : 'Conversación de Lumina'}
+                            : t('ui.chat.conversation')}
                         </Typography>
                       </Box>
                       <IconButton
@@ -2887,7 +2878,7 @@ export const AskAI: React.FC = () => {
                   },
                 }}
               >
-                Nuevo Chat
+                {t('ui.chat.newChat')}
               </Button>
             </Box>
           </Box>

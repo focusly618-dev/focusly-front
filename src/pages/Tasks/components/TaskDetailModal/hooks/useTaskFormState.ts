@@ -108,9 +108,20 @@ export const useTaskFormState = ({
   const [priority, setPriority] = useState<PriorityType>(initialState.priority);
   const [status, setStatus] = useState<Task['status']>(initialState.status);
   const [category, setCategory] = useState(initialState.category);
-  const [currentDate, setCurrentDate] = useState<Date | null>(
+  const [currentDate, setCurrentDateState] = useState<Date | null>(
     initialState.currentDate,
   );
+  // A new task follows its date: with one it's to do, without one it waits in
+  // the Inbox (the same rule it's saved with)
+  const setCurrentDate = (date: Date | null) => {
+    setCurrentDateState(date);
+    if (initialTask) return;
+    setStatus((previous) => {
+      if (date && previous === 'Backlog') return 'Todo';
+      if (!date && previous === 'Todo') return 'Backlog';
+      return previous;
+    });
+  };
   const [duration, setDuration] = useState(initialState.duration);
   const [realTime, setRealTime] = useState(initialState.realTime);
   const [color, setColor] = useState(initialState.color);

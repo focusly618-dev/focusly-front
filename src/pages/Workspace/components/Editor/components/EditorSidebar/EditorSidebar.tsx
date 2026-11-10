@@ -293,6 +293,9 @@ export const EditorSidebar = (props: EditorSidebarProps) => {
           aria-hidden="true"
           onClick={() => setIsRightSidebarOpen(false)}
           sx={{
+            // On a phone it covers the page; on a desktop a veil over the
+            // document only swallowed the click meant for it
+            display: { xs: 'block', md: 'none' },
             position: 'fixed',
             inset: 0,
             bgcolor: (currentTheme) =>

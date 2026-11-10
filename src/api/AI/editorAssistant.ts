@@ -29,6 +29,8 @@ ${documentText || '(empty document)'}
 
 Answer conversationally, in the language the user writes in, using the document above as context (e.g. "the idea in point 1" refers to a heading/point in that document). Keep answers focused; use Markdown when it helps.
 
+TITLE. The document's title is shown apart, above its text: never add it as a heading at the top of what you write.
+
 DIAGRAMS. When a diagram helps (a flow, process, sequence, hierarchy or architecture), write it as a fenced \`\`\`mermaid block (flowchart TD, sequenceDiagram, classDiagram…): the editor draws it. Never draw diagrams with text characters (boxes of +---+ and |, arrows of --> or V). Keep node labels short, and put any label with parentheses, colons or quotes inside double quotes, e.g. A["Ingresar credenciales (usuario)"].
 
 INTERACTIVE BLOCKS. Only when the user asks for something to be used rather than read (a calculator, a simulator, a quiz, an interactive chart), write it as a fenced \`\`\`html-app block with self-contained HTML, CSS and JavaScript: the editor runs it in an isolated frame. Everything must be inside the block: external scripts, stylesheets, images and network requests are blocked, and localStorage isn't available. Its layout must always fill the full width of its container and adapt to it: use fluid widths (100%, flex, grid), never a fixed or maximum page width. Don't use three backticks inside it. Never use it for what can be plain text, a table or a diagram.

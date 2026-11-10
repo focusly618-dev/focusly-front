@@ -48,9 +48,10 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
           },
         }}
       >
-        {activeMenuType === 'workspace' && activeWorkspaceItem && (
-          <>
+        {activeMenuType === 'workspace' &&
+          activeWorkspaceItem && [
             <MenuItem
+              key="0"
               onClick={() => {
                 handleDeleteWorkspace(activeWorkspaceItem.id);
                 handleCloseMenu();
@@ -61,13 +62,13 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
                 <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
               </ListItemIcon>
               <ListItemText>Delete note</ListItemText>
-            </MenuItem>
-          </>
-        )}
+            </MenuItem>,
+          ]}
 
-        {activeMenuType === 'group' && activeGroupItem && (
-          <>
+        {activeMenuType === 'group' &&
+          activeGroupItem && [
             <MenuItem
+              key="0"
               onClick={() => {
                 handleRenameGroupPrompt(activeGroupItem);
                 handleCloseMenu();
@@ -78,9 +79,10 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
                 <EditIcon fontSize="small" sx={{ color: 'text.secondary' }} />
               </ListItemIcon>
               <ListItemText>Rename Project</ListItemText>
-            </MenuItem>
-            <Divider sx={{ my: 0.5, opacity: 0.1 }} />
+            </MenuItem>,
+            <Divider key="divider" sx={{ my: 0.5, opacity: 0.1 }} />,
             <MenuItem
+              key="1"
               onClick={() => {
                 handleDeleteGroup(activeGroupItem.id);
                 handleCloseMenu();
@@ -91,9 +93,8 @@ export const SidebarMenus = ({ sidebar }: SidebarMenusProps) => {
                 <DeleteIcon fontSize="small" sx={{ color: 'error.main' }} />
               </ListItemIcon>
               <ListItemText>Delete Project</ListItemText>
-            </MenuItem>
-          </>
-        )}
+            </MenuItem>,
+          ]}
       </Menu>
     </>
   );

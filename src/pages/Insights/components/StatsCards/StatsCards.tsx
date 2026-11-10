@@ -35,7 +35,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
 
   const cards = [
     {
-      title: 'TOTAL FOCUS',
+      title: t('ui.insights.totalFocus'),
       value: totalFocusHours.value,
       change:
         totalFocusHours.value === '0h 0m' ? noData : changeOf(totalFocusHours),
@@ -46,7 +46,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
       changeColor: byMode(emerald[600], emerald[400]),
     },
     {
-      title: 'TAREAS COMPLETADAS',
+      title: t('ui.insights.tasksDone'),
       value: taskCompletion.value,
       change: changeOf(taskCompletion),
       icon: (
@@ -58,7 +58,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
       changeColor: byMode(emerald[600], emerald[400]),
     },
     {
-      title: 'ENERGÍA PROMEDIO',
+      title: t('ui.insights.energy'),
       value: energyScore.value === 'N/A' ? EMPTY_VALUE : energyScore.value,
       change: energyScore.value === 'N/A' ? noData : changeOf(energyScore),
       icon: <Bolt sx={{ ...iconSx, color: amber[500] }} />,
@@ -66,7 +66,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
       changeColor: null,
     },
     {
-      title: 'DEEP WORK RATIO',
+      title: t('ui.insights.deepWork'),
       value:
         workedMinutes > 0
           ? `${Math.round((deepMinutes / workedMinutes) * 100)}%`

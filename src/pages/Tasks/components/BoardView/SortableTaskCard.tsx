@@ -1,4 +1,5 @@
 import { useSortable } from '@dnd-kit/sortable';
+import { useTranslation } from 'react-i18next';
 import { CSS } from '@dnd-kit/utilities';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { Box, Typography, useTheme, alpha, lighten } from '@mui/material';
@@ -20,6 +21,7 @@ interface SortableTaskCardProps {
 
 export const SortableTaskCard = memo(
   ({ task, onClick, isOverlay, isDropTarget }: SortableTaskCardProps) => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
     const { user } = useAppSelector((state) => state.auth);
@@ -82,24 +84,27 @@ export const SortableTaskCard = memo(
       }
       if (task.priority_level >= 3) {
         return {
-          label: task.priority_level >= 4 ? 'Urgente' : 'Alta',
+          label:
+            task.priority_level >= 4
+              ? t('ui.priority.urgent')
+              : t('tasks.priority.high'),
           color: isDark ? '#f87171' : '#dc2626',
           bg: isDark ? 'rgba(239, 68, 68, 0.16)' : '#fee2e2',
         };
       }
       if (task.priority_level === 2) {
         return {
-          label: 'Media',
+          label: t('tasks.priority.medium'),
           color: isDark ? '#fbbf24' : '#d97706',
           bg: isDark ? 'rgba(245, 158, 11, 0.14)' : '#fef3c7',
         };
       }
       return {
-        label: 'Baja',
+        label: t('tasks.priority.low'),
         color: isDark ? '#34d399' : '#16a34a',
         bg: isDark ? 'rgba(16, 185, 129, 0.16)' : '#dcfce7',
       };
-    }, [task.priority_level, isDark]);
+    }, [task.priority_level, isDark, t]);
 
     return (
       <Box

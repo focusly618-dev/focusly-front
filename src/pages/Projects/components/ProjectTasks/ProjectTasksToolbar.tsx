@@ -389,6 +389,8 @@ export const ProjectTasksToolbar: React.FC<ProjectTasksToolbarProps> = ({
               width: 96,
               height: 6,
               borderRadius: 3,
+              // The default track is a tint of the brand: read as progress
+              bgcolor: 'action.selected',
               '& .MuiLinearProgress-bar': { bgcolor: BRAND },
             }}
           />

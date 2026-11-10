@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import {
   Box,
@@ -34,6 +35,7 @@ const formatValue = (value: number) => {
 };
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   if (active && payload && payload.length) {
     return (
@@ -84,7 +86,10 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
               }}
             />
             <Box component="span" sx={{ flex: 1 }}>
-              {item.name === 'actual' ? 'Tiempo Real' : 'Objetivo'}:
+              {item.name === 'actual'
+                ? t('ui.insights.actual')
+                : t('ui.insights.target')}
+              :
             </Box>
             <Box
               component="span"
@@ -106,6 +111,7 @@ const axisTickColor = (theme: Theme) =>
 export const ProductivityTrendsChart: React.FC<
   ProductivityTrendsChartProps
 > = ({ data }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   return (
@@ -138,12 +144,9 @@ export const ProductivityTrendsChart: React.FC<
               component="h3"
               sx={{ fontSize: '18px', fontWeight: 700, color: 'text.primary' }}
             >
-              Rendimiento de Enfoque
+              {t('ui.insights.trendsTitle')}
             </Typography>
-            <MuiTooltip
-              title="Comparamos tu objetivo (estimado) contra el tiempo real registrado."
-              arrow
-            >
+            <MuiTooltip title={t('ui.insights.trendsHelp')} arrow>
               <InfoIcon
                 sx={{ fontSize: 14, cursor: 'help', color: 'text.disabled' }}
               />
@@ -152,7 +155,7 @@ export const ProductivityTrendsChart: React.FC<
           <Typography
             sx={{ fontSize: '12px', mt: 0.25, color: 'text.secondary' }}
           >
-            Objetivo Estimado vs. Tiempo Real
+            {t('ui.insights.trendsSubtitle')}
           </Typography>
         </Box>
 
@@ -176,7 +179,7 @@ export const ProductivityTrendsChart: React.FC<
                 bgcolor: byMode(brand.main, brand.dark),
               }}
             />
-            <span>Tiempo Real</span>
+            <span>{t('ui.insights.actual')}</span>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
             <Box
@@ -187,7 +190,7 @@ export const ProductivityTrendsChart: React.FC<
                 bgcolor: 'divider',
               }}
             />
-            <span>Objetivo</span>
+            <span>{t('ui.insights.target')}</span>
           </Box>
         </Box>
       </Box>

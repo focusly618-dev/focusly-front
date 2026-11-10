@@ -743,7 +743,14 @@ export const TaskProperties = ({
             {durationInputError && (
               <Typography
                 variant="caption"
-                sx={{ color: 'error.main', fontSize: '10px', ml: 0.5 }}
+                sx={{
+                  // Over the gap below: showing it mustn't move the form
+                  position: 'absolute',
+                  color: 'error.main',
+                  fontSize: '10px',
+                  lineHeight: 1.3,
+                  ml: 0.5,
+                }}
               >
                 {durationInputError}
               </Typography>
@@ -797,10 +804,9 @@ export const TaskProperties = ({
                 open={timePickerOpen}
                 onClose={() => setTimePickerOpen(false)}
                 value={currentDate}
-                onChange={(newValue) => {
-                  setCurrentDate(newValue);
-                  setTimePickerOpen(false);
-                }}
+                // Stays open across hour, minute and AM/PM, until OK
+                closeOnSelect={false}
+                onChange={(newValue) => setCurrentDate(newValue)}
                 slotProps={{
                   textField: {
                     sx: {

@@ -289,7 +289,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     viewName,
     currentDate,
     locale,
-    t('calendar.today', 'Hoy'),
+    // The "Today" button is right beside it
+    format(currentDate, 'd MMM', { locale }),
   );
   const onCurrentPeriod = isCurrentPeriod(viewName, currentDate);
 
@@ -888,6 +889,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         onClose={() => setIsWeeklyPlannerOpen(false)}
         tasks={tasks}
         currentDate={currentDate}
+        events={events}
       />
 
       <AwaitedTasksModal

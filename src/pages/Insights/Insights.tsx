@@ -1,5 +1,4 @@
-import { Box, Fab } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Box } from '@mui/material';
 import { PageContainer } from './Insights.styles';
 import { useInsights } from './useInsights.hook';
 import { InsightsHeader } from './components/InsightsHeader';
@@ -73,25 +72,6 @@ export const Insights = () => {
           />
         </Box>
       </Box>
-
-      {/* Floating Action Button */}
-      <Fab
-        color="primary"
-        aria-label="add"
-        sx={{
-          position: 'fixed',
-          bottom: 32,
-          right: 32,
-          boxShadow: '0 4px 14px rgba(0, 135, 103, 0.35)',
-          bgcolor: 'primary.main',
-          color: '#ffffff',
-          '&:hover': {
-            bgcolor: 'primary.dark',
-          },
-        }}
-      >
-        <AddIcon />
-      </Fab>
     </PageContainer>
   );
 };

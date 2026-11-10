@@ -34,10 +34,18 @@ import {
   Visibility as ReviewIcon,
   AccessTime as PendingIcon,
   CheckCircleOutline as DoneIcon,
+  InboxOutlined as BacklogIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 const COLUMNS = [
+  {
+    id: 'Backlog',
+    title: 'Backlog',
+    color: '#64748b',
+    darkColor: '#94a3b8',
+    Icon: BacklogIcon,
+  },
   {
     id: 'Todo',
     title: 'To Do',
@@ -78,6 +86,8 @@ const COLUMNS = [
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getColumnTitle = (id: string, fallback: string, t: any) => {
   switch (id) {
+    case 'Backlog':
+      return t('tasks.status.backlog', fallback);
     case 'Todo':
       return t('tasks.status.todo', fallback);
     case 'Planning':
@@ -96,7 +106,8 @@ const getColumnTitle = (id: string, fallback: string, t: any) => {
 type ColumnId = (typeof COLUMNS)[number]['id'];
 
 const mapToColumnStatus = (status?: string): ColumnId => {
-  if (!status || status === 'Todo' || status === 'Backlog') return 'Todo';
+  if (status === 'Backlog') return 'Backlog';
+  if (!status || status === 'Todo') return 'Todo';
   if (status === 'Planning' || status === 'Scheduled') return 'Planning';
   if (status === 'Review' || status === 'in_review') return 'Review';
   if (

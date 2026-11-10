@@ -51,7 +51,7 @@
     "intelligence": "Intelligenz",
     "askAi": "KI fragen",
     "insights": "Insights",
-    "workspace": "Arbeitsbereiche",
+    "workspace": "Dokumente",
     "collections": "Sammlungen",
     "projects": "Projekte",
     "recentProjects": "Zuletzt",
@@ -64,7 +64,7 @@
     "logIn": "Anmelden",
     "getStarted": "Loslegen",
     "viewProfile": "Profil ansehen",
-    "searchWorkspaces": "Arbeitsbereiche durchsuchen..."
+    "searchWorkspaces": "Dokumente durchsuchen..."
   },
   "settings": {
     "theme": {
@@ -125,9 +125,9 @@
     "week": "Woche",
     "day": "Tag",
     "today": "Heute",
-    "awaitedTasks": "Anstehende Aufgaben",
+    "awaitedTasks": "Aufgaben des Tages",
     "viewAll": "Alle anzeigen",
-    "noAwaitedTasks": "Keine anstehenden Aufgaben",
+    "noAwaitedTasks": "Keine Aufgaben an diesem Tag",
     "freeTimeDesc": "Genieß deine freie Zeit!",
     "optimizeSchedule": "Zeitplan optimieren",
     "plan": {
@@ -494,7 +494,7 @@
       "someFailed": "Einige Elemente konnten nicht erstellt werden."
     },
     "summary": {
-      "projects_one": "{{count}} Projekt",
+      "projects_one": "{{count}} Projekten",
       "projects_other": "{{count}} Projekte",
       "documents_one": "{{count}} Dokument",
       "documents_other": "{{count}} Dokumente",
@@ -557,7 +557,7 @@
       "4": "Dringend"
     },
     "untitledTask": "Unbenannte Aufgabe",
-    "untitledNote": "Unbenannte Notiz",
+    "untitledNote": "Unbenanntes Dokument",
     "untitledDocument": "Unbenanntes Dokument",
     "task": {
       "subtaskCount_one": "{{count}} Unteraufgabe",
@@ -1197,23 +1197,23 @@
     "loadingDocuments": "Dokumente werden geladen…",
     "toast": {
       "deleteProjectsTitle": "Projekte entfernen",
-      "deleteProjectsDesc": "Möchtest du die folgenden Projekte wirklich löschen: {{names}}? Die enthaltenen Arbeitsbereiche werden getrennt, aber nicht gelöscht.",
+      "deleteProjectsDesc": "Möchtest du die folgenden Projekte wirklich löschen: {{names}}? Die enthaltenen Dokumente werden getrennt, aber nicht gelöscht.",
       "projectsDeleted_one": "Projekt gelöscht",
       "projectsDeleted_other": "{{count}} Projekte gelöscht",
-      "projectsDeleteFailed_one": "{{count}} Projekt konnte nicht gelöscht werden.",
+      "projectsDeleteFailed_one": "{{count}} Projekten konnte nicht gelöscht werden.",
       "projectsDeleteFailed_other": "{{count}} Projekte konnten nicht gelöscht werden.",
-      "workspacesDeleted_one": "Arbeitsbereich gelöscht",
-      "workspacesDeleted_other": "{{count}} Arbeitsbereiche gelöscht",
-      "workspacesDeleteFailed_one": "{{count}} Arbeitsbereich konnte nicht gelöscht werden.",
-      "workspacesDeleteFailed_other": "{{count}} Arbeitsbereiche konnten nicht gelöscht werden.",
+      "workspacesDeleted_one": "Dokument gelöscht",
+      "workspacesDeleted_other": "{{count}} Dokumente gelöscht",
+      "workspacesDeleteFailed_one": "{{count}} Dokument konnte nicht gelöscht werden.",
+      "workspacesDeleteFailed_other": "{{count}} Dokumente konnten nicht gelöscht werden.",
       "deletedTitle": "Projekte gelöscht"
     },
     "breadcrumb": {
       "home": "Start",
-      "folderFallback": "Ordner"
+      "folderFallback": "Projekt"
     },
-    "newFolder": "Neuer Ordner",
-    "newWorkspace": "Neuer Arbeitsbereich",
+    "newFolder": "Neues Projekt",
+    "newWorkspace": "Neuer Dokument",
     "status": {
       "recent": "Zuletzt",
       "empty": "Leer",
@@ -1222,19 +1222,19 @@
     "notesInside_one": "{{count}} Notiz darin",
     "notesInside_other": "{{count}} Notizen darin",
     "lastUpdated": "Zuletzt aktualisiert: ",
-    "error": "Fehler beim Laden der Arbeitsbereiche. Bitte versuche es erneut.",
+    "error": "Fehler beim Laden der Dokumente. Bitte versuche es erneut.",
     "emptySearch": {
       "title": "Keine Ergebnisse",
-      "desc": "Kein Arbeitsbereich passt zu deiner Suche oder deinem Filter. Passe Filter oder Suche an."
+      "desc": "Kein Dokument passt zu deiner Suche oder deinem Filter. Passe Filter oder Suche an."
     },
     "emptyFolder": {
-      "title": "Noch keine Arbeitsbereiche",
-      "desc": "Schlanke Notizen für deine strategische Planung. Erstelle deinen ersten Arbeitsbereich, um loszulegen.",
-      "action": "Arbeitsbereich erstellen",
+      "title": "Noch keine Dokumente",
+      "desc": "Schlanke Notizen für deine strategische Planung. Erstelle dein erstes Dokument, um loszulegen.",
+      "action": "Dokument erstellen",
       "subAction": "Erstelle eine Notiz oder ein Dokument"
     },
     "recentWorkspace": "ZULETZT GEÖFFNETER ARBEITSBEREICH",
-    "emptyFolderSnippet": "Dieser Ordner ist leer. Erstelle deinen ersten Arbeitsbereich, um loszulegen...",
+    "emptyFolderSnippet": "Dieses Projekt ist leer. Erstelle dein erstes Dokument, um loszulegen...",
     "filterAndSortNotes": "Notizen filtern & sortieren",
     "switchViewMode": "Ansicht wechseln",
     "sortNotes": "Notizen sortieren",
@@ -1245,38 +1245,38 @@
     "viewGallery": "Galerie",
     "viewGrid": "Raster",
     "viewList": "Liste",
-    "deleteWorkspace": "Arbeitsbereich löschen",
+    "deleteWorkspace": "Dokument löschen",
     "deleteDialog": {
       "title": "Projekt löschen",
       "description": "Möchtest du das Projekt „{{name}}“ wirklich löschen?",
       "bulkTitle": "{{count}} Projekte löschen",
       "bulkDescription": "Möchtest du die folgenden {{count}} Projekte wirklich löschen?",
-      "workspacesWarning_one": "Dieses Projekt enthält {{count}} Arbeitsbereich, der endgültig gelöscht wird.",
-      "workspacesWarning_other": "Dieses Projekt enthält {{count}} Arbeitsbereiche, die endgültig gelöscht werden.",
-      "bulkWorkspacesWarning_one": "Diese Projekte enthalten insgesamt {{count}} Arbeitsbereich, der endgültig gelöscht wird.",
-      "bulkWorkspacesWarning_other": "Diese Projekte enthalten insgesamt {{count}} Arbeitsbereiche, die endgültig gelöscht werden.",
+      "workspacesWarning_one": "Dieses Projekt enthält {{count}} Dokument, der endgültig gelöscht wird.",
+      "workspacesWarning_other": "Dieses Projekt enthält {{count}} Dokumente, die endgültig gelöscht werden.",
+      "bulkWorkspacesWarning_one": "Diese Projekte enthalten insgesamt {{count}} Dokument, der endgültig gelöscht wird.",
+      "bulkWorkspacesWarning_other": "Diese Projekte enthalten insgesamt {{count}} Dokumente, die endgültig gelöscht werden.",
       "noWorkspacesWarning": "Diese Aktion kann nicht rückgängig gemacht werden."
     },
     "deleteWorkspacesDialog": {
-      "title": "Arbeitsbereich löschen",
+      "title": "Dokument löschen",
       "description": "Möchtest du „{{name}}“ wirklich löschen?",
-      "bulkTitle": "{{count}} Arbeitsbereiche löschen",
-      "bulkDescription": "Möchtest du die folgenden {{count}} Arbeitsbereiche wirklich löschen?",
-      "warning_one": "Der Inhalt dieses Arbeitsbereichs wird endgültig gelöscht.",
-      "warning_other": "Der Inhalt von {{count}} Arbeitsbereichen wird endgültig gelöscht."
+      "bulkTitle": "{{count}} Dokumente löschen",
+      "bulkDescription": "Möchtest du die folgenden {{count}} Dokumente wirklich löschen?",
+      "warning_one": "Der Inhalt dieses Dokuments wird endgültig gelöscht.",
+      "warning_other": "Der Inhalt von {{count}} Dokumenten wird endgültig gelöscht."
     },
-    "renameFolder": "Ordner umbenennen",
+    "renameFolder": "Projekt umbenennen",
     "customizeStyle": "Stil anpassen",
-    "deleteFolder": "Ordner löschen",
+    "deleteFolder": "Projekt löschen",
     "customizeDialog": {
-      "title": "Ordner anpassen"
+      "title": "Projekt anpassen"
     },
-    "folderName": "Ordnername",
+    "folderName": "Projektename",
     "iconShape": "Symbolform",
     "filled": "Gefüllt",
     "solid": "Vollfarbig",
     "outlined": "Kontur",
-    "folderColor": "Ordnerfarbe",
+    "folderColor": "Projektfarbe",
     "colorAccent": "Akzentfarbe",
     "colors": {
       "Red": "Rot",
@@ -1297,10 +1297,10 @@
       "Slate": "Schiefer"
     },
     "createDialog": {
-      "title": "Neuen Ordner erstellen"
+      "title": "Neuen Projekt erstellen"
     },
     "namePlaceholder": "z. B. Sprintplan, Privat, Marketing",
-    "createFolder": "Ordner erstellen",
+    "createFolder": "Projekt erstellen",
     "editedOn": "Bearbeitet am {{date}}",
     "card": {
       "created": "Erstellt",
@@ -1323,12 +1323,12 @@
     }
   },
   "allProjectsModal": {
-    "title": "Alle Ordner",
-    "subtitle": "Durchsuche und wähle Ordner für deine Bibliotheksansicht.",
-    "searchPlaceholder": "In {{count}} Ordnern suchen...",
-    "emptyNoFolders": "Noch keine Ordner hinzugefügt",
-    "emptyNoMatch": "Keine passenden Ordner",
-    "emptyNoFoldersDesc": "Erstelle einen eigenen Ordner in der Bibliothek oder Seitenleiste, um deine Pläne zu gruppieren.",
+    "title": "Alle Projekte",
+    "subtitle": "Durchsuche und wähle Projekte für deine Bibliotheksansicht.",
+    "searchPlaceholder": "In {{count}} Projekten suchen...",
+    "emptyNoFolders": "Noch keine Projekte hinzugefügt",
+    "emptyNoMatch": "Keine passenden Projekte",
+    "emptyNoFoldersDesc": "Erstelle ein eigenes Projekt in der Bibliothek oder Seitenleiste, um deine Pläne zu gruppieren.",
     "emptyNoMatchDesc": "Passe deine Suchbegriffe an.",
     "items": "{{count}} Elemente",
     "visible": "Sichtbar",
@@ -1338,17 +1338,17 @@
   },
   "createProjectModal": {
     "title": "Neues Projekt erstellen",
-    "subtitle": "Wähle einen Namen und eine Farbe, damit deine Arbeitsbereiche übersichtlich und schön bleiben.",
+    "subtitle": "Wähle einen Namen und eine Farbe, damit deine Dokumente übersichtlich und schön bleiben.",
     "projectName": "Projektname",
     "namePlaceholder": "z. B. Marketingstrategie, Q1-Pläne...",
     "projectColor": "Projektfarbe",
     "create": "Projekt erstellen"
   },
   "updateProjectModal": {
-    "title": "Ordner bearbeiten",
-    "subtitle": "Ändere Name und Farbe des Ordners, um deine Arbeitsbereiche besser zu ordnen.",
-    "folderColor": "Ordnerfarbe",
-    "update": "Ordner aktualisieren"
+    "title": "Projekt bearbeiten",
+    "subtitle": "Ändere Name und Farbe des Projekts, um deine Dokumente besser zu ordnen.",
+    "folderColor": "Projektfarbe",
+    "update": "Projekt aktualisieren"
   },
   "templatesModal": {
     "title": "Profi-Vorlagen entdecken",
@@ -1479,7 +1479,7 @@
       "createdOn": "Erstellt in",
       "createdAt": "Erstellt am",
       "dueOn": "Fällig",
-      "workspacesProjects": "Arbeitsbereiche / Projekte",
+      "workspacesProjects": "Dokumente / Projekte",
       "backgroundColor": "Hintergrundfarbe",
       "removeBackground": "Hintergrund entfernen",
       "removeBackgroundColor": "Hintergrundfarbe entfernen",
@@ -1487,7 +1487,7 @@
       "custom": "Benutzerdefiniert",
       "logTime": "Zeit erfassen",
       "noTimeLogged": "Noch keine Zeit erfasst.",
-      "titlePlaceholder": "Quartals-Leistungsbericht fertigstellen",
+      "titlePlaceholder": "Name der Aufgabe",
       "palette": "Farbpalette"
     },
     "projectRequired": {
@@ -1507,9 +1507,9 @@
         "titleRequiredDesc": "Gib einen Titel für die Aufgabe ein.",
         "taskUpdated": "Aufgabe aktualisiert",
         "workspaceTitleRequired": "Titel erforderlich",
-        "workspaceTitleRequiredDesc": "Gib einen Titel für den Arbeitsbereich ein.",
-        "workspaceLinked": "Arbeitsbereich erstellt und verknüpft",
-        "workspaceCreateFailed": "Der Arbeitsbereich konnte nicht erstellt werden. Versuche es erneut."
+        "workspaceTitleRequiredDesc": "Gib einen Titel für den Dokument ein.",
+        "workspaceLinked": "Dokument erstellt und verknüpft",
+        "workspaceCreateFailed": "Der Dokument konnte nicht erstellt werden. Versuche es erneut."
       },
       "titlePlaceholder": "Aufgabentitel...",
       "status": "Status",
@@ -1522,12 +1522,12 @@
       "duration": "Dauer",
       "setDuration": "Dauer festlegen",
       "linkedSpec": "Verknüpfte Spezifikation & PRD",
-      "createWorkspace": "Arbeitsbereich erstellen",
-      "changeWorkspace": "Arbeitsbereich wechseln",
-      "linkWorkspace": "Arbeitsbereich verknüpfen",
-      "noWorkspaceLinked": "Kein Arbeitsbereich verknüpft",
+      "createWorkspace": "Dokument erstellen",
+      "changeWorkspace": "Dokument wechseln",
+      "linkWorkspace": "Dokument verknüpfen",
+      "noWorkspaceLinked": "Kein Dokument verknüpft",
       "clickToLink": "Klicke, um diese Aufgabe mit einer Spezifikation oder Notiz zu verknüpfen",
-      "unlinkWorkspace": "Arbeitsbereich trennen",
+      "unlinkWorkspace": "Dokument trennen",
       "openWorkspace": "Öffnen",
       "linked": "Verknüpft",
       "descAndContext": "Beschreibung & Kontext",
@@ -1541,18 +1541,18 @@
       "cancel": "Abbrechen",
       "createTask": "Aufgabe erstellen",
       "saveChanges": "Änderungen speichern",
-      "createWorkspaceDialogDesc": "Erstelle einen neuen Arbeitsbereich mit beliebigem Titel. Er wird automatisch mit dieser Aufgabe verknüpft.",
+      "createWorkspaceDialogDesc": "Erstelle einen neuen Dokument mit beliebigem Titel. Er wird automatisch mit dieser Aufgabe verknüpft.",
       "project": "Projekt:",
-      "workspaceTitle": "Titel des Arbeitsbereichs",
+      "workspaceTitle": "Titel des Dokuments",
       "workspaceTitlePlaceholder": "z. B. Technische Spezifikationen, Anforderungen, PRD...",
       "createAndLink": "Erstellen und verknüpfen",
-      "searchWorkspacePlaceholder": "Arbeitsbereich oder Notiz suchen..."
+      "searchWorkspacePlaceholder": "Dokument oder Notiz suchen..."
     }
   },
   "projects": {
     "loading": "Projekte werden geladen…",
     "newProject": "Neues Projekt",
-    "createCleanFolder": "Leeren Ordner erstellen",
+    "createCleanFolder": "Leeres Projekt erstellen",
     "showingResultsFor": "{{count}} Ergebnisse für „{{term}}“",
     "showingCountOfTotal": "{{current}} von {{total}} Projekten angezeigt",
     "searchProjects": "Projekte suchen...",
@@ -1592,7 +1592,7 @@
       "focusView": "Zentrierte Ansicht",
       "defaultView": "Normale Ansicht"
     },
-    "untitledNote": "Unbenannte Notiz",
+    "untitledNote": "Unbenanntes Dokument",
     "saving": "wird gespeichert",
     "saved": "gespeichert",
     "savingChanges": "Änderungen werden gespeichert...",
@@ -1993,7 +1993,7 @@
           "body": "Klicke auf einen freien Slot, um schnell eine Aufgabe zu erstellen. Ziehe einen Block auf eine andere Uhrzeit oder einen anderen Tag und zieh an seinem Rand, um die Dauer zu ändern."
         },
         "awaited": {
-          "title": "Wartende Aufgaben",
+          "title": "Aufgaben des Tages",
           "body": "Die Seitenleiste sammelt offene Aufgaben, die noch keine Uhrzeit haben, damit keine vergessen wird."
         },
         "ai": {
@@ -2208,5 +2208,73 @@
   "insightsStats": {
     "noData": "Noch keine Daten",
     "ofTrackedTime": "Deiner erfassten Zeit"
+  },
+  "ui": {
+    "taskHeader": {
+      "detail": "Aufgabendetails",
+      "new": "Neue Aufgabe",
+      "notOwner": "Du kannst diese Aufgabe nicht ändern, da sie dir nicht gehört"
+    },
+    "subtasks": {
+      "title": "Unteraufgaben",
+      "addStep": "Schritt hinzufügen...",
+      "loading": "Wird geladen...",
+      "add": "Hinzufügen",
+      "remove": "Unteraufgabe löschen"
+    },
+    "pagination": {
+      "showing": "{{count}} von {{total}} Aufgaben"
+    },
+    "empty": {
+      "listTitle": "Hier ist noch nichts",
+      "listDesc": "Aufgaben dieser Liste erscheinen hier."
+    },
+    "priority": {
+      "urgent": "Dringend"
+    },
+    "insights": {
+      "totalFocus": "FOKUS GESAMT",
+      "tasksDone": "ERLEDIGTE AUFGABEN",
+      "energy": "DURCHSCHNITTLICHE ENERGIE",
+      "deepWork": "DEEP-WORK-ANTEIL",
+      "trendsTitle": "Fokusleistung",
+      "trendsHelp": "Wir vergleichen dein geschätztes Ziel mit der tatsächlich erfassten Zeit.",
+      "trendsSubtitle": "Geschätztes Ziel vs. tatsächliche Zeit",
+      "actual": "Tatsächliche Zeit",
+      "target": "Ziel",
+      "goldenTitle": "Goldene Stunden",
+      "analyzing": "Wird analysiert...",
+      "analyze": "Mit KI analysieren",
+      "optimizeTitle": "Möchtest du deine Zeit optimieren?",
+      "scoreLast7": "PRODUKTIVITÄTSWERT (LETZTE 7 TAGE)",
+      "activityMap": "Aktivitätskarte",
+      "less": "Weniger",
+      "more": "Mehr",
+      "timeDistribution": "Zeitverteilung",
+      "focus": "FOKUS",
+      "activity": "AKTIVITÄT"
+    },
+    "chat": {
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "older": "Früher",
+      "userAsked": "Du hast gefragt",
+      "understanding": "Verstehe, was du brauchst",
+      "consulting": "Prüfe dein Focusly",
+      "consultingDesc": "Dokumente, Projekte, Aufgaben und Kalender",
+      "structuring": "Antwort wird vorbereitet",
+      "actionsDetected": "{{count}} vorgeschlagen",
+      "thought": "Luminas Überlegungen",
+      "copy": "Kopieren",
+      "regenerate": "Neu erzeugen",
+      "goToEnd": "Zum Ende",
+      "askPlaceholder": "Frag Lumina etwas oder tippe @ für Kontext...",
+      "context": "Kontext",
+      "attachTitle": "Datei anhängen (PDF, DOCX, TXT, MD… max. 3 MB)",
+      "attach": "Anhängen",
+      "searchHistory": "Verlauf durchsuchen...",
+      "conversation": "Lumina-Unterhaltung",
+      "newChat": "Neuer Chat"
+    }
   }
 }

@@ -53,6 +53,7 @@ export const TasksContentView = ({
   handleTaskClick,
   updateTask,
   deleteTasks,
+  searchTerm,
   setSearchTerm,
   isAIScheduleEnabled,
   onStartFocus,
@@ -89,6 +90,8 @@ export const TasksContentView = ({
 
   const showEmptyStateTasks = tasks.length === 0;
   const showEmptyStateFiltered = filteredTasks.length === 0;
+  // No search and no status picked: the list is just empty
+  const isPlainEmpty = !searchTerm?.trim() && activeTab?.id === 'All';
 
   return (
     <AnimatedContainer
@@ -123,13 +126,16 @@ export const TasksContentView = ({
         />
       ) : !isListView && showEmptyStateFiltered ? (
         <EmptyState
-          title={t('tasks.empty.noMatchTitle', 'No tasks match your search')}
-          description={t(
-            'tasks.empty.noMatchDesc',
-            "Try a different keyword or filter to find what you're looking for, or create a new task above.",
-          )}
-          actionText={t('tasks.empty.clearFilters', 'Clear all filters')}
-          onAction={() => setSearchTerm('')}
+          title={
+            isPlainEmpty
+              ? t('ui.empty.listTitle')
+              : t('tasks.empty.noMatchTitle')
+          }
+          description={
+            isPlainEmpty ? t('ui.empty.listDesc') : t('tasks.empty.noMatchDesc')
+          }
+          actionText={isPlainEmpty ? undefined : t('tasks.empty.clearFilters')}
+          onAction={isPlainEmpty ? undefined : () => setSearchTerm('')}
         />
       ) : viewMode === 'workload' ? (
         <WorkloadDashboard filteredTasks={filteredTasks} />
@@ -210,16 +216,20 @@ export const TasksContentView = ({
                 }}
               >
                 <EmptyState
-                  title={t(
-                    'tasks.empty.noMatchTitle',
-                    'No hay tareas que coincidan con la búsqueda',
-                  )}
-                  description={t(
-                    'tasks.empty.noMatchDesc',
-                    'Prueba con otra palabra clave o limpia los filtros para ver tus tareas.',
-                  )}
-                  actionText={t('tasks.empty.clearFilters', 'Limpiar filtros')}
-                  onAction={() => setSearchTerm('')}
+                  title={
+                    isPlainEmpty
+                      ? t('ui.empty.listTitle')
+                      : t('tasks.empty.noMatchTitle')
+                  }
+                  description={
+                    isPlainEmpty
+                      ? t('ui.empty.listDesc')
+                      : t('tasks.empty.noMatchDesc')
+                  }
+                  actionText={
+                    isPlainEmpty ? undefined : t('tasks.empty.clearFilters')
+                  }
+                  onAction={isPlainEmpty ? undefined : () => setSearchTerm('')}
                 />
               </Box>
             ) : (
@@ -392,8 +402,10 @@ export const TasksContentView = ({
                   fontWeight: 500,
                 }}
               >
-                Mostrando {paginatedTasks.length} de {displayedTasks.length}{' '}
-                {t('tasks.header.upcomingTitle', 'tareas próximas en total')}
+                {t('ui.pagination.showing', {
+                  count: paginatedTasks.length,
+                  total: displayedTasks.length,
+                })}
               </Typography>
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

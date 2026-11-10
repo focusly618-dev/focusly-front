@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, useTheme, Tooltip } from '@mui/material';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
@@ -18,6 +19,7 @@ function formatMinutes(val: number): string {
 export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
   data,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const [hoveredData, setHoveredData] =
@@ -50,7 +52,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
     <ChartCard>
       <Box display="flex" alignItems="center" gap={0.5}>
         <Typography variant="h6" fontWeight="bold">
-          Time Distribution
+          {t('ui.insights.timeDistribution')}
         </Typography>
         <Tooltip
           title="Shows which types of activities you spend the most time on, classifying your tasks into categories like Deep Work, Meetings, or Admin."
@@ -176,9 +178,9 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               lineHeight: 1.2,
             }}
           >
-            FOCUS
+            {t('ui.insights.focus')}
             <br />
-            ACTIVITY
+            {t('ui.insights.activity')}
           </Typography>
         </Box>
       </Box>

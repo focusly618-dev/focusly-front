@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useRef, type MouseEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Tooltip, Popover } from '@mui/material';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { ChartCard, HeatmapGrid, HeatmapCell } from '../../Insights.styles';
@@ -76,6 +77,7 @@ export const ActivityMap = ({
   baseDate,
   loading,
 }: ActivityMapProps) => {
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [activeCell, setActiveCell] = useState<HeatmapCellData | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -131,7 +133,7 @@ export const ActivityMap = ({
       >
         <Box display="flex" alignItems="center" gap={0.5}>
           <Typography variant="h6" fontWeight="bold">
-            Activity Map
+            {t('ui.insights.activityMap')}
           </Typography>
           <Tooltip
             title="Shows completed tasks per hour (Daily), day of week (Weekly), or calendar day (Monthly). Hover a cell to see what you finished."
@@ -145,7 +147,7 @@ export const ActivityMap = ({
 
         <Box display="flex" gap={1} alignItems="center">
           <Typography variant="caption" color="text.secondary">
-            Less
+            {t('ui.insights.less')}
           </Typography>
           <Box display="flex" gap={0.5}>
             {[0, 1, 2, 3, 4].map((i) => (
@@ -161,7 +163,7 @@ export const ActivityMap = ({
             ))}
           </Box>
           <Typography variant="caption" color="text.secondary">
-            More
+            {t('ui.insights.more')}
           </Typography>
         </Box>
       </Box>

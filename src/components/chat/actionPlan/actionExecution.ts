@@ -19,7 +19,12 @@ import {
   patchNeedsCurrent,
 } from './eventBody';
 import type { ParsedLuminaAction } from '@/utils';
-import { normalizeEstimateTimer, parseDeadline, taskStart } from './planFormat';
+import {
+  normalizeEstimateTimer,
+  parseDeadline,
+  taskStart,
+  withoutLeadingTitle,
+} from './planFormat';
 
 export { normalizeEstimateTimer, parseDeadline };
 
@@ -145,7 +150,8 @@ export const executeSingleAction = async (
           color: '#3b82f6',
           links: [],
           user_id: ctx.userId,
-          status: 'Backlog',
+          // It always gets a start below: it isn't waiting in the Inbox
+          status: 'Todo',
           use_ai: true,
           subtasks: formattedSubtasks,
           workspace_id: action.payload.workspace_id || undefined,
@@ -337,9 +343,11 @@ export const executeSingleAction = async (
 
     if (isEmptyDocument(rawContent)) {
       rawContent = isNote
-        ? `# ${title}\n\nNota creada por Lumina.\n`
-        : `# ${title}\n\n## Resumen / Objetivos\nDocumento de trabajo generado por Lumina.\n\n## Secciones de Investigación\n- [ ] Recopilar fuentes y antecedentes\n- [ ] Desarrollo de conceptos clave\n- [ ] Conclusiones y referencias\n`;
+        ? 'Nota creada por Lumina.\n'
+        : `## Resumen / Objetivos\nDocumento de trabajo generado por Lumina.\n\n## Secciones de Investigación\n- [ ] Recopilar fuentes y antecedentes\n- [ ] Desarrollo de conceptos clave\n- [ ] Conclusiones y referencias\n`;
     }
+
+    rawContent = withoutLeadingTitle(rawContent, title);
 
     let targetGroupId =
       action.payload.project_group_id || action.payload.groupId || null;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -126,6 +127,7 @@ const HourMarkers = () => {
 export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
   fallbackGoldenWindow,
 }) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const userId = user?.id || '';
   const [loading, setLoading] = useState(false);
@@ -296,7 +298,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box display="flex" alignItems="center" gap={0.5}>
           <Typography variant="h6" fontWeight="bold">
-            Golden Hours
+            {t('ui.insights.goldenTitle')}
           </Typography>
           <Tooltip
             title="Identificamos tus momentos pico de concentración analizando a qué horas del día completas tareas, haces sesiones de foco y editas tus notas."
@@ -335,7 +337,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
             },
           }}
         >
-          {loading ? 'Analyzing...' : 'Analyze with AI'}
+          {loading ? t('ui.insights.analyzing') : t('ui.insights.analyze')}
         </Button>
       </Box>
 
@@ -531,7 +533,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
               gap={1}
             >
               <Typography variant="body2" fontWeight="bold">
-                ¿Quieres optimizar tu tiempo?
+                {t('ui.insights.optimizeTitle')}
               </Typography>
               <Typography
                 variant="caption"
@@ -546,7 +548,7 @@ export const GoldenHoursCard: React.FC<GoldenHoursCardProps> = ({
 
           {/* Footer Text */}
           <Typography variant="caption" color="text.secondary" mt="auto">
-            PRODUCTIVITY SCORE (LAST 7 DAYS)
+            {t('ui.insights.scoreLast7')}
           </Typography>
         </Box>
       )}
