@@ -22,7 +22,9 @@
     "error": "Erreur",
     "connect": "Connecter",
     "all": "Tout",
-    "create": "Créer"
+    "create": "Créer",
+    "maximize": "Agrandir",
+    "restoreSize": "Restaurer la taille"
   },
   "errors": {
     "network": "Impossible de se connecter au serveur. Vérifiez votre connexion Internet et réessayez.",
@@ -1485,7 +1487,8 @@
       "custom": "Personnalisée",
       "logTime": "Enregistrer du temps",
       "noTimeLogged": "Aucun temps enregistré pour l'instant.",
-      "titlePlaceholder": "Terminer le rapport de performance trimestriel"
+      "titlePlaceholder": "Terminer le rapport de performance trimestriel",
+      "palette": "Palette de couleurs"
     },
     "projectRequired": {
       "title": "Choisissez un projet",

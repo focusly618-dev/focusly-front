@@ -12,10 +12,13 @@ import {
   Typography,
   alpha,
   useTheme,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import CheckIcon from '@mui/icons-material/Check';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -24,6 +27,10 @@ import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import AdjustRoundedIcon from '@mui/icons-material/AdjustRounded';
 import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import { surfaceColor } from '@/context';
 import { ProjectTaskSubtasks } from './ProjectTaskSubtasks';
 import { ProjectStatusMenu } from './ProjectStatusMenu';
 import {
@@ -50,6 +57,7 @@ export interface ProjectTaskItemProps {
     task: ProjectTaskItemData,
     status: ProjectTaskStatusId,
   ) => void;
+  onDeleteTask?: (task: ProjectTaskItemData) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onAddSubtask?: (taskId: string, title: string) => void;
   /** Selection mode: the row toggles selection instead of opening. */
@@ -62,8 +70,8 @@ export interface ProjectTaskItemProps {
 // check · title · [project] · status · priority · due · estimate · actions
 const columns = (showProject: boolean) =>
   showProject
-    ? '28px minmax(0, 1fr) 148px 132px 104px 104px 52px 52px'
-    : '28px minmax(0, 1fr) 132px 108px 108px 52px 52px';
+    ? '32px minmax(0, 1fr) 148px 132px 104px 104px 52px 52px'
+    : '32px minmax(0, 1fr) 132px 108px 108px 52px 52px';
 
 export const ProjectChip = ({ task }: { task: ProjectTaskItemData }) => {
   const { t } = useTranslation();
@@ -118,9 +126,11 @@ export const ProjectChip = ({ task }: { task: ProjectTaskItemData }) => {
 export const StatusChip = ({
   task,
   onClick,
+  ariaLabel,
 }: {
   task: ProjectTaskItemData;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  ariaLabel?: string;
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -142,7 +152,10 @@ export const StatusChip = ({
         e.stopPropagation();
         onClick?.(e);
       }}
-      aria-label={`${t('projectTasks.columns.status', { defaultValue: 'Status' })}: ${label}`}
+      aria-label={
+        ariaLabel ||
+        `${t('projectTasks.columns.status', { defaultValue: 'Status' })}: ${label}`
+      }
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -271,6 +284,7 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
   onTaskClick,
   onToggleComplete,
   onChangeStatus,
+  onDeleteTask,
   onToggleSubtask,
   onAddSubtask,
   selectionMode = false,
@@ -282,6 +296,7 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
   const isDark = theme.palette.mode === 'dark';
   const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
   const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
+  const [actionAnchor, setActionAnchor] = useState<HTMLElement | null>(null);
 
   const subtasks = task.subtasks ?? [];
   const completedSubtasks = subtasks.filter((s) => s.completed).length;
@@ -303,32 +318,52 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '4px',
+        gap: 0.8,
         px: '6px',
         py: '2px',
         borderRadius: '5px',
         font: 'inherit',
-        fontSize: '11px',
-        fontWeight: 600,
         cursor: 'pointer',
+        border: 'none',
+        bgcolor: 'transparent',
         flexShrink: 0,
-        color: completedSubtasks > 0 ? '#10b981' : 'text.secondary',
-        bgcolor:
-          completedSubtasks > 0 ? alpha('#10b981', 0.12) : 'action.hover',
-        border: '1px solid',
-        borderColor: completedSubtasks > 0 ? alpha('#10b981', 0.25) : 'divider',
-        '&:focus-visible': { outline: '2px solid #008767' },
+        '&:hover': { bgcolor: 'action.hover' },
       }}
     >
-      <FormatListBulletedIcon sx={{ fontSize: 12 }} />
-      {t('tasks.subtasksCount', {
-        completed: completedSubtasks,
-        total: subtasks.length,
-        defaultValue: `${completedSubtasks}/${subtasks.length}`,
-      })}
+      <Box
+        sx={{
+          width: 38,
+          height: 5,
+          borderRadius: 3,
+          bgcolor: (thm) => surfaceColor(thm, '#2a2c36', '#3A3A3A', '#e5e7eb'),
+          overflow: 'hidden',
+        }}
+      >
+        <Box
+          sx={{
+            width: `${Math.round((completedSubtasks / subtasks.length) * 100)}%`,
+            height: '100%',
+            bgcolor: (thm) =>
+              thm.palette.mode === 'dark' ? '#2dd4bf' : '#008767',
+            borderRadius: 3,
+            transition: 'width 0.3s ease',
+          }}
+        />
+      </Box>
+      <Typography
+        sx={{
+          fontSize: '11.5px',
+          color: (thm) => (thm.palette.mode === 'dark' ? '#8a8f98' : '#6b7280'),
+          fontWeight: 600,
+          fontFamily: 'monospace',
+        }}
+      >
+        {completedSubtasks}/{subtasks.length}
+      </Typography>
       <KeyboardArrowDownIcon
         sx={{
           fontSize: 14,
+          color: 'text.secondary',
           transition: 'transform 0.15s ease',
           transform: isSubtasksExpanded ? 'rotate(180deg)' : 'none',
         }}
@@ -377,16 +412,23 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
       sx={{
         borderBottom: '1px solid',
         borderColor: 'divider',
+        borderLeft: task.color
+          ? `3.5px solid ${task.color}`
+          : '3.5px solid transparent',
         bgcolor: selected
           ? alpha('#008767', isDark ? 0.12 : 0.06)
-          : 'background.paper',
-        transition: 'background-color 0.12s ease',
+          : task.color
+            ? alpha(task.color, isDark ? 0.08 : 0.04)
+            : 'background.paper',
+        transition: 'all 0.12s ease',
         '&:hover': {
           bgcolor: selected
             ? alpha('#008767', isDark ? 0.16 : 0.09)
-            : isDark
-              ? 'rgba(255, 255, 255, 0.025)'
-              : 'rgba(15, 23, 42, 0.02)',
+            : task.color
+              ? alpha(task.color, isDark ? 0.14 : 0.08)
+              : isDark
+                ? 'rgba(255, 255, 255, 0.025)'
+                : 'rgba(15, 23, 42, 0.02)',
         },
       }}
     >
@@ -405,7 +447,7 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
         sx={{
           display: 'grid',
           gridTemplateColumns: {
-            xs: '28px minmax(0, 1fr) auto',
+            xs: '32px minmax(0, 1fr) auto',
             md: columns(showProject),
           },
           alignItems: 'center',
@@ -420,40 +462,74 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
         }}
       >
         {/* Complete (or select) */}
-        {selectionMode ? (
+        <Box
+          className="checkbox-cell"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (selectionMode) {
+              onToggleSelect?.(task);
+            } else {
+              onToggleComplete?.(task);
+            }
+          }}
+        >
           <Checkbox
             size="small"
-            checked={selected}
-            onClick={(e) => e.stopPropagation()}
-            onChange={() => onToggleSelect?.(task)}
-            sx={{ p: 0.25, '&.Mui-checked': { color: '#008767' } }}
-            slotProps={{ input: { 'aria-label': task.title } }}
-          />
-        ) : (
-          <IconButton
-            size="small"
-            aria-label={
-              isDone
-                ? t('projectTasks.markNotDone')
-                : t('projectTasks.markDone')
-            }
-            onClick={(e) => {
+            checked={Boolean(selectionMode ? selected : isDone)}
+            onChange={(e) => {
               e.stopPropagation();
-              onToggleComplete?.(task);
+              if (selectionMode) {
+                onToggleSelect?.(task);
+              } else {
+                onToggleComplete?.(task);
+              }
             }}
+            onClick={(e) => e.stopPropagation()}
+            slotProps={{ input: { 'aria-label': task.title } }}
+            icon={
+              <Box
+                sx={{
+                  width: 17,
+                  height: 17,
+                  borderRadius: '4px',
+                  border: (thm) =>
+                    thm.palette.mode === 'dark'
+                      ? '1.5px solid #3a3d48'
+                      : '1.5px solid #d1d5db',
+                  bgcolor: 'transparent',
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    borderColor: '#008767',
+                  },
+                }}
+              />
+            }
+            checkedIcon={
+              <Box
+                sx={{
+                  width: 17,
+                  height: 17,
+                  borderRadius: '4px',
+                  bgcolor: '#008767',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <CheckIcon sx={{ fontSize: 13, color: '#ffffff' }} />
+              </Box>
+            }
             sx={{
-              p: 0.25,
-              color: isDone ? '#10b981' : 'text.disabled',
-              '&:hover': { color: '#10b981' },
+              padding: 0,
             }}
-          >
-            {isDone ? (
-              <CheckCircleIcon sx={{ fontSize: 19 }} />
-            ) : (
-              <RadioButtonUncheckedIcon sx={{ fontSize: 19 }} />
-            )}
-          </IconButton>
-        )}
+          />
+        </Box>
 
         {/* Title, with its details underneath on small screens */}
         <Box sx={{ minWidth: 0 }}>
@@ -520,6 +596,7 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
         <Box sx={{ display: { xs: 'none', md: 'flex' }, minWidth: 0 }}>
           <StatusChip
             task={task}
+            ariaLabel={t('projectTasks.changeStatus')}
             onClick={
               !selectionMode && onChangeStatus
                 ? (e) => setStatusAnchor(e.currentTarget)
@@ -589,17 +666,32 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
               </AvatarGroup>
             </Tooltip>
           )}
-          {!selectionMode && onChangeStatus && (
-            <Tooltip title={t('projectTasks.changeStatus')}>
+          {!selectionMode && (
+            <Tooltip
+              title={t('tasks.columns.actions', { defaultValue: 'Acciones' })}
+            >
               <IconButton
                 size="small"
-                aria-label={t('projectTasks.changeStatus')}
+                aria-label={t('tasks.columns.actions', {
+                  defaultValue: 'Acciones',
+                })}
                 aria-haspopup="menu"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setStatusAnchor(e.currentTarget);
+                  setActionAnchor(e.currentTarget);
                 }}
-                sx={{ p: 0.5, color: 'text.secondary' }}
+                sx={{
+                  p: 0.5,
+                  color: 'text.secondary',
+                  borderRadius: '6px',
+                  '&:hover': {
+                    bgcolor: (thm) =>
+                      thm.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.06)'
+                        : '#f3f4f6',
+                    color: 'text.primary',
+                  },
+                }}
               >
                 <MoreHorizIcon sx={{ fontSize: 18 }} />
               </IconButton>
@@ -607,6 +699,98 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
           )}
         </Box>
       </Box>
+
+      {/* Row Contextual Action Menu */}
+      <Menu
+        anchorEl={actionAnchor}
+        open={Boolean(actionAnchor)}
+        onClose={() => setActionAnchor(null)}
+        PaperProps={{
+          sx: {
+            borderRadius: '10px',
+            minWidth: '180px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            p: 0.5,
+          },
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            setActionAnchor(null);
+            onTaskClick?.(task);
+          }}
+          sx={{ gap: 1.2, py: 0.8, borderRadius: '6px' }}
+        >
+          <ListItemIcon sx={{ minWidth: 'auto', color: 'text.secondary' }}>
+            <EditOutlinedIcon sx={{ fontSize: 17 }} />
+          </ListItemIcon>
+          <ListItemText
+            primaryTypographyProps={{ fontSize: '13px', fontWeight: 500 }}
+          >
+            {t('tasks.actions.editTask', { defaultValue: 'Editar tarea' })}
+          </ListItemText>
+        </MenuItem>
+
+        {onChangeStatus && (
+          <MenuItem
+            onClick={() => {
+              const anchor = actionAnchor;
+              setActionAnchor(null);
+              if (anchor) setStatusAnchor(anchor);
+            }}
+            sx={{ gap: 1.2, py: 0.8, borderRadius: '6px' }}
+          >
+            <ListItemIcon sx={{ minWidth: 'auto', color: 'text.secondary' }}>
+              <SyncAltIcon sx={{ fontSize: 17 }} />
+            </ListItemIcon>
+            <ListItemText
+              primaryTypographyProps={{ fontSize: '13px', fontWeight: 500 }}
+            >
+              {t('projectTasks.changeStatus', {
+                defaultValue: 'Cambiar estado',
+              })}
+            </ListItemText>
+          </MenuItem>
+        )}
+
+        {onDeleteTask && <Divider sx={{ my: 0.5 }} />}
+
+        {onDeleteTask && (
+          <MenuItem
+            onClick={() => {
+              setActionAnchor(null);
+              onDeleteTask(task);
+            }}
+            sx={{
+              gap: 1.2,
+              py: 0.8,
+              borderRadius: '6px',
+              color: 'error.main',
+              '&:hover': {
+                bgcolor: (thm) =>
+                  thm.palette.mode === 'dark'
+                    ? 'rgba(239, 68, 68, 0.12)'
+                    : 'rgba(239, 68, 68, 0.08)',
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 'auto', color: 'inherit' }}>
+              <DeleteOutlineRoundedIcon sx={{ fontSize: 17 }} />
+            </ListItemIcon>
+            <ListItemText
+              primaryTypographyProps={{
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'inherit',
+              }}
+            >
+              {t('tasks.actions.deleteTask', {
+                defaultValue: 'Eliminar tarea',
+              })}
+            </ListItemText>
+          </MenuItem>
+        )}
+      </Menu>
 
       <ProjectStatusMenu
         anchorEl={statusAnchor}
@@ -628,9 +812,20 @@ export const ProjectTaskItem: React.FC<ProjectTaskItemProps> = ({
   );
 };
 
+export interface ProjectTaskColumnsProps {
+  showProject?: boolean;
+  selectionMode?: boolean;
+  onToggleSelectAll?: () => void;
+  isAllSelected?: boolean;
+  isSomeSelected?: boolean;
+}
+
 /** Column titles header at the top of the unified table card. */
-export const ProjectTaskColumns: React.FC<{ showProject?: boolean }> = ({
+export const ProjectTaskColumns: React.FC<ProjectTaskColumnsProps> = ({
   showProject = true,
+  onToggleSelectAll,
+  isAllSelected = false,
+  isSomeSelected = false,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -662,7 +857,6 @@ export const ProjectTaskColumns: React.FC<{ showProject?: boolean }> = ({
 
   return (
     <Box
-      aria-hidden
       sx={{
         display: { xs: 'none', md: 'grid' },
         gridTemplateColumns: columns(showProject),
@@ -677,14 +871,88 @@ export const ProjectTaskColumns: React.FC<{ showProject?: boolean }> = ({
     >
       <Box
         sx={{
-          width: 15,
-          height: 15,
-          borderRadius: '4px',
-          border: '1.5px solid',
-          borderColor: 'text.disabled',
-          ml: 0.5,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: onToggleSelectAll ? 'pointer' : 'default',
         }}
-      />
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleSelectAll?.();
+        }}
+      >
+        <Checkbox
+          checked={isAllSelected}
+          indeterminate={isSomeSelected}
+          onChange={(e) => {
+            e.stopPropagation();
+            onToggleSelectAll?.();
+          }}
+          onClick={(e) => e.stopPropagation()}
+          size="small"
+          inputProps={{
+            'aria-label': t('selection.selectAll', {
+              defaultValue: 'Seleccionar todo',
+            }),
+          }}
+          icon={
+            <Box
+              sx={{
+                width: 17,
+                height: 17,
+                borderRadius: '4px',
+                border: (thm) =>
+                  thm.palette.mode === 'dark'
+                    ? '1.5px solid #3a3d48'
+                    : '1.5px solid #d1d5db',
+                bgcolor: 'transparent',
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  borderColor: '#008767',
+                },
+              }}
+            />
+          }
+          checkedIcon={
+            <Box
+              sx={{
+                width: 17,
+                height: 17,
+                borderRadius: '4px',
+                bgcolor: '#008767',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <CheckIcon sx={{ fontSize: 13, color: '#ffffff' }} />
+            </Box>
+          }
+          indeterminateIcon={
+            <Box
+              sx={{
+                width: 17,
+                height: 17,
+                borderRadius: '4px',
+                bgcolor: '#008767',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 9,
+                  height: 2,
+                  bgcolor: '#ffffff',
+                  borderRadius: '1px',
+                }}
+              />
+            </Box>
+          }
+          sx={{ padding: 0 }}
+        />
+      </Box>
       {colHeader(t('projectTasks.columns.task'))}
       {showProject &&
         colHeader(

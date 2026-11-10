@@ -22,7 +22,9 @@
     "error": "Erro",
     "connect": "Conectar",
     "all": "Todos",
-    "create": "Criar"
+    "create": "Criar",
+    "maximize": "Maximizar",
+    "restoreSize": "Restaurar tamanho"
   },
   "errors": {
     "network": "Não foi possível conectar ao servidor. Verifique sua conexão com a internet e tente novamente.",
@@ -1485,7 +1487,8 @@
       "custom": "Personalizada",
       "logTime": "Registrar tempo",
       "noTimeLogged": "Nenhum tempo registrado ainda.",
-      "titlePlaceholder": "Concluir o relatório de desempenho trimestral"
+      "titlePlaceholder": "Concluir o relatório de desempenho trimestral",
+      "palette": "Paleta de cores"
     },
     "projectRequired": {
       "title": "Escolha um projeto",

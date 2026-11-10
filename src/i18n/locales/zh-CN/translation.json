@@ -22,7 +22,9 @@
     "error": "错误",
     "connect": "连接",
     "all": "全部",
-    "create": "创建"
+    "create": "创建",
+    "maximize": "最大化",
+    "restoreSize": "恢复大小"
   },
   "errors": {
     "network": "无法连接到服务器。请检查网络连接后重试。",
@@ -1485,7 +1487,8 @@
       "custom": "自定义",
       "logTime": "记录时间",
       "noTimeLogged": "还没有记录时间。",
-      "titlePlaceholder": "完成季度绩效报告"
+      "titlePlaceholder": "完成季度绩效报告",
+      "palette": "调色板"
     },
     "projectRequired": {
       "title": "选择一个项目",

@@ -12,21 +12,24 @@ import {
 import {
   Link as LinkIcon,
   MoreVert as MoreVertIcon,
+  CalendarTodayOutlined as CalendarIcon,
+  TimerOutlined as TimerIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { CARD_ICON_RISE, WorkspaceCard } from '../WorkspaceLibrary.styles';
 import {
-  WorkspaceCard,
-  CardAvatarCircle,
-  BadgeChip,
-  PropertyGrid,
-  PropertyItem,
-  PropertyLabel,
-  PropertyValue,
-} from '../WorkspaceLibrary.styles';
-import { colorPaletteMap, iconMap } from '../constants/library.constants';
+  CardDivider,
+  FolderIconWrapper,
+  FooterItem,
+} from '@/pages/Projects/components/ProjectFolders/ProjectFolderCard/ProjectFolderCard.styles';
+import {
+  colorPaletteMap,
+  flatBackgroundColor,
+  iconMap,
+} from '../constants/library.constants';
 import type { WorkspaceTypes } from '../../../workspace.types';
 import { formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import { UNTITLED_WORKSPACE_TITLE, colorPalette, isColorDark } from '@/utils';
+import { UNTITLED_WORKSPACE_TITLE, colorPalette } from '@/utils';
 import { surfaceColor } from '@/context';
 
 interface WorkspaceCardItemProps {
@@ -138,9 +141,6 @@ export const WorkspaceCardItem = ({
     ? colorPaletteMap[workspace.background_color] ||
       colorPalette.find((c) => c.color === workspace.background_color)
     : undefined;
-  const colorChipName =
-    colorPalette.find((c) => c.color === workspace.background_color)?.label ||
-    'Color';
   const gradient =
     paletteEntry?.gradient ||
     (workspace.background_color &&
@@ -158,18 +158,10 @@ export const WorkspaceCardItem = ({
     gradient !== 'none',
   );
 
-  const isDarkBg = isBackgroundActive
-    ? isColorDark(gradient || workspace.background_color)
-    : false;
-  const isLightBg = isBackgroundActive
-    ? !isDarkBg
-    : theme.palette.mode === 'light';
-
   const isDark = theme.palette.mode === 'dark';
   const folderName = groupName || null;
   const baseColor = groupColor || theme.palette.primary.main;
   const visibleColor = isDark ? lighten(baseColor, 0.3) : baseColor;
-  const badgeBgColor = alpha(visibleColor, isDark ? 0.15 : 0.08);
 
   const snippet =
     getSnippet(workspace.content) || t('workspaceLibrary.card.noContent');
@@ -187,56 +179,39 @@ export const WorkspaceCardItem = ({
   const [tasksAnchorEl, setTasksAnchorEl] = useState<HTMLElement | null>(null);
   const isTasksPopoverOpen = Boolean(tasksAnchorEl);
 
-  // Common emojis and their corresponding soft background colors for avatar circle
-  const getAvatarStyles = () => {
-    if (isBackgroundActive) {
-      return {
-        bgcolor: isLightBg
-          ? 'rgba(0, 0, 0, 0.06)'
-          : 'rgba(255, 255, 255, 0.18)',
-        borderColor: isLightBg
-          ? 'rgba(0, 0, 0, 0.12)'
-          : 'rgba(255, 255, 255, 0.25)',
-        color: isLightBg ? '#0f172a' : '#ffffff',
-      };
-    }
-    const emoji = workspace.emoji;
-    const emojiColors: Record<string, string> = {
-      '😁': '#fbbf24', // yellow
-      '😊': '#fbbf24',
-      '😈': '#a78bfa', // purple
-      '🔥': '#f87171', // red
-      '💡': '#fbbf24',
-      '🚀': '#60a5fa', // blue
-      '⭐': '#fbbf24',
-      '❤️': '#f87171',
-    };
-    const matchedColor = emoji ? emojiColors[emoji] : undefined;
-    if (matchedColor) {
-      return {
-        bgcolor: isDark ? alpha(matchedColor, 0.15) : alpha(matchedColor, 0.08),
-        borderColor: isDark
-          ? alpha(matchedColor, 0.25)
-          : alpha(matchedColor, 0.12),
-        color: matchedColor,
-      };
-    }
-    // Fallback to project/group color
-    return {
-      bgcolor: isDark ? alpha(baseColor, 0.15) : alpha(baseColor, 0.08),
-      borderColor: isDark ? alpha(baseColor, 0.25) : alpha(baseColor, 0.12),
-      color: visibleColor,
-    };
+  const emojiColors: Record<string, string> = {
+    '😁': '#fbbf24',
+    '😊': '#fbbf24',
+    '😈': '#a78bfa',
+    '🔥': '#f87171',
+    '💡': '#fbbf24',
+    '🚀': '#60a5fa',
+    '⭐': '#fbbf24',
+    '❤️': '#f87171',
   };
+  const tileColor =
+    (workspace.emoji && emojiColors[workspace.emoji]) || visibleColor;
 
-  const avatarStyles = getAvatarStyles();
+  const doneTasks = linkedTasksList.filter(
+    (task) => task.status?.toUpperCase() === 'DONE',
+  ).length;
+  const allTasksDone =
+    linkedTasksList.length > 0 && doneTasks === linkedTasksList.length;
+  const timeSpent = (field: 'estimate_timer' | 'real_timer') =>
+    formatDuration(
+      linkedTasksList.reduce((acc, task) => acc + (task[field] || 0), 0),
+    ) || '0m';
 
   return (
     <WorkspaceCard
       onClick={() =>
         selectionMode ? onToggleSelect?.(workspace) : onSelect(workspace)
       }
-      gradient={isBackgroundActive ? gradient : undefined}
+      cover={
+        isBackgroundActive && gradient
+          ? flatBackgroundColor(gradient)
+          : undefined
+      }
       compact={compact}
       sx={
         selected
@@ -244,544 +219,197 @@ export const WorkspaceCardItem = ({
           : undefined
       }
     >
-      {/* Top Row: Avatar (left), Folder / Color Badge & Menu Options (right) */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2,
-        }}
-      >
-        <CardAvatarCircle
+      {/* Icon · project, name and snippet · menu */}
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+        <FolderIconWrapper
+          baseColor={tileColor}
           sx={{
-            bgcolor: avatarStyles.bgcolor,
-            borderColor: avatarStyles.borderColor,
-            color: avatarStyles.color,
-            borderWidth: '1px',
-            borderStyle: 'solid',
+            // A narrow card gives the whole width to the text under the icon
+            ...(compact
+              ? { position: 'absolute', left: 0, top: `-${CARD_ICON_RISE}px` }
+              : { mt: `-${CARD_ICON_RISE}px` }),
+            background: surfaceColor(theme, '#1C1C1E', '#262626', '#FFFFFF'),
+            borderColor: theme.palette.divider,
+            boxShadow: '0 2px 6px rgba(15, 23, 42, 0.12)',
           }}
         >
           {workspace.emoji && !iconMap[workspace.emoji] ? (
-            <span style={{ fontSize: '20px', lineHeight: 1 }}>
+            <Box
+              component="span"
+              sx={{ fontSize: '1.5rem', lineHeight: 1, userSelect: 'none' }}
+            >
               {workspace.emoji}
-            </span>
+            </Box>
           ) : (
             createElement(
               (workspace.emoji && iconMap[workspace.emoji]) || iconMap.Article,
-              {
-                sx: {
-                  fontSize: 20,
-                  color: avatarStyles.color,
-                  opacity: 0.9,
-                },
-              },
+              { sx: { fontSize: 22 } },
             )
           )}
-        </CardAvatarCircle>
+        </FolderIconWrapper>
 
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            gap: 1,
-            flex: 1,
-            minWidth: 0,
-            ml: 1,
-          }}
-        >
+        <Box sx={{ flex: 1, minWidth: 0, pt: compact ? '18px' : 0 }}>
           {folderName && (
-            <BadgeChip
-              color={visibleColor}
-              bgColor={badgeBgColor}
+            <Typography
+              noWrap
               sx={{
-                borderRadius: '20px',
-                px: 1.5,
-                py: 0.4,
-                fontSize: '11px',
+                fontSize: '12px',
                 fontWeight: 600,
-                border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'}`,
-                minWidth: 0,
-                ...(isBackgroundActive && {
-                  bgcolor: isLightBg
-                    ? 'rgba(0, 0, 0, 0.08)'
-                    : 'rgba(255, 255, 255, 0.15)',
-                  color: isLightBg ? 'rgba(0, 0, 0, 0.8)' : '#fff',
-                  borderColor: 'transparent',
-                }),
+                lineHeight: 1.3,
+                color: visibleColor,
               }}
+            >
+              {folderName}
+            </Typography>
+          )}
+          <Typography
+            noWrap
+            sx={{
+              fontWeight: 700,
+              fontSize: '17px',
+              lineHeight: 1.3,
+              color: 'text.primary',
+            }}
+          >
+            {workspace.title || UNTITLED_WORKSPACE_TITLE}
+          </Typography>
+          <Typography
+            sx={{
+              mt: '4px',
+              fontSize: '14px',
+              lineHeight: 1.4,
+              color: 'text.secondary',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: compact ? 2 : 1,
+              WebkitBoxOrient: 'vertical',
+            }}
+          >
+            {snippet}
+          </Typography>
+        </Box>
+
+        {selectionMode ? (
+          <Checkbox
+            size="small"
+            checked={selected}
+            onClick={(e) => e.stopPropagation()}
+            onChange={() => onToggleSelect?.(workspace)}
+            sx={{
+              p: 0.5,
+              mt: '-2px',
+              flexShrink: 0,
+              '&.Mui-checked': { color: '#008767' },
+            }}
+            inputProps={{
+              'aria-label': workspace.title || UNTITLED_WORKSPACE_TITLE,
+            }}
+          />
+        ) : (
+          onMenuOpen && (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMenuOpen(e, workspace);
+              }}
+              aria-label={t('workspaceLibrary.card.options')}
+              sx={{
+                color: 'text.secondary',
+                p: 0.5,
+                mt: '-2px',
+                mr: '-6px',
+                flexShrink: 0,
+              }}
+            >
+              <MoreVertIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          )
+        )}
+      </Box>
+
+      {!compact && (
+        <Box sx={{ mt: 'auto' }}>
+          <CardDivider />
+
+          {/* Created · task status · time */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: { xs: 2, sm: 2.5 },
+              minWidth: 0,
+            }}
+          >
+            <FooterItem title={t('workspaceLibrary.card.created')}>
+              <CalendarIcon />
+              <span>
+                {new Date(workspace.createdAt).toLocaleDateString(
+                  i18n.language,
+                  { day: 'numeric', month: 'short', year: 'numeric' },
+                )}
+              </span>
+            </FooterItem>
+            <FooterItem
+              title={t('workspaceLibrary.card.taskStatus')}
+              sx={{ overflow: 'hidden' }}
             >
               <Box
                 component="span"
+                aria-hidden
                 sx={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {folderName}
-              </Box>
-            </BadgeChip>
-          )}
-
-          {/* Visual chip for custom cover/color */}
-          {workspace.background_color &&
-            workspace.background_color !== 'none' && (
-              <Box
-                sx={{
-                  // Hidden on phones, where the card is narrow.
-                  display: { xs: 'none', sm: 'inline-flex' },
-                  alignItems: 'center',
-                  gap: 0.6,
-                  px: 1,
-                  py: 0.3,
-                  borderRadius: '12px',
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
                   flexShrink: 0,
-                  bgcolor: isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(0, 0, 0, 0.08)'
-                      : 'rgba(255, 255, 255, 0.18)'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.06)'
-                      : 'rgba(0, 0, 0, 0.04)',
-                  border: `1px solid ${
-                    isBackgroundActive
-                      ? isLightBg
-                        ? 'rgba(0, 0, 0, 0.12)'
-                        : 'rgba(255, 255, 255, 0.22)'
-                      : isDark
-                        ? 'rgba(255, 255, 255, 0.1)'
-                        : 'rgba(0, 0, 0, 0.08)'
-                  }`,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: '50%',
-                    background:
-                      workspace.background_color.startsWith(
-                        'linear-gradient',
-                      ) || gradient
-                        ? gradient || workspace.background_color
-                        : workspace.background_color,
-                  }}
-                />
-                <Typography
-                  noWrap
-                  sx={{
-                    fontSize: '10.5px',
-                    fontWeight: 600,
-                    color: isBackgroundActive
-                      ? isLightBg
-                        ? '#0f172a'
-                        : '#ffffff'
-                      : 'text.secondary',
-                  }}
-                >
-                  {colorChipName}
-                </Typography>
-              </Box>
-            )}
-
-          {selectionMode ? (
-            <Checkbox
-              size="small"
-              checked={selected}
-              onClick={(e) => e.stopPropagation()}
-              onChange={() => onToggleSelect?.(workspace)}
-              sx={{
-                p: 0.5,
-                flexShrink: 0,
-                color: isBackgroundActive && !isLightBg ? '#ffffff' : undefined,
-                '&.Mui-checked': {
-                  color:
-                    isBackgroundActive && !isLightBg ? '#ffffff' : '#008767',
-                },
-              }}
-              inputProps={{
-                'aria-label': workspace.title || UNTITLED_WORKSPACE_TITLE,
-              }}
-            />
-          ) : (
-            onMenuOpen && (
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMenuOpen(e, workspace);
-                }}
-                aria-label={t('workspaceLibrary.card.options')}
-                sx={{
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? '#0f172a'
-                      : '#ffffff'
-                    : 'text.secondary',
-                  p: 0.5,
-                  flexShrink: 0,
-                  '&:hover': {
-                    backgroundColor: isBackgroundActive
-                      ? isLightBg
-                        ? 'rgba(0,0,0,0.08)'
-                        : 'rgba(255,255,255,0.15)'
-                      : 'action.hover',
-                  },
-                }}
-              >
-                <MoreVertIcon fontSize="small" />
-              </IconButton>
-            )
-          )}
-        </Box>
-      </Box>
-
-      {/* Middle Section: Workspace Title and Snippet Description */}
-      <Box sx={{ mb: 1 }}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 600,
-            fontSize: '1.05rem',
-            lineHeight: 1.3,
-            mb: 0.5,
-            color: isBackgroundActive
-              ? isLightBg
-                ? '#0f172a'
-                : '#ffffff'
-              : linkedTasksList.length > 0
-                ? 'primary.main'
-                : 'text.primary',
-            textShadow:
-              isBackgroundActive && !isLightBg
-                ? '0 1px 3px rgba(0,0,0,0.4)'
-                : 'none',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            transition: 'color 0.2s ease',
-            '.MuiPaper-root:hover &': {
-              color: isBackgroundActive
-                ? isLightBg
-                  ? '#020617'
-                  : '#ffffff'
-                : isDark
-                  ? '#ffffff'
-                  : theme.palette.primary.main,
-            },
-          }}
-        >
-          {workspace.title || UNTITLED_WORKSPACE_TITLE}
-        </Typography>
-
-        <Typography
-          variant="body2"
-          sx={{
-            fontSize: '0.85rem',
-            color: isBackgroundActive
-              ? isLightBg
-                ? 'rgba(15, 23, 42, 0.82)'
-                : 'rgba(255, 255, 255, 0.9)'
-              : 'text.secondary',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            minHeight: '38px',
-            lineHeight: 1.4,
-            transition: 'color 0.2s ease',
-            '.MuiPaper-root:hover &': {
-              color: isBackgroundActive
-                ? isLightBg
-                  ? '#0f172a'
-                  : '#ffffff'
-                : isDark
-                  ? 'rgba(255, 255, 255, 0.95)'
-                  : 'rgba(15, 23, 42, 0.9)',
-            },
-          }}
-        >
-          {snippet}
-        </Typography>
-      </Box>
-
-      {/* Properties Section: 2x2 Grid */}
-      {!compact && (
-        <PropertyGrid
-          sx={{
-            borderTopColor: isBackgroundActive
-              ? isLightBg
-                ? 'rgba(0, 0, 0, 0.1)'
-                : 'rgba(255, 255, 255, 0.18)'
-              : theme.palette.divider,
-            pt: 1.5,
-            mt: 1.5,
-          }}
-        >
-          <PropertyItem>
-            <PropertyLabel
-              sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(15, 23, 42, 0.65)'
-                    : 'rgba(255, 255, 255, 0.75)'
-                  : isDark
-                    ? 'rgba(255, 255, 255, 0.65)'
-                    : 'rgba(15, 23, 42, 0.65)',
-                transition: 'color 0.2s ease',
-                '.MuiPaper-root:hover &': {
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(15, 23, 42, 0.85)'
-                      : 'rgba(255, 255, 255, 0.95)'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.85)'
-                      : 'rgba(15, 23, 42, 0.85)',
-                },
-              }}
-            >
-              {t('workspaceLibrary.card.created')}
-            </PropertyLabel>
-            <PropertyValue
-              sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? '#0f172a'
-                    : '#ffffff'
-                  : 'text.primary',
-                transition: 'color 0.2s ease',
-                '.MuiPaper-root:hover &': {
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? '#020617'
-                      : '#ffffff'
-                    : isDark
-                      ? '#ffffff'
-                      : '#0f172a',
-                },
-              }}
-            >
-              {new Date(workspace.createdAt).toLocaleDateString(i18n.language, {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              })}
-            </PropertyValue>
-          </PropertyItem>
-
-          <PropertyItem>
-            <PropertyLabel
-              sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(15, 23, 42, 0.65)'
-                    : 'rgba(255, 255, 255, 0.75)'
-                  : isDark
-                    ? 'rgba(255, 255, 255, 0.65)'
-                    : 'rgba(15, 23, 42, 0.65)',
-                transition: 'color 0.2s ease',
-                '.MuiPaper-root:hover &': {
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(15, 23, 42, 0.85)'
-                      : 'rgba(255, 255, 255, 0.95)'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.85)'
-                      : 'rgba(15, 23, 42, 0.85)',
-                },
-              }}
-            >
-              {t('workspaceLibrary.card.taskStatus')}
-            </PropertyLabel>
-            <PropertyValue
-              sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? '#0f172a'
-                    : '#ffffff'
-                  : linkedTasksList.length > 0
-                    ? linkedTasksList.every(
-                        (task) => task.status?.toUpperCase() === 'DONE',
-                      )
-                      ? '#10b981'
-                      : 'text.primary'
-                    : 'text.secondary',
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                fontStyle: linkedTasksList.length === 0 ? 'italic' : 'normal',
-                transition: 'color 0.2s ease',
-                '.MuiPaper-root:hover &': {
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? '#020617'
-                      : '#ffffff'
-                    : isDark
-                      ? '#ffffff'
-                      : '#0f172a',
-                },
-              }}
-            >
-              {linkedTasksList.length > 1 ? (
-                <>
-                  <Box
-                    component="span"
-                    sx={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      bgcolor: linkedTasksList.every(
-                        (task) => task.status?.toUpperCase() === 'DONE',
-                      )
+                  bgcolor:
+                    linkedTasksList.length === 0
+                      ? '#9ca3af'
+                      : allTasksDone
                         ? '#10b981'
                         : '#fbbf24',
-                      display: 'inline-block',
-                    }}
-                  />
-                  {t('workspaceLibrary.card.doneCount', {
-                    done: linkedTasksList.filter(
-                      (task) => task.status?.toUpperCase() === 'DONE',
-                    ).length,
-                    total: linkedTasksList.length,
-                  })}
-                </>
-              ) : linkedTasksList.length === 1 ? (
-                <>
-                  <Box
-                    component="span"
-                    sx={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      bgcolor:
-                        linkedTasksList[0].status?.toUpperCase() === 'DONE'
-                          ? '#10b981'
-                          : '#fbbf24',
-                      display: 'inline-block',
-                    }}
-                  />
-                  {statusLabel(linkedTasksList[0].status)}
-                </>
-              ) : (
-                t('workspaceLibrary.card.none')
-              )}
-            </PropertyValue>
-          </PropertyItem>
+                }}
+              />
+              <Box
+                component="span"
+                sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+              >
+                {linkedTasksList.length > 1
+                  ? t('workspaceLibrary.card.doneCount', {
+                      done: doneTasks,
+                      total: linkedTasksList.length,
+                    })
+                  : linkedTasksList.length === 1
+                    ? statusLabel(linkedTasksList[0].status)
+                    : t('workspaceLibrary.card.noTask')}
+              </Box>
+            </FooterItem>
+            {linkedTasksList.length > 0 && (
+              <FooterItem title={t('workspaceLibrary.card.time')}>
+                <TimerIcon />
+                <span>
+                  {timeSpent('estimate_timer')} / {timeSpent('real_timer')}
+                </span>
+              </FooterItem>
+            )}
+          </Box>
 
-          <PropertyItem>
-            <PropertyLabel
-              sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(15, 23, 42, 0.65)'
-                    : 'rgba(255, 255, 255, 0.75)'
-                  : isDark
-                    ? 'rgba(255, 255, 255, 0.65)'
-                    : 'rgba(15, 23, 42, 0.65)',
-                transition: 'color 0.2s ease',
-                '.MuiPaper-root:hover &': {
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(15, 23, 42, 0.85)'
-                      : 'rgba(255, 255, 255, 0.95)'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.85)'
-                      : 'rgba(15, 23, 42, 0.85)',
-                },
-              }}
-            >
-              {t('workspaceLibrary.card.time')}
-            </PropertyLabel>
-            <PropertyValue
-              sx={{
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? '#0f172a'
-                    : '#ffffff'
-                  : linkedTasksList.length > 0
-                    ? 'primary.main'
-                    : 'text.secondary',
-                fontWeight: 600,
-                transition: 'color 0.2s ease',
-                '.MuiPaper-root:hover &': {
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? '#020617'
-                      : '#ffffff'
-                    : isDark
-                      ? '#ffffff'
-                      : 'primary.main',
-                },
-              }}
-            >
-              {linkedTasksList.length > 0
-                ? `${
-                    formatDuration(
-                      linkedTasksList.reduce(
-                        (acc, task) => acc + (task.estimate_timer || 0),
-                        0,
-                      ),
-                    ) || '0m'
-                  } / ${
-                    formatDuration(
-                      linkedTasksList.reduce(
-                        (acc, task) => acc + (task.real_timer || 0),
-                        0,
-                      ),
-                    ) || '0m'
-                  }`
-                : '—'}
-            </PropertyValue>
-          </PropertyItem>
-        </PropertyGrid>
-      )}
-
-      {/* Footer Section: Action Buttons */}
-      {!compact && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mt: 'auto',
-            width: '100%',
-          }}
-        >
-          {linkedTasksList.length > 0 ? (
+          {/* Linked tasks: unlink the first, list the rest */}
+          {linkedTasksList.length > 0 && (
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                width: '100%',
-                p: '6px 10px 6px 12px',
-                borderRadius: '20px',
-                bgcolor: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(0, 0, 0, 0.06)'
-                    : 'rgba(255, 255, 255, 0.15)'
-                  : isDark
-                    ? 'rgba(92, 92, 246, 0.12)'
-                    : 'rgba(92, 92, 246, 0.05)',
-                border: `1px solid ${
-                  isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(0, 0, 0, 0.12)'
-                      : 'rgba(255, 255, 255, 0.25)'
-                    : isDark
-                      ? 'rgba(92, 92, 246, 0.2)'
-                      : 'rgba(92, 92, 246, 0.1)'
-                }`,
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? '#0f172a'
-                    : '#ffffff'
-                  : 'primary.main',
-                transition: 'all 0.2s ease',
+                mt: 1.5,
+                p: '5px 10px',
+                borderRadius: '8px',
+                bgcolor: alpha(
+                  theme.palette.primary.main,
+                  isDark ? 0.14 : 0.06,
+                ),
+                color: 'primary.main',
               }}
             >
               <Box
@@ -797,26 +425,17 @@ export const WorkspaceCardItem = ({
                   flex: 1,
                   mr: 1,
                   cursor: 'pointer',
-                  '&:hover .unlink-text': {
-                    color: 'error.main',
-                  },
+                  '&:hover .unlink-text': { color: 'error.main' },
                 }}
               >
                 <LinkIcon sx={{ fontSize: 14, flexShrink: 0 }} />
                 <Typography
-                  variant="caption"
+                  noWrap
                   className="unlink-text"
                   sx={{
                     fontWeight: 600,
-                    fontSize: '0.8rem',
-                    color: isBackgroundActive
-                      ? isLightBg
-                        ? '#0f172a'
-                        : '#ffffff'
-                      : 'primary.main',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    fontSize: '12.5px',
+                    color: 'primary.main',
                     transition: 'color 0.2s ease',
                   }}
                 >
@@ -824,7 +443,7 @@ export const WorkspaceCardItem = ({
                 </Typography>
               </Box>
 
-              {linkedTasksList.length > 1 ? (
+              {linkedTasksList.length > 1 && (
                 <Box
                   onClick={(e) => {
                     e.stopPropagation();
@@ -834,123 +453,23 @@ export const WorkspaceCardItem = ({
                     px: 1,
                     py: 0.25,
                     borderRadius: '12px',
-                    bgcolor: isBackgroundActive
-                      ? isLightBg
-                        ? 'rgba(0, 0, 0, 0.12)'
-                        : 'rgba(255, 255, 255, 0.25)'
-                      : isDark
-                        ? 'rgba(92, 92, 246, 0.25)'
-                        : 'rgba(92, 92, 246, 0.15)',
-                    color: isBackgroundActive
-                      ? isLightBg
-                        ? '#0f172a'
-                        : '#ffffff'
-                      : 'primary.main',
                     fontSize: '11px',
                     fontWeight: 700,
                     whiteSpace: 'nowrap',
                     cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
                     flexShrink: 0,
-                    transition: 'all 0.15s ease',
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                      bgcolor: isBackgroundActive
-                        ? isLightBg
-                          ? 'rgba(0, 0, 0, 0.2)'
-                          : 'rgba(255, 255, 255, 0.35)'
-                        : 'primary.main',
-                      color: '#ffffff',
-                    },
+                    bgcolor: alpha(
+                      theme.palette.primary.main,
+                      isDark ? 0.25 : 0.14,
+                    ),
+                    '&:hover': { bgcolor: 'primary.main', color: '#ffffff' },
                   }}
                 >
                   {t('workspaceLibrary.card.more', {
                     count: linkedTasksList.length - 1,
                   })}
                 </Box>
-              ) : (
-                <Typography
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUnlinkTask(workspace);
-                  }}
-                  sx={{
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    '&:hover': { color: 'error.main' },
-                  }}
-                >
-                  →
-                </Typography>
               )}
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 1,
-                width: '100%',
-                p: '8px 14px',
-                borderRadius: '20px',
-                bgcolor: isBackgroundActive
-                  ? isLightBg
-                    ? 'rgba(0, 0, 0, 0.05)'
-                    : 'rgba(255, 255, 255, 0.12)'
-                  : isDark
-                    ? 'rgba(255, 255, 255, 0.04)'
-                    : 'rgba(0, 0, 0, 0.03)',
-                border: `1px dashed ${
-                  isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(0, 0, 0, 0.18)'
-                      : 'rgba(255, 255, 255, 0.28)'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.12)'
-                      : 'rgba(0, 0, 0, 0.12)'
-                }`,
-                color: isBackgroundActive
-                  ? isLightBg
-                    ? '#1e293b'
-                    : '#f8fafc'
-                  : 'text.secondary',
-                transition: 'all 0.2s ease',
-                '.MuiPaper-root:hover &': {
-                  borderColor: isBackgroundActive
-                    ? isLightBg
-                      ? 'rgba(0, 0, 0, 0.3)'
-                      : 'rgba(255, 255, 255, 0.45)'
-                    : isDark
-                      ? 'rgba(255, 255, 255, 0.25)'
-                      : 'rgba(0, 0, 0, 0.25)',
-                  color: isBackgroundActive
-                    ? isLightBg
-                      ? '#0f172a'
-                      : '#ffffff'
-                    : isDark
-                      ? '#ffffff'
-                      : '#0f172a',
-                },
-              }}
-            >
-              <LinkIcon sx={{ fontSize: 13, opacity: 0.6 }} />
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '0.8rem',
-                  letterSpacing: '0.2px',
-                  color: 'inherit',
-                }}
-              >
-                {t('workspaceLibrary.card.noTask')}
-              </Typography>
             </Box>
           )}
         </Box>

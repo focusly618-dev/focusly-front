@@ -22,7 +22,9 @@
     "error": "Fehler",
     "connect": "Verbinden",
     "all": "Alle",
-    "create": "Erstellen"
+    "create": "Erstellen",
+    "maximize": "Maximieren",
+    "restoreSize": "Größe wiederherstellen"
   },
   "errors": {
     "network": "Keine Verbindung zum Server. Prüfe deine Internetverbindung und versuche es erneut.",
@@ -1485,7 +1487,8 @@
       "custom": "Benutzerdefiniert",
       "logTime": "Zeit erfassen",
       "noTimeLogged": "Noch keine Zeit erfasst.",
-      "titlePlaceholder": "Quartals-Leistungsbericht fertigstellen"
+      "titlePlaceholder": "Quartals-Leistungsbericht fertigstellen",
+      "palette": "Farbpalette"
     },
     "projectRequired": {
       "title": "Wähle ein Projekt",

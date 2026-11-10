@@ -21,7 +21,9 @@
     "error": "エラー",
     "connect": "接続する",
     "all": "すべて",
-    "create": "作成"
+    "create": "作成",
+    "maximize": "最大化",
+    "restoreSize": "サイズを元に戻す"
   },
   "errors": {
     "network": "サーバーに接続できませんでした。インターネット接続を確認してもう一度お試しください。",
@@ -1453,7 +1455,8 @@
       "custom": "カスタム",
       "logTime": "時間を記録",
       "noTimeLogged": "記録された時間はまだありません。",
-      "titlePlaceholder": "四半期パフォーマンスレポートを完成させる"
+      "titlePlaceholder": "四半期パフォーマンスレポートを完成させる",
+      "palette": "カラーパレット"
     },
     "projectRequired": {
       "title": "プロジェクトを選択",

@@ -22,7 +22,9 @@
     "error": "Errore",
     "connect": "Connetti",
     "all": "Tutti",
-    "create": "Crea"
+    "create": "Crea",
+    "maximize": "Ingrandisci",
+    "restoreSize": "Ripristina dimensioni"
   },
   "errors": {
     "network": "Impossibile connettersi al server. Controlla la connessione a Internet e riprova.",
@@ -1485,7 +1487,8 @@
       "custom": "Personalizzato",
       "logTime": "Registra tempo",
       "noTimeLogged": "Nessun tempo registrato.",
-      "titlePlaceholder": "Completare il report trimestrale sulle prestazioni"
+      "titlePlaceholder": "Completare il report trimestrale sulle prestazioni",
+      "palette": "Tavolozza colori"
     },
     "projectRequired": {
       "title": "Scegli un progetto",

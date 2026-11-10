@@ -207,11 +207,19 @@ export const useProjectTasks = (options: UseProjectTasksOptions = {}) => {
             }
           : undefined;
 
+      const taskColor =
+        t.color ||
+        (() => {
+          const match = t.notes?.match(/\[COLOR:(.*?)\]/);
+          return match ? match[1] : undefined;
+        })();
+
       return {
         id: t.id,
         title: t.title,
         status: mapStatusFromBackend(t.status),
         priority: mapPriorityFromBackend(t.priority_level),
+        color: taskColor,
         tag: t.tags?.[0]?.name,
         duration: t.estimate_timer
           ? formatDuration(t.estimate_timer)

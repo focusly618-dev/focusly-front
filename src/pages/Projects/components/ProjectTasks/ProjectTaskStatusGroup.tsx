@@ -30,6 +30,7 @@ export interface ProjectTaskStatusGroupProps {
     task: ProjectTaskItemData,
     status: ProjectTaskStatusId,
   ) => void;
+  onDeleteTask?: (task: ProjectTaskItemData) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onAddSubtask?: (taskId: string, title: string) => void;
   /** An empty title asks for the full task form. */
@@ -47,6 +48,7 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
   onTaskClick,
   onToggleComplete,
   onChangeStatus,
+  onDeleteTask,
   onToggleSubtask,
   onAddSubtask,
   onAddTask,
@@ -184,6 +186,7 @@ export const ProjectTaskStatusGroup: React.FC<ProjectTaskStatusGroupProps> = ({
               onTaskClick={onTaskClick}
               onToggleComplete={onToggleComplete}
               onChangeStatus={onChangeStatus}
+              onDeleteTask={onDeleteTask}
               onToggleSubtask={onToggleSubtask}
               onAddSubtask={onAddSubtask}
               selectionMode={selectionMode}

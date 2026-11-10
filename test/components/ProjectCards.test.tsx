@@ -123,9 +123,8 @@ describe('WorkspaceCardItem', () => {
       screen.getByText('workspaceLibrary.card.noContent'),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('workspaceLibrary.card.created'),
+      screen.getByTitle('workspaceLibrary.card.created'),
     ).toBeInTheDocument();
-    expect(screen.getByText('workspaceLibrary.card.none')).toBeInTheDocument();
     expect(
       screen.getByText('workspaceLibrary.card.noTask'),
     ).toBeInTheDocument();

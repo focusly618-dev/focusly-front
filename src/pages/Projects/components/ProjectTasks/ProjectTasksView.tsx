@@ -57,6 +57,9 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
   const selection = useMultiSelect<ProjectTaskItemData>();
   const [moveAnchor, setMoveAnchor] = useState<HTMLElement | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<ProjectTaskItemData | null>(
+    null,
+  );
   const { filters, sort } = view;
   const layout = view.layout ?? 'list';
   const isAllProjects = !projectId;
@@ -268,6 +271,7 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
           onTaskClick={onOpenTask}
           onToggleComplete={projectTasks.toggleProjectTaskComplete}
           onChangeStatus={projectTasks.setProjectTaskStatus}
+          onDeleteTask={(task) => setTaskToDelete(task)}
           onToggleSubtask={(taskId, subtaskId) =>
             projectTasks.toggleProjectSubtask(
               taskId,
@@ -286,6 +290,17 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
           selectionMode={selection.state.isSelecting}
           isSelected={selection.actions.isSelected}
           onToggleSelect={selection.actions.toggle}
+          onToggleSelectAll={() => {
+            if (!selection.state.isSelecting) {
+              selection.actions.startSelecting();
+            }
+            selection.actions.toggleAll(shown);
+          }}
+          isAllSelected={selection.actions.areAllSelected(shown)}
+          isSomeSelected={
+            selection.state.selectedCount > 0 &&
+            !selection.actions.areAllSelected(shown)
+          }
         />
       )}
 
@@ -309,6 +324,25 @@ export const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
         onSelect={async (status) => {
           await projectTasks.setProjectTasksStatus(selected, status);
           selection.actions.stopSelecting();
+        }}
+      />
+
+      <ConfirmDeleteDialog
+        open={Boolean(taskToDelete)}
+        onClose={() => setTaskToDelete(null)}
+        title={t('tasks.actions.deleteTask', {
+          defaultValue: 'Eliminar tarea',
+        })}
+        description={t('tasks.deleteModal.description', {
+          defaultValue:
+            '¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.',
+        })}
+        itemNames={taskToDelete ? [taskToDelete.title] : []}
+        onConfirm={async () => {
+          if (taskToDelete) {
+            await projectTasks.deleteProjectTasks([taskToDelete.id]);
+            setTaskToDelete(null);
+          }
         }}
       />
 

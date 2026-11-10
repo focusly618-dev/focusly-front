@@ -32,6 +32,7 @@ export interface CreateProjectTaskInput {
   tag?: string;
   modules?: string[];
   description?: string;
+  color?: string;
   subtasks?: Array<{
     id?: string;
     title: string;
@@ -49,6 +50,7 @@ export interface UpdateProjectTaskInput {
   duration?: string | number;
   dueDate?: string;
   description?: string;
+  color?: string;
   projectId?: string;
   /** null unlinks the workspace. */
   workspaceId?: string | null;
@@ -223,6 +225,14 @@ export const useTaskMutations = () => {
       if (deadline) createTaskInput.deadline = deadline;
       if (formattedSubtasks.length > 0)
         createTaskInput.subtasks = formattedSubtasks;
+      if (input.color) {
+        createTaskInput.color = input.color;
+        const currentNotes = (createTaskInput.notes as string) || '';
+        if (!currentNotes.includes('[COLOR:')) {
+          createTaskInput.notes =
+            `${currentNotes} [COLOR:${input.color}]`.trim();
+        }
+      }
 
       const res = await createTaskMutation({
         variables: { createTaskInput },
@@ -289,6 +299,20 @@ export const useTaskMutations = () => {
       }
       if (input.description !== undefined) {
         updateTaskInput.notes = input.description;
+      }
+      if (input.color !== undefined) {
+        updateTaskInput.color = input.color;
+        const baseNotes = (
+          updateTaskInput.notes !== undefined
+            ? updateTaskInput.notes
+            : input.description !== undefined
+              ? input.description
+              : ''
+        ) as string;
+        const cleanNotes = baseNotes.replace(/\s*\[COLOR:.*?\]/g, '').trim();
+        updateTaskInput.notes = input.color
+          ? `${cleanNotes} [COLOR:${input.color}]`.trim()
+          : cleanNotes;
       }
       if (input.projectId !== undefined) {
         updateTaskInput.project_id = input.projectId || undefined;

@@ -203,4 +203,38 @@ describe('ProjectTasksView', () => {
       screen.getByRole('button', { name: /projectTasks\.viewMode\.kanban/ }),
     ).toHaveAttribute('aria-pressed', 'true');
   });
+
+  it('deletes a task via row action menu', async () => {
+    render(<Harness />);
+    const row = screen.getByRole('button', { name: 'Escribir capítulo' });
+    fireEvent.click(
+      within(row).getByRole('button', { name: 'tasks.columns.actions' }),
+    );
+    fireEvent.click(
+      screen.getByRole('menuitem', { name: 'tasks.actions.deleteTask' }),
+    );
+    // Confirm delete in the confirmation dialog
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'common.delete' }));
+    });
+    expect(projectTasks.deleteProjectTasks).toHaveBeenCalledWith(['t2']);
+  });
+
+  it('renders subtask progress and count on the row', () => {
+    projectTasks = makeProjectTasks([
+      {
+        id: 't-sub',
+        title: 'Tarea con subtareas',
+        status: 'todo',
+        projectId: 'p1',
+        color: '#f59e0b',
+        subtasks: [
+          { id: 's1', title: 'Paso 1', completed: true },
+          { id: 's2', title: 'Paso 2', completed: false },
+        ],
+      },
+    ]);
+    render(<Harness />);
+    expect(screen.getAllByText('1/2').length).toBeGreaterThan(0);
+  });
 });

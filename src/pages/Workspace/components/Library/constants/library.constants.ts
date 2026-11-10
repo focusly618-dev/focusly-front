@@ -359,3 +359,7 @@ export const SEARCH_SHORTCUT =
   /Mac|iPhone|iPad/i.test(navigator.userAgent)
     ? '⌘K'
     : 'Ctrl K';
+
+/** A background as one flat color: a gradient preset becomes its first color. */
+export const flatBackgroundColor = (background: string): string =>
+  /#[0-9a-f]{3,8}\b|rgba?\([^)]*\)/i.exec(background)?.[0] ?? background;

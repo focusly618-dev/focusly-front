@@ -11,6 +11,7 @@ import {
   Stack,
   Menu,
   MenuItem,
+  Popover,
   CircularProgress,
   InputBase,
   Divider,
@@ -41,7 +42,13 @@ import {
   KeyboardArrowDown as KeyboardArrowDownIcon,
   Check as CheckIcon,
   DeleteOutline as DeleteOutlineIcon,
+  PaletteOutlined as PaletteIcon,
 } from '@mui/icons-material';
+import {
+  PASTEL_COLORS,
+  isTaskCustomColor,
+  isColorDark,
+} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import {
   PriorityBadge,
   ModernFolderFilledIcon,
@@ -57,6 +64,10 @@ import {
   DURATION_OPTIONS,
 } from './useCreateProjectTaskModal.hook';
 import { surfaceColor } from '@/context';
+import {
+  headerContainerSx,
+  headerIconButtonSx,
+} from '@/pages/Tasks/components/TaskDetailModal/components/TaskHeader/TaskHeader.styles';
 import { ConfirmDeleteDialog } from '../../modals/ConfirmDeleteDialog/ConfirmDeleteDialog';
 
 export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
@@ -110,6 +121,8 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
     setIsFullScreen,
     title,
     setTitle,
+    color,
+    setColor,
     setStatus,
     statusMenuAnchor,
     setStatusMenuAnchor,
@@ -166,6 +179,16 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
   const cardBorder = themeTokens.cardBorder;
   const secondaryText = themeTokens.secondaryText;
   const headerText = themeTokens.headerText;
+  const [colorPopoverAnchor, setColorPopoverAnchor] =
+    React.useState<HTMLElement | null>(null);
+
+  // The header as a task's: its color fills the band, text follows the color
+  const hasCustomColor = isTaskCustomColor(color);
+  const isHeaderDark = hasCustomColor && isColorDark(color);
+  const onColorText = isHeaderDark ? '#ffffff' : '#0f172a';
+  const headerMutedText = hasCustomColor ? onColorText : secondaryText;
+  const headerStrongText = hasCustomColor ? onColorText : headerText;
+  const headerIconSx = headerIconButtonSx(hasCustomColor, color);
 
   return (
     <>
@@ -184,7 +207,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             boxShadow: isDark
               ? '0 24px 48px -12px rgba(0, 0, 0, 0.7)'
               : '0 20px 40px -15px rgba(15, 23, 42, 0.12)',
-            border: `1px solid ${cardBorder}`,
+            border: `1px solid ${hasCustomColor ? `${color}55` : cardBorder}`,
             maxHeight: isFullScreen ? '100vh' : '90vh',
             display: 'flex',
             flexDirection: 'column',
@@ -195,13 +218,11 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
         {/* ── HEADER BREADCRUMBS & CONTROLS ── */}
         <Box
           sx={{
-            px: 3,
-            pt: 2.5,
-            pb: 1.5,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            borderBottom: `1px solid ${alpha(cardBorder, 0.6)}`,
+            ...headerContainerSx(hasCustomColor, color, isFullScreen),
+            ...(!hasCustomColor && {
+              pb: 1.5,
+              borderBottom: `1px solid ${alpha(cardBorder, 0.6)}`,
+            }),
           }}
         >
           {/* Breadcrumb Context */}
@@ -227,9 +248,13 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 py: 0.45,
                 height: 30,
                 borderRadius: '8px',
-                bgcolor: isDark
-                  ? 'rgba(255, 255, 255, 0.04)'
-                  : 'rgba(0, 0, 0, 0.03)',
+                bgcolor: hasCustomColor
+                  ? isHeaderDark
+                    ? 'rgba(255, 255, 255, 0.18)'
+                    : 'rgba(0, 0, 0, 0.1)'
+                  : isDark
+                    ? 'rgba(255, 255, 255, 0.04)'
+                    : 'rgba(0, 0, 0, 0.03)',
                 border: `1px solid ${
                   projectMenuAnchor
                     ? alpha(currentProjectColor, 0.5)
@@ -276,7 +301,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 sx={{
                   fontSize: '13px',
                   fontWeight: 600,
-                  color: headerText,
+                  color: headerStrongText,
                   maxWidth: '180px',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -291,7 +316,7 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 <KeyboardArrowDownIcon
                   sx={{
                     fontSize: 15,
-                    color: secondaryText,
+                    color: headerMutedText,
                     opacity: 0.7,
                     ml: -0.2,
                     transition: 'transform 0.15s ease',
@@ -472,11 +497,11 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
               )}
             </Menu>
 
-            <Typography sx={{ color: secondaryText, fontSize: '13px' }}>
+            <Typography sx={{ color: headerMutedText, fontSize: '13px' }}>
               /
             </Typography>
             <Typography
-              sx={{ fontSize: '13px', fontWeight: 500, color: secondaryText }}
+              sx={{ fontSize: '13px', fontWeight: 500, color: headerMutedText }}
             >
               {isEditing
                 ? t('tasks.actions.editTask', 'Edit Task')
@@ -499,41 +524,88 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
             )}
           </Stack>
 
-          {/* Top Controls */}
-          <Stack direction="row" alignItems="center" spacing={0.5}>
-            <IconButton
-              size="small"
-              onClick={() => setIsFullScreen(!isFullScreen)}
-              sx={{ color: secondaryText, p: '6px' }}
+          {/* Top Controls: background, size, close, delete */}
+          <Stack direction="row" alignItems="center" spacing={0.75}>
+            <Tooltip title={t('tasks.properties.backgroundColor')} arrow>
+              <IconButton
+                size="small"
+                aria-label={t('tasks.properties.backgroundColor')}
+                onClick={(e) => setColorPopoverAnchor(e.currentTarget)}
+                sx={{
+                  ...headerIconSx,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.6,
+                  p: 0.5,
+                  px: 0.8,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    bgcolor: hasCustomColor ? color : '#008767',
+                    border: hasCustomColor
+                      ? '1.5px solid rgba(0,0,0,0.3)'
+                      : '1.5px solid white',
+                    boxShadow: '0 0 0 1px rgba(0,0,0,0.2)',
+                  }}
+                />
+                <PaletteIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={t(isFullScreen ? 'common.restoreSize' : 'common.maximize')}
+              arrow
             >
-              {isFullScreen ? (
-                <CloseFullscreenIcon sx={{ fontSize: 16 }} />
-              ) : (
-                <OpenInFullIcon sx={{ fontSize: 16 }} />
-              )}
-            </IconButton>
-            <Box
-              sx={{
-                px: '6px',
-                py: '2px',
-                borderRadius: '4px',
-                bgcolor: surfaceColor(theme, '#27272a', '#333333', '#f1f5f9'),
-                color: secondaryText,
-                fontSize: '11px',
-                fontWeight: 600,
-                fontFamily: 'monospace',
-                letterSpacing: -0.5,
-              }}
-            >
-              ⌘↵
-            </Box>
-            <IconButton
-              size="small"
-              onClick={onClose}
-              sx={{ color: secondaryText, p: '6px' }}
-            >
-              <CloseIcon sx={{ fontSize: 18 }} />
-            </IconButton>
+              <IconButton
+                size="small"
+                aria-label={t(
+                  isFullScreen ? 'common.restoreSize' : 'common.maximize',
+                )}
+                onClick={() => setIsFullScreen(!isFullScreen)}
+                sx={headerIconSx}
+              >
+                {isFullScreen ? (
+                  <CloseFullscreenIcon sx={{ fontSize: 16 }} />
+                ) : (
+                  <OpenInFullIcon sx={{ fontSize: 16 }} />
+                )}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('common.close')} arrow>
+              <IconButton
+                size="small"
+                aria-label={t('common.close')}
+                onClick={onClose}
+                sx={headerIconSx}
+              >
+                <CloseIcon sx={{ fontSize: 19 }} />
+              </IconButton>
+            </Tooltip>
+            {isEditing && onDelete && (
+              <Tooltip
+                title={t('tasks.createProjectTaskModal.deleteTask')}
+                arrow
+              >
+                <IconButton
+                  size="small"
+                  aria-label={t('tasks.createProjectTaskModal.deleteTask')}
+                  onClick={handleDeleteTask}
+                  disabled={isSubmitting}
+                  sx={{
+                    ...headerIconSx,
+                    '&:hover': {
+                      bgcolor: 'rgba(239, 68, 68, 0.15)',
+                      color: '#ef4444',
+                    },
+                  }}
+                >
+                  <DeleteOutlineIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            )}
           </Stack>
         </Box>
 
@@ -790,6 +862,121 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
                 </MenuItem>
               ))}
             </Menu>
+
+            {/* Task background, opened from the header */}
+            <Popover
+              open={Boolean(colorPopoverAnchor)}
+              anchorEl={colorPopoverAnchor}
+              onClose={() => setColorPopoverAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              PaperProps={{
+                sx: {
+                  p: 1.5,
+                  borderRadius: '12px',
+                  width: '280px',
+                  bgcolor: surfaceColor(theme, '#1a1b22', '#262626', '#ffffff'),
+                  border: `1px solid ${cardBorder}`,
+                  boxShadow: isDark
+                    ? '0 12px 32px rgba(0, 0, 0, 0.5)'
+                    : '0 8px 24px rgba(0, 0, 0, 0.1)',
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  color: 'text.secondary',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  mb: 1,
+                }}
+              >
+                {t('tasks.properties.palette')}
+              </Typography>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(6, 1fr)',
+                  gap: 1,
+                  mb: 1.5,
+                }}
+              >
+                {PASTEL_COLORS.map((item) => {
+                  const isSelected =
+                    color?.toUpperCase() === item.value.toUpperCase();
+                  return (
+                    <Tooltip key={item.value} title={item.name} arrow>
+                      <Box
+                        onClick={() => {
+                          setColor(item.value);
+                          setColorPopoverAnchor(null);
+                        }}
+                        sx={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: '50%',
+                          bgcolor: item.value,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: isSelected
+                            ? '2px solid'
+                            : '1.5px solid rgba(0,0,0,0.1)',
+                          borderColor: isSelected
+                            ? 'text.primary'
+                            : 'rgba(0,0,0,0.1)',
+                          transition: 'transform 0.15s ease',
+                          '&:hover': {
+                            transform: 'scale(1.15)',
+                          },
+                        }}
+                      >
+                        {isSelected && (
+                          <Box
+                            sx={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: '50%',
+                              bgcolor: isColorDark(item.value)
+                                ? '#ffffff'
+                                : '#0f172a',
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </Tooltip>
+                  );
+                })}
+              </Box>
+
+              {color && (
+                <Button
+                  fullWidth
+                  size="small"
+                  onClick={() => {
+                    setColor('');
+                    setColorPopoverAnchor(null);
+                  }}
+                  startIcon={<CloseIcon sx={{ fontSize: 14 }} />}
+                  sx={{
+                    textTransform: 'none',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: 'error.main',
+                    borderRadius: '8px',
+                    py: 0.5,
+                    '&:hover': {
+                      bgcolor: alpha('#ef4444', 0.08),
+                    },
+                  }}
+                >
+                  {t('tasks.properties.removeBackgroundColor')}
+                </Button>
+              )}
+            </Popover>
 
             {/* Module / Tags */}
             <Box
@@ -2086,28 +2273,6 @@ export const CreateProjectTaskModal: React.FC<CreateProjectTaskModalProps> = (
 
           {/* Actions on the Right */}
           <Stack direction="row" alignItems="center" spacing={2.5}>
-            {/* Delete Button (Editing mode) */}
-            {isEditing && onDelete && (
-              <Tooltip title={t('tasks.createProjectTaskModal.deleteTask')}>
-                <IconButton
-                  size="small"
-                  onClick={handleDeleteTask}
-                  disabled={isSubmitting}
-                  sx={{
-                    color: '#ef4444',
-                    p: 0.8,
-                    borderRadius: '8px',
-                    bgcolor: isDark ? 'rgba(239, 68, 68, 0.1)' : '#fee2e2',
-                    '&:hover': {
-                      bgcolor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#fecaca',
-                    },
-                  }}
-                >
-                  <DeleteOutlineIcon sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Tooltip>
-            )}
-
             {/* Create More Checkbox (Creation mode only) */}
             {!isEditing && (
               <Stack

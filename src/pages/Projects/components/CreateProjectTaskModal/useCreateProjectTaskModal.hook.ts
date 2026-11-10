@@ -62,6 +62,7 @@ interface FormSnapshot {
   estimatedDuration: string;
   modules: string[];
   subtasks: Subtask[];
+  color?: string;
   projectId?: string;
   workspaceId: string | null;
 }
@@ -293,6 +294,7 @@ export function useCreateProjectTaskModal({
   const [durationMenuAnchor, setDurationMenuAnchor] =
     useState<null | HTMLElement>(null);
   const [createMore, setCreateMore] = useState(false);
+  const [color, setColor] = useState('');
   const [description, setDescription] = useState('');
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
@@ -321,15 +323,26 @@ export function useCreateProjectTaskModal({
 
     if (task) {
       const initialDueDate = toDateInputValue(task.rawDeadline);
+      const initialColor =
+        task.color ||
+        (() => {
+          const match = task.description?.match(/\[COLOR:(.*?)\]/);
+          return match ? match[1] : '';
+        })() ||
+        '';
 
       const initial: FormSnapshot = {
         title: task.title || '',
-        description: task.description || '',
+        // The color also lives in the notes as a tag the user never sees
+        description: (task.description || '')
+          .replace(/\s*\[COLOR:.*?\]/g, '')
+          .trim(),
         status: mapStatusFromBackend(task.status || defaultStatus),
         priority: task.priority || 'Medium',
         dueDate: initialDueDate,
         // No estimate stays empty instead of silently becoming 30m.
         estimatedDuration: task.duration || '',
+        color: initialColor,
         modules:
           task.modules && task.modules.length > 0
             ? task.modules
@@ -355,6 +368,7 @@ export function useCreateProjectTaskModal({
       setPriority(initial.priority);
       setDueDate(initial.dueDate);
       setEstimatedDuration(initial.estimatedDuration);
+      setColor(initialColor);
       setModules(initial.modules);
       setSubtasks(initial.subtasks);
       setSelectedWorkspaceId(initial.workspaceId);
@@ -366,6 +380,7 @@ export function useCreateProjectTaskModal({
       setPriority('Medium');
       setDueDate('');
       setEstimatedDuration('30m');
+      setColor('');
       setModules([]);
       setSubtasks([]);
       setSelectedWorkspaceId(linkedWorkspaceId || null);
@@ -481,6 +496,7 @@ export function useCreateProjectTaskModal({
             dueDate: dueDate || undefined,
             estimatedDuration,
             description: description.trim(),
+            color: color || undefined,
             subtasks: toSubtaskPayload(subtasks),
             projectId: selectedProject?.id,
             workspaceId: selectedWorkspaceId || undefined,
@@ -490,6 +506,7 @@ export function useCreateProjectTaskModal({
         if (createMore) {
           setTitle('');
           setDescription('');
+          setColor('');
           setSubtasks([]);
           setModules([]);
         } else {
@@ -512,9 +529,15 @@ export function useCreateProjectTaskModal({
     const changes: Record<string, unknown> = {};
 
     if (title.trim() !== initial.title.trim()) changes.title = title.trim();
-    if (description !== initial.description) {
+    // The color is saved inside the notes, so each one travels with the other:
+    // alone, a new color would replace the description and a new description
+    // would drop the color.
+    const descriptionChanged = description !== initial.description;
+    const colorChanged = color !== (initial.color || '');
+    if (descriptionChanged || colorChanged) {
       changes.description = description.trim();
     }
+    if (colorChanged || (descriptionChanged && color)) changes.color = color;
     if (status !== initial.status) changes.status = currentStatusConfig.id;
     if (priority !== initial.priority) {
       changes.priority = currentPriorityConfig.id;
@@ -623,6 +646,8 @@ export function useCreateProjectTaskModal({
     setIsFullScreen,
     title,
     setTitle,
+    color,
+    setColor,
     status,
     setStatus,
     statusMenuAnchor,

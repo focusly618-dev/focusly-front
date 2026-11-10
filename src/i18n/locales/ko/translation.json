@@ -22,7 +22,9 @@
     "error": "오류",
     "connect": "연결",
     "all": "전체",
-    "create": "만들기"
+    "create": "만들기",
+    "maximize": "최대화",
+    "restoreSize": "크기 복원"
   },
   "errors": {
     "network": "서버에 연결할 수 없어요. 인터넷 연결을 확인하고 다시 시도해 주세요.",
@@ -1485,7 +1487,8 @@
       "custom": "사용자 지정",
       "logTime": "시간 기록",
       "noTimeLogged": "아직 기록된 시간이 없어요.",
-      "titlePlaceholder": "분기별 성과 보고서 완성하기"
+      "titlePlaceholder": "분기별 성과 보고서 완성하기",
+      "palette": "색상 팔레트"
     },
     "projectRequired": {
       "title": "프로젝트 선택",

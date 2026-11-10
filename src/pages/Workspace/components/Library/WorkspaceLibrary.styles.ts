@@ -441,7 +441,7 @@ export const GridContainer = styled(Box, {
     gridTemplateColumns:
       activeLayout === 'grid'
         ? 'repeat(auto-fill, minmax(min(100%, 220px), 1fr))'
-        : 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
+        : 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
     gridAutoRows: '1fr',
     gap: '20px',
     overflowY: 'auto',
@@ -454,69 +454,64 @@ export const GridContainer = styled(Box, {
   };
 });
 
+const CARD_COVER = { regular: 84, compact: 44 };
+// How far the content starts below the cover, and the icon rises over it
+const COVER_GAP = 14;
+export const CARD_ICON_RISE = COVER_GAP + 25;
+
+/**
+ * A document card, as a Notion gallery card: the document's background is a
+ * flat cover across the top, the icon sits on its edge, and the text is
+ * always on the card's own surface. Without a background the cover is neutral,
+ * so the titles of a row stay aligned.
+ */
 export const WorkspaceCard = styled(Card, {
-  shouldForwardProp: (prop) => prop !== 'gradient' && prop !== 'compact',
-})<{ gradient?: string; compact?: boolean }>(({ theme, gradient, compact }) => {
+  shouldForwardProp: (prop) => prop !== 'cover' && prop !== 'compact',
+})<{ cover?: string; compact?: boolean }>(({ theme, cover, compact }) => {
   const isDark = theme.palette.mode === 'dark';
-  const hasGradient = Boolean(gradient && gradient !== 'none');
+  const coverHeight = compact ? CARD_COVER.compact : CARD_COVER.regular;
   return {
-    background: hasGradient
-      ? gradient
-      : surfaceColor(theme, '#18191e', 'rgba(36, 36, 37, 0.7)', '#ffffff'),
-    backgroundSize: 'cover',
-    borderRadius: '12px',
-    padding: theme.spacing(1),
+    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
-    minHeight: compact ? '120px' : '330px',
+    minHeight: compact ? '150px' : '236px',
     height: '100%',
     minWidth: 0,
-    cursor: 'pointer',
-    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-    border: `1px solid ${
-      hasGradient
-        ? isDark
-          ? 'rgba(255, 255, 255, 0.25)'
-          : 'rgba(0, 0, 0, 0.15)'
-        : isDark
-          ? 'rgba(255, 255, 255, 0.06)'
-          : 'rgba(0, 0, 0, 0.06)'
-    }`,
-    backgroundClip: 'padding-box',
-    position: 'relative',
+    padding: `${coverHeight + COVER_GAP}px ${compact ? '18px 16px' : '24px 18px'}`,
+    borderRadius: '16px',
+    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#E8EAEE'}`,
+    background: surfaceColor(theme, '#1C1C1E', '#262626', '#FFFFFF'),
     overflow: 'hidden',
+    cursor: 'pointer',
     boxShadow: isDark
-      ? '0 4px 20px -2px rgba(0, 0, 0, 0.3)'
-      : '0 2px 8px -1px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02)',
-    '&::before': hasGradient
-      ? {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: isDark
-            ? 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 100%)'
-            : 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.15) 100%)',
-          zIndex: 0,
-          pointerEvents: 'none',
-        }
-      : {},
+      ? '0 1px 2px rgba(0, 0, 0, 0.4)'
+      : '0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.03)',
+    transition:
+      'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: `${coverHeight}px`,
+      background:
+        cover || alpha(theme.palette.text.primary, isDark ? 0.06 : 0.04),
+      pointerEvents: 'none',
+    },
     '& > *': {
       position: 'relative',
       zIndex: 1,
     },
     '&:hover': {
-      transform: 'translateY(-1.5px)',
+      transform: 'translateY(-2px)',
       boxShadow: isDark
-        ? '0 12px 30px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(99, 102, 241, 0.15)'
-        : '0 8px 24px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
-      borderColor: isDark ? 'rgba(99, 102, 241, 0.3)' : 'rgba(0, 0, 0, 0.15)',
-      '& .arrow-button': {
-        color: theme.palette.primary.main,
-        transform: 'translateX(2px)',
-      },
+        ? '0 10px 26px rgba(0, 0, 0, 0.4)'
+        : '0 10px 24px rgba(15, 23, 42, 0.07)',
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+      transition: 'none',
+      '&:hover': { transform: 'none' },
     },
   };
 });

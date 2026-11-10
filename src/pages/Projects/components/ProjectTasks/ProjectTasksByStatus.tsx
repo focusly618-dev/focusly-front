@@ -19,18 +19,26 @@ export interface ProjectTasksByStatusProps {
     task: ProjectTaskItemData,
     status: ProjectTaskStatusId,
   ) => void;
+  onDeleteTask?: (task: ProjectTaskItemData) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onAddSubtask?: (taskId: string, title: string) => void;
   onAddTask?: (statusId: string, title: string) => void;
   selectionMode?: boolean;
   isSelected?: (taskId: string) => boolean;
   onToggleSelect?: (task: ProjectTaskItemData) => void;
+  onToggleSelectAll?: () => void;
+  isAllSelected?: boolean;
+  isSomeSelected?: boolean;
 }
 
 export const ProjectTasksByStatus: React.FC<ProjectTasksByStatusProps> = ({
   tasks,
   showEmptyStatuses = false,
   showProject = true,
+  selectionMode = false,
+  onToggleSelectAll,
+  isAllSelected = false,
+  isSomeSelected = false,
   ...handlers
 }) => (
   <Box
@@ -50,7 +58,13 @@ export const ProjectTasksByStatus: React.FC<ProjectTasksByStatusProps> = ({
       },
     }}
   >
-    <ProjectTaskColumns showProject={showProject} />
+    <ProjectTaskColumns
+      showProject={showProject}
+      selectionMode={selectionMode}
+      onToggleSelectAll={onToggleSelectAll}
+      isAllSelected={isAllSelected}
+      isSomeSelected={isSomeSelected}
+    />
     {visibleStatuses(tasks, showEmptyStatuses).map((status) => (
       <ProjectTaskStatusGroup
         key={status.id}
@@ -58,6 +72,7 @@ export const ProjectTasksByStatus: React.FC<ProjectTasksByStatusProps> = ({
         tasks={tasksInStatus(tasks, status)}
         showProject={showProject}
         defaultExpanded={!status.isCompleted}
+        selectionMode={selectionMode}
         {...handlers}
       />
     ))}

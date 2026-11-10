@@ -765,6 +765,7 @@ export const WorkspaceLibrary = ({
             duration: taskData.estimatedDuration as string | undefined,
             dueDate: taskData.dueDate as string | undefined,
             description: taskData.description as string | undefined,
+            color: taskData.color as string | undefined,
             modules: taskData.modules as string[] | undefined,
             subtasks: ((taskData.subtasks as TaskModalSubtasks) ?? []).map(
               (subtask) => ({
@@ -791,6 +792,7 @@ export const WorkspaceLibrary = ({
             duration: taskData.estimatedDuration as string | undefined,
             dueDate: taskData.dueDate as string | undefined,
             description: taskData.description as string | undefined,
+            color: taskData.color as string | undefined,
             tags: taskData.modules as string[] | undefined,
             subtasks: taskData.subtasks as TaskModalSubtasks | undefined,
             projectId: taskData.projectId as string | undefined,

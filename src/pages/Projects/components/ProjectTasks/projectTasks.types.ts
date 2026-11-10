@@ -58,6 +58,7 @@ export interface ProjectTaskItemData {
   attendees?: ProjectTaskAttendee[];
   subtasks?: ProjectSubtaskItem[];
   completed?: boolean;
+  color?: string;
   project?: ProjectInfo;
   projectId?: string;
   projectName?: string;

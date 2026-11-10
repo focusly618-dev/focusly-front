@@ -22,7 +22,9 @@
     "error": "Error",
     "connect": "Connect",
     "all": "All",
-    "create": "Create"
+    "create": "Create",
+    "maximize": "Maximize",
+    "restoreSize": "Restore size"
   },
   "errors": {
     "network": "Couldn't connect to the server. Check your internet connection and try again.",
@@ -1485,7 +1487,8 @@
       "custom": "Custom",
       "logTime": "Log time",
       "noTimeLogged": "No time logged yet.",
-      "titlePlaceholder": "Complete quarterly performance report"
+      "titlePlaceholder": "Complete quarterly performance report",
+      "palette": "Color palette"
     },
     "projectRequired": {
       "title": "Choose a project",
