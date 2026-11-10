@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { executeSingleAction } from '@/components/chat/actionPlan/actionExecution';
 import { taskStart } from '@/components/chat/actionPlan/planFormat';
+import { parseLuminaActions, STREAM_INCOMPLETE_NOTICE } from '@/utils';
 import type { ParsedLuminaAction } from '@/utils';
 
 const local = (value: string) => new Date(value).toISOString();
@@ -55,5 +56,31 @@ describe('a task from a plan starts when Lumina said', () => {
       estimated_start_date: '2026-11-13T10:00:00',
     });
     expect(input.estimated_end_date).toBe(local('2026-11-13T10:45:00'));
+  });
+});
+
+describe('a reply cut by the provider', () => {
+  const notice = `\n\n${STREAM_INCOMPLETE_NOTICE}`;
+
+  it('still shows the notice when cut inside an action tag', () => {
+    const result = parseLuminaActions(
+      `Te propongo esto.\n\n[ACTION: CREATE_TASK {"title": "A", "dead${notice}`,
+    );
+    expect(result.cleanText).toBe(
+      `Te propongo esto.\n\n${STREAM_INCOMPLETE_NOTICE}`,
+    );
+    expect(result.actions).toEqual([]);
+    expect(result.hasPendingAction).toBe(false);
+  });
+
+  it('keeps it as normal text when cut before any tag', () => {
+    const result = parseLuminaActions(`Te propongo es${notice}`);
+    expect(result.cleanText).toContain(STREAM_INCOMPLETE_NOTICE);
+  });
+
+  it('an action still being written stays pending', () => {
+    const result = parseLuminaActions('Listo [ACTION: CREATE_TASK {"title"');
+    expect(result.hasPendingAction).toBe(true);
+    expect(result.cleanText).toBe('Listo');
   });
 });

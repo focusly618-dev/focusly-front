@@ -276,6 +276,10 @@ export const extractLuminaActionTags = (
  * legitimately emits one ACTION tag per task — extract every one of them,
  * not just the first, so the user sees the whole plan, not one task.
  */
+// Sent by focusly-ai (STREAM_INCOMPLETE) when a reply couldn't be finished.
+export const STREAM_INCOMPLETE_NOTICE =
+  '⚠️ Lumina no pudo terminar esta respuesta. Por favor, intenta de nuevo en un momento.';
+
 export const parseLuminaActions = (
   text: string,
 ): {
@@ -322,6 +326,16 @@ export const parseLuminaActions = (
   cleanText = cleanText.replace(/^\s*\}\]\s*/gm, '');
   cleanText = cleanText.replace(/\s*\}\]\s*/g, '\n');
   cleanText = cleanText.replace(/\n{3,}/g, '\n\n').trim();
+
+  // Cut inside an action tag: nothing more is coming, and the notice after
+  // the open tag would otherwise be hidden with it
+  if (hasPendingAction && text.trimEnd().endsWith(STREAM_INCOMPLETE_NOTICE)) {
+    return {
+      cleanText: `${cleanText}\n\n${STREAM_INCOMPLETE_NOTICE}`.trim(),
+      actions,
+      hasPendingAction: false,
+    };
+  }
 
   return { cleanText, actions, hasPendingAction };
 };
