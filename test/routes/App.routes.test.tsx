@@ -160,11 +160,19 @@ describe('App route guards', () => {
     ['/lumina', 'SITE_PAGE_LUMINA'],
     ['/product/tasks', 'SITE_PAGE_TASKS'],
     ['/for/students', 'SITE_PAGE_STUDENTS'],
-    ['/help', 'SITE_PAGE_HELP'],
+    ['/pricing', 'SITE_PAGE_PRICING'],
   ])('renders the site page at %s', (path, text) => {
     renderAppAt(path, false);
     expect(screen.getByText(text)).toBeInTheDocument();
   });
+
+  it.each(['/help', '/changelog', '/templates'])(
+    'has no page at %s any more',
+    (path) => {
+      renderAppAt(path, false);
+      expect(screen.getByText('NOT_FOUND_PAGE')).toBeInTheDocument();
+    },
+  );
 
   it('sends the old /features page to the product section of the home page', () => {
     renderAppAt('/features', false);
