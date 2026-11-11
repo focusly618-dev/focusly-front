@@ -28,10 +28,6 @@ export const de: SiteContent = {
       name: 'Projekte',
       desc: 'Gruppiere deine Dokumente nach Projekt',
     },
-    templates: {
-      name: 'Vorlagen',
-      desc: 'Sofort nutzbare Dokumente und Pläne',
-    },
     insights: {
       name: 'Insights und goldenes Zeitfenster',
       short: 'Insights',
@@ -58,14 +54,6 @@ export const de: SiteContent = {
       desc: 'Plane Skript, Aufnahme und Veröffentlichung in derselben Woche.',
     },
     pricing: { name: 'Preise', desc: 'Tarife Free und Pro' },
-    help: {
-      name: 'Hilfe-Center',
-      desc: 'Schritt-für-Schritt-Anleitungen und Antworten',
-    },
-    changelog: {
-      name: 'Neuigkeiten',
-      desc: 'Änderungen und Verbesserungen in jeder Version',
-    },
   },
 
   pages: {
@@ -244,11 +232,6 @@ export const de: SiteContent = {
         ],
       ],
     },
-    templates: {
-      group: 'Ressourcen',
-      title: 'Vorlagen für einen schnelleren Start',
-      sub: 'Dokumente und Pläne mit fertiger Struktur für deine Arbeitsbereiche.',
-    },
     students: {
       group: 'Für wen',
       title: 'Focusly für Studierende',
@@ -330,16 +313,6 @@ export const de: SiteContent = {
       title: 'Tarife und Preise',
       sub: 'Starte kostenlos, ohne Karte, und wechsle, wenn du mehr brauchst.',
     },
-    help: {
-      group: 'Ressourcen',
-      title: 'Hilfe-Center',
-      sub: 'Schritt-für-Schritt-Anleitungen und Antworten, um das Beste aus Focusly herauszuholen.',
-    },
-    changelog: {
-      group: 'Ressourcen',
-      title: 'Neuigkeiten',
-      sub: 'Die Änderungen und Verbesserungen in jeder Focusly-Version.',
-    },
   },
 
   nav: {
@@ -349,7 +322,6 @@ export const de: SiteContent = {
     lumina: 'Lumina AI',
     who: 'Für wen',
     pricing: 'Preise',
-    resources: 'Ressourcen',
     login: 'Anmelden',
     start: 'Kostenlos starten',
     openApp: 'Focusly öffnen',
@@ -708,7 +680,6 @@ export const de: SiteContent = {
   footer: {
     tagline: 'Aufgaben, Kalender, Notizen und KI an einem Ort.',
     product: 'Produkt',
-    resources: 'Ressourcen',
     legal: 'Rechtliches',
     terms: 'AGB',
     privacy: 'Datenschutz',
@@ -724,105 +695,5 @@ export const de: SiteContent = {
     seePricing: 'Preise ansehen',
     explore: 'Weiter entdecken',
     finalTitle: 'Deine nächste Woche, schon organisiert',
-    useTemplate: 'Vorlage verwenden',
-    preview: 'Vorschau',
-    filterTemplates: 'Vorlagen filtern',
-    helpSearchLabel: 'Im Hilfe-Center suchen',
-    helpPlaceholder: 'Suche nach einer Anleitung oder Frage',
-    helpEmpty: 'Keine Ergebnisse für „{q}“.',
-    helpContactTitle: 'Nicht gefunden, was du suchst?',
-    helpContactDesc: 'Schreib uns und wir melden uns.',
-    helpContact: 'Kontakt',
   },
-
-  help: [
-    {
-      icon: 'rocket_launch',
-      title: 'Erste Schritte',
-      desc: 'Erstelle dein Konto per Magic Link oder Google und lege deine Arbeitszeiten fest.',
-    },
-    {
-      icon: 'checklist',
-      title: 'Aufgaben',
-      desc: 'Eingang, heute, demnächst, Prioritäten, Tags und Unteraufgaben.',
-    },
-    {
-      icon: 'calendar_month',
-      title: 'Kalender und Google Kalender',
-      desc: 'Verbinde dein Konto und verstehe die Synchronisierung.',
-    },
-    {
-      icon: 'auto_awesome',
-      title: 'Lumina AI',
-      desc: '@-Erwähnungen, Anhänge und Wochenpläne.',
-    },
-    {
-      icon: 'description',
-      title: 'Arbeitsbereiche',
-      desc: 'Markdown-Dokumente, Projekte und Vorlagen.',
-    },
-    {
-      icon: 'manage_accounts',
-      title: 'Konto und Abrechnung',
-      desc: 'Tarife, Sprache, Design und Kontolöschung.',
-    },
-  ],
-
-  changelog: [
-    {
-      version: 'Workspaces 2.0',
-      date: '[PENDIENTE: fecha]',
-      tag: 'Neu',
-      title: 'Workspaces 2.0 ist da',
-      desc: '[PENDIENTE: resumen real de los cambios]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: 'Verbesserung',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: 'Fehlerbehebung',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-  ],
-
-  templateCategories: ['Alle', 'Planung', 'Lernen', 'Arbeit', 'Content'],
-  templates: [
-    {
-      cat: 'Planung',
-      name: 'Wochenplanung',
-      desc: 'Ziele, Prioritäten und Wochenrückblick.',
-    },
-    {
-      cat: 'Lernen',
-      name: 'Lernplan',
-      desc: 'Themen, Prüfungstermine und Wiederholungseinheiten.',
-    },
-    {
-      cat: 'Arbeit',
-      name: 'Kunden-Tracker',
-      desc: 'Umfang, Lieferungen und Notizen für jeden Kunden.',
-    },
-    {
-      cat: 'Arbeit',
-      name: 'Meeting-Notizen',
-      desc: 'Teilnehmende, Entscheidungen und nächste Schritte.',
-    },
-    {
-      cat: 'Arbeit',
-      name: 'Technische Doku',
-      desc: 'Kontext, Entscheidungen und Spezifikation.',
-    },
-    {
-      cat: 'Content',
-      name: 'Videoskript',
-      desc: 'Idee, Struktur, Skript und Checkliste zur Veröffentlichung.',
-    },
-  ],
 };

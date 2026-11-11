@@ -28,10 +28,6 @@ export const es: SiteContent = {
       desc: 'Markdown con vista previa en vivo',
     },
     projects: { name: 'Proyectos', desc: 'Agrupa tus documentos por proyecto' },
-    templates: {
-      name: 'Plantillas',
-      desc: 'Documentos y planes listos para usar',
-    },
     insights: {
       name: 'Insights y ventana dorada',
       short: 'Insights',
@@ -58,8 +54,6 @@ export const es: SiteContent = {
       desc: 'Planifica guion, grabación y publicación en la misma semana.',
     },
     pricing: { name: 'Precios', desc: 'Planes Gratis y Pro' },
-    help: { name: 'Centro de ayuda', desc: 'Guías y respuestas paso a paso' },
-    changelog: { name: 'Novedades', desc: 'Cambios y mejoras de cada versión' },
   },
 
   pages: {
@@ -238,11 +232,6 @@ export const es: SiteContent = {
         ],
       ],
     },
-    templates: {
-      group: 'Recursos',
-      title: 'Plantillas para empezar más rápido',
-      sub: 'Documentos y planes con una estructura lista para usar en tus workspaces.',
-    },
     students: {
       group: 'Para quién',
       title: 'Focusly para estudiantes',
@@ -324,16 +313,6 @@ export const es: SiteContent = {
       title: 'Planes y precios',
       sub: 'Empieza gratis, sin tarjeta, y mejora cuando lo necesites.',
     },
-    help: {
-      group: 'Recursos',
-      title: 'Centro de ayuda',
-      sub: 'Guías y respuestas paso a paso para sacarle partido a Focusly.',
-    },
-    changelog: {
-      group: 'Recursos',
-      title: 'Novedades',
-      sub: 'Los cambios y mejoras de cada versión de Focusly.',
-    },
   },
 
   nav: {
@@ -343,7 +322,6 @@ export const es: SiteContent = {
     lumina: 'Lumina IA',
     who: 'Para quién',
     pricing: 'Precios',
-    resources: 'Recursos',
     login: 'Iniciar sesión',
     start: 'Empieza gratis',
     openApp: 'Abrir Focusly',
@@ -702,7 +680,6 @@ export const es: SiteContent = {
   footer: {
     tagline: 'Tareas, calendario, notas e IA en un solo lugar.',
     product: 'Producto',
-    resources: 'Recursos',
     legal: 'Legal',
     terms: 'Términos',
     privacy: 'Privacidad',
@@ -718,111 +695,5 @@ export const es: SiteContent = {
     seePricing: 'Ver precios',
     explore: 'Sigue explorando',
     finalTitle: 'Tu próxima semana, ya organizada',
-    useTemplate: 'Usar plantilla',
-    preview: 'vista previa',
-    filterTemplates: 'Filtrar plantillas',
-    helpSearchLabel: 'Buscar en el centro de ayuda',
-    helpPlaceholder: 'Busca una guía o una pregunta',
-    helpEmpty: 'No hay resultados para “{q}”.',
-    helpContactTitle: '¿No encuentras lo que buscas?',
-    helpContactDesc: 'Escríbenos y te respondemos.',
-    helpContact: 'Contactar',
   },
-
-  help: [
-    {
-      icon: 'rocket_launch',
-      title: 'Primeros pasos',
-      desc: 'Crea tu cuenta con enlace mágico o Google y configura tu horario.',
-    },
-    {
-      icon: 'checklist',
-      title: 'Tareas',
-      desc: 'Bandeja, hoy, próximos, prioridades, etiquetas y subtareas.',
-    },
-    {
-      icon: 'calendar_month',
-      title: 'Calendario y Google Calendar',
-      desc: 'Conecta tu cuenta y entiende la sincronización.',
-    },
-    {
-      icon: 'auto_awesome',
-      title: 'Lumina IA',
-      desc: 'Menciones con @, adjuntos y planes semanales.',
-    },
-    {
-      icon: 'description',
-      title: 'Workspaces',
-      desc: 'Documentos en Markdown, proyectos y plantillas.',
-    },
-    {
-      icon: 'manage_accounts',
-      title: 'Cuenta y facturación',
-      desc: 'Planes, idioma, tema y eliminación de la cuenta.',
-    },
-  ],
-
-  changelog: [
-    {
-      version: 'Workspaces 2.0',
-      date: '[PENDIENTE: fecha]',
-      tag: 'Nuevo',
-      title: 'Workspaces 2.0 ya disponible',
-      desc: '[PENDIENTE: resumen real de los cambios]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: 'Mejora',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: 'Corrección',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-  ],
-
-  templateCategories: [
-    'Todas',
-    'Planificación',
-    'Estudio',
-    'Trabajo',
-    'Contenido',
-  ],
-  templates: [
-    {
-      cat: 'Planificación',
-      name: 'Planificación semanal',
-      desc: 'Objetivos, prioridades y revisión de la semana.',
-    },
-    {
-      cat: 'Estudio',
-      name: 'Plan de estudio',
-      desc: 'Temas, fechas de examen y sesiones de repaso.',
-    },
-    {
-      cat: 'Trabajo',
-      name: 'Seguimiento de cliente',
-      desc: 'Alcance, entregables y notas de cada cliente.',
-    },
-    {
-      cat: 'Trabajo',
-      name: 'Notas de reunión',
-      desc: 'Asistentes, decisiones y próximos pasos.',
-    },
-    {
-      cat: 'Trabajo',
-      name: 'Documentación técnica',
-      desc: 'Contexto, decisiones y especificación.',
-    },
-    {
-      cat: 'Contenido',
-      name: 'Guion de video',
-      desc: 'Idea, estructura, guion y checklist de publicación.',
-    },
-  ],
 };

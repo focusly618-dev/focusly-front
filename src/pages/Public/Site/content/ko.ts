@@ -25,7 +25,6 @@ export const ko: SiteContent = {
       desc: '실시간 미리보기가 되는 마크다운',
     },
     projects: { name: '프로젝트', desc: '문서를 프로젝트별로 묶기' },
-    templates: { name: '템플릿', desc: '바로 쓸 수 있는 문서와 계획' },
     insights: {
       name: '인사이트 및 골든 윈도',
       short: '인사이트',
@@ -52,11 +51,6 @@ export const ko: SiteContent = {
       desc: '대본, 촬영, 게시를 같은 주에 계획해요.',
     },
     pricing: { name: '요금', desc: 'Free, Pro 플랜' },
-    help: { name: '도움말 센터', desc: '단계별 가이드와 답변' },
-    changelog: {
-      name: '새로운 기능',
-      desc: '버전마다의 변경 사항과 개선 사항',
-    },
   },
 
   pages: {
@@ -211,11 +205,6 @@ export const ko: SiteContent = {
         ],
       ],
     },
-    templates: {
-      group: '리소스',
-      title: '더 빨리 시작하는 템플릿',
-      sub: '워크스페이스에 바로 쓸 수 있는 구조의 문서와 계획.',
-    },
     students: {
       group: '이런 분께',
       title: '학생을 위한 Focusly',
@@ -285,16 +274,6 @@ export const ko: SiteContent = {
       title: '플랜 및 요금',
       sub: '카드 없이 무료로 시작하고, 필요할 때 업그레이드하세요.',
     },
-    help: {
-      group: '리소스',
-      title: '도움말 센터',
-      sub: 'Focusly를 최대한 활용하기 위한 단계별 가이드와 답변.',
-    },
-    changelog: {
-      group: '리소스',
-      title: '새로운 기능',
-      sub: 'Focusly의 버전마다의 변경 사항과 개선 사항.',
-    },
   },
 
   nav: {
@@ -304,7 +283,6 @@ export const ko: SiteContent = {
     lumina: 'Lumina AI',
     who: '이런 분께',
     pricing: '요금',
-    resources: '리소스',
     login: '로그인',
     start: '무료로 시작',
     openApp: 'Focusly 열기',
@@ -653,7 +631,6 @@ export const ko: SiteContent = {
   footer: {
     tagline: '작업, 캘린더, 노트, AI를 한곳에.',
     product: '제품',
-    resources: '리소스',
     legal: '법적 고지',
     terms: '약관',
     privacy: '개인정보',
@@ -669,105 +646,5 @@ export const ko: SiteContent = {
     seePricing: '요금 보기',
     explore: '계속 둘러보기',
     finalTitle: '다음 주가 벌써 정리되어 있어요',
-    useTemplate: '템플릿 사용',
-    preview: '미리보기',
-    filterTemplates: '템플릿 필터',
-    helpSearchLabel: '도움말 센터 검색',
-    helpPlaceholder: '가이드나 질문을 검색하세요',
-    helpEmpty: '“{q}”에 대한 결과가 없어요.',
-    helpContactTitle: '찾는 내용이 없나요?',
-    helpContactDesc: '메시지를 보내 주시면 답변드릴게요.',
-    helpContact: '문의하기',
   },
-
-  help: [
-    {
-      icon: 'rocket_launch',
-      title: '시작하기',
-      desc: '매직 링크나 Google로 계정을 만들고 근무 시간을 설정하세요.',
-    },
-    {
-      icon: 'checklist',
-      title: '작업',
-      desc: '수신함, 오늘, 예정, 우선순위, 태그, 하위 작업.',
-    },
-    {
-      icon: 'calendar_month',
-      title: '캘린더 및 Google 캘린더',
-      desc: '계정을 연결하고 동기화를 이해하세요.',
-    },
-    {
-      icon: 'auto_awesome',
-      title: 'Lumina AI',
-      desc: '@ 언급, 첨부 파일, 주간 계획.',
-    },
-    {
-      icon: 'description',
-      title: '워크스페이스',
-      desc: '마크다운 문서, 프로젝트, 템플릿.',
-    },
-    {
-      icon: 'manage_accounts',
-      title: '계정 및 결제',
-      desc: '플랜, 언어, 테마, 계정 삭제.',
-    },
-  ],
-
-  changelog: [
-    {
-      version: 'Workspaces 2.0',
-      date: '[PENDIENTE: fecha]',
-      tag: '신규',
-      title: 'Workspaces 2.0 출시',
-      desc: '[PENDIENTE: resumen real de los cambios]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: '개선',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: '수정',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-  ],
-
-  templateCategories: ['전체', '계획', '공부', '업무', '콘텐츠'],
-  templates: [
-    {
-      cat: '계획',
-      name: '주간 계획',
-      desc: '목표, 우선순위, 한 주 회고.',
-    },
-    {
-      cat: '공부',
-      name: '학습 계획',
-      desc: '주제, 시험 날짜, 복습 세션.',
-    },
-    {
-      cat: '업무',
-      name: '고객 관리',
-      desc: '고객별 범위, 산출물, 노트.',
-    },
-    {
-      cat: '업무',
-      name: '회의록',
-      desc: '참석자, 결정 사항, 다음 단계.',
-    },
-    {
-      cat: '업무',
-      name: '기술 문서',
-      desc: '배경, 결정 사항, 사양.',
-    },
-    {
-      cat: '콘텐츠',
-      name: '영상 대본',
-      desc: '아이디어, 구성, 대본, 게시 체크리스트.',
-    },
-  ],
 };

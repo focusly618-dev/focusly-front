@@ -28,7 +28,6 @@ export const ja: SiteContent = {
       name: 'プロジェクト',
       desc: 'ドキュメントをプロジェクトごとに整理',
     },
-    templates: { name: 'テンプレート', desc: 'すぐに使えるドキュメントと計画' },
     insights: {
       name: 'インサイトとゴールデンタイム',
       short: 'インサイト',
@@ -52,8 +51,6 @@ export const ja: SiteContent = {
       desc: '台本、撮影、公開を同じ週の中で計画。',
     },
     pricing: { name: '料金', desc: '無料・Proプラン' },
-    help: { name: 'ヘルプセンター', desc: 'ステップごとのガイドと回答' },
-    changelog: { name: '新機能', desc: '各バージョンの変更点と改善' },
   },
 
   pages: {
@@ -229,11 +226,6 @@ export const ja: SiteContent = {
         ],
       ],
     },
-    templates: {
-      group: 'リソース',
-      title: 'すぐに始められるテンプレート',
-      sub: 'ワークスペースですぐに使える構成のドキュメントと計画。',
-    },
     students: {
       group: '対象ユーザー',
       title: '学生のためのFocusly',
@@ -312,16 +304,6 @@ export const ja: SiteContent = {
       title: 'プランと料金',
       sub: 'カード不要で無料で始めて、必要になったらアップグレード。',
     },
-    help: {
-      group: 'リソース',
-      title: 'ヘルプセンター',
-      sub: 'Focuslyを使いこなすための、ステップごとのガイドと回答。',
-    },
-    changelog: {
-      group: 'リソース',
-      title: '新機能',
-      sub: 'Focuslyの各バージョンの変更点と改善。',
-    },
   },
 
   nav: {
@@ -331,7 +313,6 @@ export const ja: SiteContent = {
     lumina: 'Lumina AI',
     who: '対象ユーザー',
     pricing: '料金',
-    resources: 'リソース',
     login: 'ログイン',
     start: '無料で始める',
     openApp: 'Focuslyを開く',
@@ -681,7 +662,6 @@ export const ja: SiteContent = {
   footer: {
     tagline: 'タスク、カレンダー、ノート、AIをひとつに。',
     product: '製品',
-    resources: 'リソース',
     legal: '法的情報',
     terms: '利用規約',
     privacy: 'プライバシー',
@@ -697,89 +677,5 @@ export const ja: SiteContent = {
     seePricing: '料金を見る',
     explore: 'さらに見る',
     finalTitle: '来週は、もう整っています',
-    useTemplate: 'テンプレートを使う',
-    preview: 'プレビュー',
-    filterTemplates: 'テンプレートを絞り込む',
-    helpSearchLabel: 'ヘルプセンターを検索',
-    helpPlaceholder: 'ガイドや質問を検索',
-    helpEmpty: '「{q}」に一致する結果はありません。',
-    helpContactTitle: '探しているものが見つかりませんか？',
-    helpContactDesc: 'お問い合わせいただければ、お返事します。',
-    helpContact: 'お問い合わせ',
   },
-
-  help: [
-    {
-      icon: 'rocket_launch',
-      title: 'はじめに',
-      desc: 'マジックリンクまたはGoogleでアカウントを作成し、スケジュールを設定します。',
-    },
-    {
-      icon: 'checklist',
-      title: 'タスク',
-      desc: '受信箱、今日、予定、優先度、タグ、サブタスク。',
-    },
-    {
-      icon: 'calendar_month',
-      title: 'カレンダーとGoogleカレンダー',
-      desc: 'アカウントを連携し、同期の仕組みを理解します。',
-    },
-    {
-      icon: 'auto_awesome',
-      title: 'Lumina AI',
-      desc: '@メンション、添付ファイル、週間プラン。',
-    },
-    {
-      icon: 'description',
-      title: 'ワークスペース',
-      desc: 'Markdownのドキュメント、プロジェクト、テンプレート。',
-    },
-    {
-      icon: 'manage_accounts',
-      title: 'アカウントと請求',
-      desc: 'プラン、言語、テーマ、アカウントの削除。',
-    },
-  ],
-
-  changelog: [
-    {
-      version: 'Workspaces 2.0',
-      date: '[PENDIENTE: fecha]',
-      tag: '新機能',
-      title: 'Workspaces 2.0をリリース',
-      desc: '[PENDIENTE: resumen real de los cambios]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: '改善',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: '修正',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-  ],
-
-  templateCategories: ['すべて', '計画', '勉強', '仕事', 'コンテンツ'],
-  templates: [
-    { cat: '計画', name: '週間計画', desc: '目標、優先度、週の振り返り。' },
-    { cat: '勉強', name: '勉強計画', desc: 'テーマ、試験日、復習セッション。' },
-    {
-      cat: '仕事',
-      name: 'クライアント管理',
-      desc: '各クライアントの範囲、成果物、ノート。',
-    },
-    { cat: '仕事', name: '会議メモ', desc: '参加者、決定事項、次のステップ。' },
-    { cat: '仕事', name: '技術ドキュメント', desc: '背景、決定事項、仕様。' },
-    {
-      cat: 'コンテンツ',
-      name: '動画の台本',
-      desc: 'アイデア、構成、台本、公開チェックリスト。',
-    },
-  ],
 };

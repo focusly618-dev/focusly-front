@@ -38,7 +38,6 @@ export interface SiteContent {
     lumina: string;
     who: string;
     pricing: string;
-    resources: string;
     login: string;
     start: string;
     openApp: string;
@@ -182,7 +181,6 @@ export interface SiteContent {
   footer: {
     tagline: string;
     product: string;
-    resources: string;
     legal: string;
     terms: string;
     privacy: string;
@@ -198,26 +196,5 @@ export interface SiteContent {
     seePricing: string;
     explore: string;
     finalTitle: string;
-    useTemplate: string;
-    preview: string;
-    filterTemplates: string;
-    helpSearchLabel: string;
-    helpPlaceholder: string;
-    /** "{q}" is replaced by the search query. */
-    helpEmpty: string;
-    helpContactTitle: string;
-    helpContactDesc: string;
-    helpContact: string;
   };
-
-  help: IconText[];
-  changelog: {
-    version: string;
-    date: string;
-    tag: string;
-    title: string;
-    desc: string;
-  }[];
-  templateCategories: [string, ...string[]];
-  templates: { cat: string; name: string; desc: string }[];
 }

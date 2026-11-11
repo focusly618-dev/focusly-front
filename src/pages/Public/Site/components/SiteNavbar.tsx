@@ -20,7 +20,7 @@ import { SiteLink } from './ui';
 import { MobileMenu } from './MobileMenu';
 import { useNavModel, type NavEntry } from './navModel';
 
-type MenuId = 'product' | 'who' | 'resources' | 'lang';
+type MenuId = 'product' | 'who' | 'lang';
 
 export const Logo = ({
   size = 28,
@@ -574,78 +574,75 @@ export const SiteNavbar = () => {
                   {c.nav.lumina}
                 </SiteLink>
 
-                {(
-                  [
-                    ['who', c.nav.who, nav.who, 540, false],
-                    ['resources', c.nav.resources, nav.resources, 320, true],
-                  ] as const
-                ).map(([id, label, items, width, neutral]) => (
-                  <React.Fragment key={id}>
-                    <Box
-                      onMouseEnter={() => openMenu(id)}
-                      onMouseLeave={leave}
-                      sx={{
-                        position: 'relative',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <ButtonBase
-                        data-trigger={id}
-                        aria-expanded={open === id}
-                        aria-controls={`menu-${id}`}
-                        onClick={() => clickMenu(id)}
-                        sx={triggerSx(id, id)}
-                      >
-                        {label}
-                        {chevron(id)}
-                      </ButtonBase>
+                {([['who', c.nav.who, nav.who, 540, false]] as const).map(
+                  ([id, label, items, width, neutral]) => (
+                    <React.Fragment key={id}>
                       <Box
-                        id={`menu-${id}`}
-                        data-menu={id}
+                        onMouseEnter={() => openMenu(id)}
+                        onMouseLeave={leave}
                         sx={{
-                          ...panelSx(id),
-                          position: 'absolute',
-                          top: '100%',
-                          left: -8,
-                          width,
-                          pt: 1.5,
-                          transform: `translateY(${open === id ? '0px' : '8px'})`,
+                          position: 'relative',
+                          display: 'flex',
+                          alignItems: 'center',
                         }}
                       >
+                        <ButtonBase
+                          data-trigger={id}
+                          aria-expanded={open === id}
+                          aria-controls={`menu-${id}`}
+                          onClick={() => clickMenu(id)}
+                          sx={triggerSx(id, id)}
+                        >
+                          {label}
+                          {chevron(id)}
+                        </ButtonBase>
                         <Box
+                          id={`menu-${id}`}
+                          data-menu={id}
                           sx={{
-                            ...surfaceSx,
-                            p: 1.25,
-                            display: 'grid',
-                            gridTemplateColumns: neutral ? '1fr' : '1fr 1fr',
-                            gap: '2px',
+                            ...panelSx(id),
+                            position: 'absolute',
+                            top: '100%',
+                            left: -8,
+                            width,
+                            pt: 1.5,
+                            transform: `translateY(${open === id ? '0px' : '8px'})`,
                           }}
                         >
-                          {items.map((item) => (
-                            <MenuItemLink
-                              key={item.slug}
-                              item={item}
-                              onNavigate={close}
-                              neutralIcon={neutral}
-                            />
-                          ))}
+                          <Box
+                            sx={{
+                              ...surfaceSx,
+                              p: 1.25,
+                              display: 'grid',
+                              gridTemplateColumns: neutral ? '1fr' : '1fr 1fr',
+                              gap: '2px',
+                            }}
+                          >
+                            {items.map((item) => (
+                              <MenuItemLink
+                                key={item.slug}
+                                item={item}
+                                onNavigate={close}
+                                neutralIcon={neutral}
+                              />
+                            ))}
+                          </Box>
                         </Box>
                       </Box>
-                    </Box>
-                    {id === 'who' && (
-                      <SiteLink
-                        to={nav.pricingHref}
-                        aria-current={
-                          activeKey === 'pricing' ? 'true' : undefined
-                        }
-                        sx={plainLinkSx('pricing')}
-                      >
-                        {c.nav.pricing}
-                      </SiteLink>
-                    )}
-                  </React.Fragment>
-                ))}
+                      {id === 'who' && (
+                        <SiteLink
+                          to={nav.pricingHref}
+                          aria-current={
+                            activeKey === 'pricing' ? 'true' : undefined
+                          }
+                          sx={plainLinkSx('pricing')}
+                        >
+                          {c.nav.pricing}
+                        </SiteLink>
+                      )}
+                    </React.Fragment>
+                  ),
+                )}
               </Box>
 
               <Box

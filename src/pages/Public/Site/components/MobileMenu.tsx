@@ -42,12 +42,6 @@ export const MobileMenu = ({
     { kind: 'link', label: c.nav.lumina, href: model.luminaHref },
     { kind: 'accordion', key: 'who', label: c.nav.who, items: model.who },
     { kind: 'link', label: c.nav.pricing, href: model.pricingHref },
-    {
-      kind: 'accordion',
-      key: 'resources',
-      label: c.nav.resources,
-      items: model.resources,
-    },
   ];
 
   return (

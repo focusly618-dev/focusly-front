@@ -12,19 +12,16 @@ export type PageSlug =
   | 'projects'
   | 'insights'
   | 'lumina'
-  | 'templates'
   | 'students'
   | 'freelancers'
   | 'developers'
   | 'creators'
-  | 'pricing'
-  | 'help'
-  | 'changelog';
+  | 'pricing';
 
 /** Navbar entry a page belongs to (drives the active highlight). */
-export type NavKey = 'product' | 'lumina' | 'who' | 'pricing' | 'resources';
+export type NavKey = 'product' | 'lumina' | 'who' | 'pricing';
 
-export type PageType = 'pricing' | 'help' | 'log' | 'tpl';
+export type PageType = 'pricing';
 
 export interface PageMeta {
   path: string;
@@ -128,7 +125,7 @@ export const PAGES: Record<PageSlug, PageMeta> = {
     path: '/product/workspaces',
     icon: 'description',
     navKey: 'product',
-    related: ['projects', 'templates', 'lumina'],
+    related: ['projects', 'lumina', 'tasks'],
     media: img('editor Markdown con vista previa'),
     blockMedia: [
       'captura · editor dividido',
@@ -142,7 +139,7 @@ export const PAGES: Record<PageSlug, PageMeta> = {
     path: '/product/projects',
     icon: 'folder_open',
     navKey: 'product',
-    related: ['workspaces', 'templates', 'tasks'],
+    related: ['workspaces', 'tasks', 'lumina'],
     media: img('vista de proyecto'),
     blockMedia: [
       'captura · proyecto con documentos',
@@ -194,13 +191,6 @@ export const PAGES: Record<PageSlug, PageMeta> = {
       'lumina-memory',
       'lumina-privacy',
     ],
-  },
-  templates: {
-    path: '/templates',
-    icon: 'dashboard_customize',
-    navKey: 'resources',
-    type: 'tpl',
-    related: ['workspaces', 'projects', 'help'],
   },
   students: {
     path: '/for/students',
@@ -271,21 +261,7 @@ export const PAGES: Record<PageSlug, PageMeta> = {
     icon: 'sell',
     navKey: 'pricing',
     type: 'pricing',
-    related: ['lumina', 'help', 'changelog'],
-  },
-  help: {
-    path: '/help',
-    icon: 'help',
-    navKey: 'resources',
-    type: 'help',
-    related: ['changelog', 'templates', 'pricing'],
-  },
-  changelog: {
-    path: '/changelog',
-    icon: 'new_releases',
-    navKey: 'resources',
-    type: 'log',
-    related: ['help', 'templates', 'lumina'],
+    related: ['lumina', 'tasks', 'students'],
   },
 };
 
@@ -295,7 +271,7 @@ export const PAGE_SLUGS = Object.keys(PAGES) as PageSlug[];
 export const PRODUCT_COLUMNS = [
   { key: 'plan', slugs: ['tasks', 'calendar', 'planner'] },
   { key: 'focus', slugs: ['focus', 'timeBlocks'] },
-  { key: 'organize', slugs: ['workspaces', 'projects', 'templates'] },
+  { key: 'organize', slugs: ['workspaces', 'projects'] },
   { key: 'understand', slugs: ['insights'] },
 ] as const satisfies readonly { key: string; slugs: readonly PageSlug[] }[];
 
@@ -306,12 +282,6 @@ export const WHO_SLUGS = [
   'freelancers',
   'developers',
   'creators',
-] as const satisfies readonly PageSlug[];
-
-export const RESOURCE_SLUGS = [
-  'help',
-  'changelog',
-  'templates',
 ] as const satisfies readonly PageSlug[];
 
 /** Home sections the navbar highlights while they're on screen. */
@@ -333,6 +303,3 @@ export const PRICING = {
 } as const;
 
 export type PlanKey = keyof typeof PRICING;
-
-/** Support address shown in the help center once it's defined. */
-export const SUPPORT_EMAIL = '';

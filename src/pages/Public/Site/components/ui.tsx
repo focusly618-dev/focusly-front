@@ -253,6 +253,10 @@ export const MediaPlaceholder = ({
 const videoLanguage = (lang: string): string | null =>
   lang === 'es' ? null : lang === 'ja' ? 'ja' : 'en';
 
+// Language sets found missing, so other videos and later visits in the same
+// session go straight to the Spanish one
+const missingVideos = new Set<string>();
+
 /**
  * Muted looping video from MEDIA_BASE_URL/videos, in the variant matching the
  * theme: `<name>-light` or `<name>-dark` (.webm, .mp4 and -poster.webp), in
@@ -285,16 +289,37 @@ export const LoopVideo = ({
   const videoLang = videoLanguage(lang);
   const localized = videoLang ? `${base}-${videoLang}` : null;
   // A language's video that can't be loaded (not uploaded yet): Spanish instead
-  const [missing, setMissing] = useState<string | null>(null);
+  const [missing, setMissing] = useState<string | null>(() =>
+    localized && missingVideos.has(localized) ? localized : null,
+  );
   const src = localized && localized !== missing ? localized : base;
+  const markMissing = (path: string) => {
+    missingVideos.add(path);
+    setMissing(path);
+  };
+  // The <video> only loads once it plays (preload="none"): until then its
+  // poster would stay blank. Its poster tells right away whether the
+  // language's set exists.
+  useEffect(() => {
+    if (!localized || missingVideos.has(localized)) return;
+    const probe = new Image();
+    probe.onerror = () => {
+      missingVideos.add(localized);
+      setMissing(localized);
+    };
+    probe.src = `${localized}-poster.webp`;
+    return () => {
+      probe.onerror = null;
+    };
+  }, [localized]);
   // The backend answers with a signed link that expires. If a long-open tab
   // reloads the file with a stale one, ask again past the cached redirect.
   const [retry, setRetry] = useState(0);
   const query = retry ? `?r=${retry}` : '';
   const handleError = () => {
-    // One more try first: it may just be an expired link
-    if (src === localized && retry >= 1) {
-      setMissing(localized);
+    // A language's video that never loaded isn't there: no retry for it
+    if (src === localized) {
+      markMissing(localized);
       setRetry(0);
       return;
     }
@@ -322,7 +347,9 @@ export const LoopVideo = ({
     );
     observer.observe(video);
     return () => observer.disconnect();
-  }, [active, src, reduced]);
+    // A retry remounts the <video> (it's keyed by src + query): the new one
+    // has to be observed and played again, or with preload="none" it never loads
+  }, [active, src, query, reduced]);
 
   const frame = mergeSx(
     {
@@ -345,7 +372,7 @@ export const LoopVideo = ({
         src={`${src}-poster.webp`}
         alt={alt}
         sx={frame}
-        onError={() => src === localized && setMissing(localized)}
+        onError={() => src === localized && markMissing(localized)}
       />
     );
   }

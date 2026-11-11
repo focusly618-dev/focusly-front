@@ -25,7 +25,6 @@ export const zhCN: SiteContent = {
       desc: '支持实时预览的 Markdown',
     },
     projects: { name: '项目', desc: '按项目整理你的文档' },
-    templates: { name: '模板', desc: '开箱即用的文档和计划' },
     insights: {
       name: '洞察和黄金时段',
       short: '洞察',
@@ -52,11 +51,6 @@ export const zhCN: SiteContent = {
       desc: '在同一周内规划脚本、录制和发布。',
     },
     pricing: { name: '价格', desc: 'Free 和 Pro 套餐' },
-    help: { name: '帮助中心', desc: '分步指南和解答' },
-    changelog: {
-      name: '新功能',
-      desc: '每个版本的变化与改进',
-    },
   },
 
   pages: {
@@ -169,11 +163,6 @@ export const zhCN: SiteContent = {
         ['你的信息，只为你所用', 'Lumina 只在回答你时使用你的数据。'],
       ],
     },
-    templates: {
-      group: '资源',
-      title: '更快上手的模板',
-      sub: '为你的工作区准备好结构的文档和计划。',
-    },
     students: {
       group: '适用人群',
       title: '面向学生的 Focusly',
@@ -231,16 +220,6 @@ export const zhCN: SiteContent = {
       title: '套餐与价格',
       sub: '免费开始，无需银行卡，需要时再升级。',
     },
-    help: {
-      group: '资源',
-      title: '帮助中心',
-      sub: '分步指南和解答，帮你充分利用 Focusly。',
-    },
-    changelog: {
-      group: '资源',
-      title: '新功能',
-      sub: 'Focusly 每个版本的变化与改进。',
-    },
   },
 
   nav: {
@@ -250,7 +229,6 @@ export const zhCN: SiteContent = {
     lumina: 'Lumina AI',
     who: '适用人群',
     pricing: '价格',
-    resources: '资源',
     login: '登录',
     start: '免费开始',
     openApp: '打开 Focusly',
@@ -599,7 +577,6 @@ export const zhCN: SiteContent = {
   footer: {
     tagline: '任务、日历、笔记和 AI 集中一处。',
     product: '产品',
-    resources: '资源',
     legal: '法律信息',
     terms: '条款',
     privacy: '隐私',
@@ -615,105 +592,5 @@ export const zhCN: SiteContent = {
     seePricing: '查看价格',
     explore: '继续探索',
     finalTitle: '你的下一周，已经安排好了',
-    useTemplate: '使用模板',
-    preview: '预览',
-    filterTemplates: '筛选模板',
-    helpSearchLabel: '搜索帮助中心',
-    helpPlaceholder: '搜索指南或问题',
-    helpEmpty: '没有找到与“{q}”相关的结果。',
-    helpContactTitle: '没找到你要的内容？',
-    helpContactDesc: '给我们留言，我们会尽快回复。',
-    helpContact: '联系我们',
   },
-
-  help: [
-    {
-      icon: 'rocket_launch',
-      title: '快速入门',
-      desc: '用魔法链接或 Google 创建账号，并设置你的工作时间。',
-    },
-    {
-      icon: 'checklist',
-      title: '任务',
-      desc: '收件箱、今天、即将到来、优先级、标签和子任务。',
-    },
-    {
-      icon: 'calendar_month',
-      title: '日历和 Google 日历',
-      desc: '连接你的账号并了解同步方式。',
-    },
-    {
-      icon: 'auto_awesome',
-      title: 'Lumina AI',
-      desc: '@ 提及、附件和周计划。',
-    },
-    {
-      icon: 'description',
-      title: '工作区',
-      desc: 'Markdown 文档、项目和模板。',
-    },
-    {
-      icon: 'manage_accounts',
-      title: '账号与账单',
-      desc: '套餐、语言、主题和账号删除。',
-    },
-  ],
-
-  changelog: [
-    {
-      version: 'Workspaces 2.0',
-      date: '[PENDIENTE: fecha]',
-      tag: '新功能',
-      title: 'Workspaces 2.0 正式上线',
-      desc: '[PENDIENTE: resumen real de los cambios]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: '改进',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: '修复',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-  ],
-
-  templateCategories: ['全部', '规划', '学习', '工作', '内容'],
-  templates: [
-    {
-      cat: '规划',
-      name: '每周规划',
-      desc: '目标、优先级和本周回顾。',
-    },
-    {
-      cat: '学习',
-      name: '学习计划',
-      desc: '主题、考试日期和复习时段。',
-    },
-    {
-      cat: '工作',
-      name: '客户跟进表',
-      desc: '每位客户的范围、交付物和笔记。',
-    },
-    {
-      cat: '工作',
-      name: '会议记录',
-      desc: '参会人、决定和后续步骤。',
-    },
-    {
-      cat: '工作',
-      name: '技术文档',
-      desc: '背景、决策和规格说明。',
-    },
-    {
-      cat: '内容',
-      name: '视频脚本',
-      desc: '创意、结构、脚本和发布检查清单。',
-    },
-  ],
 };

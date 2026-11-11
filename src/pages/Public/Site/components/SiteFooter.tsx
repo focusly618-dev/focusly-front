@@ -20,7 +20,6 @@ const PRODUCT_LINKS: PageSlug[] = [
   'insights',
   'pricing',
 ];
-const RESOURCE_LINKS: PageSlug[] = ['help', 'changelog', 'templates'];
 
 export const SiteFooter = () => {
   const t = useSiteTokens();
@@ -35,13 +34,6 @@ export const SiteFooter = () => {
       title: c.footer.product,
       links: PRODUCT_LINKS.map((slug) => ({
         label: c.items[slug].short ?? c.items[slug].name,
-        href: PAGES[slug].path,
-      })),
-    },
-    {
-      title: c.footer.resources,
-      links: RESOURCE_LINKS.map((slug) => ({
-        label: c.items[slug].name,
         href: PAGES[slug].path,
       })),
     },

@@ -7,7 +7,6 @@ import {
   PAGES,
   PAGE_SLUGS,
   PRODUCT_COLUMNS,
-  RESOURCE_SLUGS,
   SIGNUP_PATH,
   SPY_SECTIONS,
   WHO_SLUGS,
@@ -68,7 +67,6 @@ export const useNavModel = () => {
       items: col.slugs.map(entry),
     })),
     who: WHO_SLUGS.map(entry),
-    resources: RESOURCE_SLUGS.map(entry),
     // On the home page these jump to their section; elsewhere, to their page.
     luminaHref: isHome ? '#lumina' : PAGES.lumina.path,
     pricingHref: isHome ? '#precios' : PAGES.pricing.path,

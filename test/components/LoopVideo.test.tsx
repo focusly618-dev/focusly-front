@@ -55,17 +55,26 @@ describe('the site loop videos', () => {
 
   it("fall back to Spanish when a language's video won't load", () => {
     i18n.language = 'en';
-    const { container } = render(<LoopVideo name="tasks-hero" alt="" />);
+    const { container, unmount } = render(
+      <LoopVideo name="focus-hero" alt="" />,
+    );
 
-    // Once: maybe just an expired link, so it asks again
-    failLoad(container);
-    expect(sources(container)[0]).toBe('tasks-hero-light-en.webm?r=1');
-
-    // Twice: not there, so the Spanish one plays instead
+    // A language's video that never loaded isn't there: no retry for it
     failLoad(container);
     expect(sources(container)).toEqual([
-      'tasks-hero-light.webm',
-      'tasks-hero-light.mp4',
+      'focus-hero-light.webm',
+      'focus-hero-light.mp4',
     ]);
+    unmount();
+
+    // Later in the session the same video goes straight to Spanish
+    const again = render(<LoopVideo name="focus-hero" alt="" />);
+    expect(sources(again.container)[0]).toBe('focus-hero-light.webm');
+  });
+
+  it('ask again for a video that played before (an expired link)', () => {
+    const { container } = render(<LoopVideo name="tasks-hero" alt="" />);
+    failLoad(container);
+    expect(sources(container)[0]).toBe('tasks-hero-light.webm?r=1');
   });
 });

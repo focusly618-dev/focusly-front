@@ -25,7 +25,6 @@ export const en: SiteContent = {
       desc: 'Markdown with live preview',
     },
     projects: { name: 'Projects', desc: 'Group your documents by project' },
-    templates: { name: 'Templates', desc: 'Ready-to-use documents and plans' },
     insights: {
       name: 'Insights & golden window',
       short: 'Insights',
@@ -52,11 +51,6 @@ export const en: SiteContent = {
       desc: 'Plan scripting, recording and publishing in the same week.',
     },
     pricing: { name: 'Pricing', desc: 'Free and Pro plans' },
-    help: { name: 'Help center', desc: 'Step-by-step guides and answers' },
-    changelog: {
-      name: "What's new",
-      desc: 'Changes and improvements in every release',
-    },
   },
 
   pages: {
@@ -226,11 +220,6 @@ export const en: SiteContent = {
         ],
       ],
     },
-    templates: {
-      group: 'Resources',
-      title: 'Templates to get started faster',
-      sub: 'Documents and plans with a ready-to-use structure for your workspaces.',
-    },
     students: {
       group: 'Who it’s for',
       title: 'Focusly for students',
@@ -309,16 +298,6 @@ export const en: SiteContent = {
       title: 'Plans and pricing',
       sub: 'Start free, no card needed, and upgrade when you need to.',
     },
-    help: {
-      group: 'Resources',
-      title: 'Help center',
-      sub: 'Step-by-step guides and answers to get the most out of Focusly.',
-    },
-    changelog: {
-      group: 'Resources',
-      title: "What's new",
-      sub: 'The changes and improvements in every Focusly release.',
-    },
   },
 
   nav: {
@@ -328,7 +307,6 @@ export const en: SiteContent = {
     lumina: 'Lumina AI',
     who: 'Who it’s for',
     pricing: 'Pricing',
-    resources: 'Resources',
     login: 'Log in',
     start: 'Start free',
     openApp: 'Open Focusly',
@@ -678,7 +656,6 @@ export const en: SiteContent = {
   footer: {
     tagline: 'Tasks, calendar, notes and AI in one place.',
     product: 'Product',
-    resources: 'Resources',
     legal: 'Legal',
     terms: 'Terms',
     privacy: 'Privacy',
@@ -694,105 +671,5 @@ export const en: SiteContent = {
     seePricing: 'See pricing',
     explore: 'Keep exploring',
     finalTitle: 'Your next week, already organized',
-    useTemplate: 'Use template',
-    preview: 'preview',
-    filterTemplates: 'Filter templates',
-    helpSearchLabel: 'Search the help center',
-    helpPlaceholder: 'Search for a guide or a question',
-    helpEmpty: 'No results for “{q}”.',
-    helpContactTitle: 'Can’t find what you’re looking for?',
-    helpContactDesc: 'Write to us and we’ll get back to you.',
-    helpContact: 'Contact us',
   },
-
-  help: [
-    {
-      icon: 'rocket_launch',
-      title: 'Getting started',
-      desc: 'Create your account with a magic link or Google and set your schedule.',
-    },
-    {
-      icon: 'checklist',
-      title: 'Tasks',
-      desc: 'Inbox, today, upcoming, priorities, tags and subtasks.',
-    },
-    {
-      icon: 'calendar_month',
-      title: 'Calendar & Google Calendar',
-      desc: 'Connect your account and understand the sync.',
-    },
-    {
-      icon: 'auto_awesome',
-      title: 'Lumina AI',
-      desc: '@ mentions, attachments and weekly plans.',
-    },
-    {
-      icon: 'description',
-      title: 'Workspaces',
-      desc: 'Markdown documents, projects and templates.',
-    },
-    {
-      icon: 'manage_accounts',
-      title: 'Account & billing',
-      desc: 'Plans, language, theme and account deletion.',
-    },
-  ],
-
-  changelog: [
-    {
-      version: 'Workspaces 2.0',
-      date: '[PENDIENTE: fecha]',
-      tag: 'New',
-      title: 'Workspaces 2.0 is here',
-      desc: '[PENDIENTE: resumen real de los cambios]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: 'Improvement',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-    {
-      version: '[PENDIENTE]',
-      date: '[PENDIENTE: fecha]',
-      tag: 'Fix',
-      title: '[PENDIENTE: título]',
-      desc: '[PENDIENTE: descripción]',
-    },
-  ],
-
-  templateCategories: ['All', 'Planning', 'Study', 'Work', 'Content'],
-  templates: [
-    {
-      cat: 'Planning',
-      name: 'Weekly planning',
-      desc: 'Goals, priorities and the week’s review.',
-    },
-    {
-      cat: 'Study',
-      name: 'Study plan',
-      desc: 'Topics, exam dates and review sessions.',
-    },
-    {
-      cat: 'Work',
-      name: 'Client tracker',
-      desc: 'Scope, deliverables and notes for each client.',
-    },
-    {
-      cat: 'Work',
-      name: 'Meeting notes',
-      desc: 'Attendees, decisions and next steps.',
-    },
-    {
-      cat: 'Work',
-      name: 'Technical docs',
-      desc: 'Context, decisions and specification.',
-    },
-    {
-      cat: 'Content',
-      name: 'Video script',
-      desc: 'Idea, structure, script and publishing checklist.',
-    },
-  ],
 };
